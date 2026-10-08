@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 import { CourseParticipants } from '../CourseParticipants';
@@ -23,10 +23,11 @@ const participant = (
   id: string,
   firstName: string,
   matrixUserHandle: string | null = null,
-  extra: { picture?: string | null; externalProfile?: string | null } = {}
+  extra: { picture?: string | null; externalProfile?: string | null; isGuest?: boolean } = {}
 ) => ({
   __typename: 'CourseParticipant',
   userId: id,
+  isGuest: extra.isGuest ?? false,
   User: {
     __typename: 'User',
     id,
@@ -46,6 +47,8 @@ const withData = (rows: unknown[], count: number) =>
     },
   });
 
+const expand = () => fireEvent.click(screen.getByRole('button', { name: /participants.count/ }));
+
 describe('CourseParticipants', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -57,6 +60,7 @@ describe('CourseParticipants', () => {
     withData([participant('me', 'Ich'), participant('u2', 'Aisha'), participant('u3', 'Leon')], 3);
 
     render(<CourseParticipants courseId={1} currentUserId="me" />);
+    expand();
 
     expect(screen.getByText('Aisha Test')).toBeInTheDocument();
     expect(screen.getByText('Leon Test')).toBeInTheDocument();
@@ -67,6 +71,7 @@ describe('CourseParticipants', () => {
     withData([participant('u2', 'Aisha', 'aisha.test.ab12cd'), participant('u3', 'Leon', null)], 3);
 
     render(<CourseParticipants courseId={1} currentUserId="me" />);
+    expand();
 
     const links = screen.getAllByRole('link');
     expect(links).toHaveLength(1);
@@ -78,6 +83,7 @@ describe('CourseParticipants', () => {
     withData([participant('me', 'Ich'), participant('u2', 'Aisha'), participant('u3', 'Leon')], 50);
 
     render(<CourseParticipants courseId={1} currentUserId="me" />);
+    expand();
 
     // 50 total - the viewer - the 2 shown = 47
     expect(screen.getByText(/participants.and_more:\{"count":47\}/)).toBeInTheDocument();
@@ -87,6 +93,7 @@ describe('CourseParticipants', () => {
     withData([participant('me', 'Ich'), participant('u2', 'Aisha')], 2);
 
     render(<CourseParticipants courseId={1} currentUserId="me" />);
+    expand();
 
     expect(screen.queryByText(/participants.and_more/)).not.toBeInTheDocument();
   });
@@ -125,8 +132,42 @@ describe('CourseParticipants', () => {
     );
 
     render(<CourseParticipants courseId={1} currentUserId="me" />);
+    expand();
 
     const names = screen.getAllByText(/Test$/).map((el) => el.textContent);
     expect(names).toEqual(['Photo Test', 'HandleAndLink Test', 'Bare Test']);
+  });
+
+  it('starts collapsed with a face stack and the head count, and expands on demand', () => {
+    const rows = Array.from({ length: 10 }, (_, i) => participant(`u${i}`, `P${i}`));
+    withData([participant('me', 'Ich'), ...rows], 70);
+
+    render(<CourseParticipants courseId={1} currentUserId="me" />);
+
+    const toggle = screen.getByRole('button', { name: /participants.count:\{"count":70\}/ });
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.queryByText('P0 Test')).not.toBeInTheDocument();
+    // 69 others, 6 of them in the stack
+    expect(screen.getByText('+63')).toBeInTheDocument();
+
+    fireEvent.click(toggle);
+
+    expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByText('P0 Test')).toBeInTheDocument();
+    expect(screen.getByText('participants.show_less')).toBeInTheDocument();
+  });
+
+  it('lists guests and marks them', () => {
+    withData(
+      [participant('u2', 'Aisha'), participant('g1', 'Gast', null, { isGuest: true })],
+      3
+    );
+
+    render(<CourseParticipants courseId={1} currentUserId="me" />);
+
+    expect(screen.getByText(/participants.guest_count:\{"count":1\}/)).toBeInTheDocument();
+    expand();
+    expect(screen.getByText('Gast Test')).toBeInTheDocument();
+    expect(screen.getAllByText('participants.guest_badge')).toHaveLength(1);
   });
 });

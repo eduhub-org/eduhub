@@ -9,13 +9,14 @@ import { gql } from '@apollo/client';
  * status, so this cannot reveal who merely applied.
  */
 export const COURSE_PARTICIPANTS = gql`
-  query CourseParticipants($courseId: Int!, $limit: Int = 48) {
+  query CourseParticipants($courseId: Int!, $limit: Int = 500) {
     CourseParticipant(
       where: { courseId: { _eq: $courseId } }
       order_by: { User: { firstName: asc, lastName: asc } }
       limit: $limit
     ) {
       userId
+      isGuest
       User {
         id
         firstName

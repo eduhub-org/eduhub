@@ -244,12 +244,15 @@ select_permissions:
           # matrixUserHandle rides along so the directory can offer a direct
           # message; it is a chat handle inside a room these two already share,
           # not a contact detail like email, which stays out of this role.
+          # REGISTERED on both sides: direct event signups, guests included,
+          # are participants too (see the CourseParticipant view).
           - CourseEnrollments:
               _and:
                 - status:
                     _in:
                       - CONFIRMED
                       - COMPLETED
+                      - REGISTERED
                 - Course:
                     CourseEnrollments:
                       _and:
@@ -259,6 +262,7 @@ select_permissions:
                             _in:
                               - CONFIRMED
                               - COMPLETED
+                              - REGISTERED
           # Instructors and speakers of a course you are taking part in. The
           # anonymous branches above are bounded to published courses, and an
           # instructor is not enrolled in their own course, so without these two

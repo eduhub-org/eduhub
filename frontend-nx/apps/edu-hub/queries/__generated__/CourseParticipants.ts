@@ -35,6 +35,7 @@ export interface CourseParticipants_CourseParticipant_User {
 export interface CourseParticipants_CourseParticipant {
   __typename: "CourseParticipant";
   userId: any | null;
+  isGuest: boolean | null;
   /**
    * An object relationship
    */

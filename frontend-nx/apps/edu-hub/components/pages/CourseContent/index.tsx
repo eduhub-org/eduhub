@@ -253,6 +253,12 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
     (courseEnrollment?.status === CourseEnrollmentStatus_enum.CONFIRMED ||
       courseEnrollment?.status === CourseEnrollmentStatus_enum.COMPLETED);
 
+  // Direct event signups (REGISTERED) take part as much as confirmed applicants,
+  // so they get the participant list too - the same statuses the
+  // CourseParticipant permission accepts.
+  const canSeeParticipants =
+    isLoggedInParticipant || (isLoggedIn && courseEnrollment?.status === CourseEnrollmentStatus_enum.REGISTERED);
+
   return (
     <div>
       {getCoursesAuthorizedLoading || getCoursesUnauthorizedLoading ? (
@@ -395,7 +401,7 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
               {/* Below attendances: only asked for by someone taking part, the
                   Hasura permission returns an empty list to anyone else, so this
                   saves a pointless round trip rather than guarding it. */}
-              {isLoggedInParticipant && (
+              {canSeeParticipants && (
                 <div className="min-w-0 text-white mx-6 xl:mx-0">
                   <CourseParticipants courseId={course.id} currentUserId={userId} />
                 </div>
