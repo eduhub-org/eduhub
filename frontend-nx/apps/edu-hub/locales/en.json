@@ -390,7 +390,6 @@
       "optional": "optional",
       "program_session": "Cross-course",
       "program_session_tooltip": "Takes place for all courses of “{program}”",
-      "optional_hint": "All sessions are mandatory unless marked “optional”.",
       "untitled_session": "Agenda item",
       "add_to_calendar_short": "Calendar"
     },

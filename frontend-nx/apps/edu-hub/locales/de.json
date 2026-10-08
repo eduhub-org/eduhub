@@ -390,7 +390,6 @@
       "optional": "optional",
       "program_session": "Kursübergreifend",
       "program_session_tooltip": "Findet für alle Kurse von „{program}“ statt",
-      "optional_hint": "Alle Termine sind Pflicht, außer als „optional“ markierte.",
       "untitled_session": "Programmpunkt",
       "add_to_calendar_short": "Kalender"
     },
