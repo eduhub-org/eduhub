@@ -28,5 +28,4 @@ export interface CreateUserVariables {
   firstName: string;
   lastName: string;
   email: string;
-  sendEmail: boolean;
 }

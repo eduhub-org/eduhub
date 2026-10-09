@@ -1,29 +1,45 @@
-import { FC, useCallback, useMemo, useRef, useState } from 'react';
-import { useTranslations } from 'next-intl';
-import { useLocale } from 'next-intl';
+import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
+import listPlugin from '@fullcalendar/list';
 import interactionPlugin from '@fullcalendar/interaction';
-import { EventClickArg, EventInput } from '@fullcalendar/core';
+import deLocale from '@fullcalendar/core/locales/de';
+import { DatesSetArg, EventClickArg, EventContentArg, EventInput } from '@fullcalendar/core';
 
 import { Page } from '../../layout/Page';
 import CommonPageHeader from '../../common/CommonPageHeader';
-import { useAdminQuery } from '../../../hooks/authedQuery';
-import { CALENDAR_SESSIONS, CALENDAR_COURSES } from '../../../queries/calendarSessions';
+import DropDownSelector from '../../inputs/DropDownSelector';
+import { useIsAdmin } from '../../../hooks/authentication';
+import { useLazyRoleQuery, useManageQuery } from '../../../hooks/authedQuery';
+import { useManageProgramWhere } from '../../../hooks/manageScope';
+import { useMediaQuery } from '../../../hooks/useMediaQuery';
+import { CALENDAR_SESSIONS } from '../../../queries/calendarSessions';
+import { CalendarSessions, CalendarSessions_Session } from '../../../queries/__generated__/CalendarSessions';
+import { PROGRAMS_WITH_MINIMUM_PROPERTIES } from '../../../queries/programList';
+import { Programs } from '../../../queries/__generated__/Programs';
 import { getLocationColor } from '../../../helpers/calendarColors';
 import { generateICalString, downloadICalFile } from '../../../helpers/icalExport';
-import { LocationOption_enum } from '../../../__generated__/globalTypes';
 
-import { Checkbox, FormControlLabel, FormGroup } from '@mui/material';
-
-import CalendarLegend from './CalendarLegend';
+import CalendarFilters from './CalendarFilters';
 import SessionDetailPopover from './SessionDetailPopover';
-
-interface CourseListItem {
-  id: number;
-  title: string;
-}
+import {
+  ALL_PROGRAMS,
+  CalendarRange,
+  Publication,
+  SessionKind,
+  addressesOfSessions,
+  buildSessionWhere,
+  coursesOfSessions,
+  filterSessions,
+  isOutsideLecturePeriod,
+  resolveAddress,
+  resolveLocation,
+  scopedProgramIds,
+  sessionKind,
+  sessionProgram,
+} from './calendarSessions';
 
 interface SessionDetail {
   id: number;
@@ -38,221 +54,189 @@ interface SessionDetail {
   speakers: { firstName: string; lastName: string }[];
 }
 
-function resolveLocation(session: any): string | undefined {
-  if (session.SessionAddresses?.length > 0) {
-    const addr = session.SessionAddresses[0];
-    return addr.CourseLocation?.locationOption ?? undefined;
-  }
-  if (session.Course?.CourseLocations?.length > 0) {
-    return session.Course.CourseLocations[0].locationOption;
-  }
-  return undefined;
-}
+type Tag = { id: number; name: string };
 
-function resolveAddress(session: any): string | undefined {
-  if (session.SessionAddresses?.length === 0) return undefined;
-  const addr = session.SessionAddresses[0];
-  const direct = addr.address?.trim();
-  if (direct) return direct;
-  const fromLocation =
-    addr.LocationAddress?.address?.trim() || addr.LocationAddress?.shortLabel?.trim();
-  if (fromLocation) return fromLocation;
-  return addr.CourseLocation?.defaultSessionAddress?.trim() || undefined;
-}
+const EXPORT_PAGE_SIZE = 2000;
 
-const LOCATIONS = [LocationOption_enum.KIEL, LocationOption_enum.HEIDE, LocationOption_enum.ONLINE];
+const withSelected = (options: Tag[], selected: Tag[]): Tag[] => [
+  ...options,
+  ...selected.filter((tag) => !options.some((option) => option.id === tag.id)),
+];
 
-function BulkToggleCheckbox({
-  checked,
-  indeterminate,
-  onChange,
-  label,
-}: {
-  checked: boolean;
-  indeterminate: boolean;
-  onChange: () => void;
-  label: string;
-}) {
+const sessionHeadline = (session: CalendarSessions_Session) => session.Course?.title || session.title;
+const sessionSubline = (session: CalendarSessions_Session) => (session.Course ? session.title : '');
+
+const renderEventContent = (arg: EventContentArg) => {
+  const { subline, address } = arg.event.extendedProps;
   return (
-    <FormControlLabel
-      control={
-        <Checkbox
-          checked={checked}
-          indeterminate={indeterminate}
-          onChange={onChange}
-          size="small"
-          sx={{
-            color: 'var(--eduhub-label-secondary)',
-            '&.Mui-checked': { color: 'var(--eduhub-brand)' },
-            '&.MuiCheckbox-indeterminate': { color: 'var(--eduhub-brand)' },
-          }}
-        />
-      }
-      label={label}
-      className="text-label-secondary m-0"
-      sx={{ '& .MuiFormControlLabel-label': { color: 'var(--eduhub-label-primary)' } }}
-    />
+    <div className="eduhub-calendar-event">
+      {arg.timeText && <span className="eduhub-calendar-event-time">{arg.timeText}</span>}
+      <span className="eduhub-calendar-event-title">{arg.event.title}</span>
+      {subline && <span className="eduhub-calendar-event-sub">{subline}</span>}
+      {address && arg.view.type !== 'dayGridMonth' && <span className="eduhub-calendar-event-sub">{address}</span>}
+    </div>
   );
-}
+};
 
 const CalendarContent: FC = () => {
   const t = useTranslations();
   const locale = useLocale();
+  const isAdmin = useIsAdmin();
+  const isMobile = useMediaQuery('(max-width: 767px)');
   const calendarRef = useRef<FullCalendar>(null);
 
+  const [programSelection, setProgramSelection] = useState<string>(ALL_PROGRAMS);
+  const [range, setRange] = useState<CalendarRange | null>(null);
+  const [viewType, setViewType] = useState('dayGridMonth');
+  const [kinds, setKinds] = useState<SessionKind[]>(['COURSES', 'EVENTS']);
+  const [locations, setLocations] = useState<string[]>([]);
+  const [publication, setPublication] = useState<Publication[]>(['PUBLISHED', 'UNPUBLISHED']);
+  const [selectedCourses, setSelectedCourses] = useState<Tag[]>([]);
+  const [selectedAddresses, setSelectedAddresses] = useState<Tag[]>([]);
   const [popoverAnchor, setPopoverAnchor] = useState<HTMLElement | null>(null);
   const [selectedSession, setSelectedSession] = useState<SessionDetail | null>(null);
-  const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
-  const [selectedCourseIds, setSelectedCourseIds] = useState<number[]>([]);
-  const [showCourses, setShowCourses] = useState(true);
-  const [showEvents, setShowEvents] = useState(true);
 
-  const coursesWhere = useMemo(() => {
-    if (!showCourses && !showEvents) {
-      return { id: { _eq: -1 } }; // no courses when neither selected
-    }
-    if (showCourses && !showEvents) {
-      return { Program: { type: { _neq: 'EVENTS' } } };
-    }
-    if (!showCourses && showEvents) {
-      return { Program: { type: { _eq: 'EVENTS' } } };
-    }
-    return {};
-  }, [showCourses, showEvents]);
-
-  const { data: coursesData, error: coursesError } = useAdminQuery(CALENDAR_COURSES, {
-    variables: { where: coursesWhere },
+  // Super-admins see every program, org admins only the programs they manage.
+  const programWhere = useManageProgramWhere();
+  const programsQuery = useManageQuery<Programs>(PROGRAMS_WITH_MINIMUM_PROPERTIES, {
+    variables: { where: programWhere },
   });
+  const programs = useMemo(() => programsQuery.data?.Program ?? [], [programsQuery.data]);
 
-  const courseList = useMemo<CourseListItem[]>(
-    () => (coursesData?.Course ?? []).map((c: { id: number; title: string }) => ({ id: c.id, title: c.title })),
-    [coursesData?.Course]
+  // An admin of a single program gets that program's calendar without a selector.
+  const showProgramSelector = programs.length > 1;
+  const effectiveSelection = programs.length === 1 ? String(programs[0].id) : programSelection;
+  const selectedProgram = programs.find((program) => String(program.id) === effectiveSelection);
+
+  const programOptions = useMemo(() => {
+    const multipleOrganizations = new Set(programs.map((program) => program.organizationId)).size > 1;
+    return [
+      { value: ALL_PROGRAMS, label: t('calendar.program_all') },
+      ...programs.map((program) => ({
+        value: String(program.id),
+        label: multipleOrganizations ? `${program.title} · ${program.Organization.name}` : program.title,
+      })),
+    ];
+  }, [programs, t]);
+
+  const programIds = useMemo(
+    () => scopedProgramIds(effectiveSelection, programs, isAdmin),
+    [effectiveSelection, programs, isAdmin]
   );
 
-  const validCourseIds = useMemo(
-    () => selectedCourseIds.filter((id) => courseList.some((c) => c.id === id)),
-    [selectedCourseIds, courseList]
-  );
-
-  const where = useMemo(() => {
-    const conditions: unknown[] = [];
-    if (validCourseIds.length > 0) {
-      conditions.push({ courseId: { _in: validCourseIds } });
-    }
-    if (selectedLocations.length > 0) {
-      const locs = selectedLocations as LocationOption_enum[];
-      conditions.push({
-        _or: [
-          { SessionAddresses: { CourseLocation: { locationOption: { _in: locs } } } },
-          { Course: { CourseLocations: { locationOption: { _in: locs } } } },
-        ],
-      });
-    }
-    // Filter by type: Kurse (non-EVENTS programs) vs Events (EVENTS program)
-    if (!showCourses && !showEvents) {
-      conditions.push({ courseId: { _eq: -1 } }); // show nothing
-    } else if (showCourses && !showEvents) {
-      conditions.push({ Course: { Program: { type: { _neq: 'EVENTS' } } } });
-    } else if (!showCourses && showEvents) {
-      conditions.push({ Course: { Program: { type: { _eq: 'EVENTS' } } } });
-    }
-    if (conditions.length === 0) return {};
-    if (conditions.length === 1) return conditions[0];
-    return { _and: conditions };
-  }, [validCourseIds, selectedLocations, showCourses, showEvents]);
-
-  const { data, loading, error } = useAdminQuery(CALENDAR_SESSIONS, {
-    variables: { where },
-    skip: validCourseIds.length > 0 && courseList.length === 0,
+  const sessionsQuery = useManageQuery<CalendarSessions>(CALENDAR_SESSIONS, {
+    variables: { where: buildSessionWhere(programIds, range) },
+    skip: !range || programsQuery.loading || (programIds !== null && programIds.length === 0),
   });
+  const [loadAllSessions, exportQuery] = useLazyRoleQuery<CalendarSessions>(CALENDAR_SESSIONS);
 
-  const handleLocationToggle = useCallback((location: string) => {
-    setSelectedLocations((prev) =>
-      prev.includes(location) ? prev.filter((l) => l !== location) : [...prev, location]
-    );
-  }, []);
+  const sessions = useMemo(() => sessionsQuery.data?.Session ?? [], [sessionsQuery.data]);
+  // The type filter only applies across programs; a single program has a single type.
+  const showKindFilter = effectiveSelection === ALL_PROGRAMS;
+  const filters = useMemo(
+    () => ({
+      kinds: showKindFilter ? kinds : (['COURSES', 'EVENTS'] as SessionKind[]),
+      publication,
+      locations,
+      courseIds: selectedCourses.map((course) => course.id),
+      addresses: selectedAddresses.map((address) => address.name),
+    }),
+    [showKindFilter, kinds, publication, locations, selectedCourses, selectedAddresses]
+  );
+  const visibleSessions = useMemo(() => filterSessions(sessions, filters), [sessions, filters]);
 
-  const handleCourseToggle = useCallback((courseId: number) => {
-    setSelectedCourseIds((prev) =>
-      prev.includes(courseId) ? prev.filter((id) => id !== courseId) : [...prev, courseId]
-    );
-  }, []);
-
-  const allTypesSelected = showCourses && showEvents;
-  const handleSelectAllTypes = useCallback(() => {
-    setShowCourses(true);
-    setShowEvents(true);
-  }, []);
-  const handleDeselectAllTypes = useCallback(() => {
-    setShowCourses(false);
-    setShowEvents(false);
-  }, []);
-
-  const allLocationsSelected = LOCATIONS.every((loc) => selectedLocations.includes(loc));
-  const handleSelectAllLocations = useCallback(() => {
-    setSelectedLocations([...LOCATIONS]);
-  }, []);
-  const handleDeselectAllLocations = useCallback(() => {
-    setSelectedLocations([]);
-  }, []);
-
-  const allCoursesSelected =
-    courseList.length > 0 && courseList.every((c) => selectedCourseIds.includes(c.id));
-  const handleSelectAllCourses = useCallback(() => {
-    setSelectedCourseIds(courseList.map((c) => c.id));
-  }, [courseList]);
-  const handleDeselectAllCourses = useCallback(() => {
-    setSelectedCourseIds([]);
-  }, []);
-
-  const events: EventInput[] = useMemo(() => {
-    if (!data?.Session) return [];
-
-    return data.Session.map((session: any) => {
-      const location = resolveLocation(session);
-      const colors = getLocationColor(location);
-      const courseTitle = session.Course?.title || '';
-      // Classify by Program.type (shortTitle is a free-text label); keep shortTitle for display only.
-      const isEvent = session.Course?.Program?.type === 'EVENTS';
-      const address = resolveAddress(session);
-
-      const titleLine = courseTitle + (session.title ? ` – ${session.title}` : '');
-      const displayTitle = address ? `${titleLine}\n${address}` : titleLine;
-
-      return {
-        id: String(session.id),
-        title: displayTitle,
-        start: session.startDateTime,
-        end: session.endDateTime,
-        backgroundColor: colors.background,
-        borderColor: colors.border,
-        textColor: colors.text,
-        classNames: isEvent ? ['fc-event-event-type'] : [],
-        extendedProps: {
-          sessionId: session.id,
-          sessionTitle: session.title || '',
-          courseTitle,
-          programTitle: session.Course?.Program?.shortTitle || session.Course?.Program?.title || '',
-          isEvent,
-          description: session.description || '',
-          location,
-          address,
-          speakers:
-            session.SessionSpeakers?.map((sp: any) => ({
-              firstName: sp.User?.firstName || '',
-              lastName: sp.User?.lastName || '',
-            })) || [],
-        },
-      };
+  // Course and address options come from the loaded range; selected tags stay among the options when
+  // they have no sessions in it, so the selector keeps showing them.
+  const courseOptions = useMemo(
+    () => withSelected(coursesOfSessions(sessions), selectedCourses),
+    [sessions, selectedCourses]
+  );
+  // Addresses have no id of their own; give each one a stable id for the tag selector.
+  const addressIds = useRef(new Map<string, number>());
+  const addressOptions = useMemo(() => {
+    const options = addressesOfSessions(sessions).map((name) => {
+      if (!addressIds.current.has(name)) addressIds.current.set(name, addressIds.current.size + 1);
+      return { id: addressIds.current.get(name) as number, name };
     });
-  }, [data]);
+    return withSelected(options, selectedAddresses);
+  }, [sessions, selectedAddresses]);
+
+  const events: EventInput[] = useMemo(
+    () =>
+      visibleSessions.map((session) => {
+        const location = resolveLocation(session);
+        const colors = getLocationColor(location);
+        const program = sessionProgram(session);
+        return {
+          id: String(session.id),
+          title: sessionHeadline(session),
+          start: session.startDateTime,
+          end: session.endDateTime,
+          backgroundColor: colors.background,
+          borderColor: colors.border,
+          textColor: colors.text,
+          classNames: sessionKind(session) === 'EVENTS' ? ['fc-event-event-type'] : [],
+          extendedProps: {
+            sessionId: session.id,
+            subline: sessionSubline(session),
+            programTitle: program?.shortTitle || program?.title || '',
+            description: session.description || '',
+            location,
+            address: resolveAddress(session),
+            speakers: session.SessionSpeakers.map((speaker) => ({
+              firstName: speaker.User?.firstName || '',
+              lastName: speaker.User?.lastName || '',
+            })),
+          },
+        };
+      }),
+    [visibleSessions]
+  );
+
+  // Keep the view fitting the screen: an agenda list on phones, the month grid elsewhere.
+  useEffect(() => {
+    const api = calendarRef.current?.getApi();
+    if (!api) return;
+    if (isMobile && api.view.type !== 'listWeek' && api.view.type !== 'timeGridDay') {
+      api.changeView('listWeek');
+    } else if (!isMobile && api.view.type === 'listWeek') {
+      api.changeView('dayGridMonth');
+    }
+  }, [isMobile]);
+
+  const handleDatesSet = useCallback((arg: DatesSetArg) => {
+    setViewType(arg.view.type);
+    setRange((prev) =>
+      prev && prev.start.getTime() === arg.start.getTime() && prev.end.getTime() === arg.end.getTime()
+        ? prev
+        : { start: arg.start, end: arg.end }
+    );
+  }, []);
+
+  const handleProgramChange = useCallback(
+    (value: string) => {
+      setProgramSelection(value);
+      setSelectedCourses([]);
+      setSelectedAddresses([]);
+      // Land on the program's lecture period rather than on an empty month.
+      const program = programs.find((p) => String(p.id) === value);
+      const api = calendarRef.current?.getApi();
+      if (program && api && isOutsideLecturePeriod(program, api.getDate())) {
+        api.gotoDate(program.lectureStart);
+      }
+    },
+    [programs]
+  );
+
+  const toggle = <T,>(list: T[], value: T) =>
+    list.includes(value) ? list.filter((item) => item !== value) : [...list, value];
 
   const handleEventClick = useCallback((info: EventClickArg) => {
     const props = info.event.extendedProps;
     setSelectedSession({
       id: props.sessionId,
-      title: props.sessionTitle,
-      courseTitle: props.courseTitle,
+      title: props.subline,
+      courseTitle: info.event.title,
       programTitle: props.programTitle,
       startDateTime: info.event.startStr,
       endDateTime: info.event.endStr,
@@ -269,207 +253,152 @@ const CalendarContent: FC = () => {
     setSelectedSession(null);
   }, []);
 
-  const handleExportICal = useCallback(() => {
-    if (!data?.Session) return;
-
-    const icalEvents = data.Session.map((session: any) => {
-      const courseTitle = session.Course?.title || '';
+  // The export covers every session of the selected program(s) that matches the filters, not just
+  // the visible range.
+  const handleExportICal = useCallback(async () => {
+    const where = buildSessionWhere(programIds, null);
+    const allSessions: CalendarSessions_Session[] = [];
+    for (let offset = 0; ; offset += EXPORT_PAGE_SIZE) {
+      const { data, error: pageError } = await loadAllSessions({
+        variables: { where, limit: EXPORT_PAGE_SIZE, offset },
+      });
+      // A failed page shows up through exportQuery.error; never export a partial calendar.
+      if (pageError || !data) return;
+      allSessions.push(...data.Session);
+      if (data.Session.length < EXPORT_PAGE_SIZE) break;
+    }
+    const icalEvents = filterSessions(allSessions, filters).map((session) => {
       const location = resolveLocation(session);
       const address = resolveAddress(session);
-
+      const subline = sessionSubline(session);
       return {
         uid: `session-${session.id}@eduhub`,
-        title: courseTitle + (session.title ? ` – ${session.title}` : ''),
+        title: sessionHeadline(session) + (subline ? ` – ${subline}` : ''),
         startDateTime: session.startDateTime,
         endDateTime: session.endDateTime,
         description: session.description || undefined,
         location: [location, address].filter(Boolean).join(' – ') || undefined,
       };
     });
+    if (icalEvents.length === 0) return;
+    downloadICalFile(generateICalString(icalEvents, selectedProgram?.title ?? 'EduHub Calendar'));
+  }, [loadAllSessions, programIds, filters, selectedProgram]);
 
-    const icalString = generateICalString(icalEvents, 'EduHub Calendar');
-    downloadICalFile(icalString);
-  }, [data]);
+  const error = programsQuery.error || sessionsQuery.error || exportQuery.error;
+  const noPrograms = !programsQuery.loading && programs.length === 0;
 
   return (
     <Page>
-      <div className="max-w-screen-xl mx-auto mt-20 text-label-primary">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="mx-auto mt-20 max-w-screen-xl px-3 text-label-primary sm:px-0">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <CommonPageHeader headline={t('calendar.title')} />
-          <button
-            onClick={handleExportICal}
-            disabled={!data?.Session?.length}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-bg-secondary hover:bg-border-primary 
-              text-sm text-label-primary transition-colors disabled:opacity-40 disabled:cursor-not-allowed
-              self-start sm:self-auto mt-0 sm:mt-6 border border-border-primary"
-          >
-            {t('calendar.export_ical')}
-          </button>
-        </div>
-
-        <div className="flex flex-col lg:flex-row lg:items-start gap-6 mb-6">
-          <div className="flex flex-col sm:flex-row gap-6 sm:gap-8">
-            <div>
-              <p className="text-sm font-medium text-label-secondary mb-2">{t('calendar.filter_type')}</p>
-              <FormGroup row className="gap-x-4 mb-4">
-                <BulkToggleCheckbox
-                  checked={allTypesSelected}
-                  indeterminate={!allTypesSelected && (showCourses || showEvents)}
-                  onChange={() => (allTypesSelected ? handleDeselectAllTypes() : handleSelectAllTypes())}
-                  label={t('calendar.filter_type_all')}
+          <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end">
+            {!showProgramSelector && selectedProgram && (
+              <span className="self-start rounded-full bg-bg-secondary px-4 py-2 text-sm text-label-secondary sm:self-auto">
+                {selectedProgram.title}
+              </span>
+            )}
+            {showProgramSelector && (
+              <div className="w-full sm:w-72">
+                <DropDownSelector
+                  variant="eduhub"
+                  label={t('calendar.program')}
+                  value={effectiveSelection}
+                  options={programOptions}
+                  onValueUpdated={handleProgramChange}
                 />
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={showCourses}
-                      onChange={() => setShowCourses((v) => !v)}
-                      size="small"
-                      sx={{
-                        color: 'var(--eduhub-label-secondary)',
-                        '&.Mui-checked': { color: 'var(--eduhub-brand)' },
-                      }}
-                    />
-                  }
-                  label={t('calendar.filter_courses')}
-                  className="text-label-secondary m-0"
-                  sx={{ '& .MuiFormControlLabel-label': { color: 'var(--eduhub-label-primary)' } }}
-                />
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={showEvents}
-                      onChange={() => setShowEvents((v) => !v)}
-                      size="small"
-                      sx={{
-                        color: 'var(--eduhub-label-secondary)',
-                        '&.Mui-checked': { color: 'var(--eduhub-brand)' },
-                      }}
-                    />
-                  }
-                  label={t('calendar.filter_events')}
-                  className="text-label-secondary m-0"
-                  sx={{ '& .MuiFormControlLabel-label': { color: 'var(--eduhub-label-primary)' } }}
-                />
-              </FormGroup>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-label-secondary mb-2">{t('calendar.filter_location')}</p>
-              <FormGroup row className="gap-x-4">
-                <BulkToggleCheckbox
-                  checked={allLocationsSelected}
-                  indeterminate={selectedLocations.length > 0 && !allLocationsSelected}
-                  onChange={() =>
-                    allLocationsSelected ? handleDeselectAllLocations() : handleSelectAllLocations()
-                  }
-                  label={t('calendar.filter_location_all')}
-                />
-                {LOCATIONS.map(
-                  (loc) => (
-                    <FormControlLabel
-                      key={loc}
-                      control={
-                        <Checkbox
-                          checked={selectedLocations.includes(loc)}
-                          onChange={() => handleLocationToggle(loc)}
-                          size="small"
-                          sx={{
-                            color: 'var(--eduhub-label-secondary)',
-                            '&.Mui-checked': { color: 'var(--eduhub-brand)' },
-                          }}
-                        />
-                      }
-                      label={t(`common.location.${loc}`)}
-                      className="text-label-secondary m-0"
-                      sx={{ '& .MuiFormControlLabel-label': { color: 'var(--eduhub-label-primary)' } }}
-                    />
-                  )
-                )}
-              </FormGroup>
-            </div>
-            <div className="min-w-0">
-              <p className="text-sm font-medium text-label-secondary mb-2">{t('calendar.filter_course')}</p>
-              <div className="flex flex-wrap gap-x-4 gap-y-0 max-h-28 overflow-y-auto overflow-x-hidden pr-2">
-                {courseList.length > 0 && (
-                  <BulkToggleCheckbox
-                    checked={allCoursesSelected}
-                    indeterminate={selectedCourseIds.length > 0 && !allCoursesSelected}
-                    onChange={() =>
-                      allCoursesSelected ? handleDeselectAllCourses() : handleSelectAllCourses()
-                    }
-                    label={t('calendar.filter_course_all')}
-                  />
-                )}
-                {courseList.map((c) => (
-                  <FormControlLabel
-                    key={c.id}
-                    control={
-                      <Checkbox
-                        checked={selectedCourseIds.includes(c.id)}
-                        onChange={() => handleCourseToggle(c.id)}
-                        size="small"
-                        sx={{
-                          color: 'var(--eduhub-label-secondary)',
-                          '&.Mui-checked': { color: 'var(--eduhub-brand)' },
-                        }}
-                      />
-                    }
-                    label={c.title}
-                    className="text-label-secondary m-0"
-                    sx={{ '& .MuiFormControlLabel-label': { color: 'var(--eduhub-label-primary)' } }}
-                  />
-                ))}
               </div>
-            </div>
+            )}
+            <button
+              type="button"
+              onClick={handleExportICal}
+              disabled={noPrograms || exportQuery.loading}
+              className="self-start whitespace-nowrap rounded-full border-2 border-label-primary px-4 py-2 text-sm
+                text-label-primary transition-colors hover:border-brand disabled:cursor-not-allowed
+                disabled:opacity-40 sm:self-auto"
+            >
+              {t('calendar.export_ical')}
+            </button>
           </div>
-          <CalendarLegend />
         </div>
 
-        {error || coursesError ? (
-          <div className="text-center py-20 text-red-600">
-            {t('calendar.error_loading')}: {(error || coursesError)?.message}
-          </div>
-        ) : loading ? (
-          <div className="text-center py-20 text-label-secondary">
-            {t('common.loading')}
+        {noPrograms ? (
+          <div className="rounded-xl border border-border-primary bg-bg-card py-16 text-center text-label-secondary">
+            {t('calendar.no_programs')}
           </div>
         ) : (
-          <div className="light eduhub-calendar bg-fill-primary rounded-xl p-2 sm:p-4 shadow-lg border border-border-primary">
-            <FullCalendar
-              ref={calendarRef}
-              plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-              initialView="dayGridMonth"
-              headerToolbar={{
-                left: 'prev,next today',
-                center: 'title',
-                right: 'dayGridMonth,timeGridWeek,timeGridDay',
-              }}
-              locale={locale}
-              events={events}
-              eventClick={handleEventClick}
-              height="auto"
-              eventTimeFormat={{
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: false,
-              }}
-              slotLabelFormat={{
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: false,
-              }}
-              dayMaxEvents={3}
-              nowIndicator
-              eventDisplay="block"
-              eventClassNames="cursor-pointer rounded text-xs"
+          <div className="flex flex-col gap-4">
+            <CalendarFilters
+              key={effectiveSelection}
+              showKindFilter={showKindFilter}
+              kinds={kinds}
+              onToggleKind={(kind) => setKinds((prev) => toggle(prev, kind))}
+              publication={publication}
+              onTogglePublication={(state) => setPublication((prev) => toggle(prev, state))}
+              locations={locations}
+              onToggleLocation={(location) => setLocations((prev) => toggle(prev, location))}
+              onClearLocations={() => setLocations([])}
+              courseOptions={courseOptions}
+              courses={selectedCourses}
+              onCoursesChange={setSelectedCourses}
+              addressOptions={addressOptions}
+              addresses={selectedAddresses}
+              onAddressesChange={setSelectedAddresses}
             />
+
+            {error && (
+              <div className="rounded-xl border border-error px-4 py-3 text-sm text-error">
+                {t('calendar.error_loading')}: {error.message}
+              </div>
+            )}
+
+            {/* The calendar stays mounted while loading so navigating does not reset its date. */}
+            <div className="light eduhub-calendar relative rounded-2xl border border-border-primary bg-fill-primary p-2 shadow-lg sm:p-4">
+              {sessionsQuery.loading && (
+                <div className="absolute right-4 top-4 z-10 rounded-full bg-bg-secondary px-3 py-1 text-xs text-label-secondary sm:top-auto sm:bottom-4">
+                  {t('common.loading')}
+                </div>
+              )}
+              {!sessionsQuery.loading && !error && range && viewType !== 'listWeek' && visibleSessions.length === 0 && (
+                <div className="pointer-events-none absolute inset-x-0 top-1/2 z-10 flex justify-center">
+                  <span className="rounded-full bg-bg-secondary px-4 py-2 text-sm text-label-secondary shadow">
+                    {t('calendar.no_sessions_in_range')}
+                  </span>
+                </div>
+              )}
+              <FullCalendar
+                ref={calendarRef}
+                plugins={[dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin]}
+                initialView="dayGridMonth"
+                headerToolbar={
+                  isMobile
+                    ? { left: 'prev,next', center: 'title', right: 'today' }
+                    : { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek,listWeek' }
+                }
+                footerToolbar={isMobile ? { center: 'listWeek,timeGridDay,dayGridMonth' } : undefined}
+                locales={[deLocale]}
+                locale={locale}
+                firstDay={1}
+                events={events}
+                eventContent={renderEventContent}
+                eventClick={handleEventClick}
+                datesSet={handleDatesSet}
+                height="auto"
+                eventTimeFormat={{ hour: '2-digit', minute: '2-digit', hour12: false }}
+                slotLabelFormat={{ hour: '2-digit', minute: '2-digit', hour12: false }}
+                slotMinTime="07:00:00"
+                slotMaxTime="23:00:00"
+                dayMaxEvents={3}
+                nowIndicator
+                eventDisplay="block"
+                eventClassNames="cursor-pointer"
+                noEventsContent={t('calendar.no_sessions_in_range')}
+              />
+            </div>
           </div>
         )}
 
-        <SessionDetailPopover
-          session={selectedSession}
-          anchorEl={popoverAnchor}
-          onClose={handleClosePopover}
-        />
+        <SessionDetailPopover session={selectedSession} anchorEl={popoverAnchor} onClose={handleClosePopover} />
       </div>
     </Page>
   );

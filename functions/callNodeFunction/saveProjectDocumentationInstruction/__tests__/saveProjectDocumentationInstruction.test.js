@@ -21,7 +21,7 @@ jest.unstable_mockModule('graphql-request', () => {
 });
 
 jest.unstable_mockModule('../../saveFile/index.js', () => ({
-  default: mockSaveFile,
+  saveFileUnchecked: mockSaveFile,
 }));
 
 const { default: saveProjectDocumentationInstruction } = await import('../index.js');

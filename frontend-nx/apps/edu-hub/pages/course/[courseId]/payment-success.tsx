@@ -7,6 +7,7 @@ import { CheckCircle, Error as ErrorIcon } from '@mui/icons-material';
 import { useAuthedQuery } from '../../../hooks/authedQuery';
 import { COURSE } from '../../../queries/course';
 import { Course, CourseVariables } from '../../../queries/__generated__/Course';
+import { ProgramType } from '../../../types/enums';
 
 /**
  * Payment success page that polls for webhook completion.
@@ -74,6 +75,7 @@ export default function PaymentSuccessPage() {
   }, [session_id, courseId]);
 
   const course = courseData?.Course_by_pk;
+  const isEvent = course?.Program?.type === ProgramType.EVENTS;
 
   if (error) {
     return (
@@ -96,7 +98,7 @@ export default function PaymentSuccessPage() {
           {error}
         </Typography>
         <Button variant="contained" onClick={() => router.push(`/course/${courseId}`)}>
-          {t('modal.payment.back_to_course')}
+          {t(isEvent ? 'modal.payment.back_to_course_event' : 'modal.payment.back_to_course')}
         </Button>
       </Box>
     );
@@ -154,7 +156,7 @@ export default function PaymentSuccessPage() {
           variant="contained"
           onClick={() => router.push(`/course/${courseId}`)}
         >
-          {t('modal.payment.view_course')}
+          {t(isEvent ? 'modal.payment.view_course_event' : 'modal.payment.view_course')}
         </Button>
         <Button
           variant="outlined"

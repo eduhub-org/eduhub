@@ -30,6 +30,15 @@ object_relationships:
         remote_table:
           name: DegreeParticipationStats
           schema: public
+  - name: AttendanceStats
+    using:
+      manual_configuration:
+        column_mapping:
+          id: enrollmentId
+        insertion_order: null
+        remote_table:
+          name: CourseEnrollmentAttendanceStats
+          schema: public
 array_relationships:
   - name: CourseEnrollmentAddons
     using:
@@ -177,6 +186,7 @@ select_permissions:
         - isTest
         - cancellationRequestedAt
         - cancellationRequestReason
+        - questionnaireResponse
       filter: {}
       allow_aggregations: true
   - role: user_access
@@ -237,6 +247,7 @@ select_permissions:
         - isTest
         - cancellationRequestedAt
         - cancellationRequestReason
+        - questionnaireResponse
       filter:
         _or:
           - Course:

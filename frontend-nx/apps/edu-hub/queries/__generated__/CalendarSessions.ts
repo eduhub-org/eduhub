@@ -9,6 +9,24 @@ import { Session_bool_exp, LocationOption_enum } from "./../../__generated__/glo
 // GraphQL query operation: CalendarSessions
 // ====================================================
 
+export interface CalendarSessions_Session_Program {
+  __typename: "Program";
+  id: number;
+  type: string;
+  /**
+   * The title of the program
+   */
+  title: string;
+  /**
+   * The 6 letter short title for the program.
+   */
+  shortTitle: string | null;
+  /**
+   * Decides whether the courses of this program can be published or not. (Courses are ony published if the filed publised in the Course table is also set to true.)
+   */
+  published: boolean;
+}
+
 export interface CalendarSessions_Session_Course_CourseLocations {
   __typename: "CourseLocation";
   id: number;
@@ -34,6 +52,10 @@ export interface CalendarSessions_Session_Course_Program {
    * The 6 letter short title for the program.
    */
   shortTitle: string | null;
+  /**
+   * Decides whether the courses of this program can be published or not. (Courses are ony published if the filed publised in the Course table is also set to true.)
+   */
+  published: boolean;
 }
 
 export interface CalendarSessions_Session_Course {
@@ -43,6 +65,10 @@ export interface CalendarSessions_Session_Course {
    * The title of the course (only editable by an admin user)
    */
   title: string;
+  /**
+   * Decides whether the course is published for all users or not.
+   */
+  published: boolean;
   /**
    * An array relationship
    */
@@ -141,6 +167,11 @@ export interface CalendarSessions_Session {
    * The ID of the course the session belongs to
    */
   courseId: number | null;
+  programId: number | null;
+  /**
+   * An object relationship
+   */
+  Program: CalendarSessions_Session_Program | null;
   /**
    * An object relationship
    */
@@ -165,4 +196,5 @@ export interface CalendarSessions {
 export interface CalendarSessionsVariables {
   where?: Session_bool_exp | null;
   limit?: number | null;
+  offset?: number | null;
 }

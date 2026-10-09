@@ -2,6 +2,7 @@ import { gql } from "@apollo/client";
 import { User_bool_exp, UserStatus_enum } from "../__generated__/globalTypes";
 import { AuthRoles } from "../types/enums";
 import { USER_FRAGMENT } from "./userFragment";
+import { ENROLLMENT_HISTORY_FRAGMENT } from "./enrollmentHistoryFragment";
 
 /** User picker where-clause. org_admin cannot filter on status in Hasura, so ACTIVE is omitted there. */
 export function buildUserSelectionFilter(
@@ -107,6 +108,7 @@ export const USER_SELECTION_TWO_PARAMS = gql`
 `;
 
 export const USERS_BY_LAST_NAME = gql`
+  ${ENROLLMENT_HISTORY_FRAGMENT}
   query UsersByLastName(
     $limit: Int = 10
     $offset: Int = 0
@@ -131,21 +133,8 @@ export const USERS_BY_LAST_NAME = gql`
         id
         name
       }
-      CourseEnrollments {
-        id
-        courseId
-        userId
-        status
-        updated_at
-        Course {
-          id
-          title
-          Program {
-            id
-            title
-            shortTitle
-          }
-        }
+      CourseEnrollments(where: { isTest: { _eq: false } }) {
+        ...EnrollmentHistoryFragment
       }
     }
     User_aggregate(where: $filter) {
@@ -182,8 +171,8 @@ export const USER_OCCUPATION = gql`
 `;
 
 export const CREATE_USER = gql`
-  mutation CreateUser($firstName: String!, $lastName: String!, $email: String!, $sendEmail: Boolean!) {
-    createUser(firstName: $firstName, lastName: $lastName, email: $email, sendEmail: $sendEmail) {
+  mutation CreateUser($firstName: String!, $lastName: String!, $email: String!) {
+    createUser(firstName: $firstName, lastName: $lastName, email: $email) {
       success
       userId
       keycloakUserId

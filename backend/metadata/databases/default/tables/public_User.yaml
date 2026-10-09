@@ -244,21 +244,30 @@ select_permissions:
           # matrixUserHandle rides along so the directory can offer a direct
           # message; it is a chat handle inside a room these two already share,
           # not a contact detail like email, which stays out of this role.
-          - CourseEnrollments:
-              _and:
-                - status:
-                    _in:
-                      - CONFIRMED
-                      - COMPLETED
-                - Course:
-                    CourseEnrollments:
-                      _and:
-                        - userId:
-                            _eq: X-Hasura-User-Id
-                        - status:
-                            _in:
-                              - CONFIRMED
-                              - COMPLETED
+          # REGISTERED on both sides: direct event signups, guests included,
+          # are participants too (see the CourseParticipant view). Anonymized
+          # users are left out, as in that view: anonymization keeps
+          # matrixUserHandle, and the handle carries the original name.
+          - _and:
+              - status:
+                  _neq: DELETED
+              - CourseEnrollments:
+                  _and:
+                    - status:
+                        _in:
+                          - CONFIRMED
+                          - COMPLETED
+                          - REGISTERED
+                    - Course:
+                        CourseEnrollments:
+                          _and:
+                            - userId:
+                                _eq: X-Hasura-User-Id
+                            - status:
+                                _in:
+                                  - CONFIRMED
+                                  - COMPLETED
+                                  - REGISTERED
           # Instructors and speakers of a course you are taking part in. The
           # anonymous branches above are bounded to published courses, and an
           # instructor is not enrolled in their own course, so without these two
@@ -275,6 +284,7 @@ select_permissions:
                         _in:
                           - CONFIRMED
                           - COMPLETED
+                          - REGISTERED
           - SessionSpeakers:
               Session:
                 Course:
@@ -286,6 +296,7 @@ select_permissions:
                           _in:
                             - CONFIRMED
                             - COMPLETED
+                            - REGISTERED
       limit: 100
   # Org admins with canManageSettings may read contact details of users they administer (and their
   # own record) when managing an organization's admin team on /manage/settings/access. status/updated_at

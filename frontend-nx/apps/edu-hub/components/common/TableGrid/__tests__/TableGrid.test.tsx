@@ -142,6 +142,53 @@ describe('TableGrid per-row options', () => {
     expect(screen.getByText('Locked').closest('.locked-row')).toBeInTheDocument();
     expect(screen.getByText('Editable').closest('.locked-row')).not.toBeInTheDocument();
   });
+
+  it('lets an expanded row open its neighbour and marks the row opened last as active', () => {
+    Element.prototype.scrollIntoView = jest.fn();
+    render(
+      <TableGrid<TestRow>
+        columns={columns}
+        data={[
+          { id: 1, name: 'First' },
+          { id: 2, name: 'Second' },
+          { id: 3, name: 'Third' },
+        ]}
+        enablePagination={false}
+        error={undefined}
+        loading={false}
+        pageIndex={0}
+        onPageChange={jest.fn()}
+        refetchQueries={[]}
+        searchFilter=""
+        onSearchFilterChange={jest.fn()}
+        showGlobalSearchField={false}
+        expandableRowComponent={({ row, isActive, expandNext, expandPrevious }) => (
+          <div>
+            <span>
+              details {row.name} {isActive ? 'active' : 'inactive'}
+            </span>
+            {expandNext && <button onClick={expandNext}>next of {row.name}</button>}
+            {expandPrevious && <button onClick={expandPrevious}>previous of {row.name}</button>}
+          </div>
+        )}
+      />
+    );
+
+    fireEvent.click(screen.getAllByRole('button', { name: 'common.table_grid.expand_row' })[0]);
+    expect(screen.getByText('details First active')).toBeInTheDocument();
+    // The first row has no previous one.
+    expect(screen.queryByText('previous of First')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByText('next of First'));
+    expect(screen.queryByText(/details First/)).not.toBeInTheDocument();
+    expect(screen.getByText('details Second active')).toBeInTheDocument();
+    expect(Element.prototype.scrollIntoView).toHaveBeenCalled();
+
+    fireEvent.click(screen.getByText('next of Second'));
+    // The last row has no next one.
+    expect(screen.getByText('details Third active')).toBeInTheDocument();
+    expect(screen.queryByText('next of Third')).not.toBeInTheDocument();
+  });
 });
 
 /** jsdom has no matchMedia; answer every query with `matches`. */
@@ -203,6 +250,18 @@ describe('TableGrid responsive options', () => {
     expect(screen.queryByText('Extra')).not.toBeInTheDocument();
     expect(screen.queryByText('extra cell')).not.toBeInTheDocument();
     expect(screen.getByText('Row one')).toBeInTheDocument();
+  });
+
+  it('also drops hideBelow columns that are keyed by a nested accessor', () => {
+    mockMatchMedia(true);
+    renderGrid({
+      columns: [
+        ...columns,
+        { accessorKey: 'owner.name', header: 'Owner', meta: { hideBelow: 'xl' }, cell: () => 'owner cell' },
+      ],
+    });
+    expect(screen.queryByText('Owner')).not.toBeInTheDocument();
+    expect(screen.queryByText('owner cell')).not.toBeInTheDocument();
   });
 
   it('renders the mobile card summary on phones when one is provided', () => {

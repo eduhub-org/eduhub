@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { CourseEnrollment_bool_exp, CourseEnrollment_order_by, CourseRegistrationType_enum, CourseEnrollmentStatus_enum, InvoiceStatus_enum, UserStatus_enum, MotivationRating_enum } from "./../../__generated__/globalTypes";
+import { CourseEnrollment_bool_exp, CourseEnrollment_order_by, CourseRegistrationType_enum, CourseEnrollmentStatus_enum, InvoiceStatus_enum, MotivationRating_enum, UserStatus_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: ManagedCourseApplications
@@ -52,10 +52,19 @@ export interface ManagedCourseApplications_Course_by_pk_CourseEnrollments_User_O
 
 export interface ManagedCourseApplications_Course_by_pk_CourseEnrollments_User_CourseEnrollments_Course_Program {
   __typename: "Program";
+  id: number;
+  /**
+   * The title of the program
+   */
+  title: string;
   /**
    * The 6 letter short title for the program.
    */
   shortTitle: string | null;
+  /**
+   * The first day a course lecture can possibly be in this program.
+   */
+  lectureStart: any | null;
 }
 
 export interface ManagedCourseApplications_Course_by_pk_CourseEnrollments_User_CourseEnrollments_Course {
@@ -75,8 +84,16 @@ export interface ManagedCourseApplications_Course_by_pk_CourseEnrollments_User_C
   Program: ManagedCourseApplications_Course_by_pk_CourseEnrollments_User_CourseEnrollments_Course_Program;
 }
 
+export interface ManagedCourseApplications_Course_by_pk_CourseEnrollments_User_CourseEnrollments_AttendanceStats {
+  __typename: "CourseEnrollmentAttendanceStats";
+  attendedSessions: number | null;
+  totalSessions: number | null;
+  pastSessions: number | null;
+}
+
 export interface ManagedCourseApplications_Course_by_pk_CourseEnrollments_User_CourseEnrollments {
   __typename: "CourseEnrollment";
+  id: number;
   /**
    * The users current enrollment status to this course
    */
@@ -85,18 +102,19 @@ export interface ManagedCourseApplications_Course_by_pk_CourseEnrollments_User_C
    * The ID of the course of this enrollment from the given user
    */
   courseId: number;
+  created_at: any | null;
   /**
    * URL to the file containing the user's achievement certificate (if he obtained one)
    */
   achievementCertificateURL: string | null;
   /**
-   * URL to the file containing the user's attendance certificate (if he obtained one)
-   */
-  attendanceCertificateURL: string | null;
-  /**
    * An object relationship
    */
   Course: ManagedCourseApplications_Course_by_pk_CourseEnrollments_User_CourseEnrollments_Course;
+  /**
+   * An object relationship
+   */
+  AttendanceStats: ManagedCourseApplications_Course_by_pk_CourseEnrollments_User_CourseEnrollments_AttendanceStats | null;
 }
 
 export interface ManagedCourseApplications_Course_by_pk_CourseEnrollments_User {
@@ -204,6 +222,10 @@ export interface ManagedCourseApplications_Course_by_pk_CourseEnrollments {
    * Optional reason the participant gave with their cancellation request.
    */
   cancellationRequestReason: string | null;
+  /**
+   * Stored application questionnaire response. The "provider" key names the questionnaire tool (currently "formbricks"), "formatVersion" the JSON layout. Filled on demand from the applications tab and nightly by the sync_formbricks_responses cron. NULL = not fetched yet.
+   */
+  questionnaireResponse: any | null;
   /**
    * An object relationship
    */
