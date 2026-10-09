@@ -41,6 +41,7 @@ export const EXPERTS_LIST = gql`
           Program {
             id
             shortTitle
+            type
           }
         }
       }

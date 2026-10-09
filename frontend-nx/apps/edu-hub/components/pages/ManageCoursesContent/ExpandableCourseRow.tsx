@@ -797,7 +797,12 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
               />
             </Card>
 
-            <Card title={t('manageCourses.instructors.label')} description={t('manageCourses.instructors.help_text')}>
+            <Card
+              title={t(isEventCourse ? 'manageCourses.instructors.label_event' : 'manageCourses.instructors.label')}
+              description={t(
+                isEventCourse ? 'manageCourses.instructors.help_text_event' : 'manageCourses.instructors.help_text'
+              )}
+            >
               <div className="space-y-2">
                 {course.CourseInstructors.map((courseInstructor) => (
                   <Fragment key={courseInstructor.User.id}>
@@ -809,7 +814,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                   className="flex items-center space-x-2 text-blue-600 hover:text-blue-800 p-2 w-full rounded hover:bg-blue-50 transition-colors"
                 >
                   <MdAddCircle className="w-5 h-5" />
-                  <span>{t('manageCourses.instructors.add')}</span>
+                  <span>{t(isEventCourse ? 'manageCourses.instructors.add_event' : 'manageCourses.instructors.add')}</span>
                 </button>
               </div>
             </Card>
@@ -978,7 +983,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
         <SelectUserDialog
           onClose={addInstructorHandler}
           open={instructorDialogOpen}
-          title={t('manageCourses.instructors.add')}
+          title={t(isEventCourse ? 'manageCourses.instructors.add_event' : 'manageCourses.instructors.add')}
           onAddNewUser={handleAddNewUser}
           showAddNewUserOption={true}
         />

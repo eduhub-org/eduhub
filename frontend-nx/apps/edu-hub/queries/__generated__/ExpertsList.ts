@@ -16,6 +16,7 @@ export interface ExpertsList_User_CourseInstructors_Course_Program {
    * The 6 letter short title for the program.
    */
   shortTitle: string | null;
+  type: string;
 }
 
 export interface ExpertsList_User_CourseInstructors_Course {

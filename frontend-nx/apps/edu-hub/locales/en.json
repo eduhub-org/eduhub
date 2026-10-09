@@ -779,7 +779,7 @@
       "end": "End preview",
       "errors": {
         "TEST_ENROLLMENT_FAILED": "The preview could not be ended. Please try again later.",
-        "TEST_ENROLLMENT_UNAUTHORIZED": "Only instructors of this offering can use the participant view.",
+        "TEST_ENROLLMENT_UNAUTHORIZED": "Only instructors or organizers of this offering can use the participant view.",
         "TEST_ENROLLMENT_ALREADY_PARTICIPANT": "You are enrolled here for real, so there is no preview to end.",
         "TEST_ENROLLMENT_COURSE_NOT_FOUND": "This offering no longer exists.",
         "TEST_ENROLLMENT_INVALID_INPUT": "The request was malformed."
@@ -1225,8 +1225,11 @@
     },
     "instructors": {
       "label": "Instructors",
+      "label_event": "Organizers",
       "add": "Add Instructor",
-      "help_text": "Instructors can manage the offering and are named on its page."
+      "add_event": "Add organizer",
+      "help_text": "Instructors can manage the offering and are named on its page.",
+      "help_text_event": "Organizers can manage the event and are named on its page."
     },
     "funding_organizations": {
       "label": "Funding Organizations",
@@ -2115,12 +2118,12 @@
       "title": "Confidentiality of personal data",
       "intro": "Before you manage your course or event, please confirm once that you will treat participants' personal data confidentially.",
       "points": {
-        "access": "As an instructor you get access to personal data of participants and other users, for example names, email addresses, organizations, application documents and attendance.",
+        "access": "As an instructor or organizer you get access to personal data of participants and other users, for example names, email addresses, organizations, application documents and attendance.",
         "purpose": "You use this data only to run your courses and events, and only as {operator} intends.",
         "no_disclosure": "You do not pass it on to anyone else and do not use it for your own purposes, such as your own mailing lists or advertising.",
         "exports": "You keep exports and printouts (participant lists, attendance lists, name tags) safe and delete or shred them once the event is over.",
         "incidents": "If data gets lost or misused, for example a list left behind, you tell {recipient} straight away.",
-        "duration": "This commitment continues after your time as an instructor ends."
+        "duration": "This commitment continues after your time as an instructor or organizer ends."
       },
       "checkbox": "I have read this and commit to keeping personal data confidential.",
       "accept": "Confirm",
@@ -2164,7 +2167,7 @@
       "end_dialog_question": "This removes your preview enrollment. Projects only you created while previewing, and your attendances, are deleted with it.",
       "errors": {
         "TEST_ENROLLMENT_FAILED": "The preview could not be changed. Please try again later.",
-        "TEST_ENROLLMENT_UNAUTHORIZED": "Only instructors of this offering can use the participant view.",
+        "TEST_ENROLLMENT_UNAUTHORIZED": "Only instructors or organizers of this offering can use the participant view.",
         "TEST_ENROLLMENT_ALREADY_PARTICIPANT": "You are already enrolled here, so you already see the page as a participant.",
         "TEST_ENROLLMENT_COURSE_NOT_FOUND": "This offering no longer exists.",
         "TEST_ENROLLMENT_INVALID_INPUT": "The request was malformed."
@@ -2665,6 +2668,7 @@
     "role": "Role",
     "session": "Session",
     "role_instructor": "Instructor",
+    "role_organizer": "Organizer",
     "role_speaker": "Speaker",
     "no_roles": "No roles assigned"
   },
