@@ -3069,7 +3069,6 @@
     "filter_location": "Location",
     "filter_location_all": "All Locations",
     "filter_course": "Course",
-    "filter_course_all": "All Courses",
     "select_all": "Select all",
     "deselect_all": "Deselect all",
     "month_view": "Month View",
@@ -3078,7 +3077,17 @@
     "today": "Today",
     "no_sessions": "No sessions available.",
     "session_details": "Session Details",
-    "error_loading": "Error loading calendar data."
+    "error_loading": "Error loading calendar data.",
+    "program": "Program",
+    "program_all": "All programs",
+    "no_programs": "You don't manage any program whose sessions could be shown here yet.",
+    "no_sessions_in_range": "No sessions in this period.",
+    "filter_publication": "Status",
+    "filter_publication_published": "Published",
+    "filter_publication_unpublished": "Not published",
+    "filter_course_placeholder": "Start typing a course name…",
+    "filter_address": "Address",
+    "filter_address_placeholder": "Start typing an address…"
   },
   "footer": {
     "imprint": "Imprint",

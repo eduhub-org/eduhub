@@ -184,14 +184,125 @@
   color: var(--eduhub-label-secondary);
 }
 
-/* Event-type sessions: dashed border to distinguish from regular courses */
+.eduhub-calendar .fc .fc-button {
+  border-radius: 9999px;
+  padding: 0.35rem 0.9rem;
+  font-size: 0.875rem;
+  text-transform: capitalize;
+  box-shadow: none;
+}
+
+.eduhub-calendar .fc .fc-button-group > .fc-button:not(:first-child) {
+  margin-left: 0.25rem;
+}
+
+.eduhub-calendar .fc .fc-button:focus {
+  box-shadow: 0 0 0 2px var(--eduhub-brand);
+}
+
+.eduhub-calendar .fc .fc-toolbar-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.eduhub-calendar .fc .fc-col-header-cell-cushion {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--eduhub-label-secondary);
+}
+
+.eduhub-calendar .fc .fc-day-today .fc-daygrid-day-number {
+  background-color: var(--eduhub-brand);
+  border-radius: 9999px;
+  color: #ffffff;
+  margin: 2px;
+  min-width: 1.75rem;
+  text-align: center;
+}
+
+/* Session cards: tinted by location with a solid accent on the left. */
+.eduhub-calendar .fc-daygrid-block-event,
+.eduhub-calendar .fc-timegrid-event {
+  border-width: 0 0 0 3px;
+  border-radius: 6px;
+  padding: 2px 4px;
+}
+
+/* Event-type sessions: dashed outline to distinguish them from regular courses */
 .eduhub-calendar .fc-event-event-type {
+  border-width: 1px 1px 1px 3px;
   border-style: dashed;
 }
 
-/* Preserve line breaks in event titles (e.g. address on second line) */
-.eduhub-calendar .fc-event-title {
-  white-space: pre-line;
+.eduhub-calendar-event {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 0.75rem;
+  line-height: 1.25;
+}
+
+.eduhub-calendar-event-time {
+  font-weight: 600;
+  opacity: 0.8;
+}
+
+.eduhub-calendar-event-title {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.eduhub-calendar-event-sub {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  opacity: 0.85;
+}
+
+.eduhub-calendar .fc-list-event .eduhub-calendar-event,
+.eduhub-calendar .fc-list-event .eduhub-calendar-event-title,
+.eduhub-calendar .fc-list-event .eduhub-calendar-event-sub {
+  color: var(--eduhub-label-primary);
+  white-space: normal;
+  font-size: 0.875rem;
+}
+
+/* The list view shows the time in its own column. */
+.eduhub-calendar .fc-list-event .eduhub-calendar-event-time {
+  display: none;
+}
+
+.eduhub-calendar .fc .fc-list-day-cushion {
+  background-color: var(--eduhub-bg-secondary);
+}
+
+.eduhub-calendar .fc .fc-list-day-cushion a {
+  color: var(--eduhub-label-primary);
+  font-weight: 600;
+}
+
+.eduhub-calendar .fc .fc-list-event-time {
+  color: var(--eduhub-label-secondary);
+  white-space: nowrap;
+}
+
+@media (max-width: 767px) {
+  .eduhub-calendar .fc .fc-toolbar {
+    gap: 0.5rem;
+  }
+
+  .eduhub-calendar .fc .fc-toolbar-title {
+    font-size: 1rem;
+  }
+
+  .eduhub-calendar .fc .fc-button {
+    padding: 0.3rem 0.7rem;
+  }
 }
 
 /*
