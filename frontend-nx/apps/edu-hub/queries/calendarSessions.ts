@@ -1,16 +1,7 @@
 import { gql } from '@apollo/client';
 
-export const CALENDAR_COURSES = gql`
-  query CalendarCourses($where: Course_bool_exp = {}, $limit: Int = 500) {
-    Course(where: $where, order_by: { title: asc }, limit: $limit) {
-      id
-      title
-    }
-  }
-`;
-
 export const CALENDAR_SESSIONS = gql`
-  query CalendarSessions($where: Session_bool_exp = {}, $limit: Int = 1000) {
+  query CalendarSessions($where: Session_bool_exp = {}, $limit: Int = 2000) {
     Session(where: $where, order_by: { startDateTime: asc }, limit: $limit) {
       id
       startDateTime
@@ -18,6 +9,13 @@ export const CALENDAR_SESSIONS = gql`
       title
       description
       courseId
+      programId
+      Program {
+        id
+        type
+        title
+        shortTitle
+      }
       Course {
         id
         title

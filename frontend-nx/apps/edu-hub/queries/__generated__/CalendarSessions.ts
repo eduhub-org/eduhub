@@ -9,6 +9,20 @@ import { Session_bool_exp, LocationOption_enum } from "./../../__generated__/glo
 // GraphQL query operation: CalendarSessions
 // ====================================================
 
+export interface CalendarSessions_Session_Program {
+  __typename: "Program";
+  id: number;
+  type: string;
+  /**
+   * The title of the program
+   */
+  title: string;
+  /**
+   * The 6 letter short title for the program.
+   */
+  shortTitle: string | null;
+}
+
 export interface CalendarSessions_Session_Course_CourseLocations {
   __typename: "CourseLocation";
   id: number;
@@ -141,6 +155,11 @@ export interface CalendarSessions_Session {
    * The ID of the course the session belongs to
    */
   courseId: number | null;
+  programId: number | null;
+  /**
+   * An object relationship
+   */
+  Program: CalendarSessions_Session_Program | null;
   /**
    * An object relationship
    */

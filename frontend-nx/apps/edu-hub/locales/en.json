@@ -3058,7 +3058,11 @@
     "today": "Today",
     "no_sessions": "No sessions available.",
     "session_details": "Session Details",
-    "error_loading": "Error loading calendar data."
+    "error_loading": "Error loading calendar data.",
+    "program": "Program",
+    "program_all": "All programs",
+    "no_programs": "You don't manage any program whose sessions could be shown here yet.",
+    "no_sessions_in_range": "No sessions in this period."
   },
   "footer": {
     "imprint": "Imprint",

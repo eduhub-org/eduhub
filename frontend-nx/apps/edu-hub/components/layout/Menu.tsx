@@ -101,6 +101,10 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
   // Statistics entry: super-admins always see it; org admins when they hold canViewStatistics on at
   // least one organization (they then see the statistics of those organizations' programs).
   const canViewStatisticsMenu = isAdmin || (isOrgAdmin && orgAdminCaps.canViewStatistics);
+  // Calendar entry: shows the sessions of the programs the admin manages, so org admins see it when
+  // they can manage any program type.
+  const canViewCalendarMenu =
+    canManageCoursesMenu || canManageEventsMenu || canManageDegreesMenu || canManageSettingsMenu;
   // Whether the "Verwaltung" section has any entries for this user. Plain instructors have no
   // management entries and skip the section.
   const hasManagement =
@@ -202,7 +206,7 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
         </MenuItem>
       )}
 
-      {isAdmin && (
+      {canViewCalendarMenu && (
         <MenuItem
           component={Link}
           href="/manage/calendar"

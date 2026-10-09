@@ -3043,7 +3043,11 @@
     "today": "Heute",
     "no_sessions": "Keine Termine vorhanden.",
     "session_details": "Termindetails",
-    "error_loading": "Fehler beim Laden der Kalenderdaten."
+    "error_loading": "Fehler beim Laden der Kalenderdaten.",
+    "program": "Programm",
+    "program_all": "Alle Programme",
+    "no_programs": "Du verwaltest noch kein Programm, dessen Termine hier angezeigt werden könnten.",
+    "no_sessions_in_range": "Keine Termine in diesem Zeitraum."
   },
   "footer": {
     "imprint": "Impressum",
