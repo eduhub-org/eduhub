@@ -766,7 +766,10 @@
     "participants": {
       "title": "Wer ist dabei",
       "message_on_element": "Auf Element schreiben",
-      "and_more": "und {count} weitere"
+      "and_more": "und {count} weitere",
+      "count": "{count, plural, one {# Teilnehmer:in} other {# Teilnehmende}}",
+      "show_all": "Alle anzeigen",
+      "show_less": "Weniger anzeigen"
     },
     "participant_preview": {
       "notice": "Vorschau: Du siehst diese Seite als Teilnehmer:in.",

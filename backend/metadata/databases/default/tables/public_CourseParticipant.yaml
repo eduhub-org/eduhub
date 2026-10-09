@@ -25,7 +25,8 @@ select_permissions:
   # filter is the whole access rule: you must be a participant of the course
   # you are asking about, which is why the frontend query only has to name the
   # course. The view carries no enrollment status, so nothing here can reveal
-  # who merely applied.
+  # who merely applied. REGISTERED counts as taking part: it is how direct
+  # event signups (with an account or as a guest) are enrolled.
   - role: user_access_others
     permission:
       columns:
@@ -41,6 +42,7 @@ select_permissions:
                   _in:
                     - CONFIRMED
                     - COMPLETED
+                    - REGISTERED
       allow_aggregations: true
   - role: instructor_access
     permission:
