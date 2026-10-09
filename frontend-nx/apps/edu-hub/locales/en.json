@@ -760,6 +760,7 @@
       "location": "Location",
       "language": "Language",
       "price": "Price",
+      "price_depends_on_add_ons": "depending on add-ons",
       "places": "Places",
       "places_left": "{count} left",
       "places_total": "of {count}",
