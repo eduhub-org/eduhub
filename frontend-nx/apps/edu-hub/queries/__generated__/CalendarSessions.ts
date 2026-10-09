@@ -196,4 +196,5 @@ export interface CalendarSessions {
 export interface CalendarSessionsVariables {
   where?: Session_bool_exp | null;
   limit?: number | null;
+  offset?: number | null;
 }

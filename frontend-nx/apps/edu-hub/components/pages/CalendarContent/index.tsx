@@ -56,6 +56,8 @@ interface SessionDetail {
 
 type Tag = { id: number; name: string };
 
+const EXPORT_PAGE_SIZE = 2000;
+
 const withSelected = (options: Tag[], selected: Tag[]): Tag[] => [
   ...options,
   ...selected.filter((tag) => !options.some((option) => option.id === tag.id)),
@@ -254,8 +256,18 @@ const CalendarContent: FC = () => {
   // The export covers every session of the selected program(s) that matches the filters, not just
   // the visible range.
   const handleExportICal = useCallback(async () => {
-    const { data } = await loadAllSessions({ variables: { where: buildSessionWhere(programIds, null) } });
-    const icalEvents = filterSessions(data?.Session ?? [], filters).map((session) => {
+    const where = buildSessionWhere(programIds, null);
+    const allSessions: CalendarSessions_Session[] = [];
+    for (let offset = 0; ; offset += EXPORT_PAGE_SIZE) {
+      const { data, error: pageError } = await loadAllSessions({
+        variables: { where, limit: EXPORT_PAGE_SIZE, offset },
+      });
+      // A failed page shows up through exportQuery.error; never export a partial calendar.
+      if (pageError || !data) return;
+      allSessions.push(...data.Session);
+      if (data.Session.length < EXPORT_PAGE_SIZE) break;
+    }
+    const icalEvents = filterSessions(allSessions, filters).map((session) => {
       const location = resolveLocation(session);
       const address = resolveAddress(session);
       const subline = sessionSubline(session);
@@ -272,7 +284,7 @@ const CalendarContent: FC = () => {
     downloadICalFile(generateICalString(icalEvents, selectedProgram?.title ?? 'EduHub Calendar'));
   }, [loadAllSessions, programIds, filters, selectedProgram]);
 
-  const error = programsQuery.error || sessionsQuery.error;
+  const error = programsQuery.error || sessionsQuery.error || exportQuery.error;
   const noPrograms = !programsQuery.loading && programs.length === 0;
 
   return (

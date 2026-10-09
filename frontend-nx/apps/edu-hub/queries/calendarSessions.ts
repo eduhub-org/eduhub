@@ -1,8 +1,8 @@
 import { gql } from '@apollo/client';
 
 export const CALENDAR_SESSIONS = gql`
-  query CalendarSessions($where: Session_bool_exp = {}, $limit: Int = 2000) {
-    Session(where: $where, order_by: { startDateTime: asc }, limit: $limit) {
+  query CalendarSessions($where: Session_bool_exp = {}, $limit: Int = 2000, $offset: Int = 0) {
+    Session(where: $where, order_by: [{ startDateTime: asc }, { id: asc }], limit: $limit, offset: $offset) {
       id
       startDateTime
       endDateTime
