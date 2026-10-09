@@ -130,6 +130,23 @@ const saveImage = async (req) => {
     }
 
     const { base64file: _base64file, ...pathInputs } = req.body.input;
+
+    // ${userid} in the path is caller input. Without this check any logged-in
+    // user could overwrite another user's public profile picture by sending
+    // that user's id and the file name from their picture URL.
+    if ('userid' in pathInputs) {
+      const sessionVariables = req.body.session_variables || {};
+      const isAdmin = sessionVariables['x-hasura-role'] === 'admin';
+      if (!isAdmin && pathInputs.userid !== sessionVariables['x-hasura-user-id']) {
+        logger.error("Refusing image upload into another user's folder");
+        return {
+          success: false,
+          messageKey: "UNAUTHORIZED",
+          error: "You can only upload images for your own profile"
+        };
+      }
+    }
+
     const filePath = replacePlaceholders(templatePath, {
       ...pathInputs,
       filename: safeFileName,
