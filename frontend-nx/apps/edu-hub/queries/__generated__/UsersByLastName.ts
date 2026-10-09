@@ -53,6 +53,7 @@ export interface UsersByLastName_User_CourseEnrollments_AttendanceStats {
   __typename: "CourseEnrollmentAttendanceStats";
   attendedSessions: number | null;
   totalSessions: number | null;
+  pastSessions: number | null;
 }
 
 export interface UsersByLastName_User_CourseEnrollments {

@@ -6,27 +6,27 @@ import { HelpOutline } from '@mui/icons-material';
 import { EnrollmentHistoryFragment } from '../../queries/__generated__/EnrollmentHistoryFragment';
 import { CourseEnrollmentStatus_enum } from '../../__generated__/globalTypes';
 
-/**
- * Badge colour per outcome: completed, participating, open, withdrawn/expired, failed. Tints of
- * the theme tokens (the colour theme is CSS variables, so Tailwind opacity modifiers do not apply).
- */
-const tint = (token: string, percent: number) => `color-mix(in srgb, var(${token}) ${percent}%, transparent)`;
-const OPEN = 'var(--eduhub-bg-secondary)';
-const STATUS_BADGE_COLORS: Record<CourseEnrollmentStatus_enum, string> = {
-  [CourseEnrollmentStatus_enum.COMPLETED]: tint('--eduhub-success', 80),
-  [CourseEnrollmentStatus_enum.CONFIRMED]: tint('--eduhub-info', 22),
+/** Timeline dot colour per outcome: completed, participating, open, withdrawn/expired, failed. */
+const OPEN = 'var(--eduhub-label-disabled)';
+const STATUS_DOT_COLORS: Record<CourseEnrollmentStatus_enum, string> = {
+  [CourseEnrollmentStatus_enum.COMPLETED]: 'var(--eduhub-success)',
+  [CourseEnrollmentStatus_enum.CONFIRMED]: 'var(--eduhub-info)',
   [CourseEnrollmentStatus_enum.APPLIED]: OPEN,
   [CourseEnrollmentStatus_enum.INVITED]: OPEN,
   [CourseEnrollmentStatus_enum.WAITLIST]: OPEN,
   [CourseEnrollmentStatus_enum.REGISTERED]: OPEN,
-  [CourseEnrollmentStatus_enum.CANCELLED]: tint('--eduhub-warning', 45),
-  [CourseEnrollmentStatus_enum.EXPIRED]: tint('--eduhub-warning', 45),
-  [CourseEnrollmentStatus_enum.REJECTED]: tint('--eduhub-error', 30),
-  [CourseEnrollmentStatus_enum.ABORTED]: tint('--eduhub-error', 30),
+  [CourseEnrollmentStatus_enum.CANCELLED]: 'var(--eduhub-warning)',
+  [CourseEnrollmentStatus_enum.EXPIRED]: 'var(--eduhub-warning)',
+  [CourseEnrollmentStatus_enum.REJECTED]: 'var(--eduhub-error)',
+  [CourseEnrollmentStatus_enum.ABORTED]: 'var(--eduhub-error)',
 };
 
-/** Statuses for which the participant actually took part, so attendance means something. */
+/**
+ * Statuses for which the person took part (or, for direct sign-ups such as events, was signed up),
+ * so attendance means something.
+ */
 const PARTICIPATION_STATUSES = new Set<CourseEnrollmentStatus_enum>([
+  CourseEnrollmentStatus_enum.REGISTERED,
   CourseEnrollmentStatus_enum.CONFIRMED,
   CourseEnrollmentStatus_enum.COMPLETED,
   CourseEnrollmentStatus_enum.ABORTED,
@@ -81,6 +81,12 @@ export const attendanceOf = (enrollment: EnrollmentHistoryFragment) => {
   return { attended, total, percent: Math.round((attended / total) * 100) };
 };
 
+/** Mandatory sessions are over, but no attendance was recorded for them (common for events). */
+export const isAttendanceUnrecorded = (enrollment: EnrollmentHistoryFragment) =>
+  PARTICIPATION_STATUSES.has(enrollment.status) &&
+  (enrollment.AttendanceStats?.pastSessions ?? 0) > 0 &&
+  (enrollment.AttendanceStats?.totalSessions ?? 0) === 0;
+
 /** ECTS are only shown once the achievement certificate exists, i.e. when they were earned. */
 const earnedEcts = (enrollment: EnrollmentHistoryFragment) => {
   if (!enrollment.achievementCertificateURL || !enrollment.Course.ects) return null;
@@ -100,12 +106,18 @@ interface Props {
 }
 
 /**
- * A person's applications and participations, grouped by program, with a colour coded
- * outcome badge and the attendance of mandatory sessions.
+ * A person's applications and participations as a timeline, newest program first. The dot shows
+ * the outcome; a hollow dot means the sessions are over but no attendance was recorded.
  */
 export const EnrollmentHistory: FC<Props> = ({ enrollments, excludeCourseId, showLabel = true }) => {
   const t = useTranslations('enrollmentHistory');
-  const groups = useMemo(() => groupEnrollmentsByProgram(enrollments, excludeCourseId), [enrollments, excludeCourseId]);
+  const entries = useMemo(
+    () =>
+      groupEnrollmentsByProgram(enrollments, excludeCourseId).flatMap((group) =>
+        group.enrollments.map((enrollment) => ({ group, enrollment }))
+      ),
+    [enrollments, excludeCourseId]
+  );
 
   return (
     <div className="min-w-0">
@@ -117,48 +129,50 @@ export const EnrollmentHistory: FC<Props> = ({ enrollments, excludeCourseId, sho
           </Tooltip>
         </div>
       )}
-      {groups.length === 0 ? (
+      {entries.length === 0 ? (
         <div className="text-sm text-label-secondary italic">{t('empty')}</div>
       ) : (
-        <div className="space-y-3">
-          {groups.map((group) => (
-            <section key={group.programId} aria-label={group.title}>
-              <Tooltip title={group.title} placement="top-start">
-                <h4 className="inline-block text-xs font-semibold uppercase tracking-wide text-label-secondary mb-1">
-                  {group.shortTitle}
-                </h4>
-              </Tooltip>
-              <ul className="space-y-1">
-                {group.enrollments.map((enrollment) => {
-                  const attendance = attendanceOf(enrollment);
-                  const ects = earnedEcts(enrollment);
-                  return (
-                    <li
-                      key={enrollment.id}
-                      className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 text-sm text-label-primary"
-                    >
-                      <span
-                        className="shrink-0 rounded-full px-2 py-0.5 text-xs font-medium text-label-primary"
-                        style={{ backgroundColor: STATUS_BADGE_COLORS[enrollment.status] ?? OPEN }}
-                      >
-                        {t(`status.${enrollment.status}`)}
-                      </span>
-                      <span className="min-w-0 break-words">{enrollment.Course.title}</span>
-                      {ects && <span className="text-xs text-label-secondary">{t('ects', { ects })}</span>}
-                      {attendance && (
-                        <Tooltip title={t('attendance_tooltip', { total: attendance.total })} placement="top">
-                          <span className="text-xs text-label-secondary whitespace-nowrap">
-                            {t('attendance', attendance)}
-                          </span>
-                        </Tooltip>
-                      )}
-                    </li>
-                  );
-                })}
-              </ul>
-            </section>
-          ))}
-        </div>
+        <ol className="min-w-0">
+          {entries.map(({ group, enrollment }, index) => {
+            const isLast = index === entries.length - 1;
+            const attendance = attendanceOf(enrollment);
+            const unrecorded = isAttendanceUnrecorded(enrollment);
+            const ects = earnedEcts(enrollment);
+            const dotColor = STATUS_DOT_COLORS[enrollment.status] ?? OPEN;
+            return (
+              <li key={enrollment.id} className="flex gap-3">
+                <div className="flex w-3 flex-shrink-0 flex-col items-center" aria-hidden="true">
+                  <span
+                    data-testid="history-dot"
+                    className="mt-1 h-3 w-3 flex-shrink-0 rounded-full"
+                    style={unrecorded ? { border: `2px solid ${dotColor}` } : { backgroundColor: dotColor }}
+                  />
+                  {!isLast && <span className="mt-1 w-0.5 flex-1 bg-table-divider" />}
+                </div>
+                <div className={`min-w-0 flex-1 ${isLast ? '' : 'pb-4'}`}>
+                  <Tooltip title={group.title} placement="top-start">
+                    <div className="inline-block text-[11px] font-semibold text-label-secondary">{group.shortTitle}</div>
+                  </Tooltip>
+                  <div className="text-sm font-semibold text-label-primary break-words">{enrollment.Course.title}</div>
+                  <div className="text-xs text-label-secondary">
+                    {t(`status.${enrollment.status}`)}
+                    {attendance && (
+                      <Tooltip title={t('attendance_tooltip', { total: attendance.total })} placement="top">
+                        <span className="whitespace-nowrap"> · {t('attendance', attendance)}</span>
+                      </Tooltip>
+                    )}
+                    {unrecorded && (
+                      <Tooltip title={t('attendance_not_recorded_tooltip')} placement="top">
+                        <span className="whitespace-nowrap"> · {t('attendance_not_recorded')}</span>
+                      </Tooltip>
+                    )}
+                    {ects && <span className="whitespace-nowrap"> · {t('ects', { ects })}</span>}
+                  </div>
+                </div>
+              </li>
+            );
+          })}
+        </ol>
       )}
     </div>
   );

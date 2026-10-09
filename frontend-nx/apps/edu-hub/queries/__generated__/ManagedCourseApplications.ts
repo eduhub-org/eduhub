@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { CourseEnrollment_bool_exp, CourseEnrollment_order_by, CourseRegistrationType_enum, CourseEnrollmentStatus_enum, InvoiceStatus_enum, UserStatus_enum, MotivationRating_enum } from "./../../__generated__/globalTypes";
+import { CourseEnrollment_bool_exp, CourseEnrollment_order_by, CourseRegistrationType_enum, CourseEnrollmentStatus_enum, InvoiceStatus_enum, MotivationRating_enum, UserStatus_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: ManagedCourseApplications
@@ -88,6 +88,7 @@ export interface ManagedCourseApplications_Course_by_pk_CourseEnrollments_User_C
   __typename: "CourseEnrollmentAttendanceStats";
   attendedSessions: number | null;
   totalSessions: number | null;
+  pastSessions: number | null;
 }
 
 export interface ManagedCourseApplications_Course_by_pk_CourseEnrollments_User_CourseEnrollments {
