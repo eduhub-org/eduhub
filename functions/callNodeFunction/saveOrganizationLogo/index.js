@@ -1,7 +1,7 @@
 import { GraphQLClient, gql } from 'graphql-request';
 import { Storage } from '@google-cloud/storage';
 
-import saveImage from '../saveImage/index.js';
+import { saveImageUnchecked } from '../saveImage/index.js';
 import { buildCloudStorage } from '../lib/cloud-storage.js';
 import { authorizeOrganizationAdminFieldChange } from '../lib/organizationAdminFieldAuthorization.js';
 
@@ -90,7 +90,8 @@ export default async function saveOrganizationLogo(req, logger) {
 
     // The path template, bucket and sizes still come from the action headers, so
     // the storage layout stays declared in the metadata next to the other uploads.
-    const uploadResult = await saveImage(req);
+    // Authorized above, so the generic per-record upload check does not apply.
+    const uploadResult = await saveImageUnchecked(req);
     if (!uploadResult?.success) {
       return uploadResult;
     }

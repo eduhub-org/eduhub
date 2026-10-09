@@ -12,9 +12,11 @@ import { EXPERTS_LIST } from '../../../queries/experts';
 import { ExpertsList_User } from '../../../queries/__generated__/ExpertsList';
 import { PageBlock } from '../../common/PageBlock';
 import CommonPageHeader from '../../common/CommonPageHeader';
+import { ProgramType } from '../../../types/enums';
 
 interface ExpertRole {
   type: 'instructor' | 'speaker';
+  isEvent?: boolean;
   courseTitle: string;
   programShortTitle: string;
   sessionTitle?: string;
@@ -32,6 +34,7 @@ const ExpandableExpertRow: FC<{ row: ExpertsList_User }> = ({ row }) => {
       if (ci.Course) {
         result.push({
           type: 'instructor',
+          isEvent: ci.Course.Program?.type === ProgramType.EVENTS,
           courseTitle: ci.Course.title,
           programShortTitle: ci.Course.Program?.shortTitle || '',
         });
@@ -79,7 +82,7 @@ const ExpandableExpertRow: FC<{ row: ExpertsList_User }> = ({ row }) => {
           </div>
           <div className="md:col-span-2 truncate text-xs md:text-sm">{role.programShortTitle}</div>
           <div className="md:col-span-3 text-xs md:text-sm">
-            {role.type === 'instructor' ? t('role_instructor') : t('role_speaker')}
+            {role.type === 'speaker' ? t('role_speaker') : role.isEvent ? t('role_organizer') : t('role_instructor')}
           </div>
           <div className="md:col-span-3 truncate text-xs md:text-sm" title={role.sessionTitle || ''}>
             {role.sessionTitle || '-'}

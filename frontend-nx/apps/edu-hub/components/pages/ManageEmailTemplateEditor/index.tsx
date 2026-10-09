@@ -71,6 +71,7 @@ const ManageEmailTemplateEditor: FC<ManageEmailTemplateEditorProps> = ({ templat
         '\\[Session:ReminderTime\\]': 'tomorrow',
         '\\[System:PasswordResetLink\\]': 'https://keycloak.example.com/reset',
         '\\[System:PortalUrl\\]': 'https://edu.opencampus.sh',
+        '\\[System:PrivacyPolicyLink\\]': 'https://edu.opencampus.sh/privacy',
         // StuJo job board
         '\\[JobPosting:Title\\]': 'Werkstudent:in Frontend',
         '\\[JobPosting:Type\\]': 'Studentenjob',

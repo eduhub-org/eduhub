@@ -203,7 +203,12 @@ export const EMAIL_VARIABLES = {
     '[System:PortalUrl]': {
       description: 'Portal URL for user login',
       example: 'https://edu.opencampus.sh',
-      categories: ['general']
+      categories: ['general', 'organizer']
+    },
+    '[System:PrivacyPolicyLink]': {
+      description: 'Link to the privacy policy',
+      example: 'https://edu.opencampus.sh/privacy',
+      categories: ['general', 'organizer']
     }
   },
 
@@ -447,6 +452,12 @@ export function createVariableReplacer(data, formatDate) {
       .replaceAll('[OrganizationClaim:Verification]', escape(data.organizationClaim?.verification || ''))
       .replaceAll('[OrganizationClaim:AdminUrl]', data.organizationClaim?.adminUrl || '')
       .replaceAll('[OrganizationClaim:ContactEmail]', escape(data.organizationClaim?.contactEmail || ''));
+
+    // System links - always attempt replacement
+    const portalUrl = data.portalUrl || process.env.FRONTEND_URL || 'https://edu.opencampus.sh';
+    result = result
+      .replaceAll('[System:PortalUrl]', portalUrl)
+      .replaceAll('[System:PrivacyPolicyLink]', `${portalUrl}/privacy`);
 
     // Session variables (for reminders) - always attempt replacement
     result = result

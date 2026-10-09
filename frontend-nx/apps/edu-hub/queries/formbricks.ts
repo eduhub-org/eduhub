@@ -21,6 +21,7 @@ export const GET_FORMBRICKS_RESPONSES = gql`
         finished
         answers {
           questionId
+          questionType
           headline
           answer
           rawAnswer

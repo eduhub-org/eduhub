@@ -28,7 +28,8 @@ export type EditorVariable = { text: string; label: string; categories?: string[
 
 /**
  * Determine template category based on template type.
- * ORGANIZER_ADDED uses 'organizer' category (user + course placeholders only, no enrollment dates).
+ * ORGANIZER_ADDED and SESSION_SPEAKER_ADDED use the 'organizer' category (user +
+ * course placeholders only, no enrollment dates).
  */
 export function getTemplateCategory(templateType?: string): string {
   if (!templateType) return 'enrollment';
@@ -42,7 +43,7 @@ export function getTemplateCategory(templateType?: string): string {
     'REGISTRATION_CONFIRMED',
   ];
   const generalTemplates = ['USER_CREATED'];
-  const organizerTemplates = ['ORGANIZER_ADDED'];
+  const organizerTemplates = ['ORGANIZER_ADDED', 'SESSION_SPEAKER_ADDED'];
   // Cancellation request of a paid enrollment: [User:*] is the recipient, the
   // participant has their own [Cancellation:*] placeholders.
   const cancellationRequestTemplates = ['CANCELLATION_REQUEST_ORGANIZER', 'CANCELLATION_REQUEST_CONFIRMATION'];
@@ -98,7 +99,8 @@ const EMAIL_PLACEHOLDERS: EditorVariable[] = [
   { text: '[Session:ReminderText]', label: 'Reminder Text', categories: ['session'] },
   { text: '[Session:ReminderTime]', label: 'Reminder Time', categories: ['session'] },
   { text: '[System:PasswordResetLink]', label: 'Password Reset Link', categories: ['general'] },
-  { text: '[System:PortalUrl]', label: 'Portal URL', categories: ['general'] },
+  { text: '[System:PortalUrl]', label: 'Portal URL', categories: ['general', 'organizer'] },
+  { text: '[System:PrivacyPolicyLink]', label: 'Privacy Policy Link', categories: ['general', 'organizer'] },
   // StuJo job board. Substituted by the two local replacers in
   // lib/stripeJobPosting.ts and publishJobPosting/index.js, not by the shared
   // registry in emailTemplateVariables.js.

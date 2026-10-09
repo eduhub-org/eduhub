@@ -12,10 +12,12 @@ interface IProps {
 export const DescriptionFields: FC<IProps> = ({ course }) => {
   const t = useTranslations('course');
 
-  // Events do not award achievement certificates, so the attendance rules -
-  // camera on, and so forth - have nothing to apply to.
+  // The camera rule is about online attendance, so it only applies to a course
+  // that awards an achievement certificate and can be attended online. Events
+  // award no certificates, so they never show it.
   const isEventCourse = course.Program?.type === 'EVENTS';
-  const isAchievementCertificatePossible = !isEventCourse && course.achievementCertificatePossible;
+  const hasOnlineLocation = !!course.CourseLocations?.some((location) => location.locationOption === 'ONLINE');
+  const showsOnlineAttendanceRule = !isEventCourse && course.achievementCertificatePossible && hasOnlineLocation;
 
   return (
     <>
@@ -51,7 +53,7 @@ export const DescriptionFields: FC<IProps> = ({ course }) => {
           ) : null}
         </div>
       ) : null}
-      {isAchievementCertificatePossible ? (
+      {showsOnlineAttendanceRule ? (
         <div className="flex flex-wrap bg-transparent text-label-primary rounded-2xl p-2 sm:p-4 mx-6 xl:mx-0">
           <ReactMarkdown
             className="prose max-w-none break-words [&_*]:break-words text-label-primary prose-headings:font-semibold prose-headings:text-label-primary prose-p:text-label-primary prose-strong:text-label-primary prose-li:text-label-primary"

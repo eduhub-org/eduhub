@@ -102,7 +102,6 @@ type Mutation {
     firstName: String!
     lastName: String!
     email: String!
-    sendEmail: Boolean!
   ): CreateUserResult!
 }
 
@@ -582,6 +581,7 @@ type FormbricksResponse {
 
 type FormbricksAnswer {
   questionId: String!
+  questionType: String
   headline: String!
   answer: String!
   rawAnswer: String

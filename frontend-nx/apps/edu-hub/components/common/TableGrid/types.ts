@@ -42,6 +42,16 @@ export interface TableGridFilter {
   onChange: (selected: string[]) => void;
 }
 
+/** What TableGrid passes to an expanded row. */
+export interface ExpandedRowProps<T> {
+  row: T;
+  /** The row opened last. Only this one should react to keyboard shortcuts. */
+  isActive?: boolean;
+  /** Close this row and open the next / previous one on the page. Undefined at the edge of the page. */
+  expandNext?: () => void;
+  expandPrevious?: () => void;
+}
+
 export interface TableGridProps<T extends BaseRow> {
   addButtonText?: string;
   /** When set, the add button is disabled and this text explains why. */
@@ -55,7 +65,7 @@ export interface TableGridProps<T extends BaseRow> {
   generateDeletionConfirmationQuestion?: (row: T) => string;
   enablePagination?: boolean;
   error: ApolloError | null | undefined;
-  expandableRowComponent?: (props: { row: T }) => ReactElement<any> | null;
+  expandableRowComponent?: (props: ExpandedRowProps<T>) => ReactElement<any> | null;
   loading: boolean;
   pageSize?: number;
   refetchQueries: string[];

@@ -32,7 +32,7 @@ describe('saveOrganizationLogo', () => {
       filePath: 'organizations/org-7/public/logo/logo.png',
     }));
 
-    jest.unstable_mockModule('../../saveImage/index.js', () => ({ default: saveImageMock }));
+    jest.unstable_mockModule('../../saveImage/index.js', () => ({ saveImageUnchecked: saveImageMock }));
     jest.unstable_mockModule('graphql-request', () => {
       const actual = jest.requireActual('graphql-request');
       return {
