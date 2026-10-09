@@ -766,7 +766,10 @@
     "participants": {
       "title": "Who's here",
       "message_on_element": "Message on Element",
-      "and_more": "and {count} more"
+      "and_more": "and {count} more",
+      "count": "{count, plural, one {# participant} other {# participants}}",
+      "show_all": "Show all",
+      "show_less": "Show less"
     },
     "participant_preview": {
       "notice": "Preview: you are seeing this page as a participant.",
