@@ -14,6 +14,12 @@ import { queueEmail } from '../lib/queueEmail.js';
  * the unit instead. It is skipped when the person added themselves or
  * organizes the course (or a course of the program), since they already know.
  *
+ * A failure to queue is returned as `retryable`, which the dispatcher answers
+ * with a non-2xx status so Hasura retries the event (retry_conf on the
+ * send_speaker_added_email trigger). The mail carries the SessionSpeaker id in
+ * MailLog.metadata under the unique index MailLog_session_speaker_mail_unique,
+ * so a retry or a duplicate delivery can never queue it twice.
+ *
  * @param {Object} req - Request object from Hasura event trigger
  * @param {Object} logger - Winston logger instance
  * @returns {Object} Response object
@@ -73,6 +79,8 @@ const GET_PRIOR_INVOLVEMENT = gql`
 `;
 
 const noAction = (reason) => ({ success: true, messageKey: 'NO_ACTION_NEEDED', message: reason });
+
+const DEDUP_INDEX = 'MailLog_session_speaker_mail_unique';
 
 export default async function sendSpeakerAddedEmail(req, logger) {
   const start = Date.now();
@@ -161,14 +169,20 @@ export default async function sendSpeakerAddedEmail(req, logger) {
       recipientEmail: User.email,
       recipientUser: User,
       courseId: Course?.id ?? null,
+      metadata: { type: 'SESSION_SPEAKER_ADDED', sessionSpeakerId },
       client,
       logger,
     });
 
     if (!emailResult.success) {
+      // An earlier delivery of this event already queued the mail.
+      if (String(emailResult.error).includes(DEDUP_INDEX)) {
+        return noAction('Speaker added email already queued for this event');
+      }
       logger.error(`Failed to queue speaker added email: ${emailResult.error}`, { duration: Date.now() - start });
       return {
         success: false,
+        retryable: true,
         error: emailResult.error,
         messageKey: emailResult.messageKey || 'EMAIL_QUEUE_FAILED',
       };
@@ -194,6 +208,7 @@ export default async function sendSpeakerAddedEmail(req, logger) {
     });
     return {
       success: false,
+      retryable: true,
       error: error.message,
       messageKey: 'EMAIL_PROCESSING_FAILED',
     };

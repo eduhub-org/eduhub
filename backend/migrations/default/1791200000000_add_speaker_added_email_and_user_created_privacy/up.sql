@@ -36,6 +36,14 @@ SELECT
   'noreply@opencampus.sh', NOW(), NOW()
 WHERE NOT EXISTS (SELECT 1 FROM "public"."MailTemplate" WHERE "type" = 'SESSION_SPEAKER_ADDED' AND "courseId" IS NULL);
 
+-- Hasura retries the send_speaker_added_email event when queueing fails, and
+-- delivers events at least once anyway. The handler tags its mail with the
+-- SessionSpeaker id, and this index makes a second copy impossible. Partial,
+-- like MailLog_job_posting_mail_unique, so other mails are unaffected.
+CREATE UNIQUE INDEX "MailLog_session_speaker_mail_unique"
+  ON "public"."MailLog" ((metadata ->> 'sessionSpeakerId'))
+  WHERE metadata ? 'sessionSpeakerId';
+
 -- 2. USER_CREATED: now always sent (createUser no longer has an opt-out), so
 --    it carries the privacy notice. Also fixes [User:Firstname], which never
 --    matched the [User:FirstName] placeholder and showed up literally.

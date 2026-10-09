@@ -1,3 +1,5 @@
+DROP INDEX IF EXISTS "public"."MailLog_session_speaker_mail_unique";
+
 DELETE FROM "public"."MailTemplate"
   WHERE "type" = 'SESSION_SPEAKER_ADDED';
 

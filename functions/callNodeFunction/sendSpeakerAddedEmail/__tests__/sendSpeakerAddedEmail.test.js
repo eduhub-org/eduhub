@@ -90,6 +90,7 @@ describe('sendSpeakerAddedEmail', () => {
         recipientEmail: speaker.email,
         recipientUser: speaker,
         courseId: 101,
+        metadata: { type: 'SESSION_SPEAKER_ADDED', sessionSpeakerId: 55 },
       })
     );
 
@@ -145,6 +146,45 @@ describe('sendSpeakerAddedEmail', () => {
 
     expect(result.success).toBe(false);
     expect(result.messageKey).toBe('SPEAKER_NO_EMAIL');
+  });
+
+  it('marks a failure to queue as retryable', async () => {
+    graphqlRequestMock.mockResolvedValueOnce(detailsResponse()).mockResolvedValueOnce(priorResponse());
+    queueEmailMock.mockResolvedValue({ success: false, error: 'connection reset', messageKey: 'EMAIL_QUEUE_FAILED' });
+
+    const result = await sendSpeakerAddedEmail(insertEvent(), mockLogger);
+
+    expect(result).toEqual(expect.objectContaining({ success: false, retryable: true }));
+  });
+
+  it('marks unexpected errors as retryable', async () => {
+    graphqlRequestMock.mockRejectedValueOnce(new Error('Hasura unavailable'));
+
+    const result = await sendSpeakerAddedEmail(insertEvent(), mockLogger);
+
+    expect(result).toEqual(expect.objectContaining({ success: false, retryable: true }));
+  });
+
+  it('treats a mail already queued by an earlier delivery as done', async () => {
+    graphqlRequestMock.mockResolvedValueOnce(detailsResponse()).mockResolvedValueOnce(priorResponse());
+    queueEmailMock.mockResolvedValue({
+      success: false,
+      error: 'Uniqueness violation. duplicate key value violates unique constraint "MailLog_session_speaker_mail_unique"',
+    });
+
+    const result = await sendSpeakerAddedEmail(insertEvent(), mockLogger);
+
+    expect(result.success).toBe(true);
+    expect(result.messageKey).toBe('NO_ACTION_NEEDED');
+    expect(result.retryable).toBeUndefined();
+  });
+
+  it('does not retry a speaker without email address', async () => {
+    graphqlRequestMock.mockResolvedValueOnce(detailsResponse(undefined, { ...speaker, email: null }));
+
+    const result = await sendSpeakerAddedEmail(insertEvent(), mockLogger);
+
+    expect(result.retryable).toBeUndefined();
   });
 
   it('scopes a program-wide session to its program and links the portal', async () => {

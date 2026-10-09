@@ -248,6 +248,15 @@ export const callNodeFunction = async (req, res) => {
     if (req.body.request_query?.includes('mutation')) {
       return res.status(200).json(result);
     }
+
+    // Event triggers retry only on a non-2xx answer. Handlers opt in per
+    // failure with `retryable`, since most failures (a deleted row, a missing
+    // address) would fail the same way again; a handler that does opt in must
+    // make its side effect idempotent across deliveries.
+    if (req.body.event && result?.retryable) {
+      logger.warn(`Retryable failure in ${functionName}`, { response: redactForLogging(result) });
+      return res.status(500).json(result);
+    }
     
     // Define formattedResponse with the output from formatResponse.
     const formattedResponse = formatResponse(result);
