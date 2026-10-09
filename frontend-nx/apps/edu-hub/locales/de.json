@@ -2321,6 +2321,7 @@
       "button": "Benutzer erstellen",
       "dialog_title": "Neuen Benutzer erstellen",
       "success": "Benutzer wurde erfolgreich erstellt.",
+      "success_without_email": "Der Account wurde angelegt, aber die Willkommens-E-Mail konnte nicht verschickt werden. Bitte informiere die Person selbst: Sie kann über „Passwort vergessen“ ein Passwort festlegen, und unsere Datenschutzerklärung findet sie unter /privacy.",
       "error": "Fehler beim Erstellen des Benutzers",
       "error_first_name_required": "Vorname ist erforderlich",
       "error_last_name_required": "Nachname ist erforderlich",

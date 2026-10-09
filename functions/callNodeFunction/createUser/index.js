@@ -266,7 +266,7 @@ export default async function createUser(req, logger) {
       // Don't fail the user creation if email queuing fails
     } else {
       emailQueued = true;
-      logger.info(`Queued welcome email for user ${email}`);
+      logger.info(`Queued welcome email for user ${hasuraUserId}`);
     }
 
     return {

@@ -2336,6 +2336,7 @@
       "button": "Create User",
       "dialog_title": "Create New User",
       "success": "User created successfully.",
+      "success_without_email": "The account was created, but the welcome email could not be sent. Please inform the person yourself: they can set a password via “Forgot password”, and our privacy policy is at /privacy.",
       "error": "Error creating user",
       "error_first_name_required": "First name is required",
       "error_last_name_required": "Last name is required",

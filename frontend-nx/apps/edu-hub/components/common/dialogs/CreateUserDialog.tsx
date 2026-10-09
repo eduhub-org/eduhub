@@ -43,6 +43,7 @@ export const CreateUserDialog: React.FC<CreateUserDialogProps> = ({
   const [validationError, setValidationError] = useState<string | null>(null);
   const [serverError, setServerError] = useState<string | null>(null);
   const [showSuccessNotification, setShowSuccessNotification] = useState(false);
+  const [welcomeEmailFailed, setWelcomeEmailFailed] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Update form fields when initial values change
@@ -67,6 +68,9 @@ export const CreateUserDialog: React.FC<CreateUserDialogProps> = ({
   const [createUser, { loading }] = useRoleMutation<CreateUser, CreateUserVariables>(CREATE_USER, {
     onCompleted: (data) => {
       if (data?.createUser?.success) {
+        // The account exists either way; without the welcome mail the person has
+        // no password link or privacy notice, so the organizer has to step in.
+        setWelcomeEmailFailed(data.createUser.emailQueued === false);
         setShowSuccessNotification(true);
         
         // Call onUserCreated callback if provided
@@ -246,7 +250,8 @@ export const CreateUserDialog: React.FC<CreateUserDialogProps> = ({
       <NotificationSnackbar
         open={showSuccessNotification}
         onClose={() => setShowSuccessNotification(false)}
-        message={t('create_user.success')}
+        message={welcomeEmailFailed ? t('create_user.success_without_email') : t('create_user.success')}
+        duration={welcomeEmailFailed ? 15000 : undefined}
       />
 
       <ErrorMessageDialog

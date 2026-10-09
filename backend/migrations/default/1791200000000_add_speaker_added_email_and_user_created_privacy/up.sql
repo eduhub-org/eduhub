@@ -40,7 +40,7 @@ WHERE NOT EXISTS (SELECT 1 FROM "public"."MailTemplate" WHERE "type" = 'SESSION_
 --    it carries the privacy notice. Also fixes [User:Firstname], which never
 --    matched the [User:FirstName] placeholder and showed up literally.
 --    Only the untouched seed is replaced; a template already edited in the
---    settings is left alone and needs the privacy paragraph added by hand.
+--    settings keeps its text and gets the privacy notice appended below.
 UPDATE "public"."MailTemplate"
 SET
   "subject" = 'Willkommen bei EduHub - Dein Account wurde erstellt / Welcome to EduHub - Your account has been created',
@@ -74,3 +74,23 @@ WHERE "type" = 'USER_CREATED'
   AND "courseId" IS NULL
   AND "content" LIKE '%[User:Firstname]%'
   AND "content" LIKE '%Die Passwort-Setzung ist optional%';
+
+-- 3. An edited USER_CREATED template keeps its text but must still carry the
+--    privacy notice, so it is added before </body> (or at the end when the
+--    editor stored no document wrapper). Skips templates that already link it,
+--    which includes the one replaced above.
+UPDATE "public"."MailTemplate"
+SET
+  "content" = CASE
+    WHEN "content" LIKE '%</body>%' THEN replace("content", '</body>', notice.html || '</body>')
+    ELSE "content" || notice.html
+  END,
+  "updated_at" = NOW()
+FROM (SELECT '
+  <hr style="margin: 2em 0; border: none; border-top: 1px solid #ccc;" />
+  <p>Für deinen Account speichern wir deinen Namen und deine E-Mail-Adresse. Welche Daten wir zu welchem Zweck verarbeiten und welche Rechte du hast, steht in unserer <a href="[System:PrivacyPolicyLink]">Datenschutzerklärung</a>.</p>
+  <p>For your account we store your name and email address. Our <a href="[System:PrivacyPolicyLink]">privacy policy</a> explains which data we process and why, and what your rights are.</p>
+'::text AS html) AS notice
+WHERE "type" = 'USER_CREATED'
+  AND "courseId" IS NULL
+  AND "content" NOT LIKE '%[System:PrivacyPolicyLink]%';
