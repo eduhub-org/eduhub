@@ -1,6 +1,7 @@
 import { FC, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import { CircularProgress } from '@mui/material';
+import { ClampedText } from './ClampedText';
 import { useRoleQuery } from '../../../../hooks/authedQuery';
 import { GET_FORMBRICKS_RESPONSES } from '../../../../queries/formbricks';
 import {
@@ -54,33 +55,36 @@ const ResponseView: FC<{ surveyName?: string | null; response: QuestionnaireResp
 }) => {
   const t = useTranslations('manageCourse');
   return (
-    <div className="space-y-3">
-      <div className="text-sm font-medium text-gray-700 flex items-center gap-2">
-        {t('formbricks.questionnaire_responses')}
-        {surveyName && <span className="text-xs text-gray-500 font-normal">({surveyName})</span>}
+    <div>
+      <div className="mb-2 flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+        <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-label-secondary">
+          {t('formbricks.questionnaire_responses')}
+          {surveyName && <span className="font-normal normal-case tracking-normal">({surveyName})</span>}
+        </div>
+        {response.finished ? (
+          <span className="text-xs text-label-secondary">
+            {t('application_details.answer_count', { count: response.answers.length })}
+          </span>
+        ) : (
+          <span className="flex items-center gap-1 text-xs italic text-label-secondary">
+            <span aria-hidden="true" className="not-italic text-[color:var(--eduhub-warning)]">⚠</span>
+            <span>{t('formbricks.incomplete_response')}</span>
+          </span>
+        )}
       </div>
 
-      <div className="space-y-3">
+      <ol>
         {response.answers.map((answer) => (
-          <div
+          <li
             key={answer.questionId}
-            className="bg-gray-50 rounded-md p-3 border border-gray-200"
+            className="space-y-1 border-t border-table-divider py-4"
             data-question-type={answer.questionType ?? undefined}
           >
-            <div className="text-sm font-semibold text-gray-800 mb-2">{answer.headline}</div>
-            <div className="text-sm text-gray-900 whitespace-pre-wrap break-words bg-white rounded px-3 py-2 border border-gray-200">
-              {answer.answer}
-            </div>
-          </div>
+            <div className="text-[13px] font-semibold text-label-secondary">{answer.headline}</div>
+            <ClampedText text={answer.answer} className="text-[15px] leading-relaxed text-label-primary" />
+          </li>
         ))}
-      </div>
-
-      {!response.finished && (
-        <div className="text-xs text-orange-600 italic flex items-center gap-1">
-          <span>⚠</span>
-          <span>{t('formbricks.incomplete_response')}</span>
-        </div>
-      )}
+      </ol>
     </div>
   );
 };

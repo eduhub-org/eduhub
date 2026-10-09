@@ -18,7 +18,7 @@ import {
 } from '../../../../queries/__generated__/ManagedCourseApplicationRecipients';
 import { useLazyRoleQuery, useRoleQuery } from '../../../../hooks/authedQuery';
 import { MANAGED_COURSE_APPLICATIONS, MANAGED_COURSE_APPLICATION_RECIPIENTS } from '../../../../queries/course';
-import Dot, { DotColor } from '../../../common/Dot';
+import Dot from '../../../common/Dot';
 import { CourseEnrollmentStatistics } from './CourseEnrollmentStatistics';
 import { useIsInstructor, useIsAdmin } from '../../../../hooks/authentication';
 import {
@@ -42,9 +42,7 @@ import {
   CancelEnrollmentsByOrganizerVariables,
 } from '../../../../queries/__generated__/CancelEnrollmentsByOrganizer';
 import { Button as OldButton } from '../../../common/Button';
-import { Dialog, DialogTitle, Tooltip } from '@mui/material';
-import { HelpOutline } from '@mui/icons-material';
-import { useTheme } from '@mui/material/styles';
+import { Dialog, DialogTitle } from '@mui/material';
 import { MdClose } from 'react-icons/md';
 import DatePicker from 'react-datepicker';
 import { ensurePortalContainer } from '../../../inputs/OptimisticDatePicker';
@@ -61,17 +59,24 @@ import { ParticipantExportMenu } from '../ParticipantExport/ParticipantExportMen
 import { useDeferredBulkAction, useTableGrid } from '../../../common/TableGrid/hooks';
 import { createMultiWordSearchCondition } from '../../../common/TableGrid/utils';
 import { ColumnDef, SortingState } from '@tanstack/react-table';
-import { GoDotFill } from 'react-icons/go';
-import { IoIosCheckmarkCircle, IoIosCloseCircle } from 'react-icons/io';
+import { IconType } from 'react-icons';
+import {
+  MdCheckCircleOutline,
+  MdHighlightOff,
+  MdHourglassEmpty,
+  MdMailOutline,
+  MdOutlineTimerOff,
+  MdRadioButtonChecked,
+  MdWarningAmber,
+} from 'react-icons/md';
 import { CourseEnrollmentStatus_enum, MotivationRating_enum, UserStatus_enum } from '../../../../__generated__/globalTypes';
 import { getPaymentStatusFromInvoices } from '../../../../utils/invoicePaymentStatus';
 import { useDisplayDate } from '../../../../helpers/dateTimeHelpers';
-import { BulkAction } from '../../../common/TableGrid/types';
+import { BulkAction, ExpandedRowProps } from '../../../common/TableGrid/types';
 import { ApolloError } from '@apollo/client';
 import { ErrorMessageDialog } from '../../../common/dialogs/ErrorMessageDialog';
 import { QuestionConfirmationDialog } from '../../../common/dialogs/QuestionConfirmationDialog';
-import { EnrollmentHistory } from '../../../common/EnrollmentHistory';
-import { FormbricksResponsesDisplay } from './FormbricksResponsesDisplay';
+import { ApplicationDetails, RATING_OPTIONS } from './ApplicationDetails';
 import { getRegistrationFeatures } from './registrationConfig';
 import NotificationSnackbar from '../../../common/dialogs/NotificationSnackbar';
 import Loading from '../../../common/Loading';
@@ -86,13 +91,14 @@ const BULK_EMAIL_PREVIEW_COUNT = 8;
  * minimum widths.
  */
 const APPLICATION_TABLE_COLUMN_SIZES = {
-  'User.firstName': 200,
-  'User.lastName': 200,
-  'User.Organization.name': 300,
+  'User.firstName': 150,
+  'User.lastName': 150,
+  'User.Organization.name': 200,
   created_at: 104,
   motivationRating: 120,
   Invoices: 120,
-  status: 120,
+  // Icon and label, plus "· Guest" and a cancellation request pill on one line.
+  status: 280,
 } as const;
 
 /** Statuses in which a participant's cancellation request still awaits the organizer. */
@@ -101,69 +107,70 @@ const CANCELLATION_REQUEST_OPEN_STATUSES: string[] = ['APPLIED', 'WAITLIST', 'IN
 /** Guests registered without an account; unconfirmed guest sign-ups have no enrollment yet. */
 const isGuest = (enrollment: ApplicationEnrollment) => enrollment.User.status === UserStatus_enum.GUEST;
 
-/** The status icon of an enrollment; the table shows it alone, the mobile card next to its label. */
-const renderStatusIcon = (
+/** Icon, colour and short label of an enrollment's status; the long label stays as tooltip. */
+const statusDisplay = (
   enrollment: ApplicationEnrollment,
-  t: (key: string) => string,
-  hasApplicationProcess: boolean,
-  size = '1.5em'
-) => {
-  const expired = isExpired(enrollment);
+  hasApplicationProcess: boolean
+): { icon: IconType; color: string; labelKey: string; muted?: boolean } => {
+  if (enrollment.status === 'EXPIRED' || (isExpired(enrollment) && enrollment.status === 'INVITED')) {
+    return { icon: MdOutlineTimerOff, color: 'var(--eduhub-label-disabled)', labelKey: 'status.invitation_expired', muted: true };
+  }
+  switch (enrollment.status) {
+    case 'INVITED':
+      return { icon: MdMailOutline, color: 'var(--eduhub-info)', labelKey: 'status.invited' };
+    case 'CONFIRMED':
+    case 'COMPLETED':
+    case 'REGISTERED':
+      return {
+        icon: MdCheckCircleOutline,
+        color: 'var(--eduhub-success)',
+        labelKey: hasApplicationProcess ? 'status.confirmed_short' : 'status.registered_short',
+      };
+    case 'WAITLIST':
+      return { icon: MdHourglassEmpty, color: 'var(--eduhub-warning)', labelKey: 'status.waitlist' };
+    case 'REJECTED':
+      return { icon: MdHighlightOff, color: 'var(--eduhub-error)', labelKey: 'status.rejected_short' };
+    case 'CANCELLED':
+      return { icon: MdHighlightOff, color: 'var(--eduhub-error)', labelKey: 'status.cancelled' };
+    case 'ABORTED':
+      return { icon: MdHighlightOff, color: 'var(--eduhub-error)', labelKey: 'status.aborted' };
+    default:
+      return { icon: MdRadioButtonChecked, color: 'var(--eduhub-label-disabled)', labelKey: 'status.applied' };
+  }
+};
+
+/**
+ * Status as icon and short label, followed by "· Guest" for guests and, while a paid participant's
+ * cancellation request awaits the organizer, a "cancellation requested" pill.
+ */
+const renderStatus = (enrollment: ApplicationEnrollment, t: (key: string) => string, hasApplicationProcess: boolean) => {
+  const { icon: Icon, color, labelKey, muted } = statusDisplay(enrollment, hasApplicationProcess);
+  const cancellationRequested =
+    !!enrollment.cancellationRequestedAt && CANCELLATION_REQUEST_OPEN_STATUSES.includes(enrollment.status);
   return (
-    <div>
-      {!expired && enrollment.status === 'APPLIED' && (
-        <GoDotFill className="inline" title={t('status.applied')} color="grey" size={size} />
-      )}
-      {!expired && enrollment.status === 'INVITED' && (
-        <IoIosCheckmarkCircle className="inline" title={t('status.invited')} color="grey" size={size} />
-      )}
-      {(enrollment.status === 'CONFIRMED' ||
-        enrollment.status === 'COMPLETED' ||
-        enrollment.status === 'REGISTERED') && (
-        <IoIosCheckmarkCircle
-          className="inline"
-          title={t(statusLabelKey(enrollment, hasApplicationProcess))}
-          color="lightgreen"
-          size={size}
-        />
-      )}
-      {enrollment.status === 'ABORTED' && (
-        <IoIosCheckmarkCircle title={t('status.aborted')} color="red" size={size} className="inline" />
-      )}
-      {enrollment.status === 'REJECTED' && (
-        <IoIosCloseCircle title={t('status.rejected')} color="red" size={size} className="inline" />
-      )}
-      {enrollment.status === 'CANCELLED' && (
-        <IoIosCloseCircle title={t('status.cancelled')} color="red" size={size} className="inline" />
-      )}
-      {enrollment.status === 'WAITLIST' && (
-        <span
-          className="inline-block max-w-full truncate text-[11px] font-semibold text-label-primary bg-bg-secondary px-1.5 py-0.5 rounded border border-border-primary"
-          title={t('status.waitlist')}
-        >
-          {t('status.waitlist_badge')}
+    <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
+      <span
+        className="inline-flex items-center gap-1.5 whitespace-nowrap text-sm font-semibold"
+        title={t(statusLabelKey(enrollment, hasApplicationProcess))}
+      >
+        <Icon size="1.15em" style={{ color }} className="flex-shrink-0" aria-hidden="true" />
+        <span className={muted ? 'font-normal text-label-secondary' : ''}>{t(labelKey)}</span>
+      </span>
+      {isGuest(enrollment) && (
+        <span className="whitespace-nowrap text-xs text-label-secondary" title={t('status.registered_guest')}>
+          · {t('status.guest_badge')}
         </span>
       )}
-      {(enrollment.status === 'EXPIRED' || (expired && enrollment.status === 'INVITED')) && (
-        <IoIosCloseCircle
-          className="inline"
-          title={t('status.invitation_expired')}
-          color="grey"
-          size={size}
-        />
-      )}
-      {/* A paid participant asked to cancel: the decision (and any refund in
-          Stripe) is the organizer's, so the request stays visible until the
-          enrollment is cancelled or otherwise ended. */}
-      {enrollment.cancellationRequestedAt && CANCELLATION_REQUEST_OPEN_STATUSES.includes(enrollment.status) && (
+      {cancellationRequested && (
         <span
-          className="mt-1 block max-w-full truncate text-[11px] font-semibold text-error bg-bg-secondary px-1.5 py-0.5 rounded border border-error"
+          className="inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-error px-2 py-0.5 text-[11px] font-semibold text-error"
           title={
             enrollment.cancellationRequestReason
               ? `${t('status.cancellation_requested')}: ${enrollment.cancellationRequestReason}`
               : t('status.cancellation_requested')
           }
         >
+          <MdWarningAmber className="flex-shrink-0" aria-hidden="true" />
           {t('status.cancellation_requested_badge')}
         </span>
       )}
@@ -199,13 +206,6 @@ const statusLabelKey = (enrollment: ApplicationEnrollment, hasApplicationProcess
       return 'status.applied';
   }
 };
-
-const RATING_OPTIONS: { value: MotivationRating_enum; color: DotColor; labelKey: string }[] = [
-  { value: MotivationRating_enum.UNRATED, color: 'grey', labelKey: 'rating.not_rated' },
-  { value: MotivationRating_enum.INVITE, color: 'lightgreen', labelKey: 'rating.invite' },
-  { value: MotivationRating_enum.REVIEW, color: 'orange', labelKey: 'rating.unclear' },
-  { value: MotivationRating_enum.DECLINE, color: 'red', labelKey: 'rating.reject' },
-];
 
 interface IProps {
   course: ManagedCourse_Course_by_pk;
@@ -380,7 +380,6 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
   // Inviting, rejecting and cancelling registrations is open to the course's instructors, super
   // admins, and org admins whose grant covers the course's program type (manageAsOrgAdmin).
   const canDecideRegistrations = isInstructor || isAdmin;
-  const theme = useTheme();
   const matrixRoomId = course.matrixRoomId?.trim();
   const elementBaseUrl = process.env.NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL?.replace(/\/+$/, '');
   const organizerCourseChatLink = matrixRoomId && elementBaseUrl ? `${elementBaseUrl}/#/room/${matrixRoomId}` : null;
@@ -1319,23 +1318,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
         sortingFn: (rowA, rowB) => {
           return statusSortFn(rowA.original.status, rowB.original.status);
         },
-        meta: {
-          align: 'center',
-        },
-        cell: ({ row }) => (
-          <div>
-            {renderStatusIcon(row.original, t, features.hasApplicationProcess)}
-            {/* The table shows icons only, so the guest/account difference needs a visible mark. */}
-            {isGuest(row.original) && (
-              <span
-                className="mt-1 block max-w-full truncate text-[11px] font-semibold text-label-primary bg-bg-secondary px-1.5 py-0.5 rounded border border-border-primary"
-                title={t('status.registered_guest')}
-              >
-                {t('status.guest_badge')}
-              </span>
-            )}
-          </div>
-        ),
+        cell: ({ row }) => renderStatus(row.original, t, features.hasApplicationProcess),
       });
 
       return baseColumns;
@@ -1343,108 +1326,20 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
     [t, ratingSortFn, statusSortFn, features, displayDate]
   );
 
-  // Expandable row component
-  const ExpandableApplicationRow = ({ row: enrollment }: { row: ApplicationEnrollment }) => {
-    // Access Organization from the User object
-    const orgName = enrollment.User.Organization?.name ?? enrollment.User.organizationName;
-    
-    // Get effective Formbricks survey URL (course-level overrides program default)
-    const effectiveSurveyUrl = course.formbricksEnrollmentSurveyUrl || course.Program?.defaultFormbricksEnrollmentSurveyUrl || null;
-    const hasFormbricksSurvey = !!effectiveSurveyUrl;
+  // Effective Formbricks survey URL: the course setting overrides the program default.
+  const effectiveSurveyUrl =
+    course.formbricksEnrollmentSurveyUrl || course.Program?.defaultFormbricksEnrollmentSurveyUrl || null;
 
-    return (
-      <div className="w-full p-4 md:p-5 text-label-primary">
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)] lg:grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)_auto]">
-          {/* Email, organization (its column is hidden below xl) and application history */}
-          <div className="min-w-0 space-y-4">
-            <div>
-              <div className="text-sm font-medium text-label-primary mb-1">{t('email')}</div>
-              <div className="text-label-primary break-words font-medium md:pl-4" title={enrollment.User.email}>
-                {enrollment.User.email}
-              </div>
-            </div>
-            <div className="xl:hidden">
-              <div className="text-sm font-medium text-label-primary mb-1">{t('organization')}</div>
-              <div className="text-label-primary break-words md:pl-4">{orgName || '-'}</div>
-            </div>
-            <EnrollmentHistory enrollments={enrollment.User.CourseEnrollments} excludeCourseId={enrollment.courseId} />
-          </div>
-
-          {features.hasQuestionnaire && (
-            <div className="min-w-0">
-              <div className="mb-4">
-                {hasFormbricksSurvey ? (
-                  <FormbricksResponsesDisplay
-                    storedResponse={enrollment.questionnaireResponse}
-                    courseId={enrollment.courseId}
-                    userId={enrollment.userId}
-                    enrollmentId={enrollment.id}
-                    formbricksEnrollmentSurveyUrl={effectiveSurveyUrl || ''}
-                  />
-                ) : (
-                  <>
-                    <div className="text-sm font-medium text-label-primary mb-1">{t('application')}</div>
-                    <div className="text-label-primary whitespace-pre-wrap break-words md:pl-4">
-                      {enrollment.motivationLetter || '-'}
-                    </div>
-                  </>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* Rating controls: large labelled buttons, so they are easy to hit on phones */}
-          {features.hasApplicationProcess && (
-            <div>
-              <div className="mb-4">
-                <div className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-1">
-                  {t('evaluation')}
-                  <Tooltip title={t('application_status_tooltip')} placement="top">
-                    <HelpOutline style={{ cursor: 'pointer', color: theme.palette.text.disabled }} />
-                  </Tooltip>
-                </div>
-                <div className="grid grid-cols-4 gap-2 md:flex">
-                  {RATING_OPTIONS.map((option) => {
-                    const isActive = enrollment.motivationRating === option.value;
-                    return (
-                      <button
-                        key={option.value}
-                        type="button"
-                        onClick={() => setEnrollmentRating(enrollment, option.value)}
-                        aria-pressed={isActive}
-                        className={`flex min-h-11 flex-col items-center justify-center rounded-lg px-1 py-1 text-[11px] leading-tight text-center transition-colors ${
-                          isActive
-                            ? 'font-semibold border-2 border-label-primary'
-                            : 'border-2 border-transparent bg-bg-secondary hover:opacity-80'
-                        }`}
-                      >
-                        <span className="text-[10px]">
-                          <Dot color={option.color} className="block" />
-                        </span>
-                        {t(option.labelKey)}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {enrollment.status === 'INVITED' && (
-                <div className="mt-4">
-                  <div className="text-sm font-medium text-gray-700 mb-1 flex items-center gap-1">
-                    {t('invitation_deadline')}
-                    <Tooltip title={t('application_deadline_tooltip')} placement="top">
-                      <HelpOutline style={{ cursor: 'pointer', color: theme.palette.text.disabled }} />
-                    </Tooltip>
-                  </div>
-                  <div className="text-gray-900 font-medium pl-4">{displayDate(enrollment.invitationExpirationDate)}</div>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  };
+  const ExpandableApplicationRow = ({ row: enrollment, ...navigation }: ExpandedRowProps<ApplicationEnrollment>) => (
+    <ApplicationDetails
+      enrollment={enrollment}
+      features={features}
+      surveyUrl={effectiveSurveyUrl}
+      onRate={(rating) => setEnrollmentRating(enrollment, rating)}
+      displayDate={displayDate}
+      {...navigation}
+    />
+  );
 
   // Phones: one card per enrollment, with the rating and status spelled out instead of a legend.
   const renderMobileRow = useCallback(
@@ -1474,10 +1369,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
                 <span>{t(`payment_status_values.${getPaymentStatusFromInvoices(enrollment.Invoices)}`)}</span>
               )}
             </div>
-            <span className="inline-flex items-center gap-1 rounded-full bg-bg-secondary px-2 py-0.5 font-semibold">
-              {renderStatusIcon(enrollment, t, features.hasApplicationProcess, '1.2em')}
-              {t(statusLabelKey(enrollment, features.hasApplicationProcess))}
-            </span>
+            {renderStatus(enrollment, t, features.hasApplicationProcess)}
           </div>
         </div>
       );

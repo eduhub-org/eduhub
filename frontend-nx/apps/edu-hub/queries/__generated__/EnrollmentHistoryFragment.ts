@@ -47,6 +47,7 @@ export interface EnrollmentHistoryFragment_AttendanceStats {
   __typename: "CourseEnrollmentAttendanceStats";
   attendedSessions: number | null;
   totalSessions: number | null;
+  pastSessions: number | null;
 }
 
 export interface EnrollmentHistoryFragment {

@@ -2,7 +2,12 @@ import React from 'react';
 import { render, screen, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
-import { EnrollmentHistory, attendanceOf, groupEnrollmentsByProgram } from '../EnrollmentHistory';
+import {
+  EnrollmentHistory,
+  attendanceOf,
+  groupEnrollmentsByProgram,
+  isAttendanceUnrecorded,
+} from '../EnrollmentHistory';
 import { EnrollmentHistoryFragment } from '../../../queries/__generated__/EnrollmentHistoryFragment';
 import { CourseEnrollmentStatus_enum } from '../../../__generated__/globalTypes';
 
@@ -44,10 +49,11 @@ const enrollment = (
   };
 };
 
-const stats = (attendedSessions: number, totalSessions: number) => ({
+const stats = (attendedSessions: number, totalSessions: number, pastSessions = totalSessions) => ({
   __typename: 'CourseEnrollmentAttendanceStats' as const,
   attendedSessions,
   totalSessions,
+  pastSessions,
 });
 
 describe('groupEnrollmentsByProgram', () => {
@@ -82,10 +88,34 @@ describe('attendanceOf', () => {
       attendanceOf(enrollment('x', P26S, CourseEnrollmentStatus_enum.COMPLETED, { AttendanceStats: stats(0, 0) }))
     ).toBeNull();
   });
+
+  it('reports attendance for direct sign-ups such as events', () => {
+    expect(
+      attendanceOf(enrollment('x', P26S, CourseEnrollmentStatus_enum.REGISTERED, { AttendanceStats: stats(1, 1) }))
+    ).toEqual({ attended: 1, total: 1, percent: 100 });
+  });
+});
+
+describe('isAttendanceUnrecorded', () => {
+  it('is true only when sessions are over but nothing was recorded for a participation', () => {
+    const registered = (AttendanceStats: ReturnType<typeof stats> | null) =>
+      enrollment('x', P26S, CourseEnrollmentStatus_enum.REGISTERED, { AttendanceStats });
+    expect(isAttendanceUnrecorded(registered(stats(0, 0, 2)))).toBe(true);
+    // Still upcoming
+    expect(isAttendanceUnrecorded(registered(null))).toBe(false);
+    // Recorded
+    expect(isAttendanceUnrecorded(registered(stats(1, 2, 2)))).toBe(false);
+    // Not a participation
+    expect(
+      isAttendanceUnrecorded(
+        enrollment('x', P26S, CourseEnrollmentStatus_enum.APPLIED, { AttendanceStats: stats(0, 0, 2) })
+      )
+    ).toBe(false);
+  });
 });
 
 describe('EnrollmentHistory', () => {
-  it('renders program groups with status badges, earned ECTS and attendance', () => {
+  it('renders a timeline entry per enrollment with status, earned ECTS and attendance', () => {
     render(
       <EnrollmentHistory
         enrollments={[
@@ -94,19 +124,27 @@ describe('EnrollmentHistory', () => {
             AttendanceStats: stats(9, 10),
           }),
           enrollment('Pentesting', P26W, CourseEnrollmentStatus_enum.CANCELLED),
+          enrollment('Open Day', P26W, CourseEnrollmentStatus_enum.REGISTERED, { AttendanceStats: stats(0, 0, 1) }),
         ]}
       />
     );
 
-    const group26S = screen.getByRole('region', { name: 'Program 26S' });
-    expect(within(group26S).getByText('status.COMPLETED')).toBeInTheDocument();
-    expect(within(group26S).getByText('ects {"ects":"5"}')).toBeInTheDocument();
-    expect(within(group26S).getByText('attendance {"attended":9,"total":10,"percent":90}')).toBeInTheDocument();
+    const entry = (title: string) => screen.getByText(title).closest('li') as HTMLElement;
 
-    const group26W = screen.getByRole('region', { name: 'Program 26W' });
-    expect(within(group26W).getByText('status.CANCELLED')).toBeInTheDocument();
-    expect(within(group26W).queryByText(/^attendance/)).not.toBeInTheDocument();
-    expect(within(group26W).queryByText(/^ects/)).not.toBeInTheDocument();
+    const completed = entry('Applied ML');
+    expect(within(completed).getByText('26S')).toBeInTheDocument();
+    expect(within(completed).getByText(/status\.COMPLETED/)).toBeInTheDocument();
+    expect(within(completed).getByText(/ects \{"ects":"5"\}/)).toBeInTheDocument();
+    expect(within(completed).getByText(/attendance \{"attended":9,"total":10,"percent":90\}/)).toBeInTheDocument();
+
+    const cancelled = entry('Pentesting');
+    expect(within(cancelled).getByText(/status\.CANCELLED/)).toBeInTheDocument();
+    expect(within(cancelled).queryByText(/attendance/)).not.toBeInTheDocument();
+    expect(within(cancelled).queryByText(/ects/)).not.toBeInTheDocument();
+
+    const event = entry('Open Day');
+    expect(within(event).getByText(/attendance_not_recorded$/)).toBeInTheDocument();
+    expect(within(event).getByTestId('history-dot')).toHaveStyle({ backgroundColor: '' });
   });
 
   it('shows the empty state when only the current course is there', () => {

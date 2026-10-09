@@ -20,6 +20,7 @@ select_permissions:
         - enrollmentId
         - attendedSessions
         - totalSessions
+        - pastSessions
       filter: {}
   # Same scope as the org admin's CourseEnrollment select permission.
   - role: org_admin_access
@@ -28,6 +29,7 @@ select_permissions:
         - enrollmentId
         - attendedSessions
         - totalSessions
+        - pastSessions
       filter:
         CourseEnrollment:
           _or:

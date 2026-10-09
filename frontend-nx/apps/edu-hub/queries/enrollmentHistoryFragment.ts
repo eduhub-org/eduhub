@@ -22,6 +22,7 @@ export const ENROLLMENT_HISTORY_FRAGMENT = gql`
     AttendanceStats {
       attendedSessions
       totalSessions
+      pastSessions
     }
   }
 `;
