@@ -1,5 +1,5 @@
 import { GraphQLClient } from "graphql-request";
-import saveFile from "../saveFile/index.js";
+import { saveFileUnchecked } from "../saveFile/index.js";
 
 /**
  * Roles other than admin that may store an instruction PDF. The value is the
@@ -133,5 +133,5 @@ export default async function saveProjectDocumentationInstruction(req, logger) {
     }
   }
 
-  return saveFile(req, logger);
+  return saveFileUnchecked(req, logger);
 }

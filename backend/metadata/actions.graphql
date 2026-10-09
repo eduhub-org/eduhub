@@ -102,7 +102,6 @@ type Mutation {
     firstName: String!
     lastName: String!
     email: String!
-    sendEmail: Boolean!
   ): CreateUserResult!
 }
 

@@ -260,7 +260,7 @@ describe('Sessions Component - event agenda', () => {
 });
 
 describe('Sessions Component - optional sessions', () => {
-  it('marks optional sessions and explains the default once', () => {
+  it('marks only the optional sessions', () => {
     render(
       <Sessions
         sessions={[mockSessions[0], secondSession({ isMandatory: false })]}
@@ -270,10 +270,11 @@ describe('Sessions Component - optional sessions', () => {
     );
 
     expect(screen.getAllByText('sessions.optional')).toHaveLength(1);
-    expect(screen.getByText('sessions.optional_hint')).toBeInTheDocument();
+    // The former "all sessions are mandatory" hint stays gone.
+    expect(screen.queryByText('sessions.optional_hint')).not.toBeInTheDocument();
   });
 
-  it('shows neither pill nor hint when every session is mandatory', () => {
+  it('shows no pill when every session is mandatory', () => {
     render(
       <Sessions
         sessions={[mockSessions[0], secondSession()]}
@@ -283,7 +284,6 @@ describe('Sessions Component - optional sessions', () => {
     );
 
     expect(screen.queryByText('sessions.optional')).not.toBeInTheDocument();
-    expect(screen.queryByText('sessions.optional_hint')).not.toBeInTheDocument();
   });
 });
 

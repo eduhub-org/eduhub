@@ -259,12 +259,6 @@ export const Sessions: FC<SessionsProps> = ({
   // registration rail now, alongside the other whole-course actions.
   const sectionHeader = (title: string) => <SectionTitle className="mb-8">{title}</SectionTitle>;
 
-  // Mandatory is the default, so only the exceptions carry a pill; the hint
-  // explains that once, and only when there is an exception to explain.
-  const optionalHint = sessions.some((session) => session.isMandatory === false) ? (
-    <p className="max-w-2xl -mt-6 mb-6 text-sm text-label-secondary">{t('sessions.optional_hint')}</p>
-  ) : null;
-
   const sharedLocationsLine = sharedLocations ? (
     <div className="max-w-2xl mb-4 break-words">
       <SessionLocations locations={sharedLocations} canSeeOnlineLink={canSeeOnlineLink} />
@@ -277,7 +271,6 @@ export const Sessions: FC<SessionsProps> = ({
     return (
       <div>
         {sectionHeader(t('sessions.agenda'))}
-        {optionalHint}
         <div>
           {dayGroups.map((group) => (
             <div
@@ -318,7 +311,6 @@ export const Sessions: FC<SessionsProps> = ({
   return (
     <div>
       {sectionHeader(sessions.length === 1 ? t('sessions.date_singular') : t('sessions.date_plural'))}
-      {optionalHint}
       {sharedLocationsLine}
       <ul className="max-w-2xl">
         {visibleSessions.map((session) => (
