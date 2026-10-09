@@ -27,7 +27,9 @@ import SessionDetailPopover from './SessionDetailPopover';
 import {
   ALL_PROGRAMS,
   CalendarRange,
+  Publication,
   SessionKind,
+  addressesOfSessions,
   buildSessionWhere,
   coursesOfSessions,
   filterSessions,
@@ -51,6 +53,13 @@ interface SessionDetail {
   address?: string;
   speakers: { firstName: string; lastName: string }[];
 }
+
+type Tag = { id: number; name: string };
+
+const withSelected = (options: Tag[], selected: Tag[]): Tag[] => [
+  ...options,
+  ...selected.filter((tag) => !options.some((option) => option.id === tag.id)),
+];
 
 const sessionHeadline = (session: CalendarSessions_Session) => session.Course?.title || session.title;
 const sessionSubline = (session: CalendarSessions_Session) => (session.Course ? session.title : '');
@@ -79,7 +88,9 @@ const CalendarContent: FC = () => {
   const [viewType, setViewType] = useState('dayGridMonth');
   const [kinds, setKinds] = useState<SessionKind[]>(['COURSES', 'EVENTS']);
   const [locations, setLocations] = useState<string[]>([]);
-  const [courseIds, setCourseIds] = useState<number[]>([]);
+  const [publication, setPublication] = useState<Publication[]>(['PUBLISHED', 'UNPUBLISHED']);
+  const [selectedCourses, setSelectedCourses] = useState<Tag[]>([]);
+  const [selectedAddresses, setSelectedAddresses] = useState<Tag[]>([]);
   const [popoverAnchor, setPopoverAnchor] = useState<HTMLElement | null>(null);
   const [selectedSession, setSelectedSession] = useState<SessionDetail | null>(null);
 
@@ -121,22 +132,32 @@ const CalendarContent: FC = () => {
   // The type filter only applies across programs; a single program has a single type.
   const showKindFilter = effectiveSelection === ALL_PROGRAMS;
   const filters = useMemo(
-    () => ({ kinds: showKindFilter ? kinds : (['COURSES', 'EVENTS'] as SessionKind[]), locations, courseIds }),
-    [showKindFilter, kinds, locations, courseIds]
+    () => ({
+      kinds: showKindFilter ? kinds : (['COURSES', 'EVENTS'] as SessionKind[]),
+      publication,
+      locations,
+      courseIds: selectedCourses.map((course) => course.id),
+      addresses: selectedAddresses.map((address) => address.name),
+    }),
+    [showKindFilter, kinds, publication, locations, selectedCourses, selectedAddresses]
   );
   const visibleSessions = useMemo(() => filterSessions(sessions, filters), [sessions, filters]);
 
-  // Course chips come from the loaded range; selected courses stay listed when they have no
-  // sessions in it, so they can still be switched off.
-  const courseTitles = useRef(new Map<number, string>());
-  const courses = useMemo(() => {
-    const inRange = coursesOfSessions(sessions);
-    inRange.forEach((course) => courseTitles.current.set(course.id, course.title));
-    const missing = courseIds
-      .filter((id) => !inRange.some((course) => course.id === id) && courseTitles.current.has(id))
-      .map((id) => ({ id, title: courseTitles.current.get(id) as string }));
-    return [...inRange, ...missing].sort((a, b) => a.title.localeCompare(b.title));
-  }, [sessions, courseIds]);
+  // Course and address options come from the loaded range; selected tags stay among the options when
+  // they have no sessions in it, so the selector keeps showing them.
+  const courseOptions = useMemo(
+    () => withSelected(coursesOfSessions(sessions), selectedCourses),
+    [sessions, selectedCourses]
+  );
+  // Addresses have no id of their own; give each one a stable id for the tag selector.
+  const addressIds = useRef(new Map<string, number>());
+  const addressOptions = useMemo(() => {
+    const options = addressesOfSessions(sessions).map((name) => {
+      if (!addressIds.current.has(name)) addressIds.current.set(name, addressIds.current.size + 1);
+      return { id: addressIds.current.get(name) as number, name };
+    });
+    return withSelected(options, selectedAddresses);
+  }, [sessions, selectedAddresses]);
 
   const events: EventInput[] = useMemo(
     () =>
@@ -193,7 +214,8 @@ const CalendarContent: FC = () => {
   const handleProgramChange = useCallback(
     (value: string) => {
       setProgramSelection(value);
-      setCourseIds([]);
+      setSelectedCourses([]);
+      setSelectedAddresses([]);
       // Land on the program's lecture period rather than on an empty month.
       const program = programs.find((p) => String(p.id) === value);
       const api = calendarRef.current?.getApi();
@@ -295,16 +317,21 @@ const CalendarContent: FC = () => {
         ) : (
           <div className="flex flex-col gap-4">
             <CalendarFilters
+              key={effectiveSelection}
               showKindFilter={showKindFilter}
               kinds={kinds}
               onToggleKind={(kind) => setKinds((prev) => toggle(prev, kind))}
+              publication={publication}
+              onTogglePublication={(state) => setPublication((prev) => toggle(prev, state))}
               locations={locations}
               onToggleLocation={(location) => setLocations((prev) => toggle(prev, location))}
               onClearLocations={() => setLocations([])}
-              courses={courses}
-              courseIds={courseIds}
-              onToggleCourse={(id) => setCourseIds((prev) => toggle(prev, id))}
-              onClearCourses={() => setCourseIds([])}
+              courseOptions={courseOptions}
+              courses={selectedCourses}
+              onCoursesChange={setSelectedCourses}
+              addressOptions={addressOptions}
+              addresses={selectedAddresses}
+              onAddressesChange={setSelectedAddresses}
             />
 
             {error && (

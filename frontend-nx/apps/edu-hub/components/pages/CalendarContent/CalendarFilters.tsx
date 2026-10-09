@@ -3,11 +3,13 @@ import { useTranslations } from 'next-intl';
 
 import { LocationOption_enum } from '../../../__generated__/globalTypes';
 import { getLocationColor } from '../../../helpers/calendarColors';
-import { SessionKind } from './calendarSessions';
+import TagSelector from '../../inputs/TagSelector';
+import { Publication, SessionKind } from './calendarSessions';
 
 export const LOCATIONS = [LocationOption_enum.KIEL, LocationOption_enum.HEIDE, LocationOption_enum.ONLINE] as const;
 
 const KINDS: SessionKind[] = ['COURSES', 'EVENTS'];
+const PUBLICATIONS: Publication[] = ['PUBLISHED', 'UNPUBLISHED'];
 
 const FilterChip: FC<{ active: boolean; onClick: () => void; children: ReactNode }> = ({
   active,
@@ -35,38 +37,49 @@ const FilterGroup: FC<{ label: string; children: ReactNode }> = ({ label, childr
   </div>
 );
 
+type Tag = { id: number; name: string };
+
 interface IProps {
   showKindFilter: boolean;
   kinds: SessionKind[];
   onToggleKind: (kind: SessionKind) => void;
+  publication: Publication[];
+  onTogglePublication: (publication: Publication) => void;
   locations: string[];
   onToggleLocation: (location: string) => void;
   onClearLocations: () => void;
-  courses: { id: number; title: string }[];
-  courseIds: number[];
-  onToggleCourse: (courseId: number) => void;
-  onClearCourses: () => void;
+  courseOptions: Tag[];
+  courses: Tag[];
+  onCoursesChange: (courses: Tag[]) => void;
+  addressOptions: Tag[];
+  addresses: Tag[];
+  onAddressesChange: (addresses: Tag[]) => void;
 }
 
 // Filters double as the legend: each location chip carries its calendar colour and the events chip
-// the dashed outline that event sessions get in the calendar.
+// the dashed outline that event sessions get in the calendar. Courses and addresses are too many for
+// chips, so they are picked by typing in a tag selector.
 const CalendarFilters: FC<IProps> = ({
   showKindFilter,
   kinds,
   onToggleKind,
+  publication,
+  onTogglePublication,
   locations,
   onToggleLocation,
   onClearLocations,
+  courseOptions,
   courses,
-  courseIds,
-  onToggleCourse,
-  onClearCourses,
+  onCoursesChange,
+  addressOptions,
+  addresses,
+  onAddressesChange,
 }) => {
   const t = useTranslations();
 
   return (
-    <div className="flex flex-col gap-5 rounded-xl border border-border-primary bg-bg-card p-4 sm:p-5">
-      <div className="flex flex-col gap-5 md:flex-row md:gap-10">
+    <div className="light flex flex-col gap-5 rounded-2xl border border-border-primary bg-fill-primary p-4 text-label-primary shadow-lg sm:p-5">
+      <div className="flex flex-col gap-5 md:flex-row md:flex-wrap md:gap-x-10">
         {showKindFilter && (
           <FilterGroup label={t('calendar.filter_type')}>
             {KINDS.map((kind) => (
@@ -82,6 +95,13 @@ const CalendarFilters: FC<IProps> = ({
             ))}
           </FilterGroup>
         )}
+        <FilterGroup label={t('calendar.filter_publication')}>
+          {PUBLICATIONS.map((state) => (
+            <FilterChip key={state} active={publication.includes(state)} onClick={() => onTogglePublication(state)}>
+              {t(`calendar.filter_publication_${state.toLowerCase()}`)}
+            </FilterChip>
+          ))}
+        </FilterGroup>
         <FilterGroup label={t('calendar.filter_location')}>
           <FilterChip active={locations.length === 0} onClick={onClearLocations}>
             {t('calendar.filter_location_all')}
@@ -98,24 +118,31 @@ const CalendarFilters: FC<IProps> = ({
           ))}
         </FilterGroup>
       </div>
-      {courses.length > 0 && (
-        <FilterGroup label={t('calendar.filter_course')}>
-          <div className="flex max-h-32 flex-wrap gap-2 overflow-y-auto pr-1">
-            <FilterChip active={courseIds.length === 0} onClick={onClearCourses}>
-              {t('calendar.filter_course_all')}
-            </FilterChip>
-            {courses.map((course) => (
-              <FilterChip
-                key={course.id}
-                active={courseIds.includes(course.id)}
-                onClick={() => onToggleCourse(course.id)}
-              >
-                <span className="max-w-[16rem] truncate">{course.title}</span>
-              </FilterChip>
-            ))}
-          </div>
-        </FilterGroup>
-      )}
+      <div className="grid grid-cols-1 gap-x-8 md:grid-cols-2">
+        {/* TagSelector also renders a snackbar next to its input; keep both in one grid cell. */}
+        <div>
+          <TagSelector
+            variant="material"
+            label={t('calendar.filter_course')}
+            placeholder={courses.length === 0 ? t('calendar.filter_course_placeholder') : ''}
+            itemId={0}
+            values={courses}
+            options={courseOptions}
+            onValueUpdated={onCoursesChange}
+          />
+        </div>
+        <div>
+          <TagSelector
+            variant="material"
+            label={t('calendar.filter_address')}
+            placeholder={addresses.length === 0 ? t('calendar.filter_address_placeholder') : ''}
+            itemId={0}
+            values={addresses}
+            options={addressOptions}
+            onValueUpdated={onAddressesChange}
+          />
+        </div>
+      </div>
     </div>
   );
 };

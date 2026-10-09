@@ -3034,7 +3034,6 @@
     "filter_location": "Ort",
     "filter_location_all": "Alle Orte",
     "filter_course": "Kurs",
-    "filter_course_all": "Alle Kurse",
     "select_all": "Alle auswählen",
     "deselect_all": "Alle abwählen",
     "month_view": "Monatsansicht",
@@ -3047,7 +3046,13 @@
     "program": "Programm",
     "program_all": "Alle Programme",
     "no_programs": "Du verwaltest noch kein Programm, dessen Termine hier angezeigt werden könnten.",
-    "no_sessions_in_range": "Keine Termine in diesem Zeitraum."
+    "no_sessions_in_range": "Keine Termine in diesem Zeitraum.",
+    "filter_publication": "Status",
+    "filter_publication_published": "Veröffentlicht",
+    "filter_publication_unpublished": "Nicht veröffentlicht",
+    "filter_course_placeholder": "Kursnamen eingeben…",
+    "filter_address": "Adresse",
+    "filter_address_placeholder": "Adresse eingeben…"
   },
   "footer": {
     "imprint": "Impressum",

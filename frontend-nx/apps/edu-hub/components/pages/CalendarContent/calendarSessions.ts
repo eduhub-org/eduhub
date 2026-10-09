@@ -70,35 +70,54 @@ export const resolveAddress = (session: CalendarSessions_Session): string | unde
   return addr.CourseLocation?.defaultSessionAddress?.trim() || undefined;
 };
 
+export type Publication = 'PUBLISHED' | 'UNPUBLISHED';
+
+// An offering is public only when both the course and its program are published; a program session
+// follows its program.
+export const isSessionPublished = (session: CalendarSessions_Session): boolean =>
+  session.Course ? session.Course.published && session.Course.Program.published : !!session.Program?.published;
+
 export interface SessionFilters {
   kinds: SessionKind[];
+  publication: Publication[];
   locations: string[];
   courseIds: number[];
+  addresses: string[];
 }
 
-// Client-side filters on the loaded sessions. An empty location or course selection means "all";
-// kinds are always explicit.
+// Client-side filters on the loaded sessions. An empty location, course or address selection means
+// "all"; kinds and publication states are always explicit.
 export const filterSessions = (
   sessions: CalendarSessions_Session[],
-  { kinds, locations, courseIds }: SessionFilters
+  { kinds, publication, locations, courseIds, addresses }: SessionFilters
 ): CalendarSessions_Session[] =>
   sessions.filter((session) => {
     if (!kinds.includes(sessionKind(session))) return false;
+    if (!publication.includes(isSessionPublished(session) ? 'PUBLISHED' : 'UNPUBLISHED')) return false;
     if (locations.length > 0) {
       const location = resolveLocation(session);
       if (!location || !locations.includes(location)) return false;
     }
     if (courseIds.length > 0 && !(session.courseId && courseIds.includes(session.courseId))) return false;
+    if (addresses.length > 0) {
+      const address = resolveAddress(session);
+      if (!address || !addresses.includes(address)) return false;
+    }
     return true;
   });
 
-export const coursesOfSessions = (sessions: CalendarSessions_Session[]): { id: number; title: string }[] => {
+export const coursesOfSessions = (sessions: CalendarSessions_Session[]): { id: number; name: string }[] => {
   const courses = new Map<number, string>();
   sessions.forEach((session) => {
     if (session.Course) courses.set(session.Course.id, session.Course.title);
   });
-  return Array.from(courses, ([id, title]) => ({ id, title })).sort((a, b) => a.title.localeCompare(b.title));
+  return Array.from(courses, ([id, name]) => ({ id, name })).sort((a, b) => a.name.localeCompare(b.name));
 };
+
+export const addressesOfSessions = (sessions: CalendarSessions_Session[]): string[] =>
+  Array.from(new Set(sessions.map(resolveAddress).filter((address): address is string => !!address))).sort((a, b) =>
+    a.localeCompare(b)
+  );
 
 // Whether `date` lies outside the program's lecture period, i.e. whether selecting the program
 // should move the calendar to the period's start so the admin does not land on an empty month.

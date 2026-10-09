@@ -15,10 +15,12 @@ export const CALENDAR_SESSIONS = gql`
         type
         title
         shortTitle
+        published
       }
       Course {
         id
         title
+        published
         CourseLocations {
           id
           locationOption
@@ -29,6 +31,7 @@ export const CALENDAR_SESSIONS = gql`
           type
           title
           shortTitle
+          published
         }
       }
       SessionAddresses {

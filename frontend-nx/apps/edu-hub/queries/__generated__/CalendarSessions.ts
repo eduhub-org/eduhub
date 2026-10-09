@@ -21,6 +21,10 @@ export interface CalendarSessions_Session_Program {
    * The 6 letter short title for the program.
    */
   shortTitle: string | null;
+  /**
+   * Decides whether the courses of this program can be published or not. (Courses are ony published if the filed publised in the Course table is also set to true.)
+   */
+  published: boolean;
 }
 
 export interface CalendarSessions_Session_Course_CourseLocations {
@@ -48,6 +52,10 @@ export interface CalendarSessions_Session_Course_Program {
    * The 6 letter short title for the program.
    */
   shortTitle: string | null;
+  /**
+   * Decides whether the courses of this program can be published or not. (Courses are ony published if the filed publised in the Course table is also set to true.)
+   */
+  published: boolean;
 }
 
 export interface CalendarSessions_Session_Course {
@@ -57,6 +65,10 @@ export interface CalendarSessions_Session_Course {
    * The title of the course (only editable by an admin user)
    */
   title: string;
+  /**
+   * Decides whether the course is published for all users or not.
+   */
+  published: boolean;
   /**
    * An array relationship
    */

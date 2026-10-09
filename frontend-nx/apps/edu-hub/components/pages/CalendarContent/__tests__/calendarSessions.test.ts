@@ -2,12 +2,14 @@ import { LocationOption_enum } from '../../../../__generated__/globalTypes';
 import { CalendarSessions_Session } from '../../../../queries/__generated__/CalendarSessions';
 import {
   ALL_PROGRAMS,
+  addressesOfSessions,
   buildSessionWhere,
   coursesOfSessions,
   filterSessions,
   isOutsideLecturePeriod,
+  isSessionPublished,
   scopedProgramIds,
-  SessionKind,
+  SessionFilters,
   sessionKind,
 } from '../calendarSessions';
 
@@ -17,9 +19,24 @@ const session = (
     course,
     programType = 'COURSES',
     location,
-  }: { course?: { id: number; title: string }; programType?: string; location?: LocationOption_enum } = {}
+    address,
+    published = true,
+  }: {
+    course?: { id: number; title: string };
+    programType?: string;
+    location?: LocationOption_enum;
+    address?: string;
+    published?: boolean;
+  } = {}
 ): CalendarSessions_Session => {
-  const program = { __typename: 'Program' as const, id: 1, type: programType, title: 'P', shortTitle: null };
+  const program = {
+    __typename: 'Program' as const,
+    id: 1,
+    type: programType,
+    title: 'P',
+    shortTitle: null,
+    published: true,
+  };
   return {
     __typename: 'Session',
     id,
@@ -34,13 +51,16 @@ const session = (
       ? {
           __typename: 'Course',
           ...course,
+          published,
           CourseLocations: location
             ? [{ __typename: 'CourseLocation', id: 1, locationOption: location, defaultSessionAddress: null }]
             : [],
           Program: program,
         }
       : null,
-    SessionAddresses: [],
+    SessionAddresses: address
+      ? [{ __typename: 'SessionAddress', id, address, CourseLocation: null, LocationAddress: null }]
+      : [],
     SessionSpeakers: [],
   };
 };
@@ -86,29 +106,52 @@ describe('buildSessionWhere', () => {
 });
 
 describe('filterSessions', () => {
-  const kiel = session(1, { course: { id: 10, title: 'Zeta' }, location: LocationOption_enum.KIEL });
-  const online = session(2, { course: { id: 11, title: 'Alpha' }, location: LocationOption_enum.ONLINE });
+  const kiel = session(1, {
+    course: { id: 10, title: 'Zeta' },
+    location: LocationOption_enum.KIEL,
+    address: 'Wissenschaftspark',
+  });
+  const online = session(2, {
+    course: { id: 11, title: 'Alpha' },
+    location: LocationOption_enum.ONLINE,
+    published: false,
+  });
   const event = session(3, { course: { id: 12, title: 'Meetup' }, programType: 'EVENTS' });
   const programSession = session(4);
   const all = [kiel, online, event, programSession];
-  const kinds: SessionKind[] = ['COURSES', 'EVENTS'];
+  const none: SessionFilters = {
+    kinds: ['COURSES', 'EVENTS'],
+    publication: ['PUBLISHED', 'UNPUBLISHED'],
+    locations: [],
+    courseIds: [],
+    addresses: [],
+  };
 
   it('keeps everything without filters', () => {
-    expect(filterSessions(all, { kinds, locations: [], courseIds: [] })).toHaveLength(4);
+    expect(filterSessions(all, none)).toHaveLength(4);
   });
 
   it('filters by kind', () => {
-    expect(filterSessions(all, { kinds: ['EVENTS'], locations: [], courseIds: [] })).toEqual([event]);
+    expect(filterSessions(all, { ...none, kinds: ['EVENTS'] })).toEqual([event]);
     expect(sessionKind(programSession)).toBe('COURSES');
   });
 
-  it('filters by location and course', () => {
-    expect(filterSessions(all, { kinds, locations: [LocationOption_enum.ONLINE], courseIds: [] })).toEqual([online]);
-    expect(filterSessions(all, { kinds, locations: [], courseIds: [10] })).toEqual([kiel]);
+  it('filters by publication state', () => {
+    expect(isSessionPublished(online)).toBe(false);
+    expect(filterSessions(all, { ...none, publication: ['UNPUBLISHED'] })).toEqual([online]);
+    expect(filterSessions(all, { ...none, publication: ['PUBLISHED'] })).not.toContain(online);
+    expect(filterSessions(all, { ...none, publication: [] })).toEqual([]);
   });
 
-  it('lists the courses of the loaded sessions by title', () => {
-    expect(coursesOfSessions(all).map((course) => course.title)).toEqual(['Alpha', 'Meetup', 'Zeta']);
+  it('filters by location, course and address', () => {
+    expect(filterSessions(all, { ...none, locations: [LocationOption_enum.ONLINE] })).toEqual([online]);
+    expect(filterSessions(all, { ...none, courseIds: [10] })).toEqual([kiel]);
+    expect(filterSessions(all, { ...none, addresses: ['Wissenschaftspark'] })).toEqual([kiel]);
+  });
+
+  it('lists the courses and addresses of the loaded sessions', () => {
+    expect(coursesOfSessions(all).map((course) => course.name)).toEqual(['Alpha', 'Meetup', 'Zeta']);
+    expect(addressesOfSessions(all)).toEqual(['Wissenschaftspark']);
   });
 });
 
