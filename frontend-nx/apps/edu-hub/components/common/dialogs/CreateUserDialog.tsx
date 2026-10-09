@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Dialog, DialogTitle, Checkbox, FormControlLabel } from '@mui/material';
+import { Dialog, DialogTitle } from '@mui/material';
 import { MdClose } from 'react-icons/md';
 import { Button } from '../Button';
 import InputField from '../../inputs/InputField';
@@ -14,7 +14,6 @@ type CreateUserVariables = {
   firstName: string;
   lastName: string;
   email: string;
-  sendEmail: boolean;
 };
 
 interface CreateUserDialogProps {
@@ -41,7 +40,6 @@ export const CreateUserDialog: React.FC<CreateUserDialogProps> = ({
   const [firstName, setFirstName] = useState(initialFirstName);
   const [lastName, setLastName] = useState(initialLastName);
   const [email, setEmail] = useState(initialEmail);
-  const [sendEmail, setSendEmail] = useState(true); // Default to true
   const [validationError, setValidationError] = useState<string | null>(null);
   const [serverError, setServerError] = useState<string | null>(null);
   const [showSuccessNotification, setShowSuccessNotification] = useState(false);
@@ -85,7 +83,6 @@ export const CreateUserDialog: React.FC<CreateUserDialogProps> = ({
         setFirstName('');
         setLastName('');
         setEmail('');
-        setSendEmail(true);
         // Clear any existing timeout
         if (timeoutRef.current) {
           clearTimeout(timeoutRef.current);
@@ -138,7 +135,6 @@ export const CreateUserDialog: React.FC<CreateUserDialogProps> = ({
         firstName: firstName.trim(),
         lastName: lastName.trim(),
         email: email.trim().toLowerCase(),
-        sendEmail: sendEmail,
       },
     });
   };
@@ -153,7 +149,6 @@ export const CreateUserDialog: React.FC<CreateUserDialogProps> = ({
       setFirstName('');
       setLastName('');
       setEmail('');
-      setSendEmail(true);
       setValidationError(null);
       setServerError(null);
       onClose();
@@ -226,18 +221,7 @@ export const CreateUserDialog: React.FC<CreateUserDialogProps> = ({
               />
             </div>
 
-            <div className="mt-4">
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={sendEmail}
-                    onChange={(e) => setSendEmail(e.target.checked)}
-                    color="primary"
-                  />
-                }
-                label={t('create_user.send_welcome_email')}
-              />
-            </div>
+            <p className="text-sm text-label-secondary">{t('create_user.welcome_email_notice')}</p>
 
             {validationError && (
               <div className="text-red-600 text-sm mt-2">{validationError}</div>

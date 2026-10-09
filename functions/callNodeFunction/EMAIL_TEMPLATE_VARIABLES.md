@@ -113,7 +113,11 @@ The email template variable system is centralized in `emailTemplateVariables.js`
 
 - **`[System:PortalUrl]`**: Portal URL for user login
   - Example: `https://edu.opencampus.sh`
-  - Available in: user creation emails
+  - Available in: all emails
+
+- **`[System:PrivacyPolicyLink]`**: Link to the privacy policy
+  - Example: `https://edu.opencampus.sh/privacy`
+  - Available in: all emails
 
 ### StuJo Job Board Variables
 *Available in: job posting emails (employer-facing)*

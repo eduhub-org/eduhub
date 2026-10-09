@@ -10,6 +10,7 @@ import updateAdminUser from "./updateAdminUser/index.js";
 import getAdminUsers from "./getAdminUsers/index.js";
 import sendEnrollmentEmail from "./sendEnrollmentEmail/index.js";
 import sendOrganizerAddedEmail from "./sendOrganizerAddedEmail/index.js";
+import sendSpeakerAddedEmail from "./sendSpeakerAddedEmail/index.js";
 import sendCancellationRequestEmail from "./sendCancellationRequestEmail/index.js";
 import sendSessionReminders from "./sendSessionReminders/index.js";
 import makeCertificatePublic from "./makeCertificatePublic/index.js";
@@ -85,6 +86,7 @@ const functionMap = {
   getAdminUsers,
   sendEnrollmentEmail,
   sendOrganizerAddedEmail,
+  sendSpeakerAddedEmail,
   sendCancellationRequestEmail,
   sendSessionReminders,
   makeCertificatePublic,
