@@ -16,6 +16,7 @@ import sendSessionReminders from "./sendSessionReminders/index.js";
 import makeCertificatePublic from "./makeCertificatePublic/index.js";
 import createUser from "./createUser/index.js";
 import getFormbricksResponses from "./getFormbricksResponses/index.js";
+import syncFormbricksResponses from "./syncFormbricksResponses/index.js";
 import getFormbricksAddonSelections from "./getFormbricksAddonSelections/index.js";
 import validateFormbricksSurvey from "./validateFormbricksSurvey/index.js";
 import saveCourseFormbricksEnrollmentSurvey from "./saveCourseFormbricksEnrollmentSurvey/index.js";
@@ -92,6 +93,7 @@ const functionMap = {
   makeCertificatePublic,
   createUser,
   getFormbricksResponses,
+  syncFormbricksResponses,
   getFormbricksAddonSelections,
   validateFormbricksSurvey,
   saveCourseFormbricksEnrollmentSurvey,

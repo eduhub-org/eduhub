@@ -1839,6 +1839,17 @@
     "certificates_group": "Certificates",
     "application_status_tooltip": "Click on the circles to change the rating",
     "application_deadline_tooltip": "If you want to change the date for the Confirmation deadline you can resend the invitation.",
+    "application_details": {
+      "contact": "Contact",
+      "applied_on": "Applied on {date}",
+      "registered_on": "Registered on {date}",
+      "answer_count": "complete · {count, plural, one {# answer} other {# answers}}",
+      "read_more": "Read more",
+      "read_less": "Show less",
+      "next_application": "Next application",
+      "next_registration": "Next registration",
+      "keyboard_hint": "Keys 1–3 and 0 rate the open application, J / K jump to the next / previous one."
+    },
     "max_participants": {
       "label": "Maximum number of participants",
       "placeholder": "Maximum number of participants",
@@ -1933,7 +1944,10 @@
       "invitation_expired": "Invitation expired",
       "registered_account": "Registered with account",
       "registered_guest": "Registered as guest",
-      "guest_badge": "Guest"
+      "guest_badge": "Guest",
+      "confirmed_short": "Confirmed",
+      "registered_short": "Registered",
+      "rejected_short": "Rejected"
     },
     "invitation_deadline": "Invitation deadline",
     "loading_course": "Loading course...",
@@ -2351,6 +2365,10 @@
       "first_name_placeholder": "Enter first name",
       "last_name_placeholder": "Enter last name",
       "email_placeholder": "Enter email address"
+    },
+    "expanded": {
+      "profile": "Profile",
+      "history": "Applications and Participations"
     }
   },
   "manageAdminUsers": {
@@ -3387,5 +3405,27 @@
     "title": "EduHub Events | opencampus.sh",
     "description": "Upcoming events at opencampus.sh",
     "icalCategory": "Education"
+  },
+  "enrollmentHistory": {
+    "label": "Previous Applications and Participations",
+    "empty": "No other applications present",
+    "legend": "Green: completed (with certificate) · Blue: participating · Gray: open · Orange: withdrew or invitation expired · Red: rejected or aborted. Hollow dot: attendance not recorded. Attendance counts attended mandatory sessions that have already taken place.",
+    "attendance": "{percent}% attended ({attended}/{total})",
+    "attendance_tooltip": "Attended mandatory sessions out of {total} recorded mandatory sessions",
+    "attendance_not_recorded": "Attendance not recorded",
+    "attendance_not_recorded_tooltip": "No attendance was recorded for the sessions that have taken place, so it is unknown whether this person took part.",
+    "ects": "{ects} ECTS",
+    "status": {
+      "APPLIED": "applied",
+      "INVITED": "invited",
+      "WAITLIST": "waitlist",
+      "REGISTERED": "registered",
+      "CONFIRMED": "participating",
+      "COMPLETED": "completed",
+      "CANCELLED": "withdrew",
+      "EXPIRED": "invitation expired",
+      "REJECTED": "rejected",
+      "ABORTED": "aborted"
+    }
   }
 }

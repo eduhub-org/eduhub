@@ -581,6 +581,7 @@ type FormbricksResponse {
 
 type FormbricksAnswer {
   questionId: String!
+  questionType: String
   headline: String!
   answer: String!
   rawAnswer: String

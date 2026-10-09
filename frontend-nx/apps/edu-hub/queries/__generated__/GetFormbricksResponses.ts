@@ -10,6 +10,7 @@
 export interface GetFormbricksResponses_getFormbricksResponses_responses_answers {
   __typename: "FormbricksAnswer";
   questionId: string;
+  questionType: string | null;
   headline: string;
   answer: string;
   rawAnswer: string | null;

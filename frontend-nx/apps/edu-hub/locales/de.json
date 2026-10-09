@@ -1821,6 +1821,17 @@
     "certificates_group": "Zertifikate",
     "application_status_tooltip": "Klicke auf die Kreise, um die Bewertung zu ändern",
     "application_deadline_tooltip": "Wenn du das Datum für die Bestätigungsfrist ändern möchtest, kannst du die Einladung erneut senden.",
+    "application_details": {
+      "contact": "Kontakt",
+      "applied_on": "Beworben am {date}",
+      "registered_on": "Angemeldet am {date}",
+      "answer_count": "vollständig · {count, plural, one {# Antwort} other {# Antworten}}",
+      "read_more": "Weiterlesen",
+      "read_less": "Weniger anzeigen",
+      "next_application": "Nächste Bewerbung",
+      "next_registration": "Nächste Anmeldung",
+      "keyboard_hint": "Tasten 1–3 und 0 bewerten die aufgeklappte Bewerbung, J / K springt zur nächsten / vorigen."
+    },
     "max_participants": {
       "label": "Max. Teilnehmendenanzahl",
       "placeholder": "Max. Teilnehmendenanzahl",
@@ -1915,7 +1926,10 @@
       "invitation_expired": "Einladung abgelaufen",
       "registered_account": "Angemeldet mit Konto",
       "registered_guest": "Angemeldet als Gast",
-      "guest_badge": "Gast"
+      "guest_badge": "Gast",
+      "confirmed_short": "Bestätigt",
+      "registered_short": "Angemeldet",
+      "rejected_short": "Abgelehnt"
     },
     "invitation_deadline": "Ablaufdatum Einladung",
     "loading_course": "Kurs wird geladen...",
@@ -2336,6 +2350,10 @@
       "first_name_placeholder": "Vorname eingeben",
       "last_name_placeholder": "Nachname eingeben",
       "email_placeholder": "E-Mail-Adresse eingeben"
+    },
+    "expanded": {
+      "profile": "Profil",
+      "history": "Bewerbungen und Teilnahmen"
     }
   },
   "manageAdminUsers": {
@@ -3372,5 +3390,27 @@
     "title": "EduHub Events | opencampus.sh",
     "description": "Kommende Events bei opencampus.sh",
     "icalCategory": "Bildung"
+  },
+  "enrollmentHistory": {
+    "label": "Bisherige Bewerbungen und Teilnahmen",
+    "empty": "Keine weiteren Bewerbungen vorhanden",
+    "legend": "Grün: abgeschlossen (mit Zertifikat) · Blau: nimmt teil · Grau: offen · Orange: selbst zurückgezogen oder Einladung verfallen · Rot: abgelehnt oder abgebrochen. Hohler Punkt: Teilnahmen nicht erfasst. Die Anwesenheit zählt besuchte Pflichttermine, die bereits stattgefunden haben.",
+    "attendance": "{percent} % anwesend ({attended}/{total})",
+    "attendance_tooltip": "Besuchte Pflichttermine von {total} bereits erfassten Pflichtterminen",
+    "attendance_not_recorded": "Teilnahmen nicht erfasst",
+    "attendance_not_recorded_tooltip": "Für die bereits stattgefundenen Termine wurde keine Anwesenheit erfasst – ob die Person teilgenommen hat, ist unbekannt.",
+    "ects": "{ects} ECTS",
+    "status": {
+      "APPLIED": "beworben",
+      "INVITED": "eingeladen",
+      "WAITLIST": "Warteliste",
+      "REGISTERED": "angemeldet",
+      "CONFIRMED": "nimmt teil",
+      "COMPLETED": "abgeschlossen",
+      "CANCELLED": "selbst zurückgezogen",
+      "EXPIRED": "Einladung verfallen",
+      "REJECTED": "abgelehnt",
+      "ABORTED": "abgebrochen"
+    }
   }
 }
