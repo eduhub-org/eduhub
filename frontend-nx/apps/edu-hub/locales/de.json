@@ -760,6 +760,7 @@
       "location": "Ort",
       "language": "Sprache",
       "price": "Preis",
+      "price_depends_on_add_ons": "je nach Zusatzoptionen",
       "places": "Plätze",
       "places_left": "Noch {count} frei",
       "places_total": "von {count}",

@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import { FC, useMemo, useCallback, Fragment, ReactNode, type JSX } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
-import { MdAttachMoney, MdCalendarMonth, MdPeopleOutline, MdSchool } from 'react-icons/md';
+import { MdCalendarMonth, MdOutlineSell, MdPeopleOutline, MdSchool } from 'react-icons/md';
 
 import { useStartTimeString, useEndTimeString, getWeekdayString } from '../../../helpers/dateTimeHelpers';
 import { useAppSettings } from '../../../contexts/AppSettingsContext';
@@ -72,29 +72,41 @@ export const CourseFacts: FC<IProps> = ({ course }) => {
       ? Number(course.requiredEcts).toLocaleString(locale, { maximumFractionDigits: 1 })
       : null;
 
-  // Format price helper
-  const formatPrice = useCallback((priceInCents: number, currency: string): string => {
-    const price = priceInCents / 100;
-    const formatter = new Intl.NumberFormat(locale === 'de' ? 'de-DE' : 'en-US', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    });
-    return `${formatter.format(price)} ${currency}`;
-  }, [locale]);
+  const formatAmount = useCallback(
+    (priceInCents: number): string =>
+      new Intl.NumberFormat(locale === 'de' ? 'de-DE' : 'en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }).format(priceInCents / 100),
+    [locale]
+  );
+  const formatPrice = useCallback(
+    (priceInCents: number, currency: string): string => `${formatAmount(priceInCents)} ${currency}`,
+    [formatAmount]
+  );
+  const formatPriceRange = useCallback(
+    (minInCents: number, maxInCents: number, currency: string): string =>
+      `${formatAmount(minInCents)} – ${formatAmount(maxInCents)} ${currency}`,
+    [formatAmount]
+  );
 
-  // Check if registration requires payment
+  // What the course costs. Only the payment registration types charge through
+  // EduHub, so every other course is free - except an external registration,
+  // whose cost lives elsewhere and is only stated if a base price was entered.
   const registrationConfig = course.registrationType
     ? getRegistrationTypeConfig(course.registrationType)
     : null;
   const requiresPayment = registrationConfig?.requiresPayment ?? false;
-
-  // Check if course has price
-  const basePrice = course.basePrice || 0;
+  const isExternalRegistration = registrationConfig?.isExternal ?? false;
   const currency = course.currency || 'EUR';
-  const hasPrice = basePrice > 0;
-  const hasAddons = course.CourseAddonMappings && course.CourseAddonMappings.length > 0;
-  // Only show price if registration requires payment
-  const showPrice = requiresPayment && (hasPrice || course.basePrice === 0 || course.basePrice === null);
+  const basePrice = requiresPayment || isExternalRegistration ? course.basePrice || 0 : 0;
+  // Add-ons are picked in the Formbricks survey, which may allow several, so
+  // the upper bound is the base price plus every add-on.
+  const addonsTotal = requiresPayment
+    ? (course.CourseAddonMappings ?? []).reduce((sum, addon) => sum + (addon.validatedPrice || 0), 0)
+    : 0;
+  const maxPrice = basePrice + addonsTotal;
+  const showPrice = !isExternalRegistration || basePrice > 0;
 
   // Get next upcoming session (or last session if no future sessions) when weekday is NONE
   const relevantSession = useMemo(() => {
@@ -228,28 +240,6 @@ export const CourseFacts: FC<IProps> = ({ course }) => {
       );
     }
 
-    // Price
-    if (showPrice) {
-      elements.push(
-        <Fact key="price" icon={<MdAttachMoney size={20} />} label={tCourse('info.price')}>
-          {hasPrice ? (
-            <>
-              {formatPrice(basePrice, currency)}
-              {hasAddons && (
-                <span className="block font-medium text-label-secondary mt-0.5">
-                  + {tCoursePage('add_ons')}
-                </span>
-              )}
-            </>
-          ) : basePrice === 0 && hasAddons ? (
-            tCoursePage('variable_price')
-          ) : (
-            tCoursePage('free_course')
-          )}
-        </Fact>
-      );
-    }
-
     // Location
     if (hasLocation) {
       elements.push(
@@ -296,6 +286,26 @@ export const CourseFacts: FC<IProps> = ({ course }) => {
       );
     }
 
+    // Price
+    if (showPrice) {
+      elements.push(
+        <Fact key="price" icon={<MdOutlineSell size={20} />} label={tCourse('info.price')}>
+          {maxPrice === 0 ? (
+            tCoursePage('free_course')
+          ) : maxPrice === basePrice ? (
+            formatPrice(basePrice, currency)
+          ) : (
+            <>
+              {formatPriceRange(basePrice, maxPrice, currency)}
+              <span className="block font-medium text-label-secondary mt-0.5">
+                {tCourse('info.price_depends_on_add_ons')}
+              </span>
+            </>
+          )}
+        </Fact>
+      );
+    }
+
     // Places left, or simply how many are taking part
     if (showsPlaces && placesLeft != null && maxParticipants != null) {
       elements.push(
@@ -338,10 +348,10 @@ export const CourseFacts: FC<IProps> = ({ course }) => {
     getStartTimeString,
     getEndTimeString,
     formatPrice,
+    formatPriceRange,
     basePrice,
+    maxPrice,
     currency,
-    hasPrice,
-    hasAddons,
     ectsTranslations,
     normalizedEctsKey,
     isDegreeCourse,
