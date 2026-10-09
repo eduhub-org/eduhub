@@ -3,6 +3,7 @@ import { buildCloudStorage } from "../lib/cloud-storage.js";
 import { replacePlaceholders } from "../lib/utils.js";
 import { sanitizeStoredFileName } from "../lib/fileName.js";
 import { logger } from "../index.js";
+import { authorizeUpload } from "../lib/uploadAuthorization.js";
 import sharp from "sharp";
 import path from "path";
 
@@ -72,7 +73,7 @@ function extractFormatFromFileName(filename) {
  *     - filePath (string): Path to the resized image
  *     - accessUrl (string): URL to access the resized image (signed URL if private, public URL if public)
  */
-const saveImage = async (req) => {
+export const saveImageUnchecked = async (req) => {
   logger.info("########## Save Image ##########");
   logger.debug("Request parameters", {
     filename: req.body.input.filename,
@@ -130,23 +131,6 @@ const saveImage = async (req) => {
     }
 
     const { base64file: _base64file, ...pathInputs } = req.body.input;
-
-    // ${userid} in the path is caller input. Without this check any logged-in
-    // user could overwrite another user's public profile picture by sending
-    // that user's id and the file name from their picture URL.
-    if ('userid' in pathInputs) {
-      const sessionVariables = req.body.session_variables || {};
-      const isAdmin = sessionVariables['x-hasura-role'] === 'admin';
-      if (!isAdmin && pathInputs.userid !== sessionVariables['x-hasura-user-id']) {
-        logger.error("Refusing image upload into another user's folder");
-        return {
-          success: false,
-          messageKey: "UNAUTHORIZED",
-          error: "You can only upload images for your own profile"
-        };
-      }
-    }
-
     const filePath = replacePlaceholders(templatePath, {
       ...pathInputs,
       filename: safeFileName,
@@ -192,6 +176,31 @@ const saveImage = async (req) => {
       error: "An error occurred while saving the image"
     };
   }
+};
+
+/**
+ * The saveImage action: checks that the caller may change the record the
+ * image belongs to (see lib/uploadAuthorization.js), then saves it.
+ */
+const saveImage = async (req) => {
+  try {
+    const authorization = await authorizeUpload(req);
+    if (!authorization.authorized) {
+      logger.error("Image upload refused", { reason: authorization.reason });
+      // filePath/accessUrl are non-null in saveImageResult (actions.graphql).
+      return { success: false, messageKey: "UNAUTHORIZED", error: authorization.reason, filePath: "", accessUrl: "" };
+    }
+  } catch (error) {
+    logger.error("Error authorizing image upload", { error: error.message });
+    return {
+      success: false,
+      messageKey: "IMAGE_SAVE_ERROR",
+      error: "An error occurred while saving the image",
+      filePath: "",
+      accessUrl: "",
+    };
+  }
+  return saveImageUnchecked(req);
 };
 
 export default saveImage;
