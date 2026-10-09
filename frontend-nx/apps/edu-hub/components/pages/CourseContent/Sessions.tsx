@@ -96,7 +96,11 @@ const SessionLocations: FC<SessionLocationsProps> = ({ locations, canSeeOnlineLi
  * shared by all courses of the program, and an optional one. Mandatory course
  * sessions - the default - get none.
  */
-const SessionEyebrow: FC<{ session: Session; programTitle?: string | null }> = ({ session, programTitle }) => {
+const SessionEyebrow: FC<{ session: Session; programTitle?: string | null; isEvent: boolean }> = ({
+  session,
+  programTitle,
+  isEvent,
+}) => {
   const t = useTranslations('course');
   const isShared = isProgramSession(session);
   const isOptional = session.isMandatory === false;
@@ -105,8 +109,14 @@ const SessionEyebrow: FC<{ session: Session; programTitle?: string | null }> = (
   return (
     <span className="flex flex-wrap items-center gap-x-2 text-[11px] font-bold uppercase tracking-widest mb-0.5">
       {isShared && (
-        <Tooltip title={t('sessions.program_session_tooltip', { program: programTitle ?? '' })}>
-          <span className="text-label-cross-course">{t('sessions.program_session')}</span>
+        <Tooltip
+          title={t(isEvent ? 'sessions.program_session_tooltip_event' : 'sessions.program_session_tooltip', {
+            program: programTitle ?? '',
+          })}
+        >
+          <span className="text-label-cross-course">
+            {t(isEvent ? 'sessions.program_session_event' : 'sessions.program_session')}
+          </span>
         </Tooltip>
       )}
       {isShared && isOptional && (
@@ -126,9 +136,10 @@ interface SessionRowProps {
   showDate: boolean;
   canSeeOnlineLink: boolean;
   programTitle?: string | null;
+  isEvent: boolean;
 }
 
-const SessionRow: FC<SessionRowProps> = ({ session, locations, showDate, canSeeOnlineLink, programTitle }) => {
+const SessionRow: FC<SessionRowProps> = ({ session, locations, showDate, canSeeOnlineLink, programTitle, isEvent }) => {
   const t = useTranslations('course');
   const displayDate = useDisplayDate();
   const formatTimeString = useFormatTimeString();
@@ -157,7 +168,7 @@ const SessionRow: FC<SessionRowProps> = ({ session, locations, showDate, canSeeO
         </span>
       </div>
       <div className="flex flex-col flex-1 min-w-0">
-        <SessionEyebrow session={session} programTitle={programTitle} />
+        <SessionEyebrow session={session} programTitle={programTitle} isEvent={isEvent} />
         {title ? (
           <span className="block text-base sm:text-lg font-semibold break-words">{title}</span>
         ) : (
@@ -298,6 +309,7 @@ export const Sessions: FC<SessionsProps> = ({
                     showDate={false}
                     canSeeOnlineLink={canSeeOnlineLink}
                     programTitle={programTitle}
+                    isEvent={isEvent}
                   />
                 ))}
               </ul>
@@ -321,6 +333,7 @@ export const Sessions: FC<SessionsProps> = ({
             showDate={true}
             canSeeOnlineLink={canSeeOnlineLink}
             programTitle={programTitle}
+            isEvent={isEvent}
           />
         ))}
       </ul>
