@@ -24,11 +24,12 @@ const MAX_AGE_DAYS = 120;
 const PAGE_SIZE = 1000;
 
 const GET_CANDIDATES = gql`
-  query GetEnrollmentsWithoutQuestionnaireResponse($after: timestamptz!, $limit: Int!, $offset: Int!) {
+  query GetEnrollmentsWithoutQuestionnaireResponse($after: timestamptz!, $limit: Int!, $page: CourseEnrollment_bool_exp!) {
     CourseEnrollment(
       where: {
         isTest: { _eq: false }
         created_at: { _gte: $after }
+        _and: [$page]
         _or: [
           { questionnaireResponse: { _is_null: true } }
           { questionnaireResponse: { _contains: { response: { finished: false } } } }
@@ -42,9 +43,9 @@ const GET_CANDIDATES = gql`
       }
       order_by: [{ created_at: desc }, { id: desc }]
       limit: $limit
-      offset: $offset
     ) {
       id
+      created_at
       userId
       courseId
       questionnaireResponse
@@ -76,12 +77,27 @@ export const groupBySurveyUrl = (enrollments) => {
   return groups;
 };
 
+/** Rows after the last one of the previous page, in (created_at, id) descending order. */
+export const pageAfter = (last) =>
+  last
+    ? {
+        _or: [
+          { created_at: { _lt: last.created_at } },
+          { _and: [{ created_at: { _eq: last.created_at } }, { id: { _lt: last.id } }] },
+        ],
+      }
+    : {};
+
+// Questions and formatted answers only: jsonb reorders object keys, so the stored
+// answers do not stringify like freshly formatted ones.
+const answerKey = (answers) => JSON.stringify((answers || []).map((a) => [a.questionId, a.answer]));
+
 /** Whether the newest response differs from what is stored (new, or a changed one). */
 const isNewer = (stored, response) =>
   !stored?.response ||
   stored.response.id !== response.id ||
   stored.response.finished !== response.finished ||
-  stored.response.answers?.length !== response.answers.length;
+  answerKey(stored.response.answers) !== answerKey(response.answers);
 
 export default async function syncFormbricksResponses(req, logger) {
   logger.info('########## Sync Formbricks Responses ##########');
@@ -91,12 +107,18 @@ export default async function syncFormbricksResponses(req, logger) {
   });
 
   const after = new Date(Date.now() - MAX_AGE_DAYS * 24 * 60 * 60 * 1000).toISOString();
-  // All pages before storing anything: stored rows leave the filter, which would shift later pages.
+  // Paged by (created_at, id), not by offset: rows that get a response meanwhile (here or from
+  // the applications tab) leave the filter and would shift offset pages.
   const candidates = [];
-  for (let offset = 0; ; offset += PAGE_SIZE) {
-    const { CourseEnrollment: page } = await client.request(GET_CANDIDATES, { after, limit: PAGE_SIZE, offset });
+  for (let last = null; ; ) {
+    const { CourseEnrollment: page } = await client.request(GET_CANDIDATES, {
+      after,
+      limit: PAGE_SIZE,
+      page: pageAfter(last),
+    });
     candidates.push(...page);
     if (page.length < PAGE_SIZE) break;
+    last = page[page.length - 1];
   }
   const groups = groupBySurveyUrl(candidates);
 

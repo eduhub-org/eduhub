@@ -145,7 +145,11 @@ export const EnrollmentHistory: FC<Props> = ({ enrollments, excludeCourseId, sho
                   <span
                     data-testid="history-dot"
                     className="mt-1 h-3 w-3 flex-shrink-0 rounded-full"
-                    style={unrecorded ? { border: `2px solid ${dotColor}` } : { backgroundColor: dotColor }}
+                    style={
+                      unrecorded
+                        ? { borderWidth: 2, borderStyle: 'solid', borderColor: dotColor }
+                        : { backgroundColor: dotColor }
+                    }
                   />
                   {!isLast && <span className="mt-1 w-0.5 flex-1 bg-table-divider" />}
                 </div>

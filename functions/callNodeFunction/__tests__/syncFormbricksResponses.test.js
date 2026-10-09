@@ -24,6 +24,7 @@ const URL_B = 'https://forms.example/s/b';
 
 const enrollment = (id, userId, courseUrl, programUrl, questionnaireResponse = null) => ({
   id,
+  created_at: '2026-10-01T00:00:00.000Z',
   userId,
   courseId: 42,
   questionnaireResponse,
@@ -58,7 +59,12 @@ describe('syncFormbricksResponses', () => {
   it('fetches each survey once and stores new or changed responses only', async () => {
     const unchangedStored = {
       provider: 'formbricks',
-      response: { id: 'r3', finished: false, answers: [{}] },
+      response: { id: 'r3', finished: false, answers: [{ questionId: 'q1', answer: 'answer' }] },
+    };
+    // Same response, still unfinished, but the applicant changed an answer since.
+    const changedStored = {
+      provider: 'formbricks',
+      response: { id: 'r7', finished: false, answers: [{ questionId: 'q1', answer: 'old answer' }] },
     };
     request.mockImplementation(async (document) => {
       if (document.includes('query GetEnrollmentsWithoutQuestionnaireResponse')) {
@@ -68,6 +74,7 @@ describe('syncFormbricksResponses', () => {
             enrollment(2, 'u2', null, URL_A), // program default
             enrollment(3, 'u3', URL_B, URL_A, unchangedStored), // course URL wins
             enrollment(4, 'u4', URL_B, null), // no response yet
+            enrollment(7, 'u7', URL_B, null, changedStored),
           ],
         };
       }
@@ -76,14 +83,14 @@ describe('syncFormbricksResponses', () => {
     loadFormbricksSurveyResponses.mockImplementation(async (url) =>
       url === URL_A
         ? loaded(URL_A, [raw('r1', 'u1'), raw('r2', 'u2')])
-        : loaded(URL_B, [raw('r3', 'u3', false)])
+        : loaded(URL_B, [raw('r3', 'u3', false), raw('r7', 'u7', false)])
     );
 
     const result = await syncFormbricksResponses({ body: {} }, logger);
 
     expect(loadFormbricksSurveyResponses).toHaveBeenCalledTimes(2);
-    expect(storedIds()).toEqual([1, 2]);
-    expect(result).toEqual({ success: true, candidates: 4, surveys: 2, failedSurveys: 0, stored: 2 });
+    expect(storedIds()).toEqual([1, 2, 7]);
+    expect(result).toEqual({ success: true, candidates: 5, surveys: 2, failedSurveys: 0, stored: 3 });
   });
 
   it('re-stores an unfinished response once it is finished, and survives a broken survey', async () => {
@@ -111,28 +118,36 @@ describe('syncFormbricksResponses', () => {
     expect(stored.provider).toBe('formbricks');
     expect(stored.response.finished).toBe(true);
   });
-  it('pages through all candidates before fetching the surveys', async () => {
-    const offsets = [];
+  it('pages by (created_at, id) so rows that leave the filter meanwhile skip nobody', async () => {
+    // 1003 candidates, newest first; pairs share a created_at so the id tie-break matters.
+    let rows = Array.from({ length: 1003 }, (_, i) => ({
+      ...enrollment(1003 - i, `u${1003 - i}`, URL_A, null),
+      created_at: new Date(Date.UTC(2026, 9, 1) - Math.floor(i / 2) * 60000).toISOString(),
+    }));
+    const pages = [];
     request.mockImplementation(async (document, variables) => {
-      if (document.includes('query GetEnrollmentsWithoutQuestionnaireResponse')) {
-        offsets.push(variables.offset);
-        // A full first page, then a short one
-        const size = variables.offset === 0 ? variables.limit : 2;
-        return {
-          CourseEnrollment: Array.from({ length: size }, (_, i) =>
-            enrollment(variables.offset + i + 1, `u${variables.offset + i + 1}`, URL_A, null)
-          ),
-        };
-      }
-      return {};
+      if (!document.includes('query GetEnrollmentsWithoutQuestionnaireResponse')) return {};
+      pages.push(variables.page);
+      const cursor = variables.page._or;
+      const after = cursor
+        ? rows.filter(
+            (r) =>
+              r.created_at < cursor[0].created_at._lt ||
+              (r.created_at === cursor[1]._and[0].created_at._eq && r.id < cursor[1]._and[1].id._lt)
+          )
+        : rows;
+      const page = after.slice(0, variables.limit);
+      // The applications tab stores a response for the newest row while the sync pages.
+      rows = rows.slice(1);
+      return { CourseEnrollment: page };
     });
-    loadFormbricksSurveyResponses.mockResolvedValue(loaded(URL_A, [raw('r', 'u1002')]));
+    loadFormbricksSurveyResponses.mockResolvedValue(loaded(URL_A, [raw('r', 'u1')]));
 
     const result = await syncFormbricksResponses({ body: {} }, logger);
 
-    expect(offsets).toEqual([0, 1000]);
-    expect(loadFormbricksSurveyResponses).toHaveBeenCalledTimes(1);
-    expect(result).toMatchObject({ candidates: 1002, surveys: 1, stored: 1 });
-    expect(storedIds()).toEqual([1002]);
+    expect(pages[0]).toEqual({});
+    expect(pages).toHaveLength(2);
+    expect(result).toMatchObject({ candidates: 1003, surveys: 1, stored: 1 });
+    expect(storedIds()).toEqual([1]);
   });
 });

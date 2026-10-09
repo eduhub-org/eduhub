@@ -144,7 +144,10 @@ describe('EnrollmentHistory', () => {
 
     const event = entry('Open Day');
     expect(within(event).getByText(/attendance_not_recorded$/)).toBeInTheDocument();
-    expect(within(event).getByTestId('history-dot')).toHaveStyle({ backgroundColor: '' });
+    const dot = within(event).getByTestId('history-dot');
+    expect(dot.style.backgroundColor).toBe('');
+    expect(dot.style.borderStyle).toBe('solid');
+    expect(dot.style.borderWidth).toBe('2px');
   });
 
   it('shows the empty state when only the current course is there', () => {

@@ -74,9 +74,9 @@ const ResponseView: FC<{ surveyName?: string | null; response: QuestionnaireResp
       </div>
 
       <ol>
-        {response.answers.map((answer) => (
+        {response.answers.map((answer, index) => (
           <li
-            key={answer.questionId}
+            key={`${answer.questionId}-${index}`}
             className="space-y-1 border-t border-table-divider py-4"
             data-question-type={answer.questionType ?? undefined}
           >
