@@ -270,6 +270,8 @@ describe('Sessions Component - optional sessions', () => {
     );
 
     expect(screen.getAllByText('sessions.optional')).toHaveLength(1);
+    // The former "all sessions are mandatory" hint stays gone.
+    expect(screen.queryByText('sessions.optional_hint')).not.toBeInTheDocument();
   });
 
   it('shows no pill when every session is mandatory', () => {
