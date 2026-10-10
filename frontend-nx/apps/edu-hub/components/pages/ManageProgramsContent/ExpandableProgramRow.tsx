@@ -196,7 +196,11 @@ const ExpandableProgramRow: FC<ExpandableProgramRowProps> = ({ program }) => {
       Array.from(
         new Set(
           (instructorEmailsData?.Course ?? []).flatMap((course) =>
-            course.CourseInstructors.map((instructor) => instructor.User.email).filter(Boolean)
+            // User is null when the org admin may see the course but not its instructors' contact
+            // details (no capability for the program's type).
+            course.CourseInstructors.map((instructor) => instructor.User?.email).filter(
+              (email): email is string => Boolean(email)
+            )
           )
         )
       ),
