@@ -53,6 +53,16 @@ import { Button } from '../../common/Button';
 import FileUploadField from '../../inputs/FileUploadField';
 import NotificationSnackbar from '../../common/dialogs/NotificationSnackbar';
 import { submissionDeadlineToCalendarDate } from '../CourseContent/Projects/projectEffectiveSubmissionDeadline';
+import { PROGRAM_INSTRUCTOR_EMAILS } from '../../../queries/programInstructors';
+import {
+  ProgramInstructorEmails,
+  ProgramInstructorEmailsVariables,
+} from '../../../queries/__generated__/ProgramInstructorEmails';
+
+// Longer mailto URLs are cut off or ignored by some email clients (same limit as the course
+// applications tab); beyond it the addresses are copied to the clipboard instead.
+const MAILTO_URL_LIMIT = 1800;
+
 interface ExpandableProgramRowProps {
   program: ProgramList_Program;
 }
@@ -176,6 +186,41 @@ const ExpandableProgramRow: FC<ExpandableProgramRowProps> = ({ program }) => {
     },
     [program.id, syncProgramInstructorRoom, t]
   );
+
+  const { data: instructorEmailsData, loading: instructorEmailsLoading } = useRoleQuery<
+    ProgramInstructorEmails,
+    ProgramInstructorEmailsVariables
+  >(PROGRAM_INSTRUCTOR_EMAILS, { variables: { programId: program.id } });
+  const instructorEmails = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          (instructorEmailsData?.Course ?? []).flatMap((course) =>
+            // User is null when the org admin may see the course but not its instructors' contact
+            // details (no capability for the program's type).
+            course.CourseInstructors.map((instructor) => instructor.User?.email).filter(
+              (email): email is string => Boolean(email)
+            )
+          )
+        )
+      ),
+    [instructorEmailsData?.Course]
+  );
+
+  const handleEmailInstructorsClick = async () => {
+    const mailtoUrl = `mailto:?bcc=${encodeURIComponent(instructorEmails.join(','))}`;
+    if (mailtoUrl.length <= MAILTO_URL_LIMIT) {
+      window.location.href = mailtoUrl;
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(instructorEmails.join(','));
+      setSyncNotice({ open: true, message: t('instructor_emails.copied', { count: instructorEmails.length }) });
+    } catch (error) {
+      console.error('ExpandableProgramRow: copying instructor emails failed', error);
+      setSyncNotice({ open: true, message: t('instructor_emails.copy_failed') });
+    }
+  };
 
   const [
     loadParticipationData,
@@ -418,7 +463,29 @@ const ExpandableProgramRow: FC<ExpandableProgramRowProps> = ({ program }) => {
               </div>
             </div>
 
-            {/* 1. Participation Data Card */}
+            {/* 1. Instructor Emails Card */}
+            <div className="bg-fill-primary border border-border-primary rounded-lg p-4">
+              <h4 className="text-sm font-medium text-label-primary mb-1">{t('instructor_emails.label')}</h4>
+              <p className="text-xs text-label-secondary mb-3">{t('instructor_emails.help_text')}</p>
+              <div className="flex items-center gap-3">
+                <Button
+                  as="button"
+                  onClick={handleEmailInstructorsClick}
+                  disabled={instructorEmailsLoading || instructorEmails.length === 0}
+                >
+                  {t('instructor_emails.button')}
+                </Button>
+                {instructorEmailsLoading ? (
+                  <CircularProgress size={18} />
+                ) : (
+                  <span className="text-sm text-label-secondary">
+                    {t('instructor_emails.count', { count: instructorEmails.length })}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* 2. Participation Data Card */}
             <div className="bg-fill-primary border border-border-primary rounded-lg p-4">
               <h4 className="text-sm font-medium text-label-primary mb-3">{t('participation_data.generate')}</h4>
               <div className="space-y-2">
