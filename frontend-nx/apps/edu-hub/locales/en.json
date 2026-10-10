@@ -1446,6 +1446,16 @@
       },
       "application_locks_hint": "An application process always includes a questionnaire and cannot be combined with payment.",
       "summary": "Registration type: {mode}"
+    },
+    "instructor_payment": {
+      "total_label": "Instructor fee (total)",
+      "total_help": "One amount per course, regardless of the number of instructors. The instructors split it among themselves.",
+      "invalid_amount": "Please enter a valid amount.",
+      "save_failed": "The change could not be saved.",
+      "remaining": "Not yet assigned",
+      "locked": "Split fixed",
+      "unlock": "Unlock split",
+      "unlock_question": "The instructors will be able to change the split again. Invoices that were already downloaded stay as they are. Unlock?"
     }
   },
   "manageCourse": {
@@ -2176,7 +2186,36 @@
     },
     "info_block_mobile_summary": "{title} · {count} characters",
     "info_block_mobile_untitled": "Untitled",
-    "info_block_mobile_empty": "Empty"
+    "info_block_mobile_empty": "Empty",
+    "course_team": {
+      "title": "Course team",
+      "message_on_element": "Message on Element",
+      "split_explanation": "The fee of {total} covers the whole course, regardless of how many instructors there are. Please agree among yourselves and split it according to the time and effort each of you put into the course (e.g. number of sessions). As soon as one person downloads their invoice, the split is fixed for everyone.",
+      "share_label": "Share of {name} in euros",
+      "invalid_amount": "Please enter a valid amount.",
+      "exceeds_total": "Too high – at most {max} is still unassigned.",
+      "save_failed": "The amount could not be saved.",
+      "total": "Total fee: {total}",
+      "remaining": "still to assign: {remaining}",
+      "sole_fee": "Your fee: {total}",
+      "locked": "The split is fixed because an invoice has already been downloaded.",
+      "download_invoice": "Download my invoice",
+      "generating": "Creating invoice…",
+      "hint_no_template": "No invoice template has been set up for this program yet.",
+      "hint_missing_amounts": "Enter an amount for every instructor (0 is allowed).",
+      "hint_sum_mismatch": "The amounts must add up exactly to the total fee (difference: {remaining}).",
+      "confirm_lock_title": "Fix the split?",
+      "confirm_lock_question": "Downloading your invoice fixes the split for all instructors; it can no longer be changed afterwards. Continue?",
+      "confirm_lock_confirm": "Fix and download",
+      "errors": {
+        "NOT_COURSE_INSTRUCTOR": "You are not listed as an instructor of this course.",
+        "NO_INVOICE_TEMPLATE": "No invoice template has been set up for this program.",
+        "NO_PAYMENT_TOTAL": "No fee has been set for this course.",
+        "PAYMENT_SPLIT_INCOMPLETE": "The split is incomplete: every amount must be entered and they must add up exactly to the total fee.",
+        "PDF_CREATION_FAILED": "The PDF could not be created. Please contact the program team.",
+        "UNEXPECTED_ERROR": "The invoice could not be created. Please try again later."
+      }
+    }
   },
   "manageProjects": {
     "headline": "Projects",
@@ -2275,7 +2314,10 @@
       "upload_template": "Click to upload template or drag and drop",
       "html_template_label": "HTML template",
       "html_template_apply_default": "Use default for this program type",
-      "apply_default_unavailable": "No attendance template default is configured for this program type yet."
+      "apply_default_unavailable": "No attendance template default is configured for this program type yet.",
+      "instructor_invoice_template": "Instructor invoice template",
+      "no_template": "No template",
+      "no_instructor_invoice_templates": "Create a template of type “Instructor invoice” under Settings → Certificate & invoice templates."
     },
     "participation_data": {
       "generate": "Generate Participation Data (CSV)",
@@ -2556,11 +2598,22 @@
       "loading": "Loading certificate templates…",
       "load_error": "The certificate templates could not be loaded.",
       "html_editor": {
-        "label": "Attendance certificate HTML templates",
+        "label": "Certificate and invoice HTML templates",
         "help_text": "Edit the Jinja2 HTML stored in the database.",
         "template_select": "Template",
         "no_templates": "No certificate templates found.",
         "preview_label": "A4 preview (sample data)"
+      },
+      "types": {
+        "PARTICIPANT_CERTIFICATE": "Participant certificate",
+        "INSTRUCTOR_INVOICE": "Instructor invoice",
+        "INSTRUCTOR_CERTIFICATE": "Instructor certificate"
+      },
+      "new_template": {
+        "name": "Name of the new template",
+        "type": "Type",
+        "create": "Create template",
+        "error": "The template could not be created. Is the name already taken?"
       }
     },
     "default_attendance_certificate_template": {
@@ -3144,8 +3197,8 @@
           "description": "Create, edit, and publish programs"
         },
         "attendance-certificates": {
-          "label": "Attendance certificates",
-          "description": "HTML templates and program-type defaults for attendance certificates"
+          "label": "Certificate & invoice templates",
+          "description": "HTML templates for certificates and instructor invoices, plus program-type defaults"
         },
         "project-types": {
           "label": "Project types",

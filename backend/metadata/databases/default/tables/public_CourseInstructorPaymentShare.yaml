@@ -1,0 +1,76 @@
+# Payment data is confidential: only instructors of the same course and (org) admins may see it.
+# Never widen the instructor_access filter -- instructors of other courses must not see amounts.
+table:
+  name: CourseInstructorPaymentShare
+  schema: public
+object_relationships:
+  - name: CourseInstructor
+    using:
+      foreign_key_constraint_on: courseInstructorId
+select_permissions:
+  - role: instructor_access
+    permission:
+      columns:
+        - id
+        - courseInstructorId
+        - amount
+        - invoiceURL
+        - created_at
+        - updated_at
+      filter:
+        CourseInstructor:
+          Course:
+            CourseInstructors:
+              userId:
+                _eq: X-Hasura-User-Id
+  - role: org_admin_access
+    permission:
+      columns:
+        - id
+        - courseInstructorId
+        - amount
+        - invoiceURL
+        - created_at
+        - updated_at
+      filter:
+        CourseInstructor:
+          Course:
+            Program:
+              Organization:
+                OrganizationAdmins:
+                  userId:
+                    _eq: X-Hasura-User-Id
+# Instructors upsert shares for themselves and their co-instructors while the split is unlocked.
+# The DB trigger course_instructor_payment_share_guard additionally enforces lock and total.
+insert_permissions:
+  - role: instructor_access
+    permission:
+      columns:
+        - courseInstructorId
+        - amount
+      check:
+        CourseInstructor:
+          Course:
+            _and:
+              - CourseInstructors:
+                  userId:
+                    _eq: X-Hasura-User-Id
+              - InstructorPayment:
+                  lockedAt:
+                    _is_null: true
+update_permissions:
+  - role: instructor_access
+    permission:
+      columns:
+        - amount
+      filter:
+        CourseInstructor:
+          Course:
+            _and:
+              - CourseInstructors:
+                  userId:
+                    _eq: X-Hasura-User-Id
+              - InstructorPayment:
+                  lockedAt:
+                    _is_null: true
+      check: null

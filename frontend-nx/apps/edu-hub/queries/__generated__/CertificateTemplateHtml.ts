@@ -3,6 +3,8 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
+import { CertificateTemplateType_enum } from "./../../__generated__/globalTypes";
+
 // ====================================================
 // GraphQL query operation: CertificateTemplateHtml
 // ====================================================
@@ -14,6 +16,10 @@ export interface CertificateTemplateHtml_CertificateTemplate_by_pk {
    * Human-readable, unique identifier (e.g. "Default achievement certificate", "Degree certificate - Digital Innovation").
    */
   name: string;
+  /**
+   * Kind of document this template renders; selectors only offer templates of the matching type.
+   */
+  type: CertificateTemplateType_enum;
   /**
    * Jinja2 HTML body. Rendering variables depend on the certificate variant: full_name, semester, course_name, ECTS, learningGoalsList, praxisprojekt, online_courses (project-based achievement), successful_participations / passed_participations / event_participations / required_ects / required_ects_display / required_event_count / achieved_ects / achieved_ects_display / attended_event_count (degree), event_entries (attendance), template (background image).
    */

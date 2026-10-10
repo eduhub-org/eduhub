@@ -5,6 +5,7 @@ export const CERTIFICATE_TEMPLATES = gql`
     CertificateTemplate(order_by: { name: asc }) {
       id
       name
+      type
     }
   }
 `;
@@ -16,8 +17,19 @@ export const CERTIFICATE_TEMPLATE_HTML = gql`
     CertificateTemplate_by_pk(id: $id) {
       id
       name
+      type
       html
       updated_at
+    }
+  }
+`;
+
+export const INSERT_CERTIFICATE_TEMPLATE = gql`
+  mutation InsertCertificateTemplate($name: String!, $type: CertificateTemplateType_enum!, $html: String!) {
+    insert_CertificateTemplate_one(object: { name: $name, type: $type, html: $html }) {
+      id
+      name
+      type
     }
   }
 `;

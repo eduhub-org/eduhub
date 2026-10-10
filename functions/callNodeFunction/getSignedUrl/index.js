@@ -1,6 +1,7 @@
 import { Storage } from "@google-cloud/storage";
 import { buildCloudStorage } from "../lib/cloud-storage.js";
 import { logger } from "../index.js";
+import { canAccessPath } from "./access.js";
 
 /**
  * Gets a signed URL for accessing a file in cloud storage.
@@ -29,12 +30,8 @@ const getSignedUrl = async (req) => {
   const userUUID = req.body.session_variables['x-hasura-user-id'];
 
   try {
-    // Admin users or users accessing their own data
-    if (userRole === 'admin' ||
-        userRole === 'instructor' ||
-       (userUUID && path.includes("/user-" + userUUID + "/")) ||
-       (userUUID && path.startsWith(userUUID + "/")) || // included for legacy names
-       (userUUID && path.startsWith("/user-" + userUUID + "/"))) { // included for legacy names
+    // Admins, instructors, or users accessing their own data (see access.js)
+    if (canAccessPath(path, userRole, userUUID)) {
       const link = await storage.loadFromBucket(path, req.headers.bucket);
       logger.info("File access granted", { path, userRole, userUUID });
       return {

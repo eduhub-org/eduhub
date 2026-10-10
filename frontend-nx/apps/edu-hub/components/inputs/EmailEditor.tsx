@@ -84,6 +84,19 @@ export const CERTIFICATE_HTML_VARIABLES: EditorVariable[] = [
   { text: '{{ praxisprojekt }}', label: 'Project title (achievement)' },
 ];
 
+export const INSTRUCTOR_INVOICE_HTML_VARIABLES: EditorVariable[] = [
+  { text: '{{ full_name }}', label: 'Instructor full name' },
+  { text: '{{ first_name }}', label: 'Instructor first name' },
+  { text: '{{ last_name }}', label: 'Instructor last name' },
+  { text: '{{ email }}', label: 'Instructor email' },
+  { text: '{{ course_name }}', label: 'Course name' },
+  { text: '{{ semester }}', label: 'Program title' },
+  { text: '{{ amount }}', label: "Instructor's amount" },
+  { text: '{{ total_amount }}', label: 'Total course fee' },
+  { text: '{% for i in instructors %}{{ i.full_name }}: {{ i.amount }}<br/>{% endfor %}', label: 'All instructors and amounts' },
+  { text: '{{ date }}', label: 'Date' },
+];
+
 const EMAIL_PLACEHOLDERS: EditorVariable[] = [
   { text: '[User:FirstName]', label: 'User Firstname', categories: ['enrollment', 'session', 'general', 'organizer', 'cancellationrequest'] },
   { text: '[User:LastName]', label: 'User Lastname', categories: ['enrollment', 'session', 'general', 'organizer', 'cancellationrequest'] },

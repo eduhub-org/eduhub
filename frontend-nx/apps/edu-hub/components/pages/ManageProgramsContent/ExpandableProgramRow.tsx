@@ -14,6 +14,7 @@ import {
   UPDATE_ACHIEVEMENT_CERTIFICATE_TEMPLATE,
   UPDATE_ATTENDANCE_CERTIFICATE_TEMPLATE,
   UPDATE_PROGRAM_ATTENDANCE_CERTIFICATE_TEMPLATE_ID,
+  UPDATE_PROGRAM_INSTRUCTOR_INVOICE_TEMPLATE_ID,
   UPDATE_START_QUESTIONAIRE,
   UPDATE_SPEAKER_QUESTIONAIRE,
   UPDATE_ClOSING_QUESTIONAIRE,
@@ -33,6 +34,11 @@ import {
   UpdateProgramAttendanceCertificateTemplateId,
   UpdateProgramAttendanceCertificateTemplateIdVariables,
 } from '../../../queries/__generated__/UpdateProgramAttendanceCertificateTemplateId';
+import {
+  UpdateProgramInstructorInvoiceTemplateId,
+  UpdateProgramInstructorInvoiceTemplateIdVariables,
+} from '../../../queries/__generated__/UpdateProgramInstructorInvoiceTemplateId';
+import { CertificateTemplateType_enum } from '../../../__generated__/globalTypes';
 import { PROJECT_TYPES } from '../../../queries/project';
 import CheckboxSelector from '../../inputs/CheckboxSelector';
 import DropDownSelector from '../../inputs/DropDownSelector';
@@ -82,11 +88,36 @@ const ExpandableProgramRow: FC<ExpandableProgramRowProps> = ({ program }) => {
   >(UPDATE_PROGRAM_ATTENDANCE_CERTIFICATE_TEMPLATE_ID, { refetchQueries: ['ProgramList'] });
   const attendanceCertificateTemplateOptions = useMemo(
     () =>
-      (certificateTemplatesData?.CertificateTemplate ?? []).map((tpl) => ({
-        value: String(tpl.id),
-        label: tpl.name,
-      })),
+      (certificateTemplatesData?.CertificateTemplate ?? [])
+        .filter((tpl) => tpl.type === CertificateTemplateType_enum.PARTICIPANT_CERTIFICATE)
+        .map((tpl) => ({
+          value: String(tpl.id),
+          label: tpl.name,
+        })),
     [certificateTemplatesData?.CertificateTemplate]
+  );
+  const instructorInvoiceTemplateOptions = useMemo(
+    () =>
+      (certificateTemplatesData?.CertificateTemplate ?? [])
+        .filter((tpl) => tpl.type === CertificateTemplateType_enum.INSTRUCTOR_INVOICE)
+        .map((tpl) => ({
+          value: String(tpl.id),
+          label: tpl.name,
+        })),
+    [certificateTemplatesData?.CertificateTemplate]
+  );
+  const [updateInstructorInvoiceTemplateId] = useManageMutation<
+    UpdateProgramInstructorInvoiceTemplateId,
+    UpdateProgramInstructorInvoiceTemplateIdVariables
+  >(UPDATE_PROGRAM_INSTRUCTOR_INVOICE_TEMPLATE_ID, { refetchQueries: ['ProgramList'] });
+  const handleInstructorInvoiceTemplateChange = useCallback(
+    (newValue: string) => {
+      void updateInstructorInvoiceTemplateId({
+        variables: { programId: program.id, value: newValue === '' ? null : parseInt(newValue, 10) },
+      });
+      return newValue;
+    },
+    [program.id, updateInstructorInvoiceTemplateId]
   );
   const handleAttendanceCertificateTemplateChange = useCallback(
     (newValue: string) => {
@@ -415,6 +446,29 @@ const ExpandableProgramRow: FC<ExpandableProgramRowProps> = ({ program }) => {
                   showFileName={true}
                   refetchQueries={['ProgramList']}
                 />
+              </div>
+
+              <div>
+                <h4 className="text-sm font-medium text-label-primary mb-3">
+                  {t('Certificates.instructor_invoice_template')}
+                </h4>
+                <div className="[&_.MuiInputBase-root]:min-h-[44px]">
+                  <DropDownSelector
+                    variant="material"
+                    label={t('Certificates.html_template_label')}
+                    value={
+                      program.instructorInvoiceTemplateId != null ? String(program.instructorInvoiceTemplateId) : ''
+                    }
+                    options={instructorInvoiceTemplateOptions}
+                    nullable
+                    nullableLabel={t('Certificates.no_template')}
+                    disabled={certificateTemplatesLoading}
+                    onValueUpdated={handleInstructorInvoiceTemplateChange}
+                  />
+                </div>
+                {!certificateTemplatesLoading && instructorInvoiceTemplateOptions.length === 0 && (
+                  <p className="text-xs text-label-secondary mt-2">{t('Certificates.no_instructor_invoice_templates')}</p>
+                )}
               </div>
             </div>
 

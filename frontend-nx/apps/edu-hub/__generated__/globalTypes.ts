@@ -391,11 +391,44 @@ export enum Badge_update_column {
 }
 
 /**
+ * unique or primary key constraints on table "CertificateTemplateType"
+ */
+export enum CertificateTemplateType_constraint {
+  CertificateTemplateType_pkey = "CertificateTemplateType_pkey",
+}
+
+export enum CertificateTemplateType_enum {
+  INSTRUCTOR_CERTIFICATE = "INSTRUCTOR_CERTIFICATE",
+  INSTRUCTOR_INVOICE = "INSTRUCTOR_INVOICE",
+  PARTICIPANT_CERTIFICATE = "PARTICIPANT_CERTIFICATE",
+}
+
+/**
+ * update columns of table "CertificateTemplateType"
+ */
+export enum CertificateTemplateType_update_column {
+  comment = "comment",
+  value = "value",
+}
+
+/**
  * unique or primary key constraints on table "CertificateTemplate"
  */
 export enum CertificateTemplate_constraint {
   CertificateTemplate_name_key = "CertificateTemplate_name_key",
   CertificateTemplate_pkey = "CertificateTemplate_pkey",
+}
+
+/**
+ * select columns of table "CertificateTemplate"
+ */
+export enum CertificateTemplate_select_column {
+  created_at = "created_at",
+  html = "html",
+  id = "id",
+  name = "name",
+  type = "type",
+  updated_at = "updated_at",
 }
 
 /**
@@ -406,6 +439,7 @@ export enum CertificateTemplate_update_column {
   html = "html",
   id = "id",
   name = "name",
+  type = "type",
   updated_at = "updated_at",
 }
 
@@ -594,6 +628,7 @@ export enum CourseEnrollment_select_column {
   location = "location",
   motivationLetter = "motivationLetter",
   motivationRating = "motivationRating",
+  questionnaireResponse = "questionnaireResponse",
   status = "status",
   termsAcceptedAt = "termsAcceptedAt",
   updated_at = "updated_at",
@@ -631,6 +666,7 @@ export enum CourseEnrollment_update_column {
   location = "location",
   motivationLetter = "motivationLetter",
   motivationRating = "motivationRating",
+  questionnaireResponse = "questionnaireResponse",
   status = "status",
   termsAcceptedAt = "termsAcceptedAt",
   updated_at = "updated_at",
@@ -716,6 +752,46 @@ export enum CourseGroup_update_column {
   created_at = "created_at",
   groupOptionId = "groupOptionId",
   id = "id",
+  updated_at = "updated_at",
+}
+
+/**
+ * unique or primary key constraints on table "CourseInstructorPaymentShare"
+ */
+export enum CourseInstructorPaymentShare_constraint {
+  CourseInstructorPaymentShare_courseInstructorId_key = "CourseInstructorPaymentShare_courseInstructorId_key",
+  CourseInstructorPaymentShare_pkey = "CourseInstructorPaymentShare_pkey",
+}
+
+/**
+ * update columns of table "CourseInstructorPaymentShare"
+ */
+export enum CourseInstructorPaymentShare_update_column {
+  amount = "amount",
+  courseInstructorId = "courseInstructorId",
+  created_at = "created_at",
+  id = "id",
+  invoiceURL = "invoiceURL",
+  updated_at = "updated_at",
+}
+
+/**
+ * unique or primary key constraints on table "CourseInstructorPayment"
+ */
+export enum CourseInstructorPayment_constraint {
+  CourseInstructorPayment_courseId_key = "CourseInstructorPayment_courseId_key",
+  CourseInstructorPayment_pkey = "CourseInstructorPayment_pkey",
+}
+
+/**
+ * update columns of table "CourseInstructorPayment"
+ */
+export enum CourseInstructorPayment_update_column {
+  courseId = "courseId",
+  created_at = "created_at",
+  id = "id",
+  lockedAt = "lockedAt",
+  totalAmount = "totalAmount",
   updated_at = "updated_at",
 }
 
@@ -1991,6 +2067,7 @@ export enum Program_select_column {
   defaultProjectSubmissionDeadline = "defaultProjectSubmissionDeadline",
   defaultProjectType = "defaultProjectType",
   id = "id",
+  instructorInvoiceTemplateId = "instructorInvoiceTemplateId",
   lectureEnd = "lectureEnd",
   lectureStart = "lectureStart",
   matrixInstructorRoomId = "matrixInstructorRoomId",
@@ -2043,6 +2120,7 @@ export enum Program_update_column {
   defaultProjectSubmissionDeadline = "defaultProjectSubmissionDeadline",
   defaultProjectType = "defaultProjectType",
   id = "id",
+  instructorInvoiceTemplateId = "instructorInvoiceTemplateId",
   lectureEnd = "lectureEnd",
   lectureStart = "lectureStart",
   matrixInstructorRoomId = "matrixInstructorRoomId",
@@ -4206,6 +4284,108 @@ export interface Boolean_comparison_exp {
 }
 
 /**
+ * Boolean expression to filter rows from the table "CertificateTemplateType". All fields are combined with a logical 'AND'.
+ */
+export interface CertificateTemplateType_bool_exp {
+  CertificateTemplates?: CertificateTemplate_bool_exp | null;
+  CertificateTemplates_aggregate?: CertificateTemplate_aggregate_bool_exp | null;
+  _and?: CertificateTemplateType_bool_exp[] | null;
+  _not?: CertificateTemplateType_bool_exp | null;
+  _or?: CertificateTemplateType_bool_exp[] | null;
+  comment?: String_comparison_exp | null;
+  value?: String_comparison_exp | null;
+}
+
+/**
+ * Boolean expression to compare columns of type "CertificateTemplateType_enum". All fields are combined with logical 'AND'.
+ */
+export interface CertificateTemplateType_enum_comparison_exp {
+  _eq?: CertificateTemplateType_enum | null;
+  _in?: CertificateTemplateType_enum[] | null;
+  _is_null?: boolean | null;
+  _neq?: CertificateTemplateType_enum | null;
+  _nin?: CertificateTemplateType_enum[] | null;
+}
+
+/**
+ * input type for inserting data into table "CertificateTemplateType"
+ */
+export interface CertificateTemplateType_insert_input {
+  CertificateTemplates?: CertificateTemplate_arr_rel_insert_input | null;
+  comment?: string | null;
+  value?: string | null;
+}
+
+/**
+ * input type for inserting object relation for remote table "CertificateTemplateType"
+ */
+export interface CertificateTemplateType_obj_rel_insert_input {
+  data: CertificateTemplateType_insert_input;
+  on_conflict?: CertificateTemplateType_on_conflict | null;
+}
+
+/**
+ * on_conflict condition type for table "CertificateTemplateType"
+ */
+export interface CertificateTemplateType_on_conflict {
+  constraint: CertificateTemplateType_constraint;
+  update_columns: CertificateTemplateType_update_column[];
+  where?: CertificateTemplateType_bool_exp | null;
+}
+
+/**
+ * Ordering options when selecting data from "CertificateTemplateType".
+ */
+export interface CertificateTemplateType_order_by {
+  CertificateTemplates_aggregate?: CertificateTemplate_aggregate_order_by | null;
+  comment?: order_by | null;
+  value?: order_by | null;
+}
+
+export interface CertificateTemplate_aggregate_bool_exp {
+  count?: CertificateTemplate_aggregate_bool_exp_count | null;
+}
+
+export interface CertificateTemplate_aggregate_bool_exp_count {
+  arguments?: CertificateTemplate_select_column[] | null;
+  distinct?: boolean | null;
+  filter?: CertificateTemplate_bool_exp | null;
+  predicate: Int_comparison_exp;
+}
+
+/**
+ * order by aggregate values of table "CertificateTemplate"
+ */
+export interface CertificateTemplate_aggregate_order_by {
+  avg?: CertificateTemplate_avg_order_by | null;
+  count?: order_by | null;
+  max?: CertificateTemplate_max_order_by | null;
+  min?: CertificateTemplate_min_order_by | null;
+  stddev?: CertificateTemplate_stddev_order_by | null;
+  stddev_pop?: CertificateTemplate_stddev_pop_order_by | null;
+  stddev_samp?: CertificateTemplate_stddev_samp_order_by | null;
+  sum?: CertificateTemplate_sum_order_by | null;
+  var_pop?: CertificateTemplate_var_pop_order_by | null;
+  var_samp?: CertificateTemplate_var_samp_order_by | null;
+  variance?: CertificateTemplate_variance_order_by | null;
+}
+
+/**
+ * input type for inserting array relation for remote table "CertificateTemplate"
+ */
+export interface CertificateTemplate_arr_rel_insert_input {
+  data: CertificateTemplate_insert_input[];
+  on_conflict?: CertificateTemplate_on_conflict | null;
+}
+
+/**
+ * order by avg() on columns of table "CertificateTemplate"
+ */
+export interface CertificateTemplate_avg_order_by {
+  id?: order_by | null;
+}
+
+/**
  * Boolean expression to filter rows from the table "CertificateTemplate". All fields are combined with a logical 'AND'.
  */
 export interface CertificateTemplate_bool_exp {
@@ -4215,6 +4395,7 @@ export interface CertificateTemplate_bool_exp {
   AttendanceCourses_aggregate?: Course_aggregate_bool_exp | null;
   AttendancePrograms?: Program_bool_exp | null;
   AttendancePrograms_aggregate?: Program_aggregate_bool_exp | null;
+  CertificateTemplateType?: CertificateTemplateType_bool_exp | null;
   ProjectTypes?: ProjectType_bool_exp | null;
   ProjectTypes_aggregate?: ProjectType_aggregate_bool_exp | null;
   _and?: CertificateTemplate_bool_exp[] | null;
@@ -4224,6 +4405,7 @@ export interface CertificateTemplate_bool_exp {
   html?: String_comparison_exp | null;
   id?: Int_comparison_exp | null;
   name?: String_comparison_exp | null;
+  type?: CertificateTemplateType_enum_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
 }
 
@@ -4234,12 +4416,36 @@ export interface CertificateTemplate_insert_input {
   AchievementCourses?: Course_arr_rel_insert_input | null;
   AttendanceCourses?: Course_arr_rel_insert_input | null;
   AttendancePrograms?: Program_arr_rel_insert_input | null;
+  CertificateTemplateType?: CertificateTemplateType_obj_rel_insert_input | null;
   ProjectTypes?: ProjectType_arr_rel_insert_input | null;
   created_at?: any | null;
   html?: string | null;
   id?: number | null;
   name?: string | null;
+  type?: CertificateTemplateType_enum | null;
   updated_at?: any | null;
+}
+
+/**
+ * order by max() on columns of table "CertificateTemplate"
+ */
+export interface CertificateTemplate_max_order_by {
+  created_at?: order_by | null;
+  html?: order_by | null;
+  id?: order_by | null;
+  name?: order_by | null;
+  updated_at?: order_by | null;
+}
+
+/**
+ * order by min() on columns of table "CertificateTemplate"
+ */
+export interface CertificateTemplate_min_order_by {
+  created_at?: order_by | null;
+  html?: order_by | null;
+  id?: order_by | null;
+  name?: order_by | null;
+  updated_at?: order_by | null;
 }
 
 /**
@@ -4266,12 +4472,63 @@ export interface CertificateTemplate_order_by {
   AchievementCourses_aggregate?: Course_aggregate_order_by | null;
   AttendanceCourses_aggregate?: Course_aggregate_order_by | null;
   AttendancePrograms_aggregate?: Program_aggregate_order_by | null;
+  CertificateTemplateType?: CertificateTemplateType_order_by | null;
   ProjectTypes_aggregate?: ProjectType_aggregate_order_by | null;
   created_at?: order_by | null;
   html?: order_by | null;
   id?: order_by | null;
   name?: order_by | null;
+  type?: order_by | null;
   updated_at?: order_by | null;
+}
+
+/**
+ * order by stddev() on columns of table "CertificateTemplate"
+ */
+export interface CertificateTemplate_stddev_order_by {
+  id?: order_by | null;
+}
+
+/**
+ * order by stddev_pop() on columns of table "CertificateTemplate"
+ */
+export interface CertificateTemplate_stddev_pop_order_by {
+  id?: order_by | null;
+}
+
+/**
+ * order by stddev_samp() on columns of table "CertificateTemplate"
+ */
+export interface CertificateTemplate_stddev_samp_order_by {
+  id?: order_by | null;
+}
+
+/**
+ * order by sum() on columns of table "CertificateTemplate"
+ */
+export interface CertificateTemplate_sum_order_by {
+  id?: order_by | null;
+}
+
+/**
+ * order by var_pop() on columns of table "CertificateTemplate"
+ */
+export interface CertificateTemplate_var_pop_order_by {
+  id?: order_by | null;
+}
+
+/**
+ * order by var_samp() on columns of table "CertificateTemplate"
+ */
+export interface CertificateTemplate_var_samp_order_by {
+  id?: order_by | null;
+}
+
+/**
+ * order by variance() on columns of table "CertificateTemplate"
+ */
+export interface CertificateTemplate_variance_order_by {
+  id?: order_by | null;
 }
 
 /**
@@ -4910,6 +5167,49 @@ export interface CourseEnrollmentAddon_variance_order_by {
 }
 
 /**
+ * Boolean expression to filter rows from the table "CourseEnrollmentAttendanceStats". All fields are combined with a logical 'AND'.
+ */
+export interface CourseEnrollmentAttendanceStats_bool_exp {
+  CourseEnrollment?: CourseEnrollment_bool_exp | null;
+  _and?: CourseEnrollmentAttendanceStats_bool_exp[] | null;
+  _not?: CourseEnrollmentAttendanceStats_bool_exp | null;
+  _or?: CourseEnrollmentAttendanceStats_bool_exp[] | null;
+  attendedSessions?: Int_comparison_exp | null;
+  enrollmentId?: Int_comparison_exp | null;
+  pastSessions?: Int_comparison_exp | null;
+  totalSessions?: Int_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "CourseEnrollmentAttendanceStats"
+ */
+export interface CourseEnrollmentAttendanceStats_insert_input {
+  CourseEnrollment?: CourseEnrollment_obj_rel_insert_input | null;
+  attendedSessions?: number | null;
+  enrollmentId?: number | null;
+  pastSessions?: number | null;
+  totalSessions?: number | null;
+}
+
+/**
+ * input type for inserting object relation for remote table "CourseEnrollmentAttendanceStats"
+ */
+export interface CourseEnrollmentAttendanceStats_obj_rel_insert_input {
+  data: CourseEnrollmentAttendanceStats_insert_input;
+}
+
+/**
+ * Ordering options when selecting data from "CourseEnrollmentAttendanceStats".
+ */
+export interface CourseEnrollmentAttendanceStats_order_by {
+  CourseEnrollment?: CourseEnrollment_order_by | null;
+  attendedSessions?: order_by | null;
+  enrollmentId?: order_by | null;
+  pastSessions?: order_by | null;
+  totalSessions?: order_by | null;
+}
+
+/**
  * Boolean expression to filter rows from the table "CourseEnrollmentStatus". All fields are combined with a logical 'AND'.
  */
 export interface CourseEnrollmentStatus_bool_exp {
@@ -5030,34 +5330,11 @@ export interface CourseEnrollment_avg_order_by {
 }
 
 /**
- * Boolean expression to filter rows from the table "CourseEnrollmentAttendanceStats". All fields are combined with a logical 'AND'.
- */
-export interface CourseEnrollmentAttendanceStats_bool_exp {
-  CourseEnrollment?: CourseEnrollment_bool_exp | null;
-  _and?: CourseEnrollmentAttendanceStats_bool_exp[] | null;
-  _not?: CourseEnrollmentAttendanceStats_bool_exp | null;
-  _or?: CourseEnrollmentAttendanceStats_bool_exp[] | null;
-  attendedSessions?: Int_comparison_exp | null;
-  enrollmentId?: Int_comparison_exp | null;
-  totalSessions?: Int_comparison_exp | null;
-}
-
-/**
- * Ordering options when selecting data from "CourseEnrollmentAttendanceStats".
- */
-export interface CourseEnrollmentAttendanceStats_order_by {
-  CourseEnrollment?: CourseEnrollment_order_by | null;
-  attendedSessions?: order_by | null;
-  enrollmentId?: order_by | null;
-  totalSessions?: order_by | null;
-}
-
-/**
  * Boolean expression to filter rows from the table "CourseEnrollment". All fields are combined with a logical 'AND'.
  */
 export interface CourseEnrollment_bool_exp {
-  BillingOrganization?: Organization_bool_exp | null;
   AttendanceStats?: CourseEnrollmentAttendanceStats_bool_exp | null;
+  BillingOrganization?: Organization_bool_exp | null;
   Course?: Course_bool_exp | null;
   CourseEnrollmentAddons?: CourseEnrollmentAddon_bool_exp | null;
   CourseEnrollmentAddons_aggregate?: CourseEnrollmentAddon_aggregate_bool_exp | null;
@@ -5095,6 +5372,7 @@ export interface CourseEnrollment_bool_exp {
  * input type for inserting data into table "CourseEnrollment"
  */
 export interface CourseEnrollment_insert_input {
+  AttendanceStats?: CourseEnrollmentAttendanceStats_obj_rel_insert_input | null;
   BillingOrganization?: Organization_obj_rel_insert_input | null;
   Course?: Course_obj_rel_insert_input | null;
   CourseEnrollmentAddons?: CourseEnrollmentAddon_arr_rel_insert_input | null;
@@ -5117,6 +5395,7 @@ export interface CourseEnrollment_insert_input {
   location?: LocationOption_enum | null;
   motivationLetter?: string | null;
   motivationRating?: MotivationRating_enum | null;
+  questionnaireResponse?: any | null;
   status?: CourseEnrollmentStatus_enum | null;
   termsAcceptedAt?: any | null;
   updated_at?: any | null;
@@ -5686,6 +5965,111 @@ export interface CourseInput {
   title: string;
 }
 
+/**
+ * Boolean expression to filter rows from the table "CourseInstructorPaymentShare". All fields are combined with a logical 'AND'.
+ */
+export interface CourseInstructorPaymentShare_bool_exp {
+  CourseInstructor?: CourseInstructor_bool_exp | null;
+  _and?: CourseInstructorPaymentShare_bool_exp[] | null;
+  _not?: CourseInstructorPaymentShare_bool_exp | null;
+  _or?: CourseInstructorPaymentShare_bool_exp[] | null;
+  amount?: Int_comparison_exp | null;
+  courseInstructorId?: Int_comparison_exp | null;
+  created_at?: timestamptz_comparison_exp | null;
+  id?: Int_comparison_exp | null;
+  invoiceURL?: String_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "CourseInstructorPaymentShare"
+ */
+export interface CourseInstructorPaymentShare_insert_input {
+  CourseInstructor?: CourseInstructor_obj_rel_insert_input | null;
+  amount?: number | null;
+  courseInstructorId?: number | null;
+  created_at?: any | null;
+  id?: number | null;
+  invoiceURL?: string | null;
+  updated_at?: any | null;
+}
+
+/**
+ * input type for inserting object relation for remote table "CourseInstructorPaymentShare"
+ */
+export interface CourseInstructorPaymentShare_obj_rel_insert_input {
+  data: CourseInstructorPaymentShare_insert_input;
+  on_conflict?: CourseInstructorPaymentShare_on_conflict | null;
+}
+
+/**
+ * on_conflict condition type for table "CourseInstructorPaymentShare"
+ */
+export interface CourseInstructorPaymentShare_on_conflict {
+  constraint: CourseInstructorPaymentShare_constraint;
+  update_columns: CourseInstructorPaymentShare_update_column[];
+  where?: CourseInstructorPaymentShare_bool_exp | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "CourseInstructorPayment". All fields are combined with a logical 'AND'.
+ */
+export interface CourseInstructorPayment_bool_exp {
+  Course?: Course_bool_exp | null;
+  _and?: CourseInstructorPayment_bool_exp[] | null;
+  _not?: CourseInstructorPayment_bool_exp | null;
+  _or?: CourseInstructorPayment_bool_exp[] | null;
+  courseId?: Int_comparison_exp | null;
+  created_at?: timestamptz_comparison_exp | null;
+  id?: Int_comparison_exp | null;
+  lockedAt?: timestamptz_comparison_exp | null;
+  totalAmount?: Int_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "CourseInstructorPayment"
+ */
+export interface CourseInstructorPayment_insert_input {
+  Course?: Course_obj_rel_insert_input | null;
+  courseId?: number | null;
+  created_at?: any | null;
+  id?: number | null;
+  lockedAt?: any | null;
+  totalAmount?: number | null;
+  updated_at?: any | null;
+}
+
+/**
+ * input type for inserting object relation for remote table "CourseInstructorPayment"
+ */
+export interface CourseInstructorPayment_obj_rel_insert_input {
+  data: CourseInstructorPayment_insert_input;
+  on_conflict?: CourseInstructorPayment_on_conflict | null;
+}
+
+/**
+ * on_conflict condition type for table "CourseInstructorPayment"
+ */
+export interface CourseInstructorPayment_on_conflict {
+  constraint: CourseInstructorPayment_constraint;
+  update_columns: CourseInstructorPayment_update_column[];
+  where?: CourseInstructorPayment_bool_exp | null;
+}
+
+/**
+ * Ordering options when selecting data from "CourseInstructorPayment".
+ */
+export interface CourseInstructorPayment_order_by {
+  Course?: Course_order_by | null;
+  courseId?: order_by | null;
+  created_at?: order_by | null;
+  id?: order_by | null;
+  lockedAt?: order_by | null;
+  totalAmount?: order_by | null;
+  updated_at?: order_by | null;
+}
+
 export interface CourseInstructor_aggregate_bool_exp {
   count?: CourseInstructor_aggregate_bool_exp_count | null;
 }
@@ -5735,6 +6119,7 @@ export interface CourseInstructor_avg_order_by {
  */
 export interface CourseInstructor_bool_exp {
   Course?: Course_bool_exp | null;
+  PaymentShare?: CourseInstructorPaymentShare_bool_exp | null;
   User?: User_bool_exp | null;
   _and?: CourseInstructor_bool_exp[] | null;
   _not?: CourseInstructor_bool_exp | null;
@@ -5751,6 +6136,7 @@ export interface CourseInstructor_bool_exp {
  */
 export interface CourseInstructor_insert_input {
   Course?: Course_obj_rel_insert_input | null;
+  PaymentShare?: CourseInstructorPaymentShare_obj_rel_insert_input | null;
   User?: User_obj_rel_insert_input | null;
   courseId?: number | null;
   created_at?: any | null;
@@ -5779,6 +6165,14 @@ export interface CourseInstructor_min_order_by {
   id?: order_by | null;
   updated_at?: order_by | null;
   userId?: order_by | null;
+}
+
+/**
+ * input type for inserting object relation for remote table "CourseInstructor"
+ */
+export interface CourseInstructor_obj_rel_insert_input {
+  data: CourseInstructor_insert_input;
+  on_conflict?: CourseInstructor_on_conflict | null;
 }
 
 /**
@@ -6303,6 +6697,7 @@ export interface Course_bool_exp {
   CourseStatus?: CourseStatus_bool_exp | null;
   DegreeCourses?: CourseDegree_bool_exp | null;
   DegreeCourses_aggregate?: CourseDegree_aggregate_bool_exp | null;
+  InstructorPayment?: CourseInstructorPayment_bool_exp | null;
   Language?: Language_bool_exp | null;
   Program?: Program_bool_exp | null;
   ProjectCourses?: ProjectCourse_bool_exp | null;
@@ -6378,6 +6773,7 @@ export interface Course_insert_input {
   CourseSeries?: CourseSeries_obj_rel_insert_input | null;
   CourseStatus?: CourseStatus_obj_rel_insert_input | null;
   DegreeCourses?: CourseDegree_arr_rel_insert_input | null;
+  InstructorPayment?: CourseInstructorPayment_obj_rel_insert_input | null;
   Language?: Language_obj_rel_insert_input | null;
   Program?: Program_obj_rel_insert_input | null;
   ProjectCourses?: ProjectCourse_arr_rel_insert_input | null;
@@ -6539,6 +6935,7 @@ export interface Course_order_by {
   CourseSeries?: CourseSeries_order_by | null;
   CourseStatus?: CourseStatus_order_by | null;
   DegreeCourses_aggregate?: CourseDegree_aggregate_order_by | null;
+  InstructorPayment?: CourseInstructorPayment_order_by | null;
   Language?: Language_order_by | null;
   Program?: Program_order_by | null;
   ProjectCourses_aggregate?: ProjectCourse_aggregate_order_by | null;
@@ -6756,6 +7153,7 @@ export interface Course_variance_order_by {
  * Boolean expression to filter rows from the table "DegreeParticipationStats". All fields are combined with a logical 'AND'.
  */
 export interface DegreeParticipationStats_bool_exp {
+  DegreeCourse?: Course_bool_exp | null;
   _and?: DegreeParticipationStats_bool_exp[] | null;
   _not?: DegreeParticipationStats_bool_exp | null;
   _or?: DegreeParticipationStats_bool_exp[] | null;
@@ -6769,6 +7167,7 @@ export interface DegreeParticipationStats_bool_exp {
  * input type for inserting data into table "DegreeParticipationStats"
  */
 export interface DegreeParticipationStats_insert_input {
+  DegreeCourse?: Course_obj_rel_insert_input | null;
   attendedEventCount?: any | null;
   degreeCourseId?: number | null;
   ectsTotal?: any | null;
@@ -6786,6 +7185,7 @@ export interface DegreeParticipationStats_obj_rel_insert_input {
  * Ordering options when selecting data from "DegreeParticipationStats".
  */
 export interface DegreeParticipationStats_order_by {
+  DegreeCourse?: Course_order_by | null;
   attendedEventCount?: order_by | null;
   degreeCourseId?: order_by | null;
   ectsTotal?: order_by | null;
@@ -9900,6 +10300,7 @@ export interface Program_avg_order_by {
   attendanceCertificateTemplateId?: order_by | null;
   defaultMaxMissedSessions?: order_by | null;
   id?: order_by | null;
+  instructorInvoiceTemplateId?: order_by | null;
   organizationId?: order_by | null;
 }
 
@@ -9911,6 +10312,7 @@ export interface Program_bool_exp {
   Courses?: Course_bool_exp | null;
   Courses_aggregate?: Course_aggregate_bool_exp | null;
   DefaultProjectType?: ProjectType_bool_exp | null;
+  InstructorInvoiceTemplate?: CertificateTemplate_bool_exp | null;
   Organization?: Organization_bool_exp | null;
   ProgramType?: ProgramType_bool_exp | null;
   Sessions?: Session_bool_exp | null;
@@ -9930,6 +10332,7 @@ export interface Program_bool_exp {
   defaultProjectSubmissionDeadline?: timestamptz_comparison_exp | null;
   defaultProjectType?: String_comparison_exp | null;
   id?: Int_comparison_exp | null;
+  instructorInvoiceTemplateId?: Int_comparison_exp | null;
   lectureEnd?: date_comparison_exp | null;
   lectureStart?: date_comparison_exp | null;
   matrixInstructorRoomId?: String_comparison_exp | null;
@@ -9953,6 +10356,7 @@ export interface Program_insert_input {
   AttendanceCertificateTemplate?: CertificateTemplate_obj_rel_insert_input | null;
   Courses?: Course_arr_rel_insert_input | null;
   DefaultProjectType?: ProjectType_obj_rel_insert_input | null;
+  InstructorInvoiceTemplate?: CertificateTemplate_obj_rel_insert_input | null;
   Organization?: Organization_obj_rel_insert_input | null;
   ProgramType?: ProgramType_obj_rel_insert_input | null;
   Sessions?: Session_arr_rel_insert_input | null;
@@ -9968,6 +10372,7 @@ export interface Program_insert_input {
   defaultProjectSubmissionDeadline?: any | null;
   defaultProjectType?: string | null;
   id?: number | null;
+  instructorInvoiceTemplateId?: number | null;
   lectureEnd?: any | null;
   lectureStart?: any | null;
   matrixInstructorRoomId?: string | null;
@@ -10000,6 +10405,7 @@ export interface Program_max_order_by {
   defaultProjectSubmissionDeadline?: order_by | null;
   defaultProjectType?: order_by | null;
   id?: order_by | null;
+  instructorInvoiceTemplateId?: order_by | null;
   lectureEnd?: order_by | null;
   lectureStart?: order_by | null;
   matrixInstructorRoomId?: order_by | null;
@@ -10028,6 +10434,7 @@ export interface Program_min_order_by {
   defaultProjectSubmissionDeadline?: order_by | null;
   defaultProjectType?: order_by | null;
   id?: order_by | null;
+  instructorInvoiceTemplateId?: order_by | null;
   lectureEnd?: order_by | null;
   lectureStart?: order_by | null;
   matrixInstructorRoomId?: order_by | null;
@@ -10064,6 +10471,7 @@ export interface Program_order_by {
   AttendanceCertificateTemplate?: CertificateTemplate_order_by | null;
   Courses_aggregate?: Course_aggregate_order_by | null;
   DefaultProjectType?: ProjectType_order_by | null;
+  InstructorInvoiceTemplate?: CertificateTemplate_order_by | null;
   Organization?: Organization_order_by | null;
   ProgramType?: ProgramType_order_by | null;
   Sessions_aggregate?: Session_aggregate_order_by | null;
@@ -10079,6 +10487,7 @@ export interface Program_order_by {
   defaultProjectSubmissionDeadline?: order_by | null;
   defaultProjectType?: order_by | null;
   id?: order_by | null;
+  instructorInvoiceTemplateId?: order_by | null;
   lectureEnd?: order_by | null;
   lectureStart?: order_by | null;
   matrixInstructorRoomId?: order_by | null;
@@ -10102,6 +10511,7 @@ export interface Program_stddev_order_by {
   attendanceCertificateTemplateId?: order_by | null;
   defaultMaxMissedSessions?: order_by | null;
   id?: order_by | null;
+  instructorInvoiceTemplateId?: order_by | null;
   organizationId?: order_by | null;
 }
 
@@ -10112,6 +10522,7 @@ export interface Program_stddev_pop_order_by {
   attendanceCertificateTemplateId?: order_by | null;
   defaultMaxMissedSessions?: order_by | null;
   id?: order_by | null;
+  instructorInvoiceTemplateId?: order_by | null;
   organizationId?: order_by | null;
 }
 
@@ -10122,6 +10533,7 @@ export interface Program_stddev_samp_order_by {
   attendanceCertificateTemplateId?: order_by | null;
   defaultMaxMissedSessions?: order_by | null;
   id?: order_by | null;
+  instructorInvoiceTemplateId?: order_by | null;
   organizationId?: order_by | null;
 }
 
@@ -10132,6 +10544,7 @@ export interface Program_sum_order_by {
   attendanceCertificateTemplateId?: order_by | null;
   defaultMaxMissedSessions?: order_by | null;
   id?: order_by | null;
+  instructorInvoiceTemplateId?: order_by | null;
   organizationId?: order_by | null;
 }
 
@@ -10142,6 +10555,7 @@ export interface Program_var_pop_order_by {
   attendanceCertificateTemplateId?: order_by | null;
   defaultMaxMissedSessions?: order_by | null;
   id?: order_by | null;
+  instructorInvoiceTemplateId?: order_by | null;
   organizationId?: order_by | null;
 }
 
@@ -10152,6 +10566,7 @@ export interface Program_var_samp_order_by {
   attendanceCertificateTemplateId?: order_by | null;
   defaultMaxMissedSessions?: order_by | null;
   id?: order_by | null;
+  instructorInvoiceTemplateId?: order_by | null;
   organizationId?: order_by | null;
 }
 
@@ -10162,6 +10577,7 @@ export interface Program_variance_order_by {
   attendanceCertificateTemplateId?: order_by | null;
   defaultMaxMissedSessions?: order_by | null;
   id?: order_by | null;
+  instructorInvoiceTemplateId?: order_by | null;
   organizationId?: order_by | null;
 }
 

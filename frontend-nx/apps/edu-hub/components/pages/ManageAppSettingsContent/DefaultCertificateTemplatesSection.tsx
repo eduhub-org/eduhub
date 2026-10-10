@@ -1,5 +1,6 @@
 import { FC } from 'react';
 import { useTranslations } from 'next-intl';
+import { CertificateTemplateType_enum } from '../../../__generated__/globalTypes';
 
 import { useAdminQuery } from '../../../hooks/authedQuery';
 import { useAdminMutation } from '../../../hooks/authedMutation';
@@ -60,7 +61,9 @@ const DefaultCertificateTemplatesSection: FC = () => {
               }
             >
               <option value="">{t('default_attendance_certificate_template.none_option')}</option>
-              {(certificateTemplatesData?.CertificateTemplate ?? []).map((tpl) => (
+              {(certificateTemplatesData?.CertificateTemplate ?? [])
+        .filter((tpl) => tpl.type === CertificateTemplateType_enum.PARTICIPANT_CERTIFICATE)
+        .map((tpl) => (
                 <option key={tpl.id} value={tpl.id}>
                   {tpl.name}
                 </option>

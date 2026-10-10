@@ -1428,6 +1428,16 @@
       },
       "application_locks_hint": "Ein Bewerbungsprozess enthält immer einen Fragebogen und lässt sich nicht mit einer Zahlung kombinieren.",
       "summary": "Anmeldeart: {mode}"
+    },
+    "instructor_payment": {
+      "total_label": "Vergütung für die Kursleitung (gesamt)",
+      "total_help": "Ein Betrag pro Kurs, unabhängig von der Anzahl der Kursleitenden. Die Kursleitenden teilen ihn untereinander auf.",
+      "invalid_amount": "Bitte gib einen gültigen Betrag ein.",
+      "save_failed": "Die Änderung konnte nicht gespeichert werden.",
+      "remaining": "Noch nicht verteilt",
+      "locked": "Aufteilung festgelegt",
+      "unlock": "Aufteilung entsperren",
+      "unlock_question": "Die Kursleitenden können die Aufteilung danach wieder ändern. Bereits heruntergeladene Rechnungen bleiben unverändert. Entsperren?"
     }
   },
   "manageCourse": {
@@ -2161,7 +2171,36 @@
     },
     "info_block_mobile_summary": "{title} · {count} Zeichen",
     "info_block_mobile_untitled": "Ohne Titel",
-    "info_block_mobile_empty": "Noch leer"
+    "info_block_mobile_empty": "Noch leer",
+    "course_team": {
+      "title": "Kursteam",
+      "message_on_element": "Auf Element schreiben",
+      "split_explanation": "Die Vergütung von {total} gilt für den gesamten Kurs, unabhängig von der Anzahl der Kursleitenden. Bitte stimmt euch untereinander ab und teilt den Betrag danach auf, wie viel Zeit und Aufwand jede*r in den Kurs gesteckt hat (z. B. Anzahl der Sessions). Sobald eine Person ihre Rechnung herunterlädt, ist die Aufteilung für alle festgelegt.",
+      "share_label": "Anteil von {name} in Euro",
+      "invalid_amount": "Bitte gib einen gültigen Betrag ein.",
+      "exceeds_total": "Zu hoch – höchstens {max} sind noch frei.",
+      "save_failed": "Der Betrag konnte nicht gespeichert werden.",
+      "total": "Gesamtvergütung: {total}",
+      "remaining": "noch zu verteilen: {remaining}",
+      "sole_fee": "Deine Vergütung: {total}",
+      "locked": "Die Aufteilung ist festgelegt, weil bereits eine Rechnung heruntergeladen wurde.",
+      "download_invoice": "Meine Rechnung herunterladen",
+      "generating": "Rechnung wird erstellt…",
+      "hint_no_template": "Für dieses Programm ist noch keine Rechnungsvorlage hinterlegt.",
+      "hint_missing_amounts": "Tragt für alle Kursleitenden einen Betrag ein (0 ist erlaubt).",
+      "hint_sum_mismatch": "Die Beträge müssen genau die Gesamtvergütung ergeben (Differenz: {remaining}).",
+      "confirm_lock_title": "Aufteilung festlegen?",
+      "confirm_lock_question": "Mit dem Herunterladen Deiner Rechnung wird die Aufteilung für alle Kursleitenden festgelegt und kann danach nicht mehr geändert werden. Fortfahren?",
+      "confirm_lock_confirm": "Festlegen und herunterladen",
+      "errors": {
+        "NOT_COURSE_INSTRUCTOR": "Du bist nicht als Kursleitung dieses Kurses eingetragen.",
+        "NO_INVOICE_TEMPLATE": "Für dieses Programm ist keine Rechnungsvorlage hinterlegt.",
+        "NO_PAYMENT_TOTAL": "Für diesen Kurs ist keine Vergütung hinterlegt.",
+        "PAYMENT_SPLIT_INCOMPLETE": "Die Aufteilung ist unvollständig: Alle Beträge müssen eingetragen sein und genau die Gesamtvergütung ergeben.",
+        "PDF_CREATION_FAILED": "Das PDF konnte nicht erstellt werden. Bitte wende Dich an das Programmteam.",
+        "UNEXPECTED_ERROR": "Die Rechnung konnte nicht erstellt werden. Bitte versuche es später erneut."
+      }
+    }
   },
   "manageProjects": {
     "headline": "Projekte",
@@ -2260,7 +2299,10 @@
       "upload_template": "Klicken, um Template hochzuladen oder Datei hier ablegen",
       "html_template_label": "HTML-Template",
       "html_template_apply_default": "Standard für diesen Programmtyp verwenden",
-      "apply_default_unavailable": "Für diesen Programmtyp ist noch kein Standard-Template für Teilnahmenachweise hinterlegt."
+      "apply_default_unavailable": "Für diesen Programmtyp ist noch kein Standard-Template für Teilnahmenachweise hinterlegt.",
+      "instructor_invoice_template": "Rechnungsvorlage für Kursleitende",
+      "no_template": "Keine Vorlage",
+      "no_instructor_invoice_templates": "Lege unter Einstellungen → Zertifikat- & Rechnungsvorlagen eine Vorlage vom Typ „Rechnung für Kursleitende“ an."
     },
     "participation_data": {
       "generate": "Teilnehmer:innen Daten generieren (CSV)",
@@ -2541,11 +2583,22 @@
       "loading": "Zertifikat-Vorlagen werden geladen…",
       "load_error": "Die Zertifikat-Vorlagen konnten nicht geladen werden.",
       "html_editor": {
-        "label": "HTML-Vorlagen für Teilnahmezertifikate",
+        "label": "HTML-Vorlagen für Zertifikate und Rechnungen",
         "help_text": "Bearbeite das in der Datenbank gespeicherte Jinja2-HTML.",
         "template_select": "Vorlage",
         "no_templates": "Keine Zertifikat-Vorlagen gefunden.",
         "preview_label": "A4-Vorschau (Beispieldaten)"
+      },
+      "types": {
+        "PARTICIPANT_CERTIFICATE": "Zertifikat für Teilnehmende",
+        "INSTRUCTOR_INVOICE": "Rechnung für Kursleitende",
+        "INSTRUCTOR_CERTIFICATE": "Zertifikat für Kursleitende"
+      },
+      "new_template": {
+        "name": "Name der neuen Vorlage",
+        "type": "Typ",
+        "create": "Vorlage anlegen",
+        "error": "Die Vorlage konnte nicht angelegt werden. Ist der Name schon vergeben?"
       }
     },
     "default_attendance_certificate_template": {
@@ -3129,8 +3182,8 @@
           "description": "Programme anlegen, bearbeiten und veröffentlichen"
         },
         "attendance-certificates": {
-          "label": "Teilnahmezertifikate",
-          "description": "HTML-Vorlagen und Programmtyp-Voreinstellungen für Teilnahmezertifikate"
+          "label": "Zertifikat- & Rechnungsvorlagen",
+          "description": "HTML-Vorlagen für Zertifikate und Rechnungen der Kursleitenden sowie Programmtyp-Voreinstellungen"
         },
         "project-types": {
           "label": "Projekttypen",

@@ -51,6 +51,18 @@ export const ADMIN_COURSE_LIST = gql`
         ...ProgramFragmentMinimumProperties
         organizationId
       }
+      InstructorPayment {
+        id
+        totalAmount
+        lockedAt
+      }
+      InstructorPaymentShares: CourseInstructors(order_by: { id: asc }) {
+        id
+        PaymentShare {
+          id
+          amount
+        }
+      }
       courseSeriesId
       CourseEnrollments(where: { isTest: { _eq: false } }) {
         id
