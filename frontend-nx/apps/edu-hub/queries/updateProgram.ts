@@ -312,3 +312,12 @@ export const UPDATE_PROGRAM_INSTRUCTOR_INVOICE_TEMPLATE_ID = gql`
     }
   }
 `;
+
+export const UPDATE_PROGRAM_INSTRUCTOR_CERTIFICATE_TEMPLATE_ID = gql`
+  mutation UpdateProgramInstructorCertificateTemplateId($programId: Int!, $value: Int) {
+    update_Program_by_pk(pk_columns: { id: $programId }, _set: { instructorCertificateTemplateId: $value }) {
+      id
+      instructorCertificateTemplateId
+    }
+  }
+`;

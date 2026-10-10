@@ -294,6 +294,14 @@ export const CourseTeamCard: FC<IProps> = ({ courseId }) => {
         </div>
       ) : null}
 
+      {me?.certificateURL ? (
+        <div className="mt-4 border-t border-border-primary pt-4">
+          <Button as="a" href={getCertificateDownloadUrl(me.certificateURL)} filled>
+            {t('download_certificate')}
+          </Button>
+        </div>
+      ) : null}
+
       <QuestionConfirmationDialog
         open={confirmLockOpen}
         title={t('confirm_lock_title')}

@@ -54,6 +54,22 @@ actions:
     permissions:
       - role: instructor_access
     comment: Locks the course's instructor payment split and renders the caller's invoice PDF
+  - name: createInstructorCertificates
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_CALL_PYTHON_FUNCTION}}'
+      timeout: 300
+      headers:
+        - name: Hasura-Secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: Bucket
+          value_from_env: HASURA_BUCKET
+        - name: Function-Name
+          value: create_instructor_certificates
+    permissions:
+      # The function checks that an org admin manages each course's program before generating.
+      - role: org_admin_access
+    comment: Renders the instructor certificates of the given courses from the program templates
   - name: createStripeBasePrice
     definition:
       kind: synchronous
@@ -798,6 +814,7 @@ custom_types:
     - name: ActionOutput
     - name: CreateCertificatesResult
     - name: InstructorDocumentResult
+    - name: CreateInstructorCertificatesResult
     - name: LoadParticipationDataResult
     - name: UpdateAdminStatusResult
     - name: GetAdminUsersResult
