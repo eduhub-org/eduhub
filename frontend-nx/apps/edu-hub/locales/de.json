@@ -2262,6 +2262,14 @@
       "html_template_apply_default": "Standard für diesen Programmtyp verwenden",
       "apply_default_unavailable": "Für diesen Programmtyp ist noch kein Standard-Template für Teilnahmenachweise hinterlegt."
     },
+    "instructor_emails": {
+      "label": "Kursleitungen",
+      "button": "E-Mail an alle Kursleitungen",
+      "help_text": "Öffnet Dein E-Mail-Programm mit allen Kursleitungen der Kurse dieses Programms in BCC.",
+      "count": "{count, plural, =0 {Noch keine Kursleitungen zugeordnet} one {# Kursleitung} other {# Kursleitungen}}",
+      "copied": "Zu viele Empfänger:innen für Dein E-Mail-Programm. Die {count} Adressen wurden stattdessen in die Zwischenablage kopiert – füge sie ins BCC-Feld ein.",
+      "copy_failed": "Zu viele Empfänger:innen für Dein E-Mail-Programm, und das Kopieren der Adressen in die Zwischenablage ist fehlgeschlagen."
+    },
     "participation_data": {
       "generate": "Teilnehmer:innen Daten generieren (CSV)",
       "download": "Teilnehmer:innen Daten herunterladen (CSV)"
