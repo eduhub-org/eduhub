@@ -350,10 +350,10 @@
       "reject": "Decline participation",
       "confirm": "Confirm participation",
       "ects": "ECTS",
-      "course_not_available": "Course not available",
+      "course_not_available": "This offering is not available.",
       "to_course_chat": "GO TO CHAT",
       "to_online_meeting": "GO TO ONLINE MEETING",
-      "no_online_participation_available": "This course does not offer online participation.",
+      "no_online_participation_available": "Online participation is not offered.",
       "speaker": "Speaker",
       "link_will_be_provided_soon": "(Link will be provided here soon)",
       "address_will_be_provided_soon": "(Address will be provided here soon)",
@@ -389,8 +389,9 @@
       "location_not_available": "Location not available",
       "optional": "optional",
       "program_session": "Cross-course",
+      "program_session_event": "Cross-event",
       "program_session_tooltip": "Takes place for all courses of “{program}”",
-      "optional_hint": "All sessions are mandatory unless marked “optional”.",
+      "program_session_tooltip_event": "Takes place for all events of “{program}”",
       "untitled_session": "Agenda item",
       "add_to_calendar_short": "Calendar"
     },
@@ -661,8 +662,8 @@
       "invitation_expired": "Your invitation has expired",
       "payment_pending": "Your payment has not been completed yet. You can review your selections and try again.",
       "payment_failed": "Your payment could not be processed. You can review your selections and try again.",
-      "waitlist": "You are on the waitlist. The course is currently full. We will inform you if a spot becomes available.",
-      "course_full_notice": "This course is currently full. You can join the waitlist.",
+      "waitlist": "You are on the waitlist. All places are currently taken. We will let you know if a place becomes available.",
+      "course_full_notice": "All places are currently taken. You can join the waitlist.",
       "application_period_ended": "Unfortunately, the application period has ended. You can subscribe to our <a>newsletter</a> to stay informed about new offers.",
       "application_period_ended_title": "Application Period Ended",
       "registration_period_ended": "Unfortunately, the registration period has ended. You can subscribe to our <a>newsletter</a> to stay informed about new offers.",
@@ -679,7 +680,7 @@
       "title_direct": "Registration",
       "title_with_payment": "Registration and Payment",
       "motivation_letter_label": "Motivation Letter",
-      "motivation_letter_placeholder": "Please tell us why you want to participate in this course...",
+      "motivation_letter_placeholder": "Please tell us why you want to participate...",
       "summary_description": "You are about to confirm your participation in \"{title}\" and will be redirected to complete your payment.",
       "pricing_summary": "Pricing Summary",
       "base_price": "Base Price",
@@ -692,12 +693,14 @@
         "verifying": "Verifying payment...",
         "verifying_description": "Please wait a moment while we confirm your payment.",
         "success_title": "Payment successful!",
-        "success_description": "Your payment has been processed successfully. You have been enrolled in the course.",
+        "success_description": "Your payment has been processed successfully. Your registration is complete.",
         "cancelled_title": "Payment cancelled",
         "cancelled_description": "The payment was cancelled. You can try again later.",
         "error_verifying": "Error verifying payment",
         "back_to_course": "Back to course",
+        "back_to_course_event": "Back to event",
         "view_course": "View course",
+        "view_course_event": "View event",
         "my_courses": "My courses",
         "try_again": "Try again",
         "back_to_home": "Back to home"
@@ -708,8 +711,8 @@
       "proceed_to_payment": "Proceed to Payment",
       "submitting": "Submitting...",
       "success_message_approval": "Your application has been submitted successfully. You will receive an email notification once your application has been reviewed.",
-      "success_message_direct": "You have been successfully registered for this course. You will receive a confirmation email shortly.",
-      "success_message_waitlist": "You are on the waitlist for this course."
+      "success_message_direct": "Your registration was successful. You will receive a confirmation email shortly.",
+      "success_message_waitlist": "You are now on the waitlist."
     },
     "errors": {
       "motivation_letter_required": "Please provide a motivation letter",
@@ -727,7 +730,7 @@
       "survey_title_registration": "Registration questionnaire"
     },
     "onboarding_modal": {
-      "decline_confirm_text": "Do you really want to decline the invitation to this course?",
+      "decline_confirm_text": "Do you really want to decline the invitation?",
       "decline_button_text": "Yes",
       "title": "Onboarding for your Course Participation",
       "badge": "Action required",
@@ -757,6 +760,7 @@
       "location": "Location",
       "language": "Language",
       "price": "Price",
+      "price_depends_on_add_ons": "depending on add-ons",
       "places": "Places",
       "places_left": "{count} left",
       "places_total": "of {count}",
@@ -776,9 +780,9 @@
       "end": "End preview",
       "errors": {
         "TEST_ENROLLMENT_FAILED": "The preview could not be ended. Please try again later.",
-        "TEST_ENROLLMENT_UNAUTHORIZED": "Only instructors of this course can use the participant view.",
-        "TEST_ENROLLMENT_ALREADY_PARTICIPANT": "You are enrolled in this course for real, so there is no preview to end.",
-        "TEST_ENROLLMENT_COURSE_NOT_FOUND": "This course no longer exists.",
+        "TEST_ENROLLMENT_UNAUTHORIZED": "Only instructors or organizers of this offering can use the participant view.",
+        "TEST_ENROLLMENT_ALREADY_PARTICIPANT": "You are enrolled here for real, so there is no preview to end.",
+        "TEST_ENROLLMENT_COURSE_NOT_FOUND": "This offering no longer exists.",
         "TEST_ENROLLMENT_INVALID_INPUT": "The request was malformed."
       }
     },
@@ -922,7 +926,7 @@
     "address": {
       "label": "Link or Address",
       "placeholder": {
-        "online": "This link will be provided to participants for all online sessions of the course.",
+        "online": "This link will be provided to participants for all online sessions.",
         "offline": "This address can be adjusted when creating individual sessions if necessary."
       },
       "errorText": "The entered link does not have the correct format."
@@ -946,8 +950,8 @@
     "end_time": "End Time",
     "short_description": {
       "label": "Short Description",
-      "help_text": "This text will appear on the course tile and as a tagline on the course page.",
-      "placeholder": "Enter a brief description of the course..."
+      "help_text": "This text will appear on the tile and as a tagline on the detail page.",
+      "placeholder": "Enter a brief description..."
     },
     "learning_goals": {
       "label": "Learning Goals",
@@ -958,7 +962,7 @@
     },
     "info_block_1_title": {
       "label": "Info Block 1",
-      "help_text": "For the content of this part of the description, please refer to existing courses to stay as consistent as possible. Typically, this section describes what participants can expect in the course ('What you will get').",
+      "help_text": "For the content of this part of the description, please refer to existing offerings to stay as consistent as possible. Typically, this section describes what participants can expect ('What you will get').",
       "placeholder": "Title"
     },
     "info_block_1_content": {
@@ -966,7 +970,7 @@
     },
     "info_block_2_title": {
       "label": "Info Block 2",
-      "help_text": "For the content of this part of the description, please refer to existing courses to ensure consistency. Typically, this section describes what participants are expected to contribute or lead ('What you should bring').",
+      "help_text": "For the content of this part of the description, please refer to existing offerings to ensure consistency. Typically, this section describes what participants are expected to contribute or lead ('What you should bring').",
       "placeholder": "Title"
     },
     "info_block_2_content": {
@@ -1222,8 +1226,11 @@
     },
     "instructors": {
       "label": "Instructors",
+      "label_event": "Organizers",
       "add": "Add Instructor",
-      "help_text": "Instructors can manage the offering and are named on its page."
+      "add_event": "Add organizer",
+      "help_text": "Instructors can manage the offering and are named on its page.",
+      "help_text_event": "Organizers can manage the event and are named on its page."
     },
     "funding_organizations": {
       "label": "Funding Organizations",
@@ -1472,7 +1479,7 @@
     "add_as_aborted": "add or change as aborted",
     "add_as_cancelled": "add or change as cancelled",
     "add_user_error": "Please select at least one user!",
-    "add_user_preview_conflict": "Not added because they have a participant preview open on this course: {names}. The preview has to be ended first.",
+    "add_user_preview_conflict": "Not added because they have a participant preview open here: {names}. The preview has to be ended first.",
     "submit": "Submit",
     "application_history": {
       "label": "Previous Applications and Participations",
@@ -1507,19 +1514,19 @@
       "send_invitations_selected": "Send Invitations to Selected",
       "send_invitations_all": "Send Invitations to all with Green Rating",
       "send_invitations_dialog_title": "Send Invitations",
-      "send_invitations_selected_count_singular": "Of {selected} selected participants, {identified} person with green rating was identified and will be notified of their invitation for this course.",
-      "send_invitations_selected_count_plural": "Of {selected} selected participants, {identified} persons with green rating were identified and will be notified of their invitation for this course.",
-      "send_invitations_all_count_singular": "{count} person with green rating was identified and will be notified of their invitation for this course.",
-      "send_invitations_all_count_plural": "{count} persons with green rating were identified and will be notified of their invitation for this course.",
+      "send_invitations_selected_count_singular": "Of {selected} selected participants, {identified} person with green rating was identified and will be notified of their invitation.",
+      "send_invitations_selected_count_plural": "Of {selected} selected participants, {identified} persons with green rating were identified and will be notified of their invitation.",
+      "send_invitations_all_count_singular": "{count} person with green rating was identified and will be notified of their invitation.",
+      "send_invitations_all_count_plural": "{count} persons with green rating were identified and will be notified of their invitation.",
       "send_invitations_confirm": "Send Invitations",
       "send_rejections": "Send Rejections",
       "send_rejections_selected": "Send Rejections to Selected",
       "send_rejections_all": "Send Rejections to all with Red Rating",
       "send_rejections_dialog_title": "Send Rejections",
-      "send_rejections_selected_count_singular": "Of {selected} selected participants, {identified} person with red rating was identified and will be notified of their rejection for this course.",
-      "send_rejections_selected_count_plural": "Of {selected} selected participants, {identified} persons with red rating were identified and will be notified of their rejection for this course.",
-      "send_rejections_all_count_singular": "{count} person with red rating was identified and will be notified of their rejection for this course.",
-      "send_rejections_all_count_plural": "{count} persons with red rating were identified and will be notified of their rejection for this course.",
+      "send_rejections_selected_count_singular": "Of {selected} selected participants, {identified} person with red rating was identified and will be notified of their rejection.",
+      "send_rejections_selected_count_plural": "Of {selected} selected participants, {identified} persons with red rating were identified and will be notified of their rejection.",
+      "send_rejections_all_count_singular": "{count} person with red rating was identified and will be notified of their rejection.",
+      "send_rejections_all_count_plural": "{count} persons with red rating were identified and will be notified of their rejection.",
       "send_rejections_confirm": "Send Rejections",
       "send_invitations_error": "Failed to send invitations: {error}",
       "cancel_registrations_error": "The registrations could not be cancelled: {error}",
@@ -1809,6 +1816,7 @@
     "achievement_cert_issued": "Achievement certificate issued",
     "achievement_cert_not_issued": "No achievement certificate issued",
     "attendance_program_session": "Cross-course",
+    "attendance_program_session_event": "Cross-event",
     "attendance_optional_session": "optional",
     "attendance_status_passed": "Attendance requirement met",
     "attendance_status_failed": "Attendance requirement not met",
@@ -1840,6 +1848,17 @@
     "certificates_group": "Certificates",
     "application_status_tooltip": "Click on the circles to change the rating",
     "application_deadline_tooltip": "If you want to change the date for the Confirmation deadline you can resend the invitation.",
+    "application_details": {
+      "contact": "Contact",
+      "applied_on": "Applied on {date}",
+      "registered_on": "Registered on {date}",
+      "answer_count": "complete · {count, plural, one {# answer} other {# answers}}",
+      "read_more": "Read more",
+      "read_less": "Show less",
+      "next_application": "Next application",
+      "next_registration": "Next registration",
+      "keyboard_hint": "Keys 1–3 and 0 rate the open application, J / K jump to the next / previous one."
+    },
     "max_participants": {
       "label": "Maximum number of participants",
       "placeholder": "Maximum number of participants",
@@ -1934,12 +1953,15 @@
       "invitation_expired": "Invitation expired",
       "registered_account": "Registered with account",
       "registered_guest": "Registered as guest",
-      "guest_badge": "Guest"
+      "guest_badge": "Guest",
+      "confirmed_short": "Confirmed",
+      "registered_short": "Registered",
+      "rejected_short": "Rejected"
     },
     "invitation_deadline": "Invitation deadline",
-    "loading_course": "Loading course...",
-    "course_load_error": "The course could not be loaded. Please try again.",
-    "course_not_found": "Course {courseId} could not be found!",
+    "loading_course": "Loading...",
+    "course_load_error": "The offering could not be loaded. Please try again.",
+    "course_not_found": "Offering {courseId} could not be found!",
     "add_session": "Add Session",
     "SessionsTab": {
       "date_time": "Date & time",
@@ -2009,7 +2031,7 @@
     "address": {
       "label": "Link or Address",
       "placeholder": {
-        "online": "This link will be provided to participants for all online sessions of the course.",
+        "online": "This link will be provided to participants for all online sessions.",
         "offline": "This address can be adjusted when creating individual sessions if necessary."
       },
       "errorText": "The entered link does not have the correct format."
@@ -2034,8 +2056,8 @@
     "end_time": "End Time",
     "short_description": {
       "label": "Short Description",
-      "help_text": "This text will appear on the course tile and as a tagline on the course page.",
-      "placeholder": "Enter a brief description of the course..."
+      "help_text": "This text will appear on the tile and as a tagline on the detail page.",
+      "placeholder": "Enter a brief description..."
     },
     "learning_goals": {
       "label": "Learning Goals",
@@ -2046,7 +2068,7 @@
     },
     "info_block_1_title": {
       "label": "Info Block 1",
-      "help_text": "For the content of this part of the description, please refer to existing courses to stay as consistent as possible. Typically, this section describes what participants can expect in the course ('What you will get').",
+      "help_text": "For the content of this part of the description, please refer to existing offerings to stay as consistent as possible. Typically, this section describes what participants can expect ('What you will get').",
       "placeholder": "Title"
     },
     "info_block_1_content": {
@@ -2054,7 +2076,7 @@
     },
     "info_block_2_title": {
       "label": "Info Block 2",
-      "help_text": "For the content of this part of the description, please refer to existing courses to ensure consistency. Typically, this section describes what participants are expected to contribute or lead ('What you should bring').",
+      "help_text": "For the content of this part of the description, please refer to existing offerings to ensure consistency. Typically, this section describes what participants are expected to contribute or lead ('What you should bring').",
       "placeholder": "Title"
     },
     "info_block_2_content": {
@@ -2063,7 +2085,7 @@
     "add_new_location": "Add location",
     "no_enrollments_present": "There are no enrollments yet.",
     "not_submitted": "not submitted",
-    "confirmation_push_course_to_next_status": "Do you want to send the course to its next state?",
+    "confirmation_push_course_to_next_status": "Do you want to move this offering to its next state?",
     "set_status_high": "increase status",
     "please_fill_all_fields": "Please fill out all fields to proceed!",
     "errors": {
@@ -2095,14 +2117,14 @@
     },
     "instructor_confidentiality": {
       "title": "Confidentiality of personal data",
-      "intro": "Before you manage your course, please confirm once that you will treat participants' personal data confidentially.",
+      "intro": "Before you manage your course or event, please confirm once that you will treat participants' personal data confidentially.",
       "points": {
-        "access": "As an instructor you get access to personal data of participants and other users, for example names, email addresses, organizations, application documents and attendance.",
+        "access": "As an instructor or organizer you get access to personal data of participants and other users, for example names, email addresses, organizations, application documents and attendance.",
         "purpose": "You use this data only to run your courses and events, and only as {operator} intends.",
         "no_disclosure": "You do not pass it on to anyone else and do not use it for your own purposes, such as your own mailing lists or advertising.",
         "exports": "You keep exports and printouts (participant lists, attendance lists, name tags) safe and delete or shred them once the event is over.",
         "incidents": "If data gets lost or misused, for example a list left behind, you tell {recipient} straight away.",
-        "duration": "This commitment continues after your time as an instructor ends."
+        "duration": "This commitment continues after your time as an instructor or organizer ends."
       },
       "checkbox": "I have read this and commit to keeping personal data confidential.",
       "accept": "Confirm",
@@ -2141,14 +2163,14 @@
       "open": "Open participant view",
       "end": "End preview",
       "start_dialog_title": "Start the participant view",
-      "start_dialog_question": "This enrolls you in this course as a participant, so you see the course page exactly as your participants do. The enrollment is invisible: it appears in no participant list, no count, no statistic, no export and no email. Note that anything you really submit while previewing, such as a proposed project, is real and visible to participants until you end the preview.",
+      "start_dialog_question": "This enrolls you as a participant, so you see the page exactly as your participants do. The enrollment is invisible: it appears in no participant list, no count, no statistic, no export and no email. Note that anything you really submit while previewing, such as a proposed project, is real and visible to participants until you end the preview.",
       "end_dialog_title": "End the preview",
-      "end_dialog_question": "This removes your preview enrollment. Projects only you created while previewing, and your attendances in this course, are deleted with it.",
+      "end_dialog_question": "This removes your preview enrollment. Projects only you created while previewing, and your attendances, are deleted with it.",
       "errors": {
         "TEST_ENROLLMENT_FAILED": "The preview could not be changed. Please try again later.",
-        "TEST_ENROLLMENT_UNAUTHORIZED": "Only instructors of this course can use the participant view.",
-        "TEST_ENROLLMENT_ALREADY_PARTICIPANT": "You are already enrolled in this course, so you already see the course page as a participant.",
-        "TEST_ENROLLMENT_COURSE_NOT_FOUND": "This course no longer exists.",
+        "TEST_ENROLLMENT_UNAUTHORIZED": "Only instructors or organizers of this offering can use the participant view.",
+        "TEST_ENROLLMENT_ALREADY_PARTICIPANT": "You are already enrolled here, so you already see the page as a participant.",
+        "TEST_ENROLLMENT_COURSE_NOT_FOUND": "This offering no longer exists.",
         "TEST_ENROLLMENT_INVALID_INPUT": "The request was malformed."
       }
     },
@@ -2340,17 +2362,22 @@
       "button": "Create User",
       "dialog_title": "Create New User",
       "success": "User created successfully.",
+      "success_without_email": "The account was created, but the welcome email could not be sent. Please inform the person yourself: they can set a password via “Forgot password”, and our privacy policy is at /privacy.",
       "error": "Error creating user",
       "error_first_name_required": "First name is required",
       "error_last_name_required": "Last name is required",
       "error_email_required": "Email is required",
       "error_email_invalid": "Invalid email address",
-      "send_welcome_email": "Send welcome email",
+      "welcome_email_notice": "The person receives an email with a link to set their password and information on data protection.",
       "creating": "Creating...",
       "cancel": "Cancel",
       "first_name_placeholder": "Enter first name",
       "last_name_placeholder": "Enter last name",
       "email_placeholder": "Enter email address"
+    },
+    "expanded": {
+      "profile": "Profile",
+      "history": "Applications and Participations"
     }
   },
   "manageAdminUsers": {
@@ -2642,6 +2669,7 @@
     "role": "Role",
     "session": "Session",
     "role_instructor": "Instructor",
+    "role_organizer": "Organizer",
     "role_speaker": "Speaker",
     "no_roles": "No roles assigned"
   },
@@ -2906,6 +2934,7 @@
       "APPLICATION_RECEIVED_PAID": "Application Received (Paid)",
       "USER_CREATED": "User Created",
       "ORGANIZER_ADDED": "Organizer Added",
+      "SESSION_SPEAKER_ADDED": "Speaker Added",
       "CANCELLATION_REQUEST_ORGANIZER": "Cancellation Request (to Organizers)",
       "CANCELLATION_REQUEST_CONFIRMATION": "Cancellation Request (Confirmation)",
       "WAITLIST_NOTICE": "Waitlist Notice",
@@ -2963,6 +2992,7 @@
       "SESSION_REMINDER": "Sent before sessions start (24h, 1h, 15min before)",
       "USER_CREATED": "Sent when a new user account is created",
       "ORGANIZER_ADDED": "Sent when a user is added as an organizer to a course or event",
+      "SESSION_SPEAKER_ADDED": "Sent when a user is first listed as a speaker in a course or event",
       "CANCELLATION_REQUEST_ORGANIZER": "Sent to organizers and organization admins when someone asks to cancel a paid registration",
       "CANCELLATION_REQUEST_CONFIRMATION": "Sent to participants confirming their cancellation request for a paid registration",
       "WAITLIST_NOTICE": "Sent when a user joins the waitlist because the offering is full",
@@ -3032,7 +3062,7 @@
   },
   "pricing_summary": {
     "title": "Pricing Summary",
-    "base_price": "Course Fee",
+    "base_price": "Participation fee",
     "addons": "Add-ons",
     "total": "Total",
     "no_pricing": "No pricing configured.",
@@ -3049,7 +3079,6 @@
     "filter_location": "Location",
     "filter_location_all": "All Locations",
     "filter_course": "Course",
-    "filter_course_all": "All Courses",
     "select_all": "Select all",
     "deselect_all": "Deselect all",
     "month_view": "Month View",
@@ -3058,7 +3087,17 @@
     "today": "Today",
     "no_sessions": "No sessions available.",
     "session_details": "Session Details",
-    "error_loading": "Error loading calendar data."
+    "error_loading": "Error loading calendar data.",
+    "program": "Program",
+    "program_all": "All programs",
+    "no_programs": "You don't manage any program whose sessions could be shown here yet.",
+    "no_sessions_in_range": "No sessions in this period.",
+    "filter_publication": "Status",
+    "filter_publication_published": "Published",
+    "filter_publication_unpublished": "Not published",
+    "filter_course_placeholder": "Start typing a course name…",
+    "filter_address": "Address",
+    "filter_address_placeholder": "Start typing an address…"
   },
   "footer": {
     "imprint": "Imprint",
@@ -3385,5 +3424,27 @@
     "title": "EduHub Events | opencampus.sh",
     "description": "Upcoming events at opencampus.sh",
     "icalCategory": "Education"
+  },
+  "enrollmentHistory": {
+    "label": "Previous Applications and Participations",
+    "empty": "No other applications present",
+    "legend": "Green: completed (with certificate) · Blue: participating · Gray: open · Orange: withdrew or invitation expired · Red: rejected or aborted. Hollow dot: attendance not recorded. Attendance counts attended mandatory sessions that have already taken place.",
+    "attendance": "{percent}% attended ({attended}/{total})",
+    "attendance_tooltip": "Attended mandatory sessions out of {total} recorded mandatory sessions",
+    "attendance_not_recorded": "Attendance not recorded",
+    "attendance_not_recorded_tooltip": "No attendance was recorded for the sessions that have taken place, so it is unknown whether this person took part.",
+    "ects": "{ects} ECTS",
+    "status": {
+      "APPLIED": "applied",
+      "INVITED": "invited",
+      "WAITLIST": "waitlist",
+      "REGISTERED": "registered",
+      "CONFIRMED": "participating",
+      "COMPLETED": "completed",
+      "CANCELLED": "withdrew",
+      "EXPIRED": "invitation expired",
+      "REJECTED": "rejected",
+      "ABORTED": "aborted"
+    }
   }
 }

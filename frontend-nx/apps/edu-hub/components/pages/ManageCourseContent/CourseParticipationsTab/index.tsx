@@ -3,7 +3,7 @@ import { useTranslations } from 'next-intl';
 import { FC, ReactNode, useCallback, useMemo, useState, type JSX } from 'react';
 import { useIsAdmin, useIsInstructor } from '../../../../hooks/authentication';
 import { useManagementRoleContext } from '../../../../hooks/managementRole';
-import { AuthRoles } from '../../../../types/enums';
+import { AuthRoles, ProgramType } from '../../../../types/enums';
 import { useRoleMutation } from '../../../../hooks/authedMutation';
 import Dot, { DotColor } from '../../../common/Dot';
 import { CertificateDownload } from '../../../common/CertificateDownload';
@@ -178,6 +178,9 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
   const courseSessions = courseData?.Sessions;
   const programSessions = courseData?.Program?.Sessions;
   const programTitle = courseData?.Program?.title ?? '';
+  const programSessionLabel = t(
+    course.Program?.type === ProgramType.EVENTS ? 'attendance_program_session_event' : 'attendance_program_session'
+  );
   const courseProjectCourses = courseData?.ProjectCourses;
 
   const pageUserIds = useMemo(
@@ -584,7 +587,7 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
                 }
                 title={[
                   new Date(d.session.startDateTime).toLocaleString(),
-                  isProgramSession(d.session) ? `${t('attendance_program_session')} (${programTitle})` : null,
+                  isProgramSession(d.session) ? `${programSessionLabel} (${programTitle})` : null,
                   isMandatorySession(d.session) ? null : t('attendance_optional_session'),
                 ]
                   .filter(Boolean)
@@ -608,7 +611,7 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
         </div>
       );
     };
-  }, [attendanceLoading, summarizeAttendance, programTitle, t]);
+  }, [attendanceLoading, summarizeAttendance, programTitle, programSessionLabel, t]);
 
   const columns = useMemo<ColumnDef<ExtendedEnrollment>[]>(() => {
     const allColumns: ColumnDef<ExtendedEnrollment>[] = [

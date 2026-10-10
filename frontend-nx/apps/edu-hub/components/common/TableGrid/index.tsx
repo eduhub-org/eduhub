@@ -1,4 +1,4 @@
-import { BaseRow, TableGridFilter, TableGridProps } from './types';
+import { BaseRow, ExpandedRowProps, TableGridFilter, TableGridProps } from './types';
 import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { TextField, Checkbox, Select, MenuItem, FormControl, InputLabel, SelectChangeEvent, ListSubheader, ListItemText, Divider, Tooltip, CircularProgress } from '@mui/material';
 import { useTranslations } from 'next-intl';
@@ -70,10 +70,9 @@ const StableCell: React.FC<{ context: CellContext<any, unknown> }> = ({ context 
 };
 
 /** Stable wrapper so expandable row content is not remounted when parent re-renders (e.g. after refetch). */
-const ExpandableRowWrapper: React.FC<{
-  renderFn: (props: { row: any }) => React.ReactElement<any> | null;
-  row: any;
-}> = ({ renderFn, row }) => renderFn({ row });
+const ExpandableRowWrapper: React.FC<
+  ExpandedRowProps<any> & { renderFn: (props: ExpandedRowProps<any>) => React.ReactElement<any> | null }
+> = ({ renderFn, ...props }) => renderFn(props);
 
 /**
  * Toolbar facet filter: one dropdown per filter with a checkbox per option, so several values can
@@ -220,6 +219,10 @@ const TableGrid = <T extends BaseRow,>({
 
   const t = useTranslations();
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
+  // The row opened last; it owns keyboard shortcuts and is scrolled to when opened by expandNext/Previous.
+  const [activeRowId, setActiveRowId] = useState<number | null>(null);
+  const [scrollToRowId, setScrollToRowId] = useState<number | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [internalSorting, setInternalSorting] = useState<SortingState>([]);
   const settledPageRef = useRef<{
     data: T[];
@@ -343,13 +346,34 @@ const TableGrid = <T extends BaseRow,>({
       const newExpandedRows = new Set(expandedRows);
       if (expandedRows.has(rowId)) {
         newExpandedRows.delete(rowId);
+        if (activeRowId === rowId) setActiveRowId(null);
       } else {
         newExpandedRows.add(rowId);
+        setActiveRowId(rowId);
       }
       setExpandedRows(newExpandedRows);
     },
-    [expandedRows]
+    [expandedRows, activeRowId]
   );
+
+  const moveExpansion = useCallback((fromRowId: number, toRowId: number) => {
+    setExpandedRows((prev) => {
+      const next = new Set(prev);
+      next.delete(fromRowId);
+      next.add(toRowId);
+      return next;
+    });
+    setActiveRowId(toRowId);
+    setScrollToRowId(toRowId);
+  }, []);
+
+  useEffect(() => {
+    if (scrollToRowId == null) return;
+    containerRef.current
+      ?.querySelector(`[data-row-id="${scrollToRowId}"]`)
+      ?.scrollIntoView({ block: 'start', behavior: 'smooth' });
+    setScrollToRowId(null);
+  }, [scrollToRowId]);
 
   const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
     const itemRank = rankItem(row.getValue(columnId), value);
@@ -402,7 +426,8 @@ const TableGrid = <T extends BaseRow,>({
     const visibility: Record<string, boolean> = {};
     columns.forEach((col) => {
       const hideBelow = col.meta?.hideBelow;
-      const id = col.id ?? (col as { accessorKey?: string }).accessorKey;
+      // TanStack derives the id from a dotted accessorKey with the dots replaced by underscores.
+      const id = col.id ?? (col as { accessorKey?: string }).accessorKey?.replace(/\./g, '_');
       if (hideBelow && id) {
         visibility[id] = hideBelow === 'xl' ? !belowXl : !belowLg;
       }
@@ -728,6 +753,20 @@ const TableGrid = <T extends BaseRow,>({
     enablePagination && !isServerSideSorting
       ? table.getRowModel().rows.slice(tablePageIndex * tablePageSize, (tablePageIndex + 1) * tablePageSize)
       : table.getRowModel().rows;
+
+  const expandedRowProps = (rowIndex: number): ExpandedRowProps<T> => {
+    const row = rowsToDisplay[rowIndex].original;
+    const isExpandable = (candidate?: T) =>
+      candidate != null && (canExpandRow ? canExpandRow(candidate) : true);
+    const next = rowsToDisplay[rowIndex + 1]?.original;
+    const previous = rowsToDisplay[rowIndex - 1]?.original;
+    return {
+      row,
+      isActive: activeRowId === row.id,
+      expandNext: isExpandable(next) ? () => moveExpansion(row.id, next.id) : undefined,
+      expandPrevious: isExpandable(previous) ? () => moveExpansion(row.id, previous.id) : undefined,
+    };
+  };
   const showBody = (!loading || isShowingRetainedPage) && !error;
 
   const renderDeleteButton = (row: T, label?: string) => (
@@ -798,7 +837,7 @@ const TableGrid = <T extends BaseRow,>({
         return (
         <React.Fragment key={row.id}>
           {/* Primary Row */}
-          <div className="flex items-stretch">
+          <div className="flex items-stretch scroll-mt-4" data-row-id={row.original.id}>
             <div
               className={`flex-grow min-w-0 flex items-stretch overflow-hidden light text-label-primary ${rowSurface} ${
                 rowIndex > 0 ? 'border-t border-table-divider' : ''
@@ -870,7 +909,7 @@ const TableGrid = <T extends BaseRow,>({
                   <ExpandableRowWrapper
                     key={`expandableRow-${row.id}`}
                     renderFn={expandableRowComponent}
-                    row={row.original}
+                    {...expandedRowProps(rowIndex)}
                   />
                 </div>
               </div>
@@ -945,13 +984,14 @@ const TableGrid = <T extends BaseRow,>({
       <div className="rounded-xl light bg-fill-primary text-label-secondary p-4 text-center">-</div>
     ) : (
       <div className="flex flex-col gap-2">
-        {rowsToDisplay.map((row) => {
+        {rowsToDisplay.map((row, rowIndex) => {
           const isExpanded = expandedRows.has(row.original.id);
           const rowExpandable = Boolean(expandableRowComponent) && (canExpandRow ? canExpandRow(row.original) : true);
           return (
             <div
               key={row.id}
-              className={`rounded-xl overflow-hidden light text-label-primary ${
+              data-row-id={row.original.id}
+              className={`scroll-mt-4 rounded-xl overflow-hidden light text-label-primary ${
                 selectedRowIds.has(row.original.id) ? 'bg-bg-secondary' : 'bg-fill-primary'
               } ${rowClassName?.(row.original) ?? ''}`}
             >
@@ -983,7 +1023,7 @@ const TableGrid = <T extends BaseRow,>({
               </div>
               {rowExpandable && isExpanded && (
                 <div className="border-t border-table-divider">
-                  <ExpandableRowWrapper renderFn={expandableRowComponent!} row={row.original} />
+                  <ExpandableRowWrapper renderFn={expandableRowComponent!} {...expandedRowProps(rowIndex)} />
                   {rowHasDelete(row.original) && (
                     <div className="border-t border-table-divider flex justify-center">
                       {renderDeleteButton(row.original, t('common.table_grid_delete_button.delete'))}
@@ -998,7 +1038,7 @@ const TableGrid = <T extends BaseRow,>({
     ));
 
   return (
-    <div className="min-w-0 max-w-full">
+    <div className="min-w-0 max-w-full" ref={containerRef}>
       {/* The toolbar stays interactive while rows reload, so typing in the search field goes on. */}
       {toolbar}
       <div className="relative" aria-busy={loading}>

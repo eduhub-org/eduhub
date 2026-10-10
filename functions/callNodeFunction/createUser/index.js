@@ -16,7 +16,9 @@ try {
 
 /**
  * Creates a new user in both Keycloak and Hasura
- * Optionally sends welcome email immediately if sendEmail is true
+ * Always queues the welcome email: the person did not sign up themselves, so
+ * the mail is how they learn about the account and our privacy policy
+ * (GDPR Art. 14).
  * 
  * @param {Object} req - Request object from Hasura action
  * @param {Object} logger - Winston logger instance
@@ -26,7 +28,7 @@ export default async function createUser(req, logger) {
   logger.info("########## Create User ##########");
   logger.debug(`Request body: ${JSON.stringify(req.body)}`);
 
-  const { firstName, lastName, email, sendEmail } = req.body.input;
+  const { firstName, lastName, email } = req.body.input;
 
   // Validate input
   if (!firstName || !lastName || !email) {
@@ -227,48 +229,44 @@ export default async function createUser(req, logger) {
 
     let emailQueued = false;
     
-    // Queue the welcome email only if sendEmail is true
-    if (sendEmail) {
-      // Create variable replacer function
-      const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleDateString('de-DE', {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric'
-        });
-      };
-
-      const variableReplacer = createVariableReplacer({
-        user: { firstName, lastName },
-        passwordResetLink,
-        portalUrl
-      }, formatDate);
-
-      // Also handle custom template variables for password reset link and portal URL
-      const customReplacer = (text, options) => {
-        if (!text) return text;
-        let result = variableReplacer(text, options);
-        result = result.replaceAll('[System:PasswordResetLink]', passwordResetLink);
-        result = result.replaceAll('[System:PortalUrl]', portalUrl);
-        return result;
-      };
-
-      const emailResult = await queueEmail({
-        templateType: 'USER_CREATED',
-        variableReplacer: customReplacer,
-        recipientEmail: email,
-        courseId: null,
-        client: graphqlClient,
-        logger: logger
+    // Queue the welcome email
+    const formatDate = (dateString) => {
+      return new Date(dateString).toLocaleDateString('de-DE', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
       });
+    };
 
-      if (!emailResult.success) {
-        logger.error(`Failed to queue welcome email: ${emailResult.error}`);
-        // Don't fail the user creation if email queuing fails
-      } else {
-        emailQueued = true;
-        logger.info(`Queued welcome email for user ${email}`);
-      }
+    const variableReplacer = createVariableReplacer({
+      user: { firstName, lastName },
+      passwordResetLink,
+      portalUrl
+    }, formatDate);
+
+    // [System:PasswordResetLink] is specific to this mail; the replacer handles the rest
+    const customReplacer = (text, options) => {
+      if (!text) return text;
+      let result = variableReplacer(text, options);
+      result = result.replaceAll('[System:PasswordResetLink]', passwordResetLink);
+      return result;
+    };
+
+    const emailResult = await queueEmail({
+      templateType: 'USER_CREATED',
+      variableReplacer: customReplacer,
+      recipientEmail: email,
+      courseId: null,
+      client: graphqlClient,
+      logger: logger
+    });
+
+    if (!emailResult.success) {
+      logger.error(`Failed to queue welcome email: ${emailResult.error}`);
+      // Don't fail the user creation if email queuing fails
+    } else {
+      emailQueued = true;
+      logger.info(`Queued welcome email for user ${hasuraUserId}`);
     }
 
     return {

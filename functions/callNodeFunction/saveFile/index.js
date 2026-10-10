@@ -2,6 +2,7 @@ import { Storage } from "@google-cloud/storage";
 import { buildCloudStorage } from "../lib/cloud-storage.js";
 import { replacePlaceholders } from "../lib/utils.js";
 import { logger } from "../index.js";
+import { authorizeUpload } from "../lib/uploadAuthorization.js";
 import { maxBase64LengthForBytes, validateFileUpload } from "./fileValidation.js";
 import { sanitizeStoredFileName } from "../lib/fileName.js";
 
@@ -33,7 +34,7 @@ const FAILURE_FILE_FIELDS = { filePath: "", accessUrl: "" };
  *   - filePath (string): Path to the file in the storage bucket
  *   - accessUrl (string): URL to access the file (signed URL if private, public URL if public)
  */
-const saveFile = async (req) => {
+export const saveFileUnchecked = async (req) => {
   logger.info("########## Save File ##########");
   logger.debug("Request parameters", {
     templatePath: req.headers['file-path'],
@@ -148,6 +149,29 @@ const saveFile = async (req) => {
       ...FAILURE_FILE_FIELDS,
     };
   }
+};
+
+/**
+ * The saveFile action: checks that the caller may change the record the file
+ * belongs to (see lib/uploadAuthorization.js), then saves it.
+ */
+const saveFile = async (req) => {
+  try {
+    const authorization = await authorizeUpload(req);
+    if (!authorization.authorized) {
+      logger.error("File upload refused", { reason: authorization.reason });
+      return { success: false, messageKey: "UNAUTHORIZED", error: authorization.reason, ...FAILURE_FILE_FIELDS };
+    }
+  } catch (error) {
+    logger.error("Error authorizing file upload", { error: error.message });
+    return {
+      success: false,
+      messageKey: "FILE_SAVE_ERROR",
+      error: "An error occurred while saving the file",
+      ...FAILURE_FILE_FIELDS,
+    };
+  }
+  return saveFileUnchecked(req);
 };
 
 export default saveFile;

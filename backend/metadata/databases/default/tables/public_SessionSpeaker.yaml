@@ -235,3 +235,26 @@ delete_permissions:
                             _eq: X-Hasura-User-Id
                         - canManageSettings:
                             _eq: true
+event_triggers:
+  - name: send_speaker_added_email
+    definition:
+      enable_manual: false
+      insert:
+        columns: '*'
+    retry_conf:
+      interval_sec: 3660
+      num_retries: 10
+      timeout_sec: 60
+    webhook_from_env: CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION
+    headers:
+      - name: secret
+        value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+      - name: name
+        value: sendSpeakerAddedEmail
+    cleanup_config:
+      batch_size: 10000
+      clean_invocation_logs: false
+      clear_older_than: 168
+      paused: true
+      schedule: 0 0 * * *
+      timeout: 60

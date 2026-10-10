@@ -1597,6 +1597,7 @@ export enum MailTemplateType_enum {
   REGISTRATION_CONFIRMED_PAID = "REGISTRATION_CONFIRMED_PAID",
   SESSION_REMINDER = "SESSION_REMINDER",
   SESSION_RESCHEDULED = "SESSION_RESCHEDULED",
+  SESSION_SPEAKER_ADDED = "SESSION_SPEAKER_ADDED",
   USER_CREATED = "USER_CREATED",
   WAITLIST_NOTICE = "WAITLIST_NOTICE",
   WAITLIST_PROMOTED = "WAITLIST_PROMOTED",
@@ -5029,10 +5030,34 @@ export interface CourseEnrollment_avg_order_by {
 }
 
 /**
+ * Boolean expression to filter rows from the table "CourseEnrollmentAttendanceStats". All fields are combined with a logical 'AND'.
+ */
+export interface CourseEnrollmentAttendanceStats_bool_exp {
+  CourseEnrollment?: CourseEnrollment_bool_exp | null;
+  _and?: CourseEnrollmentAttendanceStats_bool_exp[] | null;
+  _not?: CourseEnrollmentAttendanceStats_bool_exp | null;
+  _or?: CourseEnrollmentAttendanceStats_bool_exp[] | null;
+  attendedSessions?: Int_comparison_exp | null;
+  enrollmentId?: Int_comparison_exp | null;
+  totalSessions?: Int_comparison_exp | null;
+}
+
+/**
+ * Ordering options when selecting data from "CourseEnrollmentAttendanceStats".
+ */
+export interface CourseEnrollmentAttendanceStats_order_by {
+  CourseEnrollment?: CourseEnrollment_order_by | null;
+  attendedSessions?: order_by | null;
+  enrollmentId?: order_by | null;
+  totalSessions?: order_by | null;
+}
+
+/**
  * Boolean expression to filter rows from the table "CourseEnrollment". All fields are combined with a logical 'AND'.
  */
 export interface CourseEnrollment_bool_exp {
   BillingOrganization?: Organization_bool_exp | null;
+  AttendanceStats?: CourseEnrollmentAttendanceStats_bool_exp | null;
   Course?: Course_bool_exp | null;
   CourseEnrollmentAddons?: CourseEnrollmentAddon_bool_exp | null;
   CourseEnrollmentAddons_aggregate?: CourseEnrollmentAddon_aggregate_bool_exp | null;
@@ -5059,6 +5084,7 @@ export interface CourseEnrollment_bool_exp {
   location?: LocationOption_enum_comparison_exp | null;
   motivationLetter?: String_comparison_exp | null;
   motivationRating?: MotivationRating_enum_comparison_exp | null;
+  questionnaireResponse?: jsonb_comparison_exp | null;
   status?: CourseEnrollmentStatus_enum_comparison_exp | null;
   termsAcceptedAt?: timestamptz_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
@@ -5156,6 +5182,7 @@ export interface CourseEnrollment_on_conflict {
  * Ordering options when selecting data from "CourseEnrollment".
  */
 export interface CourseEnrollment_order_by {
+  AttendanceStats?: CourseEnrollmentAttendanceStats_order_by | null;
   BillingOrganization?: Organization_order_by | null;
   Course?: Course_order_by | null;
   CourseEnrollmentAddons_aggregate?: CourseEnrollmentAddon_aggregate_order_by | null;
@@ -5178,6 +5205,7 @@ export interface CourseEnrollment_order_by {
   location?: order_by | null;
   motivationLetter?: order_by | null;
   motivationRating?: order_by | null;
+  questionnaireResponse?: order_by | null;
   status?: order_by | null;
   termsAcceptedAt?: order_by | null;
   updated_at?: order_by | null;

@@ -142,6 +142,7 @@ describe('sendOrganizerAddedEmail', () => {
         templateType: 'ORGANIZER_ADDED',
         recipientEmail: 'john@example.com',
         courseId: 101,
+        metadata: { type: 'ORGANIZER_ADDED', courseInstructorId: 1 },
       })
     );
 
@@ -222,5 +223,58 @@ describe('sendOrganizerAddedEmail', () => {
     const subject = 'Hello [User:FirstName] [User:LastName], course [Enrollment:CourseId--Course:Name]';
     const body = variableReplacer(subject);
     expect(body).toBe('Hello John Doe, course Introduction to Programming');
+  });
+
+  describe('retries', () => {
+    const insertRequest = {
+      body: { event: { op: 'INSERT', data: { new: { id: 1, courseId: 101, userId: 'user-123' } } } },
+    };
+    const details = {
+      CourseInstructor_by_pk: {
+        id: 1,
+        courseId: 101,
+        userId: 'user-123',
+        User: { id: 'user-123', firstName: 'John', lastName: 'Doe', email: 'john@example.com' },
+        Course: { id: 101, title: 'Test Course', Program: { title: 'Program', shortTitle: 'PG', type: 'DEGREE' } },
+      },
+    };
+
+    it('marks a failure to queue as retryable', async () => {
+      graphqlRequestMock.mockResolvedValue(details);
+      queueEmailMock.mockResolvedValue({ success: false, error: 'connection reset', messageKey: 'EMAIL_QUEUE_FAILED' });
+
+      const result = await sendOrganizerAddedEmail(insertRequest, mockLogger);
+
+      expect(result).toEqual(expect.objectContaining({ success: false, retryable: true }));
+    });
+
+    it('marks unexpected errors as retryable', async () => {
+      graphqlRequestMock.mockRejectedValue(new Error('Hasura unavailable'));
+
+      const result = await sendOrganizerAddedEmail(insertRequest, mockLogger);
+
+      expect(result).toEqual(expect.objectContaining({ success: false, retryable: true }));
+    });
+
+    it('treats a mail already queued by an earlier delivery as done', async () => {
+      graphqlRequestMock.mockResolvedValue(details);
+      queueEmailMock.mockResolvedValue({
+        success: false,
+        error: 'Uniqueness violation. duplicate key value violates unique constraint "MailLog_organizer_added_mail_unique"',
+      });
+
+      const result = await sendOrganizerAddedEmail(insertRequest, mockLogger);
+
+      expect(result).toEqual(expect.objectContaining({ success: true, messageKey: 'NO_ACTION_NEEDED' }));
+    });
+
+    it('does not retry permanent failures', async () => {
+      graphqlRequestMock.mockResolvedValue({ CourseInstructor_by_pk: null });
+
+      const result = await sendOrganizerAddedEmail(insertRequest, mockLogger);
+
+      expect(result.success).toBe(false);
+      expect(result.retryable).toBeUndefined();
+    });
   });
 });

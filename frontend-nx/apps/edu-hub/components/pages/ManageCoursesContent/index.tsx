@@ -90,6 +90,16 @@ const storeProgramTab = (key: string, tab: StoredProgramTab) => {
   }
 };
 
+/**
+ * Counted as confirmed, as in the course's own statistics: guests and other direct sign-ups are
+ * REGISTERED, not CONFIRMED.
+ */
+const CONFIRMED_STATUSES = [
+  CourseEnrollmentStatus_enum.CONFIRMED,
+  CourseEnrollmentStatus_enum.COMPLETED,
+  CourseEnrollmentStatus_enum.REGISTERED,
+];
+
 // Courses without an application process only report confirmed participants.
 const hasApplicationProcess = (course: AdminCourseList_Course) =>
   getRegistrationFeatures(course.registrationType).hasApplicationProcess;
@@ -771,7 +781,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
   const getConfirmedCount = useCallback(
     (course: AdminCourseList_Course) => {
       const statusCounts = getStatusCounts(course);
-      return statusCounts[CourseEnrollmentStatus_enum.CONFIRMED] ?? 0;
+      return CONFIRMED_STATUSES.reduce((sum, status) => sum + (statusCounts[status] ?? 0), 0);
     },
     [getStatusCounts]
   );
