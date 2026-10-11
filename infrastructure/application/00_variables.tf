@@ -510,3 +510,8 @@ variable "stujo_net_canonical_hosts" {
     "stujo-flensburg" = "flensburg.stujo.net"
   }
 }
+variable "alert_email" {
+  description = "Recipient of the hourly-capped error alert mails (see 10_monitoring.tf). Leave empty to disable alerting."
+  type        = string
+  default     = ""
+}
