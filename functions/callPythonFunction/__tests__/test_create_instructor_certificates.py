@@ -88,3 +88,22 @@ def test_missing_background_image_skips_course():
     result = create_instructor_certificates(_args([4]), client, storage)
     assert result["skippedCourseIds"] == [4]
     client.set_instructor_certificate_url.assert_not_called()
+
+
+def test_render_escapes_names_but_keeps_session_list():
+    import pythonFunctions.create_instructor_certificates as module
+    captured = {}
+    original = module.pisa.CreatePDF
+
+    def fake_create_pdf(html, dest):
+        captured["html"] = html
+        return original(html, dest=dest)
+
+    module.pisa.CreatePDF = fake_create_pdf
+    try:
+        context = build_certificate_context(_course(), {"firstName": "<b>Ada</b>", "lastName": ""}, "", datetime(2027, 2, 1))
+        module.render_pdf(TEMPLATE, context)
+    finally:
+        module.pisa.CreatePDF = original
+    assert "&lt;b&gt;Ada&lt;/b&gt;" in captured["html"]
+    assert "<li>Intro</li>" in captured["html"]

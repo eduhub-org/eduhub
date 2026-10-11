@@ -11,6 +11,7 @@ from io import BytesIO
 from zoneinfo import ZoneInfo
 
 from jinja2 import Environment, DictLoader
+from markupsafe import Markup
 from xhtml2pdf import pisa
 
 from api_clients import EduHubClient, StorageClient
@@ -38,7 +39,8 @@ def build_certificate_context(course, user, image, today):
         "full_name": f"{user.get('firstName') or ''} {user.get('lastName') or ''}".strip(),
         "course_name": course.get("title") or "",
         "semester": (course.get("Program") or {}).get("title") or "",
-        "session_entries": "".join(f"<li>{escape(title)}</li>" for title in sessions),
+        # Built from escaped titles, so it is safe to mark as HTML for the autoescaping template.
+        "session_entries": Markup("".join(f"<li>{escape(title)}</li>" for title in sessions)),
         "ECTS": course.get("ects") or "",
         "date": today.strftime("%d.%m.%Y"),
         "template": image,
@@ -46,7 +48,8 @@ def build_certificate_context(course, user, image, today):
 
 
 def render_pdf(template_html, context):
-    env = Environment(loader=DictLoader({"template": template_html}))
+    # Names and titles are user-editable: escape them so they cannot inject markup.
+    env = Environment(loader=DictLoader({"template": template_html}), autoescape=True)
     rendered_html = env.get_template("template").render(context)
     pdf_bytes_io = BytesIO()
     if pisa.CreatePDF(rendered_html, dest=pdf_bytes_io).err:
