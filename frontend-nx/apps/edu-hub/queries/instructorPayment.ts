@@ -42,6 +42,7 @@ export const COURSE_TEAM = gql`
       ...CourseTeamFields
       CourseInstructors(order_by: { id: asc }) {
         id
+        certificateURL
         User {
           id
           matrixUserHandle
@@ -98,6 +99,18 @@ export const GENERATE_INSTRUCTOR_INVOICE = gql`
     generateInstructorInvoice(courseId: $courseId) {
       success
       path
+      error
+      messageKey
+    }
+  }
+`;
+
+export const CREATE_INSTRUCTOR_CERTIFICATES = gql`
+  mutation CreateInstructorCertificates($courseIds: [Int!]!) {
+    createInstructorCertificates(courseIds: $courseIds) {
+      success
+      count
+      skippedCourseIds
       error
       messageKey
     }

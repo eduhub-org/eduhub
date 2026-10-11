@@ -1335,7 +1335,8 @@
     "bulk_action": {
       "publish": "Ausgewählte veröffentlichen",
       "unpublish": "Ausgewählte zurückziehen",
-      "copy": "In Programm kopieren"
+      "copy": "In Programm kopieren",
+      "generate_instructor_certificates": "Zertifikate für Kursleitung erstellen"
     },
     "copy_to_program_dialog": {
       "title": {
@@ -1438,6 +1439,12 @@
       "locked": "Aufteilung festgelegt",
       "unlock": "Aufteilung entsperren",
       "unlock_question": "Die Kursleitenden können die Aufteilung danach wieder ändern. Bereits heruntergeladene Rechnungen bleiben unverändert. Entsperren?"
+    },
+    "instructor_certificates": {
+      "generate": "Zertifikate für die Kursleitung erstellen",
+      "generated": "{count, plural, =0 {Keine Zertifikate erstellt.} one {# Zertifikat für die Kursleitung erstellt.} other {# Zertifikate für die Kursleitung erstellt.}}",
+      "skipped": "{count, plural, one {# Kurs wurde übersprungen} other {# Kurse wurden übersprungen}} (keine Vorlage im Programm, fehlendes Hintergrundbild oder keine Berechtigung).",
+      "failed": "Die Zertifikate für die Kursleitung konnten nicht erstellt werden."
     }
   },
   "manageCourse": {
@@ -2199,7 +2206,8 @@
         "PAYMENT_SPLIT_INCOMPLETE": "Die Aufteilung ist unvollständig: Alle Beträge müssen eingetragen sein und genau die Gesamtvergütung ergeben.",
         "PDF_CREATION_FAILED": "Das PDF konnte nicht erstellt werden. Bitte wende Dich an das Programmteam.",
         "UNEXPECTED_ERROR": "Die Rechnung konnte nicht erstellt werden. Bitte versuche es später erneut."
-      }
+      },
+      "download_certificate": "Mein Zertifikat als Kursleitung herunterladen"
     }
   },
   "manageProjects": {
@@ -2302,7 +2310,9 @@
       "apply_default_unavailable": "Für diesen Programmtyp ist noch kein Standard-Template für Teilnahmenachweise hinterlegt.",
       "instructor_invoice_template": "Rechnungsvorlage für Kursleitende",
       "no_template": "Keine Vorlage",
-      "no_instructor_invoice_templates": "Lege unter Einstellungen → Zertifikat- & Rechnungsvorlagen eine Vorlage vom Typ „Rechnung für Kursleitende“ an."
+      "no_instructor_invoice_templates": "Lege unter Einstellungen → Zertifikat- & Rechnungsvorlagen eine Vorlage vom Typ „Rechnung für Kursleitende“ an.",
+      "instructor_certificate_template": "Zertifikatsvorlage für Kursleitende",
+      "no_instructor_certificate_templates": "Lege unter Einstellungen → Zertifikat- & Rechnungsvorlagen eine Vorlage vom Typ „Zertifikat für Kursleitende“ an."
     },
     "participation_data": {
       "generate": "Teilnehmer:innen Daten generieren (CSV)",

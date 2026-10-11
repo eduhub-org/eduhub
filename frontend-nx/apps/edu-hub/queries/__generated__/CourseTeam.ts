@@ -69,6 +69,10 @@ export interface CourseTeam_Course_by_pk_CourseInstructors {
    * An object relationship
    */
   User: CourseTeam_Course_by_pk_CourseInstructors_User;
+  /**
+   * Bucket path of the instructor certificate for this course; setting it the first time mails the instructor (INSTRUCTOR_CERTIFICATE_READY).
+   */
+  certificateURL: string | null;
 }
 
 export interface CourseTeam_Course_by_pk_Program_InstructorInvoiceTemplate {

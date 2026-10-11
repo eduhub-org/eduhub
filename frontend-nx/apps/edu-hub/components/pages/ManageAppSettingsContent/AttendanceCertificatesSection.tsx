@@ -20,7 +20,11 @@ import {
   CertificateTemplateHtmlVariables,
 } from '../../../queries/__generated__/CertificateTemplateHtml';
 import DefaultCertificateTemplatesSection from './DefaultCertificateTemplatesSection';
-import EmailEditor, { CERTIFICATE_HTML_VARIABLES, INSTRUCTOR_INVOICE_HTML_VARIABLES } from '../../inputs/EmailEditor';
+import EmailEditor, {
+  CERTIFICATE_HTML_VARIABLES,
+  INSTRUCTOR_CERTIFICATE_HTML_VARIABLES,
+  INSTRUCTOR_INVOICE_HTML_VARIABLES,
+} from '../../inputs/EmailEditor';
 import DropDownSelector from '../../inputs/DropDownSelector';
 
 const ATTENDANCE_SAMPLE_CONTEXT: Record<string, string> = {
@@ -44,7 +48,18 @@ const INSTRUCTOR_INVOICE_SAMPLE_CONTEXT: Record<string, string> = {
   '{{ date }}': '01.02.2026',
 };
 
+const INSTRUCTOR_CERTIFICATE_SAMPLE_CONTEXT: Record<string, string> = {
+  '{{ template }}': '',
+  '{{ full_name }}': 'Max Mustermann',
+  '{{ course_name }}': 'Sample Course',
+  '{{ semester }}': 'Winter Semester 2025/26',
+  '{{ session_entries }}': '<li>Introduction Session</li><li>Workshop Day 1</li>',
+  '{{ ECTS }}': '5',
+  '{{ date }}': '01.02.2026',
+};
+
 const SAMPLE_CONTEXTS: Record<string, Record<string, string>> = {
+  [CertificateTemplateType_enum.INSTRUCTOR_CERTIFICATE]: INSTRUCTOR_CERTIFICATE_SAMPLE_CONTEXT,
   [CertificateTemplateType_enum.PARTICIPANT_CERTIFICATE]: ATTENDANCE_SAMPLE_CONTEXT,
   [CertificateTemplateType_enum.INSTRUCTOR_INVOICE]: INSTRUCTOR_INVOICE_SAMPLE_CONTEXT,
 };
@@ -52,6 +67,7 @@ const SAMPLE_CONTEXTS: Record<string, Record<string, string>> = {
 const EDITOR_VARIABLES: Partial<Record<string, typeof CERTIFICATE_HTML_VARIABLES>> = {
   [CertificateTemplateType_enum.PARTICIPANT_CERTIFICATE]: CERTIFICATE_HTML_VARIABLES,
   [CertificateTemplateType_enum.INSTRUCTOR_INVOICE]: INSTRUCTOR_INVOICE_HTML_VARIABLES,
+  [CertificateTemplateType_enum.INSTRUCTOR_CERTIFICATE]: INSTRUCTOR_CERTIFICATE_HTML_VARIABLES,
 };
 
 // Starting point for a new invoice template; admins adapt address, wording and recipient.
@@ -67,6 +83,21 @@ const INSTRUCTOR_INVOICE_STARTER_HTML = `<html>
   <p>Unterschrift / Signature: ______________________________</p>
 </body>
 </html>`;
+
+const INSTRUCTOR_CERTIFICATE_STARTER_HTML = `<html>
+<body style="font-family: Helvetica, sans-serif; font-size: 12pt; text-align: center;">
+  <h1>Zertifikat / Certificate</h1>
+  <p><b>{{ full_name }}</b></p>
+  <p>hat im {{ semester }} den Kurs <b>{{ course_name }}</b> als Kursleitung durchgeführt.</p>
+  <ul style="text-align: left;">{{ session_entries }}</ul>
+  <p>{{ date }}</p>
+</body>
+</html>`;
+
+const STARTER_HTML: Record<string, string> = {
+  [CertificateTemplateType_enum.INSTRUCTOR_INVOICE]: INSTRUCTOR_INVOICE_STARTER_HTML,
+  [CertificateTemplateType_enum.INSTRUCTOR_CERTIFICATE]: INSTRUCTOR_CERTIFICATE_STARTER_HTML,
+};
 
 const renderCertificatePreview = (html: string, type: string): string => {
   let rendered = html;
@@ -127,7 +158,7 @@ const AttendanceCertificatesSection: FC = () => {
         variables: {
           name,
           type: newType as CertificateTemplateType_enum,
-          html: newType === CertificateTemplateType_enum.INSTRUCTOR_INVOICE ? INSTRUCTOR_INVOICE_STARTER_HTML : '<html><body></body></html>',
+          html: STARTER_HTML[newType] ?? '<html><body></body></html>',
         },
       });
       const id = result.data?.insert_CertificateTemplate_one?.id;
@@ -176,7 +207,7 @@ const AttendanceCertificatesSection: FC = () => {
               value={newType}
               onChange={(e) => setNewType(e.target.value)}
             >
-              {[CertificateTemplateType_enum.PARTICIPANT_CERTIFICATE, CertificateTemplateType_enum.INSTRUCTOR_INVOICE].map(
+              {Object.values(CertificateTemplateType_enum).map(
                 (type) => (
                   <option key={type} value={type}>
                     {t(`types.${type}`)}
