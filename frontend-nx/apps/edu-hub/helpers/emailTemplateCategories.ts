@@ -64,6 +64,7 @@ const CATEGORY_BY_TYPE: Record<string, EmailTemplateCategory> = {
   USER_CREATED: 'system',
   ORGANIZER_ADDED: 'system',
   SESSION_SPEAKER_ADDED: 'system',
+  INSTRUCTOR_CERTIFICATE_READY: 'system',
   // StuJo job board (the postings are sold through the same platform, but the
   // mails go to employers rather than participants)
   JOB_POSTING_PUBLISHED: 'jobboard',

@@ -726,3 +726,55 @@ class EduHubClient:
         self._post_graphql(
             mutation, {"id": share_id, "invoiceURL": invoice_url}, "SetInstructorInvoiceUrl"
         )
+
+    def fetch_instructor_certificate_courses(self, course_ids, user_id):
+        """Loads courses with what an instructor certificate needs.
+
+        ``OrganizationAdmins`` is filtered to ``user_id`` so the caller's org-admin
+        capabilities for each course's program can be checked.
+        """
+        query = """
+        query InstructorCertificateCourses($courseIds: [Int!]!, $userId: uuid) {
+          Course(where: { id: { _in: $courseIds } }) {
+            id
+            title
+            ects
+            Program {
+              title
+              type
+              attendanceCertificateTemplateURL
+              InstructorCertificateTemplate { html }
+              Organization {
+                OrganizationAdmins(where: { userId: { _eq: $userId } }) {
+                  canManageCourses
+                  canManageEvents
+                  canManageDegrees
+                  canManageSettings
+                }
+              }
+            }
+            CourseInstructors(order_by: { id: asc }) {
+              id
+              User { id firstName lastName }
+            }
+            Sessions(order_by: { startDateTime: asc }) { title }
+          }
+        }"""
+        data = self._post_graphql(
+            query, {"courseIds": course_ids, "userId": user_id}, "InstructorCertificateCourses"
+        )
+        return data["Course"]
+
+    def set_instructor_certificate_url(self, course_instructor_id, certificate_url):
+        mutation = """
+        mutation SetInstructorCertificateUrl($id: Int!, $certificateURL: String!) {
+          update_CourseInstructor_by_pk(
+            pk_columns: { id: $id }
+            _set: { certificateURL: $certificateURL }
+          ) { id }
+        }"""
+        self._post_graphql(
+            mutation,
+            {"id": course_instructor_id, "certificateURL": certificate_url},
+            "SetInstructorCertificateUrl",
+        )

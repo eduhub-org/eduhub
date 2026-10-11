@@ -1353,7 +1353,8 @@
     "bulk_action": {
       "publish": "Publish Selected",
       "unpublish": "Unpublish Selected",
-      "copy": "Copy to Program"
+      "copy": "Copy to Program",
+      "generate_instructor_certificates": "Generate instructor certificates"
     },
     "copy_to_program_dialog": {
       "title": {
@@ -1456,6 +1457,12 @@
       "locked": "Split fixed",
       "unlock": "Unlock split",
       "unlock_question": "The instructors will be able to change the split again. Invoices that were already downloaded stay as they are. Unlock?"
+    },
+    "instructor_certificates": {
+      "generate": "Generate instructor certificates",
+      "generated": "{count, plural, =0 {No certificates generated.} one {# instructor certificate generated.} other {# instructor certificates generated.}}",
+      "skipped": "{count, plural, one {# course was skipped} other {# courses were skipped}} (no template in the program, missing background image or no permission).",
+      "failed": "The instructor certificates could not be generated."
     }
   },
   "manageCourse": {
@@ -2214,7 +2221,8 @@
         "PAYMENT_SPLIT_INCOMPLETE": "The split is incomplete: every amount must be entered and they must add up exactly to the total fee.",
         "PDF_CREATION_FAILED": "The PDF could not be created. Please contact the program team.",
         "UNEXPECTED_ERROR": "The invoice could not be created. Please try again later."
-      }
+      },
+      "download_certificate": "Download my instructor certificate"
     }
   },
   "manageProjects": {
@@ -2317,7 +2325,9 @@
       "apply_default_unavailable": "No attendance template default is configured for this program type yet.",
       "instructor_invoice_template": "Instructor invoice template",
       "no_template": "No template",
-      "no_instructor_invoice_templates": "Create a template of type “Instructor invoice” under Settings → Certificate & invoice templates."
+      "no_instructor_invoice_templates": "Create a template of type “Instructor invoice” under Settings → Certificate & invoice templates.",
+      "instructor_certificate_template": "Instructor certificate template",
+      "no_instructor_certificate_templates": "Create a template of type “Instructor certificate” under Settings → Certificate & invoice templates."
     },
     "participation_data": {
       "generate": "Generate Participation Data (CSV)",

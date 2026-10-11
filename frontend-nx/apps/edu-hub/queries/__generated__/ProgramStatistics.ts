@@ -172,6 +172,10 @@ export interface ProgramStatistics_Program {
    */
   instructorInvoiceTemplateId: number | null;
   /**
+   * HTML template (type INSTRUCTOR_CERTIFICATE) for the certificates confirming that someone instructed a course of this program.
+   */
+  instructorCertificateTemplateId: number | null;
+  /**
    * The URL to the pdf template for the attendance certificate
    */
   achievementCertificateTemplateURL: string | null;

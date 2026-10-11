@@ -28,7 +28,7 @@ export type EditorVariable = { text: string; label: string; categories?: string[
 
 /**
  * Determine template category based on template type.
- * ORGANIZER_ADDED and SESSION_SPEAKER_ADDED use the 'organizer' category (user +
+ * ORGANIZER_ADDED, SESSION_SPEAKER_ADDED and INSTRUCTOR_CERTIFICATE_READY use the 'organizer' category (user +
  * course placeholders only, no enrollment dates).
  */
 export function getTemplateCategory(templateType?: string): string {
@@ -43,7 +43,7 @@ export function getTemplateCategory(templateType?: string): string {
     'REGISTRATION_CONFIRMED',
   ];
   const generalTemplates = ['USER_CREATED'];
-  const organizerTemplates = ['ORGANIZER_ADDED', 'SESSION_SPEAKER_ADDED'];
+  const organizerTemplates = ['ORGANIZER_ADDED', 'SESSION_SPEAKER_ADDED', 'INSTRUCTOR_CERTIFICATE_READY'];
   // Cancellation request of a paid enrollment: [User:*] is the recipient, the
   // participant has their own [Cancellation:*] placeholders.
   const cancellationRequestTemplates = ['CANCELLATION_REQUEST_ORGANIZER', 'CANCELLATION_REQUEST_CONFIRMATION'];
@@ -94,6 +94,16 @@ export const INSTRUCTOR_INVOICE_HTML_VARIABLES: EditorVariable[] = [
   { text: '{{ amount }}', label: "Instructor's amount" },
   { text: '{{ total_amount }}', label: 'Total course fee' },
   { text: '{% for i in instructors %}{{ i.full_name }}: {{ i.amount }}<br/>{% endfor %}', label: 'All instructors and amounts' },
+  { text: '{{ date }}', label: 'Date' },
+];
+
+export const INSTRUCTOR_CERTIFICATE_HTML_VARIABLES: EditorVariable[] = [
+  { text: '{{ template }}', label: 'Background image (attendance template of the program)' },
+  { text: '{{ full_name }}', label: 'Instructor full name' },
+  { text: '{{ course_name }}', label: 'Course name' },
+  { text: '{{ semester }}', label: 'Program title' },
+  { text: '{{ session_entries }}', label: 'Course sessions (HTML list items)' },
+  { text: '{{ ECTS }}', label: 'ECTS' },
   { text: '{{ date }}', label: 'Date' },
 ];
 

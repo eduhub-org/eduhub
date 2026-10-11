@@ -806,6 +806,7 @@ export enum CourseInstructor_constraint {
  * select columns of table "CourseInstructor"
  */
 export enum CourseInstructor_select_column {
+  certificateURL = "certificateURL",
   courseId = "courseId",
   created_at = "created_at",
   id = "id",
@@ -817,6 +818,7 @@ export enum CourseInstructor_select_column {
  * update columns of table "CourseInstructor"
  */
 export enum CourseInstructor_update_column {
+  certificateURL = "certificateURL",
   courseId = "courseId",
   created_at = "created_at",
   id = "id",
@@ -2067,6 +2069,7 @@ export enum Program_select_column {
   defaultProjectSubmissionDeadline = "defaultProjectSubmissionDeadline",
   defaultProjectType = "defaultProjectType",
   id = "id",
+  instructorCertificateTemplateId = "instructorCertificateTemplateId",
   instructorInvoiceTemplateId = "instructorInvoiceTemplateId",
   lectureEnd = "lectureEnd",
   lectureStart = "lectureStart",
@@ -2120,6 +2123,7 @@ export enum Program_update_column {
   defaultProjectSubmissionDeadline = "defaultProjectSubmissionDeadline",
   defaultProjectType = "defaultProjectType",
   id = "id",
+  instructorCertificateTemplateId = "instructorCertificateTemplateId",
   instructorInvoiceTemplateId = "instructorInvoiceTemplateId",
   lectureEnd = "lectureEnd",
   lectureStart = "lectureStart",
@@ -6124,6 +6128,7 @@ export interface CourseInstructor_bool_exp {
   _and?: CourseInstructor_bool_exp[] | null;
   _not?: CourseInstructor_bool_exp | null;
   _or?: CourseInstructor_bool_exp[] | null;
+  certificateURL?: String_comparison_exp | null;
   courseId?: Int_comparison_exp | null;
   created_at?: timestamptz_comparison_exp | null;
   id?: Int_comparison_exp | null;
@@ -6138,6 +6143,7 @@ export interface CourseInstructor_insert_input {
   Course?: Course_obj_rel_insert_input | null;
   PaymentShare?: CourseInstructorPaymentShare_obj_rel_insert_input | null;
   User?: User_obj_rel_insert_input | null;
+  certificateURL?: string | null;
   courseId?: number | null;
   created_at?: any | null;
   id?: number | null;
@@ -6149,6 +6155,7 @@ export interface CourseInstructor_insert_input {
  * order by max() on columns of table "CourseInstructor"
  */
 export interface CourseInstructor_max_order_by {
+  certificateURL?: order_by | null;
   courseId?: order_by | null;
   created_at?: order_by | null;
   id?: order_by | null;
@@ -6160,6 +6167,7 @@ export interface CourseInstructor_max_order_by {
  * order by min() on columns of table "CourseInstructor"
  */
 export interface CourseInstructor_min_order_by {
+  certificateURL?: order_by | null;
   courseId?: order_by | null;
   created_at?: order_by | null;
   id?: order_by | null;
@@ -10300,6 +10308,7 @@ export interface Program_avg_order_by {
   attendanceCertificateTemplateId?: order_by | null;
   defaultMaxMissedSessions?: order_by | null;
   id?: order_by | null;
+  instructorCertificateTemplateId?: order_by | null;
   instructorInvoiceTemplateId?: order_by | null;
   organizationId?: order_by | null;
 }
@@ -10312,6 +10321,7 @@ export interface Program_bool_exp {
   Courses?: Course_bool_exp | null;
   Courses_aggregate?: Course_aggregate_bool_exp | null;
   DefaultProjectType?: ProjectType_bool_exp | null;
+  InstructorCertificateTemplate?: CertificateTemplate_bool_exp | null;
   InstructorInvoiceTemplate?: CertificateTemplate_bool_exp | null;
   Organization?: Organization_bool_exp | null;
   ProgramType?: ProgramType_bool_exp | null;
@@ -10332,6 +10342,7 @@ export interface Program_bool_exp {
   defaultProjectSubmissionDeadline?: timestamptz_comparison_exp | null;
   defaultProjectType?: String_comparison_exp | null;
   id?: Int_comparison_exp | null;
+  instructorCertificateTemplateId?: Int_comparison_exp | null;
   instructorInvoiceTemplateId?: Int_comparison_exp | null;
   lectureEnd?: date_comparison_exp | null;
   lectureStart?: date_comparison_exp | null;
@@ -10356,6 +10367,7 @@ export interface Program_insert_input {
   AttendanceCertificateTemplate?: CertificateTemplate_obj_rel_insert_input | null;
   Courses?: Course_arr_rel_insert_input | null;
   DefaultProjectType?: ProjectType_obj_rel_insert_input | null;
+  InstructorCertificateTemplate?: CertificateTemplate_obj_rel_insert_input | null;
   InstructorInvoiceTemplate?: CertificateTemplate_obj_rel_insert_input | null;
   Organization?: Organization_obj_rel_insert_input | null;
   ProgramType?: ProgramType_obj_rel_insert_input | null;
@@ -10372,6 +10384,7 @@ export interface Program_insert_input {
   defaultProjectSubmissionDeadline?: any | null;
   defaultProjectType?: string | null;
   id?: number | null;
+  instructorCertificateTemplateId?: number | null;
   instructorInvoiceTemplateId?: number | null;
   lectureEnd?: any | null;
   lectureStart?: any | null;
@@ -10405,6 +10418,7 @@ export interface Program_max_order_by {
   defaultProjectSubmissionDeadline?: order_by | null;
   defaultProjectType?: order_by | null;
   id?: order_by | null;
+  instructorCertificateTemplateId?: order_by | null;
   instructorInvoiceTemplateId?: order_by | null;
   lectureEnd?: order_by | null;
   lectureStart?: order_by | null;
@@ -10434,6 +10448,7 @@ export interface Program_min_order_by {
   defaultProjectSubmissionDeadline?: order_by | null;
   defaultProjectType?: order_by | null;
   id?: order_by | null;
+  instructorCertificateTemplateId?: order_by | null;
   instructorInvoiceTemplateId?: order_by | null;
   lectureEnd?: order_by | null;
   lectureStart?: order_by | null;
@@ -10471,6 +10486,7 @@ export interface Program_order_by {
   AttendanceCertificateTemplate?: CertificateTemplate_order_by | null;
   Courses_aggregate?: Course_aggregate_order_by | null;
   DefaultProjectType?: ProjectType_order_by | null;
+  InstructorCertificateTemplate?: CertificateTemplate_order_by | null;
   InstructorInvoiceTemplate?: CertificateTemplate_order_by | null;
   Organization?: Organization_order_by | null;
   ProgramType?: ProgramType_order_by | null;
@@ -10487,6 +10503,7 @@ export interface Program_order_by {
   defaultProjectSubmissionDeadline?: order_by | null;
   defaultProjectType?: order_by | null;
   id?: order_by | null;
+  instructorCertificateTemplateId?: order_by | null;
   instructorInvoiceTemplateId?: order_by | null;
   lectureEnd?: order_by | null;
   lectureStart?: order_by | null;
@@ -10511,6 +10528,7 @@ export interface Program_stddev_order_by {
   attendanceCertificateTemplateId?: order_by | null;
   defaultMaxMissedSessions?: order_by | null;
   id?: order_by | null;
+  instructorCertificateTemplateId?: order_by | null;
   instructorInvoiceTemplateId?: order_by | null;
   organizationId?: order_by | null;
 }
@@ -10522,6 +10540,7 @@ export interface Program_stddev_pop_order_by {
   attendanceCertificateTemplateId?: order_by | null;
   defaultMaxMissedSessions?: order_by | null;
   id?: order_by | null;
+  instructorCertificateTemplateId?: order_by | null;
   instructorInvoiceTemplateId?: order_by | null;
   organizationId?: order_by | null;
 }
@@ -10533,6 +10552,7 @@ export interface Program_stddev_samp_order_by {
   attendanceCertificateTemplateId?: order_by | null;
   defaultMaxMissedSessions?: order_by | null;
   id?: order_by | null;
+  instructorCertificateTemplateId?: order_by | null;
   instructorInvoiceTemplateId?: order_by | null;
   organizationId?: order_by | null;
 }
@@ -10544,6 +10564,7 @@ export interface Program_sum_order_by {
   attendanceCertificateTemplateId?: order_by | null;
   defaultMaxMissedSessions?: order_by | null;
   id?: order_by | null;
+  instructorCertificateTemplateId?: order_by | null;
   instructorInvoiceTemplateId?: order_by | null;
   organizationId?: order_by | null;
 }
@@ -10555,6 +10576,7 @@ export interface Program_var_pop_order_by {
   attendanceCertificateTemplateId?: order_by | null;
   defaultMaxMissedSessions?: order_by | null;
   id?: order_by | null;
+  instructorCertificateTemplateId?: order_by | null;
   instructorInvoiceTemplateId?: order_by | null;
   organizationId?: order_by | null;
 }
@@ -10566,6 +10588,7 @@ export interface Program_var_samp_order_by {
   attendanceCertificateTemplateId?: order_by | null;
   defaultMaxMissedSessions?: order_by | null;
   id?: order_by | null;
+  instructorCertificateTemplateId?: order_by | null;
   instructorInvoiceTemplateId?: order_by | null;
   organizationId?: order_by | null;
 }
@@ -10577,6 +10600,7 @@ export interface Program_variance_order_by {
   attendanceCertificateTemplateId?: order_by | null;
   defaultMaxMissedSessions?: order_by | null;
   id?: order_by | null;
+  instructorCertificateTemplateId?: order_by | null;
   instructorInvoiceTemplateId?: order_by | null;
   organizationId?: order_by | null;
 }
