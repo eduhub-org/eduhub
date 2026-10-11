@@ -88,6 +88,10 @@ export interface AdminProgramFragment {
    */
   attendanceCertificateTemplateId: number | null;
   /**
+   * HTML template (type INSTRUCTOR_INVOICE) used to render the invoices instructors download for their share of a course fee.
+   */
+  instructorInvoiceTemplateId: number | null;
+  /**
    * The URL to the pdf template for the attendance certificate
    */
   achievementCertificateTemplateURL: string | null;

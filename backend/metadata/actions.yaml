@@ -39,6 +39,21 @@ actions:
         - name: Function-Name
           value: create_certificates
     comment: createCertificates
+  - name: generateInstructorInvoice
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_CALL_PYTHON_FUNCTION}}'
+      timeout: 120
+      headers:
+        - name: Hasura-Secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: Bucket
+          value_from_env: HASURA_BUCKET
+        - name: Function-Name
+          value: generate_instructor_invoice
+    permissions:
+      - role: instructor_access
+    comment: Locks the course's instructor payment split and renders the caller's invoice PDF
   - name: createStripeBasePrice
     definition:
       kind: synchronous
@@ -782,6 +797,7 @@ custom_types:
     - name: AdminUsersOutput
     - name: ActionOutput
     - name: CreateCertificatesResult
+    - name: InstructorDocumentResult
     - name: LoadParticipationDataResult
     - name: UpdateAdminStatusResult
     - name: GetAdminUsersResult

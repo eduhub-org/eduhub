@@ -8,6 +8,16 @@ object_relationships:
   - name: User
     using:
       foreign_key_constraint_on: userId
+  # Row-filtered by CourseInstructorPaymentShare permissions (null for non-co-instructors).
+  - name: PaymentShare
+    using:
+      manual_configuration:
+        column_mapping:
+          id: courseInstructorId
+        insertion_order: null
+        remote_table:
+          name: CourseInstructorPaymentShare
+          schema: public
 select_permissions:
   - role: anonymous
     permission:

@@ -10,6 +10,7 @@ from pythonFunctions.check_attendance import check_attendance
 from pythonFunctions.check_course_continuation import check_course_continuation
 from pythonFunctions.create_certificates import create_certificates
 from pythonFunctions.expire_invitations import expire_invitations
+from pythonFunctions.generate_instructor_invoice import generate_instructor_invoice
 from pythonFunctions.expire_job_postings import expire_job_postings
 from pythonFunctions.load_participation_data import load_participation_data
 from pythonFunctions.send_job_alerts import send_job_alerts
@@ -32,6 +33,7 @@ PYTHON_FUNCTIONS: Dict[str, Callable] = {
     "create_certificates": create_certificates,
     "expire_invitations": expire_invitations,
     "expire_job_postings": expire_job_postings,
+    "generate_instructor_invoice": generate_instructor_invoice,
     "load_participation_data": load_participation_data,
     "send_job_alerts": send_job_alerts,
     "send_project_deadline_reminders": send_project_deadline_reminders,

@@ -2,6 +2,16 @@ table:
   name: Course
   schema: public
 object_relationships:
+  # Row-filtered by CourseInstructorPayment permissions (null for non-instructors of the course).
+  - name: InstructorPayment
+    using:
+      manual_configuration:
+        column_mapping:
+          id: courseId
+        insertion_order: null
+        remote_table:
+          name: CourseInstructorPayment
+          schema: public
   - name: AchievementCertificateTemplate
     using:
       foreign_key_constraint_on: achievementCertificateTemplateId

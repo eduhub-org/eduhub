@@ -646,3 +646,83 @@ class EduHubClient:
         }
 
         return self.send_query(mutation, variables)
+    def fetch_instructor_payment_course(self, course_id):
+        """Loads a course with its instructor payment, shares and invoice template.
+
+        Returns:
+            dict | None: The ``Course_by_pk`` object, or None if the course does not exist.
+        """
+        query = """
+        query InstructorPaymentCourse($courseId: Int!) {
+          Course_by_pk(id: $courseId) {
+            id
+            title
+            InstructorPayment { id totalAmount lockedAt }
+            CourseInstructors(order_by: { id: asc }) {
+              id
+              User { id firstName lastName email }
+              PaymentShare { id amount }
+            }
+            Program {
+              title
+              InstructorInvoiceTemplate { html }
+            }
+          }
+        }"""
+        data = self._post_graphql(query, {"courseId": course_id}, "InstructorPaymentCourse")
+        return data["Course_by_pk"]
+
+    def upsert_instructor_payment_share(self, course_instructor_id, amount):
+        mutation = """
+        mutation UpsertInstructorPaymentShare($courseInstructorId: Int!, $amount: Int!) {
+          insert_CourseInstructorPaymentShare_one(
+            object: { courseInstructorId: $courseInstructorId, amount: $amount }
+            on_conflict: {
+              constraint: CourseInstructorPaymentShare_courseInstructorId_key
+              update_columns: [amount]
+            }
+          ) { id }
+        }"""
+        self._post_graphql(
+            mutation,
+            {"courseInstructorId": course_instructor_id, "amount": amount},
+            "UpsertInstructorPaymentShare",
+        )
+
+    def lock_instructor_payment(self, course_id):
+        """Sets ``lockedAt`` if the split is not locked yet.
+
+        Returns:
+            bool: True if this call locked the split, False if it was locked already.
+        """
+        mutation = """
+        mutation LockInstructorPayment($courseId: Int!) {
+          update_CourseInstructorPayment(
+            where: { courseId: { _eq: $courseId }, lockedAt: { _is_null: true } }
+            _set: { lockedAt: "now()" }
+          ) { affected_rows }
+        }"""
+        data = self._post_graphql(mutation, {"courseId": course_id}, "LockInstructorPayment")
+        return data["update_CourseInstructorPayment"]["affected_rows"] > 0
+
+    def unlock_instructor_payment(self, course_id):
+        mutation = """
+        mutation UnlockInstructorPayment($courseId: Int!) {
+          update_CourseInstructorPayment(
+            where: { courseId: { _eq: $courseId } }
+            _set: { lockedAt: null }
+          ) { affected_rows }
+        }"""
+        self._post_graphql(mutation, {"courseId": course_id}, "UnlockInstructorPayment")
+
+    def set_instructor_invoice_url(self, share_id, invoice_url):
+        mutation = """
+        mutation SetInstructorInvoiceUrl($id: Int!, $invoiceURL: String!) {
+          update_CourseInstructorPaymentShare_by_pk(
+            pk_columns: { id: $id }
+            _set: { invoiceURL: $invoiceURL }
+          ) { id }
+        }"""
+        self._post_graphql(
+            mutation, {"id": share_id, "invoiceURL": invoice_url}, "SetInstructorInvoiceUrl"
+        )

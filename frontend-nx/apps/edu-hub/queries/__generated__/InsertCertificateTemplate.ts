@@ -6,10 +6,10 @@
 import { CertificateTemplateType_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
-// GraphQL query operation: CertificateTemplates
+// GraphQL mutation operation: InsertCertificateTemplate
 // ====================================================
 
-export interface CertificateTemplates_CertificateTemplate {
+export interface InsertCertificateTemplate_insert_CertificateTemplate_one {
   __typename: "CertificateTemplate";
   id: number;
   /**
@@ -22,9 +22,15 @@ export interface CertificateTemplates_CertificateTemplate {
   type: CertificateTemplateType_enum;
 }
 
-export interface CertificateTemplates {
+export interface InsertCertificateTemplate {
   /**
-   * fetch data from the table: "CertificateTemplate"
+   * insert a single row into the table: "CertificateTemplate"
    */
-  CertificateTemplate: CertificateTemplates_CertificateTemplate[];
+  insert_CertificateTemplate_one: InsertCertificateTemplate_insert_CertificateTemplate_one | null;
+}
+
+export interface InsertCertificateTemplateVariables {
+  name: string;
+  type: CertificateTemplateType_enum;
+  html: string;
 }

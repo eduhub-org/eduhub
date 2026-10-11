@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { AttendanceStatus_enum, CourseEnrollmentStatus_enum, Program_bool_exp } from "./../../__generated__/globalTypes";
+import { Program_bool_exp, AttendanceStatus_enum, CourseEnrollmentStatus_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: ProgramStatistics
@@ -167,6 +167,10 @@ export interface ProgramStatistics_Program {
    * Default attendance-certificate template for courses in this program. Falls back to NULL when no template is configured.
    */
   attendanceCertificateTemplateId: number | null;
+  /**
+   * HTML template (type INSTRUCTOR_INVOICE) used to render the invoices instructors download for their share of a course fee.
+   */
+  instructorInvoiceTemplateId: number | null;
   /**
    * The URL to the pdf template for the attendance certificate
    */
