@@ -28,6 +28,60 @@ select_permissions:
         - created_at
         - updated_at
       filter: {}
+  # Org admins see the instructors of every course they can manage (same scope as the instructor
+  # contact details they can read in public_User.yaml), e.g. for the "email all instructors" button
+  # on the manage programs page. Without this rule they only inherit anonymous's limit of 10 rows;
+  # inherited roles take the highest limit of their parent roles, hence an explicit limit here.
+  - role: org_admin_access
+    permission:
+      columns:
+        - id
+        - courseId
+        - userId
+        - created_at
+        - updated_at
+      filter:
+        Course:
+          Program:
+            _or:
+              - _and:
+                  - type:
+                      _eq: EVENTS
+                  - Organization:
+                      OrganizationAdmins:
+                        _and:
+                          - userId:
+                              _eq: X-Hasura-User-Id
+                          - canManageEvents:
+                              _eq: true
+              - _and:
+                  - type:
+                      _eq: COURSES
+                  - Organization:
+                      OrganizationAdmins:
+                        _and:
+                          - userId:
+                              _eq: X-Hasura-User-Id
+                          - canManageCourses:
+                              _eq: true
+              - _and:
+                  - type:
+                      _eq: DEGREES
+                  - Organization:
+                      OrganizationAdmins:
+                        _and:
+                          - userId:
+                              _eq: X-Hasura-User-Id
+                          - canManageDegrees:
+                              _eq: true
+              - Organization:
+                  OrganizationAdmins:
+                    _and:
+                      - userId:
+                          _eq: X-Hasura-User-Id
+                      - canManageSettings:
+                          _eq: true
+      limit: 1000
 insert_permissions:
   - role: instructor_access
     permission:

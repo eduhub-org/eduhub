@@ -2277,6 +2277,14 @@
       "html_template_apply_default": "Use default for this program type",
       "apply_default_unavailable": "No attendance template default is configured for this program type yet."
     },
+    "instructor_emails": {
+      "label": "Instructors",
+      "button": "Email all instructors",
+      "help_text": "Opens your email client with all instructors of this program's courses in BCC.",
+      "count": "{count, plural, =0 {No instructors assigned yet} one {# instructor} other {# instructors}}",
+      "copied": "Too many recipients for your email client. The {count} addresses were copied to the clipboard instead – paste them into the BCC field.",
+      "copy_failed": "Too many recipients for your email client, and copying the addresses to the clipboard failed."
+    },
     "participation_data": {
       "generate": "Generate Participation Data (CSV)",
       "download": "Download Participation Data (CSV)"
