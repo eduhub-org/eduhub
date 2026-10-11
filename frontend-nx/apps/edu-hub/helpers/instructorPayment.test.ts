@@ -2,7 +2,7 @@ import {
   centsToEuroInput,
   formatEuro,
   parseEuroToCents,
-  sanitizeEuroInput,
+  isEuroInputAllowed,
   summarizeSplit,
 } from './instructorPayment';
 
@@ -16,10 +16,15 @@ describe('instructorPayment helpers', () => {
     expect(parseEuroToCents('1,234')).toBeNull();
   });
 
-  it('only lets numbers through', () => {
-    expect(sanitizeEuroInput('25a0€')).toBe('250');
-    expect(sanitizeEuroInput('1,2.34')).toBe('1,23');
-    expect(sanitizeEuroInput('-5')).toBe('5');
+  it('only lets numbers through and never rewrites an amount', () => {
+    expect(isEuroInputAllowed('250')).toBe(true);
+    expect(isEuroInputAllowed('250,')).toBe(true);
+    expect(isEuroInputAllowed('250.5')).toBe(true);
+    expect(isEuroInputAllowed('')).toBe(true);
+    expect(isEuroInputAllowed('25a0')).toBe(false);
+    expect(isEuroInputAllowed('-5')).toBe(false);
+    expect(isEuroInputAllowed('1.234,56')).toBe(false);
+    expect(isEuroInputAllowed('1,234')).toBe(false);
   });
 
   it('round-trips cents to an editable string', () => {

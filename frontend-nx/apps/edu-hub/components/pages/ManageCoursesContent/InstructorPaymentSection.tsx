@@ -8,7 +8,7 @@ import {
   centsToEuroInput,
   formatEuro,
   parseEuroToCents,
-  sanitizeEuroInput,
+  isEuroInputAllowed,
   summarizeSplit,
 } from '../../../helpers/instructorPayment';
 import {
@@ -97,7 +97,9 @@ const InstructorPaymentSection: FC<IProps> = ({ course, onError }) => {
             className="w-32 rounded border border-border-primary bg-transparent px-2 py-1 text-right"
             placeholder="–"
             value={value}
-            onChange={(e) => setValue(sanitizeEuroInput(e.target.value))}
+            onChange={(e) => {
+            if (isEuroInputAllowed(e.target.value)) setValue(e.target.value);
+          }}
             onBlur={saveTotal}
             onKeyDown={(e) => {
               if (e.key === 'Enter') (e.target as HTMLInputElement).blur();

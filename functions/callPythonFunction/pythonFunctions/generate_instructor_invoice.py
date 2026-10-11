@@ -76,7 +76,9 @@ def build_invoice_context(course, instructor, today):
 
 
 def render_pdf(template_html, context):
-    env = Environment(loader=DictLoader({"template": template_html}))
+    # Names, emails and course titles are user-editable: escape them so they cannot inject
+    # markup (or remote resources fetched by xhtml2pdf) into the invoice.
+    env = Environment(loader=DictLoader({"template": template_html}), autoescape=True)
     rendered_html = env.get_template("template").render(context)
     pdf_bytes_io = BytesIO()
     pisa_status = pisa.CreatePDF(rendered_html, dest=pdf_bytes_io)
@@ -112,25 +114,26 @@ def generate_instructor_invoice(arguments, edu_hub_client=None, storage_client=N
         # Lock first, then validate the freshly read split, so a co-instructor cannot
         # change a share between our check and the lock.
         locked_now = edu_hub_client.lock_instructor_payment(course_id)
-        course = edu_hub_client.fetch_instructor_payment_course(course_id)
         try:
+            course = edu_hub_client.fetch_instructor_payment_course(course_id)
             assert_split_complete(course)
-        except InvoiceError:
+
+            caller = find_caller_instructor(course, user_id)
+            context = build_invoice_context(course, caller, datetime.now(ZoneInfo("Europe/Berlin")))
+            pdf = render_pdf(template, context)
+
+            path = f"{user_id}/{course_id}/instructor_invoice.pdf"
+            storage_client = storage_client or StorageClient()
+            storage_client.upload_file(
+                path="", blob_name=path, buffer=pdf, content_type="application/pdf"
+            )
+            pdf.close()
+            edu_hub_client.set_instructor_invoice_url(caller["PaymentShare"]["id"], path)
+        except Exception:
+            # No invoice came out of this call, so a lock it set must not stay behind.
             if locked_now:
                 edu_hub_client.unlock_instructor_payment(course_id)
             raise
-
-        caller = find_caller_instructor(course, user_id)
-        context = build_invoice_context(course, caller, datetime.now(ZoneInfo("Europe/Berlin")))
-        pdf = render_pdf(template, context)
-
-        path = f"{user_id}/{course_id}/instructor_invoice.pdf"
-        storage_client = storage_client or StorageClient()
-        storage_client.upload_file(
-            path="", blob_name=path, buffer=pdf, content_type="application/pdf"
-        )
-        pdf.close()
-        edu_hub_client.set_instructor_invoice_url(caller["PaymentShare"]["id"], path)
 
         logging.info(f"Generated instructor invoice for course {course_id}, user {user_id}")
         return {"success": True, "path": path, "messageKey": "INVOICE_GENERATED"}

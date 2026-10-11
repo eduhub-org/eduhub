@@ -115,3 +115,33 @@ class TestGenerateInstructorInvoice:
         assert result["path"] == "u2/7/instructor_invoice.pdf"
         client.upsert_instructor_payment_share.assert_not_called()
         client.set_instructor_invoice_url.assert_called_once_with(20, "u2/7/instructor_invoice.pdf")
+
+
+def test_failed_upload_releases_a_fresh_lock():
+    client = MagicMock()
+    client.fetch_instructor_payment_course.return_value = _course([_instructor(1, "u1", 30000), _instructor(2, "u2", 20000)])
+    client.lock_instructor_payment.return_value = True
+    storage = MagicMock()
+    storage.upload_file.side_effect = RuntimeError("bucket down")
+    result = generate_instructor_invoice(_args("u1"), client, storage)
+    assert result["success"] is False
+    client.unlock_instructor_payment.assert_called_once_with(7)
+    client.set_instructor_invoice_url.assert_not_called()
+
+
+def test_render_escapes_user_controlled_fields():
+    import pythonFunctions.generate_instructor_invoice as module
+    captured = {}
+    original = module.pisa.CreatePDF
+
+    def fake_create_pdf(html, dest):
+        captured["html"] = html
+        return original(html, dest=dest)
+
+    module.pisa.CreatePDF = fake_create_pdf
+    try:
+        module.render_pdf("<p>{{ full_name }}</p>", {"full_name": '<img src="http://evil/x.png">'})
+    finally:
+        module.pisa.CreatePDF = original
+    assert "<img" not in captured["html"]
+    assert "&lt;img" in captured["html"]

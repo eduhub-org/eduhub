@@ -86,7 +86,8 @@ BEGIN
       USING ERRCODE = 'check_violation', HINT = 'no_payment_total';
   END IF;
 
-  IF payment."lockedAt" IS NOT NULL AND caller_role IS NOT NULL AND caller_role <> 'admin' THEN
+  -- Only an explicit admin role may change a locked split (the invoice function writes as admin).
+  IF payment."lockedAt" IS NOT NULL AND (caller_role IS NULL OR caller_role <> 'admin') THEN
     RAISE EXCEPTION 'The instructor payment split of course % is locked', course_id
       USING ERRCODE = 'check_violation', HINT = 'payment_split_locked';
   END IF;
@@ -96,7 +97,10 @@ BEGIN
   JOIN "public"."CourseInstructor" ci ON ci."id" = s."courseInstructorId"
   WHERE ci."courseId" = course_id AND s."id" IS DISTINCT FROM NEW."id";
 
-  IF other_shares + NEW."amount" > payment."totalAmount" THEN
+  -- An admin may lower the total below the current shares; decreasing a share must then still
+  -- be possible, so only an insert or an increase is rejected for exceeding the total.
+  IF other_shares + NEW."amount" > payment."totalAmount"
+     AND (TG_OP = 'INSERT' OR NEW."amount" > OLD."amount") THEN
     RAISE EXCEPTION 'Instructor shares of course % would exceed the total', course_id
       USING ERRCODE = 'check_violation', HINT = 'payment_split_exceeds_total';
   END IF;
@@ -109,3 +113,25 @@ CREATE TRIGGER "course_instructor_payment_share_guard_trg"
 BEFORE INSERT OR UPDATE ON "public"."CourseInstructorPaymentShare"
 FOR EACH ROW
 EXECUTE PROCEDURE "public"."course_instructor_payment_share_guard"();
+
+-- Unlocking a split invalidates the invoices generated from it: their references are cleared so
+-- nobody keeps working with an invoice whose amount may change. Regenerating overwrites the file.
+CREATE OR REPLACE FUNCTION "public"."course_instructor_payment_unlock_invoices"()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  IF OLD."lockedAt" IS NOT NULL AND NEW."lockedAt" IS NULL THEN
+    UPDATE "public"."CourseInstructorPaymentShare" s
+    SET "invoiceURL" = NULL
+    FROM "public"."CourseInstructor" ci
+    WHERE ci."id" = s."courseInstructorId" AND ci."courseId" = NEW."courseId";
+  END IF;
+  RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER "course_instructor_payment_unlock_invoices_trg"
+AFTER UPDATE OF "lockedAt" ON "public"."CourseInstructorPayment"
+FOR EACH ROW
+EXECUTE PROCEDURE "public"."course_instructor_payment_unlock_invoices"();

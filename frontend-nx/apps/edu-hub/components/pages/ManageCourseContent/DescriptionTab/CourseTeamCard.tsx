@@ -13,7 +13,7 @@ import {
   centsToEuroInput,
   formatEuro,
   parseEuroToCents,
-  sanitizeEuroInput,
+  isEuroInputAllowed,
   summarizeSplit,
 } from '../../../../helpers/instructorPayment';
 import { useRoleQuery } from '../../../../hooks/authedQuery';
@@ -116,7 +116,9 @@ const ShareInput: FC<ShareInputProps> = ({ member, total, otherSharesSum, disabl
           placeholder="–"
           value={value}
           disabled={disabled}
-          onChange={(e) => setValue(sanitizeEuroInput(e.target.value))}
+          onChange={(e) => {
+            if (isEuroInputAllowed(e.target.value)) setValue(e.target.value);
+          }}
           onBlur={save}
           onKeyDown={(e) => {
             if (e.key === 'Enter') (e.target as HTMLInputElement).blur();
@@ -194,16 +196,22 @@ export const CourseTeamCard: FC<IProps> = ({ courseId }) => {
   const runGenerateInvoice = async () => {
     setConfirmLockOpen(false);
     setGenerating(true);
+    // Open the tab while still inside the click handler; popups opened after an await get blocked.
+    const invoiceWindow = window.open('', '_blank');
     try {
       const result = await generateInvoice({ variables: { courseId } });
       const response = result.data?.generateInstructorInvoice;
       if (!response?.success || !response.path) {
+        invoiceWindow?.close();
         const key = response?.messageKey;
         handleError(key && INVOICE_ERROR_KEYS.includes(key) ? t(`errors.${key}`) : t('errors.UNEXPECTED_ERROR'));
         return;
       }
-      window.open(getCertificateDownloadUrl(response.path), '_blank', 'noopener');
+      const url = getCertificateDownloadUrl(response.path);
+      if (invoiceWindow) invoiceWindow.location.href = url;
+      else window.location.assign(url);
     } catch {
+      invoiceWindow?.close();
       handleError(t('errors.UNEXPECTED_ERROR'));
     } finally {
       setGenerating(false);

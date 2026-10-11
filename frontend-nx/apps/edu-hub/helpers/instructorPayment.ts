@@ -8,15 +8,12 @@ export const formatEuro = (cents: number, locale: string): string =>
     currency: 'EUR',
   }).format(cents / 100);
 
-/** Keeps only what can be part of a euro amount: digits and one decimal separator (, or .). */
-export const sanitizeEuroInput = (input: string): string => {
-  const cleaned = input.replace(/[^\d.,]/g, '');
-  const separatorIndex = cleaned.search(/[.,]/);
-  if (separatorIndex === -1) return cleaned;
-  const whole = cleaned.slice(0, separatorIndex);
-  const decimals = cleaned.slice(separatorIndex + 1).replace(/[.,]/g, '').slice(0, 2);
-  return `${whole}${cleaned[separatorIndex]}${decimals}`;
-};
+/**
+ * Whether a keystroke/paste result may stand in the field: digits with at most one decimal
+ * separator (, or .) and two decimals. Anything else is rejected as a whole rather than
+ * rewritten, so a pasted "1.234,56" or "-5" never silently turns into a different amount.
+ */
+export const isEuroInputAllowed = (input: string): boolean => /^\d*([.,]\d{0,2})?$/.test(input);
 
 /** "250", "250,5", "250.50" -> cents; null when empty or not a valid amount. */
 export const parseEuroToCents = (input: string): number | null => {
