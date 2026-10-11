@@ -1,0 +1,141 @@
+# Payment data is confidential: only instructors of the same course and (org) admins may see it.
+# Never widen the instructor_access filter -- instructors of other courses must not see amounts.
+table:
+  name: CourseInstructorPayment
+  schema: public
+object_relationships:
+  - name: Course
+    using:
+      foreign_key_constraint_on: courseId
+select_permissions:
+  - role: instructor_access
+    permission:
+      columns:
+        - id
+        - courseId
+        - totalAmount
+        - lockedAt
+        - created_at
+        - updated_at
+      filter:
+        Course:
+          CourseInstructors:
+            userId:
+              _eq: X-Hasura-User-Id
+  - role: org_admin_access
+    permission:
+      columns:
+        - id
+        - courseId
+        - totalAmount
+        - lockedAt
+        - created_at
+        - updated_at
+      filter:
+        Course:
+          Program:
+            Organization:
+              OrganizationAdmins:
+                userId:
+                  _eq: X-Hasura-User-Id
+insert_permissions:
+  - role: org_admin_access
+    permission:
+      columns:
+        - courseId
+        - totalAmount
+      check:
+        Course:
+          _or:
+            - Program:
+                _and:
+                  - type:
+                      _eq: EVENTS
+                  - Organization:
+                      OrganizationAdmins:
+                        _and:
+                          - userId:
+                              _eq: X-Hasura-User-Id
+                          - canManageEvents:
+                              _eq: true
+            - Program:
+                _and:
+                  - type:
+                      _eq: COURSES
+                  - Organization:
+                      OrganizationAdmins:
+                        _and:
+                          - userId:
+                              _eq: X-Hasura-User-Id
+                          - canManageCourses:
+                              _eq: true
+            - Program:
+                _and:
+                  - type:
+                      _eq: DEGREES
+                  - Organization:
+                      OrganizationAdmins:
+                        _and:
+                          - userId:
+                              _eq: X-Hasura-User-Id
+                          - canManageDegrees:
+                              _eq: true
+            - Program:
+                Organization:
+                  OrganizationAdmins:
+                    _and:
+                      - userId:
+                          _eq: X-Hasura-User-Id
+                      - canManageSettings:
+                          _eq: true
+update_permissions:
+  - role: org_admin_access
+    permission:
+      columns:
+        - totalAmount
+        - lockedAt
+      filter:
+        Course:
+          _or:
+            - Program:
+                _and:
+                  - type:
+                      _eq: EVENTS
+                  - Organization:
+                      OrganizationAdmins:
+                        _and:
+                          - userId:
+                              _eq: X-Hasura-User-Id
+                          - canManageEvents:
+                              _eq: true
+            - Program:
+                _and:
+                  - type:
+                      _eq: COURSES
+                  - Organization:
+                      OrganizationAdmins:
+                        _and:
+                          - userId:
+                              _eq: X-Hasura-User-Id
+                          - canManageCourses:
+                              _eq: true
+            - Program:
+                _and:
+                  - type:
+                      _eq: DEGREES
+                  - Organization:
+                      OrganizationAdmins:
+                        _and:
+                          - userId:
+                              _eq: X-Hasura-User-Id
+                          - canManageDegrees:
+                              _eq: true
+            - Program:
+                Organization:
+                  OrganizationAdmins:
+                    _and:
+                      - userId:
+                          _eq: X-Hasura-User-Id
+                      - canManageSettings:
+                          _eq: true
+      check: null

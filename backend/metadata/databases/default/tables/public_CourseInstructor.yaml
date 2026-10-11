@@ -8,6 +8,16 @@ object_relationships:
   - name: User
     using:
       foreign_key_constraint_on: userId
+  # Row-filtered by CourseInstructorPaymentShare permissions (null for non-co-instructors).
+  - name: PaymentShare
+    using:
+      manual_configuration:
+        column_mapping:
+          id: courseInstructorId
+        insertion_order: null
+        remote_table:
+          name: CourseInstructorPaymentShare
+          schema: public
 select_permissions:
   - role: anonymous
     permission:
@@ -25,6 +35,7 @@ select_permissions:
         - id
         - courseId
         - userId
+        - certificateURL
         - created_at
         - updated_at
       filter: {}
@@ -119,6 +130,29 @@ event_triggers:
         value_from_env: HASURA_CLOUD_FUNCTION_SECRET
       - name: role
         value: instructor
+    cleanup_config:
+      batch_size: 10000
+      clean_invocation_logs: false
+      clear_older_than: 168
+      paused: true
+      schedule: 0 0 * * *
+      timeout: 60
+  - name: send_instructor_certificate_email
+    definition:
+      enable_manual: false
+      update:
+        columns:
+          - certificateURL
+    retry_conf:
+      interval_sec: 3660
+      num_retries: 10
+      timeout_sec: 60
+    webhook_from_env: CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION
+    headers:
+      - name: secret
+        value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+      - name: name
+        value: sendInstructorCertificateEmail
     cleanup_config:
       batch_size: 10000
       clean_invocation_logs: false
