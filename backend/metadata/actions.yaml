@@ -68,7 +68,9 @@ actions:
           value: create_instructor_certificates
     permissions:
       # The function checks that an org admin manages each course's program before generating.
-      - role: org_admin_access
+      # Listed as org_admin itself: the inherited role does not pick up an org_admin_access
+      # action permission.
+      - role: org_admin
     comment: Renders the instructor certificates of the given courses from the program templates
   - name: createStripeBasePrice
     definition:
