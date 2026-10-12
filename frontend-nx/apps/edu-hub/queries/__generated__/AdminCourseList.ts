@@ -320,6 +320,37 @@ export interface AdminCourseList_Course_CourseAddonMappings {
   currency: string;
 }
 
+export interface AdminCourseList_Course_InstructorPayment {
+  __typename: "CourseInstructorPayment";
+  id: number;
+  /**
+   * Total instructor fee for the course in cents (e.g. 50000 = €500.00).
+   */
+  totalAmount: number;
+  /**
+   * Set when the first instructor generates an invoice; afterwards the split can no longer be changed by instructors. Admins reset it to NULL to unlock.
+   */
+  lockedAt: any | null;
+}
+
+export interface AdminCourseList_Course_InstructorPaymentShares_PaymentShare {
+  __typename: "CourseInstructorPaymentShare";
+  id: number;
+  /**
+   * Share of the course fee in cents.
+   */
+  amount: number;
+}
+
+export interface AdminCourseList_Course_InstructorPaymentShares {
+  __typename: "CourseInstructor";
+  id: number;
+  /**
+   * An object relationship
+   */
+  PaymentShare: AdminCourseList_Course_InstructorPaymentShares_PaymentShare | null;
+}
+
 export interface AdminCourseList_Course_CourseEnrollments_CourseEnrollmentStatus {
   __typename: "CourseEnrollmentStatus";
   value: string;
@@ -558,6 +589,14 @@ export interface AdminCourseList_Course {
    * Stripe Price ID for the base course price
    */
   stripePriceId: string | null;
+  /**
+   * An object relationship
+   */
+  InstructorPayment: AdminCourseList_Course_InstructorPayment | null;
+  /**
+   * An array relationship
+   */
+  InstructorPaymentShares: AdminCourseList_Course_InstructorPaymentShares[];
   /**
    * Links this course to its CourseSeries (the set of all iterations of the same course). Used to surface projects from past iterations.
    */

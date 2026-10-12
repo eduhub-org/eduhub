@@ -63,6 +63,8 @@ import { AddonValidationDialog } from './AddonValidationDialog';
 import CreateMatrixRoomDialog from './CreateMatrixRoomDialog';
 import { Button } from '../../common/Button';
 import Card from '../../common/Card';
+import InstructorPaymentSection from './InstructorPaymentSection';
+import InstructorCertificatesButton from './InstructorCertificatesButton';
 import { ProgramType } from '../../../types/enums';
 import { UPDATE_COURSE_PROPERTY } from '../../../queries/mutateCourse';
 import useErrorHandler from '../../../hooks/useErrorHandler';
@@ -817,6 +819,8 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                   <span>{t(isEventCourse ? 'manageCourses.instructors.add_event' : 'manageCourses.instructors.add')}</span>
                 </button>
               </div>
+              <InstructorPaymentSection course={course} onError={handleError} />
+              <InstructorCertificatesButton courseId={course.id} />
             </Card>
 
             {/* Certificates - hidden for a degree: the flags are forced by a trigger

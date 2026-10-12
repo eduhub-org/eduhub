@@ -54,6 +54,14 @@ type Mutation {
 }
 
 type Mutation {
+  generateInstructorInvoice(courseId: Int!): InstructorDocumentResult!
+}
+
+type Mutation {
+  createInstructorCertificates(courseIds: [Int!]!): CreateInstructorCertificatesResult!
+}
+
+type Mutation {
   createStripeBasePrice(
     courseId: Int!
     basePrice: Int!
@@ -495,6 +503,21 @@ type ActionOutput {
   success: Boolean!
   messageKey: String!
   error: String
+}
+
+type CreateInstructorCertificatesResult {
+  success: Boolean!
+  count: Int
+  skippedCourseIds: [Int!]
+  error: String
+  messageKey: String!
+}
+
+type InstructorDocumentResult {
+  success: Boolean!
+  path: String
+  error: String
+  messageKey: String!
 }
 
 type CreateCertificatesResult {

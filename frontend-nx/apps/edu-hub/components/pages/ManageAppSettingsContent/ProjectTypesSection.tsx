@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { FC, useCallback, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
+import { CertificateTemplateType_enum } from '../../../__generated__/globalTypes';
 import { ColumnDef } from '@tanstack/react-table';
 
 import TableGrid from '../../common/TableGrid';
@@ -67,7 +68,9 @@ const ProjectTypesSection: FC = () => {
 
   const certificateOptions = useMemo(
     () =>
-      (certificateTemplatesData?.CertificateTemplate ?? []).map((tpl) => ({
+      (certificateTemplatesData?.CertificateTemplate ?? [])
+        .filter((tpl) => tpl.type === CertificateTemplateType_enum.PARTICIPANT_CERTIFICATE)
+        .map((tpl) => ({
         value: String(tpl.id),
         label: tpl.name,
       })),

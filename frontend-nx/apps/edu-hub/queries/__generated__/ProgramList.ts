@@ -95,6 +95,14 @@ export interface ProgramList_Program {
    */
   attendanceCertificateTemplateId: number | null;
   /**
+   * HTML template (type INSTRUCTOR_INVOICE) used to render the invoices instructors download for their share of a course fee.
+   */
+  instructorInvoiceTemplateId: number | null;
+  /**
+   * HTML template (type INSTRUCTOR_CERTIFICATE) for the certificates confirming that someone instructed a course of this program.
+   */
+  instructorCertificateTemplateId: number | null;
+  /**
    * The URL to the pdf template for the attendance certificate
    */
   achievementCertificateTemplateURL: string | null;

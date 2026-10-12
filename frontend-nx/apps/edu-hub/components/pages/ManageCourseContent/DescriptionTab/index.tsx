@@ -49,6 +49,7 @@ import {
 import InputField from '../../../inputs/InputField';
 import { Button as ChatLinkButton } from '../../../common/Button';
 import MobileCollapsible from './MobileCollapsible';
+import { CourseTeamCard } from './CourseTeamCard';
 interface IProps {
   course: ManagedCourse_Course_by_pk;
   qResult: QueryResult<any, any>;
@@ -188,6 +189,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
 
   return (
     <div>
+      <CourseTeamCard courseId={course.id} />
       {programOrganizerChatLink ? (
         <div className="mb-6 flex items-center justify-center gap-3 rounded-lg border border-border-primary bg-bg-secondary p-4">
           <p className="text-sm text-label-primary">{t('element_program_instructor_chat_prompt')}</p>
