@@ -144,7 +144,7 @@ export interface MyCertificates_CourseEnrollment_Course {
    */
   published: boolean;
   /**
-   * The number of maximum participants in the course.
+   * Participant limit; NULL means no limit (0 or less is stored as NULL)
    */
   maxParticipants: number | null;
   /**

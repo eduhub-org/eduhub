@@ -167,6 +167,9 @@ export interface CalendarSessions_Session {
    * The ID of the course the session belongs to
    */
   courseId: number | null;
+  /**
+   * Set for program-wide sessions (courseId is then NULL); shown in every course of the program
+   */
   programId: number | null;
   /**
    * An object relationship

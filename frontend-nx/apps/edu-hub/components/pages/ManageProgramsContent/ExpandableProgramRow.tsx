@@ -1,3 +1,4 @@
+import { DocumentNode } from '@apollo/client';
 import { FC, useCallback, useMemo, useState } from 'react';
 import { CircularProgress } from '@mui/material';
 import { useTranslations } from 'next-intl';
@@ -14,6 +15,8 @@ import {
   UPDATE_ACHIEVEMENT_CERTIFICATE_TEMPLATE,
   UPDATE_ATTENDANCE_CERTIFICATE_TEMPLATE,
   UPDATE_PROGRAM_ATTENDANCE_CERTIFICATE_TEMPLATE_ID,
+  UPDATE_PROGRAM_INSTRUCTOR_INVOICE_TEMPLATE_ID,
+  UPDATE_PROGRAM_INSTRUCTOR_CERTIFICATE_TEMPLATE_ID,
   UPDATE_START_QUESTIONAIRE,
   UPDATE_SPEAKER_QUESTIONAIRE,
   UPDATE_ClOSING_QUESTIONAIRE,
@@ -33,6 +36,7 @@ import {
   UpdateProgramAttendanceCertificateTemplateId,
   UpdateProgramAttendanceCertificateTemplateIdVariables,
 } from '../../../queries/__generated__/UpdateProgramAttendanceCertificateTemplateId';
+import { CertificateTemplateType_enum } from '../../../__generated__/globalTypes';
 import { PROJECT_TYPES } from '../../../queries/project';
 import CheckboxSelector from '../../inputs/CheckboxSelector';
 import DropDownSelector from '../../inputs/DropDownSelector';
@@ -53,9 +57,77 @@ import { Button } from '../../common/Button';
 import FileUploadField from '../../inputs/FileUploadField';
 import NotificationSnackbar from '../../common/dialogs/NotificationSnackbar';
 import { submissionDeadlineToCalendarDate } from '../CourseContent/Projects/projectEffectiveSubmissionDeadline';
+import { PROGRAM_INSTRUCTOR_EMAILS } from '../../../queries/programInstructors';
+import {
+  ProgramInstructorEmails,
+  ProgramInstructorEmailsVariables,
+} from '../../../queries/__generated__/ProgramInstructorEmails';
+
+// Longer mailto URLs are cut off or ignored by some email clients (same limit as the course
+// applications tab); beyond it the addresses are copied to the clipboard instead.
+const MAILTO_URL_LIMIT = 1800;
+
 interface ExpandableProgramRowProps {
   program: ProgramList_Program;
 }
+
+interface InstructorTemplateSelectorProps {
+  title: string;
+  emptyHint: string;
+  programId: number;
+  value: number | null;
+  templateType: CertificateTemplateType_enum;
+  mutation: DocumentNode;
+}
+
+/** Picks the program's template for an instructor document (invoice or certificate). */
+const InstructorTemplateSelector: FC<InstructorTemplateSelectorProps> = ({
+  title,
+  emptyHint,
+  programId,
+  value,
+  templateType,
+  mutation,
+}) => {
+  const t = useTranslations('managePrograms');
+  const { data, loading } = useRoleQuery<CertificateTemplates>(CERTIFICATE_TEMPLATES);
+  const [updateTemplateId] = useManageMutation<unknown, { programId: number; value: number | null }>(mutation, {
+    refetchQueries: ['ProgramList'],
+  });
+  const options = useMemo(
+    () =>
+      (data?.CertificateTemplate ?? [])
+        .filter((tpl) => tpl.type === templateType)
+        .map((tpl) => ({ value: String(tpl.id), label: tpl.name })),
+    [data?.CertificateTemplate, templateType]
+  );
+  const handleChange = useCallback(
+    (newValue: string) => {
+      void updateTemplateId({ variables: { programId, value: newValue === '' ? null : parseInt(newValue, 10) } });
+      return newValue;
+    },
+    [programId, updateTemplateId]
+  );
+
+  return (
+    <div>
+      <h4 className="text-sm font-medium text-label-primary mb-3">{title}</h4>
+      <div className="[&_.MuiInputBase-root]:min-h-[44px]">
+        <DropDownSelector
+          variant="material"
+          label={t('Certificates.html_template_label')}
+          value={value != null ? String(value) : ''}
+          options={options}
+          nullable
+          nullableLabel={t('Certificates.no_template')}
+          disabled={loading}
+          onValueUpdated={handleChange}
+        />
+      </div>
+      {!loading && options.length === 0 && <p className="text-xs text-label-secondary mt-2">{emptyHint}</p>}
+    </div>
+  );
+};
 
 const ExpandableProgramRow: FC<ExpandableProgramRowProps> = ({ program }) => {
   const t = useTranslations('managePrograms');
@@ -82,10 +154,12 @@ const ExpandableProgramRow: FC<ExpandableProgramRowProps> = ({ program }) => {
   >(UPDATE_PROGRAM_ATTENDANCE_CERTIFICATE_TEMPLATE_ID, { refetchQueries: ['ProgramList'] });
   const attendanceCertificateTemplateOptions = useMemo(
     () =>
-      (certificateTemplatesData?.CertificateTemplate ?? []).map((tpl) => ({
-        value: String(tpl.id),
-        label: tpl.name,
-      })),
+      (certificateTemplatesData?.CertificateTemplate ?? [])
+        .filter((tpl) => tpl.type === CertificateTemplateType_enum.PARTICIPANT_CERTIFICATE)
+        .map((tpl) => ({
+          value: String(tpl.id),
+          label: tpl.name,
+        })),
     [certificateTemplatesData?.CertificateTemplate]
   );
   const handleAttendanceCertificateTemplateChange = useCallback(
@@ -176,6 +250,41 @@ const ExpandableProgramRow: FC<ExpandableProgramRowProps> = ({ program }) => {
     },
     [program.id, syncProgramInstructorRoom, t]
   );
+
+  const { data: instructorEmailsData, loading: instructorEmailsLoading } = useRoleQuery<
+    ProgramInstructorEmails,
+    ProgramInstructorEmailsVariables
+  >(PROGRAM_INSTRUCTOR_EMAILS, { variables: { programId: program.id } });
+  const instructorEmails = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          (instructorEmailsData?.Course ?? []).flatMap((course) =>
+            // User is null when the org admin may see the course but not its instructors' contact
+            // details (no capability for the program's type).
+            course.CourseInstructors.map((instructor) => instructor.User?.email).filter(
+              (email): email is string => Boolean(email)
+            )
+          )
+        )
+      ),
+    [instructorEmailsData?.Course]
+  );
+
+  const handleEmailInstructorsClick = async () => {
+    const mailtoUrl = `mailto:?bcc=${encodeURIComponent(instructorEmails.join(','))}`;
+    if (mailtoUrl.length <= MAILTO_URL_LIMIT) {
+      window.location.href = mailtoUrl;
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(instructorEmails.join(','));
+      setSyncNotice({ open: true, message: t('instructor_emails.copied', { count: instructorEmails.length }) });
+    } catch (error) {
+      console.error('ExpandableProgramRow: copying instructor emails failed', error);
+      setSyncNotice({ open: true, message: t('instructor_emails.copy_failed') });
+    }
+  };
 
   const [
     loadParticipationData,
@@ -416,9 +525,48 @@ const ExpandableProgramRow: FC<ExpandableProgramRowProps> = ({ program }) => {
                   refetchQueries={['ProgramList']}
                 />
               </div>
+
+              <InstructorTemplateSelector
+                title={t('Certificates.instructor_invoice_template')}
+                emptyHint={t('Certificates.no_instructor_invoice_templates')}
+                programId={program.id}
+                value={program.instructorInvoiceTemplateId}
+                templateType={CertificateTemplateType_enum.INSTRUCTOR_INVOICE}
+                mutation={UPDATE_PROGRAM_INSTRUCTOR_INVOICE_TEMPLATE_ID}
+              />
+              <InstructorTemplateSelector
+                title={t('Certificates.instructor_certificate_template')}
+                emptyHint={t('Certificates.no_instructor_certificate_templates')}
+                programId={program.id}
+                value={program.instructorCertificateTemplateId}
+                templateType={CertificateTemplateType_enum.INSTRUCTOR_CERTIFICATE}
+                mutation={UPDATE_PROGRAM_INSTRUCTOR_CERTIFICATE_TEMPLATE_ID}
+              />
             </div>
 
-            {/* 1. Participation Data Card */}
+            {/* 1. Instructor Emails Card */}
+            <div className="bg-fill-primary border border-border-primary rounded-lg p-4">
+              <h4 className="text-sm font-medium text-label-primary mb-1">{t('instructor_emails.label')}</h4>
+              <p className="text-xs text-label-secondary mb-3">{t('instructor_emails.help_text')}</p>
+              <div className="flex items-center gap-3">
+                <Button
+                  as="button"
+                  onClick={handleEmailInstructorsClick}
+                  disabled={instructorEmailsLoading || instructorEmails.length === 0}
+                >
+                  {t('instructor_emails.button')}
+                </Button>
+                {instructorEmailsLoading ? (
+                  <CircularProgress size={18} />
+                ) : (
+                  <span className="text-sm text-label-secondary">
+                    {t('instructor_emails.count', { count: instructorEmails.length })}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* 2. Participation Data Card */}
             <div className="bg-fill-primary border border-border-primary rounded-lg p-4">
               <h4 className="text-sm font-medium text-label-primary mb-3">{t('participation_data.generate')}</h4>
               <div className="space-y-2">

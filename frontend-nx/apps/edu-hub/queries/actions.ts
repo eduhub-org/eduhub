@@ -280,9 +280,10 @@ export const SEND_SESSION_REMINDERS = gql`
 `;
 
 export const NOTIFY_SESSION_PARTICIPANTS = gql`
-  mutation NotifySessionParticipants($sessionId: Int!) {
-    notifySessionParticipants(sessionId: $sessionId) {
+  mutation NotifySessionParticipants($sessionId: Int!, $skipCourse: Boolean) {
+    notifySessionParticipants(sessionId: $sessionId, skipCourse: $skipCourse) {
       success
+      courseSent
       queued
       total
       error

@@ -2,6 +2,10 @@
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { ColumnDef } from '@tanstack/react-table';
 import { useManageMutation } from '../../../hooks/authedMutation';
+import {
+  instructorCertificatesResultMessage,
+  useCreateInstructorCertificates,
+} from './InstructorCertificatesButton';
 import { useRoleQuery } from '../../../hooks/authedQuery';
 
 import { QUERY_LIMIT } from '../../../pages/manage/courses';
@@ -379,6 +383,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
   const [insertCourse] = useManageMutation<InsertCourseWithLocation, InsertCourseWithLocationVariables>(INSERT_COURSE);
 
   const [copyCourses] = useManageMutation(COPY_COURSES_TO_PROGRAM);
+  const [createInstructorCertificates] = useCreateInstructorCertificates();
 
   // A new offering needs a concrete program, hence a program tab (not "All") selected.
   const selectedProgramId = filter.where.programId?._eq;
@@ -483,6 +488,18 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
             )
           );
           setShowSuccessNotification(true);
+        } else if (action === 'generate_instructor_certificates') {
+          const { data } = await createInstructorCertificates({ variables: { courseIds } });
+          const { ok, message } = instructorCertificatesResultMessage(t, data?.createInstructorCertificates);
+          if (!data?.createInstructorCertificates?.success) throw new Error(message);
+          if (ok) {
+            setSuccessMessage(message);
+            setShowSuccessNotification(true);
+          } else {
+            // Some courses were skipped: worth noticing, but the others were generated.
+            setErrorMessage(message);
+            setShowErrorNotification(true);
+          }
         }
       } catch (error) {
         console.error(`Error during bulk ${action} action:`, error);
@@ -492,13 +509,14 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
         throw error;
       }
     },
-    [copyBulkAction, refetch, updateCourse, t, messageKey]
+    [copyBulkAction, refetch, updateCourse, createInstructorCertificates, t, messageKey]
   );
 
   const bulkActions = [
     { value: 'publish', label: t('bulk_action.publish') },
     { value: 'unpublish', label: t('bulk_action.unpublish') },
     { value: 'copy', label: t('bulk_action.copy') },
+    { value: 'generate_instructor_certificates', label: t('bulk_action.generate_instructor_certificates') },
   ];
 
   const courseGroupOptions = useMemo(() => {

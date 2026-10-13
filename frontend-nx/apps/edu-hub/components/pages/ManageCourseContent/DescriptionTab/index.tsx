@@ -49,6 +49,7 @@ import {
 import InputField from '../../../inputs/InputField';
 import { Button as ChatLinkButton } from '../../../common/Button';
 import MobileCollapsible from './MobileCollapsible';
+import { CourseTeamCard } from './CourseTeamCard';
 interface IProps {
   course: ManagedCourse_Course_by_pk;
   qResult: QueryResult<any, any>;
@@ -188,6 +189,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
 
   return (
     <div>
+      <CourseTeamCard courseId={course.id} isEventCourse={isEventCourse} />
       {programOrganizerChatLink ? (
         <div className="mb-6 flex items-center justify-center gap-3 rounded-lg border border-border-primary bg-bg-secondary p-4">
           <p className="text-sm text-label-primary">{t('element_program_instructor_chat_prompt')}</p>
@@ -375,7 +377,8 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
               variant="eduhub"
               type="number"
               label={t('max_participants.label')}
-              value={course.maxParticipants?.toString() || '0'}
+              // No value means no limit, so an unset limit is shown empty rather than as 0.
+              value={course.maxParticipants?.toString() ?? ''}
               itemId={course.id}
               updateValueMutation={UPDATE_COURSE_MAX_PARTICIPANTS}
               refetchQueries={['ManagedCourse']}

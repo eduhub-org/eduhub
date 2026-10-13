@@ -1,6 +1,10 @@
 table:
   name: CertificateTemplate
   schema: public
+object_relationships:
+  - name: CertificateTemplateType
+    using:
+      foreign_key_constraint_on: type
 array_relationships:
   - name: AchievementCourses
     using:
@@ -37,6 +41,7 @@ select_permissions:
         - id
         - name
         - html
+        - type
         - created_at
         - updated_at
       filter: {}
@@ -46,6 +51,7 @@ select_permissions:
         - id
         - name
         - html
+        - type
         - created_at
         - updated_at
       filter: {}

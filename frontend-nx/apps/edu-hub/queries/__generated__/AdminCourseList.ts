@@ -9,6 +9,36 @@ import { Course_bool_exp, Course_order_by, Weekday_enum, CourseRegistrationType_
 // GraphQL query operation: AdminCourseList
 // ====================================================
 
+export interface AdminCourseList_Course_SourceSession_Course {
+  __typename: "Course";
+  id: number;
+  /**
+   * The title of the course (only editable by an admin user)
+   */
+  title: string;
+  /**
+   * Decides whether the course is published for all users or not.
+   */
+  published: boolean;
+}
+
+export interface AdminCourseList_Course_SourceSession {
+  __typename: "Session";
+  id: number;
+  /**
+   * The title of the session
+   */
+  title: string;
+  /**
+   * The day and time of the start of the session
+   */
+  startDateTime: any;
+  /**
+   * An object relationship
+   */
+  Course: AdminCourseList_Course_SourceSession_Course | null;
+}
+
 export interface AdminCourseList_Course_Sessions_SessionAddresses_CourseLocation {
   __typename: "CourseLocation";
   id: number;
@@ -320,6 +350,37 @@ export interface AdminCourseList_Course_CourseAddonMappings {
   currency: string;
 }
 
+export interface AdminCourseList_Course_InstructorPayment {
+  __typename: "CourseInstructorPayment";
+  id: number;
+  /**
+   * Total instructor fee for the course in cents (e.g. 50000 = €500.00).
+   */
+  totalAmount: number;
+  /**
+   * Set when the first instructor generates an invoice; afterwards the split can no longer be changed by instructors. Admins reset it to NULL to unlock.
+   */
+  lockedAt: any | null;
+}
+
+export interface AdminCourseList_Course_InstructorPaymentShares_PaymentShare {
+  __typename: "CourseInstructorPaymentShare";
+  id: number;
+  /**
+   * Share of the course fee in cents.
+   */
+  amount: number;
+}
+
+export interface AdminCourseList_Course_InstructorPaymentShares {
+  __typename: "CourseInstructor";
+  id: number;
+  /**
+   * An object relationship
+   */
+  PaymentShare: AdminCourseList_Course_InstructorPaymentShares_PaymentShare | null;
+}
+
 export interface AdminCourseList_Course_CourseEnrollments_CourseEnrollmentStatus {
   __typename: "CourseEnrollmentStatus";
   value: string;
@@ -445,7 +506,7 @@ export interface AdminCourseList_Course {
    */
   programId: number;
   /**
-   * The number of maximum participants in the course.
+   * Participant limit; NULL means no limit (0 or less is stored as NULL)
    */
   maxParticipants: number | null;
   /**
@@ -489,6 +550,14 @@ export interface AdminCourseList_Course {
    * Whether visitors without an account may register for this course/event with just name and email. Only honoured for courses in a Program of type EVENTS with a direct registration type.
    */
   guestRegistrationEnabled: boolean;
+  /**
+   * Set on an event created from a course session; its session, locations and addresses are kept in sync with that session
+   */
+  sourceSessionId: number | null;
+  /**
+   * An object relationship
+   */
+  SourceSession: AdminCourseList_Course_SourceSession | null;
   /**
    * Full URL to the Formbricks survey for course enrollment/application (for iframe embedding). Overrides program default if set.
    */
@@ -558,6 +627,14 @@ export interface AdminCourseList_Course {
    * Stripe Price ID for the base course price
    */
   stripePriceId: string | null;
+  /**
+   * An object relationship
+   */
+  InstructorPayment: AdminCourseList_Course_InstructorPayment | null;
+  /**
+   * An array relationship
+   */
+  InstructorPaymentShares: AdminCourseList_Course_InstructorPaymentShares[];
   /**
    * Links this course to its CourseSeries (the set of all iterations of the same course). Used to surface projects from past iterations.
    */

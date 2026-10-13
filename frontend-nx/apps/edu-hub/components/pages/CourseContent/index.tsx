@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { FC, useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { CircularProgress } from '@mui/material';
@@ -18,7 +19,6 @@ import { DescriptionFields } from './DescriptionFields';
 import { FundingOrganizations } from './FundingOrganizations';
 import CourseProjectsSection from '../../common/TileSlider/CourseProjectsSection';
 import { RegistrationRail } from './RegistrationRail';
-import { useWeekdayStartAndEndString } from '../../../helpers/dateTimeHelpers';
 import { LearningGoals } from './LearningGoals';
 import { Sessions } from './Sessions';
 import { CourseParticipants } from './CourseParticipants';
@@ -74,7 +74,6 @@ const RAIL_STICKY =
 const CourseContent: FC<{ id: number }> = ({ id }) => {
   const t = useTranslations('course');
   const tCoursePage = useTranslations('coursePage');
-  const tCommon = useTranslations('common'); // Used for weekday translations
   const isLoggedIn = useIsLoggedIn();
   const userId = useUserId();
   const [resetValues, setResetValues] = useState<boolean | null>(null);
@@ -82,7 +81,6 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
   const [registrationSuccessWaitlist, setRegistrationSuccessWaitlist] = useState(false);
   const [participationExitKind, setParticipationExitKind] = useState<ParticipationExitKind | null>(null);
   const [cancellationRequested, setCancellationRequested] = useState(false);
-  const getWeekdayStartAndEndString = useWeekdayStartAndEndString();
 
   // Query for authorized course data
   const [
@@ -295,11 +293,16 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
               <PageBlock>
                 <div className={BODY_GRID}>
                   <div className="flex min-w-0 flex-col text-white lg:col-start-1 lg:row-start-1">
-                    {/* An event carries its dates in the agenda below, not here. */}
-                    {!isEventCourse && course.weekDay !== 'NONE' ? (
-                      <span className="text-xs mb-2">{getWeekdayStartAndEndString(course, tCommon)}</span>
-                    ) : null}
                     <span className="text-xl sm:text-2xl leading-snug">{course.tagline}</span>
+                    {/* An event opened from a session of a course points back to that course. */}
+                    {course.SourceSession?.Course?.published && (
+                      <span className="mt-3 text-sm sm:text-base">
+                        {tCoursePage('part_of_course', { course: course.SourceSession.Course.title })}{' '}
+                        <Link href={`/course/${course.SourceSession.Course.id}`} className="underline font-semibold">
+                          {tCoursePage('to_course')}
+                        </Link>
+                      </span>
+                    )}
                   </div>
 
                   <div className={RAIL_STICKY}>
@@ -323,6 +326,7 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                         courseLocations={course.CourseLocations}
                         isLoggedInParticipant={isLoggedInParticipant}
                         isEvent={isEventCourse}
+                        hideSessionDescriptions={course.sourceSessionId != null}
                       />
                     ) : (
                       <CurrentDegreeCourses degreeCourses={course.DegreeCourses} />

@@ -54,6 +54,14 @@ type Mutation {
 }
 
 type Mutation {
+  generateInstructorInvoice(courseId: Int!): InstructorDocumentResult!
+}
+
+type Mutation {
+  createInstructorCertificates(courseIds: [Int!]!): CreateInstructorCertificatesResult!
+}
+
+type Mutation {
   createStripeBasePrice(
     courseId: Int!
     basePrice: Int!
@@ -299,7 +307,7 @@ type Mutation {
 }
 
 type Mutation {
-  notifySessionParticipants(sessionId: Int!): NotifySessionParticipantsResult!
+  notifySessionParticipants(sessionId: Int!, skipCourse: Boolean): NotifySessionParticipantsResult!
 }
 
 type NotifySessionParticipantsResult {
@@ -308,6 +316,11 @@ type NotifySessionParticipantsResult {
   total: Int
   error: String
   messageKey: String
+  """
+  Whether the course participants' mailing went out. A retry passes
+  skipCourse when it did, so only the public event's registrants are mailed again.
+  """
+  courseSent: Boolean
 }
 
 type Mutation {
@@ -495,6 +508,21 @@ type ActionOutput {
   success: Boolean!
   messageKey: String!
   error: String
+}
+
+type CreateInstructorCertificatesResult {
+  success: Boolean!
+  count: Int
+  skippedCourseIds: [Int!]
+  error: String
+  messageKey: String!
+}
+
+type InstructorDocumentResult {
+  success: Boolean!
+  path: String
+  error: String
+  messageKey: String!
 }
 
 type CreateCertificatesResult {
