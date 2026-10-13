@@ -18,7 +18,6 @@ import { DescriptionFields } from './DescriptionFields';
 import { FundingOrganizations } from './FundingOrganizations';
 import CourseProjectsSection from '../../common/TileSlider/CourseProjectsSection';
 import { RegistrationRail } from './RegistrationRail';
-import { useWeekdayStartAndEndString } from '../../../helpers/dateTimeHelpers';
 import { LearningGoals } from './LearningGoals';
 import { Sessions } from './Sessions';
 import { CourseParticipants } from './CourseParticipants';
@@ -74,7 +73,6 @@ const RAIL_STICKY =
 const CourseContent: FC<{ id: number }> = ({ id }) => {
   const t = useTranslations('course');
   const tCoursePage = useTranslations('coursePage');
-  const tCommon = useTranslations('common'); // Used for weekday translations
   const isLoggedIn = useIsLoggedIn();
   const userId = useUserId();
   const [resetValues, setResetValues] = useState<boolean | null>(null);
@@ -82,7 +80,6 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
   const [registrationSuccessWaitlist, setRegistrationSuccessWaitlist] = useState(false);
   const [participationExitKind, setParticipationExitKind] = useState<ParticipationExitKind | null>(null);
   const [cancellationRequested, setCancellationRequested] = useState(false);
-  const getWeekdayStartAndEndString = useWeekdayStartAndEndString();
 
   // Query for authorized course data
   const [
@@ -295,10 +292,6 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
               <PageBlock>
                 <div className={BODY_GRID}>
                   <div className="flex min-w-0 flex-col text-white lg:col-start-1 lg:row-start-1">
-                    {/* An event carries its dates in the agenda below, not here. */}
-                    {!isEventCourse && course.weekDay !== 'NONE' ? (
-                      <span className="text-xs mb-2">{getWeekdayStartAndEndString(course, tCommon)}</span>
-                    ) : null}
                     <span className="text-xl sm:text-2xl leading-snug">{course.tagline}</span>
                   </div>
 
