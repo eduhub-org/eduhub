@@ -819,7 +819,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                   <span>{t(isEventCourse ? 'manageCourses.instructors.add_event' : 'manageCourses.instructors.add')}</span>
                 </button>
               </div>
-              <InstructorPaymentSection course={course} onError={handleError} />
+              <InstructorPaymentSection course={course} isEventCourse={isEventCourse} onError={handleError} />
               <InstructorCertificatesButton courseId={course.id} />
             </Card>
 

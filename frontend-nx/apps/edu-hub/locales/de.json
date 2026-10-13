@@ -240,6 +240,7 @@
       "invalid_minimum_maximum_integer": "Der Wert muss mindestens {min} und höchstens {max} sein",
       "invalid_integer_format": "Der Wert muss eine ganze Zahl sein",
       "invalid_decimal_format": "Der Wert muss eine Zahl sein (Dezimalstellen erlaubt, z. B. 12,5)",
+      "invalid_currency_format": "Bitte gib einen gültigen Betrag ein (z. B. 250 oder 250,50).",
       "invalid_input": "Ungültige Eingabe",
       "transform_rejected": "Dieser Wert konnte nicht im erwarteten Format gespeichert werden.",
       "save_failed": "Speichern fehlgeschlagen."
@@ -1435,12 +1436,14 @@
     "instructor_payment": {
       "total_label": "Vergütung für die Kursleitung (gesamt)",
       "total_help": "Ein Betrag pro Kurs, unabhängig von der Anzahl der Kursleitenden. Die Kursleitenden teilen ihn untereinander auf.",
-      "invalid_amount": "Bitte gib einen gültigen Betrag ein.",
+      "total_label_event": "Vergütung für die Organisator:innen (gesamt)",
+      "total_help_event": "Ein Betrag pro Event, unabhängig von der Anzahl der Organisator:innen. Die Organisator:innen teilen ihn untereinander auf.",
       "save_failed": "Die Änderung konnte nicht gespeichert werden.",
       "remaining": "Noch nicht verteilt",
       "locked": "Aufteilung festgelegt",
       "unlock": "Aufteilung entsperren",
-      "unlock_question": "Die Kursleitenden können die Aufteilung danach wieder ändern. Bereits heruntergeladene Rechnungen bleiben unverändert. Entsperren?"
+      "unlock_question": "Die Kursleitenden können die Aufteilung danach wieder ändern. Bereits heruntergeladene Rechnungen bleiben unverändert. Entsperren?",
+      "unlock_question_event": "Die Organisator:innen können die Aufteilung danach wieder ändern. Bereits heruntergeladene Rechnungen bleiben unverändert. Entsperren?"
     },
     "instructor_certificates": {
       "generate": "Zertifikate für die Kursleitung erstellen",
@@ -2199,10 +2202,8 @@
       "title": "Kursteam",
       "message_on_element": "Auf Element schreiben",
       "split_explanation": "Die Vergütung von {total} gilt für den gesamten Kurs, unabhängig von der Anzahl der Kursleitenden. Bitte stimmt euch untereinander ab und teilt den Betrag danach auf, wie viel Zeit und Aufwand jede*r in den Kurs gesteckt hat (z. B. Anzahl der Sessions). Sobald eine Person ihre Rechnung herunterlädt, ist die Aufteilung für alle festgelegt.",
+      "split_explanation_event": "Die Vergütung von {total} gilt für das gesamte Event, unabhängig von der Anzahl der Organisator:innen. Bitte stimmt euch untereinander ab und teilt den Betrag danach auf, wie viel Zeit und Aufwand jede*r in das Event gesteckt hat. Sobald eine Person ihre Rechnung herunterlädt, ist die Aufteilung für alle festgelegt.",
       "share_label": "Anteil von {name} in Euro",
-      "invalid_amount": "Bitte gib einen gültigen Betrag ein.",
-      "exceeds_total": "Zu hoch – höchstens {max} sind noch frei.",
-      "save_failed": "Der Betrag konnte nicht gespeichert werden.",
       "total": "Gesamtvergütung: {total}",
       "remaining": "noch zu verteilen: {remaining}",
       "sole_fee": "Deine Vergütung: {total}",
@@ -2211,9 +2212,11 @@
       "generating": "Rechnung wird erstellt…",
       "hint_no_template": "Für dieses Programm ist noch keine Rechnungsvorlage hinterlegt.",
       "hint_missing_amounts": "Tragt für alle Kursleitenden einen Betrag ein (0 ist erlaubt).",
+      "hint_missing_amounts_event": "Tragt für alle Organisator:innen einen Betrag ein (0 ist erlaubt).",
       "hint_sum_mismatch": "Die Beträge müssen genau die Gesamtvergütung ergeben (Differenz: {remaining}).",
       "confirm_lock_title": "Aufteilung festlegen?",
       "confirm_lock_question": "Mit dem Herunterladen Deiner Rechnung wird die Aufteilung für alle Kursleitenden festgelegt und kann danach nicht mehr geändert werden. Fortfahren?",
+      "confirm_lock_question_event": "Mit dem Herunterladen Deiner Rechnung wird die Aufteilung für alle Organisator:innen festgelegt und kann danach nicht mehr geändert werden. Fortfahren?",
       "confirm_lock_confirm": "Festlegen und herunterladen",
       "errors": {
         "NOT_COURSE_INSTRUCTOR": "Du bist nicht als Kursleitung dieses Kurses eingetragen.",

@@ -24,6 +24,6 @@ export interface UpsertCourseInstructorPaymentTotal {
 }
 
 export interface UpsertCourseInstructorPaymentTotalVariables {
-  courseId: number;
-  totalAmount: number;
+  itemId: number;
+  text: number;
 }

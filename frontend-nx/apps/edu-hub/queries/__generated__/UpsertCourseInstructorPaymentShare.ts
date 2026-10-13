@@ -24,6 +24,6 @@ export interface UpsertCourseInstructorPaymentShare {
 }
 
 export interface UpsertCourseInstructorPaymentShareVariables {
-  courseInstructorId: number;
-  amount: number;
+  itemId: number;
+  text: number;
 }
