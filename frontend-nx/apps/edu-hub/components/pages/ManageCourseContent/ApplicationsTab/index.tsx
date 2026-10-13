@@ -266,12 +266,13 @@ const isExpired = (enrollment: ApplicationEnrollment) => {
 };
 
 /**
- * "Invite all" addresses everyone rated green who has not been invited yet, across all pages of the
- * table, so it is a server-side filter rather than a check on the loaded rows.
+ * "Send invitations and rejections" addresses everyone rated green or red who has not been decided
+ * on yet, across all pages of the table, so it is a server-side filter rather than a check on the
+ * loaded rows. Green ones are invited, red ones rejected.
  */
-const INVITE_ALL_FILTER = {
+const UNDECIDED_RATED_FILTER = {
   _and: [
-    { motivationRating: { _eq: MotivationRating_enum.INVITE } },
+    { motivationRating: { _in: [MotivationRating_enum.INVITE, MotivationRating_enum.DECLINE] } },
     { status: { _in: [CourseEnrollmentStatus_enum.APPLIED, CourseEnrollmentStatus_enum.WAITLIST] } },
   ],
 };
@@ -492,27 +493,32 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
   // that dialog reports success.
   const dialogBulkAction = useDeferredBulkAction();
 
-  // Dialog state for invitations: everyone rated green at once, or renewing one invitation.
+  // Dialog state for decisions: inviting everyone green and rejecting everyone red at once, or
+  // renewing one invitation.
   const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
   const [inviteDialogData, setInviteDialogData] = useState<
-    { mode: 'all'; enrollmentIds: number[] } | { mode: 'renew'; enrollmentIds: number[]; name: string } | null
+    | { mode: 'decisions'; enrollmentIds: number[]; rejectionIds: number[] }
+    | { mode: 'renew'; enrollmentIds: number[]; name: string }
+    | null
   >(null);
   const [isLoadingInviteRecipients, setIsLoadingInviteRecipients] = useState(false);
   const [inviteError, setInviteError] = useState<string | null>(null);
 
-  const handleOpenInviteAllDialog = useCallback(async () => {
+  const handleOpenDecisionsDialog = useCallback(async () => {
     setIsLoadingInviteRecipients(true);
     try {
       const result = await loadInviteRecipients({
-        variables: { id: course.id, limit: BULK_EMAIL_RECIPIENT_LIMIT, filter: INVITE_ALL_FILTER },
+        variables: { id: course.id, limit: BULK_EMAIL_RECIPIENT_LIMIT, filter: UNDECIDED_RATED_FILTER },
       });
       if (result.error) throw result.error;
-      const enrollmentIds = (result.data?.Course_by_pk?.CourseEnrollments ?? []).map((e) => e.id);
-      if (enrollmentIds.length === 0) {
-        showBulkNotice(t('bulk_actions.no_eligible_invitations'));
+      const recipients = result.data?.Course_by_pk?.CourseEnrollments ?? [];
+      const enrollmentIds = recipients.filter((e) => e.motivationRating === MotivationRating_enum.INVITE).map((e) => e.id);
+      const rejectionIds = recipients.filter((e) => e.motivationRating === MotivationRating_enum.DECLINE).map((e) => e.id);
+      if (enrollmentIds.length === 0 && rejectionIds.length === 0) {
+        showBulkNotice(t('bulk_actions.no_eligible_decisions'));
         return;
       }
-      setInviteDialogData({ mode: 'all', enrollmentIds });
+      setInviteDialogData({ mode: 'decisions', enrollmentIds, rejectionIds });
       setInviteExpireDate(getDefaultInviteExpireDate());
       setIsInviteDialogOpen(true);
     } catch (error) {
@@ -547,48 +553,50 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
 
   const handleSendInvitations = useCallback(async () => {
     if (!inviteDialogData || isSendingInvitations) return;
-    // The mutation only touches rows still in an invitable status, so a list loaded a moment ago
-    // cannot invite someone who was decided on in the meantime.
+    // The mutations only touch rows still in a decidable status, so a list loaded a moment ago
+    // cannot override a decision taken in the meantime.
     const { enrollmentIds } = inviteDialogData;
+    const rejectionIds = inviteDialogData.mode === 'decisions' ? inviteDialogData.rejectionIds : [];
 
     let invitedCount = 0;
+    let rejectedCount = 0;
     setIsSendingInvitations(true);
     try {
-      const result = await updateEnrollmentStatusForInvite({
-        variables: {
-          enrollmentIds,
-          status: CourseEnrollmentStatus_enum.INVITED,
-          // The day the picker shows. Sending the Date itself would store its
-          // UTC day, which in Germany is the previous day shortly after midnight.
-          expire: format(inviteExpireDate, 'yyyy-MM-dd'),
-        },
-      });
-      invitedCount = result.data?.update_CourseEnrollment?.affected_rows ?? 0;
+      if (enrollmentIds.length > 0) {
+        const result = await updateEnrollmentStatusForInvite({
+          variables: {
+            enrollmentIds,
+            status: CourseEnrollmentStatus_enum.INVITED,
+            // The day the picker shows. Sending the Date itself would store its
+            // UTC day, which in Germany is the previous day shortly after midnight.
+            expire: format(inviteExpireDate, 'yyyy-MM-dd'),
+          },
+        });
+        invitedCount = result.data?.update_CourseEnrollment?.affected_rows ?? 0;
+      }
+      if (rejectionIds.length > 0) {
+        const result = await updateEnrollmentStatusWhenApplied({
+          variables: { enrollmentIds: rejectionIds, status: CourseEnrollmentStatus_enum.REJECTED, expire: null },
+        });
+        rejectedCount = result.data?.update_CourseEnrollment?.affected_rows ?? 0;
+      }
     } catch (error) {
-      const errorMessage = error instanceof ApolloError 
-        ? error.message 
-        : error instanceof Error 
-        ? error.message 
-        : String(error);
-      setInviteError(
-        t('bulk_actions.send_invitations_error', { error: errorMessage }) || 
-        `Failed to send invitations: ${errorMessage}`
-      );
-      // The error dialog sits on top of the invitation dialog, which stays open for a retry.
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      // Invitations that already went out are not sent twice on a retry: they are no longer
+      // undecided, so the next load leaves them out.
+      setInviteError(t('bulk_actions.send_decisions_error', { error: errorMessage }));
+      setIsInviteDialogOpen(false);
+      setInviteDialogData(null);
+      await qResult.refetch().catch(() => undefined);
       return;
     } finally {
       setIsSendingInvitations(false);
     }
 
-    if (invitedCount === 0) {
-      showBulkNotice(t('bulk_actions.no_eligible_invitations'));
+    if (invitedCount === 0 && rejectedCount === 0) {
+      showBulkNotice(t('bulk_actions.no_eligible_decisions'));
     } else {
-      showBulkNotice(
-        invitedCount === 1
-          ? t('bulk_actions.invitations_queued_singular', { count: invitedCount })
-          : t('bulk_actions.invitations_queued_plural', { count: invitedCount }),
-        4000
-      );
+      showBulkNotice(t('bulk_actions.decisions_queued', { invited: invitedCount, rejected: rejectedCount }), 4000);
     }
     setIsInviteDialogOpen(false);
     setInviteDialogData(null);
@@ -596,13 +604,14 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
     try {
       await qResult.refetch();
     } catch (refetchError) {
-      console.error('ApplicationsTab: refetch after sending invitations failed', refetchError);
+      console.error('ApplicationsTab: refetch after sending decisions failed', refetchError);
     }
   }, [
     inviteDialogData,
     isSendingInvitations,
     inviteExpireDate,
     updateEnrollmentStatusForInvite,
+    updateEnrollmentStatusWhenApplied,
     qResult,
     showBulkNotice,
     t,
@@ -1418,8 +1427,8 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
             toolbarActions={
               <>
                 {features.hasApplicationProcess && canDecideRegistrations && (
-                  <OldButton onClick={handleOpenInviteAllDialog} disabled={isLoadingInviteRecipients} filled>
-                    {t('bulk_actions.send_invitations_all')}
+                  <OldButton onClick={handleOpenDecisionsDialog} disabled={isLoadingInviteRecipients} filled>
+                    {t('bulk_actions.send_decisions_by_rating')}
                   </OldButton>
                 )}
                 <ParticipantExportMenu courseId={course.id} />
@@ -1454,7 +1463,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
             <div className="text-xl font-semibold text-label-primary">
               {inviteDialogData?.mode === 'renew'
                 ? t('bulk_actions.renew_invitation_dialog_title')
-                : t('bulk_actions.send_invitations_dialog_title')}
+                : t('bulk_actions.send_decisions_dialog_title')}
             </div>
             <div
               className={`text-label-primary ${
@@ -1470,31 +1479,40 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
           {inviteDialogData && (
             <>
               <div className="mb-6">
-                <p className="text-label-primary mb-4">
-                  {inviteDialogData.mode === 'renew'
-                    ? t('bulk_actions.renew_invitation_text', { name: inviteDialogData.name })
-                    : inviteDialogData.enrollmentIds.length === 1
-                      ? t('bulk_actions.send_invitations_all_count_singular', { count: 1 })
-                      : t('bulk_actions.send_invitations_all_count_plural', {
-                          count: inviteDialogData.enrollmentIds.length,
-                        })}
-                </p>
-                <div className="flex flex-col gap-4">
-                  <label className="text-sm font-medium text-label-primary">
-                    {t('invitation_deadline')}
-                  </label>
-                  <DatePicker
-                    dateFormat={locale === 'de' ? 'dd.MM.yyyy' : 'MM/dd/yyyy'}
-                    selected={inviteExpireDate}
-                    onChange={handleSetInviteExpireDate}
-                    minDate={new Date()}
-                    locale={locale}
-                    className="w-full p-2 rounded border border-border-primary bg-fill-primary text-label-primary"
-                    // Render the calendar outside the dialog so it is not clipped by it
-                    portalId={INVITE_DATEPICKER_PORTAL_ID}
-                    popperPlacement="bottom-start"
-                  />
-                </div>
+                {inviteDialogData.mode === 'renew' ? (
+                  <p className="text-label-primary mb-4">
+                    {t('bulk_actions.renew_invitation_text', { name: inviteDialogData.name })}
+                  </p>
+                ) : (
+                  <ul className="text-label-primary mb-4 space-y-2">
+                    <li className="flex items-center gap-2">
+                      <Dot color="lightgreen" />
+                      {t('bulk_actions.send_decisions_invite_count', { count: inviteDialogData.enrollmentIds.length })}
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Dot color="red" />
+                      {t('bulk_actions.send_decisions_reject_count', { count: inviteDialogData.rejectionIds.length })}
+                    </li>
+                  </ul>
+                )}
+                {inviteDialogData.enrollmentIds.length > 0 && (
+                  <div className="flex flex-col gap-4">
+                    <label className="text-sm font-medium text-label-primary">
+                      {t('invitation_deadline')}
+                    </label>
+                    <DatePicker
+                      dateFormat={locale === 'de' ? 'dd.MM.yyyy' : 'MM/dd/yyyy'}
+                      selected={inviteExpireDate}
+                      onChange={handleSetInviteExpireDate}
+                      minDate={new Date()}
+                      locale={locale}
+                      className="w-full p-2 rounded border border-border-primary bg-fill-primary text-label-primary"
+                      // Render the calendar outside the dialog so it is not clipped by it
+                      portalId={INVITE_DATEPICKER_PORTAL_ID}
+                      popperPlacement="bottom-start"
+                    />
+                  </div>
+                )}
               </div>
               <div className="flex justify-end gap-3">
                 <OldButton onClick={handleCloseInviteDialog} inverted disabled={isSendingInvitations}>
@@ -1503,7 +1521,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
                 <OldButton onClick={handleSendInvitations} filled disabled={isSendingInvitations}>
                   {inviteDialogData.mode === 'renew'
                     ? t('bulk_actions.renew_invitation_confirm')
-                    : t('bulk_actions.send_invitations_confirm')}
+                    : t('bulk_actions.send_decisions_confirm')}
                 </OldButton>
               </div>
             </>
