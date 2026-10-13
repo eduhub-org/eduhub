@@ -201,10 +201,15 @@ export const UPDATE_ENROLLMENT_STATUS = gql`
   }
 `;
 
-/** Bulk status change only for rows still APPLIED or WAITLIST (avoids duplicate invite/decline emails on race). */
-export const UPDATE_ENROLLMENT_STATUS_WHEN_APPLIED = gql`
-  mutation UpdateEnrollmentStatusWhenApplied(
+/**
+ * Decides undecided applications (APPLIED/WAITLIST) by their rating: only rows that still carry
+ * `rating` are updated, so a rating changed while the confirmation dialog was open is not
+ * overridden by the decision taken on the old one.
+ */
+export const UPDATE_ENROLLMENT_STATUS_BY_RATING = gql`
+  mutation UpdateEnrollmentStatusByRating(
     $enrollmentIds: [Int!]!
+    $rating: MotivationRating_enum!
     $status: CourseEnrollmentStatus_enum!
     $expire: date
   ) {
@@ -213,6 +218,7 @@ export const UPDATE_ENROLLMENT_STATUS_WHEN_APPLIED = gql`
         _and: [
           { id: { _in: $enrollmentIds } }
           { status: { _in: [APPLIED, WAITLIST] } }
+          { motivationRating: { _eq: $rating } }
         ]
       }
       _set: { status: $status, invitationExpirationDate: $expire }

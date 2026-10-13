@@ -34,7 +34,7 @@ import {
 import {
   CANCEL_ENROLLMENTS_BY_ORGANIZER,
   UPDATE_ENROLLMENT_STATUS_FOR_INVITE,
-  UPDATE_ENROLLMENT_STATUS_WHEN_APPLIED,
+  UPDATE_ENROLLMENT_STATUS_BY_RATING,
   UPDATE_ENROLLMENT_RATING,
 } from '../../../../queries/insertEnrollment';
 import {
@@ -51,6 +51,10 @@ import {
   UpdateEnrollmentStatusWhenApplied,
   UpdateEnrollmentStatusWhenAppliedVariables,
 } from '../../../../queries/__generated__/UpdateEnrollmentStatusWhenApplied';
+import {
+  UpdateEnrollmentStatusByRating,
+  UpdateEnrollmentStatusByRatingVariables,
+} from '../../../../queries/__generated__/UpdateEnrollmentStatusByRating';
 import { useTranslations, useLocale } from 'next-intl';
 import Modal from '../../../common/Modal';
 import AddParticipantsForm from './AddParticipantsForm';
@@ -435,10 +439,10 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
     CancelEnrollmentsByOrganizerVariables
   >(CANCEL_ENROLLMENTS_BY_ORGANIZER);
 
-  const [updateEnrollmentStatusWhenApplied] = useRoleMutation<
-    UpdateEnrollmentStatusWhenApplied,
-    UpdateEnrollmentStatusWhenAppliedVariables
-  >(UPDATE_ENROLLMENT_STATUS_WHEN_APPLIED);
+  const [updateEnrollmentStatusByRating] = useRoleMutation<
+    UpdateEnrollmentStatusByRating,
+    UpdateEnrollmentStatusByRatingVariables
+  >(UPDATE_ENROLLMENT_STATUS_BY_RATING);
 
   const [loadBulkEmailRecipients, bulkEmailRecipientsQuery] = useLazyRoleQuery<
     ManagedCourseApplicationRecipients,
@@ -549,30 +553,36 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
 
   const handleSendInvitations = useCallback(async () => {
     if (!inviteDialogData || isSendingInvitations) return;
-    // The mutations only touch rows still in a decidable status, so a list loaded a moment ago
-    // cannot override a decision taken in the meantime.
+    // The mutations only touch rows still undecided (and, for decisions by rating, still rated the
+    // same), so a list loaded a moment ago cannot override what changed in the meantime.
     const { enrollmentIds } = inviteDialogData;
     const rejectionIds = inviteDialogData.mode === 'decisions' ? inviteDialogData.rejectionIds : [];
+    // The day the picker shows. Sending the Date itself would store its
+    // UTC day, which in Germany is the previous day shortly after midnight.
+    const expire = format(inviteExpireDate, 'yyyy-MM-dd');
 
     let invitedCount = 0;
     let rejectedCount = 0;
     setIsSendingInvitations(true);
     try {
       if (enrollmentIds.length > 0) {
-        const result = await updateEnrollmentStatusForInvite({
-          variables: {
-            enrollmentIds,
-            status: CourseEnrollmentStatus_enum.INVITED,
-            // The day the picker shows. Sending the Date itself would store its
-            // UTC day, which in Germany is the previous day shortly after midnight.
-            expire: format(inviteExpireDate, 'yyyy-MM-dd'),
-          },
-        });
+        const status = CourseEnrollmentStatus_enum.INVITED;
+        const result =
+          inviteDialogData.mode === 'renew'
+            ? await updateEnrollmentStatusForInvite({ variables: { enrollmentIds, status, expire } })
+            : await updateEnrollmentStatusByRating({
+                variables: { enrollmentIds, rating: MotivationRating_enum.INVITE, status, expire },
+              });
         invitedCount = result.data?.update_CourseEnrollment?.affected_rows ?? 0;
       }
       if (rejectionIds.length > 0) {
-        const result = await updateEnrollmentStatusWhenApplied({
-          variables: { enrollmentIds: rejectionIds, status: CourseEnrollmentStatus_enum.REJECTED, expire: null },
+        const result = await updateEnrollmentStatusByRating({
+          variables: {
+            enrollmentIds: rejectionIds,
+            rating: MotivationRating_enum.DECLINE,
+            status: CourseEnrollmentStatus_enum.REJECTED,
+            expire: null,
+          },
         });
         rejectedCount = result.data?.update_CourseEnrollment?.affected_rows ?? 0;
       }
@@ -607,7 +617,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
     isSendingInvitations,
     inviteExpireDate,
     updateEnrollmentStatusForInvite,
-    updateEnrollmentStatusWhenApplied,
+    updateEnrollmentStatusByRating,
     qResult,
     showBulkNotice,
     t,
