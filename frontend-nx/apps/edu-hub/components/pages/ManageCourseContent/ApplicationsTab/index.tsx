@@ -281,10 +281,6 @@ const UNDECIDED_RATED_FILTER = {
 const canRenewInvitation = (enrollment: ApplicationEnrollment) =>
   enrollment.status === 'INVITED' || enrollment.status === 'EXPIRED';
 
-const isRejectionEligibleEnrollment = (enrollment: ApplicationEnrollment) =>
-  enrollment.motivationRating === 'DECLINE' &&
-  (enrollment.status === 'APPLIED' || enrollment.status === 'WAITLIST');
-
 export const ApplicationsTab: FC<IProps> = ({ course, manageAsOrgAdmin = false }) => {
   const t = useTranslations('manageCourse');
   const [pageSize, setPageSize] = useState(20);
@@ -489,7 +485,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
     ensurePortalContainer(INVITE_DATEPICKER_PORTAL_ID);
   }, []);
 
-  // Sending rejections or cancelling finishes in a dialog, so the selection is only released once
+  // Cancelling finishes in a dialog, so the selection is only released once
   // that dialog reports success.
   const dialogBulkAction = useDeferredBulkAction();
 
@@ -672,133 +668,6 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
     qResult,
   ]);
 
-  // Dialog state for rejections
-  const [isRejectionDialogOpen, setIsRejectionDialogOpen] = useState(false);
-  const [rejectionDialogData, setRejectionDialogData] = useState<{
-    enrollmentsToSend: ApplicationEnrollment[];
-    selectedCount?: number;
-    identifiedCount: number;
-    actionType: 'selected' | 'all';
-  } | null>(null);
-
-  const handleOpenRejectionDialog = useCallback(
-    (enrollmentIds: number[], selectedCount: number | undefined, actionType: 'selected' | 'all') => {
-      const idToRow = new Map(courseEnrollments.map((e) => [e.id, e]));
-      const enrollmentsToSend = enrollmentIds
-        .map((id) => idToRow.get(id))
-        .filter(
-          (e): e is ApplicationEnrollment =>
-            !!e && isRejectionEligibleEnrollment(e)
-        );
-      if (enrollmentsToSend.length === 0) {
-        showBulkNotice(t('bulk_actions.no_eligible_rejections'));
-        return false;
-      }
-      setRejectionDialogData({
-        enrollmentsToSend,
-        selectedCount,
-        identifiedCount: enrollmentsToSend.length,
-        actionType,
-      });
-      setIsRejectionDialogOpen(true);
-      return true;
-    },
-    [courseEnrollments, showBulkNotice, t]
-  );
-
-  const [rejectionError, setRejectionError] = useState<string | null>(null);
-  // Closing the dialog settles the bulk action, so it stays closed while the mutation runs.
-  const [isSendingRejections, setIsSendingRejections] = useState(false);
-
-  const handleCloseRejectionDialog = useCallback(() => {
-    if (isSendingRejections) return;
-    setIsRejectionDialogOpen(false);
-    setRejectionDialogData(null);
-    setRejectionError(null);
-    // Cancelled (a completed send settles the action before closing): the rows stay selected.
-    dialogBulkAction.fail();
-  }, [dialogBulkAction, isSendingRejections]);
-
-  const handleSendRejections = useCallback(async () => {
-    if (!rejectionDialogData || isSendingRejections) return;
-
-    const idToRow = new Map(courseEnrollments.map((e) => [e.id, e]));
-    const enrollmentIds = rejectionDialogData.enrollmentsToSend
-      .map((e) => e.id)
-      .filter((id) => {
-        const row = idToRow.get(id);
-        return !!row && isRejectionEligibleEnrollment(row);
-      });
-
-    if (enrollmentIds.length === 0) {
-      showBulkNotice(t('bulk_actions.no_eligible_rejections'));
-      // Nothing was sent, so the rows stay selected.
-      dialogBulkAction.fail();
-      handleCloseRejectionDialog();
-      return;
-    }
-
-    let declinedCount = 0;
-    setIsSendingRejections(true);
-    try {
-      const result = await updateEnrollmentStatusWhenApplied({
-        variables: {
-          enrollmentIds,
-          status: CourseEnrollmentStatus_enum.REJECTED,
-          expire: null,
-        },
-      });
-      declinedCount = result.data?.update_CourseEnrollment?.affected_rows ?? 0;
-    } catch (error) {
-      const errorMessage = error instanceof ApolloError 
-        ? error.message 
-        : error instanceof Error 
-        ? error.message 
-        : String(error);
-      setRejectionError(
-        t('bulk_actions.send_rejections_error', { error: errorMessage }) || 
-        `Failed to send rejections: ${errorMessage}`
-      );
-      // The dialog stays open with the error; the rows stay selected for a retry.
-      return;
-    } finally {
-      setIsSendingRejections(false);
-    }
-
-    if (declinedCount === 0) {
-      showBulkNotice(t('bulk_actions.no_eligible_rejections'));
-    } else {
-      showBulkNotice(
-        declinedCount === 1
-          ? t('bulk_actions.declines_queued_singular', { count: declinedCount })
-          : t('bulk_actions.declines_queued_plural', { count: declinedCount }),
-        4000
-      );
-    }
-    if (declinedCount === 0) {
-      dialogBulkAction.fail();
-    } else {
-      dialogBulkAction.succeed();
-    }
-    handleCloseRejectionDialog();
-
-    try {
-      await qResult.refetch();
-    } catch (refetchError) {
-      console.error('ApplicationsTab: refetch after bulk decline failed', refetchError);
-    }
-  }, [
-    dialogBulkAction,
-    rejectionDialogData,
-    isSendingRejections,
-    courseEnrollments,
-    updateEnrollmentStatusWhenApplied,
-    qResult,
-    handleCloseRejectionDialog,
-    showBulkNotice,
-    t,
-  ]);
-
   // Dialog state for "no selection" warning
   const [isNoSelectionDialogOpen, setIsNoSelectionDialogOpen] = useState(false);
   const handleCloseNoSelectionDialog = useCallback(() => {
@@ -898,30 +767,6 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
         }
         setCancelEnrollmentIds(enrollmentIds);
         // handleConfirmCancelEnrollments settles the action once the dialog is confirmed.
-        return dialogBulkAction.start();
-      }
-
-      // Handle rejection actions
-      if (action === 'send_rejections_selected') {
-        // Nothing happened in these cases, so the rows stay selected.
-        if (selectedRows.length === 0) {
-          setIsNoSelectionDialogOpen(true);
-          return false;
-        }
-        const enrollmentsToSend = selectedRows.filter((e) => isRejectionEligibleEnrollment(e));
-        if (enrollmentsToSend.length === 0) {
-          showBulkNotice(t('bulk_actions.no_eligible_rejections'));
-          return false;
-        }
-        const opened = handleOpenRejectionDialog(
-          enrollmentsToSend.map((e) => e.id),
-          selectedRows.length,
-          'selected'
-        );
-        if (!opened) {
-          return false;
-        }
-        // handleSendRejections settles the action once the dialog is confirmed.
         return dialogBulkAction.start();
       }
 
@@ -1026,7 +871,6 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
       course.id,
       dialogBulkAction,
       setCancelEnrollmentIds,
-      handleOpenRejectionDialog,
       loadBulkEmailRecipients,
       openMailtoOrShowFallback,
       setIsNoSelectionDialogOpen,
@@ -1089,18 +933,8 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
       return actions;
     }
 
-    // Invitations go out through the "invite all with green rating" button above the table.
+    // Invitations and rejections go out through the "send by rating" button above the table.
     actions.push(
-      {
-        value: 'send_rejections_selected',
-        label: t('bulk_actions.send_rejections_selected'),
-        group: t('bulk_actions.send_decisions'),
-        requiresSelection: true,
-        disabled: !canDecideRegistrations,
-        disabledReason: !canDecideRegistrations
-          ? t('bulk_actions.disabled_reasons.instructors_only')
-          : t('bulk_actions.disabled_reasons.select_participants_first'),
-      },
       {
         value: 'email_status_CONFIRMED',
         label: t('bulk_actions.email_all_confirmed'),
@@ -1538,60 +1372,6 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
         question={t('bulk_actions.cancel_registrations_question', { count: cancelEnrollmentIds?.length ?? 0 })}
       />
 
-      {/* Rejection Dialog */}
-      <Dialog
-        open={isRejectionDialogOpen}
-        onClose={handleCloseRejectionDialog}
-        maxWidth="sm"
-        fullWidth
-        PaperProps={{ className: 'light' }}
-      >
-        <DialogTitle>
-          <div className="flex justify-between items-center">
-            <div className="text-xl font-semibold text-label-primary">{t('bulk_actions.send_rejections_dialog_title')}</div>
-            <div
-              className={`text-label-primary ${
-                isSendingRejections ? 'pointer-events-none opacity-50' : 'cursor-pointer'
-              }`}
-              onClick={handleCloseRejectionDialog}
-            >
-              <MdClose className="w-6 h-6" />
-            </div>
-          </div>
-        </DialogTitle>
-        <div className="px-6 pb-6">
-          {rejectionDialogData && (
-            <>
-              <div className="mb-6">
-                <p className="text-label-primary">
-                  {rejectionDialogData.actionType === 'selected' ? (
-                    rejectionDialogData.selectedCount !== undefined && rejectionDialogData.selectedCount > 0 ? (
-                      rejectionDialogData.identifiedCount === 1
-                        ? t('bulk_actions.send_rejections_selected_count_singular', { selected: rejectionDialogData.selectedCount, identified: rejectionDialogData.identifiedCount })
-                        : t('bulk_actions.send_rejections_selected_count_plural', { selected: rejectionDialogData.selectedCount, identified: rejectionDialogData.identifiedCount })
-                    ) : (
-                      t('bulk_actions.send_rejections_selected_count_plural', { selected: 0, identified: rejectionDialogData.identifiedCount })
-                    )
-                  ) : (
-                    rejectionDialogData.identifiedCount === 1
-                      ? t('bulk_actions.send_rejections_all_count_singular', { count: rejectionDialogData.identifiedCount })
-                      : t('bulk_actions.send_rejections_all_count_plural', { count: rejectionDialogData.identifiedCount })
-                  )}
-                </p>
-              </div>
-              <div className="flex justify-end gap-3">
-                <OldButton onClick={handleCloseRejectionDialog} inverted disabled={isSendingRejections}>
-                  {tCommon('cancel')}
-                </OldButton>
-                <OldButton onClick={handleSendRejections} filled disabled={isSendingRejections}>
-                  {t('bulk_actions.send_rejections_confirm')}
-                </OldButton>
-              </div>
-            </>
-          )}
-        </div>
-      </Dialog>
-
       {/* Bulk Email Dialog */}
       <Dialog
         open={!!bulkEmailPendingLabel || !!bulkEmailDialogData || !!bulkEmailError}
@@ -1722,11 +1502,6 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
         errorMessage={inviteError || ''}
         open={!!inviteError}
         onClose={() => setInviteError(null)}
-      />
-      <ErrorMessageDialog
-        errorMessage={rejectionError || ''}
-        open={!!rejectionError}
-        onClose={() => setRejectionError(null)}
       />
       <ErrorMessageDialog
         errorMessage={cancelError || ''}
