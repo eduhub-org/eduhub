@@ -240,6 +240,7 @@
       "invalid_minimum_maximum_integer": "The value must be at least {min} and at most {max}",
       "invalid_integer_format": "The value must be an integer",
       "invalid_decimal_format": "The value must be a number (decimals allowed, e.g. 12.5)",
+      "invalid_currency_format": "Please enter a valid amount (e.g. 250 or 250.50).",
       "invalid_input": "Invalid input",
       "transform_rejected": "This value could not be saved in the expected format.",
       "save_failed": "Saving failed."
@@ -1453,12 +1454,14 @@
     "instructor_payment": {
       "total_label": "Instructor fee (total)",
       "total_help": "One amount per course, regardless of the number of instructors. The instructors split it among themselves.",
-      "invalid_amount": "Please enter a valid amount.",
+      "total_label_event": "Organizer fee (total)",
+      "total_help_event": "One amount per event, regardless of the number of organizers. The organizers split it among themselves.",
       "save_failed": "The change could not be saved.",
       "remaining": "Not yet assigned",
       "locked": "Split fixed",
       "unlock": "Unlock split",
-      "unlock_question": "The instructors will be able to change the split again. Invoices that were already downloaded stay as they are. Unlock?"
+      "unlock_question": "The instructors will be able to change the split again. Invoices that were already downloaded stay as they are. Unlock?",
+      "unlock_question_event": "The organizers will be able to change the split again. Invoices that were already downloaded stay as they are. Unlock?"
     },
     "instructor_certificates": {
       "generate": "Generate instructor certificates",
@@ -2214,10 +2217,8 @@
       "title": "Course team",
       "message_on_element": "Message on Element",
       "split_explanation": "The fee of {total} covers the whole course, regardless of how many instructors there are. Please agree among yourselves and split it according to the time and effort each of you put into the course (e.g. number of sessions). As soon as one person downloads their invoice, the split is fixed for everyone.",
+      "split_explanation_event": "The fee of {total} covers the whole event, regardless of how many organizers there are. Please agree among yourselves and split it according to the time and effort each of you put into the event. As soon as one person downloads their invoice, the split is fixed for everyone.",
       "share_label": "Share of {name} in euros",
-      "invalid_amount": "Please enter a valid amount.",
-      "exceeds_total": "Too high – at most {max} is still unassigned.",
-      "save_failed": "The amount could not be saved.",
       "total": "Total fee: {total}",
       "remaining": "still to assign: {remaining}",
       "sole_fee": "Your fee: {total}",
@@ -2226,9 +2227,11 @@
       "generating": "Creating invoice…",
       "hint_no_template": "No invoice template has been set up for this program yet.",
       "hint_missing_amounts": "Enter an amount for every instructor (0 is allowed).",
+      "hint_missing_amounts_event": "Enter an amount for every organizer (0 is allowed).",
       "hint_sum_mismatch": "The amounts must add up exactly to the total fee (difference: {remaining}).",
       "confirm_lock_title": "Fix the split?",
       "confirm_lock_question": "Downloading your invoice fixes the split for all instructors; it can no longer be changed afterwards. Continue?",
+      "confirm_lock_question_event": "Downloading your invoice fixes the split for all organizers; it can no longer be changed afterwards. Continue?",
       "confirm_lock_confirm": "Fix and download",
       "errors": {
         "NOT_COURSE_INSTRUCTOR": "You are not listed as an instructor of this course.",

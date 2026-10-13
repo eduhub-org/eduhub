@@ -189,7 +189,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
 
   return (
     <div>
-      <CourseTeamCard courseId={course.id} />
+      <CourseTeamCard courseId={course.id} isEventCourse={isEventCourse} />
       {programOrganizerChatLink ? (
         <div className="mb-6 flex items-center justify-center gap-3 rounded-lg border border-border-primary bg-bg-secondary p-4">
           <p className="text-sm text-label-primary">{t('element_program_instructor_chat_prompt')}</p>
