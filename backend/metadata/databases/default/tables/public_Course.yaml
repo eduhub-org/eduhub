@@ -2,6 +2,16 @@ table:
   name: Course
   schema: public
 object_relationships:
+  # Row-filtered by CourseInstructorPayment permissions (null for non-instructors of the course).
+  - name: InstructorPayment
+    using:
+      manual_configuration:
+        column_mapping:
+          id: courseId
+        insertion_order: null
+        remote_table:
+          name: CourseInstructorPayment
+          schema: public
   - name: AchievementCertificateTemplate
     using:
       foreign_key_constraint_on: achievementCertificateTemplateId
@@ -23,6 +33,10 @@ object_relationships:
   - name: Program
     using:
       foreign_key_constraint_on: programId
+  # Set on an event created from a course session (see Session.PublicEvent).
+  - name: SourceSession
+    using:
+      foreign_key_constraint_on: sourceSessionId
   - name: Weekday
     using:
       foreign_key_constraint_on: weekDay
@@ -148,6 +162,7 @@ select_permissions:
         - programId
         - projectProposalsEnabled
         - guestRegistrationEnabled
+        - sourceSessionId
         - projectSubmissionDeadline
         - published
         - registrationType
@@ -202,6 +217,7 @@ select_permissions:
         - programId
         - projectProposalsEnabled
         - guestRegistrationEnabled
+        - sourceSessionId
         - projectSubmissionDeadline
         - published
         - startTime
@@ -249,6 +265,7 @@ select_permissions:
         - programId
         - projectProposalsEnabled
         - guestRegistrationEnabled
+        - sourceSessionId
         - projectSubmissionDeadline
         - published
         - startTime
@@ -303,6 +320,7 @@ select_permissions:
         - programId
         - projectProposalsEnabled
         - guestRegistrationEnabled
+        - sourceSessionId
         - projectSubmissionDeadline
         - published
         - startTime
@@ -528,6 +546,7 @@ insert_permissions:
         - programId
         - projectProposalsEnabled
         - guestRegistrationEnabled
+        - sourceSessionId
         - projectSubmissionDeadline
         - published
         - startTime

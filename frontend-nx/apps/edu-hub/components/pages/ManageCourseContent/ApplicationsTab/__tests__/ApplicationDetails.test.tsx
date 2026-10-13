@@ -81,4 +81,32 @@ describe('ApplicationDetails', () => {
     fireEvent.click(screen.getByRole('button', { name: /application_details\.next_application/ }));
     expect(expandNext).toHaveBeenCalled();
   });
+
+  it('offers to invite again once an invitation has expired', () => {
+    const onRenewInvitation = jest.fn();
+    renderDetails({
+      enrollment: { ...enrollment, status: 'EXPIRED', invitationExpirationDate: '2026-10-01' },
+      isInvitationExpired: true,
+      onRenewInvitation,
+    } as Partial<React.ComponentProps<typeof ApplicationDetails>>);
+    expect(screen.getByText(/status\.invitation_expired/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'application_details.reinvite' }));
+    expect(onRenewInvitation).toHaveBeenCalled();
+  });
+
+  it('offers to extend a running invitation', () => {
+    renderDetails({
+      enrollment: { ...enrollment, status: 'INVITED', invitationExpirationDate: '2026-12-01' },
+      onRenewInvitation: jest.fn(),
+    } as Partial<React.ComponentProps<typeof ApplicationDetails>>);
+    expect(screen.getByRole('button', { name: 'application_details.extend_invitation' })).toBeInTheDocument();
+  });
+
+  it('has no renewal button without the handler', () => {
+    renderDetails({
+      enrollment: { ...enrollment, status: 'EXPIRED', invitationExpirationDate: '2026-10-01' },
+      isInvitationExpired: true,
+    } as Partial<React.ComponentProps<typeof ApplicationDetails>>);
+    expect(screen.queryByRole('button', { name: 'application_details.reinvite' })).not.toBeInTheDocument();
+  });
 });

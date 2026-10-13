@@ -35,7 +35,7 @@ import {
   UPDATE_SESSION_START_TIME,
   UPDATE_SESSION_TITLE,
 } from '../../../queries/course';
-import { LOCATION_ADDRESS_BY_LOCATION_OPTION } from '../../../queries/locationAddress';
+import { CREATE_LOCATION_ADDRESS, LOCATION_ADDRESS_BY_LOCATION_OPTION } from '../../../queries/locationAddress';
 import TableGrid from '../../common/TableGrid';
 import CheckboxSelector from '../../inputs/CheckboxSelector';
 import DropDownSelector from '../../inputs/DropDownSelector';
@@ -127,10 +127,13 @@ const ProgramSessionLocation: FC<{ address: ProgramSessions_Session_SessionAddre
             value={address.locationAddressId?.toString() ?? ''}
             options={addressOptions}
             updateValueMutation={UPDATE_SESSION_ADDRESS}
-            identifierVariables={{ itemId: address.id }}
-            refetchQueries={REFETCH}
+            // locationOption is for createOptionMutation: a typed address is stored as a new
+            // LocationAddress of this location and selected, as in the course sessions tab.
+            identifierVariables={{ itemId: address.id, locationOption }}
+            creatable
+            createOptionMutation={CREATE_LOCATION_ADDRESS}
+            refetchQueries={[...REFETCH, 'LocationAddressByLocationOption']}
             nullable
-            searchable
           />
         )}
       </div>

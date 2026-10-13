@@ -14,6 +14,12 @@ object_relationships:
   - name: AttendanceCertificateTemplate
     using:
       foreign_key_constraint_on: attendanceCertificateTemplateId
+  - name: InstructorInvoiceTemplate
+    using:
+      foreign_key_constraint_on: instructorInvoiceTemplateId
+  - name: InstructorCertificateTemplate
+    using:
+      foreign_key_constraint_on: instructorCertificateTemplateId
 array_relationships:
   - name: Courses
     using:
@@ -59,6 +65,8 @@ select_permissions:
         - applicationStart
         - organizationId
         - attendanceCertificateTemplateId
+        - instructorInvoiceTemplateId
+        - instructorCertificateTemplateId
         - attendanceCertificateTemplateURL
         - closingQuestionnaire
         - defaultApplicationEnd
@@ -88,6 +96,8 @@ select_permissions:
         - achievementRecordUploadDeadline
         - applicationStart
         - attendanceCertificateTemplateId
+        - instructorInvoiceTemplateId
+        - instructorCertificateTemplateId
         - attendanceCertificateTemplateURL
         - achievementCertificateTemplateURL
         - closingQuestionnaire
@@ -128,6 +138,8 @@ update_permissions:
         - achievementRecordUploadDeadline
         - applicationStart
         - attendanceCertificateTemplateId
+        - instructorInvoiceTemplateId
+        - instructorCertificateTemplateId
         - attendanceCertificateTemplateURL
         - achievementCertificateTemplateURL
         - closingQuestionnaire
@@ -235,6 +247,8 @@ insert_permissions:
         - achievementRecordUploadDeadline
         - applicationStart
         - attendanceCertificateTemplateId
+        - instructorInvoiceTemplateId
+        - instructorCertificateTemplateId
         - attendanceCertificateTemplateURL
         - achievementCertificateTemplateURL
         - closingQuestionnaire
