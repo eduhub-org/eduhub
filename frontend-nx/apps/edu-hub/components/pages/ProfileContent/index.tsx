@@ -9,6 +9,7 @@ import ImageUploader from '../../inputs/ImageUploader';
 
 import { useRoleQuery } from '../../../hooks/authedQuery';
 import { useRoleMutation } from '../../../hooks/authedMutation';
+import { useCurrentUserId } from '../../../hooks/authentication';
 
 import {
   UPDATE_USER_FIRST_NAME,
@@ -50,7 +51,10 @@ type NewsletterOrganizationOption = {
 const ProfileContent: FC = () => {
   const t = useTranslations('profile');
   const { locale } = useRouter();
-  const { data: sessionData, status: sessionStatus } = useSession();
+  const { status: sessionStatus } = useSession();
+  // While a super-admin views as someone, this is that person's id: queries are
+  // answered as them, so asking for the admin's own records returns nothing.
+  const userId = useCurrentUserId();
   const [showError, setShowError] = useState(true);
   const [newsletterSavingOrgId, setNewsletterSavingOrgId] = useState<number | null>(null);
   const [newsletterSaveError, setNewsletterSaveError] = useState<string | null>(null);
@@ -61,9 +65,9 @@ const ProfileContent: FC = () => {
     refetch: refetchUser,
   } = useRoleQuery<User, UserVariables>(USER, {
     variables: {
-      userId: sessionData?.profile?.sub,
+      userId,
     },
-    skip: !sessionData?.profile?.sub || (sessionStatus as string) === 'loading',
+    skip: !userId || (sessionStatus as string) === 'loading',
   });
 
   const queryOccupationOptions = useRoleQuery<UserOccupation>(USER_OCCUPATION, {
@@ -104,9 +108,9 @@ const ProfileContent: FC = () => {
     refetch: refetchNewsletterOptions,
   } = useRoleQuery(MY_ORGANIZATION_NEWSLETTER_OPTIONS, {
     variables: {
-      userId: sessionData?.profile?.sub,
+      userId,
     },
-    skip: !sessionData?.profile?.sub || (sessionStatus as string) === 'loading',
+    skip: !userId || (sessionStatus as string) === 'loading',
   });
 
   const newsletterOptions = useMemo<NewsletterOrganizationOption[]>(() => {
@@ -165,7 +169,7 @@ const ProfileContent: FC = () => {
       setNewsletterSavingOrgId(organizationId);
       await upsertOrganizationNewsletterSubscription({
         variables: {
-          userId: sessionData?.profile?.sub,
+          userId,
           organizationId,
           status: checked ? 'SUBSCRIBED' : 'UNSUBSCRIBED',
           source: 'PROFILE',
@@ -181,12 +185,13 @@ const ProfileContent: FC = () => {
   };
 
   // Render loading state
-  if (sessionStatus === 'loading') {
+  // Signed in but no id yet means a view-as target is still resolving.
+  if (sessionStatus === 'loading' || (sessionStatus === 'authenticated' && !userId)) {
     return <div>Loading...</div>;
   }
 
   // Render authentication error
-  if (!sessionData?.profile?.sub) {
+  if (!userId) {
     return <div>Not authenticated</div>;
   }
 
@@ -231,7 +236,7 @@ const ProfileContent: FC = () => {
         <ImageUploader
           variant="eduhub"
           element="profilePicture"
-          identifierVariables={{ userId: sessionData?.profile?.sub ?? '' }}
+          identifierVariables={{ userId: userId ?? '' }}
           currentFile={userData?.User_by_pk?.picture ?? null}
           updateFileMutation={UPDATE_USER_PROFILE_PICTURE}
           onFileUpdated={() => refetchUser()}
