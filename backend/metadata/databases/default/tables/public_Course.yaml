@@ -33,6 +33,10 @@ object_relationships:
   - name: Program
     using:
       foreign_key_constraint_on: programId
+  # Set on an event created from a course session (see Session.PublicEvent).
+  - name: SourceSession
+    using:
+      foreign_key_constraint_on: sourceSessionId
   - name: Weekday
     using:
       foreign_key_constraint_on: weekDay
@@ -158,6 +162,7 @@ select_permissions:
         - programId
         - projectProposalsEnabled
         - guestRegistrationEnabled
+        - sourceSessionId
         - projectSubmissionDeadline
         - published
         - registrationType
@@ -212,6 +217,7 @@ select_permissions:
         - programId
         - projectProposalsEnabled
         - guestRegistrationEnabled
+        - sourceSessionId
         - projectSubmissionDeadline
         - published
         - startTime
@@ -259,6 +265,7 @@ select_permissions:
         - programId
         - projectProposalsEnabled
         - guestRegistrationEnabled
+        - sourceSessionId
         - projectSubmissionDeadline
         - published
         - startTime
@@ -313,6 +320,7 @@ select_permissions:
         - programId
         - projectProposalsEnabled
         - guestRegistrationEnabled
+        - sourceSessionId
         - projectSubmissionDeadline
         - published
         - startTime
@@ -538,6 +546,7 @@ insert_permissions:
         - programId
         - projectProposalsEnabled
         - guestRegistrationEnabled
+        - sourceSessionId
         - projectSubmissionDeadline
         - published
         - startTime

@@ -9,6 +9,36 @@ import { Course_bool_exp, Course_order_by, Weekday_enum, CourseRegistrationType_
 // GraphQL query operation: AdminCourseList
 // ====================================================
 
+export interface AdminCourseList_Course_SourceSession_Course {
+  __typename: "Course";
+  id: number;
+  /**
+   * The title of the course (only editable by an admin user)
+   */
+  title: string;
+  /**
+   * Decides whether the course is published for all users or not.
+   */
+  published: boolean;
+}
+
+export interface AdminCourseList_Course_SourceSession {
+  __typename: "Session";
+  id: number;
+  /**
+   * The title of the session
+   */
+  title: string;
+  /**
+   * The day and time of the start of the session
+   */
+  startDateTime: any;
+  /**
+   * An object relationship
+   */
+  Course: AdminCourseList_Course_SourceSession_Course | null;
+}
+
 export interface AdminCourseList_Course_Sessions_SessionAddresses_CourseLocation {
   __typename: "CourseLocation";
   id: number;
@@ -520,6 +550,14 @@ export interface AdminCourseList_Course {
    * Whether visitors without an account may register for this course/event with just name and email. Only honoured for courses in a Program of type EVENTS with a direct registration type.
    */
   guestRegistrationEnabled: boolean;
+  /**
+   * Set on an event created from a course session; its session, locations and addresses are kept in sync with that session
+   */
+  sourceSessionId: number | null;
+  /**
+   * An object relationship
+   */
+  SourceSession: AdminCourseList_Course_SourceSession | null;
   /**
    * Full URL to the Formbricks survey for course enrollment/application (for iframe embedding). Overrides program default if set.
    */

@@ -194,4 +194,47 @@ describe('notifySessionParticipants', () => {
 
     expect(result).toEqual({ success: false, error: 'boom', messageKey: 'NOTIFY_SESSION_FAILED' });
   });
+
+  describe('when the session was opened as a public event', () => {
+    const eventSession = {
+      id: 70,
+      title: 'Kickoff',
+      courseId: 30,
+      startDateTime: '2026-10-01T10:00:00+00:00',
+      endDateTime: '2026-10-01T12:00:00+00:00',
+    };
+    const withPublicEvent = () => {
+      const data = session([]);
+      data.Session_by_pk.PublicEvent = { id: 30, Sessions: [eventSession] };
+      return data;
+    };
+
+    it("also mails the event's registrants about its session", async () => {
+      mockGraphqlRequest.mockResolvedValueOnce(withPublicEvent());
+
+      const result = await notifySessionParticipants(
+        buildRequest({ role: 'admin', userId: STRANGER_ID }),
+        mockLogger
+      );
+
+      expect(mockSendSessionRescheduledEmails).toHaveBeenCalledTimes(2);
+      expect(mockSendSessionRescheduledEmails.mock.calls[1][0].session).toEqual(eventSession);
+      expect(result).toEqual({ success: true, messageKey: 'SESSION_RESCHEDULED_QUEUED', queued: 4, total: 4 });
+    });
+
+    it('reports a failed event mailing', async () => {
+      mockGraphqlRequest.mockResolvedValueOnce(withPublicEvent());
+      const failure = { success: false, messageKey: 'SESSION_RESCHEDULED_QUEUE_FAILED', error: 'partial' };
+      mockSendSessionRescheduledEmails
+        .mockResolvedValueOnce({ success: true, messageKey: 'NO_RECIPIENTS', queued: 0, total: 0 })
+        .mockResolvedValueOnce(failure);
+
+      const result = await notifySessionParticipants(
+        buildRequest({ role: 'admin', userId: STRANGER_ID }),
+        mockLogger
+      );
+
+      expect(result).toEqual(failure);
+    });
+  });
 });

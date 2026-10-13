@@ -19,6 +19,8 @@ interface NotifyParticipantsPrompt {
   registerChange: (sessionId: number) => void;
   promptOpen: boolean;
   pendingCount: number;
+  /** People the pending mails reach: course participants plus the registrants of the sessions' public events. */
+  pendingRecipients: number;
   sending: boolean;
   confirm: () => Promise<void>;
   cancel: () => void;
@@ -30,12 +32,17 @@ interface NotifyParticipantsPrompt {
 
 /**
  * Collects the sessions whose timing changed and asks once, after a short
- * pause, whether the course's participants should be informed.
+ * pause, whether the course's participants should be informed. A session that
+ * was opened as a public event also has the event's registrants to inform
+ * (`eventRegistrantCount`), since its event follows the new time.
  *
  * Informing used to happen automatically via a Hasura event trigger on
  * Session; it now only happens when the editor confirms here.
  */
-const useNotifyParticipantsPrompt = (participantCount: number): NotifyParticipantsPrompt => {
+const useNotifyParticipantsPrompt = (
+  participantCount: number,
+  eventRegistrantCount: (sessionId: number) => number = () => 0
+): NotifyParticipantsPrompt => {
   const t = useTranslations('manageCourse');
 
   // A ref, not state: re-registering the same session while the prompt is
@@ -44,6 +51,7 @@ const useNotifyParticipantsPrompt = (participantCount: number): NotifyParticipan
 
   const [promptOpen, setPromptOpen] = useState(false);
   const [pendingCount, setPendingCount] = useState(0);
+  const [pendingRecipients, setPendingRecipients] = useState(0);
   const [sending, setSending] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [savedMessage, setSavedMessage] = useState<string | null>(null);
@@ -56,16 +64,19 @@ const useNotifyParticipantsPrompt = (participantCount: number): NotifyParticipan
   const openPrompt = useDebouncedCallback(() => {
     if (pendingSessionIds.current.size === 0) return;
     setPendingCount(pendingSessionIds.current.size);
+    setPendingRecipients(
+      [...pendingSessionIds.current].reduce((sum, id) => sum + eventRegistrantCount(id), participantCount)
+    );
     setPromptOpen(true);
   }, PROMPT_DELAY_MS);
 
   const registerChange = useCallback(
     (sessionId: number) => {
-      if (participantCount <= 0) return;
+      if (participantCount + eventRegistrantCount(sessionId) <= 0) return;
       pendingSessionIds.current.add(sessionId);
       openPrompt();
     },
-    [participantCount, openPrompt]
+    [participantCount, eventRegistrantCount, openPrompt]
   );
 
   const cancel = useCallback(() => {
@@ -117,6 +128,7 @@ const useNotifyParticipantsPrompt = (participantCount: number): NotifyParticipan
     registerChange,
     promptOpen,
     pendingCount,
+    pendingRecipients,
     sending,
     confirm,
     cancel,

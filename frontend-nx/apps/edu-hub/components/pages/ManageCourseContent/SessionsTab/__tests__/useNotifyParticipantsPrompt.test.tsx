@@ -38,6 +38,20 @@ describe('useNotifyParticipantsPrompt', () => {
     expect(result.current.promptOpen).toBe(false);
   });
 
+  it("asks for a session whose public event has registrants, counting them in", () => {
+    const eventRegistrants = (sessionId: number) => (sessionId === 1 ? 3 : 0);
+    const { result } = renderHook(() => useNotifyParticipantsPrompt(0, eventRegistrants));
+
+    act(() => result.current.registerChange(2));
+    settle();
+    expect(result.current.promptOpen).toBe(false);
+
+    act(() => result.current.registerChange(1));
+    settle();
+    expect(result.current.promptOpen).toBe(true);
+    expect(result.current.pendingRecipients).toBe(3);
+  });
+
   it('asks once for the two writes a single date change makes', () => {
     const { result } = renderHook(() => useNotifyParticipantsPrompt(5));
 
@@ -48,6 +62,7 @@ describe('useNotifyParticipantsPrompt', () => {
 
     expect(result.current.promptOpen).toBe(true);
     expect(result.current.pendingCount).toBe(1);
+    expect(result.current.pendingRecipients).toBe(5);
   });
 
   it('collects several sessions edited in one burst into one prompt', () => {

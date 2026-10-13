@@ -1001,7 +1001,9 @@
     "confirmed": "Confirmed",
     "unrated_rated_not_informed": "Unrated / Rated but not informed",
     "bulk_action_copy": "Copy to Program",
-    "Uniqueness violation_ duplicate key value violates unique constraint \"CourseAddress_pkey\"": "A location address with this configuration already exists for this course."
+    "Uniqueness violation_ duplicate key value violates unique constraint \"CourseAddress_pkey\"": "A location address with this configuration already exists for this course.",
+    "part_of_course": "This event is part of the course \"{course}\".",
+    "to_course": "Go to course"
   },
   "courseAdminPage": {
     "pageTitle": "Opencampus Course Instructor View",
@@ -1865,8 +1867,8 @@
     },
     "max_participants": {
       "label": "Maximum number of participants",
-      "placeholder": "Maximum number of participants",
-      "help_text": "After the maximum number of participants is reached, users can only join the waitlist."
+      "placeholder": "Unlimited",
+      "help_text": "Leave empty for no limit. After the maximum number of participants is reached, users can only join the waitlist. From 80% capacity, the course page shows the number of participants (unless it shows the available places instead)."
     },
     "formbricks": {
       "title": "Enrollment Questionnaire",
@@ -2023,7 +2025,34 @@
         "cancel": "Don't inform",
         "sent": "The participants have been informed.",
         "failed": "The participants could not be informed."
-      }
+      },
+      "public_event": {
+        "label": "Public event",
+        "description": "Open this session to everyone: this creates a draft event that you can review and then publish. Anyone can register for it, without applying to the course.",
+        "no_events_program": "This organization has no events program yet. Ask a platform admin to create one before opening sessions to the public.",
+        "create": "Create event",
+        "creating": "Creating …",
+        "create_failed": "The event could not be created.",
+        "open_event": "Edit event",
+        "view_page": "View page",
+        "registrations": "{count, plural, =0 {No registrations yet} one {# registration} other {# registrations}}",
+        "status": {
+          "published": "Published",
+          "draft": "Draft"
+        },
+        "prefill": {
+          "tagline": "Open session of the course \"{course}\" – join even if you are not taking the course.",
+          "about_session": "What this session is about",
+          "about_course": "About the course \"{course}\""
+        },
+        "program_dialog": {
+          "title": "Choose an events program",
+          "description": "Which events program should the event appear in?",
+          "button": "Create draft"
+        }
+      },
+      "synced_session": "From the course",
+      "synced_session_locked": "Date, title, description, location and external speakers come from the session in the course and are changed there."
     },
     "location": {
       "label": "Location",
@@ -2210,6 +2239,18 @@
         "UNEXPECTED_ERROR": "The invoice could not be created. Please try again later."
       },
       "download_certificate": "Download my instructor certificate"
+    },
+    "public_event_notice": {
+      "origin": "This event was created from the session \"{session}\" on {date} of the course \"{course}\".",
+      "untitled_session": "untitled",
+      "synced": "Date, time, location, external speakers and the agenda item's title and description come from the session and follow any change made in the course – so change them there. The event's title, texts, image and registration settings are edited right here.",
+      "to_course": "Go to course",
+      "draft": "Draft: check the description, image and registration settings and preview the page. The event only appears in the events list once it is published.",
+      "published": "The event is published and appears in the events list.",
+      "preview_page": "Preview page",
+      "view_page": "View page",
+      "publish": "Publish",
+      "unpublish": "Unpublish"
     }
   },
   "manageProjects": {
