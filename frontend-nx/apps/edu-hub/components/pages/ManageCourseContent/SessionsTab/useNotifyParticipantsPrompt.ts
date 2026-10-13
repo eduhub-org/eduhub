@@ -48,6 +48,9 @@ const useNotifyParticipantsPrompt = (
   // A ref, not state: re-registering the same session while the prompt is
   // pending must not re-render or queue a second mail.
   const pendingSessionIds = useRef<Set<number>>(new Set());
+  // Sessions whose course participants were mailed while their public event's
+  // registrants were not: a retry mails only the event.
+  const courseSentSessionIds = useRef<Set<number>>(new Set());
 
   const [promptOpen, setPromptOpen] = useState(false);
   const [pendingCount, setPendingCount] = useState(0);
@@ -74,6 +77,8 @@ const useNotifyParticipantsPrompt = (
     (sessionId: number) => {
       if (participantCount + eventRegistrantCount(sessionId) <= 0) return;
       pendingSessionIds.current.add(sessionId);
+      // A new change is news to the course participants as well.
+      courseSentSessionIds.current.delete(sessionId);
       openPrompt();
     },
     [participantCount, eventRegistrantCount, openPrompt]
@@ -81,6 +86,7 @@ const useNotifyParticipantsPrompt = (
 
   const cancel = useCallback(() => {
     pendingSessionIds.current.clear();
+    courseSentSessionIds.current.clear();
     setPendingCount(0);
     setPromptOpen(false);
   }, []);
@@ -94,14 +100,17 @@ const useNotifyParticipantsPrompt = (
     try {
       for (const sessionId of sessionIds) {
         try {
-          const { data } = await notifySessionParticipants({ variables: { sessionId } });
+          const skipCourse = courseSentSessionIds.current.has(sessionId);
+          const { data } = await notifySessionParticipants({ variables: { sessionId, skipCourse } });
           const result = data?.notifySessionParticipants;
           if (result?.success) {
             // Drop only what demonstrably went out, so retrying the rest
             // cannot mail an already-notified session a second time.
             pendingSessionIds.current.delete(sessionId);
+            courseSentSessionIds.current.delete(sessionId);
             notified += 1;
           } else {
+            if (result?.courseSent) courseSentSessionIds.current.add(sessionId);
             failure = result?.error || t('SessionsTab.notify_participants.failed');
           }
         } catch (error) {

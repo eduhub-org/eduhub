@@ -24,7 +24,7 @@ Migrations `1791600000005_alter_table_public_Course_add_sourceSessionId` and
 | Trigger | Effect |
 |---|---|
 | `check_Course_sourceSessionId` (before insert/update) | Source must be a course session of the same organization; the event must be in an `EVENTS` program; no chains (an event's session cannot be a source). A new event gets `registrationType = DIRECT_CONFIRMATION`. |
-| `init_Course_from_sourceSession` (after insert) | Copies the session (title, description, times), its locations and addresses, and its speakers into the event. |
+| `init_Course_from_sourceSession` (after insert, or update of `sourceSessionId`) | Copies the session (title, description, times), its locations and addresses, and its speakers into the event. |
 | `sync_SessionSpeaker_to_public_event` | Adding or removing a speaker on the source session does the same on the event. Only the difference is applied, so speakers who stay are not mailed again. |
 | `sync_Session_to_public_event` | Later changes to the source session's title, description or times are mirrored into the event's session. |
 | `sync_SessionAddress_to_public_event` | Address changes on the source session rebuild the event's locations and addresses. |

@@ -521,7 +521,7 @@ export interface Course_Course_by_pk {
    */
   programId: number;
   /**
-   * The number of maximum participants in the course.
+   * Participant limit; NULL means no limit (0 or less is stored as NULL)
    */
   maxParticipants: number | null;
   /**

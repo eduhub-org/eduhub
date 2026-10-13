@@ -76,6 +76,7 @@ describe('notifySessionParticipants', () => {
       messageKey: 'SESSION_RESCHEDULED_QUEUED',
       queued: 2,
       total: 2,
+      courseSent: true,
     });
     expect(mockSendSessionRescheduledEmails).toHaveBeenCalledTimes(1);
     expect(mockSendSessionRescheduledEmails.mock.calls[0][0].session.id).toBe(7);
@@ -219,7 +220,7 @@ describe('notifySessionParticipants', () => {
 
       expect(mockSendSessionRescheduledEmails).toHaveBeenCalledTimes(2);
       expect(mockSendSessionRescheduledEmails.mock.calls[1][0].session).toEqual(eventSession);
-      expect(result).toEqual({ success: true, messageKey: 'SESSION_RESCHEDULED_QUEUED', queued: 4, total: 4 });
+      expect(result).toEqual({ success: true, messageKey: 'SESSION_RESCHEDULED_QUEUED', queued: 4, total: 4, courseSent: true });
     });
 
     it('reports a failed event mailing', async () => {
@@ -234,7 +235,32 @@ describe('notifySessionParticipants', () => {
         mockLogger
       );
 
-      expect(result).toEqual(failure);
+      expect(result).toEqual({ ...failure, courseSent: true });
+    });
+
+    it('mails only the event on a retry that skips the course', async () => {
+      mockGraphqlRequest.mockResolvedValueOnce(withPublicEvent());
+      const request = buildRequest({ role: 'admin', userId: STRANGER_ID });
+      request.body.input.skipCourse = true;
+
+      const result = await notifySessionParticipants(request, mockLogger);
+
+      expect(mockSendSessionRescheduledEmails).toHaveBeenCalledTimes(1);
+      expect(mockSendSessionRescheduledEmails.mock.calls[0][0].session).toEqual(eventSession);
+      expect(result).toEqual({ success: true, messageKey: 'SESSION_RESCHEDULED_QUEUED', queued: 2, total: 2, courseSent: true });
+    });
+
+    it('reports a failed course mailing as not sent', async () => {
+      mockGraphqlRequest.mockResolvedValueOnce(withPublicEvent());
+      mockSendSessionRescheduledEmails.mockResolvedValueOnce({ success: false, messageKey: 'X', error: 'boom' });
+
+      const result = await notifySessionParticipants(
+        buildRequest({ role: 'admin', userId: STRANGER_ID }),
+        mockLogger
+      );
+
+      expect(result.courseSent).toBe(false);
+      expect(result.success).toBe(false);
     });
   });
 });

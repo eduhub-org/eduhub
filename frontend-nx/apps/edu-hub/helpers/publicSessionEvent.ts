@@ -1,3 +1,5 @@
+import { formatInTimeZone } from 'date-fns-tz';
+
 import { Course_insert_input } from '../__generated__/globalTypes';
 
 /** Matches the limit of the description fields in the course editor. */
@@ -33,12 +35,11 @@ const joinParagraphs = (...parts: (string | null | undefined)[]) =>
     .filter(Boolean)
     .join('\n\n');
 
-/** The session's calendar day in local time, as the `date` column expects. */
-const localDate = (value: Date | string) => {
-  const date = new Date(value);
-  const pad = (n: number) => String(n).padStart(2, '0');
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
-};
+/**
+ * The session's calendar day in the app's time zone, as the `date` column
+ * expects - not the admin's browser day, which can differ near midnight.
+ */
+const sessionDay = (value: Date | string, timeZone: string) => formatInTimeZone(new Date(value), timeZone, 'yyyy-MM-dd');
 
 /**
  * The unpublished event created from a course session: the session describes
@@ -53,7 +54,8 @@ export const buildEventFromSession = (
   course: PublicEventSourceCourse,
   session: PublicEventSourceSession,
   programId: number,
-  texts: PublicEventTexts
+  texts: PublicEventTexts,
+  timeZone: string
 ): Course_insert_input => ({
   programId,
   sourceSessionId: session.id,
@@ -62,7 +64,7 @@ export const buildEventFromSession = (
   tagline: texts.tagline.slice(0, TAGLINE_MAX_LENGTH),
   coverImage: course.coverImage,
   language: course.language,
-  applicationEnd: localDate(session.startDateTime),
+  applicationEnd: sessionDay(session.startDateTime, timeZone),
   maxMissedSessions: 0,
   headingDescriptionField1: session.description?.trim() ? texts.aboutSessionHeading : null,
   contentDescriptionField1: session.description?.trim().slice(0, DESCRIPTION_MAX_LENGTH) || null,

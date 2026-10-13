@@ -52,6 +52,22 @@ describe('useNotifyParticipantsPrompt', () => {
     expect(result.current.pendingRecipients).toBe(3);
   });
 
+  it("retries only the event's mailing once the course's went out", async () => {
+    const { result } = renderHook(() => useNotifyParticipantsPrompt(5));
+    notifyMutation.mockResolvedValueOnce({
+      data: { notifySessionParticipants: { success: false, courseSent: true, error: 'event failed' } },
+    });
+
+    act(() => result.current.registerChange(1));
+    settle();
+    await act(async () => { await result.current.confirm(); });
+    expect(result.current.promptOpen).toBe(true);
+
+    await act(async () => { await result.current.confirm(); });
+    expect(notifyMutation).toHaveBeenLastCalledWith({ variables: { sessionId: 1, skipCourse: true } });
+    await waitFor(() => expect(result.current.promptOpen).toBe(false));
+  });
+
   it('asks once for the two writes a single date change makes', () => {
     const { result } = renderHook(() => useNotifyParticipantsPrompt(5));
 
@@ -86,8 +102,8 @@ describe('useNotifyParticipantsPrompt', () => {
     await act(async () => { await result.current.confirm(); });
 
     expect(notifyMutation).toHaveBeenCalledTimes(2);
-    expect(notifyMutation).toHaveBeenCalledWith({ variables: { sessionId: 1 } });
-    expect(notifyMutation).toHaveBeenCalledWith({ variables: { sessionId: 2 } });
+    expect(notifyMutation).toHaveBeenCalledWith({ variables: { sessionId: 1, skipCourse: false } });
+    expect(notifyMutation).toHaveBeenCalledWith({ variables: { sessionId: 2, skipCourse: false } });
     await waitFor(() => expect(result.current.promptOpen).toBe(false));
     expect(result.current.savedMessage).toBe('SessionsTab.notify_participants.sent');
   });
@@ -151,7 +167,7 @@ describe('useNotifyParticipantsPrompt', () => {
     await act(async () => { await result.current.confirm(); });
 
     expect(notifyMutation).toHaveBeenCalledTimes(1);
-    expect(notifyMutation).toHaveBeenCalledWith({ variables: { sessionId: 2 } });
+    expect(notifyMutation).toHaveBeenCalledWith({ variables: { sessionId: 2, skipCourse: false } });
     await waitFor(() => expect(result.current.promptOpen).toBe(false));
   });
 

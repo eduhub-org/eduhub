@@ -8,6 +8,7 @@ import { useManageMutation } from '../../../../hooks/authedMutation';
 import { useManageQuery } from '../../../../hooks/authedQuery';
 import { useIsAdmin } from '../../../../hooks/authentication';
 import { useOrgAdminCapabilities } from '../../../../hooks/orgAdminCapabilities';
+import { useAppSettings } from '../../../../contexts/AppSettingsContext';
 import { buildEventFromSession } from '../../../../helpers/publicSessionEvent';
 import { PROGRAMS_WITH_MINIMUM_PROPERTIES } from '../../../../queries/programList';
 import { CREATE_EVENT_FROM_SESSION } from '../../../../queries/publicSessionEvent';
@@ -42,6 +43,7 @@ const PublicEventSection: FC<Props> = ({ course, session }) => {
   const router = useRouter();
   const isAdmin = useIsAdmin();
   const { canManageEvents } = useOrgAdminCapabilities();
+  const { timeZone } = useAppSettings();
   // Hasura and the database still check that the admin may manage events of
   // this course's organization; this only decides whether to offer it.
   const canCreate = (isAdmin || canManageEvents) && course.Program?.type !== ProgramType.EVENTS;
@@ -72,7 +74,7 @@ const PublicEventSection: FC<Props> = ({ course, session }) => {
               tagline: t('prefill.tagline', { course: course.title }),
               aboutSessionHeading: t('prefill.about_session'),
               aboutCourseHeading: t('prefill.about_course', { course: course.title }),
-            }),
+            }, timeZone),
           },
         });
         const eventId = data?.insert_Course_one?.id;
@@ -82,7 +84,7 @@ const PublicEventSection: FC<Props> = ({ course, session }) => {
         setErrorMessage(error instanceof Error ? error.message : t('create_failed'));
       }
     },
-    [createEvent, course, session, t, router]
+    [createEvent, course, session, t, router, timeZone]
   );
 
   const handleCreateClick = useCallback(() => {
