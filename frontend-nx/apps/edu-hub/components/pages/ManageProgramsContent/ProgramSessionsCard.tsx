@@ -127,6 +127,8 @@ const ProgramSessionLocation: FC<{ address: ProgramSessions_Session_SessionAddre
             value={address.locationAddressId?.toString() ?? ''}
             options={addressOptions}
             updateValueMutation={UPDATE_SESSION_ADDRESS}
+            // locationOption is for createOptionMutation: a typed address is stored as a new
+            // LocationAddress of this location and selected, as in the course sessions tab.
             identifierVariables={{ itemId: address.id, locationOption }}
             creatable
             createOptionMutation={CREATE_LOCATION_ADDRESS}
