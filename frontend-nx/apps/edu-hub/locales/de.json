@@ -1518,6 +1518,9 @@
       "send_invitations_all_count_singular": "{count} Person mit grüner Bewertung wurde identifiziert und wird über ihre Einladung informiert.",
       "send_invitations_all_count_plural": "{count} Personen mit grüner Bewertung wurden identifiziert und werden über ihre Einladung informiert.",
       "send_invitations_confirm": "Einladungen senden",
+      "renew_invitation_dialog_title": "Einladung erneuern",
+      "renew_invitation_text": "{name} bekommt eine neue Einladung und kann die Teilnahme bis zum unten gewählten Datum bestätigen.",
+      "renew_invitation_confirm": "Einladung senden",
       "send_rejections": "Ablehnungen senden",
       "send_rejections_selected": "Ablehnungen an Ausgewählte senden",
       "send_rejections_all": "Ablehnungen an alle mit roter Bewertung senden",
@@ -1530,7 +1533,7 @@
       "send_invitations_error": "Fehler beim Senden der Einladungen: {error}",
       "cancel_registrations_error": "Die Registrierungen konnten nicht storniert werden: {error}",
       "send_rejections_error": "Fehler beim Senden der Ablehnungen: {error}",
-      "no_eligible_invitations": "Gerade gibt es niemanden mit grüner Bewertung und Status „beworben“ oder „eingeladen“, den du einladen könntest.",
+      "no_eligible_invitations": "Gerade gibt es niemanden mit grüner Bewertung, der noch nicht eingeladen wurde.",
       "manage_registrations": "Registrierungen verwalten",
       "cancel_registrations_selected": "Ausgewählte Registrierungen stornieren",
       "cancel_registrations_question": "Möchtest du {count, plural, one {die ausgewählte Registrierung} other {die # ausgewählten Registrierungen}} stornieren? Die Teilnehmenden werden per E-Mail informiert. Eine Erstattung veranlasst du bei Bedarf in Stripe.",
@@ -1856,6 +1859,8 @@
       "read_less": "Weniger anzeigen",
       "next_application": "Nächste Bewerbung",
       "next_registration": "Nächste Anmeldung",
+      "reinvite": "Erneut einladen mit neuer Frist",
+      "extend_invitation": "Frist verlängern",
       "keyboard_hint": "Tasten 1–3 und 0 bewerten die aufgeklappte Bewerbung, J / K springt zur nächsten / vorigen."
     },
     "max_participants": {

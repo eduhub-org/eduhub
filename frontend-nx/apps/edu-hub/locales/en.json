@@ -1536,6 +1536,9 @@
       "send_invitations_all_count_singular": "{count} person with green rating was identified and will be notified of their invitation.",
       "send_invitations_all_count_plural": "{count} persons with green rating were identified and will be notified of their invitation.",
       "send_invitations_confirm": "Send Invitations",
+      "renew_invitation_dialog_title": "Renew Invitation",
+      "renew_invitation_text": "{name} will receive a new invitation and can confirm their participation until the date below.",
+      "renew_invitation_confirm": "Send Invitation",
       "send_rejections": "Send Rejections",
       "send_rejections_selected": "Send Rejections to Selected",
       "send_rejections_all": "Send Rejections to all with Red Rating",
@@ -1548,7 +1551,7 @@
       "send_invitations_error": "Failed to send invitations: {error}",
       "cancel_registrations_error": "The registrations could not be cancelled: {error}",
       "send_rejections_error": "Failed to send rejections: {error}",
-      "no_eligible_invitations": "No applicants are eligible for an invitation right now (green rating with applied or invited status).",
+      "no_eligible_invitations": "There is nobody with a green rating who has not been invited yet.",
       "manage_registrations": "Manage registrations",
       "cancel_registrations_selected": "Cancel selected registrations",
       "cancel_registrations_question": "Do you want to cancel {count, plural, one {the selected registration} other {the # selected registrations}}? The participants will be informed by email. Issue any refund in Stripe.",
@@ -1874,6 +1877,8 @@
       "read_less": "Show less",
       "next_application": "Next application",
       "next_registration": "Next registration",
+      "reinvite": "Invite again with a new deadline",
+      "extend_invitation": "Extend deadline",
       "keyboard_hint": "Keys 1–3 and 0 rate the open application, J / K jump to the next / previous one."
     },
     "max_participants": {

@@ -284,7 +284,8 @@ export const UPDATE_ENROLLMENT_STATUS_FOR_INVITE = gql`
       where: {
         _and: [
           { id: { _in: $enrollmentIds } }
-          { status: { _in: [APPLIED, INVITED, WAITLIST] } }
+          # EXPIRED: a lapsed invitation is renewed with a new deadline.
+          { status: { _in: [APPLIED, INVITED, WAITLIST, EXPIRED] } }
         ]
       }
       _set: { status: $status, invitationExpirationDate: $expire }
