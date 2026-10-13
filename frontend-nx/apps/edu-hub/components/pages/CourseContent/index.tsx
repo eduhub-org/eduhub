@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { FC, useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { CircularProgress } from '@mui/material';
@@ -293,6 +294,15 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                 <div className={BODY_GRID}>
                   <div className="flex min-w-0 flex-col text-white lg:col-start-1 lg:row-start-1">
                     <span className="text-xl sm:text-2xl leading-snug">{course.tagline}</span>
+                    {/* An event opened from a session of a course points back to that course. */}
+                    {course.SourceSession?.Course?.published && (
+                      <span className="mt-3 text-sm sm:text-base">
+                        {tCoursePage('part_of_course', { course: course.SourceSession.Course.title })}{' '}
+                        <Link href={`/course/${course.SourceSession.Course.id}`} className="underline font-semibold">
+                          {tCoursePage('to_course')}
+                        </Link>
+                      </span>
+                    )}
                   </div>
 
                   <div className={RAIL_STICKY}>
@@ -316,6 +326,7 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                         courseLocations={course.CourseLocations}
                         isLoggedInParticipant={isLoggedInParticipant}
                         isEvent={isEventCourse}
+                        hideSessionDescriptions={course.sourceSessionId != null}
                       />
                     ) : (
                       <CurrentDegreeCourses degreeCourses={course.DegreeCourses} />

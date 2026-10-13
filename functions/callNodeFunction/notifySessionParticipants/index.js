@@ -22,13 +22,49 @@ const GET_SESSION_FOR_NOTIFICATION = `
           courseId
         }
       }
+      PublicEvent {
+        id
+        Sessions(order_by: { startDateTime: asc }, limit: 1) {
+          id
+          title
+          courseId
+          startDateTime
+          endDateTime
+        }
+      }
     }
   }
 `;
 
+const SKIPPED = { success: true, messageKey: 'NO_RECIPIENTS', queued: 0, total: 0 };
+
+/**
+ * One result for the editor out of the course's and the public event's
+ * mailing: it only counts as sent when both went out. `courseSent` tells the
+ * caller whether the course mailing is done, so a retry after a failed event
+ * mailing can skip it instead of mailing the course participants twice.
+ */
+const combineResults = (courseResult, eventResult) => {
+  if (!courseResult?.success) return { ...courseResult, courseSent: false };
+  if (!eventResult?.success) return { ...eventResult, courseSent: true };
+  const queued = (courseResult.queued ?? 0) + (eventResult.queued ?? 0);
+  const total = (courseResult.total ?? 0) + (eventResult.total ?? 0);
+  return {
+    success: true,
+    messageKey: total === 0 ? 'NO_RECIPIENTS' : 'SESSION_RESCHEDULED_QUEUED',
+    queued,
+    total,
+    courseSent: true,
+  };
+};
+
 /**
  * Mails the active (CONFIRMED/REGISTERED) participants of a session's course
- * that the session was rescheduled.
+ * that the session was rescheduled. When the session was opened to the public
+ * as an event, the event's registrants are mailed too: the event's session
+ * already carries the new time (a database trigger mirrors it), and their mail
+ * links to the event page. A retry passes `skipCourse` when the course mailing
+ * already went out, so only the event's registrants are mailed again.
  *
  * This replaces the former `send_session_rescheduled_email` event trigger: the
  * Sessions tab now asks the editor whether participants should be informed and
@@ -101,7 +137,13 @@ export default async function notifySessionParticipants(req, logger) {
       };
     }
 
-    return await sendSessionRescheduledEmails({ session, client, logger });
+    const skipCourse = req.body?.input?.skipCourse === true;
+    const courseResult = skipCourse ? SKIPPED : await sendSessionRescheduledEmails({ session, client, logger });
+    const eventSession = session.PublicEvent?.Sessions?.[0];
+    const eventResult = eventSession
+      ? await sendSessionRescheduledEmails({ session: eventSession, client, logger })
+      : SKIPPED;
+    return combineResults(courseResult, eventResult);
   } catch (error) {
     logger.error(`Error notifying session participants: ${error.message}`, { error });
     return { success: false, error: error.message, messageKey: 'NOTIFY_SESSION_FAILED' };

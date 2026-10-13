@@ -29,6 +29,12 @@ interface SessionsProps {
   isLoggedInParticipant: boolean;
   /** Events publish an agenda: grouped by day, always expanded, no "Termine" heading. */
   isEvent?: boolean;
+  /**
+   * Leaves out the description of the course's own sessions. An event created
+   * from a course session already shows that description in its first info
+   * block, so the agenda would repeat it word for word.
+   */
+  hideSessionDescriptions?: boolean;
 }
 
 interface SessionLocationsProps {
@@ -137,9 +143,18 @@ interface SessionRowProps {
   canSeeOnlineLink: boolean;
   programTitle?: string | null;
   isEvent: boolean;
+  hideDescription: boolean;
 }
 
-const SessionRow: FC<SessionRowProps> = ({ session, locations, showDate, canSeeOnlineLink, programTitle, isEvent }) => {
+const SessionRow: FC<SessionRowProps> = ({
+  session,
+  locations,
+  showDate,
+  canSeeOnlineLink,
+  programTitle,
+  isEvent,
+  hideDescription,
+}) => {
   const t = useTranslations('course');
   const displayDate = useDisplayDate();
   const formatTimeString = useFormatTimeString();
@@ -181,7 +196,7 @@ const SessionRow: FC<SessionRowProps> = ({ session, locations, showDate, canSeeO
             <SessionLocations locations={locations} canSeeOnlineLink={canSeeOnlineLink} />
           </div>
         )}
-        {description ? (
+        {description && !hideDescription ? (
           <p className="mt-1 text-sm text-label-secondary whitespace-pre-line break-words">{description}</p>
         ) : null}
         <div className="flex flex-col">
@@ -208,6 +223,7 @@ export const Sessions: FC<SessionsProps> = ({
   courseLocations,
   isLoggedInParticipant,
   isEvent = false,
+  hideSessionDescriptions = false,
 }) => {
   const t = useTranslations('course');
   const locale = useLocale();
@@ -310,6 +326,7 @@ export const Sessions: FC<SessionsProps> = ({
                     canSeeOnlineLink={canSeeOnlineLink}
                     programTitle={programTitle}
                     isEvent={isEvent}
+                    hideDescription={hideSessionDescriptions && !isProgramSession(session)}
                   />
                 ))}
               </ul>
@@ -334,6 +351,7 @@ export const Sessions: FC<SessionsProps> = ({
             canSeeOnlineLink={canSeeOnlineLink}
             programTitle={programTitle}
             isEvent={isEvent}
+            hideDescription={hideSessionDescriptions && !isProgramSession(session)}
           />
         ))}
       </ul>

@@ -985,7 +985,9 @@
     "accepted_applications": "Bewerbungen (angenommen):",
     "total_invitations": "Einladungen (gesamt):",
     "confirmed_invitations": "Einladungen (bestätigt):",
-    "Uniqueness violation_ duplicate key value violates unique constraint \"CourseAddress_pkey\"": "Eine Standortadresse mit dieser Konfiguration existiert bereits für diesen Kurs."
+    "Uniqueness violation_ duplicate key value violates unique constraint \"CourseAddress_pkey\"": "Eine Standortadresse mit dieser Konfiguration existiert bereits für diesen Kurs.",
+    "part_of_course": "Diese Veranstaltung ist Teil des Kurses „{course}“.",
+    "to_course": "Zum Kurs"
   },
   "courseAdminPage": {
     "pageTitle": "Opencampus Kurse Kursleiter Sicht",
@@ -1847,8 +1849,8 @@
     },
     "max_participants": {
       "label": "Max. Teilnehmendenanzahl",
-      "placeholder": "Max. Teilnehmendenanzahl",
-      "help_text": "Sobald die maximale Teilnehmendenanzahl erreicht ist, können sich Nutzer nur noch auf die Warteliste setzen."
+      "placeholder": "Unbegrenzt",
+      "help_text": "Lass das Feld leer, wenn es keine Begrenzung gibt. Sobald die maximale Teilnehmendenanzahl erreicht ist, können sich Nutzer nur noch auf die Warteliste setzen. Ab 80 % Auslastung zeigt die Kursseite die Zahl der Teilnehmenden an (außer wenn stattdessen die freien Plätze angezeigt werden)."
     },
     "formbricks": {
       "title": "Fragebogen URL",
@@ -2005,7 +2007,34 @@
         "cancel": "Nicht informieren",
         "sent": "Die Teilnehmenden wurden informiert.",
         "failed": "Die Teilnehmenden konnten nicht informiert werden."
-      }
+      },
+      "public_event": {
+        "label": "Öffentliche Veranstaltung",
+        "description": "Öffne diese Session für alle: Es entsteht ein Entwurf in den Veranstaltungen, den Du prüfen und dann veröffentlichen kannst. Anmelden kann sich dort jede Person, auch ohne Bewerbung für den Kurs.",
+        "no_events_program": "Für diese Organisation gibt es noch kein Veranstaltungsprogramm. Bitte das Plattform-Team, eins anzulegen, damit Du Sessions öffentlich machen kannst.",
+        "create": "Als Veranstaltung anlegen",
+        "creating": "Wird angelegt …",
+        "create_failed": "Die Veranstaltung konnte nicht angelegt werden.",
+        "open_event": "Veranstaltung bearbeiten",
+        "view_page": "Seite ansehen",
+        "registrations": "{count, plural, =0 {Noch keine Anmeldungen} one {# Anmeldung} other {# Anmeldungen}}",
+        "status": {
+          "published": "Veröffentlicht",
+          "draft": "Entwurf"
+        },
+        "prefill": {
+          "tagline": "Offene Session aus dem Kurs „{course}“ – Du kannst teilnehmen, auch wenn Du nicht im Kurs bist.",
+          "about_session": "Worum es in dieser Session geht",
+          "about_course": "Über den Kurs „{course}“"
+        },
+        "program_dialog": {
+          "title": "Veranstaltungsprogramm wählen",
+          "description": "In welchem Veranstaltungsprogramm soll die Veranstaltung erscheinen?",
+          "button": "Entwurf anlegen"
+        }
+      },
+      "synced_session": "Aus dem Kurs",
+      "synced_session_locked": "Datum, Titel, Beschreibung, Ort und externe Referenten kommen aus der Session im Kurs und werden dort geändert."
     },
     "location": {
       "label": "Veranstaltungsort",
@@ -2195,6 +2224,18 @@
         "UNEXPECTED_ERROR": "Die Rechnung konnte nicht erstellt werden. Bitte versuche es später erneut."
       },
       "download_certificate": "Mein Zertifikat als Kursleitung herunterladen"
+    },
+    "public_event_notice": {
+      "origin": "Diese Veranstaltung wurde aus der Session „{session}“ vom {date} des Kurses „{course}“ erstellt.",
+      "untitled_session": "ohne Titel",
+      "synced": "Datum, Uhrzeit, Ort, externe Referenten sowie Titel und Beschreibung des Programmpunkts kommen aus der Session und werden bei Änderungen im Kurs automatisch übernommen – ändere sie deshalb dort. Titel, Texte, Bild und Anmeldung der Veranstaltung bearbeitest Du direkt hier.",
+      "to_course": "Zum Kurs",
+      "draft": "Entwurf: Prüfe Beschreibung, Bild und Anmeldeeinstellungen und sieh Dir die Seite in der Vorschau an. Erst nach dem Veröffentlichen erscheint die Veranstaltung in der Veranstaltungsliste.",
+      "published": "Die Veranstaltung ist veröffentlicht und erscheint in der Veranstaltungsliste.",
+      "preview_page": "Vorschau der Seite",
+      "view_page": "Seite ansehen",
+      "publish": "Veröffentlichen",
+      "unpublish": "Veröffentlichung zurückziehen"
     }
   },
   "manageProjects": {

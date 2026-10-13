@@ -377,7 +377,8 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
               variant="eduhub"
               type="number"
               label={t('max_participants.label')}
-              value={course.maxParticipants?.toString() || '0'}
+              // No value means no limit, so an unset limit is shown empty rather than as 0.
+              value={course.maxParticipants?.toString() ?? ''}
               itemId={course.id}
               updateValueMutation={UPDATE_COURSE_MAX_PARTICIPANTS}
               refetchQueries={['ManagedCourse']}

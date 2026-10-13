@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { LocationOption_enum, CourseRegistrationType_enum } from "./../../__generated__/globalTypes";
+import { CourseRegistrationType_enum, LocationOption_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: EventsCalendarFeed
@@ -79,6 +79,9 @@ export interface EventsCalendarFeed_Course_Sessions {
    * The day and time of the end of the session
    */
   endDateTime: any;
+  /**
+   * Set for program-wide sessions (courseId is then NULL); shown in every course of the program
+   */
   programId: number | null;
   /**
    * An array relationship
