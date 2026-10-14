@@ -3,11 +3,16 @@
 #####
 
 resource "google_sql_database_instance" "default" {
+  # Changing the major version upgrades the instance in place (expect `~` in
+  # the plan, never `+/-`). Cloud SQL takes a backup before and after.
   name             = "default-dbi"
-  database_version = "POSTGRES_13"
+  database_version = "POSTGRES_17"
   #region           = var.region
   depends_on = [google_service_networking_connection.private]
   settings {
+    # Pinned: Cloud SQL defaults PostgreSQL 16+ to Enterprise Plus, which
+    # does not offer shared-core tiers such as db-f1-micro.
+    edition           = "ENTERPRISE"
     tier              = var.dbi_tier
     availability_type = var.dbi_availability
     database_flags {

@@ -239,7 +239,7 @@ services:
 
   db_hasura:
     container_name: eduhub-db_hasura
-    image: postgres:12
+    image: postgres:17
     environment:
       POSTGRES_PASSWORD: postgrespassword
     volumes:
