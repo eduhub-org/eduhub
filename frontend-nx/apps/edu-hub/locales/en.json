@@ -240,6 +240,7 @@
       "invalid_minimum_maximum_integer": "The value must be at least {min} and at most {max}",
       "invalid_integer_format": "The value must be an integer",
       "invalid_decimal_format": "The value must be a number (decimals allowed, e.g. 12.5)",
+      "invalid_currency_format": "Please enter a valid amount (e.g. 250 or 250.50).",
       "invalid_input": "Invalid input",
       "transform_rejected": "This value could not be saved in the expected format.",
       "save_failed": "Saving failed."
@@ -1001,7 +1002,9 @@
     "confirmed": "Confirmed",
     "unrated_rated_not_informed": "Unrated / Rated but not informed",
     "bulk_action_copy": "Copy to Program",
-    "Uniqueness violation_ duplicate key value violates unique constraint \"CourseAddress_pkey\"": "A location address with this configuration already exists for this course."
+    "Uniqueness violation_ duplicate key value violates unique constraint \"CourseAddress_pkey\"": "A location address with this configuration already exists for this course.",
+    "part_of_course": "This event is part of the course \"{course}\".",
+    "to_course": "Go to course"
   },
   "courseAdminPage": {
     "pageTitle": "Opencampus Course Instructor View",
@@ -1451,12 +1454,14 @@
     "instructor_payment": {
       "total_label": "Instructor fee (total)",
       "total_help": "One amount per course, regardless of the number of instructors. The instructors split it among themselves.",
-      "invalid_amount": "Please enter a valid amount.",
+      "total_label_event": "Organizer fee (total)",
+      "total_help_event": "One amount per event, regardless of the number of organizers. The organizers split it among themselves.",
       "save_failed": "The change could not be saved.",
       "remaining": "Not yet assigned",
       "locked": "Split fixed",
       "unlock": "Unlock split",
-      "unlock_question": "The instructors will be able to change the split again. Invoices that were already downloaded stay as they are. Unlock?"
+      "unlock_question": "The instructors will be able to change the split again. Invoices that were already downloaded stay as they are. Unlock?",
+      "unlock_question_event": "The organizers will be able to change the split again. Invoices that were already downloaded stay as they are. Unlock?"
     },
     "instructor_certificates": {
       "generate": "Generate instructor certificates",
@@ -1526,40 +1531,25 @@
       "email_all_review_rating": "Email all with Rating 'Review'",
       "email_all_by_status": "Email all by Status",
       "email_all_by_rating": "Email all by Rating",
-      "send_decisions": "Send Invitations / Rejections",
-      "send_invitations": "Send Invitations",
-      "send_invitations_selected": "Send Invitations to Selected",
-      "send_invitations_all": "Send Invitations to all with Green Rating",
-      "send_invitations_dialog_title": "Send Invitations",
-      "send_invitations_selected_count_singular": "Of {selected} selected participants, {identified} person with green rating was identified and will be notified of their invitation.",
-      "send_invitations_selected_count_plural": "Of {selected} selected participants, {identified} persons with green rating were identified and will be notified of their invitation.",
-      "send_invitations_all_count_singular": "{count} person with green rating was identified and will be notified of their invitation.",
-      "send_invitations_all_count_plural": "{count} persons with green rating were identified and will be notified of their invitation.",
-      "send_invitations_confirm": "Send Invitations",
-      "send_rejections": "Send Rejections",
-      "send_rejections_selected": "Send Rejections to Selected",
-      "send_rejections_all": "Send Rejections to all with Red Rating",
-      "send_rejections_dialog_title": "Send Rejections",
-      "send_rejections_selected_count_singular": "Of {selected} selected participants, {identified} person with red rating was identified and will be notified of their rejection.",
-      "send_rejections_selected_count_plural": "Of {selected} selected participants, {identified} persons with red rating were identified and will be notified of their rejection.",
-      "send_rejections_all_count_singular": "{count} person with red rating was identified and will be notified of their rejection.",
-      "send_rejections_all_count_plural": "{count} persons with red rating were identified and will be notified of their rejection.",
-      "send_rejections_confirm": "Send Rejections",
+      "renew_invitation_dialog_title": "Renew Invitation",
+      "renew_invitation_text": "{name} will receive a new invitation and can confirm their participation until the date below.",
+      "renew_invitation_confirm": "Send Invitation",
+      "send_decisions_by_rating": "Send Invitations and Rejections by Rating",
+      "send_decisions_dialog_title": "Send Invitations and Rejections",
+      "send_decisions_invite_count": "{count, plural, =0 {Nobody with green rating is waiting for an invitation.} one {# person with green rating will be invited.} other {# persons with green rating will be invited.}}",
+      "send_decisions_reject_count": "{count, plural, =0 {Nobody with red rating is waiting for a rejection.} one {# person with red rating will receive a rejection.} other {# persons with red rating will receive a rejection.}}",
+      "send_decisions_confirm": "Send",
+      "send_decisions_error": "The invitations and rejections could not all be sent: {error}",
+      "decisions_queued": "{invited} invited, {rejected} rejected; the participants will be notified by email.",
+      "no_eligible_decisions": "There is nobody with a green or red rating who has not been invited or rejected yet.",
       "send_invitations_error": "Failed to send invitations: {error}",
       "cancel_registrations_error": "The registrations could not be cancelled: {error}",
-      "send_rejections_error": "Failed to send rejections: {error}",
-      "no_eligible_invitations": "No applicants are eligible for an invitation right now (green rating with applied or invited status).",
       "manage_registrations": "Manage registrations",
       "cancel_registrations_selected": "Cancel selected registrations",
       "cancel_registrations_question": "Do you want to cancel {count, plural, one {the selected registration} other {the # selected registrations}}? The participants will be informed by email. Issue any refund in Stripe.",
       "cancel_registrations_confirm": "Cancel registrations",
       "registrations_cancelled": "{count, plural, one {# registration cancelled} other {# registrations cancelled}}",
       "no_eligible_cancellations": "None of the selected registrations can be cancelled.",
-      "no_eligible_rejections": "No applicants are eligible for a decline email right now (red rating and applied status only).",
-      "invitations_queued_singular": "{count} invitation was applied; confirmation emails will be sent.",
-      "invitations_queued_plural": "{count} invitations were applied; confirmation emails will be sent.",
-      "declines_queued_singular": "{count} decline was applied; a notification email will be sent.",
-      "declines_queued_plural": "{count} declines were applied; notification emails will be sent.",
       "bulk_email_dialog_title": "Email Applicants",
       "bulk_email_loading": "Loading recipients for {action}...",
       "bulk_email_load_error": "Failed to load recipients: {error}",
@@ -1874,12 +1864,14 @@
       "read_less": "Show less",
       "next_application": "Next application",
       "next_registration": "Next registration",
+      "reinvite": "Invite again with a new deadline",
+      "extend_invitation": "Extend deadline",
       "keyboard_hint": "Keys 1–3 and 0 rate the open application, J / K jump to the next / previous one."
     },
     "max_participants": {
       "label": "Maximum number of participants",
-      "placeholder": "Maximum number of participants",
-      "help_text": "After the maximum number of participants is reached, users can only join the waitlist."
+      "placeholder": "Unlimited",
+      "help_text": "Leave empty for no limit. After the maximum number of participants is reached, users can only join the waitlist. From 80% capacity, the course page shows the number of participants (unless it shows the available places instead)."
     },
     "formbricks": {
       "title": "Enrollment Questionnaire",
@@ -2036,7 +2028,34 @@
         "cancel": "Don't inform",
         "sent": "The participants have been informed.",
         "failed": "The participants could not be informed."
-      }
+      },
+      "public_event": {
+        "label": "Public event",
+        "description": "Open this session to everyone: this creates a draft event that you can review and then publish. Anyone can register for it, without applying to the course.",
+        "no_events_program": "This organization has no events program yet. Ask a platform admin to create one before opening sessions to the public.",
+        "create": "Create event",
+        "creating": "Creating …",
+        "create_failed": "The event could not be created.",
+        "open_event": "Edit event",
+        "view_page": "View page",
+        "registrations": "{count, plural, =0 {No registrations yet} one {# registration} other {# registrations}}",
+        "status": {
+          "published": "Published",
+          "draft": "Draft"
+        },
+        "prefill": {
+          "tagline": "Open session of the course \"{course}\" – join even if you are not taking the course.",
+          "about_session": "What this session is about",
+          "about_course": "About the course \"{course}\""
+        },
+        "program_dialog": {
+          "title": "Choose an events program",
+          "description": "Which events program should the event appear in?",
+          "button": "Create draft"
+        }
+      },
+      "synced_session": "From the course",
+      "synced_session_locked": "Date, title, description, location and external speakers come from the session in the course and are changed there."
     },
     "location": {
       "label": "Location",
@@ -2198,10 +2217,8 @@
       "title": "Course team",
       "message_on_element": "Message on Element",
       "split_explanation": "The fee of {total} covers the whole course, regardless of how many instructors there are. Please agree among yourselves and split it according to the time and effort each of you put into the course (e.g. number of sessions). As soon as one person downloads their invoice, the split is fixed for everyone.",
+      "split_explanation_event": "The fee of {total} covers the whole event, regardless of how many organizers there are. Please agree among yourselves and split it according to the time and effort each of you put into the event. As soon as one person downloads their invoice, the split is fixed for everyone.",
       "share_label": "Share of {name} in euros",
-      "invalid_amount": "Please enter a valid amount.",
-      "exceeds_total": "Too high – at most {max} is still unassigned.",
-      "save_failed": "The amount could not be saved.",
       "total": "Total fee: {total}",
       "remaining": "still to assign: {remaining}",
       "sole_fee": "Your fee: {total}",
@@ -2210,9 +2227,11 @@
       "generating": "Creating invoice…",
       "hint_no_template": "No invoice template has been set up for this program yet.",
       "hint_missing_amounts": "Enter an amount for every instructor (0 is allowed).",
+      "hint_missing_amounts_event": "Enter an amount for every organizer (0 is allowed).",
       "hint_sum_mismatch": "The amounts must add up exactly to the total fee (difference: {remaining}).",
       "confirm_lock_title": "Fix the split?",
       "confirm_lock_question": "Downloading your invoice fixes the split for all instructors; it can no longer be changed afterwards. Continue?",
+      "confirm_lock_question_event": "Downloading your invoice fixes the split for all organizers; it can no longer be changed afterwards. Continue?",
       "confirm_lock_confirm": "Fix and download",
       "errors": {
         "NOT_COURSE_INSTRUCTOR": "You are not listed as an instructor of this course.",
@@ -2223,6 +2242,18 @@
         "UNEXPECTED_ERROR": "The invoice could not be created. Please try again later."
       },
       "download_certificate": "Download my instructor certificate"
+    },
+    "public_event_notice": {
+      "origin": "This event was created from the session \"{session}\" on {date} of the course \"{course}\".",
+      "untitled_session": "untitled",
+      "synced": "Date, time, location, external speakers and the agenda item's title and description come from the session and follow any change made in the course – so change them there. The event's title, texts, image and registration settings are edited right here.",
+      "to_course": "Go to course",
+      "draft": "Draft: check the description, image and registration settings and preview the page. The event only appears in the events list once it is published.",
+      "published": "The event is published and appears in the events list.",
+      "preview_page": "Preview page",
+      "view_page": "View page",
+      "publish": "Publish",
+      "unpublish": "Unpublish"
     }
   },
   "manageProjects": {

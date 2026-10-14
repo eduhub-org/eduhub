@@ -19,6 +19,8 @@ interface NotifyParticipantsPrompt {
   registerChange: (sessionId: number) => void;
   promptOpen: boolean;
   pendingCount: number;
+  /** People the pending mails reach: course participants plus the registrants of the sessions' public events. */
+  pendingRecipients: number;
   sending: boolean;
   confirm: () => Promise<void>;
   cancel: () => void;
@@ -30,20 +32,29 @@ interface NotifyParticipantsPrompt {
 
 /**
  * Collects the sessions whose timing changed and asks once, after a short
- * pause, whether the course's participants should be informed.
+ * pause, whether the course's participants should be informed. A session that
+ * was opened as a public event also has the event's registrants to inform
+ * (`eventRegistrantCount`), since its event follows the new time.
  *
  * Informing used to happen automatically via a Hasura event trigger on
  * Session; it now only happens when the editor confirms here.
  */
-const useNotifyParticipantsPrompt = (participantCount: number): NotifyParticipantsPrompt => {
+const useNotifyParticipantsPrompt = (
+  participantCount: number,
+  eventRegistrantCount: (sessionId: number) => number = () => 0
+): NotifyParticipantsPrompt => {
   const t = useTranslations('manageCourse');
 
   // A ref, not state: re-registering the same session while the prompt is
   // pending must not re-render or queue a second mail.
   const pendingSessionIds = useRef<Set<number>>(new Set());
+  // Sessions whose course participants were mailed while their public event's
+  // registrants were not: a retry mails only the event.
+  const courseSentSessionIds = useRef<Set<number>>(new Set());
 
   const [promptOpen, setPromptOpen] = useState(false);
   const [pendingCount, setPendingCount] = useState(0);
+  const [pendingRecipients, setPendingRecipients] = useState(0);
   const [sending, setSending] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [savedMessage, setSavedMessage] = useState<string | null>(null);
@@ -56,20 +67,26 @@ const useNotifyParticipantsPrompt = (participantCount: number): NotifyParticipan
   const openPrompt = useDebouncedCallback(() => {
     if (pendingSessionIds.current.size === 0) return;
     setPendingCount(pendingSessionIds.current.size);
+    setPendingRecipients(
+      [...pendingSessionIds.current].reduce((sum, id) => sum + eventRegistrantCount(id), participantCount)
+    );
     setPromptOpen(true);
   }, PROMPT_DELAY_MS);
 
   const registerChange = useCallback(
     (sessionId: number) => {
-      if (participantCount <= 0) return;
+      if (participantCount + eventRegistrantCount(sessionId) <= 0) return;
       pendingSessionIds.current.add(sessionId);
+      // A new change is news to the course participants as well.
+      courseSentSessionIds.current.delete(sessionId);
       openPrompt();
     },
-    [participantCount, openPrompt]
+    [participantCount, eventRegistrantCount, openPrompt]
   );
 
   const cancel = useCallback(() => {
     pendingSessionIds.current.clear();
+    courseSentSessionIds.current.clear();
     setPendingCount(0);
     setPromptOpen(false);
   }, []);
@@ -83,14 +100,17 @@ const useNotifyParticipantsPrompt = (participantCount: number): NotifyParticipan
     try {
       for (const sessionId of sessionIds) {
         try {
-          const { data } = await notifySessionParticipants({ variables: { sessionId } });
+          const skipCourse = courseSentSessionIds.current.has(sessionId);
+          const { data } = await notifySessionParticipants({ variables: { sessionId, skipCourse } });
           const result = data?.notifySessionParticipants;
           if (result?.success) {
             // Drop only what demonstrably went out, so retrying the rest
             // cannot mail an already-notified session a second time.
             pendingSessionIds.current.delete(sessionId);
+            courseSentSessionIds.current.delete(sessionId);
             notified += 1;
           } else {
+            if (result?.courseSent) courseSentSessionIds.current.add(sessionId);
             failure = result?.error || t('SessionsTab.notify_participants.failed');
           }
         } catch (error) {
@@ -117,6 +137,7 @@ const useNotifyParticipantsPrompt = (participantCount: number): NotifyParticipan
     registerChange,
     promptOpen,
     pendingCount,
+    pendingRecipients,
     sending,
     confirm,
     cancel,

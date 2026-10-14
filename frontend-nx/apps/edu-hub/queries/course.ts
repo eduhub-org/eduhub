@@ -96,10 +96,18 @@ export const MANAGED_COURSE = gql`
       }
       Sessions(order_by: { startDateTime: asc }) {
         ...AdminSessionFragment
+        # The public event created from this session, if any.
+        PublicEvent {
+          id
+          title
+          published
+          publicParticipantCount
+        }
       }
       Program {
         id
         title
+        organizationId
         Sessions(order_by: { startDateTime: asc }) {
           ...SessionFragment
         }
@@ -699,7 +707,8 @@ export const UPDATE_COURSE_SHORT_DESCRIPTION = gql`
 export const UPDATE_COURSE_MAX_PARTICIPANTS = gql`
   mutation UpdateCourseMaxParticipants(
     $itemId: Int!
-    $text: Int!
+    # Null (an emptied field) removes the limit.
+    $text: Int
   ) {
     update_Course_by_pk(
       pk_columns: { id: $itemId }

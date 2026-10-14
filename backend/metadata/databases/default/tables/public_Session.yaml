@@ -8,6 +8,16 @@ object_relationships:
   - name: Program
     using:
       foreign_key_constraint_on: programId
+  # The public event created from this session, if any (Course.sourceSessionId is unique).
+  - name: PublicEvent
+    using:
+      manual_configuration:
+        column_mapping:
+          id: sourceSessionId
+        insertion_order: null
+        remote_table:
+          name: Course
+          schema: public
 array_relationships:
   - name: Attendances
     using:

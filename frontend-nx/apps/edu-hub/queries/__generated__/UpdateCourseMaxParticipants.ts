@@ -21,5 +21,5 @@ export interface UpdateCourseMaxParticipants {
 
 export interface UpdateCourseMaxParticipantsVariables {
   itemId: number;
-  text: number;
+  text?: number | null;
 }

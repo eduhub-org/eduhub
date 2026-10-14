@@ -930,6 +930,7 @@ export enum CourseStatus_update_column {
  */
 export enum Course_constraint {
   Course_pkey = "Course_pkey",
+  Course_sourceSessionId_key = "Course_sourceSessionId_key",
 }
 
 /**
@@ -971,6 +972,7 @@ export enum Course_select_column {
   requiredEcts = "requiredEcts",
   requiredEventCount = "requiredEventCount",
   showAvailablePlaces = "showAvailablePlaces",
+  sourceSessionId = "sourceSessionId",
   startTime = "startTime",
   status = "status",
   stripePriceId = "stripePriceId",
@@ -1044,6 +1046,7 @@ export enum Course_update_column {
   requiredEcts = "requiredEcts",
   requiredEventCount = "requiredEventCount",
   showAvailablePlaces = "showAvailablePlaces",
+  sourceSessionId = "sourceSessionId",
   startTime = "startTime",
   status = "status",
   stripePriceId = "stripePriceId",
@@ -1649,6 +1652,7 @@ export enum MailTemplateType_enum {
   ENROLLMENT_CANCELLED = "ENROLLMENT_CANCELLED",
   GUEST_ALREADY_HAS_ACCOUNT = "GUEST_ALREADY_HAS_ACCOUNT",
   GUEST_REGISTRATION_CONFIRM = "GUEST_REGISTRATION_CONFIRM",
+  INSTRUCTOR_CERTIFICATE_READY = "INSTRUCTOR_CERTIFICATE_READY",
   INVITATION_EXPIRED = "INVITATION_EXPIRED",
   INVITATION_EXPIRING_SOON = "INVITATION_EXPIRING_SOON",
   INVITE = "INVITE",
@@ -6676,6 +6680,7 @@ export interface Course_avg_order_by {
   programId?: order_by | null;
   requiredEcts?: order_by | null;
   requiredEventCount?: order_by | null;
+  sourceSessionId?: order_by | null;
 }
 
 /**
@@ -6712,6 +6717,7 @@ export interface Course_bool_exp {
   ProjectCourses_aggregate?: ProjectCourse_aggregate_bool_exp | null;
   Sessions?: Session_bool_exp | null;
   Sessions_aggregate?: Session_aggregate_bool_exp | null;
+  SourceSession?: Session_bool_exp | null;
   Weekday?: Weekday_bool_exp | null;
   _and?: Course_bool_exp[] | null;
   _not?: Course_bool_exp | null;
@@ -6753,6 +6759,7 @@ export interface Course_bool_exp {
   requiredEcts?: numeric_comparison_exp | null;
   requiredEventCount?: Int_comparison_exp | null;
   showAvailablePlaces?: Boolean_comparison_exp | null;
+  sourceSessionId?: Int_comparison_exp | null;
   startTime?: time_comparison_exp | null;
   status?: CourseStatus_enum_comparison_exp | null;
   stripePriceId?: String_comparison_exp | null;
@@ -6786,6 +6793,7 @@ export interface Course_insert_input {
   Program?: Program_obj_rel_insert_input | null;
   ProjectCourses?: ProjectCourse_arr_rel_insert_input | null;
   Sessions?: Session_arr_rel_insert_input | null;
+  SourceSession?: Session_obj_rel_insert_input | null;
   Weekday?: Weekday_obj_rel_insert_input | null;
   achievementCertificatePossible?: boolean | null;
   achievementCertificateTemplateId?: number | null;
@@ -6822,6 +6830,7 @@ export interface Course_insert_input {
   requiredEcts?: any | null;
   requiredEventCount?: number | null;
   showAvailablePlaces?: boolean | null;
+  sourceSessionId?: number | null;
   startTime?: any | null;
   status?: CourseStatus_enum | null;
   stripePriceId?: string | null;
@@ -6863,6 +6872,7 @@ export interface Course_max_order_by {
   projectSubmissionDeadline?: order_by | null;
   requiredEcts?: order_by | null;
   requiredEventCount?: order_by | null;
+  sourceSessionId?: order_by | null;
   stripePriceId?: order_by | null;
   stripeProductId?: order_by | null;
   tagline?: order_by | null;
@@ -6901,6 +6911,7 @@ export interface Course_min_order_by {
   projectSubmissionDeadline?: order_by | null;
   requiredEcts?: order_by | null;
   requiredEventCount?: order_by | null;
+  sourceSessionId?: order_by | null;
   stripePriceId?: order_by | null;
   stripeProductId?: order_by | null;
   tagline?: order_by | null;
@@ -6948,6 +6959,7 @@ export interface Course_order_by {
   Program?: Program_order_by | null;
   ProjectCourses_aggregate?: ProjectCourse_aggregate_order_by | null;
   Sessions_aggregate?: Session_aggregate_order_by | null;
+  SourceSession?: Session_order_by | null;
   Weekday?: Weekday_order_by | null;
   achievementCertificatePossible?: order_by | null;
   achievementCertificateTemplateId?: order_by | null;
@@ -6986,6 +6998,7 @@ export interface Course_order_by {
   requiredEcts?: order_by | null;
   requiredEventCount?: order_by | null;
   showAvailablePlaces?: order_by | null;
+  sourceSessionId?: order_by | null;
   startTime?: order_by | null;
   status?: order_by | null;
   stripePriceId?: order_by | null;
@@ -7035,6 +7048,7 @@ export interface Course_set_input {
   requiredEcts?: any | null;
   requiredEventCount?: number | null;
   showAvailablePlaces?: boolean | null;
+  sourceSessionId?: number | null;
   startTime?: any | null;
   status?: CourseStatus_enum | null;
   stripePriceId?: string | null;
@@ -7059,6 +7073,7 @@ export interface Course_stddev_order_by {
   programId?: order_by | null;
   requiredEcts?: order_by | null;
   requiredEventCount?: order_by | null;
+  sourceSessionId?: order_by | null;
 }
 
 /**
@@ -7075,6 +7090,7 @@ export interface Course_stddev_pop_order_by {
   programId?: order_by | null;
   requiredEcts?: order_by | null;
   requiredEventCount?: order_by | null;
+  sourceSessionId?: order_by | null;
 }
 
 /**
@@ -7091,6 +7107,7 @@ export interface Course_stddev_samp_order_by {
   programId?: order_by | null;
   requiredEcts?: order_by | null;
   requiredEventCount?: order_by | null;
+  sourceSessionId?: order_by | null;
 }
 
 /**
@@ -7107,6 +7124,7 @@ export interface Course_sum_order_by {
   programId?: order_by | null;
   requiredEcts?: order_by | null;
   requiredEventCount?: order_by | null;
+  sourceSessionId?: order_by | null;
 }
 
 /**
@@ -7123,6 +7141,7 @@ export interface Course_var_pop_order_by {
   programId?: order_by | null;
   requiredEcts?: order_by | null;
   requiredEventCount?: order_by | null;
+  sourceSessionId?: order_by | null;
 }
 
 /**
@@ -7139,6 +7158,7 @@ export interface Course_var_samp_order_by {
   programId?: order_by | null;
   requiredEcts?: order_by | null;
   requiredEventCount?: order_by | null;
+  sourceSessionId?: order_by | null;
 }
 
 /**
@@ -7155,6 +7175,7 @@ export interface Course_variance_order_by {
   programId?: order_by | null;
   requiredEcts?: order_by | null;
   requiredEventCount?: order_by | null;
+  sourceSessionId?: order_by | null;
 }
 
 /**
@@ -13205,6 +13226,7 @@ export interface Session_bool_exp {
   Attendances_aggregate?: Attendance_aggregate_bool_exp | null;
   Course?: Course_bool_exp | null;
   Program?: Program_bool_exp | null;
+  PublicEvent?: Course_bool_exp | null;
   SessionAddresses?: SessionAddress_bool_exp | null;
   SessionAddresses_aggregate?: SessionAddress_aggregate_bool_exp | null;
   SessionSpeakers?: SessionSpeaker_bool_exp | null;
@@ -13233,6 +13255,7 @@ export interface Session_insert_input {
   Attendances?: Attendance_arr_rel_insert_input | null;
   Course?: Course_obj_rel_insert_input | null;
   Program?: Program_obj_rel_insert_input | null;
+  PublicEvent?: Course_obj_rel_insert_input | null;
   SessionAddresses?: SessionAddress_arr_rel_insert_input | null;
   SessionSpeakers?: SessionSpeaker_arr_rel_insert_input | null;
   attendanceData?: string | null;
@@ -13296,6 +13319,30 @@ export interface Session_on_conflict {
   constraint: Session_constraint;
   update_columns: Session_update_column[];
   where?: Session_bool_exp | null;
+}
+
+/**
+ * Ordering options when selecting data from "Session".
+ */
+export interface Session_order_by {
+  Attendances_aggregate?: Attendance_aggregate_order_by | null;
+  Course?: Course_order_by | null;
+  Program?: Program_order_by | null;
+  PublicEvent?: Course_order_by | null;
+  SessionAddresses_aggregate?: SessionAddress_aggregate_order_by | null;
+  SessionSpeakers_aggregate?: SessionSpeaker_aggregate_order_by | null;
+  attendanceData?: order_by | null;
+  courseId?: order_by | null;
+  created_at?: order_by | null;
+  description?: order_by | null;
+  endDateTime?: order_by | null;
+  id?: order_by | null;
+  isMandatory?: order_by | null;
+  programId?: order_by | null;
+  questionaire_sent?: order_by | null;
+  startDateTime?: order_by | null;
+  title?: order_by | null;
+  updated_at?: order_by | null;
 }
 
 /**

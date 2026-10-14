@@ -240,6 +240,7 @@
       "invalid_minimum_maximum_integer": "Der Wert muss mindestens {min} und höchstens {max} sein",
       "invalid_integer_format": "Der Wert muss eine ganze Zahl sein",
       "invalid_decimal_format": "Der Wert muss eine Zahl sein (Dezimalstellen erlaubt, z. B. 12,5)",
+      "invalid_currency_format": "Bitte gib einen gültigen Betrag ein (z. B. 250 oder 250,50).",
       "invalid_input": "Ungültige Eingabe",
       "transform_rejected": "Dieser Wert konnte nicht im erwarteten Format gespeichert werden.",
       "save_failed": "Speichern fehlgeschlagen."
@@ -985,7 +986,9 @@
     "accepted_applications": "Bewerbungen (angenommen):",
     "total_invitations": "Einladungen (gesamt):",
     "confirmed_invitations": "Einladungen (bestätigt):",
-    "Uniqueness violation_ duplicate key value violates unique constraint \"CourseAddress_pkey\"": "Eine Standortadresse mit dieser Konfiguration existiert bereits für diesen Kurs."
+    "Uniqueness violation_ duplicate key value violates unique constraint \"CourseAddress_pkey\"": "Eine Standortadresse mit dieser Konfiguration existiert bereits für diesen Kurs.",
+    "part_of_course": "Diese Veranstaltung ist Teil des Kurses „{course}“.",
+    "to_course": "Zum Kurs"
   },
   "courseAdminPage": {
     "pageTitle": "Opencampus Kurse Kursleiter Sicht",
@@ -1433,12 +1436,14 @@
     "instructor_payment": {
       "total_label": "Vergütung für die Kursleitung (gesamt)",
       "total_help": "Ein Betrag pro Kurs, unabhängig von der Anzahl der Kursleitenden. Die Kursleitenden teilen ihn untereinander auf.",
-      "invalid_amount": "Bitte gib einen gültigen Betrag ein.",
+      "total_label_event": "Vergütung für die Organisator:innen (gesamt)",
+      "total_help_event": "Ein Betrag pro Event, unabhängig von der Anzahl der Organisator:innen. Die Organisator:innen teilen ihn untereinander auf.",
       "save_failed": "Die Änderung konnte nicht gespeichert werden.",
       "remaining": "Noch nicht verteilt",
       "locked": "Aufteilung festgelegt",
       "unlock": "Aufteilung entsperren",
-      "unlock_question": "Die Kursleitenden können die Aufteilung danach wieder ändern. Bereits heruntergeladene Rechnungen bleiben unverändert. Entsperren?"
+      "unlock_question": "Die Kursleitenden können die Aufteilung danach wieder ändern. Bereits heruntergeladene Rechnungen bleiben unverändert. Entsperren?",
+      "unlock_question_event": "Die Organisator:innen können die Aufteilung danach wieder ändern. Bereits heruntergeladene Rechnungen bleiben unverändert. Entsperren?"
     },
     "instructor_certificates": {
       "generate": "Zertifikate für die Kursleitung erstellen",
@@ -1508,40 +1513,25 @@
       "email_all_review_rating": "E-Mail an alle mit Bewertung 'Unklar'",
       "email_all_by_status": "E-Mail an alle nach Status",
       "email_all_by_rating": "E-Mail an alle nach Bewertung",
-      "send_decisions": "Einladungen / Ablehnungen senden",
-      "send_invitations": "Einladungen senden",
-      "send_invitations_selected": "Einladungen an Ausgewählte senden",
-      "send_invitations_all": "Einladungen an alle mit grüner Bewertung senden",
-      "send_invitations_dialog_title": "Einladungen senden",
-      "send_invitations_selected_count_singular": "Von {selected} ausgewählten Teilnehmenden wurde {identified} Person mit grüner Bewertung identifiziert und wird über ihre Einladung informiert.",
-      "send_invitations_selected_count_plural": "Von {selected} ausgewählten Teilnehmenden wurden {identified} Personen mit grüner Bewertung identifiziert und werden über ihre Einladung informiert.",
-      "send_invitations_all_count_singular": "{count} Person mit grüner Bewertung wurde identifiziert und wird über ihre Einladung informiert.",
-      "send_invitations_all_count_plural": "{count} Personen mit grüner Bewertung wurden identifiziert und werden über ihre Einladung informiert.",
-      "send_invitations_confirm": "Einladungen senden",
-      "send_rejections": "Ablehnungen senden",
-      "send_rejections_selected": "Ablehnungen an Ausgewählte senden",
-      "send_rejections_all": "Ablehnungen an alle mit roter Bewertung senden",
-      "send_rejections_dialog_title": "Ablehnungen senden",
-      "send_rejections_selected_count_singular": "Von {selected} ausgewählten Teilnehmenden wurde {identified} Person mit roter Bewertung identifiziert und wird über ihre Ablehnung informiert.",
-      "send_rejections_selected_count_plural": "Von {selected} ausgewählten Teilnehmenden wurden {identified} Personen mit roter Bewertung identifiziert und werden über ihre Ablehnung informiert.",
-      "send_rejections_all_count_singular": "{count} Person mit roter Bewertung wurde identifiziert und wird über ihre Ablehnung informiert.",
-      "send_rejections_all_count_plural": "{count} Personen mit roter Bewertung wurden identifiziert und werden über ihre Ablehnung informiert.",
-      "send_rejections_confirm": "Ablehnungen senden",
+      "renew_invitation_dialog_title": "Einladung erneuern",
+      "renew_invitation_text": "{name} bekommt eine neue Einladung und kann die Teilnahme bis zum unten gewählten Datum bestätigen.",
+      "renew_invitation_confirm": "Einladung senden",
+      "send_decisions_by_rating": "Einladungen und Ablehnungen nach Bewertung senden",
+      "send_decisions_dialog_title": "Einladungen und Ablehnungen senden",
+      "send_decisions_invite_count": "{count, plural, =0 {Niemand mit grüner Bewertung wartet auf eine Einladung.} one {# Person mit grüner Bewertung wird eingeladen.} other {# Personen mit grüner Bewertung werden eingeladen.}}",
+      "send_decisions_reject_count": "{count, plural, =0 {Niemand mit roter Bewertung wartet auf eine Ablehnung.} one {# Person mit roter Bewertung bekommt eine Ablehnung.} other {# Personen mit roter Bewertung bekommen eine Ablehnung.}}",
+      "send_decisions_confirm": "Senden",
+      "send_decisions_error": "Die Einladungen und Ablehnungen konnten nicht alle verschickt werden: {error}",
+      "decisions_queued": "{invited} eingeladen, {rejected} abgelehnt; die Teilnehmenden werden per E-Mail informiert.",
+      "no_eligible_decisions": "Gerade gibt es niemanden mit grüner oder roter Bewertung, der noch nicht eingeladen oder abgelehnt wurde.",
       "send_invitations_error": "Fehler beim Senden der Einladungen: {error}",
       "cancel_registrations_error": "Die Registrierungen konnten nicht storniert werden: {error}",
-      "send_rejections_error": "Fehler beim Senden der Ablehnungen: {error}",
-      "no_eligible_invitations": "Gerade gibt es niemanden mit grüner Bewertung und Status „beworben“ oder „eingeladen“, den du einladen könntest.",
       "manage_registrations": "Registrierungen verwalten",
       "cancel_registrations_selected": "Ausgewählte Registrierungen stornieren",
       "cancel_registrations_question": "Möchtest du {count, plural, one {die ausgewählte Registrierung} other {die # ausgewählten Registrierungen}} stornieren? Die Teilnehmenden werden per E-Mail informiert. Eine Erstattung veranlasst du bei Bedarf in Stripe.",
       "cancel_registrations_confirm": "Stornieren",
       "registrations_cancelled": "{count, plural, one {# Registrierung storniert} other {# Registrierungen storniert}}",
       "no_eligible_cancellations": "Keine der ausgewählten Registrierungen kann storniert werden.",
-      "no_eligible_rejections": "Gerade gibt es niemanden mit roter Bewertung und Status „beworben“, dem du eine Ablehnung schicken könntest.",
-      "invitations_queued_singular": "{count} Einladung wurde ausgelöst; Bestätigungs-E-Mails werden verschickt.",
-      "invitations_queued_plural": "{count} Einladungen wurden ausgelöst; Bestätigungs-E-Mails werden verschickt.",
-      "declines_queued_singular": "{count} Ablehnung wurde ausgelöst; eine Benachrichtigung wird per E-Mail verschickt.",
-      "declines_queued_plural": "{count} Ablehnungen wurden ausgelöst; Benachrichtigungen werden per E-Mail verschickt.",
       "bulk_email_dialog_title": "Bewerber:innen per E-Mail kontaktieren",
       "bulk_email_loading": "Empfänger:innen für {action} werden geladen...",
       "bulk_email_load_error": "Empfänger:innen konnten nicht geladen werden: {error}",
@@ -1856,12 +1846,14 @@
       "read_less": "Weniger anzeigen",
       "next_application": "Nächste Bewerbung",
       "next_registration": "Nächste Anmeldung",
+      "reinvite": "Erneut einladen mit neuer Frist",
+      "extend_invitation": "Frist verlängern",
       "keyboard_hint": "Tasten 1–3 und 0 bewerten die aufgeklappte Bewerbung, J / K springt zur nächsten / vorigen."
     },
     "max_participants": {
       "label": "Max. Teilnehmendenanzahl",
-      "placeholder": "Max. Teilnehmendenanzahl",
-      "help_text": "Sobald die maximale Teilnehmendenanzahl erreicht ist, können sich Nutzer nur noch auf die Warteliste setzen."
+      "placeholder": "Unbegrenzt",
+      "help_text": "Lass das Feld leer, wenn es keine Begrenzung gibt. Sobald die maximale Teilnehmendenanzahl erreicht ist, können sich Nutzer nur noch auf die Warteliste setzen. Ab 80 % Auslastung zeigt die Kursseite die Zahl der Teilnehmenden an (außer wenn stattdessen die freien Plätze angezeigt werden)."
     },
     "formbricks": {
       "title": "Fragebogen URL",
@@ -2018,7 +2010,34 @@
         "cancel": "Nicht informieren",
         "sent": "Die Teilnehmenden wurden informiert.",
         "failed": "Die Teilnehmenden konnten nicht informiert werden."
-      }
+      },
+      "public_event": {
+        "label": "Öffentliche Veranstaltung",
+        "description": "Öffne diese Session für alle: Es entsteht ein Entwurf in den Veranstaltungen, den Du prüfen und dann veröffentlichen kannst. Anmelden kann sich dort jede Person, auch ohne Bewerbung für den Kurs.",
+        "no_events_program": "Für diese Organisation gibt es noch kein Veranstaltungsprogramm. Bitte das Plattform-Team, eins anzulegen, damit Du Sessions öffentlich machen kannst.",
+        "create": "Als Veranstaltung anlegen",
+        "creating": "Wird angelegt …",
+        "create_failed": "Die Veranstaltung konnte nicht angelegt werden.",
+        "open_event": "Veranstaltung bearbeiten",
+        "view_page": "Seite ansehen",
+        "registrations": "{count, plural, =0 {Noch keine Anmeldungen} one {# Anmeldung} other {# Anmeldungen}}",
+        "status": {
+          "published": "Veröffentlicht",
+          "draft": "Entwurf"
+        },
+        "prefill": {
+          "tagline": "Offene Session aus dem Kurs „{course}“ – Du kannst teilnehmen, auch wenn Du nicht im Kurs bist.",
+          "about_session": "Worum es in dieser Session geht",
+          "about_course": "Über den Kurs „{course}“"
+        },
+        "program_dialog": {
+          "title": "Veranstaltungsprogramm wählen",
+          "description": "In welchem Veranstaltungsprogramm soll die Veranstaltung erscheinen?",
+          "button": "Entwurf anlegen"
+        }
+      },
+      "synced_session": "Aus dem Kurs",
+      "synced_session_locked": "Datum, Titel, Beschreibung, Ort und externe Referenten kommen aus der Session im Kurs und werden dort geändert."
     },
     "location": {
       "label": "Veranstaltungsort",
@@ -2183,10 +2202,8 @@
       "title": "Kursteam",
       "message_on_element": "Auf Element schreiben",
       "split_explanation": "Die Vergütung von {total} gilt für den gesamten Kurs, unabhängig von der Anzahl der Kursleitenden. Bitte stimmt euch untereinander ab und teilt den Betrag danach auf, wie viel Zeit und Aufwand jede*r in den Kurs gesteckt hat (z. B. Anzahl der Sessions). Sobald eine Person ihre Rechnung herunterlädt, ist die Aufteilung für alle festgelegt.",
+      "split_explanation_event": "Die Vergütung von {total} gilt für das gesamte Event, unabhängig von der Anzahl der Organisator:innen. Bitte stimmt euch untereinander ab und teilt den Betrag danach auf, wie viel Zeit und Aufwand jede*r in das Event gesteckt hat. Sobald eine Person ihre Rechnung herunterlädt, ist die Aufteilung für alle festgelegt.",
       "share_label": "Anteil von {name} in Euro",
-      "invalid_amount": "Bitte gib einen gültigen Betrag ein.",
-      "exceeds_total": "Zu hoch – höchstens {max} sind noch frei.",
-      "save_failed": "Der Betrag konnte nicht gespeichert werden.",
       "total": "Gesamtvergütung: {total}",
       "remaining": "noch zu verteilen: {remaining}",
       "sole_fee": "Deine Vergütung: {total}",
@@ -2195,9 +2212,11 @@
       "generating": "Rechnung wird erstellt…",
       "hint_no_template": "Für dieses Programm ist noch keine Rechnungsvorlage hinterlegt.",
       "hint_missing_amounts": "Tragt für alle Kursleitenden einen Betrag ein (0 ist erlaubt).",
+      "hint_missing_amounts_event": "Tragt für alle Organisator:innen einen Betrag ein (0 ist erlaubt).",
       "hint_sum_mismatch": "Die Beträge müssen genau die Gesamtvergütung ergeben (Differenz: {remaining}).",
       "confirm_lock_title": "Aufteilung festlegen?",
       "confirm_lock_question": "Mit dem Herunterladen Deiner Rechnung wird die Aufteilung für alle Kursleitenden festgelegt und kann danach nicht mehr geändert werden. Fortfahren?",
+      "confirm_lock_question_event": "Mit dem Herunterladen Deiner Rechnung wird die Aufteilung für alle Organisator:innen festgelegt und kann danach nicht mehr geändert werden. Fortfahren?",
       "confirm_lock_confirm": "Festlegen und herunterladen",
       "errors": {
         "NOT_COURSE_INSTRUCTOR": "Du bist nicht als Kursleitung dieses Kurses eingetragen.",
@@ -2208,6 +2227,18 @@
         "UNEXPECTED_ERROR": "Die Rechnung konnte nicht erstellt werden. Bitte versuche es später erneut."
       },
       "download_certificate": "Mein Zertifikat als Kursleitung herunterladen"
+    },
+    "public_event_notice": {
+      "origin": "Diese Veranstaltung wurde aus der Session „{session}“ vom {date} des Kurses „{course}“ erstellt.",
+      "untitled_session": "ohne Titel",
+      "synced": "Datum, Uhrzeit, Ort, externe Referenten sowie Titel und Beschreibung des Programmpunkts kommen aus der Session und werden bei Änderungen im Kurs automatisch übernommen – ändere sie deshalb dort. Titel, Texte, Bild und Anmeldung der Veranstaltung bearbeitest Du direkt hier.",
+      "to_course": "Zum Kurs",
+      "draft": "Entwurf: Prüfe Beschreibung, Bild und Anmeldeeinstellungen und sieh Dir die Seite in der Vorschau an. Erst nach dem Veröffentlichen erscheint die Veranstaltung in der Veranstaltungsliste.",
+      "published": "Die Veranstaltung ist veröffentlicht und erscheint in der Veranstaltungsliste.",
+      "preview_page": "Vorschau der Seite",
+      "view_page": "Seite ansehen",
+      "publish": "Veröffentlichen",
+      "unpublish": "Veröffentlichung zurückziehen"
     }
   },
   "manageProjects": {

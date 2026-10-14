@@ -64,6 +64,19 @@ export const COURSE_FRAGMENT = gql`
     externalRegistrationLink
     registrationType
     guestRegistrationEnabled
+    # Set when this event was created from a session of another course, which
+    # the event page links to (Course is null while that course is unpublished).
+    sourceSessionId
+    SourceSession {
+      id
+      title
+      startDateTime
+      Course {
+        id
+        title
+        published
+      }
+    }
     formbricksEnrollmentSurveyUrl
     startTime
     endTime
@@ -215,6 +228,19 @@ export const COURSE_FRAGMENT_ANONYMOUS = gql`
     externalRegistrationLink
     registrationType
     guestRegistrationEnabled
+    # Set when this event was created from a session of another course, which
+    # the event page links to (Course is null while that course is unpublished).
+    sourceSessionId
+    SourceSession {
+      id
+      title
+      startDateTime
+      Course {
+        id
+        title
+        published
+      }
+    }
     formbricksEnrollmentSurveyUrl
     startTime
     endTime

@@ -10,6 +10,7 @@ import { useTranslations } from 'next-intl';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { prioritizeClasses, isLinkFormat, isECTSFormat } from '../../helpers/util';
+import { isEuroInputAllowed, parseEuroToCents } from '../../helpers/instructorPayment';
 import useErrorHandler from '../../hooks/useErrorHandler';
 import { AlertMessageDialog } from '../common/dialogs/AlertMessageDialog';
 import { ErrorMessageDialog } from '../common/dialogs/ErrorMessageDialog';
@@ -78,9 +79,12 @@ type InputFieldProps = {
    * 'link', 'email', 'ects', 'number' and 'decimal' are specialized input types with custom validation.
    * 'number' accepts integers only; 'decimal' also accepts fractional values (comma or dot) and
    * sends a JS number, so it fits nullable `numeric` columns.
+   * 'currency' takes euros (comma or dot, at most two decimals) and sends integer cents; `min`/`max`
+   * are in euros. Pass `value` already formatted (e.g. `centsToEuroInput`). Clearing the field
+   * saves nothing and restores the saved amount on blur.
    * @default 'textarea'
    */
-  type?: 'input' | 'textarea' | 'markdown' | 'link' | 'email' | 'ects' | 'number' | 'decimal';
+  type?: 'input' | 'textarea' | 'markdown' | 'link' | 'email' | 'ects' | 'number' | 'decimal' | 'currency';
 
   /**
    * The label text for the input field.
@@ -404,6 +408,12 @@ const InputField: React.FC<InputFieldProps> = ({
             (max === undefined || num <= max)
           );
         }
+        case 'currency': {
+          const cents = parseEuroToCents(text);
+          return (
+            cents !== null && (min === undefined || cents >= min * 100) && (max === undefined || cents <= max * 100)
+          );
+        }
         default:
           return true;
       }
@@ -451,6 +461,21 @@ const InputField: React.FC<InputFieldProps> = ({
           }
           return t('input_field.invalid_decimal_format');
         }
+        case 'currency': {
+          if (parseEuroToCents(numberText ?? '') === null) {
+            return t('input_field.invalid_currency_format');
+          }
+          if (min !== undefined && max !== undefined) {
+            return t(`input_field.invalid_minimum_maximum_integer`, { min, max });
+          }
+          if (min !== undefined) {
+            return t(`input_field.invalid_minimum_integer`, { min });
+          }
+          if (max !== undefined) {
+            return t(`input_field.invalid_maximum_integer`, { max });
+          }
+          return t('input_field.invalid_currency_format');
+        }
         default:
           return t('input_field.invalid_input');
       }
@@ -459,10 +484,18 @@ const InputField: React.FC<InputFieldProps> = ({
   );
 
   const debouncedUpdateText = useDebouncedCallback((newText: string) => {
+    // An emptied amount is not a value to save; handleBlur puts the saved amount back.
+    if (type === 'currency' && newText.trim() === '') {
+      setErrorMessage('');
+      setHasBlurred(false);
+      return;
+    }
     if (validateInput(newText)) {
       if (updateValueMutation) {
         let textValue: string | number | null;
-        if (type === 'number' || type === 'decimal') {
+        if (type === 'currency') {
+          textValue = parseEuroToCents(newText);
+        } else if (type === 'number' || type === 'decimal') {
           const raw = type === 'decimal' ? newText.replace(',', '.') : newText;
           const parsed =
             raw === ''
@@ -519,6 +552,9 @@ const InputField: React.FC<InputFieldProps> = ({
   const handleTextChange = useCallback(
     (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       const newText = event.target.value;
+      if (type === 'currency' && !isEuroInputAllowed(newText)) {
+        return;
+      }
       if (type === 'number' || type === 'decimal') {
         const nonNegative = min !== undefined && min >= 0;
         const numberPattern =
@@ -544,6 +580,12 @@ const InputField: React.FC<InputFieldProps> = ({
   useEffect(() => () => debouncedUpdateText.flush(), [debouncedUpdateText]);
 
   const handleBlur = useCallback(() => {
+    if (type === 'currency' && localText.trim() === '') {
+      debouncedUpdateText.cancel();
+      setLocalText(effectiveValue);
+      setErrorMessage('');
+      return;
+    }
     setHasBlurred(true);
     if (!validateInput(localText)) {
       const currentErrorMessage = getErrorMessage(type, localText);
@@ -558,7 +600,17 @@ const InputField: React.FC<InputFieldProps> = ({
       }
     }
     debouncedUpdateText.flush();
-  }, [variant, localText, validateInput, debouncedUpdateText, type, handleError, resetError, getErrorMessage]);
+  }, [
+    variant,
+    localText,
+    effectiveValue,
+    validateInput,
+    debouncedUpdateText,
+    type,
+    handleError,
+    resetError,
+    getErrorMessage,
+  ]);
 
   // Preserves react-debounce-input's forceNotifyByEnter behavior: flush the
   // pending debounced update immediately when Enter is pressed.
@@ -606,8 +658,11 @@ const InputField: React.FC<InputFieldProps> = ({
         onChange={handleTextChange}
         onBlur={handleBlur}
         slotProps={{
+          htmlInput: type === 'currency' ? { inputMode: 'decimal' } : undefined,
           input: {
-            endAdornment: helpText ? (
+            endAdornment: type === 'currency' ? (
+              <InputAdornment position="end">€</InputAdornment>
+            ) : helpText ? (
               <InputAdornment position="end">
                 <Tooltip
                   title={<span className="block max-w-sm whitespace-pre-line text-xs leading-snug">{helpText}</span>}
@@ -729,11 +784,15 @@ const InputField: React.FC<InputFieldProps> = ({
                   min={type === 'number' ? min : undefined}
                   max={type === 'number' ? max : undefined}
                   step={type === 'number' ? 1 : undefined}
-                  inputMode={type === 'number' ? 'numeric' : undefined}
+                  inputMode={type === 'number' ? 'numeric' : type === 'currency' ? 'decimal' : undefined}
                   pattern={type === 'number' ? '[0-9]*' : undefined}
                 />
               )}
-              {showCharacterCount && type !== 'ects' && type !== 'number' && type !== 'decimal' && (
+              {showCharacterCount &&
+                type !== 'ects' &&
+                type !== 'number' &&
+                type !== 'decimal' &&
+                type !== 'currency' && (
                 <div className="absolute top-0 right-0 mr-2 mt-1 text-xs text-label-secondary">
                   {`${localText.length}/${maxLength}`}
                 </div>

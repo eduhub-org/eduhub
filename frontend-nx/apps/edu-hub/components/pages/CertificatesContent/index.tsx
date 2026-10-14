@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl';
 import { CircularProgress } from '@mui/material';
 import Link from 'next/link';
 import { useRoleQuery } from '../../../hooks/authedQuery';
+import { useCurrentUserId } from '../../../hooks/authentication';
 import { MY_CERTIFICATES } from '../../../queries/myCertificates';
 import { MyCertificates, MyCertificatesVariables } from '../../../queries/__generated__/MyCertificates';
 import { CertificateTile } from '../../common/CertificateTile';
@@ -36,7 +37,10 @@ class ErrorBoundary extends React.Component<{ children: ReactNode }, { hasError:
 
 const CertificatesContent: FC = () => {
   const t = useTranslations('certificates');
-  const { data: sessionData, status: sessionStatus } = useSession();
+  const { status: sessionStatus } = useSession();
+  // While a super-admin views as someone, this is that person's id: the query is
+  // answered as them, so asking for the admin's own enrollments returns nothing.
+  const userId = useCurrentUserId();
   const [showError, setShowError] = useState(false);
 
   const {
@@ -45,9 +49,9 @@ const CertificatesContent: FC = () => {
     error,
   } = useRoleQuery<MyCertificates, MyCertificatesVariables>(MY_CERTIFICATES, {
     variables: {
-      userId: sessionData?.profile?.sub || '',
+      userId: userId || '',
     },
-    skip: !sessionData?.profile?.sub || (sessionStatus as string) === 'loading',
+    skip: !userId || (sessionStatus as string) === 'loading',
   });
 
   useEffect(() => {
@@ -56,7 +60,8 @@ const CertificatesContent: FC = () => {
     }
   }, [error]);
 
-  if (sessionStatus === 'loading' || loading) {
+  // Signed in but no id yet means a view-as target is still resolving.
+  if (sessionStatus === 'loading' || loading || (sessionStatus === 'authenticated' && !userId)) {
     return (
       <div className="flex justify-center items-center min-h-[77vh]">
         <CircularProgress />
@@ -64,7 +69,7 @@ const CertificatesContent: FC = () => {
     );
   }
 
-  if (!sessionData?.profile?.sub) {
+  if (!userId) {
     return <div>{t('not_authenticated')}</div>;
   }
 

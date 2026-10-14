@@ -10,6 +10,11 @@
 export interface NotifySessionParticipants_notifySessionParticipants {
   __typename: "NotifySessionParticipantsResult";
   success: boolean;
+  /**
+   * Whether the course participants' mailing went out. A retry passes
+   * skipCourse when it did, so only the public event's registrants are mailed again.
+   */
+  courseSent: boolean | null;
   queued: number | null;
   total: number | null;
   error: string | null;
@@ -25,4 +30,5 @@ export interface NotifySessionParticipants {
 
 export interface NotifySessionParticipantsVariables {
   sessionId: number;
+  skipCourse?: boolean | null;
 }
