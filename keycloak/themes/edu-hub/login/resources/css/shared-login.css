@@ -13,6 +13,7 @@
   --kc-cobrand-accent: #222;
   --kc-cobrand-accent-hover: #0b7478;
   --kc-cobrand-link: #0b7478;
+  --kc-cobrand-link-hover: #222;
   --kc-cobrand-background: #222;
   --kc-cobrand-border: #dedede;
   --kc-cobrand-copy: #222;
@@ -511,21 +512,15 @@ h1#kc-page-title {
   color: var(--kc-cobrand-link);
   font-weight: 600;
   text-decoration: none;
+  transition: color 150ms ease;
 }
 
 #kc-form-login .kc-password-reset-link:hover,
 #kc-form-login .kc-password-reset-link:focus,
 #kc-registration.kc-account-switch a:hover,
 #kc-registration.kc-account-switch a:focus {
-  color: var(--kc-cobrand-accent-hover);
+  color: var(--kc-cobrand-link-hover);
   text-decoration: none;
-}
-
-#kc-form-login .kc-password-reset-link:hover,
-#kc-registration.kc-account-switch a:hover {
-  text-decoration-line: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 3px;
 }
 
 #kc-form-login .kc-password-reset-link:focus-visible,
