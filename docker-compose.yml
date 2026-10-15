@@ -265,6 +265,8 @@ services:
     environment:
       DEV_HOST: ${DEV_HOST:-localhost}
       DEV_KEYCLOAK_SSL_REQUIRED: ${DEV_KEYCLOAK_SSL_REQUIRED:-external}
+      # Show non-authenticating SSO previews when no providers are configured.
+      KEYCLOAK_SSO_PREVIEW: ${KEYCLOAK_SSO_PREVIEW:-true}
       KC_BOOTSTRAP_ADMIN_USERNAME: admin
       KC_BOOTSTRAP_ADMIN_PASSWORD: admin
       KC_HOSTNAME_STRICT: "false"
