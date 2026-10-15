@@ -2192,10 +2192,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@next/env@npm:16.3.8":
-  version: 16.3.8
-  resolution: "@next/env@npm:16.3.8"
-  checksum: 433553a1840ad078e4b3d0d2971d629bf683f671b1e4fe90d865d4db2cefbbdd48e56d88e8feedc7b6ea2725a7a118863101995dc0552fffd62274311893d99f
+"@next/env@npm:16.4.1":
+  version: 16.4.1
+  resolution: "@next/env@npm:16.4.1"
+  checksum: 00dac0af4e532b381986fcf3f28d7b926f33c4076b10ba5e874837e774b98b6e04b80f577946c98250509dc9d23daac8dd79a63cd8cd7b263b1ce7043cfc3354
   languageName: node
   linkType: hard
 
@@ -2208,58 +2208,58 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@next/swc-darwin-arm64@npm:16.3.8":
-  version: 16.3.8
-  resolution: "@next/swc-darwin-arm64@npm:16.3.8"
+"@next/swc-darwin-arm64@npm:16.4.1":
+  version: 16.4.1
+  resolution: "@next/swc-darwin-arm64@npm:16.4.1"
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
 
-"@next/swc-darwin-x64@npm:16.3.8":
-  version: 16.3.8
-  resolution: "@next/swc-darwin-x64@npm:16.3.8"
+"@next/swc-darwin-x64@npm:16.4.1":
+  version: 16.4.1
+  resolution: "@next/swc-darwin-x64@npm:16.4.1"
   conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
 
-"@next/swc-linux-arm64-gnu@npm:16.3.8":
-  version: 16.3.8
-  resolution: "@next/swc-linux-arm64-gnu@npm:16.3.8"
+"@next/swc-linux-arm64-gnu@npm:16.4.1":
+  version: 16.4.1
+  resolution: "@next/swc-linux-arm64-gnu@npm:16.4.1"
   conditions: os=linux & cpu=arm64 & libc=glibc
   languageName: node
   linkType: hard
 
-"@next/swc-linux-arm64-musl@npm:16.3.8":
-  version: 16.3.8
-  resolution: "@next/swc-linux-arm64-musl@npm:16.3.8"
+"@next/swc-linux-arm64-musl@npm:16.4.1":
+  version: 16.4.1
+  resolution: "@next/swc-linux-arm64-musl@npm:16.4.1"
   conditions: os=linux & cpu=arm64 & libc=musl
   languageName: node
   linkType: hard
 
-"@next/swc-linux-x64-gnu@npm:16.3.8":
-  version: 16.3.8
-  resolution: "@next/swc-linux-x64-gnu@npm:16.3.8"
+"@next/swc-linux-x64-gnu@npm:16.4.1":
+  version: 16.4.1
+  resolution: "@next/swc-linux-x64-gnu@npm:16.4.1"
   conditions: os=linux & cpu=x64 & libc=glibc
   languageName: node
   linkType: hard
 
-"@next/swc-linux-x64-musl@npm:16.3.8":
-  version: 16.3.8
-  resolution: "@next/swc-linux-x64-musl@npm:16.3.8"
+"@next/swc-linux-x64-musl@npm:16.4.1":
+  version: 16.4.1
+  resolution: "@next/swc-linux-x64-musl@npm:16.4.1"
   conditions: os=linux & cpu=x64 & libc=musl
   languageName: node
   linkType: hard
 
-"@next/swc-win32-arm64-msvc@npm:16.3.8":
-  version: 16.3.8
-  resolution: "@next/swc-win32-arm64-msvc@npm:16.3.8"
+"@next/swc-win32-arm64-msvc@npm:16.4.1":
+  version: 16.4.1
+  resolution: "@next/swc-win32-arm64-msvc@npm:16.4.1"
   conditions: os=win32 & cpu=arm64
   languageName: node
   linkType: hard
 
-"@next/swc-win32-x64-msvc@npm:16.3.8":
-  version: 16.3.8
-  resolution: "@next/swc-win32-x64-msvc@npm:16.3.8"
+"@next/swc-win32-x64-msvc@npm:16.4.1":
+  version: 16.4.1
+  resolution: "@next/swc-win32-x64-msvc@npm:16.4.1"
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
@@ -13535,24 +13535,24 @@ __metadata:
   languageName: node
   linkType: hard
 
-"next@npm:^16.3.8":
-  version: 16.3.8
-  resolution: "next@npm:16.3.8"
+"next@npm:^16.4.1":
+  version: 16.4.1
+  resolution: "next@npm:16.4.1"
   dependencies:
-    "@next/env": 16.3.8
-    "@next/swc-darwin-arm64": 16.3.8
-    "@next/swc-darwin-x64": 16.3.8
-    "@next/swc-linux-arm64-gnu": 16.3.8
-    "@next/swc-linux-arm64-musl": 16.3.8
-    "@next/swc-linux-x64-gnu": 16.3.8
-    "@next/swc-linux-x64-musl": 16.3.8
-    "@next/swc-win32-arm64-msvc": 16.3.8
-    "@next/swc-win32-x64-msvc": 16.3.8
+    "@next/env": 16.4.1
+    "@next/swc-darwin-arm64": 16.4.1
+    "@next/swc-darwin-x64": 16.4.1
+    "@next/swc-linux-arm64-gnu": 16.4.1
+    "@next/swc-linux-arm64-musl": 16.4.1
+    "@next/swc-linux-x64-gnu": 16.4.1
+    "@next/swc-linux-x64-musl": 16.4.1
+    "@next/swc-win32-arm64-msvc": 16.4.1
+    "@next/swc-win32-x64-msvc": 16.4.1
     "@swc/helpers": 0.5.23
     baseline-browser-mapping: ^2.9.19
     caniuse-lite: ^1.0.30001579
     postcss: 8.5.23
-    sharp: ^0.35.4
+    sharp: ^0.35.5
     styled-jsx: 5.1.6
   peerDependencies:
     "@opentelemetry/api": ^1.1.0
@@ -13591,7 +13591,7 @@ __metadata:
       optional: true
   bin:
     next: dist/bin/next
-  checksum: ab6d64c8ec054b5826e963c1ea5b76e89f2e53279b08464f1595cccae25855cc605216eef8d66b347352526b647b269ea1bee37895597fc93e8090de5ff47cc2
+  checksum: 070397615e1a33c7840e837bf9e8fc82ec4c626afcbe00131f014c58d49d7223d2e3352c40875743898ccf3664614c9d53720a872c187258e13503b28359665e
   languageName: node
   linkType: hard
 
@@ -14317,15 +14317,15 @@ __metadata:
     jest-environment-jsdom: 29.7.0
     loglevel: ^1.9.1
     lucide-react: ^0.456.0
-    next: ^16.3.8
+    next: ^16.4.1
     next-auth: ^4.24.15
     next-intl: ^4.9.2
     postcss: 8.5.18
     prettier: ^3.3.3
     raw-body: ^2.5.2
-    react: ^19.2.8
+    react: ~19.2.9
     react-datepicker: ^8.10.0
-    react-dom: ^19.2.8
+    react-dom: ~19.2.9
     react-hook-form: ^7.53.0
     react-icons: ^5.3.0
     react-markdown: ^9.0.1
@@ -15579,14 +15579,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-dom@npm:^19.2.8":
-  version: 19.2.8
-  resolution: "react-dom@npm:19.2.8"
+"react-dom@npm:~19.2.9":
+  version: 19.2.9
+  resolution: "react-dom@npm:19.2.9"
   dependencies:
     scheduler: ^0.27.0
   peerDependencies:
-    react: ^19.2.8
-  checksum: cef5d9493f911f20da5648bbd44a27e7e2e96868be4ed0a6a650499b19d74156d35e8c2eee9c075a2cbce59ef3da483cb55113f2941c1bc17fd005ffa92d7084
+    react: ^19.2.9
+  checksum: 65e505fb77a13aa4a8362022d2e7d983465049eb13c1830656b5157bdc302bf982f722be9afa67da4a6bd9472e25807da688c83b0d12f0bfa1db40474bdac712
   languageName: node
   linkType: hard
 
@@ -15728,10 +15728,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react@npm:^19.2.8":
-  version: 19.2.8
-  resolution: "react@npm:19.2.8"
-  checksum: cdedb4786eb3eb79c8fbaa6df299de61ecd9e1cd4c7cd52213b5af7a98c67d532fd6b14b9d546ae5851f3962437aec22ad17ee6e8e0450de11c595300c5e5bd7
+"react@npm:~19.2.9":
+  version: 19.2.9
+  resolution: "react@npm:19.2.9"
+  checksum: 1467c37fa5784d7ec14a4b18c8a04283ce4d84185bfd07b6eba746f21aec104152ca6f4405d0d2154021726af372a1a69a45bdb9f3e4b9cf2eb6a38ca8850611
   languageName: node
   linkType: hard
 
