@@ -78,6 +78,11 @@ module "keycloak_service" {
       name  = "KEYCLOAK_SHA"
       value = var.keycloak_sha
     },
+    # SSO mock buttons are only for the local Docker Compose stack.
+    {
+      name  = "KEYCLOAK_SSO_PREVIEW"
+      value = "false"
+    },
     {
       name  = "KC_DB_URL"
       value = "jdbc:postgresql://${google_sql_database_instance.default.private_ip_address}/keycloak"
