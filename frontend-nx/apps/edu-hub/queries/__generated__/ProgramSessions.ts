@@ -34,6 +34,10 @@ export interface ProgramSessions_Session {
    */
   title: string;
   /**
+   * A description of the session
+   */
+  description: string;
+  /**
    * The day and time of the start of the session
    */
   startDateTime: any;
