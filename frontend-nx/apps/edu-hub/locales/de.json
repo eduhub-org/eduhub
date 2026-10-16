@@ -1163,6 +1163,19 @@
       }
     },
     "organization_scope_label": "Organisation",
+    "program_settings": {
+      "open": "Programmeinstellungen",
+      "select_program_hint": "Wähle ein Programm aus, um seine Einstellungen zu öffnen",
+      "title": "Einstellungen: {title}",
+      "close": "Programmeinstellungen schließen",
+      "load_error": "Die Programmeinstellungen konnten nicht geladen werden.",
+      "published": "Veröffentlicht",
+      "application_start": "Anmeldebeginn",
+      "application_end": "Anmeldeschluss",
+      "course_start": "Kursstart",
+      "course_end": "Kursende",
+      "project_submission_deadline": "Projekt-Abgabefrist"
+    },
     "add_disabled_hint": {
       "select_program": "Wähle ein Programm aus, um ein neues Angebot hinzuzufügen."
     },
@@ -2352,6 +2365,15 @@
       "count": "{count, plural, =0 {Noch keine Kursleitungen zugeordnet} one {# Kursleitung} other {# Kursleitungen}}",
       "copied": "Zu viele Empfänger:innen für Dein E-Mail-Programm. Die {count} Adressen wurden stattdessen in die Zwischenablage kopiert – füge sie ins BCC-Feld ein.",
       "copy_failed": "Zu viele Empfänger:innen für Dein E-Mail-Programm, und das Kopieren der Adressen in die Zwischenablage ist fehlgeschlagen."
+    },
+    "participant_emails": {
+      "label": "Teilnehmende",
+      "button": "E-Mail an alle Teilnehmenden",
+      "help_text": "Öffnet Dein E-Mail-Programm mit allen bestätigten Teilnehmenden der Kurse dieses Programms in BCC.",
+      "count": "{count, plural, =0 {Noch keine bestätigten Teilnehmenden} one {# bestätigte:r Teilnehmende:r} other {# bestätigte Teilnehmende}}",
+      "copied": "Zu viele Empfänger:innen für Dein E-Mail-Programm. Die {count} Adressen wurden stattdessen in die Zwischenablage kopiert – füge sie ins BCC-Feld ein. Viele E-Mail-Anbieter erlauben höchstens 500 Empfänger:innen pro E-Mail; verteile größere Listen daher auf mehrere E-Mails.",
+      "copy_failed": "Zu viele Empfänger:innen für Dein E-Mail-Programm, und das Kopieren der Adressen in die Zwischenablage ist fehlgeschlagen.",
+      "load_failed": "Die Adressen der Teilnehmenden konnten nicht geladen werden."
     },
     "participation_data": {
       "generate": "Teilnehmer:innen Daten generieren (CSV)",

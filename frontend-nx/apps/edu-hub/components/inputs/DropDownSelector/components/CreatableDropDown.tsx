@@ -1,6 +1,6 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { Add as AddIcon, HelpOutline } from '@mui/icons-material';
-import { Tooltip } from '@mui/material';
+import { Popper, Tooltip } from '@mui/material';
 import { useTranslations } from 'next-intl';
 import { Option } from '../types';
 import { SelectChangeEvent } from '@mui/material';
@@ -44,6 +44,7 @@ export const CreatableDropDown: React.FC<CreatableDropDownProps> = ({
   const [isOpen, setIsOpen] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const [isCleared, setIsCleared] = useState(false);
+  const anchorRef = useRef<HTMLDivElement>(null);
 
   const getFilteredOptions = useCallback(
     (searchValue = '') => {
@@ -147,7 +148,7 @@ export const CreatableDropDown: React.FC<CreatableDropDownProps> = ({
 
   return (
     <div className="relative">
-      <div className="flex items-center">
+      <div ref={anchorRef} className="flex items-center">
         <input
           type="text"
           disabled={disabled}
@@ -200,11 +201,18 @@ export const CreatableDropDown: React.FC<CreatableDropDownProps> = ({
           </Tooltip>
         )}
       </div>
-      {!disabled && isOpen && (
+      {/* Fixed positioning lets the list escape ancestors that clip their overflow, such as
+          TableGrid cells; disablePortal keeps it inside dialogs and the surrounding theme. */}
+      <Popper
+        open={!disabled && isOpen && !!anchorRef.current}
+        anchorEl={anchorRef.current}
+        placement="bottom-start"
+        disablePortal
+        popperOptions={{ strategy: 'fixed' }}
+        style={{ minWidth: anchorRef.current?.offsetWidth, maxWidth: '24rem', zIndex: 1300 }}
+      >
         <div
-          className={`absolute w-full bg-fill-primary text-label-primary border border-border-primary rounded-md shadow-lg max-h-60 overflow-auto light ${
-            variant === 'eduhub' ? 'z-50' : 'z-10'
-          }`}
+          className="w-full bg-fill-primary text-label-primary border border-border-primary rounded-md shadow-lg max-h-60 overflow-auto light"
         >
           {getFilteredOptions(inputValue).map((option, index) => (
             <div
@@ -231,7 +239,7 @@ export const CreatableDropDown: React.FC<CreatableDropDownProps> = ({
             </div>
           )}
         </div>
-      )}
+      </Popper>
     </div>
   );
 };

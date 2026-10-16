@@ -12,6 +12,8 @@
 :root {
   --kc-cobrand-accent: #222;
   --kc-cobrand-accent-hover: #0b7478;
+  --kc-cobrand-link: #0b7478;
+  --kc-cobrand-link-hover: #222;
   --kc-cobrand-background: #222;
   --kc-cobrand-border: #dedede;
   --kc-cobrand-copy: #222;
@@ -22,6 +24,7 @@
 
 html.stujo-brand {
   --kc-cobrand-accent: #a71580;
+  --kc-cobrand-link: var(--kc-cobrand-accent);
   --kc-cobrand-accent-hover: #861065;
   --kc-cobrand-background: #f5f2f4;
   --kc-cobrand-border: #e2dde0;
@@ -59,6 +62,20 @@ html.stujo-brand body {
 .navbar-logo-wrapper {
   width: 100%;
   align-items: center;
+}
+
+/* The EduHub lockup is a single accessible home link. */
+.navbar-home-link {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  border-radius: 4px;
+  text-decoration: none;
+}
+
+.navbar-home-link:focus-visible {
+  outline: 2px solid var(--kc-cobrand-link);
+  outline-offset: 5px;
 }
 
 /* This theme has no mobile navigation links, so its Bootstrap toggle is inert. */
@@ -140,14 +157,6 @@ html.stujo-flensburg .navbar-cobrand-flensburg {
 /* Keep breathing room below tall flows such as registration. */
 .login-pf-page {
   padding-bottom: 40px;
-}
-
-/* Give the full login card a little more room below on laptop viewports.
-   Other, potentially taller Keycloak flows keep their natural position. */
-@media (min-width: 768px) and (min-height: 700px) {
-  html.stujo-brand body.kc-login-page .login-pf-page {
-    transform: translateY(-24px);
-  }
 }
 
 /* Use Keycloak's locale handling, presented as a compact dropdown. */
@@ -272,14 +281,11 @@ h1#kc-page-title {
   border-bottom-width: 1px;
 }
 
-.pf-c-form-control:focus {
-  outline: none;
-  box-shadow: 0 0 0 1px var(--kc-cobrand-accent);
-}
-
+/* One border and one ring match standalone fields to password groups. */
+.pf-c-form-control:focus,
 .pf-c-form-control:focus-visible {
-  outline: 1px solid var(--kc-cobrand-accent);
-  outline-offset: 1px;
+  outline: 0;
+  box-shadow: 0 0 0 1px var(--kc-cobrand-accent);
 }
 
 .pf-c-input-group {
@@ -377,23 +383,34 @@ h1#kc-page-title {
   color: var(--kc-cobrand-accent-hover);
 }
 
-/* Identity providers remain data-driven. When DLC is configured, present it
-   as a full-width secondary action separated from the password login. */
+/* Login and registration share these provider buttons, including dev previews. */
 #kc-social-providers {
   margin-top: 24px;
-  text-align: center;
 }
 
-#kc-social-providers hr {
-  margin: 0 0 18px;
-  border: 0;
-  border-top: 1px solid var(--kc-cobrand-border);
-}
-
-#kc-social-providers h4 {
-  margin: 0 0 14px;
+.kc-auth-divider {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 18px;
   color: #77737a;
   font-size: 16px;
+}
+
+.kc-auth-divider::before,
+.kc-auth-divider::after {
+  flex: 1;
+  border-top: 1px solid var(--kc-cobrand-border);
+  /* An empty rule's baseline is its bottom edge. Center its 1px stroke
+     halfway up the font's lowercase x-height, independent of line-height. */
+  transform: translateY(calc(0.5px - 0.5ex));
+  content: '';
+}
+
+#kc-social-providers .kc-auth-divider h4 {
+  margin: 0;
+  color: inherit;
+  font-size: inherit;
   font-weight: 400;
 }
 
@@ -403,34 +420,119 @@ h1#kc-page-title {
   list-style: none;
 }
 
-#kc-social-providers li {
-  margin-bottom: 10px;
+#kc-social-providers .kc-social-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-rows: 1fr;
+  gap: 12px;
 }
 
-#kc-social-providers a {
+#kc-social-providers li {
+  min-width: 0;
+  margin: 0;
+}
+
+/* Own the entire border instead of stacking PatternFly's control ::after
+   rectangle and blue underline over the rounded provider button. */
+#kc-social-providers .kc-social-button {
   display: flex;
-  min-height: 44px;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  min-height: 48px;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 9px 18px;
-  border: 1px solid #cac6c9;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--kc-field-border);
   border-radius: 8px;
-  background-color: #fff;
+  background: #fff;
   color: var(--kc-cobrand-copy);
+  font-family: inherit;
+  font-size: 15px;
   font-weight: 600;
+  line-height: 1.25;
   text-decoration: none;
 }
 
-/* Flex layout replaces the legacy offsets for floated provider icons. */
 #kc-social-providers .kc-social-provider-name {
   position: static;
 }
 
-#kc-social-providers a:hover,
-#kc-social-providers a:focus {
-  border-color: var(--kc-cobrand-accent);
+#kc-social-providers .kc-social-dlc-name {
+  text-align: left;
+}
+
+#kc-social-providers .kc-social-provider-image {
+  flex: 0 0 32px;
+  width: 32px;
+  height: 34px;
+  object-fit: contain;
+}
+
+#kc-social-providers .kc-social-provider-logo {
+  flex: 0 0 24px;
+  width: 24px;
+  height: auto;
+  float: none;
+  color: #737679;
+  font-size: 23px;
+}
+
+#kc-social-providers .kc-social-button:hover,
+#kc-social-providers .kc-social-button:focus {
+  border-color: var(--kc-cobrand-link);
+  outline: 0;
+  box-shadow: 0 0 0 1px var(--kc-cobrand-link);
   color: var(--kc-cobrand-accent);
+}
+
+#kc-sso-preview-note {
+  margin: 12px 0 0;
+  color: #77737a;
+  font-size: 12px;
+  line-height: 1.5;
+  text-align: left;
+}
+
+/* Keep account switching next to the primary action on both pages. */
+#kc-form-login .kc-account-actions {
+  text-align: right;
+}
+
+#kc-registration.kc-account-switch {
+  margin-top: 8px;
+  font-size: 16px;
+  line-height: 1.5;
+  text-align: right;
+}
+
+#kc-form-login .kc-password-reset-link,
+#kc-registration.kc-account-switch a {
+  color: var(--kc-cobrand-link);
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 150ms ease;
+}
+
+#kc-form-login .kc-password-reset-link:hover,
+#kc-form-login .kc-password-reset-link:focus,
+#kc-registration.kc-account-switch a:hover,
+#kc-registration.kc-account-switch a:focus {
+  color: var(--kc-cobrand-link-hover);
+  text-decoration: none;
+}
+
+#kc-form-login .kc-password-reset-link:focus-visible,
+#kc-registration.kc-account-switch a:focus-visible {
+  outline: 2px solid var(--kc-cobrand-accent);
+  outline-offset: 2px;
+}
+
+@media (max-width: 440px) {
+  #kc-social-providers .kc-social-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* Remove Keycloak's full-bleed grey registration footer. */
@@ -469,6 +571,16 @@ html.stujo-brand .kc-cobrand-note {
 }
 
 @media (min-width: 768px) {
+  /* Use the same top position for login and registration without the empty
+     Keycloak header spacer, keeping sign-in visible on 800px-tall screens. */
+  .login-pf-page {
+    padding-top: 0;
+  }
+
+  #kc-header {
+    margin-bottom: 0;
+  }
+
   .academy_header_guest .navbar.p-0 {
     height: 92px;
     padding: 20px 28px !important;
@@ -550,7 +662,6 @@ html.stujo-brand .kc-cobrand-note {
 }
 
 .pf-c-input-group .pf-c-button.pf-m-control:focus-visible,
-#kc-social-providers a:focus-visible,
 .pf-c-button.pf-m-primary:focus-visible {
   outline: 2px solid var(--kc-cobrand-accent);
   outline-offset: 2px;

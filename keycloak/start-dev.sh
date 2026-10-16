@@ -35,4 +35,5 @@ unset KC_BOOTSTRAP_ADMIN_USERNAME KC_BOOTSTRAP_ADMIN_PASSWORD
 
 exec /opt/keycloak/bin/kc.sh start --optimized \
   --spi-theme-cache-themes=false \
-  --spi-theme-cache-templates=false
+  --spi-theme-cache-templates=false \
+  --spi-theme-static-max-age=-1
