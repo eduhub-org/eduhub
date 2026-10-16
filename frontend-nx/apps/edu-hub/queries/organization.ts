@@ -34,6 +34,13 @@ export const ORGANIZATION_LIST = gql`
         id
         apiKeyHash
         ghostNewsletterApiKeyConfigured
+        rausgegangenApiKeyConfigured
+        rausgegangenTestMode
+      }
+      # Features a super admin activated for this organization.
+      Features {
+        id
+        feature
       }
       Users {
         id
@@ -45,6 +52,9 @@ export const ORGANIZATION_LIST = gql`
       }
     }
     OrganizationType {
+      value
+    }
+    OrganizationFeatureOption {
       value
     }
   }
@@ -218,6 +228,30 @@ export const UPDATE_ORGANIZATION_NEWSLETTER_DESCRIPTION = gql`
     ) {
       id
       newsletterDescription
+    }
+  }
+`;
+
+export const INSERT_ORGANIZATION_FEATURE = gql`
+  mutation InsertOrganizationFeature($organizationId: Int!, $feature: OrganizationFeatureOption_enum!) {
+    insert_OrganizationFeature_one(object: { organizationId: $organizationId, feature: $feature }) {
+      id
+    }
+  }
+`;
+
+export const DELETE_ORGANIZATION_FEATURE = gql`
+  mutation DeleteOrganizationFeature($organizationId: Int!, $feature: OrganizationFeatureOption_enum!) {
+    delete_OrganizationFeature(where: { organizationId: { _eq: $organizationId }, feature: { _eq: $feature } }) {
+      affected_rows
+    }
+  }
+`;
+
+export const UPDATE_ORGANIZATION_RAUSGEGANGEN_TEST_MODE = gql`
+  mutation UpdateOrganizationRausgegangenTestMode($id: Int!, $value: Boolean!) {
+    update_Organization_by_pk(pk_columns: { id: $id }, _set: { rausgegangenTestMode: $value }) {
+      id
     }
   }
 `;

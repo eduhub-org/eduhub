@@ -69,6 +69,7 @@ import { MdMarkEmailRead, MdOpenInNew, MdSettings } from 'react-icons/md';
 import { ProgramsMenubar } from '../../layout/ProgramsMenubar';
 import type { StaticComponentProperty } from '../../../types/UIComponents';
 import { ProgramType } from '../../../types/enums';
+import { useRausgegangenUnpublishPrompt } from '../ManageCourseContent/useRausgegangenUnpublishPrompt';
 import {
   programTabStorageKey,
   resolveProgramTab,
@@ -386,6 +387,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
   });
 
   const [updateCourse] = useManageMutation<UpdateCourseByPk, UpdateCourseByPkVariables>(UPDATE_COURSE_PROPERTY);
+  const { confirmUnpublish, dialog: rausgegangenUnpublishDialog } = useRausgegangenUnpublishPrompt();
 
   const [insertCourse] = useManageMutation<InsertCourseWithLocation, InsertCourseWithLocationVariables>(INSERT_COURSE);
 
@@ -472,6 +474,8 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
           );
           setShowSuccessNotification(true);
         } else if (action === 'unpublish') {
+          // Shared on Rausgegangen? Ask whether to unpublish there too (cancel keeps everything).
+          if (!(await confirmUnpublish(courseIds))) return false;
           // Update all selected courses to unpublished
           await Promise.all(
             courseIds.map((id) =>
@@ -516,7 +520,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
         throw error;
       }
     },
-    [copyBulkAction, refetch, updateCourse, createInstructorCertificates, t, messageKey]
+    [copyBulkAction, refetch, updateCourse, createInstructorCertificates, t, messageKey, confirmUnpublish]
   );
 
   const bulkActions = [
@@ -1022,6 +1026,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
 
   return (
     <>
+      {rausgegangenUnpublishDialog}
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0 flex-1">
           {organizationSelector}

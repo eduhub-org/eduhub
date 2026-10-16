@@ -11,6 +11,7 @@ import { UPDATE_COURSE_PROPERTY } from '../../../queries/mutateCourse';
 import { ManagedCourse_Course_by_pk } from '../../../queries/__generated__/ManagedCourse';
 import { UpdateCourseByPk, UpdateCourseByPkVariables } from '../../../queries/__generated__/UpdateCourseByPk';
 import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';
+import { useRausgegangenUnpublishPrompt } from './useRausgegangenUnpublishPrompt';
 
 const BUTTON =
   'inline-flex min-h-[44px] items-center gap-1.5 rounded-full border-[1.5px] border-white px-4 text-sm font-semibold text-white hover:bg-white/10 disabled:opacity-50';
@@ -30,11 +31,13 @@ export const PublicEventNotice: FC<{ course: ManagedCourse_Course_by_pk }> = ({ 
     { refetchQueries: ['ManagedCourse'], awaitRefetchQueries: true }
   );
   const [error, setError] = useState<string | null>(null);
+  const { confirmUnpublish, dialog: unpublishDialog } = useRausgegangenUnpublishPrompt();
 
   const source = course.SourceSession;
   if (course.sourceSessionId == null || !source) return null;
 
   const setPublished = async (published: boolean) => {
+    if (!published && !(await confirmUnpublish([course.id]))) return;
     try {
       await updateCourse({ variables: { id: course.id, changes: { published } } });
     } catch (e) {
@@ -76,6 +79,7 @@ export const PublicEventNotice: FC<{ course: ManagedCourse_Course_by_pk }> = ({ 
         )}
       </div>
       {error && <ErrorMessageDialog errorMessage={error} open={!!error} onClose={() => setError(null)} />}
+      {unpublishDialog}
     </div>
   );
 };

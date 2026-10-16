@@ -1,0 +1,130 @@
+table:
+  name: RausgegangenListing
+  schema: public
+object_relationships:
+  - name: Course
+    using:
+      foreign_key_constraint_on: courseId
+  - name: Category
+    using:
+      foreign_key_constraint_on: category
+# Org admins who may manage the event (canManageEvents, or canManageSettings for
+# every program type) read the listing and set enabled/category/tags. Creating or
+# changing a listing additionally requires the organization's RAUSGEGANGEN
+# feature, activated by a super admin. The sync columns are written by the
+# syncRausgegangenEvent function only. Only events can be listed (DB trigger
+# check_RausgegangenListing_course).
+select_permissions:
+  - role: org_admin_access
+    permission:
+      columns:
+        - id
+        - courseId
+        - enabled
+        - category
+        - tags
+        - rausgegangenEventId
+        - rausgegangenShowId
+        - previewUrl
+        - publicUrl
+        - published
+        - syncStatus
+        - syncError
+        - lastSyncedAt
+        - created_at
+        - updated_at
+      filter:
+        Course:
+          Program:
+            _and:
+              - type:
+                  _eq: EVENTS
+              - Organization:
+                  OrganizationAdmins:
+                    _and:
+                      - userId:
+                          _eq: X-Hasura-User-Id
+                      - _or:
+                          - canManageEvents:
+                              _eq: true
+                          - canManageSettings:
+                              _eq: true
+insert_permissions:
+  - role: org_admin_access
+    permission:
+      check:
+        Course:
+          Program:
+            _and:
+              - type:
+                  _eq: EVENTS
+              - Organization:
+                  _and:
+                    - Features:
+                        feature:
+                          _eq: RAUSGEGANGEN
+                    - OrganizationAdmins:
+                        _and:
+                          - userId:
+                              _eq: X-Hasura-User-Id
+                          - _or:
+                              - canManageEvents:
+                                  _eq: true
+                              - canManageSettings:
+                                  _eq: true
+      columns:
+        - courseId
+        - enabled
+        - category
+        - tags
+update_permissions:
+  - role: org_admin_access
+    permission:
+      columns:
+        - enabled
+        - category
+        - tags
+      filter:
+        Course:
+          Program:
+            _and:
+              - type:
+                  _eq: EVENTS
+              - Organization:
+                  _and:
+                    - Features:
+                        feature:
+                          _eq: RAUSGEGANGEN
+                    - OrganizationAdmins:
+                        _and:
+                          - userId:
+                              _eq: X-Hasura-User-Id
+                          - _or:
+                              - canManageEvents:
+                                  _eq: true
+                              - canManageSettings:
+                                  _eq: true
+      check: null
+event_triggers:
+  # Only the editor's columns: the function writes the sync columns back, which
+  # must not trigger it again.
+  - name: rausgegangen_listing_changed
+    definition:
+      enable_manual: true
+      insert:
+        columns: '*'
+      update:
+        columns:
+          - enabled
+          - category
+          - tags
+    retry_conf:
+      interval_sec: 300
+      num_retries: 5
+      timeout_sec: 120
+    webhook: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+    headers:
+      - name: name
+        value: syncRausgegangenEvent
+      - name: secret
+        value_from_env: HASURA_CLOUD_FUNCTION_SECRET

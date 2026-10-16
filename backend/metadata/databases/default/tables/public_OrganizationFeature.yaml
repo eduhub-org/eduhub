@@ -1,0 +1,41 @@
+table:
+  name: OrganizationFeature
+  schema: public
+object_relationships:
+  - name: Organization
+    using:
+      foreign_key_constraint_on: organizationId
+# Only a super admin (`admin`, full access) activates or deactivates a feature,
+# so no role gets insert, update or delete. Org admins read their own
+# organization's features to know what is unlocked.
+select_permissions:
+  - role: org_admin_access
+    permission:
+      columns:
+        - id
+        - organizationId
+        - feature
+        - created_at
+        - updated_at
+      filter:
+        Organization:
+          OrganizationAdmins:
+            userId:
+              _eq: X-Hasura-User-Id
+event_triggers:
+  # Deactivating RAUSGEGANGEN unpublishes all of the organization's events there.
+  - name: rausgegangen_organization_feature_removed
+    definition:
+      enable_manual: false
+      delete:
+        columns: '*'
+    retry_conf:
+      interval_sec: 300
+      num_retries: 5
+      timeout_sec: 120
+    webhook: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+    headers:
+      - name: name
+        value: syncRausgegangenEvent
+      - name: secret
+        value_from_env: HASURA_CLOUD_FUNCTION_SECRET

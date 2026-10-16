@@ -1,11 +1,10 @@
 import axios from 'axios';
 import { gql, GraphQLClient } from 'graphql-request';
-import crypto from 'crypto';
+import { decryptOrganizationCredential } from '../lib/organizationCredential.js';
 
 const USER_DRIVEN_SOURCES = new Set(['CHECKBOX', 'PROFILE', 'ADMIN']);
 
 const normalize = (value) => (typeof value === 'string' ? value.trim() : '');
-const KEY_LENGTH_BYTES = 32;
 
 const isSubscribedLikeStatus = (status) => status === 'SUBSCRIBED' || status === 'PENDING';
 
@@ -16,54 +15,8 @@ const hasGhostConfiguration = (organization) =>
       (normalize(organization?.ghostNewsletterListId) || normalize(organization?.ghostNewsletterSlug))
   );
 
-const decodeEncryptionKey = () => {
-  const raw = normalize(process.env.GHOST_NEWSLETTER_CREDENTIALS_ENCRYPTION_KEY);
-  if (!raw) {
-    throw new Error('Missing GHOST_NEWSLETTER_CREDENTIALS_ENCRYPTION_KEY');
-  }
-
-  if (/^[0-9a-fA-F]{64}$/.test(raw)) {
-    return Buffer.from(raw, 'hex');
-  }
-
-  const base64Key = Buffer.from(raw, 'base64');
-  if (base64Key.length === KEY_LENGTH_BYTES) {
-    return base64Key;
-  }
-
-  throw new Error(
-    'Invalid GHOST_NEWSLETTER_CREDENTIALS_ENCRYPTION_KEY format. Use 64-char hex or base64-encoded 32-byte key.'
-  );
-};
-
-const decryptGhostCredential = (encryptedValue) => {
-  const payload = normalize(encryptedValue);
-  if (!payload) {
-    throw new Error('Ghost credential is missing');
-  }
-
-  const [version, ivBase64, authTagBase64, ciphertextBase64] = payload.split(':');
-  if (version !== 'v1' || !ivBase64 || !authTagBase64 || !ciphertextBase64) {
-    throw new Error('Ghost credential payload has invalid format');
-  }
-
-  const key = decodeEncryptionKey();
-  const iv = Buffer.from(ivBase64, 'base64');
-  const authTag = Buffer.from(authTagBase64, 'base64');
-  const ciphertext = Buffer.from(ciphertextBase64, 'base64');
-
-  const decipher = crypto.createDecipheriv('aes-256-gcm', key, iv);
-  decipher.setAuthTag(authTag);
-
-  const plaintext = Buffer.concat([decipher.update(ciphertext), decipher.final()]).toString('utf8');
-  const credential = normalize(plaintext);
-
-  if (!credential) {
-    throw new Error('Ghost credential is empty after decryption');
-  }
-
-  return credential;
-};
+const decryptGhostCredential = (encryptedValue) =>
+  decryptOrganizationCredential(encryptedValue, 'Ghost credential');
 
 const buildGhostPayload = ({ subscription, userEmail, subscribe }) => {
   const organization = subscription.Organization;

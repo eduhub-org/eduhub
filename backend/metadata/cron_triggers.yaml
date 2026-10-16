@@ -201,3 +201,23 @@
     without a stored or with an unfinished response), so the applications tab
     rarely has to call Formbricks on demand. Uses the callNodeFunction
     name/secret headers.
+- name: reconcile_rausgegangen_events
+  webhook: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+  schedule: 40 2 * * *
+  include_in_metadata: true
+  payload:
+    reconcile: true
+  retry_conf:
+    num_retries: 0
+    retry_interval_seconds: 10
+    timeout_seconds: 3699
+    tolerance_seconds: 21600
+  headers:
+    - name: name
+      value: syncRausgegangenEvent
+    - name: secret
+      value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+  comment: >-
+    Resyncs every event shared on rausgegangen.de. Catches trigger deliveries
+    that failed for good, sold-out changes (enrollments do not trigger a sync)
+    and unpublished programs.

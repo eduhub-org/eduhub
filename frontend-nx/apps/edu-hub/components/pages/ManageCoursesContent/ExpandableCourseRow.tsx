@@ -66,7 +66,7 @@ import Card from '../../common/Card';
 import InstructorPaymentSection from './InstructorPaymentSection';
 import InstructorCertificatesButton from './InstructorCertificatesButton';
 import { ProgramType } from '../../../types/enums';
-import { UPDATE_COURSE_PROPERTY } from '../../../queries/mutateCourse';
+import { UPDATE_COURSE_COVER_IMAGE_CREDITS, UPDATE_COURSE_PROPERTY } from '../../../queries/mutateCourse';
 import useErrorHandler from '../../../hooks/useErrorHandler';
 import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';
 import { InfoDialog } from '../../common/dialogs/InfoDialog';
@@ -796,6 +796,18 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                   const translated = t(fileUploadKey) === fileUploadKey ? translateErrorMessage(error, t) : t(fileUploadKey);
                   handleError(translated);
                 }}
+              />
+              <InputField
+                variant="material"
+                type="input"
+                label={t('manageCourses.cover_image.credits_label')}
+                helpText={t('manageCourses.cover_image.credits_help')}
+                itemId={course.id}
+                value={course.coverImageCredits ?? ''}
+                updateValueMutation={UPDATE_COURSE_COVER_IMAGE_CREDITS}
+                transformMutationText={(text) => text.trim() || null}
+                refetchQueries={['AdminCourseList']}
+                maxLength={120}
               />
             </Card>
 

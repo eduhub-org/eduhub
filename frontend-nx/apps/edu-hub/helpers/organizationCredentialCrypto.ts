@@ -22,7 +22,12 @@ function decodeEncryptionKey(secret: string): Uint8Array {
   );
 }
 
-export function encryptGhostNewsletterCredential(plaintext: string, secret: string): string {
+/**
+ * Encrypts an organization integration credential (Ghost newsletter key, Rausgegangen API key)
+ * as "v1:iv:authTag:ciphertext" (AES-256-GCM). The node functions decrypt it with
+ * lib/organizationCredential.js; the key env var name predates the second credential.
+ */
+export function encryptOrganizationCredential(plaintext: string, secret: string): string {
   const key = decodeEncryptionKey(secret);
   const iv = crypto.randomBytes(12);
   const cipher = crypto.createCipheriv('aes-256-gcm', key, Uint8Array.from(iv));

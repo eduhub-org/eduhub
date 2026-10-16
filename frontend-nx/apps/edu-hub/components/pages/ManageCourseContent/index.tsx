@@ -27,6 +27,7 @@ import { CourseParticipationsTab } from './CourseParticipationsTab';
 import { DegreeParticipationsTab } from './DegreeParticipationsTab';
 import { ParticipantPreviewButton } from './ParticipantPreviewButton';
 import { PublicEventNotice } from './PublicEventNotice';
+import { RausgegangenEventSection } from './RausgegangenEventSection';
 import { InstructorConfidentialityGate } from './InstructorConfidentialityGate';
 import { useIsAdmin, useIsOrgAdmin, useIsUserIdInList } from '../../../hooks/authentication';
 import { getRegistrationFeatures } from './ApplicationsTab/registrationConfig';
@@ -282,6 +283,7 @@ const CourseManagement: FC<CourseManagementProps> = ({ courseId, manageAsOrgAdmi
       </div>
 
       <PublicEventNotice course={course} />
+      {isEventCourse && (isAdmin || manageAsOrgAdmin) && <RausgegangenEventSection courseId={course.id} />}
 
       {/* Two tiles per row on phones, one row from md up. */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 mb-8 md:mb-12">

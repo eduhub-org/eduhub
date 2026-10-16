@@ -937,3 +937,53 @@ type RequestJobOrganizationAccessResult {
   error: String
   messageKey: String
 }
+
+type Mutation {
+  saveLocationAddressImage(
+    base64file: String!
+    filename: String!
+    locationaddressid: Int!
+  ): saveImageResult
+}
+
+type Mutation {
+  geocodeLocationAddress(locationAddressId: Int!): GeocodeLocationAddressResult!
+}
+
+type GeocodeLocationAddressResult {
+  success: Boolean!
+  latitude: Float
+  longitude: Float
+  displayName: String
+  error: String
+}
+
+type Query {
+  searchRausgegangenLocations(locationAddressId: Int!): SearchRausgegangenLocationsResult!
+}
+
+type SearchRausgegangenLocationsResult {
+  success: Boolean!
+  error: String
+  locations: [RausgegangenLocation!]!
+}
+
+type RausgegangenLocation {
+  id: String!
+  title: String!
+  street: String
+  zipCode: String
+  city: String
+}
+
+type Mutation {
+  syncRausgegangenEventNow(courseId: Int!): SyncRausgegangenEventResult!
+}
+
+type SyncRausgegangenEventResult {
+  success: Boolean!
+  syncStatus: String
+  error: String
+  previewUrl: String
+  publicUrl: String
+}
