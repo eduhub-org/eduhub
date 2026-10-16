@@ -1563,7 +1563,7 @@
       "selection_skipped": "{count, plural, one {# selected person is} other {# selected persons are}} left out: only applicants with a matching rating who have not been invited or rejected yet are included.",
       "free_places": "{count, plural, =0 {No place in the course is free.} one {# place in the course is still free.} other {# places in the course are still free.}}",
       "invitations_withheld": "{count, plural, one {# more person with green rating is} other {# more persons with green rating are}} not invited because there are no more free places. Earlier applications are invited first; the others keep their status.",
-      "not_enough_places": "{selected} selected persons would be invited, but {count, plural, =0 {no place is} one {only # place is} other {only # places are}} free. Select fewer applicants.",
+      "not_enough_places": "{selected, plural, one {# selected person would} other {# selected persons would}} be invited, but {count, plural, =0 {no place is} one {only # place is} other {only # places are}} free. Select fewer applicants.",
       "course_full_no_invitations": "The course has no free places, so nobody with a green rating can be invited.",
       "course_full_error": "The invitations were not sent because the course does not have enough free places. Reload the page and try again.",
       "decisions_queued": "{invited} invited, {rejected} rejected; the participants will be notified by email.",

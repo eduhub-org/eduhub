@@ -1545,7 +1545,7 @@
       "selection_skipped": "{count, plural, one {# ausgewählte Person wird} other {# ausgewählte Personen werden}} ausgelassen: Berücksichtigt werden nur passend bewertete Personen, die noch nicht eingeladen oder abgelehnt wurden.",
       "free_places": "{count, plural, =0 {Im Kurs ist kein Platz mehr frei.} one {Im Kurs ist noch # Platz frei.} other {Im Kurs sind noch # Plätze frei.}}",
       "invitations_withheld": "{count, plural, one {# weitere Person mit grüner Bewertung wird} other {# weitere Personen mit grüner Bewertung werden}} nicht eingeladen, weil keine Plätze mehr frei sind. Frühere Bewerbungen werden zuerst eingeladen; die anderen behalten ihren Status.",
-      "not_enough_places": "{selected} ausgewählte Personen würden eingeladen, aber {count, plural, =0 {es ist kein Platz} one {es ist nur # Platz} other {es sind nur # Plätze}} frei. Wähle weniger Personen aus.",
+      "not_enough_places": "{selected, plural, one {# ausgewählte Person würde} other {# ausgewählte Personen würden}} eingeladen, aber {count, plural, =0 {es ist kein Platz} one {es ist nur # Platz} other {es sind nur # Plätze}} frei. Wähle weniger Personen aus.",
       "course_full_no_invitations": "Der Kurs hat keine freien Plätze mehr, deshalb kann niemand mit grüner Bewertung eingeladen werden.",
       "course_full_error": "Die Einladungen wurden nicht verschickt, weil der Kurs nicht genug freie Plätze hat. Lade die Seite neu und versuche es noch einmal.",
       "decisions_queued": "{invited} eingeladen, {rejected} abgelehnt; die Teilnehmenden werden per E-Mail informiert.",
