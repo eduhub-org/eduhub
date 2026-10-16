@@ -1,23 +1,19 @@
-import { FC, useCallback } from 'react';
+import { FC } from 'react';
 import { useTranslations } from 'next-intl';
 import { DocumentNode } from 'graphql';
 import { MdClose } from 'react-icons/md';
 
-import { useManageMutation } from '../../../hooks/authedMutation';
 import { useManageQuery } from '../../../hooks/authedQuery';
+import { useManageRole } from '../../../hooks/authentication';
 import { PROGRAM_LIST } from '../../../queries/programList';
 import { ProgramList, ProgramListVariables, ProgramList_Program } from '../../../queries/__generated__/ProgramList';
-import {
-  UpdateProgramPublished,
-  UpdateProgramPublishedVariables,
-} from '../../../queries/__generated__/UpdateProgramPublished';
 import {
   UPDATE_PROGRAM_APPLICATION_END,
   UPDATE_PROGRAM_APPLICATION_START,
   UPDATE_PROGRAM_DEFAULT_PROJECT_SUBMISSION_DEADLINE,
   UPDATE_PROGRAM_LECTURE_END,
   UPDATE_PROGRAM_LECTURE_START,
-  UPDATE_PROGRAM_PUBLISHED,
+  UPDATE_PROGRAM_PUBLISHED_VALUE,
   UPDATE_PROGRAM_TITLE,
 } from '../../../queries/updateProgram';
 import Loading from '../../common/Loading';
@@ -28,6 +24,16 @@ import ExpandableProgramRow from './ExpandableProgramRow';
 
 // 'Programs' is the program list of the courses page, whose tabs show the program titles.
 const REFETCH = ['ProgramList', 'Programs'];
+
+/**
+ * A `date` column ("2026-10-01") as local midnight of that day. `new Date()` would read it as UTC
+ * midnight, which is the previous day west of UTC. Timestamps are parsed as they are.
+ */
+const toPickerDate = (value: string | null) => {
+  if (!value) return null;
+  const dateOnly = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+  return dateOnly ? new Date(Number(dateOnly[1]), Number(dateOnly[2]) - 1, Number(dateOnly[3])) : new Date(value);
+};
 
 interface ProgramDateFieldProps {
   label: string;
@@ -51,7 +57,7 @@ const ProgramDateField: FC<ProgramDateFieldProps> = ({
     <DatePicker
       variant="material"
       itemId={programId}
-      value={value ? new Date(value) : null}
+      value={toPickerDate(value)}
       updateValueMutation={mutation}
       refetchQueries={REFETCH}
       dateFieldName={dateFieldName}
@@ -65,14 +71,7 @@ const ProgramBasicsCard: FC<{ program: ProgramList_Program }> = ({ program }) =>
   const t = useTranslations('managePrograms');
   // The table headers of the settings page contain hyphenation for their narrow columns.
   const tLabels = useTranslations('manageCourses.program_settings');
-  const [updatePublished] = useManageMutation<UpdateProgramPublished, UpdateProgramPublishedVariables>(
-    UPDATE_PROGRAM_PUBLISHED,
-    { refetchQueries: REFETCH }
-  );
-  const handlePublishedChange = useCallback(
-    (published: boolean) => updatePublished({ variables: { programId: program.id, published } }),
-    [program.id, updatePublished]
-  );
+  const manageRole = useManageRole();
 
   return (
     <div className="bg-fill-primary border border-border-primary rounded-lg p-4 space-y-4">
@@ -94,7 +93,11 @@ const ProgramBasicsCard: FC<{ program: ProgramList_Program }> = ({ program }) =>
           variant="switch"
           label={tLabels('published')}
           checked={program.published}
-          onValueUpdated={handlePublishedChange}
+          // With the mutation, CheckboxSelector shows the saved snackbar and the error dialog itself.
+          updateValueMutation={UPDATE_PROGRAM_PUBLISHED_VALUE}
+          identifierVariables={{ programId: program.id }}
+          refetchQueries={REFETCH}
+          role={manageRole}
         />
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">

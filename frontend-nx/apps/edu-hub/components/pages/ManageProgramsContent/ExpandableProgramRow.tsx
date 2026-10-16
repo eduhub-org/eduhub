@@ -72,6 +72,16 @@ import {
 // applications tab); beyond it the addresses are copied to the clipboard instead.
 const MAILTO_URL_LIMIT = 1800;
 
+/** A participant confirmed in several courses of the program gets the mail once. */
+const uniqueParticipantEmails = (data: ProgramParticipantEmails | undefined) =>
+  Array.from(
+    new Set(
+      (data?.CourseEnrollment ?? [])
+        .map((enrollment) => enrollment.User?.email)
+        .filter((email): email is string => Boolean(email))
+    )
+  );
+
 interface ExpandableProgramRowProps {
   program: ProgramList_Program;
 }
@@ -276,22 +286,28 @@ const ExpandableProgramRow: FC<ExpandableProgramRowProps> = ({ program }) => {
     [instructorEmailsData?.Course]
   );
 
-  const { data: participantEmailsData, loading: participantEmailsLoading } = useRoleQuery<
-    ProgramParticipantEmails,
-    ProgramParticipantEmailsVariables
-  >(PROGRAM_PARTICIPANT_EMAILS, { variables: { programId: program.id } });
-  // A participant confirmed in several courses of the program gets the mail once.
+  const {
+    data: participantEmailsData,
+    loading: participantEmailsLoading,
+    refetch: refetchParticipantEmails,
+  } = useRoleQuery<ProgramParticipantEmails, ProgramParticipantEmailsVariables>(PROGRAM_PARTICIPANT_EMAILS, {
+    variables: { programId: program.id },
+  });
   const participantEmails = useMemo(
-    () =>
-      Array.from(
-        new Set(
-          (participantEmailsData?.CourseEnrollment ?? [])
-            .map((enrollment) => enrollment.User?.email)
-            .filter((email): email is string => Boolean(email))
-        )
-      ),
-    [participantEmailsData?.CourseEnrollment]
+    () => uniqueParticipantEmails(participantEmailsData),
+    [participantEmailsData]
   );
+
+  // Enrollments may have changed since the row was opened, so the recipients are loaded afresh.
+  const handleEmailParticipantsClick = async () => {
+    try {
+      const { data } = await refetchParticipantEmails();
+      await emailOrCopyAddresses(uniqueParticipantEmails(data), 'participant_emails');
+    } catch (error) {
+      console.error('ExpandableProgramRow: loading participant emails failed', error);
+      setSyncNotice({ open: true, message: t('participant_emails.load_failed') });
+    }
+  };
 
   /** Opens the email client with `emails` in BCC, or copies them when the mailto URL would be too long. */
   const emailOrCopyAddresses = async (emails: string[], messageKey: 'instructor_emails' | 'participant_emails') => {
@@ -596,7 +612,7 @@ const ExpandableProgramRow: FC<ExpandableProgramRowProps> = ({ program }) => {
               <div className="flex items-center gap-3">
                 <Button
                   as="button"
-                  onClick={() => emailOrCopyAddresses(participantEmails, 'participant_emails')}
+                  onClick={handleEmailParticipantsClick}
                   disabled={participantEmailsLoading || participantEmails.length === 0}
                 >
                   {t('participant_emails.button')}
