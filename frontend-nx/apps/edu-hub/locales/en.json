@@ -1179,6 +1179,19 @@
       }
     },
     "organization_scope_label": "Organization",
+    "program_settings": {
+      "open": "Program settings",
+      "select_program_hint": "Select a program to open its settings",
+      "title": "Settings: {title}",
+      "close": "Close program settings",
+      "load_error": "The program settings could not be loaded.",
+      "published": "Published",
+      "application_start": "Registration start",
+      "application_end": "Registration deadline",
+      "course_start": "Course start",
+      "course_end": "Course end",
+      "project_submission_deadline": "Project submission deadline"
+    },
     "add_disabled_hint": {
       "select_program": "Select a program to add a new offering."
     },

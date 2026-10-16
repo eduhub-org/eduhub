@@ -1163,6 +1163,19 @@
       }
     },
     "organization_scope_label": "Organisation",
+    "program_settings": {
+      "open": "Programmeinstellungen",
+      "select_program_hint": "Wähle ein Programm aus, um seine Einstellungen zu öffnen",
+      "title": "Einstellungen: {title}",
+      "close": "Programmeinstellungen schließen",
+      "load_error": "Die Programmeinstellungen konnten nicht geladen werden.",
+      "published": "Veröffentlicht",
+      "application_start": "Anmeldebeginn",
+      "application_end": "Anmeldeschluss",
+      "course_start": "Kursstart",
+      "course_end": "Kursende",
+      "project_submission_deadline": "Projekt-Abgabefrist"
+    },
     "add_disabled_hint": {
       "select_program": "Wähle ein Programm aus, um ein neues Angebot hinzuzufügen."
     },
