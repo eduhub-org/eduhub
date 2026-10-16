@@ -9,6 +9,16 @@ import { CourseEnrollment_bool_exp, CourseEnrollmentStatus_enum, MotivationRatin
 // GraphQL query operation: ManagedCourseApplicationRecipients
 // ====================================================
 
+export interface ManagedCourseApplicationRecipients_Course_by_pk_TakenPlaces_aggregate {
+  __typename: "CourseEnrollment_aggregate_fields";
+  count: number;
+}
+
+export interface ManagedCourseApplicationRecipients_Course_by_pk_TakenPlaces {
+  __typename: "CourseEnrollment_aggregate";
+  aggregate: ManagedCourseApplicationRecipients_Course_by_pk_TakenPlaces_aggregate | null;
+}
+
 export interface ManagedCourseApplicationRecipients_Course_by_pk_CourseEnrollments_User {
   __typename: "User";
   id: any;
@@ -56,6 +66,14 @@ export interface ManagedCourseApplicationRecipients_Course_by_pk_CourseEnrollmen
 export interface ManagedCourseApplicationRecipients_Course_by_pk {
   __typename: "Course";
   id: number;
+  /**
+   * Participant limit; NULL means no limit (0 or less is stored as NULL)
+   */
+  maxParticipants: number | null;
+  /**
+   * An aggregate relationship
+   */
+  TakenPlaces: ManagedCourseApplicationRecipients_Course_by_pk_TakenPlaces;
   /**
    * An array relationship
    */

@@ -276,6 +276,16 @@ export const MANAGED_COURSE_APPLICATION_RECIPIENTS = gql`
   ) {
     Course_by_pk(id: $id) {
       id
+      maxParticipants
+      # Places taken, counted like course_active_participant_count; invitations are capped by
+      # maxParticipants minus this (enforced by course_enrollment_guard_invitation_capacity).
+      TakenPlaces: CourseEnrollments_aggregate(
+        where: { isTest: { _eq: false }, status: { _in: [CONFIRMED, INVITED, REGISTERED] } }
+      ) {
+        aggregate {
+          count
+        }
+      }
       CourseEnrollments(
         limit: $limit
         where: { _and: [{ isTest: { _eq: false } }, $filter] }
