@@ -5,6 +5,8 @@ import { MdOpenInNew } from 'react-icons/md';
 import { useDisplayDate } from '../../../helpers/dateTimeHelpers';
 import { useManageMutation } from '../../../hooks/authedMutation';
 import { useManageQuery } from '../../../hooks/authedQuery';
+import { useManageRole } from '../../../hooks/authentication';
+import { ManagementRoleProvider } from '../../../hooks/managementRole';
 import CheckboxSelector from '../../inputs/CheckboxSelector';
 import DropDownSelector from '../../inputs/DropDownSelector';
 import CreatableTagSelector from '../../inputs/CreatableTagSelector';
@@ -35,8 +37,20 @@ const REFRESH_DELAY_MS = 4000;
 /**
  * Sharing an event on rausgegangen.de. Shown to super admins and org admins
  * once a super admin has activated the feature for the organization.
+ *
+ * Its inputs save under the management role (admin / org_admin), also when the
+ * page itself runs under the instructor role of an org admin who instructs the event.
  */
 export const RausgegangenEventSection: FC<{ courseId: number }> = ({ courseId }) => {
+  const role = useManageRole();
+  return (
+    <ManagementRoleProvider role={role}>
+      <RausgegangenEventSectionContent courseId={courseId} />
+    </ManagementRoleProvider>
+  );
+};
+
+const RausgegangenEventSectionContent: FC<{ courseId: number }> = ({ courseId }) => {
   const t = useTranslations('manageCourse.rausgegangen');
   const displayDate = useDisplayDate();
   const [error, setError] = useState<string | null>(null);

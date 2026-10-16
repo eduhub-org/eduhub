@@ -11,6 +11,7 @@ import {
 } from '../../../queries/__generated__/EnabledRausgegangenListings';
 import { Button } from '../../common/Button';
 import { DialogShell } from '../../common/dialogs/DialogShell';
+import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';
 import CheckboxSelector from '../../inputs/CheckboxSelector';
 
 type Prompt = { count: number; resolve: (proceed: boolean) => void; courseIds: number[] };
@@ -18,8 +19,10 @@ type Prompt = { count: number; resolve: (proceed: boolean) => void; courseIds: n
 /**
  * Before events are unpublished in EduHub: when some of them are shared on
  * rausgegangen.de, ask whether to unpublish them there too (pre-selected).
- * Returns false when the editor cancels. Without shared events it resolves to
- * true right away, without asking.
+ * Returns false when the editor cancels, or when the shared events cannot be
+ * looked up or taken off Rausgegangen as requested (the error is shown); the
+ * caller then leaves the events published in EduHub too. Without shared events
+ * it resolves to true right away, without asking.
  *
  * Unpublishing there happens by disabling the listing; its trigger takes care
  * of the rest.
@@ -35,6 +38,7 @@ export const useRausgegangenUnpublishPrompt = (): {
   const role = useManageRole();
   const [prompt, setPrompt] = useState<Prompt | null>(null);
   const [alsoRausgegangen, setAlsoRausgegangen] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const promptRef = useRef<Prompt | null>(null);
 
   const [fetchEnabled] = useLazyRoleQuery<EnabledRausgegangenListings, EnabledRausgegangenListingsVariables>(
@@ -51,10 +55,12 @@ export const useRausgegangenUnpublishPrompt = (): {
       if (!isAdmin && !isOrgAdmin) return true;
       let sharedCourseIds: number[] = [];
       try {
-        const { data } = await fetchEnabled({ variables: { courseIds } });
+        const { data, error: queryError } = await fetchEnabled({ variables: { courseIds } });
+        if (queryError) throw queryError;
         sharedCourseIds = (data?.RausgegangenListing ?? []).map((listing) => listing.courseId);
-      } catch {
-        return true;
+      } catch (lookupError) {
+        setError(t('lookup_failed', { error: lookupError instanceof Error ? lookupError.message : String(lookupError) }));
+        return false;
       }
       if (sharedCourseIds.length === 0) return true;
 
@@ -65,7 +71,7 @@ export const useRausgegangenUnpublishPrompt = (): {
         setPrompt(next);
       });
     },
-    [fetchEnabled, isAdmin, isOrgAdmin]
+    [fetchEnabled, isAdmin, isOrgAdmin, t]
   );
 
   const close = async (proceed: boolean) => {
@@ -76,15 +82,19 @@ export const useRausgegangenUnpublishPrompt = (): {
     if (proceed && alsoRausgegangen) {
       try {
         await disableListings({ variables: { courseIds: current.courseIds } });
-      } catch (error) {
-        console.error('Could not disable the Rausgegangen listings', error);
+      } catch (disableError) {
+        setError(t('disable_failed', { error: disableError instanceof Error ? disableError.message : String(disableError) }));
+        current.resolve(false);
+        return;
       }
     }
     current.resolve(proceed);
   };
 
   const dialog = (
-    <DialogShell
+    <>
+      <ErrorMessageDialog errorMessage={error || ''} open={!!error} onClose={() => setError(null)} />
+      <DialogShell
       open={!!prompt}
       onClose={() => void close(false)}
       title={t('title')}
@@ -110,7 +120,8 @@ export const useRausgegangenUnpublishPrompt = (): {
         onValueUpdated={(value: boolean) => setAlsoRausgegangen(value)}
       />
       {!alsoRausgegangen && <p className="text-sm text-label-secondary mt-1">{t('keep_hint')}</p>}
-    </DialogShell>
+      </DialogShell>
+    </>
   );
 
   return { confirmUnpublish, dialog };

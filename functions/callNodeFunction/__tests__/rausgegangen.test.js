@@ -379,6 +379,17 @@ describe('syncCourse', () => {
     expect(result).toMatchObject({ syncStatus: 'SKIPPED', published: false });
   });
 
+  it('keeps a published event marked as published when it cannot be unpublished without a key', async () => {
+    const course = await courseWith({ listing: { enabled: false, rausgegangenEventId: 'rg-event', published: true } });
+    course.Program.Organization.rausgegangenApiKeyEncrypted = null;
+    const client = graphql(course);
+    const createClient = jest.fn();
+    const result = await syncCourse({ client, courseId: 12, logger, createClient });
+    expect(createClient).not.toHaveBeenCalled();
+    expect(result.syncStatus).toBe('ERROR');
+    expect(result).not.toHaveProperty('published');
+  });
+
   it('unpublishes when the editor disabled the listing', async () => {
     const client = graphql(await courseWith({ listing: { enabled: false, rausgegangenEventId: 'rg-event' } }));
     const rg = fakeRausgegangen();

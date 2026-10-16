@@ -53,20 +53,30 @@ export default async function geocodeLocationAddress(req, logger, { fetchImpl = 
   if (locationAddress.zipCode) url.searchParams.set('postalcode', locationAddress.zipCode);
   url.searchParams.set('country', locationAddress.country || 'Deutschland');
 
-  const response = await fetchImpl(url, {
-    headers: { 'User-Agent': USER_AGENT, Accept: 'application/json', 'Accept-Language': 'de' },
-    signal: AbortSignal.timeout(15000),
-  });
-  if (!response.ok) {
-    logger.warn(`Nominatim answered ${response.status} for location address ${id}`);
-    return { success: false, error: `Koordinatensuche fehlgeschlagen (${response.status}).` };
+  let hit;
+  try {
+    const response = await fetchImpl(url, {
+      headers: { 'User-Agent': USER_AGENT, Accept: 'application/json', 'Accept-Language': 'de' },
+      signal: AbortSignal.timeout(15000),
+    });
+    if (!response.ok) {
+      logger.warn(`Nominatim answered ${response.status} for location address ${id}`);
+      return { success: false, error: `Koordinatensuche fehlgeschlagen (${response.status}).` };
+    }
+    [hit] = await response.json();
+  } catch (error) {
+    logger.warn(`Nominatim request for location address ${id} failed`, { error: error.message });
+    return { success: false, error: 'Die Koordinatensuche ist gerade nicht erreichbar. Bitte versuche es später erneut.' };
   }
-
-  const [hit] = await response.json();
   if (!hit) return { success: false, error: 'Zu dieser Adresse wurden keine Koordinaten gefunden.' };
 
-  const latitude = Number(Number(hit.lat).toFixed(6));
-  const longitude = Number(Number(hit.lon).toFixed(6));
+  const lat = Number(hit.lat);
+  const lon = Number(hit.lon);
+  if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
+    return { success: false, error: 'Die Koordinatensuche hat keine gültigen Koordinaten geliefert.' };
+  }
+  const latitude = Number(lat.toFixed(6));
+  const longitude = Number(lon.toFixed(6));
   await client.request(UPDATE_COORDINATES, { id, latitude, longitude });
 
   return { success: true, latitude, longitude, displayName: hit.display_name ?? null, error: null };

@@ -2312,7 +2312,9 @@
         "question": "{count, plural, one {Diese Veranstaltung ist} other {# dieser Veranstaltungen sind}} auch auf rausgegangen.de veröffentlicht.",
         "also_rausgegangen": "Auch auf Rausgegangen depublizieren",
         "keep_hint": "Der Eintrag bleibt auf Rausgegangen sichtbar. Der Anmeldelink zeigt dann nur noch auf einen externen Anmeldelink, falls vorhanden.",
-        "confirm": "Depublizieren"
+        "confirm": "Depublizieren",
+        "lookup_failed": "Es konnte nicht geprüft werden, ob die Veranstaltung auf Rausgegangen geteilt ist. Nichts wurde depubliziert. ({error})",
+        "disable_failed": "Die Veranstaltung konnte auf Rausgegangen nicht depubliziert werden. Nichts wurde depubliziert. ({error})"
       }
     }
   },

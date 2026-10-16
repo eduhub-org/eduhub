@@ -2327,7 +2327,9 @@
         "question": "{count, plural, one {This event is} other {# of these events are}} also published on rausgegangen.de.",
         "also_rausgegangen": "Also unpublish on Rausgegangen",
         "keep_hint": "The entry stays visible on Rausgegangen. Its registration link then only points to an external registration link, if there is one.",
-        "confirm": "Unpublish"
+        "confirm": "Unpublish",
+        "lookup_failed": "Could not check whether the event is shared on Rausgegangen. Nothing was unpublished. ({error})",
+        "disable_failed": "The event could not be unpublished on Rausgegangen. Nothing was unpublished. ({error})"
       }
     }
   },

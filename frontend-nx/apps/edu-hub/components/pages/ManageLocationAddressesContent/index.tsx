@@ -471,7 +471,7 @@ const ManageLocationAddressesContent: FC<ManageLocationAddressesContentProps> = 
           const donor = addressesToMerge.find((addr) => !isEmpty(addr[field]));
           if (donor) venueChanges[field] = donor[field];
         }
-        // The Rausgegangen link is unique, so it moves only after the merged rows are gone
+        // The merged address whose Rausgegangen link the target takes over (moved further below)
         const rausgegangenDonor = targetAddress.rausgegangenLocationId
           ? undefined
           : addressesToMerge.find((addr) => addr.rausgegangenLocationId);
@@ -576,6 +576,24 @@ const ManageLocationAddressesContent: FC<ManageLocationAddressesContentProps> = 
           }
         }
 
+        // Move the Rausgegangen link while the donor still exists. The id is unique, so the donor
+        // gives it up first; should the target update fail, the donor gets it back.
+        if (rausgegangenDonor) {
+          const link = {
+            rausgegangenLocationId: rausgegangenDonor.rausgegangenLocationId,
+            rausgegangenLocationOwned: rausgegangenDonor.rausgegangenLocationOwned,
+          };
+          await updateLocationAddressFields({
+            variables: { id: rausgegangenDonor.id, changes: { rausgegangenLocationId: null } },
+          });
+          try {
+            await updateLocationAddressFields({ variables: { id: parseInt(targetAddressId, 10), changes: link } });
+          } catch (linkError) {
+            await updateLocationAddressFields({ variables: { id: rausgegangenDonor.id, changes: link } });
+            throw linkError;
+          }
+        }
+
         // Delete all selected addresses except the target one
         try {
           await Promise.all(addressesToMerge.map((addr) => deleteLocationAddress({ variables: { id: addr.id } })));
@@ -584,17 +602,6 @@ const ManageLocationAddressesContent: FC<ManageLocationAddressesContentProps> = 
           throw new Error(`Failed to delete location addresses: ${deleteError instanceof Error ? deleteError.message : String(deleteError)}`);
         }
 
-        if (rausgegangenDonor) {
-          await updateLocationAddressFields({
-            variables: {
-              id: parseInt(targetAddressId, 10),
-              changes: {
-                rausgegangenLocationId: rausgegangenDonor.rausgegangenLocationId,
-                rausgegangenLocationOwned: rausgegangenDonor.rausgegangenLocationOwned,
-              },
-            },
-          });
-        }
 
         // Show success notification
         setError(null);

@@ -200,13 +200,27 @@ const recordResult = async (client, listingId, set) => {
 };
 
 /**
- * Unpublishes an event that was shared before. Only an event that was actually
- * created there (rausgegangenEventId) needs it.
+ * Takes an event off Rausgegangen (or keeps it off) and records why. An event
+ * that is published there can only be unpublished with the organization's key:
+ * without one the listing stays marked as published and the error is recorded,
+ * so the nightly reconcile keeps retrying once a key is back.
  */
-const unpublishIfShared = async ({ rausgegangen, course, listing, logger }) => {
-  if (!listing.rausgegangenEventId || !rausgegangen) return;
-  await rausgegangen.patchEvent({ mapping_id: mappingId('event', course.id), published: false });
-  logger.info(`Unpublished Rausgegangen event of course ${course.id}`);
+const recordUnlisted = async ({ client, rausgegangen, course, listing, logger, syncStatus, syncError }) => {
+  if (listing.rausgegangenEventId) {
+    if (!rausgegangen) {
+      if (listing.published) {
+        return recordResult(client, listing.id, {
+          syncStatus: 'ERROR',
+          syncError:
+            'Die Veranstaltung ist noch auf Rausgegangen veröffentlicht, kann aber ohne API-Schlüssel nicht depubliziert werden. Bitte hinterlege den Schlüssel neu.',
+        });
+      }
+    } else {
+      await rausgegangen.patchEvent({ mapping_id: mappingId('event', course.id), published: false });
+      logger.info(`Unpublished Rausgegangen event of course ${course.id}`);
+    }
+  }
+  return recordResult(client, listing.id, { syncStatus, syncError, published: false });
 };
 
 /**
@@ -292,28 +306,25 @@ export const syncCourse = async ({ client, courseId, logger, createClient = crea
     rausgegangen = createClient({ apiKey, logger });
   }
 
+  const unlisted = (syncStatus, syncError) =>
+    recordUnlisted({ client, rausgegangen, course, listing, logger, syncStatus, syncError });
+
   if (!shouldBeListed) {
-    await unpublishIfShared({ rausgegangen, course, listing, logger });
     const reason = !featureActive
       ? 'Die Rausgegangen-Funktion ist für diese Organisation nicht freigeschaltet.'
       : !listing.enabled
         ? null
         : 'Das Programm ist nicht veröffentlicht.';
-    return recordResult(client, listing.id, { syncStatus: 'SKIPPED', syncError: reason, published: false });
+    return unlisted('SKIPPED', reason);
   }
 
   if (!rausgegangen) {
-    return recordResult(client, listing.id, {
-      syncStatus: 'SKIPPED',
-      syncError: 'Für diese Organisation ist kein Rausgegangen-API-Schlüssel hinterlegt.',
-      published: false,
-    });
+    return unlisted('SKIPPED', 'Für diese Organisation ist kein Rausgegangen-API-Schlüssel hinterlegt.');
   }
 
   const showSession = pickShowSession(course.Sessions, course.CourseLocations);
   if (showSession.error) {
-    await unpublishIfShared({ rausgegangen, course, listing, logger });
-    return recordResult(client, listing.id, { syncStatus: 'SKIPPED', syncError: showSession.error, published: false });
+    return unlisted('SKIPPED', showSession.error);
   }
 
   const bucketUrl = process.env.STORAGE_BUCKET_PUBLIC_URL;
@@ -326,8 +337,7 @@ export const syncCourse = async ({ client, courseId, logger, createClient = crea
     bucketUrl,
   });
   if (location.error) {
-    await unpublishIfShared({ rausgegangen, course, listing, logger });
-    return recordResult(client, listing.id, { syncStatus: 'SKIPPED', syncError: location.error, published: false });
+    return unlisted('SKIPPED', location.error);
   }
 
   const published = isProduction() && !organization.rausgegangenTestMode;
