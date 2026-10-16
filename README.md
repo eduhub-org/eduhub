@@ -65,6 +65,14 @@ Local services:
 | File storage emulator | http://localhost:4001 | serves `/emulated-bucket` |
 | Serverless functions | ports `42000`–`42026` | Node `42000`–`42024`, Python `42025`–`42026` |
 
+The local login and registration screens show SSO button previews (DLC, Google,
+LinkedIn, GitHub) when the realm has no configured identity providers. They use
+the shared production layout but do not authenticate; a note identifies the
+preview. Set `KEYCLOAK_SSO_PREVIEW=false` in `.env` and run
+`docker compose up -d keycloak` to hide them. Real configured providers always
+replace the previews. Production defaults to previews off. For Tailscale
+previews, use `scripts/start-network-preview.sh` to retain the network bindings.
+
 > **Note:** See the [Development Guide](./docs/DEVELOPMENT_GUIDE.md) for
 > environment variables, seeds, ports, and naming conventions.
 

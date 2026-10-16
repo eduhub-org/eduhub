@@ -2,7 +2,7 @@ import { gql } from '@apollo/client';
 
 // Program-wide sessions: Session rows with programId set (and courseId NULL).
 // They are shown in every course of the program and managed on the program
-// settings page. Title, times, mandatory flag and deletion reuse the Session
+// settings page. Title, description, times, mandatory flag and deletion reuse the Session
 // mutations in ./course.
 
 export const PROGRAM_SESSIONS = gql`
@@ -10,6 +10,7 @@ export const PROGRAM_SESSIONS = gql`
     Session(where: { programId: { _eq: $programId } }, order_by: { startDateTime: asc }) {
       id
       title
+      description
       startDateTime
       endDateTime
       isMandatory

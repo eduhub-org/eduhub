@@ -41,6 +41,16 @@ export const UPDATE_PROGRAM_VISIBILITY = gql`
   }
 `;
 
+// Same as UPDATE_PROGRAM_PUBLISHED, with the variable names CheckboxSelector sends.
+export const UPDATE_PROGRAM_PUBLISHED_VALUE = gql`
+  mutation UpdateProgramPublishedValue($programId: Int!, $value: Boolean!) {
+    update_Program_by_pk(pk_columns: { id: $programId }, _set: { published: $value }) {
+      id
+      published
+    }
+  }
+`;
+
 export const UPDATE_PROGRAM_PUBLISHED = gql`
   mutation UpdateProgramPublished($programId: Int!, $published: Boolean!) {
     update_Program_by_pk(
