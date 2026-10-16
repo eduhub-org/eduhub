@@ -48,9 +48,9 @@ import DatePicker from 'react-datepicker';
 import { ensurePortalContainer } from '../../../inputs/OptimisticDatePicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import {
-  UpdateEnrollmentStatusWhenApplied,
-  UpdateEnrollmentStatusWhenAppliedVariables,
-} from '../../../../queries/__generated__/UpdateEnrollmentStatusWhenApplied';
+  UpdateEnrollmentStatusForInvite,
+  UpdateEnrollmentStatusForInviteVariables,
+} from '../../../../queries/__generated__/UpdateEnrollmentStatusForInvite';
 import {
   UpdateEnrollmentStatusByRating,
   UpdateEnrollmentStatusByRatingVariables,
@@ -430,8 +430,8 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
   );
 
   const [updateEnrollmentStatusForInvite] = useRoleMutation<
-    UpdateEnrollmentStatusWhenApplied,
-    UpdateEnrollmentStatusWhenAppliedVariables
+    UpdateEnrollmentStatusForInvite,
+    UpdateEnrollmentStatusForInviteVariables
   >(UPDATE_ENROLLMENT_STATUS_FOR_INVITE);
 
   const [cancelEnrollmentsByOrganizer] = useRoleMutation<
