@@ -84,3 +84,12 @@ export const UPDATE_COURSE_PROPERTY = gql`
     }
   }
 `;
+
+export const UPDATE_COURSE_COVER_IMAGE_CREDITS = gql`
+  mutation UpdateCourseCoverImageCredits($itemId: Int!, $text: String) {
+    update_Course_by_pk(pk_columns: { id: $itemId }, _set: { coverImageCredits: $text }) {
+      id
+      coverImageCredits
+    }
+  }
+`;

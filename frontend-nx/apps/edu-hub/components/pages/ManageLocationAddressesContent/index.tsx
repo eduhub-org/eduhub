@@ -21,12 +21,14 @@ import {
   UPDATE_LOCATION_ADDRESS_DESCRIPTION,
   UPDATE_LOCATION_ADDRESS_ALIASES,
   UPDATE_LOCATION_ADDRESS_LOCATION_OPTION,
+  UPDATE_LOCATION_ADDRESS_FIELDS,
   DELETE_LOCATION_ADDRESS,
   SESSION_ADDRESSES_BY_LOCATION_ADDRESS_ID,
   COURSE_LOCATIONS_BY_DEFAULT_SESSION_ADDRESS_ID,
 } from '../../../queries/locationAddress';
 import { UPDATE_SESSION_ADDRESS_LOCATION, UPDATE_COURSE_DEFAULT_SESSION_ADDRESS_ID } from '../../../queries/course';
 import { MergeLocationAddressesDialog } from './MergeLocationAddressesDialog';
+import { LocationAddressDetails } from './LocationAddressDetails';
 import CreatableTagSelector from '../../inputs/CreatableTagSelector';
 import CommonPageHeader from '../../common/CommonPageHeader';
 import {
@@ -47,10 +49,43 @@ type LocationOption = LocationAddressList_LocationOption;
 
 type ExpandableRowProps = {
   row: LocationAddressListLocationAddress;
+  categories: string[];
+  rausgegangenAvailable: boolean;
   onError: (errorMessage: string) => void;
 };
 
-const ExpandableLocationAddressRow: React.FC<ExpandableRowProps> = ({ row, onError }): React.ReactElement<any> => {
+/** Venue columns a merge carries over to the surviving address when it has no value of its own. */
+const MERGED_VENUE_FIELDS = [
+  'street',
+  'zipCode',
+  'city',
+  'country',
+  'addressAdditionalInfo',
+  'directions',
+  'accessibilityInfo',
+  'latitude',
+  'longitude',
+  'category',
+  'image',
+  'imageCredits',
+  'websiteUrl',
+  'publicEmail',
+  'publicPhone',
+  'instagramUrl',
+] as const;
+
+const isEmpty = (value: unknown) => value === null || value === undefined || value === '';
+
+/** Street, zip code, city and coordinates: what maps and external event platforms need. */
+const isAddressComplete = (row: LocationAddressListLocationAddress) =>
+  Boolean(row.street && row.zipCode && row.city && row.latitude !== null && row.longitude !== null);
+
+const ExpandableLocationAddressRow: React.FC<ExpandableRowProps> = ({
+  row,
+  categories,
+  rausgegangenAvailable,
+  onError,
+}): React.ReactElement<any> => {
   const t = useTranslations('manageLocationAddresses');
 
   // Handle location address alias errors specifically
@@ -114,6 +149,12 @@ const ExpandableLocationAddressRow: React.FC<ExpandableRowProps> = ({ row, onErr
         value={row.description || ''}
         updateValueMutation={UPDATE_LOCATION_ADDRESS_DESCRIPTION}
         refetchQueries={['LocationAddressList']}
+      />
+      <LocationAddressDetails
+        row={row}
+        categories={categories}
+        rausgegangenAvailable={rausgegangenAvailable}
+        onError={onError}
       />
     </div>
   );
@@ -193,6 +234,7 @@ const ManageLocationAddressesContent: FC<ManageLocationAddressesContentProps> = 
   const [insertLocationAddress] = useAdminMutation(INSERT_LOCATION_ADDRESS);
   const [deleteLocationAddress] = useAdminMutation(DELETE_LOCATION_ADDRESS);
   const [updateLocationAddressAliases] = useAdminMutation(UPDATE_LOCATION_ADDRESS_ALIASES);
+  const [updateLocationAddressFields] = useAdminMutation(UPDATE_LOCATION_ADDRESS_FIELDS);
   const [updateSessionAddressLocation] = useAdminMutation(UPDATE_SESSION_ADDRESS_LOCATION);
   const [updateCourseDefaultSessionAddressId] = useAdminMutation(UPDATE_COURSE_DEFAULT_SESSION_ADDRESS_ID);
   const [fetchSessionAddresses] = useAdminLazyQuery(SESSION_ADDRESSES_BY_LOCATION_ADDRESS_ID);
@@ -207,6 +249,12 @@ const ManageLocationAddressesContent: FC<ManageLocationAddressesContentProps> = 
         })) || [],
     [data, tCommon]
   );
+
+  const categories = useMemo(
+    () => data?.LocationAddressCategory?.map((category: { value: string }) => category.value) ?? [],
+    [data]
+  );
+  const rausgegangenAvailable = (data?.RausgegangenOrganizations?.aggregate?.count ?? 0) > 0;
 
   const columns = useMemo<ColumnDef<LocationAddressListLocationAddress>[]>(
     () => [
@@ -232,7 +280,7 @@ const ManageLocationAddressesContent: FC<ManageLocationAddressesContentProps> = 
         accessorKey: 'address',
         header: t('locationAddress.address'),
         enableSorting: true,
-        meta: { width: 4 },
+        meta: { width: 3 },
         cell: ({ getValue, row }) => (
           <InputField
             variant="material"
@@ -273,6 +321,19 @@ const ManageLocationAddressesContent: FC<ManageLocationAddressesContentProps> = 
         enableSorting: true,
         meta: { width: 1 },
         cell: ({ getValue }) => <div className="px-4 py-2">{getValue<number>()}</div>,
+      },
+      {
+        id: 'completeness',
+        accessorFn: (row) => isAddressComplete(row),
+        header: t('locationAddress.completeness'),
+        enableSorting: false,
+        meta: { width: 1 },
+        cell: ({ getValue }) =>
+          getValue<boolean>() ? (
+            <span className="px-4 py-2 text-sm text-label-secondary">{t('locationAddress.complete')}</span>
+          ) : (
+            <span className="px-4 py-2 text-sm text-red-700">{t('locationAddress.incomplete')}</span>
+          ),
       },
     ],
     [t, locationOptions]
@@ -403,6 +464,23 @@ const ManageLocationAddressesContent: FC<ManageLocationAddressesContentProps> = 
           throw new Error(`Failed to update aliases: ${aliasError instanceof Error ? aliasError.message : String(aliasError)}`);
         }
 
+        // Keep the target's venue data; fill its empty fields from the merged addresses
+        const venueChanges: Record<string, unknown> = {};
+        for (const field of MERGED_VENUE_FIELDS) {
+          if (!isEmpty(targetAddress[field])) continue;
+          const donor = addressesToMerge.find((addr) => !isEmpty(addr[field]));
+          if (donor) venueChanges[field] = donor[field];
+        }
+        // The merged address whose Rausgegangen link the target takes over (moved further below)
+        const rausgegangenDonor = targetAddress.rausgegangenLocationId
+          ? undefined
+          : addressesToMerge.find((addr) => addr.rausgegangenLocationId);
+        if (Object.keys(venueChanges).length > 0) {
+          await updateLocationAddressFields({
+            variables: { id: parseInt(targetAddressId, 10), changes: venueChanges },
+          });
+        }
+
         // Get IDs of addresses being merged
         const addressesToMergeIds = addressesToMerge.map((addr) => addr.id);
 
@@ -498,6 +576,24 @@ const ManageLocationAddressesContent: FC<ManageLocationAddressesContentProps> = 
           }
         }
 
+        // Move the Rausgegangen link while the donor still exists. The id is unique, so the donor
+        // gives it up first; should the target update fail, the donor gets it back.
+        if (rausgegangenDonor) {
+          const link = {
+            rausgegangenLocationId: rausgegangenDonor.rausgegangenLocationId,
+            rausgegangenLocationOwned: rausgegangenDonor.rausgegangenLocationOwned,
+          };
+          await updateLocationAddressFields({
+            variables: { id: rausgegangenDonor.id, changes: { rausgegangenLocationId: null } },
+          });
+          try {
+            await updateLocationAddressFields({ variables: { id: parseInt(targetAddressId, 10), changes: link } });
+          } catch (linkError) {
+            await updateLocationAddressFields({ variables: { id: rausgegangenDonor.id, changes: link } });
+            throw linkError;
+          }
+        }
+
         // Delete all selected addresses except the target one
         try {
           await Promise.all(addressesToMerge.map((addr) => deleteLocationAddress({ variables: { id: addr.id } })));
@@ -505,6 +601,7 @@ const ManageLocationAddressesContent: FC<ManageLocationAddressesContentProps> = 
           console.error('Error deleting location addresses:', deleteError);
           throw new Error(`Failed to delete location addresses: ${deleteError instanceof Error ? deleteError.message : String(deleteError)}`);
         }
+
 
         // Show success notification
         setError(null);
@@ -529,6 +626,7 @@ const ManageLocationAddressesContent: FC<ManageLocationAddressesContentProps> = 
       selectedRowsForBulkAction,
       deleteLocationAddress,
       updateLocationAddressAliases,
+      updateLocationAddressFields,
       updateSessionAddressLocation,
       updateCourseDefaultSessionAddressId,
       fetchSessionAddresses,
@@ -585,7 +683,14 @@ const ManageLocationAddressesContent: FC<ManageLocationAddressesContentProps> = 
             bulkActions={bulkActions}
             onBulkAction={handleBulkAction}
             generateDeletionConfirmationQuestion={generateDeletionConfirmation}
-            expandableRowComponent={({ row }) => <ExpandableLocationAddressRow row={row} onError={setError} />}
+            expandableRowComponent={({ row }) => (
+              <ExpandableLocationAddressRow
+                row={row}
+                categories={categories}
+                rausgegangenAvailable={rausgegangenAvailable}
+                onError={setError}
+              />
+            )}
             onAddButtonClick={onAddLocationAddressClick}
             addButtonText={t('action.add')}
           />

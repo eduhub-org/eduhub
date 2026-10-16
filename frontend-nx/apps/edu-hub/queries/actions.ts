@@ -291,3 +291,55 @@ export const NOTIFY_SESSION_PARTICIPANTS = gql`
     }
   }
 `;
+
+export const SAVE_LOCATION_ADDRESS_IMAGE = gql`
+  mutation SaveLocationAddressImage($base64File: String!, $fileName: String!, $locationAddressId: Int!) {
+    saveLocationAddressImage(base64file: $base64File, filename: $fileName, locationaddressid: $locationAddressId) {
+      success
+      messageKey
+      error
+      filePath
+      accessUrl
+    }
+  }
+`;
+
+export const GEOCODE_LOCATION_ADDRESS = gql`
+  mutation GeocodeLocationAddress($locationAddressId: Int!) {
+    geocodeLocationAddress(locationAddressId: $locationAddressId) {
+      success
+      latitude
+      longitude
+      displayName
+      error
+    }
+  }
+`;
+
+export const SEARCH_RAUSGEGANGEN_LOCATIONS = gql`
+  query SearchRausgegangenLocations($locationAddressId: Int!) {
+    searchRausgegangenLocations(locationAddressId: $locationAddressId) {
+      success
+      error
+      locations {
+        id
+        title
+        street
+        zipCode
+        city
+      }
+    }
+  }
+`;
+
+export const SYNC_RAUSGEGANGEN_EVENT_NOW = gql`
+  mutation SyncRausgegangenEventNow($courseId: Int!) {
+    syncRausgegangenEventNow(courseId: $courseId) {
+      success
+      syncStatus
+      error
+      previewUrl
+      publicUrl
+    }
+  }
+`;

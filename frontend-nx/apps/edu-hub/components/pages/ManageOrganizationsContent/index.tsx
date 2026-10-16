@@ -49,17 +49,23 @@ import CreatableTagSelector from '../../inputs/CreatableTagSelector';
 import { OrganizationType_enum } from '../../../__generated__/globalTypes';
 import { MergeOrganizationsDialog } from './MergeOrganizationsDialog';
 import { ApiKeyManager } from './ApiKeyManager';
-import { GhostNewsletterCredentialManager } from './GhostNewsletterCredentialManager';
+import { OrganizationCredentialManager } from './OrganizationCredentialManager';
+import { OrganizationFeaturesSection } from './OrganizationFeaturesSection';
 import CommonPageHeader from '../../common/CommonPageHeader';
 import { useDeferredBulkAction, useTableGrid } from '../../common/TableGrid/hooks';
 import { createMultiWordSearchCondition } from '../../common/TableGrid/utils';
 
 type ExpandableRowProps = {
   row: OrganizationList_Organization;
+  featureOptions: string[];
   onError: (errorMessage: string) => void;
 };
 
-const ExpandableOrganizationRow: React.FC<ExpandableRowProps> = ({ row, onError }): React.ReactElement<any> => {
+const ExpandableOrganizationRow: React.FC<ExpandableRowProps> = ({
+  row,
+  featureOptions,
+  onError,
+}): React.ReactElement<any> => {
   const t = useTranslations('manageOrganizations');
   const { refetch } = useRoleQuery(ORGANIZATION_LIST);
   const [updateOrganizationNewsletterProvider] = useRoleMutation(UPDATE_ORGANIZATION_NEWSLETTER_PROVIDER, {
@@ -164,8 +170,10 @@ const ExpandableOrganizationRow: React.FC<ExpandableRowProps> = ({ row, onError 
             void syncGhostNewsletterProvider();
           }}
         />
-        <GhostNewsletterCredentialManager
+        <OrganizationCredentialManager
           organizationId={row.id}
+          endpoint="/api/manage-organizations/ghost-newsletter-credential"
+          translationPrefix="newsletter_api_key"
           initiallyConfigured={Boolean(row.Settings?.ghostNewsletterApiKeyConfigured)}
           onCredentialSaved={() => {
             void syncGhostNewsletterProvider();
@@ -246,6 +254,7 @@ const ExpandableOrganizationRow: React.FC<ExpandableRowProps> = ({ row, onError 
         />
       </div>
       <ApiKeyManager organization={row} onError={onError} />
+      <OrganizationFeaturesSection organization={row} featureOptions={featureOptions} />
     </div>
   );
 };
@@ -325,6 +334,11 @@ const ManageOrganizationsContent: FC<ManageOrganizationsContentProps> = ({
     () =>
       data?.OrganizationType?.map((type: { value: string }) => ({ value: type.value, label: t(`type_selection.${type.value}`) })) || [],
     [data, t]
+  );
+
+  const featureOptions = useMemo(
+    () => data?.OrganizationFeatureOption?.map((option: { value: string }) => option.value) ?? [],
+    [data]
   );
 
   const columns = useMemo<ColumnDef<OrganizationList_Organization>[]>(
@@ -722,7 +736,9 @@ const ManageOrganizationsContent: FC<ManageOrganizationsContentProps> = ({
             bulkActions={bulkActions}
             onBulkAction={handleBulkAction}
             generateDeletionConfirmationQuestion={generateDeletionConfirmation}
-            expandableRowComponent={({ row }) => <ExpandableOrganizationRow row={row} onError={setError} />}
+            expandableRowComponent={({ row }) => (
+              <ExpandableOrganizationRow row={row} featureOptions={featureOptions} onError={setError} />
+            )}
             onAddButtonClick={onAddOrganizationClick}
             addButtonText={t('action.add')}
           />

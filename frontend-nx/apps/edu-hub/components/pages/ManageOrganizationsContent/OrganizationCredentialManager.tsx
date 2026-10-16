@@ -10,13 +10,24 @@ import { Button } from '../../common/Button';
 type Props = {
   organizationId: number;
   initiallyConfigured: boolean;
+  /** API route that encrypts and stores the credential, e.g. /api/manage-organizations/ghost-newsletter-credential */
+  endpoint: string;
+  /**
+   * Translation key prefix: labels are read from manageOrganizations.organization.<prefix>, <prefix>_placeholder,
+   * _set, _rotate, _remove, _remove_confirm, _status_configured, _status_missing, _save_success, _error_auth,
+   * _error_generic, and the help text from manageOrganizations.help.<prefix>.
+   */
+  translationPrefix: string;
   /** Called after credential save/remove succeeds so parent can sync related fields (e.g. newsletter provider). */
   onCredentialSaved?: () => void;
 };
 
-export const GhostNewsletterCredentialManager: React.FC<Props> = ({
+/** Write-only input for an organization's encrypted integration credential (Ghost, Rausgegangen). */
+export const OrganizationCredentialManager: React.FC<Props> = ({
   organizationId,
   initiallyConfigured,
+  endpoint,
+  translationPrefix: prefix,
   onCredentialSaved,
 }) => {
   const t = useTranslations('manageOrganizations');
@@ -31,13 +42,13 @@ export const GhostNewsletterCredentialManager: React.FC<Props> = ({
 
   const saveCredential = async (nextCredential: string) => {
     if (!session?.accessToken) {
-      setError(t('organization.newsletter_api_key_error_auth'));
+      setError(t(`organization.${prefix}_error_auth`));
       return;
     }
 
     setIsSaving(true);
     try {
-      const response = await fetch('/api/manage-organizations/ghost-newsletter-credential', {
+      const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -51,7 +62,7 @@ export const GhostNewsletterCredentialManager: React.FC<Props> = ({
 
       const data = await response.json();
       if (!response.ok || !data?.success) {
-        throw new Error(data?.error || t('organization.newsletter_api_key_error_generic'));
+        throw new Error(data?.error || t(`organization.${prefix}_error_generic`));
       }
 
       setIsConfigured(Boolean(data.configured));
@@ -60,7 +71,7 @@ export const GhostNewsletterCredentialManager: React.FC<Props> = ({
       onCredentialSaved?.();
     } catch (saveError) {
       const message =
-        saveError instanceof Error ? saveError.message : t('organization.newsletter_api_key_error_generic');
+        saveError instanceof Error ? saveError.message : t(`organization.${prefix}_error_generic`);
       setError(message);
     } finally {
       setIsSaving(false);
@@ -77,11 +88,11 @@ export const GhostNewsletterCredentialManager: React.FC<Props> = ({
       <InputField
         variant="material"
         type="input"
-        label={t('organization.newsletter_api_key')}
-        placeholder={t('organization.newsletter_api_key_placeholder')}
+        label={t(`organization.${prefix}`)}
+        placeholder={t(`organization.${prefix}_placeholder`)}
         itemId={organizationId}
         value={credential}
-        helpText={t('help.newsletter_api_key')}
+        helpText={t(`help.${prefix}`)}
         debounceTimeout={0}
         showCharacterCount={false}
         onValueUpdated={(data) => {
@@ -89,7 +100,7 @@ export const GhostNewsletterCredentialManager: React.FC<Props> = ({
         }}
         disabled={isSaving}
         inputProps={{
-          id: `ghost-api-key-${organizationId}`,
+          id: `${prefix}-${organizationId}`,
           type: 'password',
           autoComplete: 'off',
         }}
@@ -101,7 +112,7 @@ export const GhostNewsletterCredentialManager: React.FC<Props> = ({
           disabled={isSaving || credential.trim().length === 0}
           onClick={() => void saveCredential(credential.trim())}
         >
-          {isConfigured ? t('organization.newsletter_api_key_rotate') : t('organization.newsletter_api_key_set')}
+          {isConfigured ? t(`organization.${prefix}_rotate`) : t(`organization.${prefix}_set`)}
         </Button>
 
         {isConfigured && (
@@ -110,28 +121,28 @@ export const GhostNewsletterCredentialManager: React.FC<Props> = ({
             disabled={isSaving}
             onClick={() => setShowConfirmRemove(true)}
           >
-            {t('organization.newsletter_api_key_remove')}
+            {t(`organization.${prefix}_remove`)}
           </Button>
         )}
 
         <span className="text-xs text-label-secondary">
           {isConfigured
-            ? t('organization.newsletter_api_key_status_configured')
-            : t('organization.newsletter_api_key_status_missing')}
+            ? t(`organization.${prefix}_status_configured`)
+            : t(`organization.${prefix}_status_missing`)}
         </span>
       </div>
 
       <ErrorMessageDialog errorMessage={error || ''} open={!!error} onClose={() => setError(null)} />
       <QuestionConfirmationDialog
         open={showConfirmRemove}
-        question={t('organization.newsletter_api_key_remove_confirm')}
+        question={t(`organization.${prefix}_remove_confirm`)}
         onClose={() => setShowConfirmRemove(false)}
         onConfirm={handleConfirmRemove}
       />
       <NotificationSnackbar
         open={showSuccessSnackbar}
         onClose={() => setShowSuccessSnackbar(false)}
-        message={t('organization.newsletter_api_key_save_success')}
+        message={t(`organization.${prefix}_save_success`)}
       />
     </div>
   );

@@ -278,6 +278,11 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                   <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-[1.05] break-words">
                     {course.title}
                   </h1>
+                  {course.coverImageCredits && (
+                    <p className="mt-3 text-xs text-white/70">
+                      {tCoursePage('cover_image_credits', { credits: course.coverImageCredits })}
+                    </p>
+                  )}
                 </PageBlock>
               </div>
             </div>
