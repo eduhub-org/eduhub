@@ -62,6 +62,11 @@ import {
   ProgramInstructorEmails,
   ProgramInstructorEmailsVariables,
 } from '../../../queries/__generated__/ProgramInstructorEmails';
+import { PROGRAM_PARTICIPANT_EMAILS } from '../../../queries/programParticipants';
+import {
+  ProgramParticipantEmails,
+  ProgramParticipantEmailsVariables,
+} from '../../../queries/__generated__/ProgramParticipantEmails';
 
 // Longer mailto URLs are cut off or ignored by some email clients (same limit as the course
 // applications tab); beyond it the addresses are copied to the clipboard instead.
@@ -271,18 +276,36 @@ const ExpandableProgramRow: FC<ExpandableProgramRowProps> = ({ program }) => {
     [instructorEmailsData?.Course]
   );
 
-  const handleEmailInstructorsClick = async () => {
-    const mailtoUrl = `mailto:?bcc=${encodeURIComponent(instructorEmails.join(','))}`;
+  const { data: participantEmailsData, loading: participantEmailsLoading } = useRoleQuery<
+    ProgramParticipantEmails,
+    ProgramParticipantEmailsVariables
+  >(PROGRAM_PARTICIPANT_EMAILS, { variables: { programId: program.id } });
+  // A participant confirmed in several courses of the program gets the mail once.
+  const participantEmails = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          (participantEmailsData?.CourseEnrollment ?? [])
+            .map((enrollment) => enrollment.User?.email)
+            .filter((email): email is string => Boolean(email))
+        )
+      ),
+    [participantEmailsData?.CourseEnrollment]
+  );
+
+  /** Opens the email client with `emails` in BCC, or copies them when the mailto URL would be too long. */
+  const emailOrCopyAddresses = async (emails: string[], messageKey: 'instructor_emails' | 'participant_emails') => {
+    const mailtoUrl = `mailto:?bcc=${encodeURIComponent(emails.join(','))}`;
     if (mailtoUrl.length <= MAILTO_URL_LIMIT) {
       window.location.href = mailtoUrl;
       return;
     }
     try {
-      await navigator.clipboard.writeText(instructorEmails.join(','));
-      setSyncNotice({ open: true, message: t('instructor_emails.copied', { count: instructorEmails.length }) });
+      await navigator.clipboard.writeText(emails.join(','));
+      setSyncNotice({ open: true, message: t(`${messageKey}.copied`, { count: emails.length }) });
     } catch (error) {
-      console.error('ExpandableProgramRow: copying instructor emails failed', error);
-      setSyncNotice({ open: true, message: t('instructor_emails.copy_failed') });
+      console.error(`ExpandableProgramRow: copying ${messageKey} failed`, error);
+      setSyncNotice({ open: true, message: t(`${messageKey}.copy_failed`) });
     }
   };
 
@@ -551,7 +574,7 @@ const ExpandableProgramRow: FC<ExpandableProgramRowProps> = ({ program }) => {
               <div className="flex items-center gap-3">
                 <Button
                   as="button"
-                  onClick={handleEmailInstructorsClick}
+                  onClick={() => emailOrCopyAddresses(instructorEmails, 'instructor_emails')}
                   disabled={instructorEmailsLoading || instructorEmails.length === 0}
                 >
                   {t('instructor_emails.button')}
@@ -566,7 +589,29 @@ const ExpandableProgramRow: FC<ExpandableProgramRowProps> = ({ program }) => {
               </div>
             </div>
 
-            {/* 2. Participation Data Card */}
+            {/* 2. Participant Emails Card */}
+            <div className="bg-fill-primary border border-border-primary rounded-lg p-4">
+              <h4 className="text-sm font-medium text-label-primary mb-1">{t('participant_emails.label')}</h4>
+              <p className="text-xs text-label-secondary mb-3">{t('participant_emails.help_text')}</p>
+              <div className="flex items-center gap-3">
+                <Button
+                  as="button"
+                  onClick={() => emailOrCopyAddresses(participantEmails, 'participant_emails')}
+                  disabled={participantEmailsLoading || participantEmails.length === 0}
+                >
+                  {t('participant_emails.button')}
+                </Button>
+                {participantEmailsLoading ? (
+                  <CircularProgress size={18} />
+                ) : (
+                  <span className="text-sm text-label-secondary">
+                    {t('participant_emails.count', { count: participantEmails.length })}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* 3. Participation Data Card */}
             <div className="bg-fill-primary border border-border-primary rounded-lg p-4">
               <h4 className="text-sm font-medium text-label-primary mb-3">{t('participation_data.generate')}</h4>
               <div className="space-y-2">
