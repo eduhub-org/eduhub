@@ -64,6 +64,8 @@ BEGIN
       CONTINUE;
     END IF;
 
+    -- Held until the migration commits, so no row can arrive between the check and the drop.
+    EXECUTE format('LOCK TABLE public.%I IN ACCESS EXCLUSIVE MODE', v_name);
     EXECUTE format('SELECT EXISTS (SELECT 1 FROM public.%I)', v_name) INTO v_has_rows;
     IF v_has_rows THEN
       RAISE NOTICE 'Keeping legacy table % because it still has rows', v_name;
