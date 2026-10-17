@@ -988,7 +988,8 @@
     "confirmed_invitations": "Einladungen (bestätigt):",
     "Uniqueness violation_ duplicate key value violates unique constraint \"CourseAddress_pkey\"": "Eine Standortadresse mit dieser Konfiguration existiert bereits für diesen Kurs.",
     "part_of_course": "Diese Veranstaltung ist Teil des Kurses „{course}“.",
-    "to_course": "Zum Kurs"
+    "to_course": "Zum Kurs",
+    "cover_image_credits": "Titelbild: {credits}"
   },
   "courseAdminPage": {
     "pageTitle": "Opencampus Kurse Kursleiter Sicht",
@@ -1222,7 +1223,9 @@
       "label": "Titelbild",
       "upload_text": "Klicken um Titelbild hochzuladen oder Datei hier ablegen",
       "alt": "Titelbild des Angebots",
-      "help_text": "Wird auf der Seite des Angebots und in den Slidern gezeigt."
+      "help_text": "Wird auf der Seite des Angebots und in den Slidern gezeigt.",
+      "credits_label": "Bildnachweis",
+      "credits_help": "Wer das Titelbild gemacht hat bzw. die Rechte daran hält, z. B. „Foto: Max Muster“. Wird unter dem Titel angezeigt und an Veranstaltungsportale übergeben (max. 120 Zeichen)."
     },
     "instructors": {
       "label": "Leitung",
@@ -1535,6 +1538,19 @@
       "send_decisions_reject_count": "{count, plural, =0 {Niemand mit roter Bewertung wartet auf eine Ablehnung.} one {# Person mit roter Bewertung bekommt eine Ablehnung.} other {# Personen mit roter Bewertung bekommen eine Ablehnung.}}",
       "send_decisions_confirm": "Senden",
       "send_decisions_error": "Die Einladungen und Ablehnungen konnten nicht alle verschickt werden: {error}",
+      "send_decisions": "Entscheidungen senden",
+      "send_invitations_selected": "Ausgewählte einladen (grüne Bewertung)",
+      "send_rejections_selected": "Ausgewählte ablehnen (rote Bewertung)",
+      "send_invitations_dialog_title": "Einladungen senden",
+      "send_rejections_dialog_title": "Ablehnungen senden",
+      "no_eligible_invitations": "Keine der ausgewählten Personen hat eine grüne Bewertung und wartet noch auf eine Entscheidung.",
+      "no_eligible_rejections": "Keine der ausgewählten Personen hat eine rote Bewertung und wartet noch auf eine Entscheidung.",
+      "selection_skipped": "{count, plural, one {# ausgewählte Person wird} other {# ausgewählte Personen werden}} ausgelassen: Berücksichtigt werden nur passend bewertete Personen, die noch nicht eingeladen oder abgelehnt wurden.",
+      "free_places": "{count, plural, =0 {Im Kurs ist kein Platz mehr frei.} one {Im Kurs ist noch # Platz frei.} other {Im Kurs sind noch # Plätze frei.}}",
+      "invitations_withheld": "{count, plural, one {# weitere Person mit grüner Bewertung wird} other {# weitere Personen mit grüner Bewertung werden}} nicht eingeladen, weil keine Plätze mehr frei sind. Frühere Bewerbungen werden zuerst eingeladen; die anderen behalten ihren Status.",
+      "not_enough_places": "{selected, plural, one {# ausgewählte Person würde} other {# ausgewählte Personen würden}} eingeladen, aber {count, plural, =0 {es ist kein Platz} one {es ist nur # Platz} other {es sind nur # Plätze}} frei. Wähle weniger Personen aus.",
+      "course_full_no_invitations": "Der Kurs hat keine freien Plätze mehr, deshalb kann niemand mit grüner Bewertung eingeladen werden.",
+      "course_full_error": "Die Einladungen wurden nicht verschickt, weil der Kurs nicht genug freie Plätze hat. Lade die Seite neu und versuche es noch einmal.",
       "decisions_queued": "{invited} eingeladen, {rejected} abgelehnt; die Teilnehmenden werden per E-Mail informiert.",
       "no_eligible_decisions": "Gerade gibt es niemanden mit grüner oder roter Bewertung, der noch nicht eingeladen oder abgelehnt wurde.",
       "send_invitations_error": "Fehler beim Senden der Einladungen: {error}",
@@ -2252,6 +2268,54 @@
       "view_page": "Seite ansehen",
       "publish": "Veröffentlichen",
       "unpublish": "Veröffentlichung zurückziehen"
+    },
+    "rausgegangen": {
+      "title": "Rausgegangen",
+      "description": "Teile diese Veranstaltung auf rausgegangen.de. Titel, Texte, Bild, Termine und Ort werden automatisch übertragen und aktuell gehalten.",
+      "enabled": "Auf Rausgegangen veröffentlichen",
+      "enabled_help": "Die Veranstaltung erscheint als ein Eintrag mit dem ersten Präsenz-Termin; alle Termine stehen in der Beschreibung. Die Anmeldung läuft weiter über EduHub.",
+      "publish_first": "Veröffentliche die Veranstaltung zuerst in EduHub.",
+      "category": "Kategorie auf Rausgegangen",
+      "category_help": "Unter welcher Rubrik die Veranstaltung gelistet wird. Vorträge und Lesungen: „Gesprochenes“, Workshops: „Aktiv & kreativ“.",
+      "tags": "Tags",
+      "tags_placeholder": "Tag hinzufügen",
+      "tags_help": "Bis zu 12 Schlagworte, die die Veranstaltung genauer beschreiben, z. B. „ki“ oder „workshop“.",
+      "status": {
+        "disabled": "Nicht auf Rausgegangen geteilt.",
+        "pending": "Wird übertragen …",
+        "published": "Auf Rausgegangen veröffentlicht.",
+        "unpublished": "Übertragen, aber noch nicht veröffentlicht (Testmodus oder Testumgebung). Prüfe die Vorschau.",
+        "error": "Fehler bei der Übertragung: {error}"
+      },
+      "last_synced": "zuletzt synchronisiert {date}",
+      "view": "Auf Rausgegangen ansehen",
+      "preview": "Vorschau auf Rausgegangen",
+      "sync_now": "Jetzt synchronisieren",
+      "syncing": "Synchronisiere …",
+      "categories": {
+        "AKTIV_UND_KREATIV": "Aktiv & kreativ",
+        "AUSSTELLUNG": "Ausstellung",
+        "FESTE_UND_FESTIVAL": "Feste & Festival",
+        "FILM": "Film",
+        "FOOD_UND_DRINKS": "Food & Drinks",
+        "GESPROCHENES": "Gesprochenes",
+        "KINDER_UND_FAMILIEN": "Kinder & Familien",
+        "KONZERTE_UND_MUSIK": "Konzerte & Musik",
+        "MARKT": "Markt",
+        "PARTY": "Party",
+        "SHOWS_UND_PERFORMANCES": "Shows & Performances",
+        "SPORT": "Sport",
+        "THEATER": "Theater"
+      },
+      "unpublish_prompt": {
+        "title": "Auch auf Rausgegangen depublizieren?",
+        "question": "{count, plural, one {Diese Veranstaltung ist} other {# dieser Veranstaltungen sind}} auch auf rausgegangen.de veröffentlicht.",
+        "also_rausgegangen": "Auch auf Rausgegangen depublizieren",
+        "keep_hint": "Der Eintrag bleibt auf Rausgegangen sichtbar. Der Anmeldelink zeigt dann nur noch auf einen externen Anmeldelink, falls vorhanden.",
+        "confirm": "Depublizieren",
+        "lookup_failed": "Es konnte nicht geprüft werden, ob die Veranstaltung auf Rausgegangen geteilt ist. Nichts wurde depubliziert. ({error})",
+        "disable_failed": "Die Veranstaltung konnte auf Rausgegangen nicht depubliziert werden. Nichts wurde depubliziert. ({error})"
+      }
     }
   },
   "manageProjects": {
@@ -2816,7 +2880,18 @@
       "newsletter_label_placeholder": "Optionales Anzeige-Label",
       "newsletter_description": "Newsletter-Beschreibung",
       "newsletter_description_placeholder": "Kurze Beschreibung für Teilnehmende",
-      "newsletter_double_opt_in": "Double-Opt-In-Bestätigung ist in Ghost aktiviert"
+      "newsletter_double_opt_in": "Double-Opt-In-Bestätigung ist in Ghost aktiviert",
+      "rausgegangen_api_key": "Rausgegangen-API-Schlüssel",
+      "rausgegangen_api_key_placeholder": "API-Schlüssel einfügen",
+      "rausgegangen_api_key_set": "Schlüssel speichern",
+      "rausgegangen_api_key_rotate": "Schlüssel ersetzen",
+      "rausgegangen_api_key_remove": "Schlüssel entfernen",
+      "rausgegangen_api_key_remove_confirm": "Rausgegangen-API-Schlüssel entfernen? Veranstaltungen werden dann nicht mehr synchronisiert.",
+      "rausgegangen_api_key_save_success": "Rausgegangen-API-Schlüssel gespeichert",
+      "rausgegangen_api_key_status_configured": "Schlüssel hinterlegt",
+      "rausgegangen_api_key_status_missing": "Kein Schlüssel hinterlegt",
+      "rausgegangen_api_key_error_auth": "Deine Sitzung ist abgelaufen. Bitte melde dich erneut an.",
+      "rausgegangen_api_key_error_generic": "Der Schlüssel konnte nicht gespeichert werden."
     },
     "api_key": {
       "title": "API-Schlüssel Verwaltung",
@@ -2909,7 +2984,8 @@
       "newsletter_list_id": "Optionale Ghost-Newsletter-/Listen-ID. Nutze dieses Feld oder den Slug.",
       "newsletter_slug": "Optionaler Ghost-Newsletter-Slug. Nutze dieses Feld oder die Listen-ID.",
       "newsletter_label": "Optionaler Newsletter-Titel für Teilnehmende statt des Organisationsnamens.",
-      "newsletter_double_opt_in": "Wenn aktiviert, müssen Nutzer das Abo zusätzlich per E-Mail bestätigen."
+      "newsletter_double_opt_in": "Wenn aktiviert, müssen Nutzer das Abo zusätzlich per E-Mail bestätigen.",
+      "rausgegangen_api_key": "Den Schlüssel erhältst Du von Rausgegangen (zentrale@rausgegangen.de). Er wird verschlüsselt gespeichert und nicht wieder angezeigt."
     },
     "error": {
       "loading": "Fehler beim Laden der Organisationen",
@@ -2938,7 +3014,23 @@
       "close": "Schließen",
       "cancel": "Abbrechen"
     },
-    "deletion_confirmation_question": "Das Löschen einer Organisation ist nur möglich, wenn keine Benutzer mit dieser Organisation verknüpft sind.\nBist du sicher, dass du die Organisation {name} löschen möchtest?"
+    "deletion_confirmation_question": "Das Löschen einer Organisation ist nur möglich, wenn keine Benutzer mit dieser Organisation verknüpft sind.\nBist du sicher, dass du die Organisation {name} löschen möchtest?",
+    "features": {
+      "title": "Freigeschaltete Funktionen",
+      "description": "Zusatzfunktionen stehen einer Organisation erst zur Verfügung, wenn sie hier freigeschaltet sind. Nur Super-Admins sehen diesen Bereich.",
+      "options": {
+        "RAUSGEGANGEN": {
+          "label": "Veranstaltungen auf Rausgegangen veröffentlichen",
+          "help": "Die Organisation kann ihre Veranstaltungen auf rausgegangen.de teilen. Dafür braucht sie zusätzlich einen API-Schlüssel von Rausgegangen.",
+          "deactivate_confirm": "Rausgegangen für diese Organisation deaktivieren? Alle ihre Veranstaltungen werden dort depubliziert."
+        }
+      }
+    },
+    "rausgegangen": {
+      "title": "Rausgegangen",
+      "test_mode": "Testmodus",
+      "test_mode_help": "Im Testmodus werden Veranstaltungen unveröffentlicht an Rausgegangen übertragen. Prüfe sie über den Vorschau-Link und schalte den Testmodus danach aus. Außerhalb der Produktion wird ohnehin nie veröffentlicht."
+    }
   },
   "manageLocationAddresses": {
     "headline": "Veranstaltungsadressen",
@@ -2954,7 +3046,10 @@
       "usageCount_other": "Verwendungen",
       "new_address": "Neue Adresse",
       "default_address": "Adressdetails",
-      "default_description": "Beschreibung"
+      "default_description": "Beschreibung",
+      "completeness": "Adressdaten",
+      "complete": "Vollständig",
+      "incomplete": "Unvollständig"
     },
     "input": {
       "enter_short_label": "Kurzes Label eingeben",
@@ -3016,6 +3111,86 @@
       "ONLINE": "Online",
       "HEIDE": "Heide",
       "HAMBURG": "Hamburg"
+    },
+    "venue": {
+      "section_address": "Adresse und Koordinaten",
+      "section_venue": "Ort",
+      "section_contact": "Kontakt",
+      "section_image": "Bild",
+      "street": "Straße und Hausnummer",
+      "addressAdditionalInfo": "Adresszusatz",
+      "zipCode": "PLZ",
+      "city": "Stadt",
+      "country": "Land",
+      "latitude": "Breitengrad",
+      "longitude": "Längengrad",
+      "geocode": "Koordinaten ermitteln",
+      "geocoding": "Suche Koordinaten …",
+      "geocode_success": "Koordinaten gespeichert: {place}",
+      "geocode_failed": "Die Koordinaten konnten nicht ermittelt werden.",
+      "show_on_map": "Auf der Karte ansehen",
+      "category": "Art des Ortes",
+      "directions": "Anfahrt",
+      "accessibilityInfo": "Barrierefreiheit",
+      "websiteUrl": "Website",
+      "instagramUrl": "Instagram",
+      "publicEmail": "Öffentliche E-Mail-Adresse",
+      "publicPhone": "Öffentliche Telefonnummer",
+      "image_upload": "Bild des Ortes hochladen (am besten 16:9)",
+      "imageCredits": "Bildnachweis",
+      "categories": {
+        "BAR": "Bar",
+        "CAFE": "Café",
+        "CINEMA": "Kino",
+        "CLUB": "Club",
+        "CONCERT": "Konzertsaal",
+        "GALLERY": "Galerie",
+        "MARKET": "Markt",
+        "MISC": "Sonstiges",
+        "MUSEUM": "Museum",
+        "OPENAIR": "Open Air",
+        "PUBLICSPACE": "Öffentlicher Raum",
+        "RESTAURANT": "Restaurant",
+        "SHOWROOM": "Showroom",
+        "SPORTS": "Sportstätte",
+        "STORE": "Laden",
+        "THEATER": "Theater",
+        "VENUE": "Veranstaltungsort",
+        "WORKSPACE": "Arbeitsort / Coworking",
+        "ZIRKUS": "Zirkus"
+      }
+    },
+    "venue_help": {
+      "street": "Straße und Hausnummer, z. B. „Legienstr. 40“.",
+      "addressAdditionalInfo": "Zum Beispiel „Eingang über den Hof“ oder „3. OG“.",
+      "zipCode": "Fünfstellige Postleitzahl.",
+      "city": "Stadt des Ortes.",
+      "country": "Land des Ortes.",
+      "latitude": "Wird für Karten und externe Veranstaltungsportale gebraucht. Am einfachsten über „Koordinaten ermitteln“.",
+      "longitude": "Wird für Karten und externe Veranstaltungsportale gebraucht. Am einfachsten über „Koordinaten ermitteln“.",
+      "category": "Welche Art von Ort das ist, z. B. Coworking-Space oder Veranstaltungsort.",
+      "directions": "Wie man hinkommt, z. B. Bus- und Bahnhaltestellen.",
+      "accessibilityInfo": "Zugang mit Rollstuhl, Aufzug, barrierefreie Toiletten und Ähnliches.",
+      "websiteUrl": "Website des Ortes.",
+      "instagramUrl": "Instagram-Profil des Ortes.",
+      "publicEmail": "Öffentliche Kontaktadresse des Ortes.",
+      "publicPhone": "Öffentliche Telefonnummer des Ortes.",
+      "imageCredits": "Wer das Bild gemacht hat bzw. die Rechte daran hält (max. 120 Zeichen)."
+    },
+    "rausgegangen": {
+      "title": "Rausgegangen",
+      "status_none": "Noch mit keinem Ort auf Rausgegangen verknüpft. Bei der ersten Veranstaltung wird ein passender Ort verknüpft oder neu angelegt.",
+      "status_owned": "Wir haben diesen Ort auf Rausgegangen angelegt; Änderungen hier werden übertragen.",
+      "status_linked": "Mit einem bestehenden Ort auf Rausgegangen verknüpft.",
+      "search": "Auf Rausgegangen suchen",
+      "unlink": "Verknüpfung lösen",
+      "search_title": "Ort auf Rausgegangen verknüpfen",
+      "searching": "Suche läuft …",
+      "no_results": "Kein passender Ort gefunden. Bei der nächsten Synchronisierung wird der Ort neu angelegt.",
+      "link": "Verknüpfen",
+      "linked": "Verknüpft",
+      "search_hint": "Verknüpfe einen bestehenden Ort, damit auf Rausgegangen keine Dublette entsteht. Findest Du keinen, wird der Ort bei der nächsten Synchronisierung aus unseren Adressdaten angelegt.",
+      "search_failed": "Die Suche auf Rausgegangen ist fehlgeschlagen."
     }
   },
   "manageEmailTemplates": {

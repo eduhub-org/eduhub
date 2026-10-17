@@ -18,6 +18,7 @@ import { RssEvent, selectCurrentEvents } from './eventsRss';
 import { blockSchedule, contiguousBlocks, TimedSession } from './sessionSchedule';
 import {
   AddressMap,
+  Coordinates,
   labelledAddress,
   meaningfulLabel,
   resolveSessionLocations,
@@ -130,6 +131,22 @@ export const feedLocation = (locations: ResolvedLocation[]): string | undefined 
   return unique.length > 0 ? unique.join(' – ') : undefined;
 };
 
+/**
+ * The GEO of an entry: the coordinates of its in-person place, when there is
+ * exactly one (several places have no single point).
+ */
+export const feedGeo = (locations: ResolvedLocation[]): Coordinates | undefined => {
+  const inPerson = locations.filter((location) => location.locationOption && location.locationOption !== 'ONLINE');
+  const points = new Map(
+    inPerson
+      .map((location) => location.coordinates)
+      .filter((coordinates): coordinates is Coordinates => Boolean(coordinates))
+      .map((coordinates) => [`${coordinates.latitude};${coordinates.longitude}`, coordinates])
+  );
+  const keys = new Set(inPerson.map((location) => location.key));
+  return points.size === 1 && keys.size === 1 ? [...points.values()][0] : undefined;
+};
+
 const ENTITIES: Record<string, string> = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ' };
 
 /**
@@ -210,6 +227,13 @@ export const buildEventsIcal = (events: IcalFeedEvent[], options: EventsIcalOpti
 
     return contiguousBlocks(upcoming, TIME_ZONE).map((day) => {
       const first = day[0];
+      const locations = day
+        .flatMap(({ session }) => resolveSessionLocations(session, event.CourseLocations ?? [], options.addressMap))
+        .map((location) =>
+          location.label || !location.locationOption || !options.labelByAddress
+            ? location
+            : { ...location, label: options.labelByAddress(location.locationOption, location.displayAddress) }
+        );
       const end = new Date(Math.max(...day.map((item) => item.end.getTime())));
 
       let title = event.title;
@@ -227,15 +251,8 @@ export const buildEventsIcal = (events: IcalFeedEvent[], options: EventsIcalOpti
         startDateTime: first.start.toISOString(),
         endDateTime: end.toISOString(),
         description: describe(event, link, options.renderPlainText, schedule),
-        location: feedLocation(
-          day
-            .flatMap(({ session }) => resolveSessionLocations(session, event.CourseLocations ?? [], options.addressMap))
-            .map((location) =>
-              location.label || !location.locationOption || !options.labelByAddress
-                ? location
-                : { ...location, label: options.labelByAddress(location.locationOption, location.displayAddress) }
-            )
-        ),
+        location: feedLocation(locations),
+        geo: feedGeo(locations),
         url: link,
         categories: options.categories,
         imageUrl,

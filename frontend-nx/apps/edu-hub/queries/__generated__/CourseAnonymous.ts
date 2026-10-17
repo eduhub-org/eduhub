@@ -476,6 +476,7 @@ export interface CourseAnonymous_Course_by_pk {
    * The cover image for the course
    */
   coverImage: string | null;
+  coverImageCredits: string | null;
   /**
    * The language the course is given in.
    */

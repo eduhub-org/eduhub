@@ -281,6 +281,17 @@ const UNDECIDED_RATED_FILTER = {
   ],
 };
 
+/**
+ * Places still free for invitations, or null when the course has no limit. The server enforces the
+ * same limit (course_enrollment_guard_invitation_capacity); this lets the dialog stay within it.
+ */
+const freePlacesOf = (course: ManagedCourseApplicationRecipients['Course_by_pk']): number | null => {
+  if (course?.maxParticipants == null) return null;
+  return Math.max(0, course.maxParticipants - (course.TakenPlaces.aggregate?.count ?? 0));
+};
+
+const isCourseFullError = (error: unknown) => error instanceof Error && error.message.includes('This course is full');
+
 /** An invitation that is still open or has lapsed can be sent again with a new deadline. */
 const canRenewInvitation = (enrollment: ApplicationEnrollment) =>
   enrollment.status === 'INVITED' || enrollment.status === 'EXPIRED';
@@ -489,36 +500,75 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
     ensurePortalContainer(INVITE_DATEPICKER_PORTAL_ID);
   }, []);
 
-  // Cancelling finishes in a dialog, so the selection is only released once
-  // that dialog reports success.
+  // Sending decisions for the selected rows or cancelling finishes in a dialog, so the selection is
+  // only released once that dialog reports success.
   const dialogBulkAction = useDeferredBulkAction();
 
-  // Dialog state for decisions: inviting everyone green and rejecting everyone red at once, or
-  // renewing one invitation.
+  // Dialog state for decisions: inviting everyone green and rejecting everyone red at once
+  // (source 'rating'), deciding on the selected rows (source 'selection'), or renewing one
+  // invitation. Invitations never exceed the free places: by rating, the earliest applications are
+  // invited and the rest (withheldCount) keep their status.
   const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
   const [inviteDialogData, setInviteDialogData] = useState<
-    | { mode: 'decisions'; enrollmentIds: number[]; rejectionIds: number[] }
+    | {
+        mode: 'decisions';
+        source: 'rating' | 'selection';
+        enrollmentIds: number[];
+        rejectionIds: number[];
+        freePlaces: number | null;
+        withheldCount: number;
+        skippedCount: number;
+      }
     | { mode: 'renew'; enrollmentIds: number[]; name: string }
     | null
   >(null);
   const [isLoadingInviteRecipients, setIsLoadingInviteRecipients] = useState(false);
   const [inviteError, setInviteError] = useState<string | null>(null);
 
+  /** Loads the undecided rated applications (optionally only some ids) and the free places. */
+  const loadUndecidedRated = useCallback(
+    async (onlyIds?: number[]) => {
+      const result = await loadInviteRecipients({
+        variables: {
+          id: course.id,
+          limit: BULK_EMAIL_RECIPIENT_LIMIT,
+          filter: onlyIds ? { _and: [{ id: { _in: onlyIds } }, UNDECIDED_RATED_FILTER] } : UNDECIDED_RATED_FILTER,
+        },
+      });
+      if (result.error) throw result.error;
+      // Application order: the earliest applications are invited first when places run short.
+      const recipients = [...(result.data?.Course_by_pk?.CourseEnrollments ?? [])].sort((a, b) => a.id - b.id);
+      return {
+        inviteIds: recipients.filter((e) => e.motivationRating === MotivationRating_enum.INVITE).map((e) => e.id),
+        rejectionIds: recipients.filter((e) => e.motivationRating === MotivationRating_enum.DECLINE).map((e) => e.id),
+        freePlaces: freePlacesOf(result.data?.Course_by_pk ?? null),
+      };
+    },
+    [course.id, loadInviteRecipients]
+  );
+
   const handleOpenDecisionsDialog = useCallback(async () => {
     setIsLoadingInviteRecipients(true);
     try {
-      const result = await loadInviteRecipients({
-        variables: { id: course.id, limit: BULK_EMAIL_RECIPIENT_LIMIT, filter: UNDECIDED_RATED_FILTER },
-      });
-      if (result.error) throw result.error;
-      const recipients = result.data?.Course_by_pk?.CourseEnrollments ?? [];
-      const enrollmentIds = recipients.filter((e) => e.motivationRating === MotivationRating_enum.INVITE).map((e) => e.id);
-      const rejectionIds = recipients.filter((e) => e.motivationRating === MotivationRating_enum.DECLINE).map((e) => e.id);
+      const { inviteIds, rejectionIds, freePlaces } = await loadUndecidedRated();
+      const enrollmentIds = freePlaces == null ? inviteIds : inviteIds.slice(0, freePlaces);
+      const withheldCount = inviteIds.length - enrollmentIds.length;
       if (enrollmentIds.length === 0 && rejectionIds.length === 0) {
-        showBulkNotice(t('bulk_actions.no_eligible_decisions'));
+        showBulkNotice(
+          withheldCount > 0 ? t('bulk_actions.course_full_no_invitations') : t('bulk_actions.no_eligible_decisions'),
+          4000
+        );
         return;
       }
-      setInviteDialogData({ mode: 'decisions', enrollmentIds, rejectionIds });
+      setInviteDialogData({
+        mode: 'decisions',
+        source: 'rating',
+        enrollmentIds,
+        rejectionIds,
+        freePlaces,
+        withheldCount,
+        skippedCount: 0,
+      });
       setInviteExpireDate(getDefaultInviteExpireDate());
       setIsInviteDialogOpen(true);
     } catch (error) {
@@ -527,7 +577,53 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
     } finally {
       setIsLoadingInviteRecipients(false);
     }
-  }, [course.id, getDefaultInviteExpireDate, loadInviteRecipients, showBulkNotice, t]);
+  }, [getDefaultInviteExpireDate, loadUndecidedRated, showBulkNotice, t]);
+
+  /**
+   * Opens the dialog for inviting the selected green-rated or rejecting the selected red-rated
+   * applications. Eligibility is checked against the server, not the loaded rows. Returns whether
+   * the dialog opened. A selection that needs more places than are free is refused, so the
+   * organizer decides who is left out.
+   */
+  const openSelectionDecisionDialog = useCallback(
+    async (kind: 'invite' | 'reject', selectedRows: ApplicationEnrollment[]) => {
+      setIsLoadingInviteRecipients(true);
+      try {
+        const { inviteIds, rejectionIds, freePlaces } = await loadUndecidedRated(selectedRows.map((e) => e.id));
+        const eligibleIds = kind === 'invite' ? inviteIds : rejectionIds;
+        if (eligibleIds.length === 0) {
+          showBulkNotice(
+            kind === 'invite' ? t('bulk_actions.no_eligible_invitations') : t('bulk_actions.no_eligible_rejections'),
+            4000
+          );
+          return false;
+        }
+        if (kind === 'invite' && freePlaces != null && eligibleIds.length > freePlaces) {
+          showBulkNotice(t('bulk_actions.not_enough_places', { selected: eligibleIds.length, count: freePlaces }), 6000);
+          return false;
+        }
+        setInviteDialogData({
+          mode: 'decisions',
+          source: 'selection',
+          enrollmentIds: kind === 'invite' ? eligibleIds : [],
+          rejectionIds: kind === 'reject' ? eligibleIds : [],
+          freePlaces,
+          withheldCount: 0,
+          skippedCount: selectedRows.length - eligibleIds.length,
+        });
+        setInviteExpireDate(getDefaultInviteExpireDate());
+        setIsInviteDialogOpen(true);
+        return true;
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        setInviteError(t('bulk_actions.send_invitations_error', { error: errorMessage }));
+        return false;
+      } finally {
+        setIsLoadingInviteRecipients(false);
+      }
+    },
+    [getDefaultInviteExpireDate, loadUndecidedRated, showBulkNotice, t]
+  );
 
   const handleOpenRenewInvitationDialog = useCallback(
     (enrollment: ApplicationEnrollment) => {
@@ -545,11 +641,15 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
   // The dialog cannot be closed while the mutation runs.
   const [isSendingInvitations, setIsSendingInvitations] = useState(false);
 
+  const isSelectionDecision = inviteDialogData?.mode === 'decisions' && inviteDialogData.source === 'selection';
+
   const handleCloseInviteDialog = useCallback(() => {
     if (isSendingInvitations) return;
     setIsInviteDialogOpen(false);
     setInviteDialogData(null);
-  }, [isSendingInvitations]);
+    // Not confirmed: the selected rows stay selected.
+    if (isSelectionDecision) dialogBulkAction.fail();
+  }, [dialogBulkAction, isSelectionDecision, isSendingInvitations]);
 
   const handleSendInvitations = useCallback(async () => {
     if (!inviteDialogData || isSendingInvitations) return;
@@ -590,9 +690,14 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
       const errorMessage = error instanceof Error ? error.message : String(error);
       // Invitations that already went out are not sent twice on a retry: they are no longer
       // undecided, so the next load leaves them out.
-      setInviteError(t('bulk_actions.send_decisions_error', { error: errorMessage }));
+      setInviteError(
+        isCourseFullError(error)
+          ? t('bulk_actions.course_full_error')
+          : t('bulk_actions.send_decisions_error', { error: errorMessage })
+      );
       setIsInviteDialogOpen(false);
       setInviteDialogData(null);
+      if (isSelectionDecision) dialogBulkAction.fail();
       await qResult.refetch().catch(() => undefined);
       return;
     } finally {
@@ -604,6 +709,10 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
     } else {
       showBulkNotice(t('bulk_actions.decisions_queued', { invited: invitedCount, rejected: rejectedCount }), 4000);
     }
+    if (isSelectionDecision) {
+      if (invitedCount === 0 && rejectedCount === 0) dialogBulkAction.fail();
+      else dialogBulkAction.succeed();
+    }
     setIsInviteDialogOpen(false);
     setInviteDialogData(null);
 
@@ -613,7 +722,9 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
       console.error('ApplicationsTab: refetch after sending decisions failed', refetchError);
     }
   }, [
+    dialogBulkAction,
     inviteDialogData,
+    isSelectionDecision,
     isSendingInvitations,
     inviteExpireDate,
     updateEnrollmentStatusForInvite,
@@ -780,6 +891,21 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
         return dialogBulkAction.start();
       }
 
+      if (action === 'send_invitations_selected' || action === 'send_rejections_selected') {
+        // Nothing happened in these cases, so the rows stay selected.
+        if (selectedRows.length === 0) {
+          setIsNoSelectionDialogOpen(true);
+          return false;
+        }
+        const opened = await openSelectionDecisionDialog(
+          action === 'send_invitations_selected' ? 'invite' : 'reject',
+          selectedRows
+        );
+        if (!opened) return false;
+        // handleSendInvitations settles the action once the dialog is confirmed.
+        return dialogBulkAction.start();
+      }
+
       // Handle email actions (existing)
       if (action === 'email_selected') {
         targetEnrollments = selectedRows;
@@ -883,6 +1009,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
       setCancelEnrollmentIds,
       loadBulkEmailRecipients,
       openMailtoOrShowFallback,
+      openSelectionDecisionDialog,
       setIsNoSelectionDialogOpen,
       showBulkNotice,
       t,
@@ -943,8 +1070,28 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
       return actions;
     }
 
-    // Invitations and rejections go out through the "send by rating" button above the table.
+    // The "send by rating" button above the table decides on everyone rated green or red; these
+    // decide on the selected rows only.
+    const decisionDisabledReason = !canDecideRegistrations
+      ? t('bulk_actions.disabled_reasons.instructors_only')
+      : t('bulk_actions.disabled_reasons.select_participants_first');
     actions.push(
+      {
+        value: 'send_invitations_selected',
+        label: t('bulk_actions.send_invitations_selected'),
+        group: t('bulk_actions.send_decisions'),
+        requiresSelection: true,
+        disabled: !canDecideRegistrations,
+        disabledReason: decisionDisabledReason,
+      },
+      {
+        value: 'send_rejections_selected',
+        label: t('bulk_actions.send_rejections_selected'),
+        group: t('bulk_actions.send_decisions'),
+        requiresSelection: true,
+        disabled: !canDecideRegistrations,
+        disabledReason: decisionDisabledReason,
+      },
       {
         value: 'email_status_CONFIRMED',
         label: t('bulk_actions.email_all_confirmed'),
@@ -1307,7 +1454,11 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
             <div className="text-xl font-semibold text-label-primary">
               {inviteDialogData?.mode === 'renew'
                 ? t('bulk_actions.renew_invitation_dialog_title')
-                : t('bulk_actions.send_decisions_dialog_title')}
+                : inviteDialogData?.source === 'selection'
+                  ? inviteDialogData.enrollmentIds.length > 0
+                    ? t('bulk_actions.send_invitations_dialog_title')
+                    : t('bulk_actions.send_rejections_dialog_title')
+                  : t('bulk_actions.send_decisions_dialog_title')}
             </div>
             <div
               className={`text-label-primary ${
@@ -1328,16 +1479,38 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
                     {t('bulk_actions.renew_invitation_text', { name: inviteDialogData.name })}
                   </p>
                 ) : (
-                  <ul className="text-label-primary mb-4 space-y-2">
-                    <li className="flex items-center gap-2">
-                      <Dot color="lightgreen" />
-                      {t('bulk_actions.send_decisions_invite_count', { count: inviteDialogData.enrollmentIds.length })}
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <Dot color="red" />
-                      {t('bulk_actions.send_decisions_reject_count', { count: inviteDialogData.rejectionIds.length })}
-                    </li>
-                  </ul>
+                  <>
+                    <ul className="text-label-primary mb-4 space-y-2">
+                      {(inviteDialogData.source === 'rating' || inviteDialogData.enrollmentIds.length > 0) && (
+                        <li className="flex items-center gap-2">
+                          <Dot color="lightgreen" />
+                          {t('bulk_actions.send_decisions_invite_count', { count: inviteDialogData.enrollmentIds.length })}
+                        </li>
+                      )}
+                      {(inviteDialogData.source === 'rating' || inviteDialogData.rejectionIds.length > 0) && (
+                        <li className="flex items-center gap-2">
+                          <Dot color="red" />
+                          {t('bulk_actions.send_decisions_reject_count', { count: inviteDialogData.rejectionIds.length })}
+                        </li>
+                      )}
+                    </ul>
+                    {inviteDialogData.freePlaces != null &&
+                      (inviteDialogData.enrollmentIds.length > 0 || inviteDialogData.withheldCount > 0) && (
+                        <p className="text-sm text-label-secondary mb-2">
+                          {t('bulk_actions.free_places', { count: inviteDialogData.freePlaces })}
+                        </p>
+                      )}
+                    {inviteDialogData.withheldCount > 0 && (
+                      <p className="text-sm text-warning mb-2">
+                        {t('bulk_actions.invitations_withheld', { count: inviteDialogData.withheldCount })}
+                      </p>
+                    )}
+                    {inviteDialogData.skippedCount > 0 && (
+                      <p className="text-sm text-label-secondary mb-4">
+                        {t('bulk_actions.selection_skipped', { count: inviteDialogData.skippedCount })}
+                      </p>
+                    )}
+                  </>
                 )}
                 {inviteDialogData.enrollmentIds.length > 0 && (
                   <div className="flex flex-col gap-4">

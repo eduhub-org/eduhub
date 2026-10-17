@@ -447,6 +447,7 @@ export interface InsertEnrollment_insert_CourseEnrollment_returning_Course {
    * The cover image for the course
    */
   coverImage: string | null;
+  coverImageCredits: string | null;
   /**
    * The language the course is given in.
    */

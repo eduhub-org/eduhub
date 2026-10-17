@@ -1004,7 +1004,8 @@
     "bulk_action_copy": "Copy to Program",
     "Uniqueness violation_ duplicate key value violates unique constraint \"CourseAddress_pkey\"": "A location address with this configuration already exists for this course.",
     "part_of_course": "This event is part of the course \"{course}\".",
-    "to_course": "Go to course"
+    "to_course": "Go to course",
+    "cover_image_credits": "Cover image: {credits}"
   },
   "courseAdminPage": {
     "pageTitle": "Opencampus Course Instructor View",
@@ -1238,7 +1239,9 @@
       "label": "Cover Image",
       "upload_text": "Click to upload cover image",
       "alt": "Cover image of the offering",
-      "help_text": "Shown on the offering's page and in the sliders."
+      "help_text": "Shown on the offering's page and in the sliders.",
+      "credits_label": "Image credits",
+      "credits_help": "Who took the cover image or holds its rights, e.g. \"Photo: Jane Doe\". Shown below the title and passed on to event platforms (max. 120 characters)."
     },
     "instructors": {
       "label": "Instructors",
@@ -1553,6 +1556,19 @@
       "send_decisions_reject_count": "{count, plural, =0 {Nobody with red rating is waiting for a rejection.} one {# person with red rating will receive a rejection.} other {# persons with red rating will receive a rejection.}}",
       "send_decisions_confirm": "Send",
       "send_decisions_error": "The invitations and rejections could not all be sent: {error}",
+      "send_decisions": "Send Decisions",
+      "send_invitations_selected": "Invite Selected (green rating)",
+      "send_rejections_selected": "Reject Selected (red rating)",
+      "send_invitations_dialog_title": "Send Invitations",
+      "send_rejections_dialog_title": "Send Rejections",
+      "no_eligible_invitations": "None of the selected applicants has a green rating and is still waiting for a decision.",
+      "no_eligible_rejections": "None of the selected applicants has a red rating and is still waiting for a decision.",
+      "selection_skipped": "{count, plural, one {# selected person is} other {# selected persons are}} left out: only applicants with a matching rating who have not been invited or rejected yet are included.",
+      "free_places": "{count, plural, =0 {No place in the course is free.} one {# place in the course is still free.} other {# places in the course are still free.}}",
+      "invitations_withheld": "{count, plural, one {# more person with green rating is} other {# more persons with green rating are}} not invited because there are no more free places. Earlier applications are invited first; the others keep their status.",
+      "not_enough_places": "{selected, plural, one {# selected person would} other {# selected persons would}} be invited, but {count, plural, =0 {no place is} one {only # place is} other {only # places are}} free. Select fewer applicants.",
+      "course_full_no_invitations": "The course has no free places, so nobody with a green rating can be invited.",
+      "course_full_error": "The invitations were not sent because the course does not have enough free places. Reload the page and try again.",
       "decisions_queued": "{invited} invited, {rejected} rejected; the participants will be notified by email.",
       "no_eligible_decisions": "There is nobody with a green or red rating who has not been invited or rejected yet.",
       "send_invitations_error": "Failed to send invitations: {error}",
@@ -2267,6 +2283,54 @@
       "view_page": "View page",
       "publish": "Publish",
       "unpublish": "Unpublish"
+    },
+    "rausgegangen": {
+      "title": "Rausgegangen",
+      "description": "Share this event on rausgegangen.de. Title, texts, image, dates and venue are sent automatically and kept up to date.",
+      "enabled": "Publish on Rausgegangen",
+      "enabled_help": "The event appears as one entry with its first in-person date; all dates are listed in the description. Registration still runs through EduHub.",
+      "publish_first": "Publish the event in EduHub first.",
+      "category": "Category on Rausgegangen",
+      "category_help": "The section the event is listed under. Talks and readings: \"Gesprochenes\", workshops: \"Aktiv & kreativ\".",
+      "tags": "Tags",
+      "tags_placeholder": "Add a tag",
+      "tags_help": "Up to 12 keywords that describe the event more precisely, e.g. \"ai\" or \"workshop\".",
+      "status": {
+        "disabled": "Not shared on Rausgegangen.",
+        "pending": "Sending …",
+        "published": "Published on Rausgegangen.",
+        "unpublished": "Sent, but not published yet (test mode or test environment). Check the preview.",
+        "error": "Sync failed: {error}"
+      },
+      "last_synced": "last synced {date}",
+      "view": "View on Rausgegangen",
+      "preview": "Preview on Rausgegangen",
+      "sync_now": "Sync now",
+      "syncing": "Syncing …",
+      "categories": {
+        "AKTIV_UND_KREATIV": "Active & creative",
+        "AUSSTELLUNG": "Exhibition",
+        "FESTE_UND_FESTIVAL": "Fairs & festivals",
+        "FILM": "Film",
+        "FOOD_UND_DRINKS": "Food & drinks",
+        "GESPROCHENES": "Spoken word",
+        "KINDER_UND_FAMILIEN": "Kids & families",
+        "KONZERTE_UND_MUSIK": "Concerts & music",
+        "MARKT": "Market",
+        "PARTY": "Party",
+        "SHOWS_UND_PERFORMANCES": "Shows & performances",
+        "SPORT": "Sports",
+        "THEATER": "Theater"
+      },
+      "unpublish_prompt": {
+        "title": "Unpublish on Rausgegangen too?",
+        "question": "{count, plural, one {This event is} other {# of these events are}} also published on rausgegangen.de.",
+        "also_rausgegangen": "Also unpublish on Rausgegangen",
+        "keep_hint": "The entry stays visible on Rausgegangen. Its registration link then only points to an external registration link, if there is one.",
+        "confirm": "Unpublish",
+        "lookup_failed": "Could not check whether the event is shared on Rausgegangen. Nothing was unpublished. ({error})",
+        "disable_failed": "The event could not be unpublished on Rausgegangen. Nothing was unpublished. ({error})"
+      }
     }
   },
   "manageProjects": {
@@ -2831,7 +2895,18 @@
       "newsletter_label_placeholder": "Optional display label",
       "newsletter_description": "Newsletter description",
       "newsletter_description_placeholder": "Short participant-facing description",
-      "newsletter_double_opt_in": "Double opt-in confirmation is enabled in Ghost"
+      "newsletter_double_opt_in": "Double opt-in confirmation is enabled in Ghost",
+      "rausgegangen_api_key": "Rausgegangen API key",
+      "rausgegangen_api_key_placeholder": "Paste the API key",
+      "rausgegangen_api_key_set": "Save key",
+      "rausgegangen_api_key_rotate": "Replace key",
+      "rausgegangen_api_key_remove": "Remove key",
+      "rausgegangen_api_key_remove_confirm": "Remove the Rausgegangen API key? Events will no longer be synced.",
+      "rausgegangen_api_key_save_success": "Rausgegangen API key saved",
+      "rausgegangen_api_key_status_configured": "Key configured",
+      "rausgegangen_api_key_status_missing": "No key configured",
+      "rausgegangen_api_key_error_auth": "Your session has expired. Please sign in again.",
+      "rausgegangen_api_key_error_generic": "The key could not be saved."
     },
     "api_key": {
       "title": "API Key Management",
@@ -2924,7 +2999,8 @@
       "newsletter_list_id": "Optional Ghost newsletter/list ID. Use this or the slug field.",
       "newsletter_slug": "Optional Ghost newsletter slug. Use this or the list ID field.",
       "newsletter_label": "Optional participant-facing newsletter title overriding the organization name.",
-      "newsletter_double_opt_in": "If enabled, users must confirm by email before the subscription becomes active."
+      "newsletter_double_opt_in": "If enabled, users must confirm by email before the subscription becomes active.",
+      "rausgegangen_api_key": "You get the key from Rausgegangen (zentrale@rausgegangen.de). It is stored encrypted and never shown again."
     },
     "error": {
       "loading": "Error loading organizations",
@@ -2953,7 +3029,23 @@
       "close": "Close",
       "cancel": "Cancel"
     },
-    "deletion_confirmation_question": "Deleting an organization is only possible if there are no users related to this organization.\nAre you sure you want to delete the organization {name}?"
+    "deletion_confirmation_question": "Deleting an organization is only possible if there are no users related to this organization.\nAre you sure you want to delete the organization {name}?",
+    "features": {
+      "title": "Activated features",
+      "description": "Additional features are only available to an organization once they are activated here. Only super admins see this section.",
+      "options": {
+        "RAUSGEGANGEN": {
+          "label": "Publish events on Rausgegangen",
+          "help": "The organization can share its events on rausgegangen.de. It also needs an API key from Rausgegangen.",
+          "deactivate_confirm": "Deactivate Rausgegangen for this organization? All of its events will be unpublished there."
+        }
+      }
+    },
+    "rausgegangen": {
+      "title": "Rausgegangen",
+      "test_mode": "Test mode",
+      "test_mode_help": "In test mode, events are sent to Rausgegangen unpublished. Check them via the preview link, then switch test mode off. Outside production nothing is ever published anyway."
+    }
   },
   "manageLocationAddresses": {
     "headline": "Location Addresses",
@@ -2969,7 +3061,10 @@
       "usageCount_other": "Usages",
       "new_address": "New Address",
       "default_address": "Address details",
-      "default_description": "Description"
+      "default_description": "Description",
+      "completeness": "Address data",
+      "complete": "Complete",
+      "incomplete": "Incomplete"
     },
     "input": {
       "enter_short_label": "Enter short label",
@@ -3031,6 +3126,86 @@
       "ONLINE": "Online",
       "HEIDE": "Heide",
       "HAMBURG": "Hamburg"
+    },
+    "venue": {
+      "section_address": "Address and coordinates",
+      "section_venue": "Venue",
+      "section_contact": "Contact",
+      "section_image": "Image",
+      "street": "Street and number",
+      "addressAdditionalInfo": "Address addition",
+      "zipCode": "Zip code",
+      "city": "City",
+      "country": "Country",
+      "latitude": "Latitude",
+      "longitude": "Longitude",
+      "geocode": "Look up coordinates",
+      "geocoding": "Looking up coordinates …",
+      "geocode_success": "Coordinates saved: {place}",
+      "geocode_failed": "The coordinates could not be determined.",
+      "show_on_map": "Show on map",
+      "category": "Kind of venue",
+      "directions": "Directions",
+      "accessibilityInfo": "Accessibility",
+      "websiteUrl": "Website",
+      "instagramUrl": "Instagram",
+      "publicEmail": "Public email address",
+      "publicPhone": "Public phone number",
+      "image_upload": "Upload an image of the venue (ideally 16:9)",
+      "imageCredits": "Image credits",
+      "categories": {
+        "BAR": "Bar",
+        "CAFE": "Café",
+        "CINEMA": "Cinema",
+        "CLUB": "Club",
+        "CONCERT": "Concert hall",
+        "GALLERY": "Gallery",
+        "MARKET": "Market",
+        "MISC": "Other",
+        "MUSEUM": "Museum",
+        "OPENAIR": "Open air",
+        "PUBLICSPACE": "Public space",
+        "RESTAURANT": "Restaurant",
+        "SHOWROOM": "Showroom",
+        "SPORTS": "Sports venue",
+        "STORE": "Store",
+        "THEATER": "Theater",
+        "VENUE": "Event venue",
+        "WORKSPACE": "Workspace / coworking",
+        "ZIRKUS": "Circus"
+      }
+    },
+    "venue_help": {
+      "street": "Street and house number, e.g. \"Legienstr. 40\".",
+      "addressAdditionalInfo": "For example \"entrance via the courtyard\" or \"3rd floor\".",
+      "zipCode": "Five-digit zip code.",
+      "city": "City of the venue.",
+      "country": "Country of the venue.",
+      "latitude": "Needed for maps and external event platforms. Easiest via \"Look up coordinates\".",
+      "longitude": "Needed for maps and external event platforms. Easiest via \"Look up coordinates\".",
+      "category": "What kind of place this is, e.g. coworking space or event venue.",
+      "directions": "How to get there, e.g. bus and train stops.",
+      "accessibilityInfo": "Wheelchair access, elevator, accessible toilets and the like.",
+      "websiteUrl": "Website of the venue.",
+      "instagramUrl": "Instagram profile of the venue.",
+      "publicEmail": "Public contact address of the venue.",
+      "publicPhone": "Public phone number of the venue.",
+      "imageCredits": "Who took the image or holds its rights (max. 120 characters)."
+    },
+    "rausgegangen": {
+      "title": "Rausgegangen",
+      "status_none": "Not linked to a venue on Rausgegangen yet. The first event links a matching venue or creates one.",
+      "status_owned": "We created this venue on Rausgegangen; changes made here are sent there.",
+      "status_linked": "Linked to an existing venue on Rausgegangen.",
+      "search": "Search on Rausgegangen",
+      "unlink": "Unlink",
+      "search_title": "Link a venue on Rausgegangen",
+      "searching": "Searching …",
+      "no_results": "No matching venue found. The next sync will create it.",
+      "link": "Link",
+      "linked": "Linked",
+      "search_hint": "Link an existing venue so Rausgegangen does not get a duplicate. If you find none, the next sync creates the venue from our address data.",
+      "search_failed": "The search on Rausgegangen failed."
     }
   },
   "manageEmailTemplates": {

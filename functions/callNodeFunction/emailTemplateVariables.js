@@ -496,12 +496,17 @@ export function createVariableReplacer(data, formatDate) {
  * @returns {Function} Variable replacement function
  */
 export function createEnrollmentVariableReplacer(enrollmentDetails, formatDate) {
+  const courseLink = `${process.env.FRONTEND_URL || 'https://edu.opencampus.sh'}/course/${enrollmentDetails.Course.id}`;
+  // An invitation can only be accepted when logged in; logged out, the course page offers to apply
+  // instead. force_login sends a logged-out recipient through the login first (withAuthRedirect).
+  // Guests have no account to log in with.
+  const forceLogin = enrollmentDetails.status === 'INVITED' && enrollmentDetails.User?.status !== 'GUEST';
   return createVariableReplacer({
     user: enrollmentDetails.User,
     course: enrollmentDetails.Course,
     enrollment: enrollmentDetails,
     enrollmentAddons: enrollmentDetails.CourseEnrollmentAddons || [],
-    courseLink: `${process.env.FRONTEND_URL || 'https://edu.opencampus.sh'}/course/${enrollmentDetails.Course.id}`,
+    courseLink: forceLogin ? `${courseLink}?force_login=true` : courseLink,
     certificateLink: enrollmentDetails.certificateLink || null
   }, formatDate);
 }
