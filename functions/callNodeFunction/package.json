@@ -9,8 +9,8 @@
     "got": "^12.5.3",
     "graphql-request": "^6.1.0",
     "marked": "^15.0.12",
-    "sanitize-html": "^2.17.5",
-    "sharp": "^0.35.4",
+    "sanitize-html": "^2.17.7",
+    "sharp": "^0.35.5",
     "stripe": "^22.6.2",
     "winston": "^3.3.3"
   },
