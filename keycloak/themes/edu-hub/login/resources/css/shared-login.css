@@ -73,6 +73,10 @@ html.stujo-brand body {
   text-decoration: none;
 }
 
+.navbar-home-link:focus {
+  outline: 0;
+}
+
 .navbar-home-link:focus-visible {
   outline: 2px solid var(--kc-cobrand-link);
   outline-offset: 5px;
@@ -180,8 +184,9 @@ html.stujo-flensburg .navbar-cobrand-flensburg {
   min-width: 44px;
   min-height: 44px;
   align-items: center;
-  padding: 5px 2px;
+  padding: 5px 8px;
   border: 0;
+  outline: 0;
   background: transparent;
   color: #706d73;
   font-size: 14px;
@@ -497,6 +502,7 @@ h1#kc-page-title {
 
 /* Keep account switching next to the primary action on both pages. */
 #kc-form-login .kc-account-actions {
+  margin-left: auto;
   text-align: right;
 }
 
