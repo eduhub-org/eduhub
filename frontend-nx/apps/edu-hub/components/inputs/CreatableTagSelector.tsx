@@ -2,7 +2,7 @@ import React, { useState, useEffect, useId } from 'react';
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import IconButton from '@mui/material/IconButton';
-import { useAdminMutation } from '../../hooks/authedMutation';
+import { useFlexibleMutation } from '../../hooks/authedMutation';
 import { DocumentNode } from 'graphql';
 import { useTranslations } from 'next-intl';
 import Tooltip from '@mui/material/Tooltip';
@@ -71,6 +71,10 @@ type CreatableTagSelectorProps = {
 
   // If true, inverts the color scheme (useful for dark mode)
   invertColors?: boolean;
+
+  // Hasura role of the update: 'admin' (default, settings screens) or 'role' (the current session /
+  // management role, e.g. an org admin editing an event)
+  mutationPreset?: 'admin' | 'role';
 };
 
 interface TagOption {
@@ -93,6 +97,7 @@ const CreatableTagSelector: React.FC<CreatableTagSelectorProps> = ({
   refetchQueries,
   helpText,
   className,
+  mutationPreset = 'admin',
 }) => {
   const [tags, setTags] = useState<TagOption[]>(values.map((tag) => ({ value: tag } as TagOption)));
   const [inputValue, setInputValue] = useState('');
@@ -103,7 +108,7 @@ const CreatableTagSelector: React.FC<CreatableTagSelectorProps> = ({
     setTags(values.map((tag) => ({ value: tag })));
   }, [values]);
 
-  const [updateValues] = useAdminMutation(updateValuesMutation, {
+  const [updateValues] = useFlexibleMutation(updateValuesMutation, mutationPreset, {
     refetchQueries,
   });
 

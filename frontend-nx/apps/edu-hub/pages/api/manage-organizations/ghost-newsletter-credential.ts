@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { GraphQLClient, gql } from 'graphql-request';
-import { encryptGhostNewsletterCredential } from '../../../helpers/ghostNewsletterCredentialCrypto';
+import { encryptOrganizationCredential } from '../../../helpers/organizationCredentialCrypto';
 
 type ResponseBody =
   | { success: true; configured: boolean }
@@ -86,7 +86,7 @@ export default async function manageGhostNewsletterCredential(
     }
 
     const encryptedCredential = shouldConfigure
-      ? encryptGhostNewsletterCredential(rawCredential, ENCRYPTION_KEY)
+      ? encryptOrganizationCredential(rawCredential, ENCRYPTION_KEY)
       : null;
 
     const adminClient = new GraphQLClient(GRAPHQL_URI, {

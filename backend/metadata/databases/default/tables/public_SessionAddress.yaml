@@ -431,3 +431,27 @@ delete_permissions:
                                 _eq: X-Hasura-User-Id
                             - canManageSettings:
                                 _eq: true
+event_triggers:
+  # Resyncs the parent event on rausgegangen.de (show location).
+  - name: rausgegangen_session_address_changed
+    definition:
+      enable_manual: false
+      insert:
+        columns: '*'
+      update:
+        columns:
+          - address
+          - locationAddressId
+          - courseLocationId
+      delete:
+        columns: '*'
+    retry_conf:
+      interval_sec: 300
+      num_retries: 5
+      timeout_sec: 120
+    webhook: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+    headers:
+      - name: name
+        value: syncRausgegangenEvent
+      - name: secret
+        value_from_env: HASURA_CLOUD_FUNCTION_SECRET

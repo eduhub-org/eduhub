@@ -27,6 +27,7 @@ import { CourseParticipationsTab } from './CourseParticipationsTab';
 import { DegreeParticipationsTab } from './DegreeParticipationsTab';
 import { ParticipantPreviewButton } from './ParticipantPreviewButton';
 import { PublicEventNotice } from './PublicEventNotice';
+import { RausgegangenEventSection } from './RausgegangenEventSection';
 import { InstructorConfidentialityGate } from './InstructorConfidentialityGate';
 import { useIsAdmin, useIsOrgAdmin, useIsUserIdInList } from '../../../hooks/authentication';
 import { getRegistrationFeatures } from './ApplicationsTab/registrationConfig';
@@ -44,6 +45,11 @@ interface CourseManagementProps extends Props {
    * tab an instructor gets; only the participant preview stays with the course's own instructors.
    */
   manageAsOrgAdmin: boolean;
+  /**
+   * The viewer's org admin grant covers this course, also when they instruct it and the page runs
+   * under their instructor role. Org-level settings of the course (e.g. Rausgegangen) depend on it.
+   */
+  orgAdminOfCourse?: boolean;
 }
 
 const determineTabClasses = (tabIndex: number, selectedTabIndex: number) =>
@@ -118,14 +124,14 @@ export const ManageCourseContent: FC<Props> = ({ courseId }) => {
   if (manageable && !instructsCourse) {
     return (
       <ManagementRoleProvider role={AuthRoles.org_admin}>
-        <CourseManagement courseId={courseId} manageAsOrgAdmin />
+        <CourseManagement courseId={courseId} manageAsOrgAdmin orgAdminOfCourse />
       </ManagementRoleProvider>
     );
   }
-  return <CourseManagement courseId={courseId} manageAsOrgAdmin={false} />;
+  return <CourseManagement courseId={courseId} manageAsOrgAdmin={false} orgAdminOfCourse={!!manageable} />;
 };
 
-const CourseManagement: FC<CourseManagementProps> = ({ courseId, manageAsOrgAdmin }) => {
+const CourseManagement: FC<CourseManagementProps> = ({ courseId, manageAsOrgAdmin, orgAdminOfCourse = false }) => {
   const t = useTranslations('manageCourse');
   const managedCourseQueryOptions = useMemo(
     () => ({
@@ -282,6 +288,7 @@ const CourseManagement: FC<CourseManagementProps> = ({ courseId, manageAsOrgAdmi
       </div>
 
       <PublicEventNotice course={course} />
+      {isEventCourse && (isAdmin || orgAdminOfCourse) && <RausgegangenEventSection courseId={course.id} />}
 
       {/* Two tiles per row on phones, one row from md up. */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 mb-8 md:mb-12">

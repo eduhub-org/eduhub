@@ -4,6 +4,8 @@ interface ICalEvent {
   startDateTime: string;
   endDateTime: string;
   location?: string;
+  /** Coordinates of the location, written as GEO. */
+  geo?: { latitude: number; longitude: number };
   /** Absolute link back to the page the entry came from. */
   url?: string;
   uid: string;
@@ -116,6 +118,9 @@ export function generateICalString(events: ICalEvent[], calendarName: string, op
     }
     if (event.location) {
       lines.push(`LOCATION:${escapeICalText(event.location)}`);
+    }
+    if (event.geo) {
+      lines.push(`GEO:${event.geo.latitude};${event.geo.longitude}`);
     }
     if (event.url) {
       lines.push(`URL:${event.url}`);

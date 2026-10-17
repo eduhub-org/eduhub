@@ -28,6 +28,8 @@ export interface LocationAddressesForFeed_LocationAddress {
    * Foreign key to LocationOption. Each address must belong to exactly one location option.
    */
   locationOption: LocationOption_enum;
+  latitude: any | null;
+  longitude: any | null;
 }
 
 export interface LocationAddressesForFeed {

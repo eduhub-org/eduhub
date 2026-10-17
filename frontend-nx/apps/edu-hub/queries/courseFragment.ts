@@ -43,6 +43,7 @@ export const COURSE_FRAGMENT = gql`
     published
     applicationEnd
     coverImage
+    coverImageCredits
     language
     maxMissedSessions
     chatLink
@@ -209,6 +210,7 @@ export const COURSE_FRAGMENT_ANONYMOUS = gql`
     published
     applicationEnd
     coverImage
+    coverImageCredits
     language
     maxMissedSessions
     chatLink
