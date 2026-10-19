@@ -744,9 +744,9 @@
       "mattermost_info_2": "If you don't have an account in our chat yet, you will need to sign up there first. The course chat is our central communication tool for the courses.",
       "newsletter_title": "Subscribe to updates from {organization}",
       "newsletter_description": "Receive news on upcoming courses, learning opportunities, and program updates from {organization}.",
-      "newsletter_legal": "You can revoke your consent at any time in your profile. Processing is based on our <privacy>Privacy Policy</privacy>.",
+      "newsletter_legal": "You can revoke your consent at any time via the unsubscribe link in every newsletter. Processing is based on our <privacy>Privacy Policy</privacy>.",
       "newsletter_double_opt_in": "You may receive a confirmation email (double opt-in) before your subscription becomes active.",
-      "newsletter_sync_issue": "Your last newsletter synchronization could not be completed. You can update your preference in your profile.",
+      "newsletter_sync_issue": "Your last newsletter synchronization could not be completed.",
       "errors": {
         "confirmation_failed": "We could not confirm your participation at the moment. Please try again."
       }
@@ -1137,19 +1137,7 @@
     "country_none": "-- Select Country --",
     "occupation_none": "-- Select Occupation --",
     "external_profile_placeholder": "e.g., https://linkedin.com/in/yourname",
-    "change_password_or_email": "Change password or email",
-    "newsletter_preferences": {
-      "title": "Newsletter preferences",
-      "description": "Manage newsletter subscriptions for organizations connected to your enrolled programs.",
-      "checkbox_label": "I want to receive the newsletter from {organization}",
-      "legal": "You can revoke your consent at any time. Processing is based on our <privacy>Privacy Policy</privacy>.",
-      "double_opt_in_notice": "Subscription activation may require an additional confirmation email (double opt-in).",
-      "sync_error": "The last synchronization with the newsletter provider failed.",
-      "error": "Your newsletter preference could not be saved. Please try again.",
-      "loading": "Loading…",
-      "load_error": "Newsletter options could not be loaded.",
-      "retry": "Retry"
-    }
+    "change_password_or_email": "Change password or email"
   },
   "programs": {
     "add": "Add programm",
@@ -2993,7 +2981,7 @@
       "type": "Used for categorization, filtering, and profile context.",
       "aliases": "Alternative organization names that improve search and matching.",
       "description": "Short organization text shown in context where available.",
-      "newsletter_description": "Additional newsletter text shown to participants in onboarding and profile.",
+      "newsletter_description": "Additional newsletter text shown to participants in onboarding.",
       "newsletter_api_url": "Ghost Admin API base URL used for newsletter synchronization.",
       "newsletter_api_key": "Ghost credential for authenticated newsletter sync calls. Stored encrypted and never shown again.",
       "newsletter_list_id": "Optional Ghost newsletter/list ID. Use this or the slug field.",

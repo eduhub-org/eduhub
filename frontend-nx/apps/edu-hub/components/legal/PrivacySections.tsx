@@ -567,8 +567,8 @@ export const PrivacyNewsletter: FC = () => {
       </p>
       <p>
         {isEnglish
-          ? 'You can withdraw your consent at any time with effect for the future - via the unsubscribe link in every newsletter, in your profile, or by an informal message to us. Withdrawal does not affect the lawfulness of processing carried out before it. After withdrawal we remove your address from the distribution list.'
-          : 'Du kannst deine Einwilligung jederzeit mit Wirkung für die Zukunft widerrufen - über den Abmeldelink in jedem Newsletter, in deinem Profil oder durch eine formlose Mitteilung an uns. Der Widerruf berührt nicht die Rechtmäßigkeit der bis dahin erfolgten Verarbeitung. Nach dem Widerruf entfernen wir deine Adresse aus dem Verteiler.'}
+          ? 'You can withdraw your consent at any time with effect for the future - via the unsubscribe link in every newsletter or by an informal message to us. Withdrawal does not affect the lawfulness of processing carried out before it. After withdrawal we remove your address from the distribution list.'
+          : 'Du kannst deine Einwilligung jederzeit mit Wirkung für die Zukunft widerrufen - über den Abmeldelink in jedem Newsletter oder durch eine formlose Mitteilung an uns. Der Widerruf berührt nicht die Rechtmäßigkeit der bis dahin erfolgten Verarbeitung. Nach dem Widerruf entfernen wir deine Adresse aus dem Verteiler.'}
       </p>
       <p>
         {isEnglish

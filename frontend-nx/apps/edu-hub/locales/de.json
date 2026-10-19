@@ -744,9 +744,9 @@
       "mattermost_info_2": "Falls Du noch keinen Account in unserem Chat hast, musst Du Dich dort zunächst noch einmal anmelden.\nDer Kurs-Chat ist unser zentrales Kommunikationstool für die Kurse.",
       "newsletter_title": "Updates von {organization} abonnieren",
       "newsletter_description": "Erhalte Infos zu neuen Kursen, Lernangeboten und Programm-Neuigkeiten von {organization}.",
-      "newsletter_legal": "Du kannst deine Einwilligung jederzeit in deinem Profil widerrufen. Die Verarbeitung erfolgt gemäß unserer <privacy>Datenschutzerklärung</privacy>.",
+      "newsletter_legal": "Du kannst deine Einwilligung jederzeit über den Abmeldelink in jedem Newsletter widerrufen. Die Verarbeitung erfolgt gemäß unserer <privacy>Datenschutzerklärung</privacy>.",
       "newsletter_double_opt_in": "Vor der Aktivierung kann eine zusätzliche Bestätigungs-E-Mail (Double-Opt-In) erforderlich sein.",
-      "newsletter_sync_issue": "Deine letzte Newsletter-Synchronisierung konnte nicht abgeschlossen werden. Du kannst deine Präferenz in deinem Profil aktualisieren.",
+      "newsletter_sync_issue": "Deine letzte Newsletter-Synchronisierung konnte nicht abgeschlossen werden.",
       "errors": {
         "confirmation_failed": "Deine Teilnahme konnte gerade nicht bestätigt werden. Bitte versuche es erneut."
       }
@@ -1121,19 +1121,7 @@
     "country_none": "-- Land auswählen --",
     "occupation_none": "-- Beschäftigung auswählen --",
     "external_profile_placeholder": "z.B. https://linkedin.com/in/deinname",
-    "change_password_or_email": "Passwort oder E-Mail ändern",
-    "newsletter_preferences": {
-      "title": "Newsletter-Einstellungen",
-      "description": "Verwalte Newsletter-Abos für Organisationen, die mit deinen belegten Programmen verknüpft sind.",
-      "checkbox_label": "Ich möchte den Newsletter von {organization} erhalten",
-      "legal": "Du kannst deine Einwilligung jederzeit widerrufen. Die Verarbeitung erfolgt gemäß unserer <privacy>Datenschutzerklärung</privacy>.",
-      "double_opt_in_notice": "Für die Aktivierung kann eine zusätzliche Bestätigung per E-Mail (Double-Opt-In) erforderlich sein.",
-      "sync_error": "Die letzte Synchronisierung mit dem Newsletter-Anbieter ist fehlgeschlagen.",
-      "error": "Deine Newsletter-Einstellung konnte nicht gespeichert werden. Bitte versuche es erneut.",
-      "loading": "Wird geladen…",
-      "load_error": "Newsletter-Optionen konnten nicht geladen werden.",
-      "retry": "Erneut versuchen"
-    }
+    "change_password_or_email": "Passwort oder E-Mail ändern"
   },
   "programs": {
     "add": "Programm hinzufügen",
@@ -2978,7 +2966,7 @@
       "type": "Wird für Kategorisierung, Filter und Profilkontext verwendet.",
       "aliases": "Alternative Namen der Organisation zur besseren Suche und Zuordnung.",
       "description": "Kurzer Organisationstext, der an geeigneten Stellen angezeigt wird.",
-      "newsletter_description": "Zusätzlicher Newsletter-Text für Teilnehmende im Onboarding und Profil.",
+      "newsletter_description": "Zusätzlicher Newsletter-Text für Teilnehmende im Onboarding.",
       "newsletter_api_url": "Ghost-Admin-API-Basis-URL für die Newsletter-Synchronisierung.",
       "newsletter_api_key": "Ghost-Zugangsdaten für authentifizierte Newsletter-Synchronisierung. Werden verschlüsselt gespeichert und nicht wieder angezeigt.",
       "newsletter_list_id": "Optionale Ghost-Newsletter-/Listen-ID. Nutze dieses Feld oder den Slug.",
