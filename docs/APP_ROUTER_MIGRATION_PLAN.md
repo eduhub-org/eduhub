@@ -434,6 +434,15 @@ host-dependent portal branding that `Layout` needs, while in the App Router
 
 - `app/[locale]/not-found.tsx` + `app/[locale]/[...rest]/page.tsx` calling
   `notFound()` (same pattern as §4.2), rendered inside the portal layout.
+  This only catches unprefixed paths if StuJo's `proxy.ts` composes
+  next-intl's middleware, which rewrites `/foo` to `/de/foo` — today it only
+  issues the cutover redirects and otherwise returns `NextResponse.next()`.
+  Validate the segment in `app/[locale]/layout.tsx` (`hasLocale` →
+  `notFound()`) so an unknown locale never renders.
+- A root fallback for requests the proxy never rewrites (its matcher skips
+  every path with a file extension, e.g. `/wp-login.php`):
+  `app/global-not-found.tsx` behind `experimental.globalNotFound`. It renders
+  outside the portal layout, so keep it minimal (default StuJo branding).
 - `app/[locale]/error.tsx` and `app/global-error.tsx` for server errors.
 - Translations in both `locales/de.json` and `locales/en.json` (informal "Du").
 
