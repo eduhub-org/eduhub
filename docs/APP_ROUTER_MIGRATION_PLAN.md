@@ -424,6 +424,41 @@ scope** here; it stays on the Pages Router, which is exactly why Stage C
 keeps `pages/api` patterns and shared helpers backward-compatible. Schedule
 it as a fast-follow using this document as the template.
 
+**Must-do in the StuJo migration — custom error pages.** StuJo currently has
+no `pages/404.tsx` or `pages/500.tsx`, so unknown URLs and Hasura failures
+show Next's built-in error pages. They were deliberately deferred to the
+migration: a Pages Router `404.tsx` is static and cannot resolve the
+host-dependent portal branding that `Layout` needs, while in the App Router
+`app/[locale]/layout.tsx` resolves the portal from `headers()` and wraps
+`not-found.tsx` automatically. Add:
+
+- `app/[locale]/not-found.tsx` + `app/[locale]/[...rest]/page.tsx` calling
+  `notFound()` (same pattern as §4.2), rendered inside the portal layout.
+- `app/[locale]/error.tsx` and `app/global-error.tsx` for server errors.
+- Translations in both `locales/de.json` and `locales/en.json` (informal "Du").
+
+**Must-do in the StuJo migration — unavailable job pages keep their 404.**
+`pages/stellenangebote/[id].tsx` answers an expired, archived, deactivated
+or unknown job with HTTP 404 *and* job-specific content (title, reason,
+similar offers), by setting `res.statusCode` in `getServerSideProps`. The App
+Router cannot set a page's status code (only `notFound()`, `redirect()`,
+`forbidden()`, `unauthorized()`), and `not-found.tsx` receives no params.
+410 was deliberately not used: EXPIRED/DEACTIVATED postings can be re-posted
+under the same id. When porting, keep the router-agnostic pieces
+(`fetchUnavailableJob` / `classifyUnavailableJob` in `lib/jobs.ts`, the
+`UnavailableJob` component) and pick one of:
+
+1. **Preferred:** `proxy.ts` forwards the pathname as a request header (no
+   lookup, so no cost on normal job views); the page calls `notFound()` when
+   the job is not public, and `stellenangebote/[id]/not-found.tsx` reads the
+   header, runs `fetchUnavailableJob` and renders `UnavailableJob` → real 404
+   with job-specific content. Verify `headers()` works there first.
+2. **Fallback:** the page renders `UnavailableJob` itself with HTTP 200 and
+   `robots: noindex` via `generateMetadata`. Search engines still de-index it.
+
+Do not move the classification into `proxy.ts` as a per-request Hasura
+lookup — it would add a round trip to every job view.
+
 ---
 
 ## 6. Risks and mitigations

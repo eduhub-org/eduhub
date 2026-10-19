@@ -17,12 +17,38 @@ export async function fetchAnonymous<T = unknown>(
   // an AbortSignal.timeout() and treat the abort as "no answer".
   signal?: AbortSignal
 ): Promise<T> {
+  return postGraphQL<T>(query, variables, {}, signal);
+}
+
+/**
+ * Server-side read with the admin secret, for the few lookups the anonymous
+ * role must not answer itself — e.g. *why* a job is no longer public. Only
+ * ever call it with a hard-coded query and select just the fields the caller
+ * needs: the result bypasses every permission. Resolves to null when the
+ * secret is not configured, so callers degrade instead of failing.
+ */
+export async function fetchAdmin<T = unknown>(
+  query: string,
+  variables?: Record<string, unknown>,
+  signal?: AbortSignal
+): Promise<T | null> {
+  const adminSecret = process.env.HASURA_ADMIN_SECRET;
+  if (!adminSecret) return null;
+  return postGraphQL<T>(query, variables, { 'x-hasura-admin-secret': adminSecret }, signal);
+}
+
+async function postGraphQL<T>(
+  query: string,
+  variables: Record<string, unknown> | undefined,
+  headers: Record<string, string>,
+  signal?: AbortSignal
+): Promise<T> {
   if (!API_URL) {
     throw new Error('API_URL / NEXT_PUBLIC_API_URL is not configured');
   }
   const res = await fetch(API_URL, {
     method: 'POST',
-    headers: { 'content-type': 'application/json' },
+    headers: { 'content-type': 'application/json', ...headers },
     body: JSON.stringify({ query, variables }),
     signal,
   });
