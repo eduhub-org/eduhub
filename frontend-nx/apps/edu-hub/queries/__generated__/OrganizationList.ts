@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { Organization_bool_exp, Organization_order_by, OrganizationType_enum } from "./../../__generated__/globalTypes";
+import { Organization_bool_exp, Organization_order_by, OrganizationType_enum, OrganizationFeatureOption_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: OrganizationList
@@ -14,6 +14,14 @@ export interface OrganizationList_Organization_Settings {
   id: number | null;
   apiKeyHash: string | null;
   ghostNewsletterApiKeyConfigured: boolean | null;
+  rausgegangenApiKeyConfigured: boolean | null;
+  rausgegangenTestMode: boolean | null;
+}
+
+export interface OrganizationList_Organization_Features {
+  __typename: "OrganizationFeature";
+  id: number;
+  feature: OrganizationFeatureOption_enum;
 }
 
 export interface OrganizationList_Organization_Users {
@@ -69,6 +77,10 @@ export interface OrganizationList_Organization {
   /**
    * An array relationship
    */
+  Features: OrganizationList_Organization_Features[];
+  /**
+   * An array relationship
+   */
   Users: OrganizationList_Organization_Users[];
 }
 
@@ -87,6 +99,11 @@ export interface OrganizationList_OrganizationType {
   value: string;
 }
 
+export interface OrganizationList_OrganizationFeatureOption {
+  __typename: "OrganizationFeatureOption";
+  value: string;
+}
+
 export interface OrganizationList {
   /**
    * fetch data from the table: "Organization"
@@ -100,6 +117,10 @@ export interface OrganizationList {
    * fetch data from the table: "OrganizationType"
    */
   OrganizationType: OrganizationList_OrganizationType[];
+  /**
+   * fetch data from the table: "OrganizationFeatureOption"
+   */
+  OrganizationFeatureOption: OrganizationList_OrganizationFeatureOption[];
 }
 
 export interface OrganizationListVariables {

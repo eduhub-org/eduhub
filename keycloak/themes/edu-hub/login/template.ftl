@@ -103,7 +103,12 @@
                             <div class="${properties.kcLocaleMainClass!}" id="kc-locale">
                                 <div id="kc-locale-wrapper" class="${properties.kcLocaleWrapperClass!}">
                                     <div id="kc-locale-dropdown" class="${properties.kcLocaleDropDownClass!}">
-                                        <a href="#" id="kc-current-locale-link">${locale.current}</a>
+                                        <a href="#" id="kc-current-locale-link">
+                                            ${locale.current}
+                                            <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                                <path fill="currentColor" d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z"/>
+                                            </svg>
+                                        </a>
                                         <ul class="${properties.kcLocaleListClass!}">
                                             <#list locale.supported as l>
                                                 <li class="${properties.kcLocaleListItemClass!}">

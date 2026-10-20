@@ -33,9 +33,16 @@ export interface ResolvedLocation {
   displayAddress: string;
   /** The LocationAddress's short label, when the address was resolved through one. */
   label?: string;
+  /** The LocationAddress's coordinates, when the address was resolved through one that has them. */
+  coordinates?: Coordinates;
 }
 
-export type AddressMap = Map<number, { address: string; shortLabel?: string | null }>;
+export type Coordinates = { latitude: number; longitude: number };
+
+export type AddressMap = Map<
+  number,
+  { address: string; shortLabel?: string | null; latitude?: unknown; longitude?: unknown }
+>;
 
 /** Placeholder label the LocationAddress migration gave addresses it could not match. */
 const PLACEHOLDER_LABEL = 'generic address';
@@ -60,6 +67,15 @@ export const labelledAddress = (
   const meaningful = meaningfulLabel(label);
   if (!meaningful || meaningful === rawAddress.trim()) return address;
   return address.trim() ? `${meaningful} (${address})` : meaningful;
+};
+
+/** The coordinates of a LocationAddress, if both are set (numeric columns may arrive as strings). */
+const coordinatesOf = (addressMap: AddressMap, id: number | null | undefined): Coordinates | undefined => {
+  const entry = id ? addressMap.get(id) : undefined;
+  if (entry?.latitude == null || entry?.longitude == null) return undefined;
+  const latitude = Number(entry.latitude);
+  const longitude = Number(entry.longitude);
+  return Number.isFinite(latitude) && Number.isFinite(longitude) ? { latitude, longitude } : undefined;
 };
 
 /** The short label of a LocationAddress, if it has a meaningful one. */
@@ -94,6 +110,7 @@ const resolveProgramSessionLocations = (session: ResolvableSession, addressMap: 
         ? addressMap.get(sa.locationAddressId)!.address
         : sa.address ?? '',
     label: labelOf(addressMap, sa.locationAddressId),
+    coordinates: coordinatesOf(addressMap, sa.locationAddressId),
   }));
 
 const resolveCourseSessionLocations = (
@@ -121,6 +138,7 @@ const resolveCourseSessionLocations = (
         locationOption: CourseLocation?.locationOption ?? null,
         displayAddress,
         label: labelOf(addressMap, effectiveAddressId),
+        coordinates: coordinatesOf(addressMap, effectiveAddressId),
       },
     ];
   });

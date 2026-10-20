@@ -1,4 +1,0 @@
-table:
-  name: SessionAddressType
-  schema: public
-is_enum: true

@@ -1,0 +1,11 @@
+table:
+  name: RausgegangenEventCategory
+  schema: public
+is_enum: true
+select_permissions:
+  - role: org_admin_access
+    permission:
+      columns:
+        - value
+        - comment
+      filter: {}
