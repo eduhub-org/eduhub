@@ -8,11 +8,13 @@ RETURNS boolean
 LANGUAGE sql
 STABLE
 AS $function$
+  -- '\S' (any non-whitespace character) rather than btrim, which only strips spaces, so tabs
+  -- and newlines count as empty like JavaScript's trim() in the sync function.
   SELECT
-    btrim(coalesce(organization_row."ghostNewsletterApiUrl", '')) <> ''
-    AND btrim(coalesce(organization_row."ghostNewsletterApiKeyEncrypted", '')) <> ''
+    coalesce(organization_row."ghostNewsletterApiUrl", '') ~ '\S'
+    AND coalesce(organization_row."ghostNewsletterApiKeyEncrypted", '') ~ '\S'
     AND (
-      btrim(coalesce(organization_row."ghostNewsletterListId", '')) <> ''
-      OR btrim(coalesce(organization_row."ghostNewsletterSlug", '')) <> ''
+      coalesce(organization_row."ghostNewsletterListId", '') ~ '\S'
+      OR coalesce(organization_row."ghostNewsletterSlug", '') ~ '\S'
     );
 $function$;
