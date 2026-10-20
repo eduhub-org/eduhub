@@ -510,3 +510,12 @@ variable "stujo_net_canonical_hosts" {
     "stujo-flensburg" = "flensburg.stujo.net"
   }
 }
+
+######
+# Error alerting
+###
+variable "alert_slack_channel_id" {
+  description = "Full ID of the Cloud Monitoring Slack notification channel (projects/<project>/notificationChannels/<id>) that receives error alerts. The channel must be created once in the Cloud Console, because Slack requires an interactive OAuth sign-in. Empty disables the alert."
+  type        = string
+  default     = ""
+}
