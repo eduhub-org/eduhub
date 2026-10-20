@@ -519,3 +519,9 @@ variable "alert_slack_channel_id" {
   type        = string
   default     = ""
 }
+
+variable "enable_budget_alert" {
+  description = "Post to the alert Slack channel when the month's forecasted spend exceeds last month's actual spend by more than 10%. Needs roles/billing.costsManager on the billing account for the Terraform service account, which a billing admin grants once."
+  type        = bool
+  default     = false
+}

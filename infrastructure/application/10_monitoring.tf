@@ -51,3 +51,57 @@ resource "google_monitoring_alert_policy" "service_errors" {
     content   = "An EduHub service logged an error in `${var.project_id}`. Open the incident for the matching log entry, or Logs Explorer filtered on the service and `severity>=ERROR OR jsonPayload.level=\"error\"`."
   }
 }
+
+###############################################################################
+# Cost alerting
+#####
+# A budget whose amount is last month's actual spend, so the threshold of 110%
+# fires when the current month's forecast is more than 10% above it. Google
+# sends one notification per threshold and month.
+#
+# Budgets belong to the billing account, not the project. The Budget API also
+# needs a quota project when called by a service account, hence the aliased
+# provider with user_project_override.
+
+provider "google" {
+  alias                 = "billing"
+  project               = var.project_id
+  region                = var.region
+  user_project_override = true
+  billing_project       = var.project_id
+}
+
+resource "google_project_service" "billing_budgets" {
+  count = var.enable_budget_alert ? 1 : 0
+
+  service            = "billingbudgets.googleapis.com"
+  disable_on_destroy = false
+}
+
+resource "google_billing_budget" "monthly_increase" {
+  count    = var.enable_budget_alert && var.alert_slack_channel_id != "" ? 1 : 0
+  provider = google.billing
+
+  billing_account = data.google_project.eduhub.billing_account
+  display_name    = "EduHub spend vs. last month (${var.project_id})"
+
+  budget_filter {
+    projects        = ["projects/${data.google_project.eduhub.number}"]
+    calendar_period = "MONTH"
+  }
+
+  amount {
+    last_period_amount = true
+  }
+
+  threshold_rules {
+    threshold_percent = 1.1
+    spend_basis       = "FORECASTED_SPEND"
+  }
+
+  all_updates_rule {
+    monitoring_notification_channels = [var.alert_slack_channel_id]
+  }
+
+  depends_on = [google_project_service.billing_budgets]
+}
