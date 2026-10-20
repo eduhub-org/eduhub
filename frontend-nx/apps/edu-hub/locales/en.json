@@ -1240,6 +1240,7 @@
       "upload_text": "Click to upload cover image",
       "alt": "Cover image of the offering",
       "help_text": "Shown on the offering's page and in the sliders.",
+      "format_tooltip": "Recommended: landscape, about 2:1, e.g. 1920 × 960 px (max. 5 MB).\nThe image is center-cropped both as a tile (almost 3:2) and as a wide header on the offering page (almost square on phones), so keep the important part in the middle third.\nPlease don't put text in the image: the title is laid over the bottom left automatically, and text in the image usually gets cut off.",
       "credits_label": "Image credits",
       "credits_help": "Who took the cover image or holds its rights, e.g. \"Photo: Jane Doe\". Shown below the title and passed on to event platforms (max. 120 characters)."
     },
