@@ -1467,6 +1467,14 @@
       "application_locks_hint": "An application process always includes a questionnaire and cannot be combined with payment.",
       "summary": "Registration type: {mode}"
     },
+    "registration_button_label": {
+      "button": "Registration button label: default",
+      "button_custom": "Registration button label: “{label}”",
+      "dialog_title": "Registration button label",
+      "help_text": "Replaces the default button text on the course page, whatever the registration type. Leave empty to use the default text. When the course is full, the button still offers to join the waitlist.",
+      "label_de": "German",
+      "label_en": "English"
+    },
     "instructor_payment": {
       "total_label": "Instructor fee (total)",
       "total_help": "One amount per course, regardless of the number of instructors. The instructors split it among themselves.",
