@@ -100,3 +100,19 @@ describe('fetchUnavailableJob', () => {
     await expect(fetchUnavailableJob(1)).resolves.toEqual({ reason: 'notFound', job: null });
   });
 });
+
+describe('normalizeRegionParam', () => {
+  const { normalizeRegionParam } = loadJobs();
+
+  it.each([
+    ['-2', 'FLENSBURG'],
+    ['0', 'KIEL'],
+    ['4', 'ABROAD'],
+    ['GERMANY', 'GERMANY'],
+    ['-1', ''],
+    ['kiel', ''],
+    ['', ''],
+  ])('maps %p to %p', (param, expected) => {
+    expect(normalizeRegionParam(param)).toBe(expected);
+  });
+});
