@@ -6,6 +6,7 @@ import { Tooltip } from '@mui/material';
 import { Course_Course_by_pk_Sessions as Session, Course_Course_by_pk_CourseLocations as CourseLocation } from '../../../queries/__generated__/Course';
 import { SectionTitle } from '../../common/SectionTitle';
 import UserCard from '../../common/UserCard';
+import InlineMarkdown from '../../common/InlineMarkdown';
 import { useAppSettings } from '../../../contexts/AppSettingsContext';
 import { useDisplayDate, useFormatTimeString } from '../../../helpers/dateTimeHelpers';
 import { formatDayHeading, groupSessionsByDay } from '../../../helpers/sessionSchedule';
@@ -197,7 +198,7 @@ const SessionRow: FC<SessionRowProps> = ({
           </div>
         )}
         {description && !hideDescription ? (
-          <p className="mt-1 text-sm text-label-secondary whitespace-pre-line break-words">{description}</p>
+          <InlineMarkdown markdown={description} className="mt-1 text-sm text-label-secondary" />
         ) : null}
         <div className="flex flex-col">
           {SessionSpeakers &&

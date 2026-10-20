@@ -2023,7 +2023,7 @@
       "session_description": {
         "label": "Beschreibung",
         "help_text": "Beschreibe hier den Inhalt des Termins.",
-        "placeholder": "Beschreibe den Inhalt der Session, z.B. Ablauf, Themen oder Hinweise für Teilnehmende..."
+        "placeholder": "Beschreibe den Inhalt der Session, z.B. Ablauf, Themen oder Hinweise für Teilnehmende. Möglich sind **fett**, *kursiv* und Links: [Text](https://...)"
       },
       "attendance_data": {
         "label": "Anwesenheitsdaten",

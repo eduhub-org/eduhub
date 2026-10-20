@@ -60,6 +60,7 @@ import { USER_SELECTION_WITH_FILTER, buildUserSelectionFilter } from '../../../.
 import TableGrid from '../../../common/TableGrid';
 import { formatTruncatedList, makeFullName } from '../../../../helpers/util';
 import InputField from '../../../inputs/InputField';
+import InlineMarkdown from '../../../common/InlineMarkdown';
 import CheckboxSelector from '../../../inputs/CheckboxSelector';
 import { Tooltip } from '@mui/material';
 import { MdLock, MdSync, MdVisibility } from 'react-icons/md';
@@ -813,11 +814,16 @@ const ExpandableSessionRowContent: FC<ExpandableSessionRowContentProps> = ({
         <section className="order-3 lg:col-span-2 xl:col-span-1 xl:order-2 min-w-0">
           <SectionLabel>{t('SessionsTab.session_description.label')}</SectionLabel>
           {locked ? (
-            <p className="whitespace-pre-wrap text-sm text-label-secondary">{session.description || '–'}</p>
+            session.description ? (
+              <InlineMarkdown markdown={session.description} className="text-sm text-label-secondary" />
+            ) : (
+              <p className="text-sm text-label-secondary">–</p>
+            )
           ) : (
           <InputField
             variant="eduhub"
-            type="textarea"
+            type="markdown"
+            inlineMarkdown
             value={session.description || ''}
             label=""
             updateValueMutation={UPDATE_SESSION_DESCRIPTION}

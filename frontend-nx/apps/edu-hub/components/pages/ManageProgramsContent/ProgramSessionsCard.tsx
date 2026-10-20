@@ -327,7 +327,8 @@ const ProgramSessionsCard: FC<ProgramSessionsCardProps> = ({ program }) => {
             </h5>
             <InputField
               variant="eduhub"
-              type="textarea"
+              type="markdown"
+              inlineMarkdown
               value={row.description || ''}
               label=""
               updateValueMutation={UPDATE_SESSION_DESCRIPTION}
