@@ -26,6 +26,14 @@ jest.mock('../../../../hooks/authedQuery', () => ({
   useRoleQuery: (...args: unknown[]) => mockUseRoleQuery(...args),
 }));
 
+// react-markdown/remark-gfm ship as ESM and are not part of what this test
+// exercises; render descriptions as plain text instead.
+jest.mock('react-markdown', () => ({
+  __esModule: true,
+  default: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+}));
+jest.mock('remark-gfm', () => ({ __esModule: true, default: () => undefined }));
+
 jest.mock('../../../../helpers/util', () => ({
   isLinkFormat: () => false,
 }));

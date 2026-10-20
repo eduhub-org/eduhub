@@ -2049,7 +2049,7 @@
       "session_description": {
         "label": "Description",
         "help_text": "Describe the content of the session here.",
-        "placeholder": "Describe the session content, e.g. schedule, topics or notes for participants..."
+        "placeholder": "Describe the session content, e.g. schedule, topics or notes for participants. You can use **bold**, *italics* and links: [text](https://...)"
       },
       "attendance_data": {
         "label": "Attendance data",
