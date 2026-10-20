@@ -28,21 +28,9 @@ export interface MyOrganizationNewsletterOptions_Program_Organization {
    */
   ghostNewsletterDoubleOptInEnabled: boolean;
   /**
-   * Optional Ghost newsletter list identifier.
+   * A computed field, executes function "organization_has_ghost_newsletter_configured"
    */
-  ghostNewsletterListId: string | null;
-  /**
-   * Optional Ghost newsletter slug when list ID is not used.
-   */
-  ghostNewsletterSlug: string | null;
-  /**
-   * Ghost members API URL used to synchronize newsletter subscriptions.
-   */
-  ghostNewsletterApiUrl: string | null;
-  /**
-   * Flag indicating whether an encrypted Ghost newsletter API credential is configured.
-   */
-  ghostNewsletterApiKeyConfigured: boolean;
+  hasGhostNewsletterConfigured: boolean | null;
 }
 
 export interface MyOrganizationNewsletterOptions_Program {
@@ -78,21 +66,9 @@ export interface MyOrganizationNewsletterOptions_OrganizationNewsletterSubscript
    */
   ghostNewsletterDoubleOptInEnabled: boolean;
   /**
-   * Optional Ghost newsletter list identifier.
+   * A computed field, executes function "organization_has_ghost_newsletter_configured"
    */
-  ghostNewsletterListId: string | null;
-  /**
-   * Optional Ghost newsletter slug when list ID is not used.
-   */
-  ghostNewsletterSlug: string | null;
-  /**
-   * Ghost members API URL used to synchronize newsletter subscriptions.
-   */
-  ghostNewsletterApiUrl: string | null;
-  /**
-   * Flag indicating whether an encrypted Ghost newsletter API credential is configured.
-   */
-  ghostNewsletterApiKeyConfigured: boolean;
+  hasGhostNewsletterConfigured: boolean | null;
 }
 
 export interface MyOrganizationNewsletterOptions_OrganizationNewsletterSubscription {

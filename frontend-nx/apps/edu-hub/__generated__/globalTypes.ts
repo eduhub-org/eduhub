@@ -10495,6 +10495,7 @@ export interface Organization_bool_exp {
   ghostNewsletterLabel?: String_comparison_exp | null;
   ghostNewsletterListId?: String_comparison_exp | null;
   ghostNewsletterSlug?: String_comparison_exp | null;
+  hasGhostNewsletterConfigured?: Boolean_comparison_exp | null;
   id?: Int_comparison_exp | null;
   invoiceFooterText?: String_comparison_exp | null;
   invoiceNumberPrefix?: String_comparison_exp | null;
@@ -10744,6 +10745,7 @@ export interface Organization_order_by {
   ghostNewsletterLabel?: order_by | null;
   ghostNewsletterListId?: order_by | null;
   ghostNewsletterSlug?: order_by | null;
+  hasGhostNewsletterConfigured?: order_by | null;
   id?: order_by | null;
   invoiceFooterText?: order_by | null;
   invoiceNumberPrefix?: order_by | null;
