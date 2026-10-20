@@ -367,4 +367,29 @@ describe('Sessions Component - labelled places', () => {
     const link = screen.getByText('Coworking (Kuhnkestr. 6)');
     expect(link).toHaveAttribute('href', expect.stringContaining(encodeURIComponent('Kuhnkestr. 6')));
   });
+
+  it('keeps the place on each row when two rooms share one address', () => {
+    mockUseRoleQuery.mockImplementation(() => ({
+      data: {
+        LocationAddress: [
+          { id: 7, shortLabel: 'Eventraum', address: 'Kuhnkestr. 6', locationOption: 'KIEL' },
+          { id: 8, shortLabel: 'Konferenzraum', address: 'Kuhnkestr. 6', locationOption: 'KIEL' },
+        ],
+      },
+    }));
+    const room = (locationAddressId: number) => [{ ...mockSessions[0].SessionAddresses[0], locationAddressId }];
+    render(
+      <Sessions
+        sessions={[
+          { ...mockSessions[0], SessionAddresses: room(7) },
+          secondSession({ SessionAddresses: room(8) }),
+        ]}
+        courseLocations={mockCourseLocations}
+        isLoggedInParticipant={true}
+      />
+    );
+
+    expect(screen.getByText('Eventraum (Kuhnkestr. 6)')).toBeInTheDocument();
+    expect(screen.getByText('Konferenzraum (Kuhnkestr. 6)')).toBeInTheDocument();
+  });
 });
