@@ -406,14 +406,6 @@ variable "lms_attendance_survey_id" {
   description = "ID of the survey which is used to collect the attendance data"
   type        = string
 }
-variable "mm_url" {
-  description = "URL of the Opencampus Mattermost Server"
-  type        = string
-}
-variable "mm_token" {
-  description = "The Admin Token from the Opencampus Mattermost Server"
-  type        = string
-}
 
 # Formbricks Integration
 variable "formbricks_api_url" {

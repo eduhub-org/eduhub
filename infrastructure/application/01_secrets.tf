@@ -175,20 +175,6 @@ resource "google_secret_manager_secret_version" "lms_password" {
   secret_data = var.lms_password
 }
 
-resource "google_secret_manager_secret" "mm_token" {
-  provider  = google-beta
-  secret_id = "mm-token"
-  replication {
-    auto {}
-  }
-}
-
-resource "google_secret_manager_secret_version" "mm_token" {
-  provider    = google-beta
-  secret      = google_secret_manager_secret.mm_token.name
-  secret_data = var.mm_token
-}
-
 # ===== Hasura Mail Password =====
 resource "google_secret_manager_secret" "hasura_mail_pw" {
   provider  = google-beta

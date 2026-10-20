@@ -188,7 +188,6 @@ Event triggers (`retry_conf`: `num_retries` × `interval_sec`, `timeout_sec`):
 | `sync_organization_newsletter_subscription` | syncGhostNewsletterSubscription | 5 × 300 s | 120 | sync |
 | `update_keycloak_user` (User) | updateKeycloakUser | 5 × 10 s | 60 | sync |
 | `update_matrix_instructor_power_level` (CourseInstructor) | updateMatrixInstructorPowerLevel | 3 × 10 s | 60 | sync |
-| `add_confirmed_user_to_mm` (CourseEnrollment) | Python add_confirmed_user_to_mm | 0 × 10 s | 60 | sync |
 | `add_keycloak_instructor_role` (CourseInstructor) | addKeycloakRole (identity) | 0 × 10 s | 60 | role |
 | `add_keycloak_org_admin_role` (OrganizationAdmin) | addKeycloakRole (identity) | 3 × 10 s | 60 | role |
 | `remove_keycloak_org_admin_role` (OrganizationAdmin) | removeKeycloakRole (identity) | 3 × 10 s | 60 | role |
@@ -203,7 +202,7 @@ all `tolerance_seconds: 21600`): `sync_mail_delivery_status` 3 × 60 s / 3699,
 | Class | Retries × interval | Timeout | Reason | Changes |
 |-------|--------------------|---------|--------|---------|
 | mail | 10 × 3660 s | 600 | The handlers only queue MailLog rows (sendOrganizerAdded-, sendInstructorCertificate-, sendSpeakerAddedEmail opt in with `retryable` on a queue failure; the others retry only on 5xx or timeout); `sendMail` waits out a Mailgun outage for ~10 h. | timeout 60 → 600 for `send_instructor_certificate_email`, `send_organizer_added_email`, `send_speaker_added_email`; `send_cancellation_request_email` 0 × 10 s / 120 → 10 × 3660 s / 600 (its handler already dedupes through MailLog.metadata, so redelivery is safe) |
-| sync | 5 × 300 s | 120 | External APIs (rausgegangen, Ghost, Keycloak, Matrix, Mattermost) recover in minutes; the handlers converge to current state, so a repeat is harmless. | `update_keycloak_user` 5 × 10 s → 5 × 300 s; `update_matrix_instructor_power_level` 3 × 10 s / 60 → 5 × 300 s / 120; `add_confirmed_user_to_mm` 0 → 5 × 300 s / 120 (check it tolerates an existing member) |
+| sync | 5 × 300 s | 120 | External APIs (rausgegangen, Ghost, Keycloak, Matrix) recover in minutes; the handlers converge to current state, so a repeat is harmless. | `update_keycloak_user` 5 × 10 s → 5 × 300 s; `update_matrix_instructor_power_level` 3 × 10 s / 60 → 5 × 300 s / 120; `add_confirmed_user_to_mm` 0 → 5 × 300 s / 120 (check it tolerates an existing member) |
 | role | 3 × 30 s | 60 | A role grant should land while the user is still waiting; add/remove are idempotent (`addKeycloakRole` resolves only still-available roles). | `add_keycloak_instructor_role` 0 → 3; all three interval 10 → 30 s |
 | cron | unchanged | unchanged | Crons run again on schedule; only the two that opt in retry. | none (optionally give `send_questionaires` an explicit `retry_conf`) |
 

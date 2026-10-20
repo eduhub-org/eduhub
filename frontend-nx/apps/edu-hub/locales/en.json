@@ -758,8 +758,6 @@
       "form_intro": "Please update your current employment status:",
       "confirm_sufficient_time": "Finally, confirm your course participation only if you have the time to fully attend the course until the end.",
       "important": "IMPORTANT: CONFIRM COURSE INVITATION!",
-      "mattermost_info_1": "After confirmation, please click directly on the button to go to the course chat.",
-      "mattermost_info_2": "If you don't have an account in our chat yet, you will need to sign up there first. The course chat is our central communication tool for the courses.",
       "newsletter_title": "Subscribe to updates from {organization}",
       "newsletter_description": "Receive news on upcoming courses, learning opportunities, and program updates from {organization}.",
       "newsletter_legal": "You can revoke your consent at any time in your profile. Processing is based on our <privacy>Privacy Policy</privacy>.",
@@ -1336,7 +1334,6 @@
     "participant_chat": {
       "title": "Participant chat",
       "button_open_element": "To Element room",
-      "button_open_mattermost": "To Mattermost channel",
       "button_open_chat": "Open chat",
       "explanation": "A Matrix room is the chat for this offering. Confirmed participants see a button to the room on the offering's page and join it from there. Instructors automatically get moderator rights in the room; instructors added later are also invited.",
       "explanation_external": "Confirmed participants see a button to this chat on the offering's page."

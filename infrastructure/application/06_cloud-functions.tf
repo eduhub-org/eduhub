@@ -90,7 +90,6 @@ locals {
     ZOOM_API_KEY                                = google_secret_manager_secret.zoom_api_key
     ZOOM_API_SECRET                             = google_secret_manager_secret.zoom_api_secret
     LMS_PASSWORD                                = google_secret_manager_secret.lms_password
-    MM_TOKEN                                    = google_secret_manager_secret.mm_token
   }
   secret_env = {
     for key, secret in local.function_secrets : key => {
@@ -253,7 +252,6 @@ locals {
         LMS_URL                         = var.lms_url
         LMS_USER                        = var.lms_user
         LMS_ATTENDANCE_SURVEY_ID        = var.lms_attendance_survey_id
-        MM_URL                          = var.mm_url
         # StuJo job board (expire_job_postings / send_job_alerts mails). Follows
         # the canonical host, so mail links move to stujo.net at cutover.
         STUJO_FRONTEND_URL = "https://${local.stujo_public_host}"
@@ -278,7 +276,6 @@ locals {
         local.secret_env.ZOOM_API_KEY,
         local.secret_env.ZOOM_API_SECRET,
         local.secret_env.LMS_PASSWORD,
-        local.secret_env.MM_TOKEN,
         local.secret_env.MAILGUN_API_KEY,
       ]
       service_account_email = google_service_account.custom_cloud_function_account.email
@@ -526,13 +523,6 @@ resource "google_secret_manager_secret_iam_member" "call_python_function_lms_pas
   role       = "roles/secretmanager.secretAccessor"
   member     = "serviceAccount:${google_service_account.custom_cloud_function_account.email}"
   depends_on = [google_secret_manager_secret.lms_password]
-}
-
-resource "google_secret_manager_secret_iam_member" "call_python_function_mm_token" {
-  secret_id  = google_secret_manager_secret.mm_token.id
-  role       = "roles/secretmanager.secretAccessor"
-  member     = "serviceAccount:${google_service_account.custom_cloud_function_account.email}"
-  depends_on = [google_secret_manager_secret.mm_token]
 }
 
 # sync_mail_delivery_status reads the Mailgun events API.

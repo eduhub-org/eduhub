@@ -29,7 +29,7 @@ Units are split by the secrets their handlers need, not by domain
 | `callNodeFunction` | Node 22 | dispatcher: enrollment, guests, Formbricks, Stripe, job postings, mails, syncs | Hasura, Stripe, Formbricks, guest token, Ghost key | 42022 | `CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION` |
 | `identity` | Node 22 (callNodeFunction code) | dispatcher: Keycloak and Matrix accounts | Hasura, Keycloak, Matrix; deletes bucket objects | 42021 | `CLOUD_FUNCTION_LINK_IDENTITY` |
 | `media` | Node 22 (callNodeFunction code) | dispatcher: storage files | Hasura; bucket objects, signed URLs | 42023 | `CLOUD_FUNCTION_LINK_MEDIA` |
-| `callPythonFunction` | Python 3.11 | dispatcher | Hasura, Zoom, LMS, Mattermost, Mailgun | 42025 | `CLOUD_FUNCTION_LINK_CALL_PYTHON_FUNCTION` |
+| `callPythonFunction` | Python 3.11 | dispatcher | Hasura, Zoom, LMS, Mailgun | 42025 | `CLOUD_FUNCTION_LINK_CALL_PYTHON_FUNCTION` |
 | `sendMail` | Node | MailLog insert trigger, sends via Mailgun | Mailgun, Hasura mail user | 42019 | `CLOUD_FUNCTION_LINK_SEND_MAIL` |
 | `apiProxy` | Python | external API (Participants, MOOCHub), not called by Hasura | Hasura | 42026 | — |
 
