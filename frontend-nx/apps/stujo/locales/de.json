@@ -324,5 +324,15 @@
     "SOCIAL_MEDIA": "Social Media",
     "SOCIAL_PEDAGOGY": "Sozialpädagogik",
     "OTHER": "Sonstiges Berufsfeld"
+  },
+  "unavailableJob": {
+    "expiredTitle": "Diese Stelle ist nicht mehr verfügbar",
+    "expiredText": "Die Ausschreibung ist abgelaufen oder wurde vom Unternehmen beendet. Schau Dir gern ähnliche Angebote an.",
+    "deactivatedTitle": "Diese Stelle ist vorübergehend nicht verfügbar",
+    "deactivatedText": "Das Unternehmen hat die Ausschreibung pausiert. Vielleicht ist sie bald wieder online – bis dahin findest Du hier ähnliche Angebote.",
+    "notFoundTitle": "Stellenangebot nicht gefunden",
+    "notFoundText": "Dieses Stellenangebot gibt es nicht oder nicht mehr. Vielleicht ist der Link unvollständig. In der Übersicht findest Du alle aktuellen Angebote.",
+    "jobByCompany": "„{title}“ bei {company}",
+    "similarJobs": "Ähnliche Angebote"
   }
 }

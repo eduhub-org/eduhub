@@ -233,13 +233,9 @@ export interface MyCourses_User_by_pk_CourseEnrollments_Course_Program_Organizat
    */
   ghostNewsletterDoubleOptInEnabled: boolean;
   /**
-   * Optional Ghost newsletter list identifier.
+   * A computed field, executes function "organization_has_ghost_newsletter_configured"
    */
-  ghostNewsletterListId: string | null;
-  /**
-   * Optional Ghost newsletter slug when list ID is not used.
-   */
-  ghostNewsletterSlug: string | null;
+  hasGhostNewsletterConfigured: boolean | null;
 }
 
 export interface MyCourses_User_by_pk_CourseEnrollments_Course_Program {
@@ -563,6 +559,14 @@ export interface MyCourses_User_by_pk_CourseEnrollments_Course {
    */
   externalRegistrationLink: string | null;
   registrationType: CourseRegistrationType_enum | null;
+  /**
+   * German text replacing the default label of the register/apply button on the course page. Null keeps the label derived from the registration type.
+   */
+  registrationButtonLabelDe: string | null;
+  /**
+   * English text replacing the default label of the register/apply button on the course page. Null keeps the label derived from the registration type.
+   */
+  registrationButtonLabelEn: string | null;
   /**
    * Whether visitors without an account may register for this course/event with just name and email. Only honoured for courses in a Program of type EVENTS with a direct registration type.
    */

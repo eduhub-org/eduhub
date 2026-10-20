@@ -115,11 +115,7 @@ const ProfileContent: FC = () => {
 
   const newsletterOptions = useMemo<NewsletterOrganizationOption[]>(() => {
     const hasConfiguredNewsletter = (organization: any): boolean =>
-      Boolean(
-        (organization?.ghostNewsletterListId || organization?.ghostNewsletterSlug) &&
-          organization?.ghostNewsletterApiUrl &&
-          organization?.ghostNewsletterApiKeyConfigured
-      );
+      Boolean(organization?.hasGhostNewsletterConfigured);
 
     const options = new Map<number, NewsletterOrganizationOption>();
 

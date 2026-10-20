@@ -33,6 +33,7 @@ interface RegistrationButtonProps {
  * - Responsive design with mobile-first approach
  *
  * Button text variations:
+ * - Custom label set for the course (Course.registrationButtonLabelDe/En), unless full
  * - "Sign In to Register" (not logged in)
  * - "Register via External Link" (external registration)
  * - "Register with Payment" (payment required)
@@ -88,6 +89,12 @@ export const RegistrationButton: FC<RegistrationButtonProps> = ({ course, regist
   const getButtonText = () => {
     if (isCourseFull) {
       return t('registration.join_waitlist');
+    }
+
+    // A label set per course replaces the one derived from the registration type.
+    const customLabel = (locale === 'de' ? course.registrationButtonLabelDe : course.registrationButtonLabelEn)?.trim();
+    if (customLabel) {
+      return customLabel;
     }
 
     if (course.externalRegistrationLink) {

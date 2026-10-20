@@ -201,7 +201,9 @@ export default async function syncGhostNewsletterSubscription(req, logger) {
       };
     }
 
-    if (!newRow.userId || !newRow.organizationId) {
+    // organizationId 0 is the default platform organization, so check for a missing value
+    // rather than a falsy one.
+    if (!newRow.userId || newRow.organizationId == null) {
       return {
         success: false,
         messageKey: 'INVALID_EVENT_PAYLOAD',
@@ -351,7 +353,7 @@ export default async function syncGhostNewsletterSubscription(req, logger) {
       })
     );
 
-    if (userId && organizationId) {
+    if (userId && organizationId != null) {
       try {
         const client = getGraphqlClient();
         await updateSubscriptionState(client, {

@@ -3610,6 +3610,59 @@ VALUES
    '2026-03-10 10:00:00+00', '2027-03-10 10:00:00+00',
    now(), now());
 
+-- Job postings that are NOT public, for the "job no longer available" page
+-- (/stellenangebote/<id> answers each with HTTP 404 and a reason) and the
+-- legacy redirect /stellenangebote/<legacyStujoId>-<slug>. Each shares its
+-- category with a published fixture above, so "similar offers" has results.
+--   9926 EXPIRED      → "no longer available"; legacy link /stellenangebote/12345-alt
+--   9927 DEACTIVATED  → "temporarily unavailable"
+--   9928 PUBLISHED, expiresAt passed → "no longer available" (expire cron
+--        has not run yet; it flips the row to EXPIRED at its next run)
+--   9929 ARCHIVED     → "no longer available"
+--   9930 EXPIRED but restricted to an organization → plain not-found, and
+--        its legacy link /stellenangebote/12346-alt must NOT redirect
+-- (9925 below is a DRAFT → plain not-found as well.)
+INSERT INTO public."JobPosting"
+  (id, slug, "organizationId", type, status, region, occupation,
+   title, "shortDescription", location, featured, "publishedAt", "expiresAt",
+   "legacyStujoId", "restrictedToOrganizationId", created_at, updated_at)
+VALUES
+  (9926, 'werkstudent-backend-abgelaufen', 10, 'WORKING_STUDENT', 'EXPIRED', 'KIEL',
+   'IT_TELECOMMUNICATIONS',
+   'Werkstudent:in Backend-Entwicklung (abgelaufen)',
+   'Abgelaufene Ausschreibung — Testfall für die Seite "nicht mehr verfügbar".',
+   'Kiel', false,
+   '2025-09-01 10:00:00+00', '2025-10-27 10:00:00+00',
+   12345, NULL, now(), now()),
+  (9927, 'praktikum-data-science-pausiert', 8, 'INTERNSHIP', 'DEACTIVATED', 'SCHLESWIG_HOLSTEIN_HAMBURG',
+   'RESEARCH_SCIENCE',
+   'Praktikum Data Science (pausiert)',
+   'Vom Unternehmen deaktiviert — Testfall für "vorübergehend nicht verfügbar".',
+   'Lübeck', false,
+   '2026-02-01 10:00:00+00', '2027-02-01 10:00:00+00',
+   NULL, NULL, now(), now()),
+  (9928, 'minijob-messe-frist-vorbei', 1, 'MINIJOB', 'PUBLISHED', 'KIEL',
+   'CUSTOMER_SERVICE',
+   'Minijob Messe-Service (Frist vorbei)',
+   'Noch PUBLISHED, aber expiresAt liegt in der Vergangenheit.',
+   'Kiel', false,
+   '2025-11-01 10:00:00+00', '2025-12-27 10:00:00+00',
+   NULL, NULL, now(), now()),
+  (9929, 'praktikum-jugendhilfe-archiviert', 7, 'STATE_RECOGNITION_INTERNSHIP', 'ARCHIVED', 'GERMANY',
+   'HEALTH_SOCIAL',
+   'Praktikum Jugendhilfe (archiviert)',
+   'Vom Unternehmen archiviert.',
+   'Hamburg', false,
+   '2025-06-01 10:00:00+00', '2025-07-27 10:00:00+00',
+   NULL, NULL, now(), now()),
+  (9930, 'werkstudent-intern-eingeschraenkt', 10, 'WORKING_STUDENT', 'EXPIRED', 'KIEL',
+   'IT_TELECOMMUNICATIONS',
+   'Werkstudent:in nur für Hochschulangehörige (eingeschränkt)',
+   'Auf eine Organisation beschränkt — darf öffentlich nie sichtbar werden.',
+   'Kiel', false,
+   '2025-09-01 10:00:00+00', '2025-10-27 10:00:00+00',
+   12346, 8, now(), now());
+
 SELECT pg_catalog.setval(pg_get_serial_sequence('public."Badge"', 'id'), (SELECT max(id) FROM public."Badge"), true);
 SELECT pg_catalog.setval(pg_get_serial_sequence('public."ProjectBadge"', 'id'), (SELECT max(id) FROM public."ProjectBadge"), true);
 SELECT pg_catalog.setval(pg_get_serial_sequence('public."ProjectMentor"', 'id'), (SELECT max(id) FROM public."ProjectMentor"), true);
