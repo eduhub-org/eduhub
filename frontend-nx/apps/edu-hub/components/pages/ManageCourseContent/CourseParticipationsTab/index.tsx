@@ -67,10 +67,17 @@ import {
   AttendanceOverallStatus,
   CourseEnrollmentWithAttendances,
   collapseAttendancesBySession,
-  getAttendanceStatusFromMap,
   groupAttendancesByUser,
   isMandatorySession,
 } from '../../../../helpers/courseParticipationAttendance';
+import {
+  AttendanceDay,
+  getAttendanceStatusFromDays,
+  getDayStatus,
+  groupSessionsIntoAttendanceDays,
+} from '../../../../helpers/attendanceDays';
+import { useAppSettings } from '../../../../contexts/AppSettingsContext';
+import { AttendanceCsvUpload } from './AttendanceCsvUpload';
 import { useOptimisticAttendance } from './useOptimisticAttendance';
 import { isProgramSession, mergeSessions } from '../../../../helpers/programSessions';
 import { useDisplayDate } from '../../../../helpers/dateTimeHelpers';
@@ -88,9 +95,11 @@ type ExtendedEnrollment = CourseEnrollmentWithAttendances & {
 const EMPTY_ENROLLMENTS: CourseEnrollmentWithAttendances[] = [];
 const EMPTY_SESSIONS: CourseParticipations_Course_by_pk_Sessions[] = [];
 
+type SessionDay = AttendanceDay<CourseParticipations_Course_by_pk_Sessions>;
+
 interface IDotData {
   color: DotColor;
-  session: CourseParticipations_Course_by_pk_Sessions;
+  day: SessionDay;
 }
 
 function findUserProject(
@@ -104,11 +113,11 @@ function findUserProject(
 
 function getAttendanceStatus(
   enrollment: ExtendedEnrollment,
-  sessions: CourseParticipations_Course_by_pk_Sessions[],
+  days: readonly SessionDay[],
   maxMissedSessions: number
 ): AttendanceOverallStatus {
   const attendanceBySession = collapseAttendancesBySession(enrollment.User.Attendances);
-  return getAttendanceStatusFromMap(attendanceBySession, sessions, maxMissedSessions);
+  return getAttendanceStatusFromDays(days, attendanceBySession, maxMissedSessions);
 }
 
 export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ course, qResult }) => {
@@ -120,6 +129,7 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
   // An org admin managing the course (the page runs under org_admin) acts like its instructors.
   const managesAsOrgAdmin = useManagementRoleContext() === AuthRoles.org_admin;
   const isInstructor = useIsInstructor() || managesAsOrgAdmin;
+  const { timeZone } = useAppSettings();
 
   const [pageSize, setPageSize] = useState(20);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -225,6 +235,8 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
         : EMPTY_SESSIONS,
     [courseSessions, programSessions]
   );
+  // Attendance is collected per day: one dot for all sessions starting that day.
+  const days = useMemo(() => groupSessionsIntoAttendanceDays(sessions, timeZone), [sessions, timeZone]);
   const projects = useMemo<CourseParticipations_Course_by_pk_ProjectCourses_Project[]>(
     () =>
       ((courseProjectCourses ?? []) as CourseParticipations_Course_by_pk_ProjectCourses[])
@@ -245,7 +257,7 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
     []
   );
 
-  const { enrollmentsWithOverrides, handleDotClick } = useOptimisticAttendance({
+  const { enrollmentsWithOverrides, handleDayClick } = useOptimisticAttendance({
     enrollments,
     sessions,
     insertAttendance,
@@ -340,7 +352,7 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
       try {
         if (action === 'generate_attendance_certificates') {
           const qualifyingRows = selectedRows.filter(
-            (r) => getAttendanceStatus(r, sessions, maxMissedSessions) === 'passed'
+            (r) => getAttendanceStatus(r, days, maxMissedSessions) === 'passed'
           );
           const skippedCount = selectedRows.length - qualifyingRows.length;
           const userIds = qualifyingRows.map((r) => r.userId);
@@ -374,7 +386,7 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
         } else if (action === 'generate_achievement_certificates') {
           const qualifyingRows = selectedRows.filter(
             (r) =>
-              getAttendanceStatus(r, sessions, maxMissedSessions) === 'passed' &&
+              getAttendanceStatus(r, days, maxMissedSessions) === 'passed' &&
               r.userProject?.rating === ProjectRating_enum.PASSED
           );
           const skippedCount = selectedRows.length - qualifyingRows.length;
@@ -471,7 +483,7 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
       tCoursePage,
       refetch,
       qResult,
-      sessions,
+      days,
       maxMissedSessions,
     ]
   );
@@ -530,21 +542,20 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
     (enrollment: ExtendedEnrollment) => {
       const attendanceBySession = collapseAttendancesBySession(enrollment.User.Attendances);
 
-      const dotColor = (sn: CourseParticipations_Course_by_pk_Sessions): DotColor => {
-        const att = attendanceBySession[sn.id];
-        if (!att) return 'grey';
-        if (att.status === AttendanceStatus_enum.MISSED) return 'red';
-        if (att.status === AttendanceStatus_enum.ATTENDED) return 'lightgreen';
+      const dotColor = (day: SessionDay): DotColor => {
+        const status = getDayStatus(day, attendanceBySession);
+        if (status === AttendanceStatus_enum.MISSED) return 'red';
+        if (status === AttendanceStatus_enum.ATTENDED) return 'lightgreen';
         return 'grey';
       };
 
-      const dotsData: IDotData[] = sessions.map((s: CourseParticipations_Course_by_pk_Sessions) => ({ session: s, color: dotColor(s) }));
-      // Optional sessions are shown (and editable) but not counted.
-      const mandatoryDots = dotsData.filter((d) => isMandatorySession(d.session));
+      const dotsData: IDotData[] = days.map((day) => ({ day, color: dotColor(day) }));
+      // Days with only optional sessions are shown (and editable) but not counted.
+      const mandatoryDots = dotsData.filter((d) => d.day.mandatory);
       const missed = mandatoryDots.filter((d) => d.color === 'red').length;
       const attended = mandatoryDots.filter((d) => d.color === 'lightgreen').length;
       const total = attended + missed;
-      const status = getAttendanceStatusFromMap(attendanceBySession, sessions, maxMissedSessions);
+      const status = getAttendanceStatusFromDays(days, attendanceBySession, maxMissedSessions);
       const statusDotColor: DotColor =
         status === 'passed' ? 'lightgreen' : status === 'failed' ? 'red' : 'grey';
       const statusTooltip =
@@ -555,7 +566,7 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
             : t('attendance_status_uncertain');
       return { dotsData, attended, total, statusDotColor, statusTooltip };
     },
-    [sessions, maxMissedSessions, t]
+    [days, maxMissedSessions, t]
   );
 
   const AttendanceDotsCell = useMemo(() => {
@@ -564,7 +575,7 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
       onDotClick,
     }: {
       row: Row<ExtendedEnrollment>;
-      onDotClick: (session: CourseParticipations_Course_by_pk_Sessions, userId: string) => void;
+      onDotClick: (day: SessionDay, userId: string) => void;
     }) {
       const enrollment = row.original;
       const { dotsData, attended, total, statusDotColor, statusTooltip } = summarizeAttendance(enrollment);
@@ -577,25 +588,30 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
           >
             {dotsData.map((d) => (
               <Dot
-                key={d.session.id}
+                key={d.day.dayKey}
                 color={d.color}
-                hollow={!isMandatorySession(d.session)}
+                hollow={!d.day.mandatory}
                 className={
                   attendanceLoading
                     ? 'cursor-wait opacity-60'
                     : 'cursor-pointer hover:border-2 hover:border-indigo-200 hover:rounded-full'
                 }
                 title={[
-                  new Date(d.session.startDateTime).toLocaleString(),
-                  isProgramSession(d.session) ? `${programSessionLabel} (${programTitle})` : null,
-                  isMandatorySession(d.session) ? null : t('attendance_optional_session'),
-                ]
-                  .filter(Boolean)
-                  .join(' · ')}
+                  displayDate(d.day.dayStart),
+                  ...d.day.sessions.map((session) =>
+                    [
+                      session.title,
+                      isProgramSession(session) ? `${programSessionLabel} (${programTitle})` : null,
+                      isMandatorySession(session) ? null : t('attendance_optional_session'),
+                    ]
+                      .filter(Boolean)
+                      .join(' · ')
+                  ),
+                ].join('\n')}
                 onClick={
                   attendanceLoading
                     ? undefined
-                    : () => onDotClick(d.session, enrollment.userId)
+                    : () => onDotClick(d.day, enrollment.userId)
                 }
               />
             ))}
@@ -611,7 +627,7 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
         </div>
       );
     };
-  }, [attendanceLoading, summarizeAttendance, programTitle, programSessionLabel, t]);
+  }, [attendanceLoading, summarizeAttendance, programTitle, programSessionLabel, t, displayDate]);
 
   const columns = useMemo<ColumnDef<ExtendedEnrollment>[]>(() => {
     const allColumns: ColumnDef<ExtendedEnrollment>[] = [
@@ -640,7 +656,7 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
         header: t('attendances'),
         size: 300,
         cell: ({ row }) => (
-          <AttendanceDotsCell row={row} onDotClick={handleDotClick} />
+          <AttendanceDotsCell row={row} onDotClick={handleDayClick} />
         ),
       },
       {
@@ -751,7 +767,7 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
         course.achievementCertificatePossible ||
         (column.id !== 'achievement' && column.id !== 'achievement_cert')
     );
-  }, [t, AttendanceDotsCell, handleDotClick, course.achievementCertificatePossible]);
+  }, [t, AttendanceDotsCell, handleDayClick, course.achievementCertificatePossible]);
 
   const ExpandableParticipationRow = useCallback(
     ({ row }: { row: ExtendedEnrollment }) => (
@@ -759,17 +775,17 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
         enrollment={row}
         t={t}
         attendance={summarizeAttendance(row)}
-        onToggleAttendance={(session) => handleDotClick(session, row.userId)}
+        onToggleAttendance={(day) => handleDayClick(day, row.userId)}
         attendanceDisabled={attendanceLoading}
         showAchievement={course.achievementCertificatePossible}
         formatDate={displayDate}
       />
     ),
-    [t, summarizeAttendance, handleDotClick, attendanceLoading, course.achievementCertificatePossible, displayDate]
+    [t, summarizeAttendance, handleDayClick, attendanceLoading, course.achievementCertificatePossible, displayDate]
   );
 
   // Phones: the dots are only a summary here, because they are too small to tap reliably. The
-  // expanded card lists each session with a switch instead.
+  // expanded card lists each day with a switch instead.
   const renderMobileRow = useCallback(
     (enrollment: ExtendedEnrollment) => {
       const { dotsData, attended, total, statusDotColor, statusTooltip } = summarizeAttendance(enrollment);
@@ -780,7 +796,7 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
           </div>
           <div className="flex flex-wrap items-center gap-1 text-[10px]" title={statusTooltip}>
             {dotsData.map((d) => (
-              <Dot key={d.session.id} color={d.color} hollow={!isMandatorySession(d.session)} className="block" />
+              <Dot key={d.day.dayKey} color={d.color} hollow={!d.day.mandatory} className="block" />
             ))}
             <span className="ml-1 text-xs font-semibold text-label-primary">{`${attended}/${total}`}</span>
             <Dot color={statusDotColor} className="block" />
@@ -837,6 +853,17 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
     />
   );
 
+  const attendanceUpload = (
+    <AttendanceCsvUpload
+      courseId={course.id}
+      days={days}
+      onImported={(message) => {
+        setSnackbarMessage(message);
+        setSnackbarOpen(true);
+      }}
+    />
+  );
+
   if (!course.achievementCertificatePossible) {
     return (
       <div className="flex flex-col gap-8">
@@ -867,6 +894,7 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
             onBulkAction={handleBulkAction}
             expandableRowComponent={ExpandableParticipationRow}
             renderMobileRow={renderMobileRow}
+            toolbarActions={attendanceUpload}
           />
         </section>
         <NotificationSnackbar
@@ -935,6 +963,7 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
           onBulkAction={handleBulkAction}
           expandableRowComponent={ExpandableParticipationRow}
           renderMobileRow={renderMobileRow}
+          toolbarActions={attendanceUpload}
         />
       </section>
       <NotificationSnackbar
@@ -973,6 +1002,7 @@ function ParticipationTable({
   onBulkAction,
   expandableRowComponent,
   renderMobileRow,
+  toolbarActions,
 }: {
   columns: ColumnDef<ExtendedEnrollment>[];
   data: ExtendedEnrollment[];
@@ -991,6 +1021,7 @@ function ParticipationTable({
   onBulkAction: (action: string, rows: ExtendedEnrollment[]) => void | boolean | Promise<void | boolean>;
   expandableRowComponent: (props: { row: ExtendedEnrollment }) => JSX.Element;
   renderMobileRow: (row: ExtendedEnrollment) => ReactNode;
+  toolbarActions?: ReactNode;
 }) {
   return (
     <TableGrid<ExtendedEnrollment>
@@ -1013,6 +1044,7 @@ function ParticipationTable({
       onBulkAction={onBulkAction}
       expandableRowComponent={expandableRowComponent}
       renderMobileRow={renderMobileRow}
+      toolbarActions={toolbarActions}
       preserveRowsWhileLoading
     />
   );
@@ -1067,10 +1099,10 @@ function ExpandableRowContent({
   enrollment: ExtendedEnrollment;
   t: (key: string) => string;
   attendance: { dotsData: IDotData[]; attended: number; total: number };
-  onToggleAttendance: (session: CourseParticipations_Course_by_pk_Sessions) => void;
+  onToggleAttendance: (day: SessionDay) => void;
   attendanceDisabled: boolean;
   showAchievement: boolean;
-  formatDate: (date: string) => string;
+  formatDate: (date: Date | string) => string;
 }) {
   const hasCertificates =
     !!enrollment.attendanceCertificateURL || !!enrollment.achievementCertificateURL;
@@ -1092,29 +1124,31 @@ function ExpandableRowContent({
           </div>
         </Card>
 
-        {/* Phones edit attendance here, one switch per session (on = attended). */}
+        {/* Phones edit attendance here, one switch per day (on = attended). */}
         {attendance.dotsData.length > 0 && (
           <div className="md:hidden">
             <Card title={`${t('attendances')} · ${attendance.attended}/${attendance.total}`}>
               <ul className="divide-y divide-table-divider">
                 {attendance.dotsData.map((d) => (
-                  <li key={d.session.id} className="flex items-center justify-between gap-3">
+                  <li key={d.day.dayKey} className="flex items-center justify-between gap-3">
                     <div className="min-w-0 flex items-start gap-2">
                       <span className="mt-0.5 text-[9px]">
-                        <Dot color={d.color} hollow={!isMandatorySession(d.session)} className="block" />
+                        <Dot color={d.color} hollow={!d.day.mandatory} className="block" />
                       </span>
                       <div className="min-w-0">
                         <div className="text-sm font-semibold">
-                          {formatDate(d.session.startDateTime)}
-                          {isMandatorySession(d.session) ? '' : ` · ${t('attendance_optional_session')}`}
+                          {formatDate(d.day.dayStart)}
+                          {d.day.mandatory ? '' : ` · ${t('attendance_optional_session')}`}
                         </div>
-                        <div className="truncate text-xs text-label-secondary">{d.session.title}</div>
+                        <div className="truncate text-xs text-label-secondary">
+                          {d.day.sessions.map((session) => session.title).join(' · ')}
+                        </div>
                       </div>
                     </div>
                     <EduhubSwitch
                       localChecked={d.color === 'lightgreen'}
-                      handleValueChange={() => onToggleAttendance(d.session)}
-                      ariaLabel={`${t('attendances')}: ${formatDate(d.session.startDateTime)} ${d.session.title}`}
+                      handleValueChange={() => onToggleAttendance(d.day)}
+                      ariaLabel={`${t('attendances')}: ${formatDate(d.day.dayStart)}`}
                       disabled={attendanceDisabled}
                       errorMessage=""
                     />

@@ -94,3 +94,30 @@ export const COURSE_PARTICIPATION_ATTENDANCES = gql`
     }
   }
 `;
+
+export const COURSE_ATTENDANCE_IMPORT_PARTICIPANTS = gql`
+  query CourseAttendanceImportParticipants($courseId: Int!) {
+    CourseEnrollment(
+      where: { courseId: { _eq: $courseId }, isTest: { _eq: false }, status: { _eq: CONFIRMED } }
+    ) {
+      id
+      userId
+      User {
+        id
+        email
+        Attendances(
+          where: {
+            Session: {
+              _or: [{ courseId: { _eq: $courseId } }, { Program: { Courses: { id: { _eq: $courseId } } } }]
+            }
+          }
+        ) {
+          id
+          sessionId
+          status
+          source
+        }
+      }
+    }
+  }
+`;

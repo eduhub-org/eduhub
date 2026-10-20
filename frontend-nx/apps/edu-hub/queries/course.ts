@@ -954,9 +954,20 @@ export const MANAGED_COURSE_PARTICIPANT_EXPORT = gql`
     Course_by_pk(id: $id) {
       id
       title
-      Sessions(order_by: { startDateTime: asc }, limit: 1) {
+      Sessions(order_by: { startDateTime: asc }) {
         id
         startDateTime
+        isMandatory
+        programId
+      }
+      Program {
+        id
+        Sessions(order_by: { startDateTime: asc }) {
+          id
+          startDateTime
+          isMandatory
+          programId
+        }
       }
       CourseEnrollments(
         where: { isTest: { _eq: false }, status: { _in: [REGISTERED, CONFIRMED, COMPLETED] } }
@@ -973,6 +984,16 @@ export const MANAGED_COURSE_PARTICIPANT_EXPORT = gql`
           Organization {
             id
             name
+          }
+          Attendances(
+            where: {
+              Session: { _or: [{ courseId: { _eq: $id } }, { Program: { Courses: { id: { _eq: $id } } } }] }
+            }
+          ) {
+            id
+            sessionId
+            status
+            source
           }
         }
       }

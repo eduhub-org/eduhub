@@ -5,6 +5,9 @@
  * except `downloadTextFile` and `printHtml`, which touch the DOM.
  */
 
+import { formatInTimeZone } from 'date-fns-tz';
+import { AttendanceStatus_enum } from '../../../../__generated__/globalTypes';
+
 export interface ExportParticipant {
   firstName: string;
   lastName: string;
@@ -52,6 +55,139 @@ const csvCell = (value: string, delimiter: string): string => {
  */
 export const buildCsv = (rows: string[][], delimiter: ',' | ';'): string =>
   '﻿' + rows.map((row) => row.map((cell) => csvCell(cell, delimiter)).join(delimiter)).join('\r\n') + '\r\n';
+
+/* ------------------------------------------------------ attendance CSV */
+
+// German exports write 14.10.2026, English ones 2026-10-14. Uploads accept both.
+const DAY_IN_HEADER = /(\d{1,2})\.(\d{1,2})\.(\d{4})|(\d{4})-(\d{2})-(\d{2})/;
+
+/** The date part of a day column's header ("Anwesend 14.10.2026"). */
+export const attendanceDayLabel = (dayStart: Date, timeZone: string, locale: string): string =>
+  formatInTimeZone(dayStart, timeZone, locale === 'de' ? 'dd.MM.yyyy' : 'yyyy-MM-dd');
+
+/** "yyyy-MM-dd" from a header holding a German or ISO date, else null. */
+export const dayKeyFromHeader = (header: string): string | null => {
+  const match = DAY_IN_HEADER.exec(header);
+  if (!match) return null;
+  const [year, month, day] = match[1] ? [match[3], match[2], match[1]] : [match[4], match[5], match[6]];
+  return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+};
+
+/**
+ * Splits CSV text into rows of cells: strips the byte order mark, detects `;`
+ * or `,` from the header line, handles RFC 4180 quoting and drops the `'` that
+ * `buildCsv` puts in front of formula-like values.
+ */
+export const parseCsv = (text: string): string[][] => {
+  const content = text.replace(/^\uFEFF/, '');
+  const headerLine = content.split(/\r?\n/, 1)[0] ?? '';
+  const delimiter = (headerLine.match(/;/g)?.length ?? 0) > (headerLine.match(/,/g)?.length ?? 0) ? ';' : ',';
+
+  const rows: string[][] = [];
+  let row: string[] = [];
+  let cell = '';
+  let quoted = false;
+
+  for (let i = 0; i < content.length; i += 1) {
+    const char = content[i];
+    if (quoted) {
+      if (char === '"' && content[i + 1] === '"') {
+        cell += '"';
+        i += 1;
+      } else if (char === '"') {
+        quoted = false;
+      } else {
+        cell += char;
+      }
+    } else if (char === '"') {
+      quoted = true;
+    } else if (char === delimiter) {
+      row.push(cell);
+      cell = '';
+    } else if (char === '\n' || char === '\r') {
+      if (char === '\r' && content[i + 1] === '\n') i += 1;
+      row.push(cell);
+      rows.push(row);
+      row = [];
+      cell = '';
+    } else {
+      cell += char;
+    }
+  }
+  if (cell !== '' || row.length > 0) {
+    row.push(cell);
+    rows.push(row);
+  }
+
+  const unescape = (value: string) => (/^'[=+\-@\t\r]/.test(value) ? value.slice(1) : value);
+  return rows
+    .map((cells) => cells.map(unescape))
+    .filter((cells) => cells.some((value) => value.trim() !== ''));
+};
+
+const ATTENDED_VALUES = ['x', 'ja', 'yes', 'y', 'j', '1', 'true', 'wahr', '✓', '✔', '☑', 'anwesend', 'present'];
+const MISSED_VALUES = ['', 'nein', 'no', 'n', '0', 'false', 'falsch', '-', 'abwesend', 'absent'];
+
+/** Attended or missed for a spreadsheet cell (empty means missed), null if unreadable. */
+export const parseAttendanceCell = (value: string): AttendanceStatus_enum | null => {
+  const normalized = value.trim().toLowerCase();
+  if (ATTENDED_VALUES.includes(normalized)) return AttendanceStatus_enum.ATTENDED;
+  if (MISSED_VALUES.includes(normalized)) return AttendanceStatus_enum.MISSED;
+  return null;
+};
+
+export interface ParsedAttendanceRow {
+  /** 1-based line in the file, for error messages. */
+  line: number;
+  email: string;
+  statusByDay: Record<string, AttendanceStatus_enum>;
+}
+
+export interface ParsedAttendanceCsv {
+  hasEmailColumn: boolean;
+  dayColumns: { header: string; dayKey: string }[];
+  rows: ParsedAttendanceRow[];
+  invalidCells: { line: number; header: string; value: string }[];
+}
+
+const isEmailHeader = (header: string) =>
+  ['email', 'emailadresse', 'emailaddress'].includes(header.toLowerCase().replace(/[^a-z]/g, ''));
+
+/** Reads the email column and every column whose header carries a date. */
+export const parseAttendanceCsv = (rows: string[][]): ParsedAttendanceCsv => {
+  const [header = [], ...body] = rows;
+  const emailIndex = header.findIndex(isEmailHeader);
+  const dayColumns = header
+    .map((title, index) => ({ header: title.trim(), index, dayKey: dayKeyFromHeader(title) }))
+    .filter((column): column is { header: string; index: number; dayKey: string } => column.dayKey !== null);
+
+  const result: ParsedAttendanceCsv = {
+    hasEmailColumn: emailIndex >= 0,
+    dayColumns: dayColumns.map(({ header: title, dayKey }) => ({ header: title, dayKey })),
+    rows: [],
+    invalidCells: [],
+  };
+  if (emailIndex < 0) return result;
+
+  body.forEach((cells, rowIndex) => {
+    const line = rowIndex + 2;
+    const email = (cells[emailIndex] ?? '').trim().toLowerCase();
+    if (!email) return;
+    const statusByDay: Record<string, AttendanceStatus_enum> = {};
+    for (const column of dayColumns) {
+      const value = cells[column.index] ?? '';
+      const status = parseAttendanceCell(value);
+      if (status === null) {
+        result.invalidCells.push({ line, header: column.header, value });
+      } else {
+        statusByDay[column.dayKey] = status;
+      }
+    }
+    result.rows.push({ line, email, statusByDay });
+  });
+
+  return result;
+};
 
 /* ------------------------------------------------------------ print views */
 

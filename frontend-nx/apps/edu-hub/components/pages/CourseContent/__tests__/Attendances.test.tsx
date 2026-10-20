@@ -36,4 +36,15 @@ describe('Attendances', () => {
     expect(screen.queryByText('06.10.2024')).not.toBeInTheDocument();
     expect(screen.getByText(/attendances.max_missed_mandatory_sessions/)).toHaveTextContent('"total":3');
   });
+
+  it('shows one tile per day and counts days', () => {
+    const sameDay = {
+      ...course,
+      Sessions: [session(1, 3, true), { ...session(2, 3, true), startDateTime: new Date('2024-10-03T14:00:00Z') }],
+      Program: null,
+    } as unknown as CourseWithEnrollment_Course_by_pk;
+    render(<Attendances course={sameDay} />);
+
+    expect(screen.getAllByText('03.10.2024')).toHaveLength(1);
+  });
 });

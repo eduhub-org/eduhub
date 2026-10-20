@@ -10,7 +10,13 @@ import {
   ManagedCourseParticipantExport,
   ManagedCourseParticipantExportVariables,
 } from '../../../../queries/__generated__/ManagedCourseParticipantExport';
+import { useAppSettings } from '../../../../contexts/AppSettingsContext';
+import { AttendanceStatus_enum } from '../../../../__generated__/globalTypes';
+import { getDayStatus, groupSessionsIntoAttendanceDays } from '../../../../helpers/attendanceDays';
+import { collapseAttendancesBySession, groupAttendancesByUser } from '../../../../helpers/courseParticipationAttendance';
+import { mergeSessions } from '../../../../helpers/programSessions';
 import {
+  attendanceDayLabel,
   buildAttendanceListHtml,
   buildCsv,
   buildNameTagsHtml,
@@ -31,11 +37,13 @@ interface ParticipantExportMenuProps {
 /**
  * Exports everyone with an active enrollment (guests included) for on-site
  * use: a CSV for spreadsheets and mail merge, a printable attendance list to
- * tick off, and printable name tags.
+ * tick off, and printable name tags. The CSV has one attendance column per day
+ * with a session; filled in, it can be uploaded on the participations tab.
  */
 export const ParticipantExportMenu: FC<ParticipantExportMenuProps> = ({ courseId }) => {
   const t = useTranslations('manageCourse.participant_export');
   const locale = useLocale();
+  const { timeZone } = useAppSettings();
 
   const [anchorElement, setAnchorElement] = useState<HTMLElement | null>(null);
   const [errorMessage, setErrorMessage] = useState('');
@@ -65,10 +73,37 @@ export const ParticipantExportMenu: FC<ParticipantExportMenuProps> = ({ courseId
         if (kind === 'csv') {
           const statusLabel = (status: string) =>
             ['REGISTERED', 'CONFIRMED', 'COMPLETED'].includes(status) ? t(`statuses.${status}`) : status;
+          const days = groupSessionsIntoAttendanceDays(
+            mergeSessions(course.Sessions, course.Program?.Sessions),
+            timeZone
+          );
+          const attendanceCells = course.CourseEnrollments.map(({ User }) => {
+            const [attendances = []] = Object.values(
+              groupAttendancesByUser(User.Attendances.map((a) => ({ ...a, userId: User.id })))
+            );
+            const attendanceBySession = collapseAttendancesBySession(attendances);
+            return days.map((day) =>
+              getDayStatus(day, attendanceBySession) === AttendanceStatus_enum.ATTENDED ? 'x' : ''
+            );
+          });
           const csv = buildCsv(
             [
-              [t('last_name'), t('first_name'), t('organization'), t('email'), t('status')],
-              ...participants.map((p) => [p.lastName, p.firstName, p.organization, p.email, statusLabel(p.status)]),
+              [
+                t('last_name'),
+                t('first_name'),
+                t('organization'),
+                t('email'),
+                t('status'),
+                ...days.map((day) => t('present_on', { date: attendanceDayLabel(day.dayStart, timeZone, locale) })),
+              ],
+              ...participants.map((p, index) => [
+                p.lastName,
+                p.firstName,
+                p.organization,
+                p.email,
+                statusLabel(p.status),
+                ...attendanceCells[index],
+              ]),
             ],
             locale === 'de' ? ';' : ','
           );
@@ -111,7 +146,7 @@ export const ParticipantExportMenu: FC<ParticipantExportMenuProps> = ({ courseId
         setErrorMessage(t('failed'));
       }
     },
-    [courseId, loadParticipants, locale, t]
+    [courseId, loadParticipants, locale, t, timeZone]
   );
 
   return (

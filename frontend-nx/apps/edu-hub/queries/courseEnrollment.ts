@@ -10,6 +10,14 @@ export const INSERT_SINGLE_ATTENDANCE = gql`
   }
 `;
 
+export const INSERT_ATTENDANCES = gql`
+  mutation InsertAttendances($objects: [Attendance_insert_input!]!) {
+    insert_Attendance(objects: $objects) {
+      affected_rows
+    }
+  }
+`;
+
 export const UPDATE_ATTENDANCE = gql`
   mutation UpdateSingleAttendanceByPk(
     $pkId: Int!

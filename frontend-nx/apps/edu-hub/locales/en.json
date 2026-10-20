@@ -398,9 +398,9 @@
     },
     "attendances": {
       "attendances": "Attendances",
-      "max_missed_sessions": "You may miss at most one session",
-      "max_missed_mandatory_sessions": "You may miss at most {count} of {total} mandatory sessions",
-      "max_missed_sessions_plural": "You may miss at most {count} sessions",
+      "max_missed_sessions": "You may miss at most one day",
+      "max_missed_mandatory_sessions": "You may miss at most {count} of {total} mandatory days",
+      "max_missed_sessions_plural": "You may miss at most {count} days",
       "attendance_status": {
         "ATTENDED": "Attended",
         "MISSED": "Missed",
@@ -1336,8 +1336,8 @@
       "help_text": "Number of ECTS credits for this course"
     },
     "max_missed_sessions": {
-      "label": "Maximum Missed Sessions",
-      "help_text": "Maximum number of sessions a participant can miss"
+      "label": "Maximum missed days",
+      "help_text": "Maximum number of days participants may miss. Several sessions on one day count as one day."
     },
     "degree_requirements": {
       "label": "Degree requirements",
@@ -2204,7 +2204,7 @@
       "csv": "Participant list (CSV for Excel)",
       "attendance_list": "Attendance list (print / PDF)",
       "name_tags": "Name tags (print / PDF)",
-      "hint": "Includes all registered and confirmed participants.",
+      "hint": "Includes all registered and confirmed participants. The CSV has one attendance column per day – fill it in (x = present, empty = absent) and upload it on the Participations tab.",
       "file_suffix": "participants",
       "first_name": "First name",
       "last_name": "Last name",
@@ -2221,7 +2221,27 @@
         "REGISTERED": "registered",
         "CONFIRMED": "confirmed",
         "COMPLETED": "completed"
-      }
+      },
+      "present_on": "Present {date}"
+    },
+    "attendance_import": {
+      "button": "Upload attendance (CSV)",
+      "dialog_title": "Import attendance",
+      "confirm": "Import",
+      "summary_matched": "{count, plural, =1 {1 participant} other {# participants}} matched by email.",
+      "summary_days": "Days: {days}",
+      "summary_changes": "Changes: {attended} × present, {missed} × absent (per person and day).",
+      "summary_no_changes": "The file matches the recorded attendance – nothing to change.",
+      "summary_unknown_emails": "{count, plural, =1 {1 email address does} other {# email addresses do}} not belong to a confirmed participant and will be skipped: {emails}",
+      "summary_ignored_columns": "Ignored columns (no session that day, or the day is still ahead): {columns}",
+      "summary_invalid_cells": "{count, plural, =1 {1 cell is} other {# cells are}} unreadable and will stay unchanged: {cells}",
+      "invalid_cell": "Line {line}, {header}: \"{value}\"",
+      "success": "Attendance imported: {attended} × present, {missed} × absent.",
+      "no_email_column": "The file has no \"Email\" column. Please download the participant list via \"Export participants\" and fill it in.",
+      "no_day_columns": "The file has no attendance columns (e.g. \"Present 2026-10-14\"). Please download the current participant list via \"Export participants\".",
+      "no_matching_days": "No column of the file matches a day of this course that has already started.",
+      "failed": "The file could not be processed. Please try again.",
+      "save_failed": "The attendance could not be saved: {error}"
     },
     "participant_preview": {
       "start": "View as participant",

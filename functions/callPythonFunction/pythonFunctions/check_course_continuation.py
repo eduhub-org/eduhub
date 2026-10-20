@@ -1,6 +1,7 @@
 import logging
 import os
 from datetime import datetime, timezone
+from zoneinfo import ZoneInfo
 
 from api_clients import EduHubClient
 
@@ -11,12 +12,50 @@ from pythonFunctions.mail_helpers import (
 )
 
 MAIL_TYPE = "COURSE_CONTINUATION_INQUIRY"
+ATTENDANCE_SOURCE_INSTRUCTOR = "INSTRUCTOR"
+LOCAL_TIME_ZONE = ZoneInfo("Europe/Berlin")
+
+
+def _effective_attendance(rows):
+    """Same precedence as create_certificates.pick_effective_attendance: an
+    INSTRUCTOR row wins over automated ones, then the highest id."""
+    instructor_rows = [row for row in rows if row.get("source") == ATTENDANCE_SOURCE_INSTRUCTOR]
+    return max(instructor_rows or rows, key=lambda row: row.get("id") or 0)
+
+
+def missed_days_by_user(sessions):
+    """Counts missed days per user over the given (mandatory) sessions.
+
+    Attendance is collected per calendar day: sessions starting on the same
+    day (Europe/Berlin) count once. A day is missed when the effective
+    attendance of at least one of its sessions is MISSED and none is ATTENDED.
+    Keep in sync with helpers/attendanceDays.ts and the
+    CourseEnrollmentAttendanceStats view.
+    """
+    statuses_by_user_day = {}
+    for session in sessions:
+        start = datetime.fromisoformat(session["startDateTime"].replace("Z", "+00:00"))
+        day = start.astimezone(LOCAL_TIME_ZONE).date()
+        rows_by_user = {}
+        for attendance in session.get("Attendances", []):
+            uid = attendance.get("userId")
+            if uid is not None:
+                rows_by_user.setdefault(uid, []).append(attendance)
+        for uid, rows in rows_by_user.items():
+            statuses_by_user_day.setdefault((uid, day), set()).add(_effective_attendance(rows).get("status"))
+
+    missed = {}
+    for (uid, _day), statuses in statuses_by_user_day.items():
+        if "MISSED" in statuses and "ATTENDED" not in statuses:
+            missed[uid] = missed.get(uid, 0) + 1
+    return missed
 
 
 def check_course_continuation(arguments):
     """
-    For running courses with a maxMissedSessions limit, finds active
-    (CONFIRMED/REGISTERED) enrollees who have *reached* that limit and asks
+    For running courses with a maxMissedSessions limit (counted in days),
+    finds active (CONFIRMED/REGISTERED) enrollees who have *reached* that
+    limit and asks
     them (once, deduped via MailLog metadata) to attend the remaining
     sessions or to let us know if they no longer want to take part.
 
@@ -49,14 +88,22 @@ def check_course_continuation(arguments):
                     User { id email firstName lastName }
                 }
                 Sessions(where: {isMandatory: {_eq: true}}) {
-                    Attendances(where: {status: {_eq: MISSED}}) {
+                    startDateTime
+                    Attendances {
+                        id
                         userId
+                        status
+                        source
                     }
                 }
                 Program {
                     Sessions(where: {isMandatory: {_eq: true}}) {
-                        Attendances(where: {status: {_eq: MISSED}}) {
+                        startDateTime
+                        Attendances {
+                            id
                             userId
+                            status
+                            source
                         }
                     }
                 }
@@ -82,16 +129,11 @@ def check_course_continuation(arguments):
             if max_missed is None:
                 continue
 
-            # Count MISSED attendances per user across the mandatory sessions
-            # (the query already leaves out optional ones).
-            missed_by_user = {}
-            # Mandatory program-wide sessions count like the course's own.
+            # Count missed days per user across the mandatory sessions (the
+            # query already leaves out optional ones). Mandatory program-wide
+            # sessions count like the course's own.
             program_sessions = (course.get("Program") or {}).get("Sessions", [])
-            for session in course.get("Sessions", []) + program_sessions:
-                for att in session.get("Attendances", []):
-                    uid = att.get("userId")
-                    if uid is not None:
-                        missed_by_user[uid] = missed_by_user.get(uid, 0) + 1
+            missed_by_user = missed_days_by_user(course.get("Sessions", []) + program_sessions)
 
             for enrollment in course.get("CourseEnrollments", []):
                 user = enrollment.get("User") or {}
@@ -100,7 +142,7 @@ def check_course_continuation(arguments):
                     continue
                 missed = missed_by_user.get(uid, 0)
                 # Reaching the limit is the trigger, not exceeding it. A
-                # course allowing 0 missed sessions still needs one actual
+                # course allowing 0 missed days still needs one actual
                 # absence before there is anything to write about.
                 if missed < max(max_missed, 1):
                     continue

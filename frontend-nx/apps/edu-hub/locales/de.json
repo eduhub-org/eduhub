@@ -398,9 +398,9 @@
     },
     "attendances": {
       "attendances": "Anwesenheiten",
-      "max_missed_sessions": "Du darfst an maximal einem Termin fehlen",
-      "max_missed_mandatory_sessions": "Du darfst an maximal {count} von {total} Pflichtterminen fehlen",
-      "max_missed_sessions_plural": "Du darfst an maximal {count} Terminen fehlen",
+      "max_missed_sessions": "Du darfst an maximal einem Tag fehlen",
+      "max_missed_mandatory_sessions": "Du darfst an maximal {count} von {total} Pflichttagen fehlen",
+      "max_missed_sessions_plural": "Du darfst an maximal {count} Tagen fehlen",
       "attendance_status": {
         "ATTENDED": "Teilgenommen",
         "MISSED": "Nicht teilgenommen",
@@ -1318,8 +1318,8 @@
       "help_text": "Anzahl der ECTS-Punkte für diesen Kurs"
     },
     "max_missed_sessions": {
-      "label": "Maximal verpasste Sitzungen",
-      "help_text": "Maximale Anzahl von Sitzungen, die ein Teilnehmer verpassen kann"
+      "label": "Maximal verpasste Tage",
+      "help_text": "Maximale Anzahl von Tagen, die Teilnehmende verpassen dürfen. Mehrere Termine an einem Tag zählen als ein Tag."
     },
     "degree_requirements": {
       "label": "Anforderungen für den Abschluss",
@@ -2189,7 +2189,7 @@
       "csv": "Teilnahmeliste (CSV für Excel)",
       "attendance_list": "Anwesenheitsliste (Drucken / PDF)",
       "name_tags": "Namensschilder (Drucken / PDF)",
-      "hint": "Enthält alle angemeldeten und bestätigten Teilnehmenden.",
+      "hint": "Enthält alle angemeldeten und bestätigten Teilnehmenden. Die CSV hat eine Anwesenheitsspalte pro Tag – ausgefüllt (x = anwesend, leer = nicht anwesend) kannst Du sie im Tab „Teilnahmen“ wieder hochladen.",
       "file_suffix": "teilnehmende",
       "first_name": "Vorname",
       "last_name": "Nachname",
@@ -2206,7 +2206,27 @@
         "REGISTERED": "angemeldet",
         "CONFIRMED": "bestätigt",
         "COMPLETED": "abgeschlossen"
-      }
+      },
+      "present_on": "Anwesend {date}"
+    },
+    "attendance_import": {
+      "button": "Anwesenheit hochladen (CSV)",
+      "dialog_title": "Anwesenheit übernehmen",
+      "confirm": "Übernehmen",
+      "summary_matched": "{count, plural, =1 {1 Teilnehmer:in} other {# Teilnehmende}} per E-Mail zugeordnet.",
+      "summary_days": "Tage: {days}",
+      "summary_changes": "Änderungen: {attended} × anwesend, {missed} × nicht anwesend (je Person und Tag).",
+      "summary_no_changes": "Die Datei stimmt mit der erfassten Anwesenheit überein – es gibt nichts zu ändern.",
+      "summary_unknown_emails": "{count, plural, =1 {1 E-Mail-Adresse gehört} other {# E-Mail-Adressen gehören}} zu keiner bestätigten Teilnahme und {count, plural, =1 {wird} other {werden}} übersprungen: {emails}",
+      "summary_ignored_columns": "Ignorierte Spalten (kein Termin an diesem Tag oder der Tag liegt noch in der Zukunft): {columns}",
+      "summary_invalid_cells": "{count, plural, =1 {1 Zelle ist} other {# Zellen sind}} nicht lesbar und {count, plural, =1 {bleibt} other {bleiben}} unverändert: {cells}",
+      "invalid_cell": "Zeile {line}, {header}: „{value}“",
+      "success": "Anwesenheit übernommen: {attended} × anwesend, {missed} × nicht anwesend.",
+      "no_email_column": "Die Datei hat keine Spalte „E-Mail“. Lade bitte die Teilnahmeliste über „Teilnehmende exportieren“ herunter und fülle sie aus.",
+      "no_day_columns": "Die Datei hat keine Anwesenheitsspalten (z. B. „Anwesend 14.10.2026“). Lade bitte die aktuelle Teilnahmeliste über „Teilnehmende exportieren“ herunter.",
+      "no_matching_days": "Keine Spalte der Datei passt zu einem Tag dieses Kurses, der schon begonnen hat.",
+      "failed": "Die Datei konnte nicht verarbeitet werden. Bitte versuch es noch einmal.",
+      "save_failed": "Die Anwesenheit konnte nicht gespeichert werden: {error}"
     },
     "participant_preview": {
       "start": "Als Teilnehmer:in ansehen",

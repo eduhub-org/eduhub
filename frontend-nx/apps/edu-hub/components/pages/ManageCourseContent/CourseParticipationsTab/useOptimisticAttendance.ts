@@ -14,6 +14,7 @@ import {
   getNextAttendanceStatus,
 } from '../../../../helpers/courseParticipationAttendance';
 import { ATTENDANCE_SOURCE_INSTRUCTOR } from '../../../../helpers/attendance';
+import { AttendanceDay, getDayStatus } from '../../../../helpers/attendanceDays';
 
 const REFETCH_DEBOUNCE_MS = 1500;
 
@@ -91,19 +92,13 @@ export function useOptimisticAttendance({
     []
   );
 
-  const handleDotClick = useCallback(
-    (session: CourseParticipations_Course_by_pk_Sessions, userId: string) => {
-      const enrollment = enrollments.find((item) => item.userId === userId);
-      if (!enrollment) return;
-
-      const key = attendanceOverrideKey(userId, session.id);
-      const attendanceBySession = collapseAttendancesBySession(enrollment.User.Attendances);
-      const currentStatus = overridesRef.current[key] ?? attendanceBySession[session.id]?.status;
-      const nextStatus = getNextAttendanceStatus(currentStatus);
+  const writeSession = useCallback(
+    (sessionId: number, userId: string, status: AttendanceStatus_enum) => {
+      const key = attendanceOverrideKey(userId, sessionId);
       const version = ++nextVersionRef.current;
 
       overrideVersionsRef.current = { ...overrideVersionsRef.current, [key]: version };
-      replaceOverrides({ ...overridesRef.current, [key]: nextStatus });
+      replaceOverrides({ ...overridesRef.current, [key]: status });
       pendingMutationsRef.current += 1;
 
       const previousMutation = mutationQueuesRef.current[key] ?? Promise.resolve();
@@ -113,8 +108,8 @@ export function useOptimisticAttendance({
           insertAttendance({
             variables: {
               input: {
-                status: nextStatus,
-                sessionId: session.id,
+                status,
+                sessionId,
                 source: ATTENDANCE_SOURCE_INSTRUCTOR,
                 userId,
               },
@@ -145,14 +140,25 @@ export function useOptimisticAttendance({
           }
           scheduleBackgroundSync();
         });
-    }, [
-      enrollments,
-      insertAttendance,
-      onError,
-      refetchAttendances,
-      replaceOverrides,
-      scheduleBackgroundSync,
-    ]
+    },
+    [insertAttendance, onError, refetchAttendances, replaceOverrides, scheduleBackgroundSync]
+  );
+
+  /** Attendance is collected per day, so a click writes every session of that day. */
+  const handleDayClick = useCallback(
+    (day: AttendanceDay, userId: string) => {
+      const enrollment = enrollments.find((item) => item.userId === userId);
+      if (!enrollment) return;
+
+      const [withOverrides] = applyAttendanceOverrides([enrollment], overridesRef.current, day.sessions);
+      const attendanceBySession = collapseAttendancesBySession(withOverrides.User.Attendances);
+      const nextStatus = getNextAttendanceStatus(getDayStatus(day, attendanceBySession));
+
+      for (const session of day.sessions) {
+        writeSession(session.id, userId, nextStatus);
+      }
+    },
+    [enrollments, writeSession]
   );
 
   const enrollmentsWithOverrides = useMemo(
@@ -162,6 +168,6 @@ export function useOptimisticAttendance({
 
   return {
     enrollmentsWithOverrides,
-    handleDotClick,
+    handleDayClick,
   };
 }
