@@ -515,13 +515,7 @@ variable "stujo_net_canonical_hosts" {
 # Error alerting
 ###
 variable "alert_slack_channel_id" {
-  description = "Full ID of the Cloud Monitoring Slack notification channel (projects/<project>/notificationChannels/<id>) that receives error alerts. The channel must be created once in the Cloud Console, because Slack requires an interactive OAuth sign-in. Empty disables the alert."
+  description = "Full ID of the Cloud Monitoring Slack notification channel (projects/<project>/notificationChannels/<id>) that receives error and cost alerts. The channel must be created once in the Cloud Console, because Slack requires an interactive OAuth sign-in. Empty disables both alerts."
   type        = string
   default     = ""
-}
-
-variable "enable_budget_alert" {
-  description = "Post to the alert Slack channel when the month's forecasted spend exceeds last month's actual spend by more than 10%. Needs roles/billing.costsManager on the billing account for the Terraform service account, which a billing admin grants once."
-  type        = bool
-  default     = false
 }
