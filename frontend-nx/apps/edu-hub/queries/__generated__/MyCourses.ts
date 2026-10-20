@@ -233,13 +233,9 @@ export interface MyCourses_User_by_pk_CourseEnrollments_Course_Program_Organizat
    */
   ghostNewsletterDoubleOptInEnabled: boolean;
   /**
-   * Optional Ghost newsletter list identifier.
+   * A computed field, executes function "organization_has_ghost_newsletter_configured"
    */
-  ghostNewsletterListId: string | null;
-  /**
-   * Optional Ghost newsletter slug when list ID is not used.
-   */
-  ghostNewsletterSlug: string | null;
+  hasGhostNewsletterConfigured: boolean | null;
 }
 
 export interface MyCourses_User_by_pk_CourseEnrollments_Course_Program {
