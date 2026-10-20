@@ -324,5 +324,15 @@
     "SOCIAL_MEDIA": "Social media",
     "SOCIAL_PEDAGOGY": "Social pedagogy",
     "OTHER": "Other occupational field"
+  },
+  "unavailableJob": {
+    "expiredTitle": "This job is no longer available",
+    "expiredText": "The posting has expired or was closed by the employer. Have a look at similar offers.",
+    "deactivatedTitle": "This job is temporarily unavailable",
+    "deactivatedText": "The employer has paused this posting. It may be back online soon – until then, here are similar offers.",
+    "notFoundTitle": "Job offer not found",
+    "notFoundText": "This job offer does not exist or no longer exists. Maybe the link is incomplete. You can find all current offers in the overview.",
+    "jobByCompany": "“{title}” at {company}",
+    "similarJobs": "Similar offers"
   }
 }

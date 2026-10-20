@@ -7,6 +7,12 @@ reviews:
   # and "assertive" add progressively more nitpicks.
   profile: quiet
 
+  # Generated GraphQL types follow from the queries, which are reviewed. They
+  # also count against the review's file limit (100), which a schema change
+  # touching many documents otherwise exceeds.
+  path_filters:
+    - "!**/__generated__/**"
+
   # Strip the walkthrough comment down to the actual review findings.
   review_status: false
   changed_files_summary: false

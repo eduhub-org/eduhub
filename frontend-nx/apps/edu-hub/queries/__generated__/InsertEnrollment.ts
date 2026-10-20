@@ -447,6 +447,7 @@ export interface InsertEnrollment_insert_CourseEnrollment_returning_Course {
    * The cover image for the course
    */
   coverImage: string | null;
+  coverImageCredits: string | null;
   /**
    * The language the course is given in.
    */
@@ -524,6 +525,14 @@ export interface InsertEnrollment_insert_CourseEnrollment_returning_Course {
    */
   externalRegistrationLink: string | null;
   registrationType: CourseRegistrationType_enum | null;
+  /**
+   * German text replacing the default label of the register/apply button on the course page. Null keeps the label derived from the registration type.
+   */
+  registrationButtonLabelDe: string | null;
+  /**
+   * English text replacing the default label of the register/apply button on the course page. Null keeps the label derived from the registration type.
+   */
+  registrationButtonLabelEn: string | null;
   /**
    * Whether visitors without an account may register for this course/event with just name and email. Only honoured for courses in a Program of type EVENTS with a direct registration type.
    */

@@ -40,6 +40,16 @@ object_relationships:
   - name: Weekday
     using:
       foreign_key_constraint_on: weekDay
+  # Set on an event shared on rausgegangen.de; row-filtered by its own permissions.
+  - name: RausgegangenListing
+    using:
+      manual_configuration:
+        column_mapping:
+          id: courseId
+        insertion_order: null
+        remote_table:
+          name: RausgegangenListing
+          schema: public
 array_relationships:
   - name: AchievementOptionCourses
     using:
@@ -145,6 +155,7 @@ select_permissions:
         - contentDescriptionField2
         - cost
         - coverImage
+        - coverImageCredits
         - created_at
         - ects
         - requiredEcts
@@ -159,6 +170,8 @@ select_permissions:
         - maxMissedSessions
         - maxParticipants
         - showAvailablePlaces
+        - registrationButtonLabelDe
+        - registrationButtonLabelEn
         - programId
         - projectProposalsEnabled
         - guestRegistrationEnabled
@@ -200,6 +213,7 @@ select_permissions:
         - contentDescriptionField2
         - cost
         - coverImage
+        - coverImageCredits
         - created_at
         - ects
         - requiredEcts
@@ -214,6 +228,8 @@ select_permissions:
         - maxMissedSessions
         - maxParticipants
         - showAvailablePlaces
+        - registrationButtonLabelDe
+        - registrationButtonLabelEn
         - programId
         - projectProposalsEnabled
         - guestRegistrationEnabled
@@ -249,6 +265,7 @@ select_permissions:
         - contentDescriptionField2
         - cost
         - coverImage
+        - coverImageCredits
         - created_at
         - ects
         - requiredEcts
@@ -262,6 +279,8 @@ select_permissions:
         - maxMissedSessions
         - maxParticipants
         - showAvailablePlaces
+        - registrationButtonLabelDe
+        - registrationButtonLabelEn
         - programId
         - projectProposalsEnabled
         - guestRegistrationEnabled
@@ -303,6 +322,7 @@ select_permissions:
         - contentDescriptionField2
         - cost
         - coverImage
+        - coverImageCredits
         - created_at
         - ects
         - requiredEcts
@@ -317,6 +337,8 @@ select_permissions:
         - maxMissedSessions
         - maxParticipants
         - showAvailablePlaces
+        - registrationButtonLabelDe
+        - registrationButtonLabelEn
         - programId
         - projectProposalsEnabled
         - guestRegistrationEnabled
@@ -358,6 +380,7 @@ update_permissions:
         - contentDescriptionField1
         - contentDescriptionField2
         - coverImage
+        - coverImageCredits
         - ects
         - requiredEcts
         - requiredEventCount
@@ -369,6 +392,8 @@ update_permissions:
         - maxMissedSessions
         - maxParticipants
         - showAvailablePlaces
+        - registrationButtonLabelDe
+        - registrationButtonLabelEn
         - projectProposalsEnabled
         - guestRegistrationEnabled
         - projectSubmissionDeadline
@@ -400,6 +425,7 @@ update_permissions:
         - contentDescriptionField1
         - contentDescriptionField2
         - coverImage
+        - coverImageCredits
         - ects
         - requiredEcts
         - requiredEventCount
@@ -411,6 +437,8 @@ update_permissions:
         - maxMissedSessions
         - maxParticipants
         - showAvailablePlaces
+        - registrationButtonLabelDe
+        - registrationButtonLabelEn
         - projectProposalsEnabled
         - guestRegistrationEnabled
         - projectSubmissionDeadline
@@ -531,6 +559,7 @@ insert_permissions:
         - contentDescriptionField2
         - cost
         - coverImage
+        - coverImageCredits
         - ects
         - requiredEcts
         - requiredEventCount
@@ -543,6 +572,8 @@ insert_permissions:
         - maxMissedSessions
         - maxParticipants
         - showAvailablePlaces
+        - registrationButtonLabelDe
+        - registrationButtonLabelEn
         - programId
         - projectProposalsEnabled
         - guestRegistrationEnabled
@@ -651,3 +682,33 @@ delete_permissions:
                         _eq: X-Hasura-User-Id
                     - canManageSettings:
                         _eq: true
+event_triggers:
+  # Resyncs the event on rausgegangen.de; the handler ignores courses without a listing.
+  - name: rausgegangen_course_changed
+    definition:
+      enable_manual: false
+      update:
+        columns:
+          - title
+          - tagline
+          - headingDescriptionField1
+          - contentDescriptionField1
+          - headingDescriptionField2
+          - contentDescriptionField2
+          - coverImage
+          - coverImageCredits
+          - basePrice
+          - cost
+          - published
+          - maxParticipants
+          - externalRegistrationLink
+    retry_conf:
+      interval_sec: 300
+      num_retries: 5
+      timeout_sec: 120
+    webhook: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+    headers:
+      - name: name
+        value: syncRausgegangenEvent
+      - name: secret
+        value_from_env: HASURA_CLOUD_FUNCTION_SECRET

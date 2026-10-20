@@ -28,13 +28,9 @@ export interface ProgramFragment_Organization {
    */
   ghostNewsletterDoubleOptInEnabled: boolean;
   /**
-   * Optional Ghost newsletter list identifier.
+   * A computed field, executes function "organization_has_ghost_newsletter_configured"
    */
-  ghostNewsletterListId: string | null;
-  /**
-   * Optional Ghost newsletter slug when list ID is not used.
-   */
-  ghostNewsletterSlug: string | null;
+  hasGhostNewsletterConfigured: boolean | null;
 }
 
 export interface ProgramFragment {

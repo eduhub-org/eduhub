@@ -10,7 +10,7 @@
  * Any failure returns null so the caller falls through to normal 404 handling —
  * a redirect lookup must never take a page down.
  */
-import { fetchAnonymous } from './hasura';
+import { fetchAdmin, fetchAnonymous } from './hasura';
 
 /**
  * Deadline for the lookups below. The proxy awaits them before it can answer,
@@ -21,13 +21,29 @@ import { fetchAnonymous } from './hasura';
  */
 const LOOKUP_TIMEOUT_MS = 2000;
 
-/** Old Rails job id → new JobPosting.id (or null if unknown). */
+/**
+ * Old Rails job id → new JobPosting.id (or null if unknown).
+ *
+ * Most inbound legacy links point at jobs that are no longer live (the ETL
+ * imports the whole Rails archive as EXPIRED), which the anonymous role
+ * cannot see. So this reads with the admin secret and matches every posting
+ * that was public once — the new id then shows the "no longer available"
+ * page. Drafts, pending payments and organization-restricted postings stay
+ * unmatched, so their existence is never revealed by a redirect.
+ */
 export async function lookupNewJobId(legacyStujoId: number): Promise<number | null> {
   try {
-    const data = await fetchAnonymous<{ JobPosting: { id: number }[] }>(
+    const data = await fetchAdmin<{ JobPosting: { id: number }[] }>(
       /* GraphQL */ `
         query LegacyJobId($legacy: Int!) {
-          JobPosting(where: { legacyStujoId: { _eq: $legacy } }, limit: 1) {
+          JobPosting(
+            where: {
+              legacyStujoId: { _eq: $legacy }
+              status: { _in: [PUBLISHED, EXPIRED, ARCHIVED, DEACTIVATED] }
+              restrictedToOrganizationId: { _is_null: true }
+            }
+            limit: 1
+          ) {
             id
           }
         }
@@ -35,7 +51,7 @@ export async function lookupNewJobId(legacyStujoId: number): Promise<number | nu
       { legacy: legacyStujoId },
       AbortSignal.timeout(LOOKUP_TIMEOUT_MS)
     );
-    return data.JobPosting[0]?.id ?? null;
+    return data?.JobPosting[0]?.id ?? null;
   } catch {
     return null;
   }

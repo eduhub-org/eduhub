@@ -60,8 +60,7 @@ interface OnboardingProps {
 interface OrganizationWithNewsletter {
   id: number;
   name: string;
-  ghostNewsletterListId?: string | null;
-  ghostNewsletterSlug?: string | null;
+  hasGhostNewsletterConfigured?: boolean | null;
   ghostNewsletterLabel?: string | null;
   ghostNewsletterDoubleOptInEnabled?: boolean | null;
   newsletterDescription?: string | null;
@@ -123,9 +122,7 @@ const Onboarding: FC<OnboardingProps> = ({ course, enrollmentId, refetchCourse, 
     | undefined)?.Organization;
   const organizationId = organizationWithNewsletter?.id;
   const hasOrganizationId = organizationId !== null && organizationId !== undefined;
-  const hasOrganizationNewsletter =
-    !!organizationWithNewsletter &&
-    (!!organizationWithNewsletter.ghostNewsletterListId || !!organizationWithNewsletter.ghostNewsletterSlug);
+  const hasOrganizationNewsletter = !!organizationWithNewsletter?.hasGhostNewsletterConfigured;
   const newsletterDescription = organizationWithNewsletter?.newsletterDescription?.trim() || '';
 
   const { data: newsletterSubscriptionData } = useRoleQuery(ORGANIZATION_NEWSLETTER_SUBSCRIPTION_BY_PK, {
