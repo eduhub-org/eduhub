@@ -61,8 +61,8 @@ resource "google_monitoring_alert_policy" "service_errors" {
 #
 # Budgets belong to the billing account, not the project: the Terraform service
 # account needs roles/billing.costsManager on it (granted for production on
-# 2026-10-20). Setting alert_slack_channel_id in a workspace whose service
-# account lacks that role makes the apply fail. The Budget API also
+# 2026-10-20). In a workspace whose service account lacks that role, set
+# enable_budget_alert to false or the apply fails. The Budget API also
 # needs a quota project when called by a service account, hence the aliased
 # provider with user_project_override.
 
@@ -75,14 +75,14 @@ provider "google" {
 }
 
 resource "google_project_service" "billing_budgets" {
-  count = var.alert_slack_channel_id == "" ? 0 : 1
+  count = var.enable_budget_alert && var.alert_slack_channel_id != "" ? 1 : 0
 
   service            = "billingbudgets.googleapis.com"
   disable_on_destroy = false
 }
 
 resource "google_billing_budget" "monthly_increase" {
-  count    = var.alert_slack_channel_id == "" ? 0 : 1
+  count    = var.enable_budget_alert && var.alert_slack_channel_id != "" ? 1 : 0
   provider = google.billing
 
   billing_account = data.google_project.eduhub.billing_account
