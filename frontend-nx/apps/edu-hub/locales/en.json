@@ -1096,6 +1096,19 @@
     }
   },
   "profile": {
+    "DeleteAccount": {
+      "title": "Delete account",
+      "description": "Permanently delete your account and anonymize your personal data. This cannot be undone.",
+      "certificates_warning": "All your certificates will be permanently deleted. Download any certificates you want to keep before continuing.",
+      "delete_button": "Delete my account",
+      "confirmation_title": "Permanently delete your account?",
+      "confirmation_description": "You will lose access to your account. Your profile picture, questionnaire answers and personal application details will be deleted, and open enrollments will be cancelled. Newsletter subscriptions and job alerts will be stopped.",
+      "retained_records": "Anonymous participation history, shared project content and existing invoices and payment records are retained.",
+      "type_email": "To confirm, type your email address: {email}",
+      "confirm_button": "Permanently delete my account",
+      "deleting": "Deleting account…",
+      "error": "Account deletion could not be completed. Some steps may already have finished. Please retry. If this keeps happening, contact support."
+    },
     "first_name": "First name",
     "last_name": "Last name",
     "university": "University",
@@ -2401,7 +2414,7 @@
     "occupation": "Occupation",
     "organization": "Organization",
     "matriculation_number": "Matriculation number",
-    "deletion_confirmation_question": "Are you sure you want to delete the account of {firstName} {lastName}? The following steps will be performed:\n\n1. Deleting the user account from the authentication system\n2. Anonymizing all personal data\n3. Deleting the profile picture\n4. Deleting motivation letters\n5. Replacing the certificates with anonymized versions\n\nThis process cannot be undone. Do you want to proceed with deleting with deleting {firstName} {lastName}'s account?",
+    "deletion_confirmation_question": "Are you sure you want to delete the account of {firstName} {lastName}? The following steps will be performed:\n\n1. Deleting the user account from the authentication system\n2. Anonymizing all personal data\n3. Deleting the profile picture\n4. Deleting motivation letters\n5. Permanently deleting all certificates\n\nThis process cannot be undone. Do you want to proceed with deleting {firstName} {lastName}'s account?",
     "anonymization": {
       "ANONYMIZATION_SUCCESS": "User data anonymized successfully",
       "ANONYMIZATION_PARTIAL_SUCCESS": "User data partially anonymized",
@@ -2415,7 +2428,7 @@
       "user_data_anonymization": "User data anonymization",
       "motivation_letter_anonymization": "Motivation letter anonymization",
       "profile_picture_removal": "Profile picture removal",
-      "certificate_anonymization": "Certificate anonymization"
+      "certificate_anonymization": "Certificate deletion"
     },
     "manage_admins": "Manage admins",
     "create_user": {

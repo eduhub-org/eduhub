@@ -1,4 +1,5 @@
 type Mutation {
+  deleteMyAccount: AnonymizeUserResult
   anonymizeUser(
     userId: uuid!
   ): AnonymizeUserResult

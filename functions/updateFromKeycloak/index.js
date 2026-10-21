@@ -23,6 +23,7 @@ const FIND_USER = gql`
     User_by_pk(id: $id) {
       id
       firstName
+      status
       matrixUserHandle
     }
   }
@@ -123,6 +124,11 @@ export const updateFromKeycloak = async (req, res) => {
       findUserResponse = response.User_by_pk;
     } catch (error) {
       console.error(error);
+    }
+
+    // A still-valid token or a delayed login sync must never restore erased data.
+    if (findUserResponse?.status === 'DELETED') {
+      return res.status(403).json({ error: 'Account deleted' });
     }
 
     if (user != null) {

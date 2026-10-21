@@ -4,7 +4,7 @@ import createCertificate from "./createCertificate/index.js";
 import getSignedUrl from "./getSignedUrl/index.js";
 import saveFile from "./saveFile/index.js";
 import saveImage from "./saveImage/index.js";
-import anonymizeUser from "./anonymizeUser/index.js";
+import anonymizeUser, { deleteMyAccount } from "./anonymizeUser/index.js";
 import updateKeycloakUser from "./updateKeycloakUser/index.js";
 import updateAdminUser from "./updateAdminUser/index.js";
 import getAdminUsers from "./getAdminUsers/index.js";
@@ -83,6 +83,7 @@ const functionMap = {
   saveFile,
   saveImage,
   anonymizeUser,
+  deleteMyAccount,
   updateKeycloakUser,
   updateAdminUser,
   getAdminUsers,
