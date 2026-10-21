@@ -417,7 +417,7 @@ resource "google_cloudfunctions2_function" "call_node_function" {
 
     max_instance_count    = 20
     available_memory      = "512M"
-    timeout_seconds       = 60
+    timeout_seconds       = 180
     ingress_settings      = var.cloud_function_ingress_settings
     service_account_email = google_service_account.custom_cloud_function_account.email
   }

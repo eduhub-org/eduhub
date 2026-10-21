@@ -1084,6 +1084,19 @@
     }
   },
   "profile": {
+    "DeleteAccount": {
+      "title": "Account löschen",
+      "description": "Lösche deinen Account dauerhaft und anonymisiere deine persönlichen Daten. Dies kann nicht rückgängig gemacht werden.",
+      "certificates_warning": "Alle deine Zertifikate werden unwiderruflich gelöscht. Lade Zertifikate, die du behalten möchtest, vorher herunter.",
+      "delete_button": "Meinen Account löschen",
+      "confirmation_title": "Deinen Account dauerhaft löschen?",
+      "confirmation_description": "Du verlierst den Zugang zu deinem Account. Dein Profilbild, deine Fragebogenantworten und deine persönlichen Bewerbungsangaben werden gelöscht. Offene Anmeldungen werden storniert. Newsletter-Abonnements und Job-Benachrichtigungen werden beendet.",
+      "retained_records": "Anonyme Teilnahmehistorien, gemeinsame Projektinhalte sowie vorhandene Rechnungen und Zahlungsnachweise bleiben erhalten.",
+      "type_email": "Gib zur Bestätigung deine E-Mail-Adresse ein: {email}",
+      "confirm_button": "Meinen Account dauerhaft löschen",
+      "deleting": "Account wird gelöscht…",
+      "error": "Dein Account konnte nicht vollständig gelöscht werden. Einige Schritte wurden möglicherweise bereits abgeschlossen. Bitte versuche es erneut. Wenn das Problem bestehen bleibt, wende dich an den Support."
+    },
     "first_name": "Vorname",
     "last_name": "Nachname",
     "university": "Hochschule",
@@ -2511,7 +2524,7 @@
     "occupation": "Beschäftigung",
     "organization": "Organisation",
     "matriculation_number": "Matrikelnummer",
-    "deletion_confirmation_question": "Bist du sicher, dass du den Account von {firstName} {lastName} löschen möchtest? Die folgenden Schritte werden ausgeführt:\n\n1. Löschung des Benutzerkontos aus dem Authentifizierungssystem\n2. Anonymisierung aller persönlichen Daten\n3. Löschung des Profilbildes\n4. Löschung der Motivationsbriefe\n5. Ersetzung der Zertifikate mit anonymisierten Versionen\n\nDieser Vorgang kann nicht rückgängig gemacht werden. Möchtest du mit der Löschung des Benutzerkontos von {firstName} {lastName} fortfahren?",
+    "deletion_confirmation_question": "Bist du sicher, dass du den Account von {firstName} {lastName} löschen möchtest? Die folgenden Schritte werden ausgeführt:\n\n1. Löschung des Benutzerkontos aus dem Authentifizierungssystem\n2. Anonymisierung aller persönlichen Daten\n3. Löschung des Profilbildes\n4. Löschung der Motivationsbriefe\n5. Unwiderrufliche Löschung aller Zertifikate\n\nDieser Vorgang kann nicht rückgängig gemacht werden. Möchtest du mit der Löschung des Benutzerkontos von {firstName} {lastName} fortfahren?",
     "anonymization": {
       "ANONYMIZATION_SUCCESS": "Benutzerdaten wurden erfolgreich anonymisiert",
       "ANONYMIZATION_PARTIAL_SUCCESS": "Benutzerdaten wurden teilweise anonymisiert",
@@ -2525,7 +2538,7 @@
       "user_data_anonymization": "Anonymisierung der Benutzerdaten",
       "motivation_letter_anonymization": "Anonymisierung der Motivationsbriefe",
       "profile_picture_removal": "Entfernung des Profilbilds",
-      "certificate_anonymization": "Anonymisierung der Zertifikate"
+      "certificate_anonymization": "Löschung der Zertifikate"
     },
     "manage_admins": "Admin-Benutzer verwalten",
     "create_user": {

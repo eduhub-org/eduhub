@@ -110,6 +110,9 @@ const updateKeycloakUserHandler = async (req) => {
 
     const { old: oldData, new: newData } = req.body.event.data;
     const userId = newData.id;
+    if (newData.status === 'DELETED') {
+      return { success: true, messageKey: 'DELETED_USER_SKIPPED', userId };
+    }
 
     const updatedFields = {};
     if (oldData.firstName !== newData.firstName) updatedFields.firstName = newData.firstName;

@@ -26,7 +26,7 @@ export interface DeleteUser_anonymizeUser {
 
 export interface DeleteUser {
   /**
-   * Anonymizes a user's data in Hasura and Googl Cloud bucket and deletes it in Keycloak
+   * Deletes an admin-selected account and certificates and anonymizes personal data
    */
   anonymizeUser: DeleteUser_anonymizeUser | null;
 }
