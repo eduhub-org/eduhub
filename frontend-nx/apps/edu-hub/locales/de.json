@@ -1449,6 +1449,14 @@
       "application_locks_hint": "Ein Bewerbungsprozess enthält immer einen Fragebogen und lässt sich nicht mit einer Zahlung kombinieren.",
       "summary": "Anmeldeart: {mode}"
     },
+    "registration_button_label": {
+      "button": "Beschriftung des Anmeldebuttons: Standard",
+      "button_custom": "Beschriftung des Anmeldebuttons: „{label}“",
+      "dialog_title": "Beschriftung des Anmeldebuttons",
+      "help_text": "Ersetzt den Standardtext des Buttons auf der Kursseite, unabhängig von der Anmeldeart. Leer lassen, um den Standardtext zu verwenden. Ist der Kurs voll, bietet der Button weiterhin die Warteliste an.",
+      "label_de": "Deutsch",
+      "label_en": "Englisch"
+    },
     "instructor_payment": {
       "total_label": "Vergütung für die Kursleitung (gesamt)",
       "total_help": "Ein Betrag pro Kurs, unabhängig von der Anzahl der Kursleitenden. Die Kursleitenden teilen ihn untereinander auf.",
@@ -2023,7 +2031,7 @@
       "session_description": {
         "label": "Beschreibung",
         "help_text": "Beschreibe hier den Inhalt des Termins.",
-        "placeholder": "Beschreibe den Inhalt der Session, z.B. Ablauf, Themen oder Hinweise für Teilnehmende..."
+        "placeholder": "Beschreibe den Inhalt der Session, z.B. Ablauf, Themen oder Hinweise für Teilnehmende. Möglich sind **fett**, *kursiv* und Links: [Text](https://...)"
       },
       "attendance_data": {
         "label": "Anwesenheitsdaten",

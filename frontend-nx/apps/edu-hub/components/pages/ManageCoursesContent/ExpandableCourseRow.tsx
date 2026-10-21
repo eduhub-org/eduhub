@@ -1,6 +1,6 @@
 import { FC, Fragment, useCallback, useMemo, useState, useEffect } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
-import { MdAddCircle, MdForum } from 'react-icons/md';
+import { MdAddCircle, MdEdit, MdForum } from 'react-icons/md';
 import { useManageMutation } from '../../../hooks/authedMutation';
 import { SAVE_COURSE_IMAGE } from '../../../queries/actions';
 import { INSERT_COURSE_GROUP_TAG, DELETE_COURSE_GROUP_TAG } from '../../../queries/courseGroup';
@@ -61,6 +61,7 @@ import {
 import { VALIDATE_FORMBRICKS_SURVEY, SAVE_ADDON_MAPPINGS, CREATE_STRIPE_BASE_PRICE, GET_COURSE_ADDON_MAPPINGS } from '../../../queries/stripe';
 import { AddonValidationDialog } from './AddonValidationDialog';
 import CreateMatrixRoomDialog from './CreateMatrixRoomDialog';
+import RegistrationButtonLabelDialog from './RegistrationButtonLabelDialog';
 import { Button } from '../../common/Button';
 import Card from '../../common/Card';
 import InstructorPaymentSection from './InstructorPaymentSection';
@@ -133,6 +134,9 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
   // completion thresholds for its degree certificate.
   const isDegreeCourse = course.Program?.type === ProgramType.DEGREES;
   const isEventCourse = course.Program?.type === ProgramType.EVENTS;
+  const isRegularCourse = course.Program?.type === ProgramType.COURSES;
+  const [buttonLabelDialogOpen, setButtonLabelDialogOpen] = useState(false);
+  const customButtonLabel = course.registrationButtonLabelDe || course.registrationButtonLabelEn;
 
   // Mirrors the guards in functions/callNodeFunction/registerGuestForCourse.
   const supportsGuestRegistration =
@@ -635,6 +639,20 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                   <FieldHint className="ml-11">{t('manageCourse.guest_registration.help_text')}</FieldHint>
                 </div>
               )}
+
+              {/* Custom label for the register/apply button on the course page */}
+              {isRegularCourse && (
+                <button
+                  type="button"
+                  onClick={() => setButtonLabelDialogOpen(true)}
+                  className="flex items-center gap-1 text-left text-xs text-label-secondary hover:text-label-primary"
+                >
+                  <MdEdit className="shrink-0" />
+                  {customButtonLabel
+                    ? t('manageCourses.registration_button_label.button_custom', { label: customButtonLabel })
+                    : t('manageCourses.registration_button_label.button')}
+                </button>
+              )}
             </Card>
 
             {/* Questionnaire - for every registration type that asks for input */}
@@ -1054,6 +1072,14 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
         onClose={() => setMatrixDialogOpen(false)}
         course={course}
       />
+
+      {isRegularCourse && (
+        <RegistrationButtonLabelDialog
+          open={buttonLabelDialogOpen}
+          onClose={() => setButtonLabelDialogOpen(false)}
+          course={course}
+        />
+      )}
     </div>
   );
 };

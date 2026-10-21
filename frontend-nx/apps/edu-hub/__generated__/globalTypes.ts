@@ -6951,6 +6951,8 @@ export interface Course_bool_exp {
   projectSubmissionDeadline?: timestamptz_comparison_exp | null;
   publicParticipantCount?: bigint_comparison_exp | null;
   published?: Boolean_comparison_exp | null;
+  registrationButtonLabelDe?: String_comparison_exp | null;
+  registrationButtonLabelEn?: String_comparison_exp | null;
   registrationType?: CourseRegistrationType_enum_comparison_exp | null;
   requiredEcts?: numeric_comparison_exp | null;
   requiredEventCount?: Int_comparison_exp | null;
@@ -7024,6 +7026,8 @@ export interface Course_insert_input {
   projectProposalsEnabled?: boolean | null;
   projectSubmissionDeadline?: any | null;
   published?: boolean | null;
+  registrationButtonLabelDe?: string | null;
+  registrationButtonLabelEn?: string | null;
   registrationType?: CourseRegistrationType_enum | null;
   requiredEcts?: any | null;
   requiredEventCount?: number | null;
@@ -7069,6 +7073,8 @@ export interface Course_max_order_by {
   maxParticipants?: order_by | null;
   programId?: order_by | null;
   projectSubmissionDeadline?: order_by | null;
+  registrationButtonLabelDe?: order_by | null;
+  registrationButtonLabelEn?: order_by | null;
   requiredEcts?: order_by | null;
   requiredEventCount?: order_by | null;
   sourceSessionId?: order_by | null;
@@ -7109,6 +7115,8 @@ export interface Course_min_order_by {
   maxParticipants?: order_by | null;
   programId?: order_by | null;
   projectSubmissionDeadline?: order_by | null;
+  registrationButtonLabelDe?: order_by | null;
+  registrationButtonLabelEn?: order_by | null;
   requiredEcts?: order_by | null;
   requiredEventCount?: order_by | null;
   sourceSessionId?: order_by | null;
@@ -7196,6 +7204,8 @@ export interface Course_order_by {
   projectSubmissionDeadline?: order_by | null;
   publicParticipantCount?: order_by | null;
   published?: order_by | null;
+  registrationButtonLabelDe?: order_by | null;
+  registrationButtonLabelEn?: order_by | null;
   registrationType?: order_by | null;
   requiredEcts?: order_by | null;
   requiredEventCount?: order_by | null;
@@ -7247,6 +7257,8 @@ export interface Course_set_input {
   projectProposalsEnabled?: boolean | null;
   projectSubmissionDeadline?: any | null;
   published?: boolean | null;
+  registrationButtonLabelDe?: string | null;
+  registrationButtonLabelEn?: string | null;
   registrationType?: CourseRegistrationType_enum | null;
   requiredEcts?: any | null;
   requiredEventCount?: number | null;
@@ -10483,6 +10495,7 @@ export interface Organization_bool_exp {
   ghostNewsletterLabel?: String_comparison_exp | null;
   ghostNewsletterListId?: String_comparison_exp | null;
   ghostNewsletterSlug?: String_comparison_exp | null;
+  hasGhostNewsletterConfigured?: Boolean_comparison_exp | null;
   id?: Int_comparison_exp | null;
   invoiceFooterText?: String_comparison_exp | null;
   invoiceNumberPrefix?: String_comparison_exp | null;
@@ -10732,6 +10745,7 @@ export interface Organization_order_by {
   ghostNewsletterLabel?: order_by | null;
   ghostNewsletterListId?: order_by | null;
   ghostNewsletterSlug?: order_by | null;
+  hasGhostNewsletterConfigured?: order_by | null;
   id?: order_by | null;
   invoiceFooterText?: order_by | null;
   invoiceNumberPrefix?: order_by | null;
