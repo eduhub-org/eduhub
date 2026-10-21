@@ -64,6 +64,28 @@ const REGION_WIDENING: Record<string, string[]> = {
   GERMANY: ['FLENSBURG', 'KIEL', 'SCHLESWIG_HOLSTEIN_HAMBURG', 'GERMANY'],
 };
 
+// The Rails app used numeric region ids in its URLs (`?region=-2`), and old
+// links and crawlers still send them. The comments on the JobRegion seed rows
+// record the mapping.
+const LEGACY_REGION_IDS: Record<string, string> = {
+  '-2': 'FLENSBURG',
+  '0': 'KIEL',
+  '1': 'SCHLESWIG_HOLSTEIN_HAMBURG',
+  '2': 'GERMANY',
+  '3': 'DENMARK',
+  '4': 'ABROAD',
+};
+
+/**
+ * Turns a `region` URL parameter into a JobRegion enum value. Legacy numeric
+ * ids are mapped; anything else that cannot be an enum value becomes '' (no
+ * region filter), since Hasura rejects the whole query for an invalid enum.
+ */
+export function normalizeRegionParam(region: string): string {
+  const mapped = LEGACY_REGION_IDS[region] ?? region;
+  return /^[A-Z_]+$/.test(mapped) ? mapped : '';
+}
+
 const LIST_FIELDS = /* GraphQL */ `
   id
   slug
