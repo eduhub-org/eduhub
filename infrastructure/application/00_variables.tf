@@ -510,3 +510,18 @@ variable "stujo_net_canonical_hosts" {
     "stujo-flensburg" = "flensburg.stujo.net"
   }
 }
+
+######
+# Error alerting
+###
+variable "alert_slack_channel_id" {
+  description = "Full ID of the Cloud Monitoring Slack notification channel (projects/<project>/notificationChannels/<id>) that receives error and cost alerts. The channel must be created once in the Cloud Console, because Slack requires an interactive OAuth sign-in. Empty disables both alerts."
+  type        = string
+  default     = ""
+}
+
+variable "enable_budget_alert" {
+  description = "Post to the alert Slack channel when the month's forecasted spend exceeds last month's actual spend by more than 10%. Needs roles/billing.costsManager on the billing account for the Terraform service account; set to false in workspaces where it lacks that role."
+  type        = bool
+  default     = true
+}
