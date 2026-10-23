@@ -2367,6 +2367,7 @@
     "headline": "Programme",
     "table_header": {
       "published": "Veröffent- licht",
+      "organization": "Organisation",
       "application_start": "Anmelde- beginn",
       "application_end": "Anmelde- schluss",
       "course_start": "Kursstart",
