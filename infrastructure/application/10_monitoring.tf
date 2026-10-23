@@ -59,6 +59,9 @@ resource "google_monitoring_alert_policy" "service_errors" {
 # fires when the current month's forecast is more than 10% above it. Google
 # sends one notification per threshold and month.
 #
+# Budgets only notify email channels (Slack is not supported there), so the
+# alert goes to the addresses in alert_budget_emails, at most five.
+#
 # Budgets belong to the billing account, not the project: the Terraform service
 # account needs roles/billing.costsManager on it (granted for production on
 # 2026-10-20). In a workspace whose service account lacks that role, set
@@ -74,15 +77,29 @@ provider "google" {
   billing_project       = var.project_id
 }
 
+locals {
+  budget_alert_enabled = var.enable_budget_alert && length(var.alert_budget_emails) > 0
+}
+
+resource "google_monitoring_notification_channel" "budget_email" {
+  for_each = local.budget_alert_enabled ? toset(var.alert_budget_emails) : toset([])
+
+  display_name = "EduHub budget alert: ${each.value}"
+  type         = "email"
+  labels = {
+    email_address = each.value
+  }
+}
+
 resource "google_project_service" "billing_budgets" {
-  count = var.enable_budget_alert && var.alert_slack_channel_id != "" ? 1 : 0
+  count = local.budget_alert_enabled ? 1 : 0
 
   service            = "billingbudgets.googleapis.com"
   disable_on_destroy = false
 }
 
 resource "google_billing_budget" "monthly_increase" {
-  count    = var.enable_budget_alert && var.alert_slack_channel_id != "" ? 1 : 0
+  count    = local.budget_alert_enabled ? 1 : 0
   provider = google.billing
 
   billing_account = data.google_project.eduhub.billing_account
@@ -103,7 +120,7 @@ resource "google_billing_budget" "monthly_increase" {
   }
 
   all_updates_rule {
-    monitoring_notification_channels = [var.alert_slack_channel_id]
+    monitoring_notification_channels = [for c in google_monitoring_notification_channel.budget_email : c.id]
   }
 
   depends_on = [google_project_service.billing_budgets]

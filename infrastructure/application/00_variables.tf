@@ -515,13 +515,24 @@ variable "stujo_net_canonical_hosts" {
 # Error alerting
 ###
 variable "alert_slack_channel_id" {
-  description = "Full ID of the Cloud Monitoring Slack notification channel (projects/<project>/notificationChannels/<id>) that receives error and cost alerts. The channel must be created once in the Cloud Console, because Slack requires an interactive OAuth sign-in. Empty disables both alerts."
+  description = "Full ID of the Cloud Monitoring Slack notification channel (projects/<project>/notificationChannels/<id>) that receives error alerts. The channel must be created once in the Cloud Console, because Slack requires an interactive OAuth sign-in. Empty disables the error alert."
   type        = string
   default     = ""
 }
 
 variable "enable_budget_alert" {
-  description = "Post to the alert Slack channel when the month's forecasted spend exceeds last month's actual spend by more than 10%. Needs roles/billing.costsManager on the billing account for the Terraform service account; set to false in workspaces where it lacks that role."
+  description = "Email alert_budget_emails when the month's forecasted spend exceeds last month's actual spend by more than 10%. Needs roles/billing.costsManager on the billing account for the Terraform service account; set to false in workspaces where it lacks that role."
   type        = bool
   default     = true
+}
+
+variable "alert_budget_emails" {
+  description = "Email addresses that receive the cost alert. Billing budgets only support email notification channels, not Slack. Empty disables the cost alert."
+  type        = list(string)
+  default     = []
+
+  validation {
+    condition     = length(var.alert_budget_emails) <= 5
+    error_message = "A billing budget accepts at most 5 notification channels."
+  }
 }
