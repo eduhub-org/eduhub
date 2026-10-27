@@ -5,6 +5,8 @@ import { BaseRow, BulkAction, TableGridSortMapping, UseTableGridProps } from './
 import { mergeSortDirection } from './utils';
 
 const DEFAULT_SORT: Record<string, any>[] = [{ updated_at: 'desc' }];
+/** Query variables that page or sort the rows rather than decide which rows match. */
+const NON_MATCH_VARIABLES = ['offset', 'limit', 'order_by'];
 
 /**
  * Returns a referentially stable version of a JSON-serializable value.
@@ -158,22 +160,30 @@ export function useTableGrid<V>({
     setPageIndex(0);
   }, []);
 
+  // Which rows match depends on everything but paging and sort order. fetchAllRows only changes
+  // with these, since TableGrid treats a new loadAllRows as a new query.
+  const matchVariables = useStableValue(
+    Object.fromEntries(Object.entries(effectiveVariables).filter(([key]) => !NON_MATCH_VARIABLES.includes(key)))
+  );
+  const orderByRef = useRef(orderBy);
+  orderByRef.current = orderBy;
+
   /**
-   * Runs the table's query once more for up to `limit` rows matching the current search, filters
-   * and sort order, across all pages (e.g. for TableGrid's `loadAllRows`). It keeps the role of
-   * the table query and bypasses the cache, so the visible page is left untouched.
+   * Runs the table's query once more for up to `limit` rows matching the current search and
+   * filters, across all pages and in the current sort order (e.g. for TableGrid's `loadAllRows`).
+   * It keeps the role of the table query and bypasses the cache, so the visible page is untouched.
    */
   const fetchAllRows = useCallback(
     async (limit: number) => {
       const result = await queryResult.client.query({
         query,
-        variables: { ...effectiveVariables, offset: 0, limit },
+        variables: { ...matchVariables, order_by: orderByRef.current, offset: 0, limit },
         context: queryResult.observable?.options.context,
         fetchPolicy: 'no-cache',
       });
       return result.data;
     },
-    [effectiveVariables, query, queryResult.client, queryResult.observable]
+    [matchVariables, query, queryResult.client, queryResult.observable]
   );
 
   return {
