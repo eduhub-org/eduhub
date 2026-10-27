@@ -124,7 +124,8 @@ export interface TableGridProps<T extends BaseRow> {
   toolbarActions?: ReactNode;
   /**
    * Loads every row matching the current search and filters, across all pages. When given, the
-   * table offers to extend a selection of the whole page to all `totalCount` rows.
+   * table offers to extend a selection of the whole page to all `totalCount` rows. Keep it stable
+   * (useCallback) per query: a new function counts as a new query and drops a running request.
    */
   loadAllRows?: () => Promise<T[]>;
 }

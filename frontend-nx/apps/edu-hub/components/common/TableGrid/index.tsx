@@ -284,20 +284,49 @@ const TableGrid = <T extends BaseRow,>({
 
   const [isLoadingAllRows, setIsLoadingAllRows] = useState(false);
   const [loadAllRowsFailed, setLoadAllRowsFailed] = useState(false);
+  // What "select all" added, and for which query (loadAllRows): tells whether everything matching
+  // the current query is selected, and whether the loader returned fewer rows than the total.
+  const [allMatchingSelection, setAllMatchingSelection] = useState<{
+    loader: () => Promise<T[]>;
+    ids: number[];
+    total: number;
+  } | null>(null);
+  // Identifies the running "select all" request. A new query or a change of the selection while
+  // it runs makes its result obsolete, so it is dropped instead of being added.
+  const allRowsRequestRef = useRef(0);
+  const selectedRowIdsRef = useRef(selectedRowIds);
+  selectedRowIdsRef.current = selectedRowIds;
+
+  useEffect(() => {
+    allRowsRequestRef.current += 1;
+    setIsLoadingAllRows(false);
+    setLoadAllRowsFailed(false);
+  }, [loadAllRows]);
 
   const handleSelectAllMatching = useCallback(async () => {
     if (!loadAllRows) return;
+    const requestId = ++allRowsRequestRef.current;
+    const selectionAtStart = selectedRowIdsRef.current;
+    const isCurrent = () => requestId === allRowsRequestRef.current;
     setIsLoadingAllRows(true);
     setLoadAllRowsFailed(false);
     try {
-      selectRows(await loadAllRows());
+      const rows = await loadAllRows();
+      if (!isCurrent() || selectedRowIdsRef.current !== selectionAtStart) return;
+      selectRows(rows);
+      setAllMatchingSelection({
+        loader: loadAllRows,
+        ids: rows.map((row) => row.id),
+        total: tableTotalCount ?? rows.length,
+      });
     } catch (error) {
+      if (!isCurrent()) return;
       console.error('TableGrid: failed to load all rows for the selection', error);
       setLoadAllRowsFailed(true);
     } finally {
-      setIsLoadingAllRows(false);
+      if (isCurrent()) setIsLoadingAllRows(false);
     }
-  }, [loadAllRows, selectRows]);
+  }, [loadAllRows, selectRows, tableTotalCount]);
 
   const handleRowExpansionBulkAction = useCallback(
     (action: string) => {
@@ -548,18 +577,37 @@ const TableGrid = <T extends BaseRow,>({
 
   // Selecting the whole page is not the same as selecting everything: the rest is only added on
   // request, so an action never reaches rows nobody looked at without an explicit choice.
+  // The selection can hold rows of other searches, so its size says nothing about the current
+  // query; only what "select all" loaded for this query (and is still selected) does.
+  const allMatchingSelected =
+    allMatchingSelection !== null &&
+    allMatchingSelection.loader === loadAllRows &&
+    allMatchingSelection.ids.every((id) => selectedRowIds.has(id));
+  const isAllMatchingPartial =
+    allMatchingSelected && allMatchingSelection.ids.length < allMatchingSelection.total;
   const canSelectAllMatching =
     showCheckbox &&
     Boolean(loadAllRows) &&
     tableTotalCount !== undefined &&
+    tableTotalCount > tableData.length &&
     isAllSelected(tableData) &&
-    selectedRowIds.size < tableTotalCount;
+    !allMatchingSelected;
 
-  const selectAllMatchingBanner = canSelectAllMatching ? (
-    <div
-      role="status"
-      className="mb-4 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg border border-border-primary bg-bg-card px-3 py-2 text-sm text-label-primary"
-    >
+  const bannerClassName =
+    'mb-4 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg border border-border-primary bg-bg-card px-3 py-2 text-sm text-label-primary';
+
+  const selectAllMatchingBanner = isAllMatchingPartial ? (
+    // A capped loader returns fewer rows than match: say so rather than imply all are selected.
+    <div role="status" className={bannerClassName}>
+      <span className="text-error">
+        {t('common.table_grid.select_all_matching_partial', {
+          count: allMatchingSelection.ids.length,
+          total: allMatchingSelection.total,
+        })}
+      </span>
+    </div>
+  ) : canSelectAllMatching ? (
+    <div role="status" className={bannerClassName}>
       <span>{t('common.table_grid.page_all_selected', { count: tableData.length })}</span>
       <button
         type="button"

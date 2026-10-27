@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ColumnDef } from '@tanstack/react-table';
 
@@ -338,8 +338,11 @@ describe('TableGrid selection across pages', () => {
   ];
   const allRows: TestRow[] = [...pageRows, { id: 3, name: 'Row three' }, { id: 4, name: 'Row four' }];
 
-  const renderPaged = (props: Partial<React.ComponentProps<typeof TableGrid<TestRow>>> = {}) =>
-    render(
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  const paged = (props: Partial<React.ComponentProps<typeof TableGrid<TestRow>>> = {}) => (
       <TableGrid<TestRow>
         columns={columns}
         data={pageRows}
@@ -358,7 +361,20 @@ describe('TableGrid selection across pages', () => {
         bulkActions={[{ value: 'email', label: 'Email' }]}
         {...props}
       />
+  );
+  const renderPaged = (props: Partial<React.ComponentProps<typeof TableGrid<TestRow>>> = {}) =>
+    render(paged(props));
+
+  /** A loadAllRows whose result the test hands out, to act while the request is running. */
+  const deferredLoader = () => {
+    let resolve: (rows: TestRow[]) => void = () => undefined;
+    const loadAllRows = jest.fn(
+      () => new Promise<TestRow[]>((done) => {
+        resolve = done;
+      })
     );
+    return { loadAllRows, resolve: (rows: TestRow[]) => resolve(rows) };
+  };
 
   const runBulkAction = () => {
     fireEvent.mouseDown(screen.getByRole('combobox', { name: 'common.table_grid.bulk_action' }));
@@ -397,7 +413,59 @@ describe('TableGrid selection across pages', () => {
     expect(await screen.findByText('common.table_grid.select_all_matching_error')).toBeInTheDocument();
     runBulkAction();
     await waitFor(() => expect(onBulkAction).toHaveBeenCalledWith('email', pageRows));
-    jest.restoreAllMocks();
+  });
+
+  it('drops the loaded rows when the selection was cleared while they were loading', async () => {
+    const { loadAllRows, resolve } = deferredLoader();
+    renderPaged({ onBulkAction: jest.fn(), loadAllRows });
+
+    fireEvent.click(screen.getAllByRole('checkbox')[0]);
+    fireEvent.click(screen.getByText('common.table_grid.select_all_matching'));
+    fireEvent.click(screen.getByText('common.table_grid.clear_selection'));
+
+    await act(async () => resolve(allRows));
+    expect(screen.queryByText('common.table_grid.selected_count')).not.toBeInTheDocument();
+  });
+
+  it('drops the loaded rows when the query changed while they were loading', async () => {
+    const onBulkAction = jest.fn().mockResolvedValue(undefined);
+    const { loadAllRows, resolve } = deferredLoader();
+    const { rerender } = renderPaged({ onBulkAction, loadAllRows });
+
+    fireEvent.click(screen.getAllByRole('checkbox')[0]);
+    fireEvent.click(screen.getByText('common.table_grid.select_all_matching'));
+    // A new search hands the table a new loader.
+    rerender(paged({ onBulkAction, loadAllRows: jest.fn().mockResolvedValue([]) }));
+
+    await act(async () => resolve(allRows));
+    runBulkAction();
+    await waitFor(() => expect(onBulkAction).toHaveBeenCalledWith('email', pageRows));
+  });
+
+  it('still offers to select all when rows of another search fill up the selection', () => {
+    const loadAllRows = jest.fn().mockResolvedValue(allRows);
+    const otherSearch: TestRow[] = [
+      { id: 10, name: 'Other one' },
+      { id: 11, name: 'Other two' },
+    ];
+    const { rerender } = render(paged({ onBulkAction: jest.fn(), loadAllRows, data: otherSearch }));
+    fireEvent.click(screen.getAllByRole('checkbox')[0]);
+
+    rerender(paged({ onBulkAction: jest.fn(), loadAllRows }));
+    fireEvent.click(screen.getAllByRole('checkbox')[0]);
+
+    // 4 rows are selected and 4 match, but only 2 of the matching ones.
+    expect(screen.getByText('common.table_grid.select_all_matching')).toBeInTheDocument();
+  });
+
+  it('says so when fewer rows than the total could be loaded', async () => {
+    renderPaged({ onBulkAction: jest.fn(), loadAllRows: jest.fn().mockResolvedValue(allRows.slice(0, 3)) });
+
+    fireEvent.click(screen.getAllByRole('checkbox')[0]);
+    fireEvent.click(screen.getByText('common.table_grid.select_all_matching'));
+
+    expect(await screen.findByText('common.table_grid.select_all_matching_partial')).toBeInTheDocument();
+    expect(screen.queryByText('common.table_grid.select_all_matching')).not.toBeInTheDocument();
   });
 
   it('does not offer to select all rows without a way to load them', () => {

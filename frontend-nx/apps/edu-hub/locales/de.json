@@ -164,6 +164,7 @@
       "page_all_selected": "Alle {count} Einträge auf dieser Seite sind ausgewählt.",
       "select_all_matching": "Alle {count} auswählen",
       "select_all_matching_error": "Nicht alle Einträge konnten geladen werden. Bitte versuch es noch einmal.",
+      "select_all_matching_partial": "Nur die ersten {count} von {total} Einträgen konnten ausgewählt werden.",
       "sort_by": "Sortieren",
       "sort_default": "Standardsortierung",
       "sort_asc": "{column}, aufsteigend",
