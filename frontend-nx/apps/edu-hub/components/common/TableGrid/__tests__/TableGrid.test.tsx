@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ColumnDef } from '@tanstack/react-table';
 
@@ -328,5 +328,81 @@ describe('TableGrid cell stability', () => {
     expect(after).toBe(input);
     expect(after.value).toBe('typed');
     expect(document.activeElement).toBe(after);
+  });
+});
+
+describe('TableGrid selection across pages', () => {
+  const pageRows: TestRow[] = [
+    { id: 1, name: 'Row one' },
+    { id: 2, name: 'Row two' },
+  ];
+  const allRows: TestRow[] = [...pageRows, { id: 3, name: 'Row three' }, { id: 4, name: 'Row four' }];
+
+  const renderPaged = (props: Partial<React.ComponentProps<typeof TableGrid<TestRow>>> = {}) =>
+    render(
+      <TableGrid<TestRow>
+        columns={columns}
+        data={pageRows}
+        enablePagination
+        error={undefined}
+        loading={false}
+        pageIndex={0}
+        onPageChange={jest.fn()}
+        pageSize={2}
+        totalCount={allRows.length}
+        onPageSizeChange={jest.fn()}
+        refetchQueries={[]}
+        searchFilter=""
+        onSearchFilterChange={jest.fn()}
+        showGlobalSearchField={false}
+        bulkActions={[{ value: 'email', label: 'Email' }]}
+        {...props}
+      />
+    );
+
+  const runBulkAction = () => {
+    fireEvent.mouseDown(screen.getByRole('combobox', { name: 'common.table_grid.bulk_action' }));
+    fireEvent.click(within(screen.getByRole('listbox')).getByText('Email'));
+  };
+
+  it('offers to select every matching row once the whole page is selected', async () => {
+    const onBulkAction = jest.fn().mockResolvedValue(undefined);
+    const loadAllRows = jest.fn().mockResolvedValue(allRows);
+    renderPaged({ onBulkAction, loadAllRows });
+
+    expect(screen.queryByText('common.table_grid.page_all_selected')).not.toBeInTheDocument();
+
+    // The header checkbox selects the page only.
+    fireEvent.click(screen.getAllByRole('checkbox')[0]);
+    expect(screen.getByText('common.table_grid.page_all_selected')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByText('common.table_grid.select_all_matching'));
+    await waitFor(() =>
+      expect(screen.queryByText('common.table_grid.page_all_selected')).not.toBeInTheDocument()
+    );
+    expect(loadAllRows).toHaveBeenCalledTimes(1);
+
+    runBulkAction();
+    await waitFor(() => expect(onBulkAction).toHaveBeenCalledWith('email', allRows));
+  });
+
+  it('keeps the page selected and reports when loading all rows fails', async () => {
+    jest.spyOn(console, 'error').mockImplementation(() => undefined);
+    const onBulkAction = jest.fn().mockResolvedValue(undefined);
+    renderPaged({ onBulkAction, loadAllRows: jest.fn().mockRejectedValue(new Error('network')) });
+
+    fireEvent.click(screen.getAllByRole('checkbox')[0]);
+    fireEvent.click(screen.getByText('common.table_grid.select_all_matching'));
+
+    expect(await screen.findByText('common.table_grid.select_all_matching_error')).toBeInTheDocument();
+    runBulkAction();
+    await waitFor(() => expect(onBulkAction).toHaveBeenCalledWith('email', pageRows));
+    jest.restoreAllMocks();
+  });
+
+  it('does not offer to select all rows without a way to load them', () => {
+    renderPaged({ onBulkAction: jest.fn() });
+    fireEvent.click(screen.getAllByRole('checkbox')[0]);
+    expect(screen.queryByText('common.table_grid.page_all_selected')).not.toBeInTheDocument();
   });
 });

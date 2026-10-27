@@ -186,6 +186,7 @@ const TableGrid = <T extends BaseRow,>({
   onRowDelete,
   filters = [],
   toolbarActions,
+  loadAllRows,
 }: TableGridProps<T>) => {
   const router = useRouter();
   const navigateMode = Boolean(rowHref || onRowNavigate);
@@ -273,11 +274,30 @@ const TableGrid = <T extends BaseRow,>({
     setBulkAction,
     toggleRowSelection,
     toggleAllRows,
+    selectRows,
+    deselectRow,
     handleBulkActionChange,
     clearSelections,
     isAllSelected,
     isSomeSelected,
   } = useBulkActions<T>(bulkActions, onBulkAction ?? (() => undefined));
+
+  const [isLoadingAllRows, setIsLoadingAllRows] = useState(false);
+  const [loadAllRowsFailed, setLoadAllRowsFailed] = useState(false);
+
+  const handleSelectAllMatching = useCallback(async () => {
+    if (!loadAllRows) return;
+    setIsLoadingAllRows(true);
+    setLoadAllRowsFailed(false);
+    try {
+      selectRows(await loadAllRows());
+    } catch (error) {
+      console.error('TableGrid: failed to load all rows for the selection', error);
+      setLoadAllRowsFailed(true);
+    } finally {
+      setIsLoadingAllRows(false);
+    }
+  }, [loadAllRows, selectRows]);
 
   const handleRowExpansionBulkAction = useCallback(
     (action: string) => {
@@ -398,7 +418,7 @@ const TableGrid = <T extends BaseRow,>({
             cell: ({ row }) => (
               <Checkbox
                 checked={selectedRowIds.has(row.original.id)}
-                onChange={() => toggleRowSelection(row.original.id)}
+                onChange={() => toggleRowSelection(row.original)}
                 sx={neutralCheckboxSx}
               />
             ),
@@ -525,6 +545,36 @@ const TableGrid = <T extends BaseRow,>({
   const hasSelection = showCheckbox && selectedRowIds.size > 0;
 
   const toolbarClassName = 'flex flex-wrap justify-between items-center gap-3 mb-4';
+
+  // Selecting the whole page is not the same as selecting everything: the rest is only added on
+  // request, so an action never reaches rows nobody looked at without an explicit choice.
+  const canSelectAllMatching =
+    showCheckbox &&
+    Boolean(loadAllRows) &&
+    tableTotalCount !== undefined &&
+    isAllSelected(tableData) &&
+    selectedRowIds.size < tableTotalCount;
+
+  const selectAllMatchingBanner = canSelectAllMatching ? (
+    <div
+      role="status"
+      className="mb-4 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg border border-border-primary bg-bg-card px-3 py-2 text-sm text-label-primary"
+    >
+      <span>{t('common.table_grid.page_all_selected', { count: tableData.length })}</span>
+      <button
+        type="button"
+        onClick={() => void handleSelectAllMatching()}
+        disabled={isLoadingAllRows || isBulkActionPending}
+        className="inline-flex items-center gap-2 font-semibold underline hover:text-label-secondary disabled:opacity-50"
+      >
+        {isLoadingAllRows && <CircularProgress size={14} sx={{ color: 'inherit' }} />}
+        {t('common.table_grid.select_all_matching', { count: tableTotalCount })}
+      </button>
+      {loadAllRowsFailed && (
+        <span className="text-error">{t('common.table_grid.select_all_matching_error')}</span>
+      )}
+    </div>
+  ) : null;
 
   const toolbar = showToolbar ? (
       <div className={toolbarClassName}>
@@ -783,6 +833,7 @@ const TableGrid = <T extends BaseRow,>({
         generateDeletionConfirmationQuestion ? generateDeletionConfirmationQuestion(row) : undefined
       }
       refetchQueries={refetchQueries}
+      onDeleted={() => deselectRow(row.id)}
       label={label}
     />
   );
@@ -792,7 +843,7 @@ const TableGrid = <T extends BaseRow,>({
   const selectionCheckbox = (row: T) => (
     <Checkbox
       checked={selectedRowIds.has(row.id)}
-      onChange={() => toggleRowSelection(row.id)}
+      onChange={() => toggleRowSelection(row)}
       sx={neutralCheckboxSx}
     />
   );
@@ -1041,6 +1092,7 @@ const TableGrid = <T extends BaseRow,>({
     <div className="min-w-0 max-w-full" ref={containerRef}>
       {/* The toolbar stays interactive while rows reload, so typing in the search field goes on. */}
       {toolbar}
+      {selectAllMatchingBanner}
       <div className="relative" aria-busy={loading}>
         <div
           className={isShowingRetainedPage ? 'pointer-events-none opacity-60' : ''}
