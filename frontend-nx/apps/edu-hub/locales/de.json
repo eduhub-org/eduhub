@@ -1224,6 +1224,7 @@
       "upload_text": "Klicken um Titelbild hochzuladen oder Datei hier ablegen",
       "alt": "Titelbild des Angebots",
       "help_text": "Wird auf der Seite des Angebots und in den Slidern gezeigt.",
+      "format_tooltip": "Empfohlen: Querformat ca. 2:1, z. B. 1920 × 960 px (max. 5 MB).\nDas Bild wird als Kachel (fast 3:2) und als breiter Header auf der Angebotsseite (am Handy fast quadratisch) mittig zugeschnitten – setze das Wichtige ins mittlere Drittel.\nBitte keinen Text ins Bild: Der Titel wird automatisch unten links darübergelegt, Schrift im Bild wird meist abgeschnitten.",
       "credits_label": "Bildnachweis",
       "credits_help": "Wer das Titelbild gemacht hat bzw. die Rechte daran hält, z. B. „Foto: Max Muster“. Wird unter dem Titel angezeigt und an Veranstaltungsportale übergeben (max. 120 Zeichen)."
     },
