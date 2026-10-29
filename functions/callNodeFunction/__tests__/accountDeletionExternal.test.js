@@ -3,12 +3,24 @@ import { afterEach, expect, it, jest } from '@jest/globals';
 const post = jest.fn();
 jest.unstable_mockModule('axios', () => ({ default: { post } }));
 const { unsubscribeForAccountDeletion } = await import('../syncGhostNewsletterSubscription/index.js');
-const { deactivateMatrixUser } = await import('../lib/matrixInvite.js');
+const { deactivateMatrixUser, getMatrixDeactivationConfig } = await import('../lib/matrixInvite.js');
 
 const realFetch = global.fetch;
+const realEnv = { ...process.env };
 afterEach(() => {
   global.fetch = realFetch;
+  process.env = { ...realEnv };
   jest.clearAllMocks();
+});
+
+it('uses the dedicated Synapse admin token, not the room bot token, for deactivation', () => {
+  Object.assign(process.env, {
+    MATRIX_HOMESERVER_URL: 'https://matrix.test/', MATRIX_SERVER_NAME: 'test',
+    MATRIX_ADMIN_ACCESS_TOKEN: 'bot', MATRIX_SYNAPSE_ADMIN_TOKEN: 'synapse-admin',
+  });
+  expect(getMatrixDeactivationConfig()).toMatchObject({ homeserverUrl: 'https://matrix.test', token: 'synapse-admin' });
+  delete process.env.MATRIX_SYNAPSE_ADMIN_TOKEN;
+  expect(getMatrixDeactivationConfig().token).toBeNull();
 });
 
 it('lets deletion continue for a never-synced subscription without Ghost configuration', async () => {

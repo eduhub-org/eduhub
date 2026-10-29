@@ -7,7 +7,7 @@ const deleteIdentity = jest.fn();
 const getKeycloakToken = jest.fn();
 const unsubscribe = jest.fn();
 const deactivateMatrixUser = jest.fn();
-const getMatrixInviteConfig = jest.fn();
+const getMatrixDeactivationConfig = jest.fn();
 jest.unstable_mockModule('graphql-request', () => ({ request, gql: (parts) => parts[0] }));
 jest.unstable_mockModule('@google-cloud/storage', () => ({ Storage: jest.fn() }));
 jest.unstable_mockModule('../lib/cloud-storage.js', () => ({
@@ -20,7 +20,7 @@ jest.unstable_mockModule('../syncGhostNewsletterSubscription/index.js', () => ({
 }));
 jest.unstable_mockModule('../lib/matrixInvite.js', () => ({
   deactivateMatrixUser,
-  getMatrixInviteConfig,
+  getMatrixDeactivationConfig,
   toMatrixUserId: (handle, server) => `@${handle}:${server}`,
 }));
 const { default: anonymizeUser, deleteMyAccount } = await import('../anonymizeUser/index.js');
@@ -52,7 +52,7 @@ beforeEach(() => {
   deleteIdentity.mockReset().mockResolvedValue({});
   getKeycloakToken.mockResolvedValue('token');
   unsubscribe.mockReset().mockResolvedValue(undefined);
-  getMatrixInviteConfig.mockReturnValue({ homeserverUrl: 'https://matrix.test', token: 'mx', serverName: 'test' });
+  getMatrixDeactivationConfig.mockReturnValue({ homeserverUrl: 'https://matrix.test', token: 'mx', serverName: 'test' });
   deactivateMatrixUser.mockReset().mockResolvedValue({ deactivated: true });
 });
 
@@ -163,7 +163,16 @@ it('keeps the handle for retry when Matrix deactivation fails', async () => {
 });
 
 it('skips Matrix deactivation when Matrix is not configured', async () => {
-  getMatrixInviteConfig.mockReturnValue(null);
+  getMatrixDeactivationConfig.mockReturnValue(null);
   expect(await deleteMyAccount(req(), logger)).toMatchObject({ error: null, steps: { matrix_deactivation: true } });
   expect(deactivateMatrixUser).not.toHaveBeenCalled();
+});
+
+it('fails before the database erase when Matrix is configured without the Synapse admin token', async () => {
+  getMatrixDeactivationConfig.mockReturnValue({ homeserverUrl: 'https://matrix.test', token: null, serverName: 'test' });
+  expect(await deleteMyAccount(req(), logger)).toMatchObject({
+    error: 'ERROR_SOME_STEPS_FAILED', steps: { matrix_deactivation: false, user_data_anonymization: false },
+  });
+  expect(deactivateMatrixUser).not.toHaveBeenCalled();
+  expect(request).toHaveBeenCalledTimes(1);
 });

@@ -81,7 +81,10 @@ frontend together. The shared Node function and deletion actions currently allow
 180 seconds for synchronous newsletter and storage cleanup. The Cloud Function
 timeout is configured in `infrastructure/application/06_cloud-functions.tf`.
 Mail delivery requires no additional endpoint configuration.
-`MATRIX_ADMIN_ACCESS_TOKEN` must belong to a Synapse server admin for the
-Matrix deactivation step; otherwise deletion fails at that step and can be
-retried once the token is fixed. GraphQL types are
+Matrix deactivation uses its own token, `MATRIX_SYNAPSE_ADMIN_TOKEN`
+(Terraform `matrix_synapse_admin_token`, secret `matrix-synapse-admin-token`),
+of a dedicated Synapse server-admin user. The room bot
+(`MATRIX_ADMIN_ACCESS_TOKEN`) stays a regular user. While Matrix is configured
+but this token is unset or lacks admin rights, deletion fails at the Matrix
+step before any database change and can be retried once the token is set. GraphQL types are
 generated from the running schema.

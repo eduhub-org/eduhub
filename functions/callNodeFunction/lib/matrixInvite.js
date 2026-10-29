@@ -132,6 +132,16 @@ export const getMatrixInviteConfig = () => {
 };
 
 /**
+ * Same homeserver as the room bot, but a separate server-admin token, so the bot used by
+ * every room function does not need server-admin rights. token is null while it is unset.
+ */
+export const getMatrixDeactivationConfig = () => {
+  const config = getMatrixInviteConfig();
+  if (!config) return null;
+  return { ...config, token: trimAndNull(process.env.MATRIX_SYNAPSE_ADMIN_TOKEN) };
+};
+
+/**
  * POST /_matrix/client/v3/join/{roomId} as the token user (MATRIX_ADMIN_ACCESS_TOKEN, usually the EduHub bot).
  * Required before inviteUserToMatrixRoom: Synapse rejects invites with "not in room" if the bot is not a member.
  * Succeeds for public / otherwise-joinable rooms; private rooms need a one-time manual invite in Element first.
@@ -222,7 +232,7 @@ export const inviteUserToMatrixRoom = async ({ homeserverUrl, token, roomId, mat
 /**
  * POST /_synapse/admin/v1/deactivate/{userId} with erase — logs out all devices, leaves all rooms,
  * removes display name and avatar, and hides sent messages from users joining later.
- * Requires MATRIX_ADMIN_ACCESS_TOKEN to belong to a Synapse server admin.
+ * Requires a Synapse server-admin token (see getMatrixDeactivationConfig).
  * A user who never logged in to Matrix has no account (404); that counts as done.
  */
 export const deactivateMatrixUser = async ({ homeserverUrl, token, matrixUserId, signal }) => {

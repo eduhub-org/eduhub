@@ -3,7 +3,7 @@ import { Storage } from '@google-cloud/storage';
 import { buildCloudStorage } from '../lib/cloud-storage.js';
 import { getKeycloakToken } from '../lib/utils.js';
 import { unsubscribeForAccountDeletion } from '../syncGhostNewsletterSubscription/index.js';
-import { deactivateMatrixUser, getMatrixInviteConfig, toMatrixUserId } from '../lib/matrixInvite.js';
+import { deactivateMatrixUser, getMatrixDeactivationConfig, toMatrixUserId } from '../lib/matrixInvite.js';
 import axios from 'axios';
 import path from 'node:path';
 import { GET_DELETION_DATA, ERASE_PERSONAL_DATA, getErasureVariables } from './personalData.js';
@@ -42,11 +42,13 @@ async function removeProfileImage(storage, picture, bucket) {
 // Needs the handle, so it must run before the database erase clears it.
 async function removeMatrixAccount(matrixUserHandle, logger, userId) {
   if (!matrixUserHandle) return;
-  const config = getMatrixInviteConfig();
+  const config = getMatrixDeactivationConfig();
   if (!config) {
     logger.warn?.('Matrix not configured; skipping Matrix account deactivation', { userId });
     return;
   }
+  // Fail rather than skip: the confirmation dialog promises the Element account is deactivated.
+  if (!config.token) throw new Error('MATRIX_SYNAPSE_ADMIN_TOKEN missing');
   await deactivateMatrixUser({
     homeserverUrl: config.homeserverUrl,
     token: config.token,

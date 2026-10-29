@@ -401,6 +401,17 @@ resource "google_cloudfunctions2_function" "call_node_function" {
       version    = "latest"
     }
 
+    # Mounted only once a version exists; a missing "latest" version would fail the deployment.
+    dynamic "secret_environment_variables" {
+      for_each = var.matrix_synapse_admin_token != "" ? [1] : []
+      content {
+        key        = "MATRIX_SYNAPSE_ADMIN_TOKEN"
+        project_id = var.project_id
+        secret     = google_secret_manager_secret.matrix_synapse_admin_token.secret_id
+        version    = "latest"
+      }
+    }
+
     secret_environment_variables {
       key        = "GHOST_NEWSLETTER_CREDENTIALS_ENCRYPTION_KEY"
       project_id = var.project_id
@@ -464,6 +475,13 @@ resource "google_secret_manager_secret_iam_member" "call_node_function_matrix_ad
   role       = "roles/secretmanager.secretAccessor"
   member     = "serviceAccount:${google_service_account.custom_cloud_function_account.email}"
   depends_on = [google_secret_manager_secret.matrix_admin_access_token]
+}
+
+resource "google_secret_manager_secret_iam_member" "call_node_function_matrix_synapse_admin_token" {
+  secret_id  = google_secret_manager_secret.matrix_synapse_admin_token.id
+  role       = "roles/secretmanager.secretAccessor"
+  member     = "serviceAccount:${google_service_account.custom_cloud_function_account.email}"
+  depends_on = [google_secret_manager_secret.matrix_synapse_admin_token]
 }
 
 resource "google_secret_manager_secret_iam_member" "call_node_function_ghost_encryption_key" {
