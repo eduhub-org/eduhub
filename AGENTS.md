@@ -141,3 +141,17 @@ Related sources (kept in sync but not loaded automatically): `.cursor/rules/`
 (Cursor format) and `.codex/skills/` (Codex format). Prefer the `.claude/commands/`
 versions when they disagree; treat `frontend-nx/.releaserc.json` and
 `.github/workflows/release.yml` as the final word on release behavior.
+
+## Agent skills
+
+### Issue tracker
+
+Issues live in GitHub Issues on `eduhub-org/eduhub` (via `gh`). See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Default vocabulary: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context: one root `CONTEXT.md` plus `docs/adr/`. See `docs/agents/domain.md`.
