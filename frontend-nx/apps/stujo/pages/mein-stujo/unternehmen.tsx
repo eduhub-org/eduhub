@@ -265,7 +265,7 @@ const Unternehmen: FC<Props> = ({ portal }) => {
   };
 
   const handleRequestAccess = async () => {
-    if (!claim?.organizationId) return;
+    if (claim?.organizationId == null) return;
     setError(null);
     try {
       const result = await requestAccess({
