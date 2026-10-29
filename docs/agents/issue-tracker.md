@@ -13,7 +13,7 @@ To also place a new issue on the "EduHub Development" project board with a Statu
 - **Apply / remove labels**: `gh issue edit <number> --add-label "..."` / `--remove-label "..."`
 - **Close**: `gh issue close <number> --comment "..."`
 
-Infer the repo from `git remote -v`; `gh` does this automatically when run inside a clone.
+Pass `--repo eduhub-org/eduhub` to every `gh issue`, `gh pr` and `gh label` command, so a clone of a fork never reads or changes the fork's issues. For `gh api`, use `repos/eduhub-org/eduhub/...` in place of `repos/<owner>/<repo>/...`.
 
 ## Pull requests as a triage surface
 
