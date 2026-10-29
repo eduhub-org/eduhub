@@ -27,7 +27,7 @@ import {
 import { InsertProgram, InsertProgramVariables } from '../../../queries/__generated__/InsertProgram';
 
 import TableGrid from '../../common/TableGrid';
-import { useTableGrid } from '../../common/TableGrid/hooks';
+import { usePersistedPageSize, useTableGrid } from '../../common/TableGrid/hooks';
 import { createMultiWordSearchCondition } from '../../common/TableGrid/utils';
 import InputField from '../../inputs/InputField';
 import DatePicker from '../../inputs/DatePicker';
@@ -51,9 +51,10 @@ export const ManageProgramsContent: FC<ManageProgramsContentProps> = ({ inSettin
   const manageRole = useManageRole();
   const orgWhere = useManageProgramWhere();
 
+  const [pageSize, setPageSize] = usePersistedPageSize('managePrograms', QUERY_LIMIT);
+
   // Filter state management
   const [filter] = useState({
-    limit: QUERY_LIMIT,
     order_by: [{ id: order_by.desc }],
   });
 
@@ -62,7 +63,7 @@ export const ManageProgramsContent: FC<ManageProgramsContentProps> = ({ inSettin
     queryHook: useManageQuery,
     query: PROGRAM_LIST,
     queryVariables: filter,
-    pageSize: filter.limit || QUERY_LIMIT,
+    pageSize,
     debounceMs: 1000,
     defaultSort: [{ id: order_by.desc }],
     sortColumnMapper: (columnId) => {
@@ -354,11 +355,11 @@ export const ManageProgramsContent: FC<ManageProgramsContentProps> = ({ inSettin
   );
 
   const handlePageSizeChange = useCallback(
-    () => {
-      // Page size change handled by useTableGrid
+    (newPageSize: number) => {
+      setPageSize(newPageSize);
       setPageIndex(0);
     },
-    [setPageIndex]
+    [setPageSize, setPageIndex]
   );
 
   if (initialLoading) {
@@ -375,7 +376,7 @@ export const ManageProgramsContent: FC<ManageProgramsContentProps> = ({ inSettin
         totalCount={totalCount}
         pageIndex={pageIndex}
         onPageChange={setPageIndex}
-        pageSize={filter.limit || QUERY_LIMIT}
+        pageSize={pageSize}
         onPageSizeChange={handlePageSizeChange}
         searchFilter={searchFilter}
         onSearchFilterChange={setSearchFilter}

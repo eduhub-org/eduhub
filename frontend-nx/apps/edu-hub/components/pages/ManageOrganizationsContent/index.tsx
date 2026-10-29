@@ -52,7 +52,7 @@ import { ApiKeyManager } from './ApiKeyManager';
 import { OrganizationCredentialManager } from './OrganizationCredentialManager';
 import { OrganizationFeaturesSection } from './OrganizationFeaturesSection';
 import CommonPageHeader from '../../common/CommonPageHeader';
-import { useDeferredBulkAction, useTableGrid } from '../../common/TableGrid/hooks';
+import { useDeferredBulkAction, usePersistedPageSize, useTableGrid } from '../../common/TableGrid/hooks';
 import { createMultiWordSearchCondition } from '../../common/TableGrid/utils';
 
 type ExpandableRowProps = {
@@ -272,7 +272,7 @@ const ManageOrganizationsContent: FC<ManageOrganizationsContentProps> = ({
   const [bulkActionDialogOpen, setBulkActionDialogOpen] = useState(false);
   const [selectedRowsForBulkAction, setSelectedRowsForBulkAction] = useState<OrganizationList_Organization[]>([]);
   const [mergeDialogOpen, setMergeDialogOpen] = useState(false);
-  const [pageSize, setPageSize] = useState(20);
+  const [pageSize, setPageSize] = usePersistedPageSize('manageOrganizations', 20);
 
   const handlePageSizeChange = (newPageSize: number) => {
     setPageSize(newPageSize);

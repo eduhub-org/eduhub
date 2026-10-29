@@ -36,7 +36,7 @@ import { DELETE_A_COURSE } from '../../../queries/mutateCourse';
 
 import TableGrid from '../../common/TableGrid';
 import Loading from '../../common/Loading';
-import { useDeferredBulkAction, useTableGrid } from '../../common/TableGrid/hooks';
+import { useDeferredBulkAction, usePersistedPageSize, useTableGrid } from '../../common/TableGrid/hooks';
 import { createMultiWordSearchCondition } from '../../common/TableGrid/utils';
 import { useManageQuery } from '../../../hooks/authedQuery';
 import { useManageRole } from '../../../hooks/authentication';
@@ -179,9 +179,11 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
     return (preferredRegularProgram ?? sortedPrograms[0]).id;
   }, [sortedPrograms]);
 
+  const [persistedPageSize, setPersistedPageSize] = usePersistedPageSize('manageCourses', 100);
+
   // Filter state management (single source of truth)
   const [filter, setFilter] = useState<AdminCourseListVariables>({
-    limit: 100,
+    limit: persistedPageSize,
     where: {
       ...programTypeWhere,
       programId: { _eq: defaultProgramId },
@@ -1012,6 +1014,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
 
   const handlePageSizeChange = useCallback(
     (newPageSize: number) => {
+      setPersistedPageSize(newPageSize);
       // Update the filter with new page size (useTableGrid handles offset)
       updateFilter({
         ...filter,
@@ -1019,7 +1022,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
       });
       setPageIndex(0);
     },
-    [filter, updateFilter, setPageIndex]
+    [filter, updateFilter, setPageIndex, setPersistedPageSize]
   );
 
   const settingsProgramId = currentProgramId === allTabId ? null : currentProgramId;

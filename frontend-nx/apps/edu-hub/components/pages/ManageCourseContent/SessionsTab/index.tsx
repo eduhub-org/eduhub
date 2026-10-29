@@ -79,6 +79,7 @@ import { QuestionConfirmationDialog } from '../../../common/dialogs/QuestionConf
 import { ErrorMessageDialog } from '../../../common/dialogs/ErrorMessageDialog';
 import NotificationSnackbar from '../../../common/dialogs/NotificationSnackbar';
 import { useFormatTimeString } from '../../../../helpers/dateTimeHelpers';
+import { usePersistedPageSize } from '../../../common/TableGrid/hooks';
 
 /** Course sessions are editable; program sessions are shown read-only. */
 type SessionRow = ManagedCourse_Course_by_pk_Sessions | ManagedCourse_Course_by_pk_Program_Sessions;
@@ -130,7 +131,7 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
   const formatTimeString = useFormatTimeString();
 
   const [pageIndex, setPageIndex] = useState(0);
-  const [pageSize, setPageSize] = useState(15);
+  const [pageSize, setPageSize] = usePersistedPageSize('manageCourse.sessions', 15);
   const isEventCourse = course.Program?.type === ProgramType.EVENTS;
 
   const [searchFilter, setSearchFilter] = useState('');
@@ -254,7 +255,7 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
   const handlePageSizeChange = useCallback((newSize: number) => {
     setPageSize(newSize);
     setPageIndex(0);
-  }, []);
+  }, [setPageSize]);
 
   const handleSearchFilterChange = useCallback((value: string) => {
     setSearchFilter(value);

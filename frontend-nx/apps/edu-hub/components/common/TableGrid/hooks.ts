@@ -176,6 +176,42 @@ export function useTableGrid<V>({
   };
 }
 
+const pageSizeStorageKey = (tableKey: string) => `eduhub.tableGrid.pageSize.${tableKey}`;
+
+/**
+ * Page size state for a TableGrid that remembers the size the user last picked, per table and per
+ * browser, so coming back to the page shows the same number of rows. Read during the first render:
+ * tables only render client-side behind the login gate. Storage can be unavailable (private windows,
+ * blocked site data), in which case the default size is used.
+ */
+export const usePersistedPageSize = (
+  tableKey: string,
+  defaultPageSize: number
+): [number, (size: number) => void] => {
+  const [pageSize, setPageSizeState] = useState(() => {
+    try {
+      const stored = Number(window.localStorage.getItem(pageSizeStorageKey(tableKey)));
+      return Number.isInteger(stored) && stored > 0 ? stored : defaultPageSize;
+    } catch {
+      return defaultPageSize;
+    }
+  });
+
+  const setPageSize = useCallback(
+    (size: number) => {
+      setPageSizeState(size);
+      try {
+        window.localStorage.setItem(pageSizeStorageKey(tableKey), String(size));
+      } catch {
+        // Not remembering the page size is fine.
+      }
+    },
+    [tableKey]
+  );
+
+  return [pageSize, setPageSize];
+};
+
 /**
  * Bridges bulk actions that only finish later — typically after a confirmation dialog — to the
  * promise `onBulkAction` returns. `start()` hands TableGrid a promise that stays pending while the
