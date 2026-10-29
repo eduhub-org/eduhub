@@ -11,6 +11,13 @@ try {
   ({ mergeUserPutPayload } = require("../shared_libs/node/keycloakUserMerge.cjs"));
 }
 
+let computeMatrixHandle;
+try {
+  ({ computeMatrixHandle } = require("./shared_libs/node/matrixHandle.cjs"));
+} catch {
+  ({ computeMatrixHandle } = require("../shared_libs/node/matrixHandle.cjs"));
+}
+
 let secretsMatch;
 try {
   ({ secretsMatch } = require("./shared_libs/node/security.cjs"));
@@ -123,17 +130,6 @@ async function releaseStaleEmail(client, kcAdminClient, email, userid) {
       );
     }
   }
-}
-
-function computeMatrixHandle(firstName, lastName, userId) {
-  const sanitize = (input) => {
-    const normalized = input.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-    return normalized.toLowerCase().replace(/[^a-z0-9._\-]/g, '');
-  };
-  const first = sanitize(firstName || 'user');
-  const last = sanitize(lastName || 'user');
-  const uuidPrefix = (userId || '').replace(/-/g, '').substring(0, 6);
-  return `${first}.${last}.${uuidPrefix}`;
 }
 
 export const updateFromKeycloak = async (req, res) => {
