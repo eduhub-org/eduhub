@@ -12,4 +12,6 @@ The skills speak in terms of five canonical triage roles. This file maps those r
 
 When a skill mentions a role (e.g. "apply the AFK-ready triage label"), use the corresponding label string from this table.
 
+Some of these labels may not exist on `eduhub-org/eduhub` yet. If one is missing, create it before applying it: `gh label create <name>`.
+
 Edit the right-hand column to match whatever vocabulary you actually use.
