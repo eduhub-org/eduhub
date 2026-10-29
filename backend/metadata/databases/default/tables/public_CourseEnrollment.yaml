@@ -480,6 +480,26 @@ event_triggers:
         value: add_confirmed_user_to_mm
       - name: Hasura-Secret
         value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+  # Invites the participant into the course's Matrix room once confirmed, so
+  # the room is in their Element list however they arrive after SSO login.
+  - name: invite_confirmed_user_to_matrix_room
+    definition:
+      enable_manual: true
+      insert:
+        columns: '*'
+      update:
+        columns:
+          - status
+    retry_conf:
+      interval_sec: 10
+      num_retries: 0
+      timeout_sec: 90
+    webhook: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+    headers:
+      - name: name
+        value: inviteConfirmedUserToMatrixRoom
+      - name: secret
+        value_from_env: HASURA_CLOUD_FUNCTION_SECRET
   # A participant of a paid course asked the organizers to cancel (the guard
   # trigger only lets that column go from NULL to a server timestamp, once).
   - name: send_cancellation_request_email

@@ -39,6 +39,7 @@ import syncGhostNewsletterSubscription from "./syncGhostNewsletterSubscription/i
 import createMatrixRoom from "./createMatrixRoom/index.js";
 import updateMatrixInstructorPowerLevel from "./updateMatrixInstructorPowerLevel/index.js";
 import syncProgramInstructorMatrixRoom from "./syncProgramInstructorMatrixRoom/index.js";
+import inviteConfirmedUserToMatrixRoom from "./inviteConfirmedUserToMatrixRoom/index.js";
 import copyProjectFromTemplate from "./copyProjectFromTemplate/index.js";
 import setProjectDocumentationInstructionDefault from "./setProjectDocumentationInstructionDefault/index.js";
 import deleteProjectDocumentationInstruction from "./deleteProjectDocumentationInstruction/index.js";
@@ -119,6 +120,7 @@ const functionMap = {
   createMatrixRoom,
   updateMatrixInstructorPowerLevel,
   syncProgramInstructorMatrixRoom,
+  inviteConfirmedUserToMatrixRoom,
   syncGhostNewsletterSubscription,
   copyProjectFromTemplate,
   setProjectDocumentationInstructionDefault,
