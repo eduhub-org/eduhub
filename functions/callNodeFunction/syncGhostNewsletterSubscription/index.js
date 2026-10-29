@@ -434,6 +434,8 @@ export default async function syncGhostNewsletterSubscription(req, logger) {
 export async function unsubscribeForAccountDeletion(subscription, userEmail) {
   if (!subscription.externalSubscriberId && subscription.status === 'UNSUBSCRIBED') return;
   if (!hasGhostConfiguration(subscription.Organization)) {
+    // Never synced to Ghost, so there is no remote member; the local row is deleted with the account.
+    if (!subscription.externalSubscriberId) return;
     throw new Error('Newsletter configuration missing for account deletion');
   }
   const result = await callGhostSyncEndpoint({ subscription, userEmail, subscribe: false });

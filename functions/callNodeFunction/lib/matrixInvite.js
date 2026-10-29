@@ -218,3 +218,26 @@ export const inviteUserToMatrixRoom = async ({ homeserverUrl, token, roomId, mat
   error.errcode = errcode;
   throw error;
 };
+
+/**
+ * POST /_synapse/admin/v1/deactivate/{userId} with erase — logs out all devices, leaves all rooms,
+ * removes display name and avatar, and hides sent messages from users joining later.
+ * Requires MATRIX_ADMIN_ACCESS_TOKEN to belong to a Synapse server admin.
+ * A user who never logged in to Matrix has no account (404); that counts as done.
+ */
+export const deactivateMatrixUser = async ({ homeserverUrl, token, matrixUserId, signal }) => {
+  const url = `${homeserverUrl}/_synapse/admin/v1/deactivate/${encodeURIComponent(matrixUserId)}`;
+  const response = await fetchMatrixWithRateLimitRetry(
+    url,
+    {
+      method: "POST",
+      headers: matrixHeaders(token),
+      body: JSON.stringify({ erase: true }),
+    },
+    signal
+  );
+
+  if (response.ok) return { deactivated: true };
+  if (response.status === 404) return { deactivated: false, skipped: true };
+  await parseMatrixResponse(response);
+};

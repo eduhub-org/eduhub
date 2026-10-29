@@ -6,6 +6,8 @@ const listFiles = jest.fn();
 const deleteIdentity = jest.fn();
 const getKeycloakToken = jest.fn();
 const unsubscribe = jest.fn();
+const deactivateMatrixUser = jest.fn();
+const getMatrixInviteConfig = jest.fn();
 jest.unstable_mockModule('graphql-request', () => ({ request, gql: (parts) => parts[0] }));
 jest.unstable_mockModule('@google-cloud/storage', () => ({ Storage: jest.fn() }));
 jest.unstable_mockModule('../lib/cloud-storage.js', () => ({
@@ -16,11 +18,16 @@ jest.unstable_mockModule('axios', () => ({ default: { delete: deleteIdentity } }
 jest.unstable_mockModule('../syncGhostNewsletterSubscription/index.js', () => ({
   unsubscribeForAccountDeletion: unsubscribe,
 }));
+jest.unstable_mockModule('../lib/matrixInvite.js', () => ({
+  deactivateMatrixUser,
+  getMatrixInviteConfig,
+  toMatrixUserId: (handle, server) => `@${handle}:${server}`,
+}));
 const { default: anonymizeUser, deleteMyAccount } = await import('../anonymizeUser/index.js');
 const { eraseRawAttendance } = await import('../anonymizeUser/personalData.js');
 const USER = '7c9e6679-7425-40de-944b-e07fc1f90ae7';
 const OTHER = '7c9e6679-7425-40de-944b-e07fc1f90ae8';
-const logger = { error: jest.fn() };
+const logger = { error: jest.fn(), warn: jest.fn() };
 const req = (role = 'user', input = { userId: OTHER }) => ({
   headers: { bucket: 'test' },
   body: { input, session_variables: { 'x-hasura-role': role, 'x-hasura-user-id': USER } },
@@ -45,6 +52,8 @@ beforeEach(() => {
   deleteIdentity.mockReset().mockResolvedValue({});
   getKeycloakToken.mockResolvedValue('token');
   unsubscribe.mockReset().mockResolvedValue(undefined);
+  getMatrixInviteConfig.mockReturnValue({ homeserverUrl: 'https://matrix.test', token: 'mx', serverName: 'test' });
+  deactivateMatrixUser.mockReset().mockResolvedValue({ deactivated: true });
 });
 
 it('always deletes the verified caller, ignoring an arbitrary input user ID', async () => {
@@ -134,4 +143,27 @@ it('keeps the identity active when the database transaction fails', async () => 
     error: 'ERROR_SOME_STEPS_FAILED', steps: { user_data_anonymization: false, keycloak_deletion: false },
   });
   expect(deleteIdentity).not.toHaveBeenCalled();
+});
+
+it('deactivates the Matrix account before the database erase clears the handle', async () => {
+  expect(await deleteMyAccount(req(), logger)).toMatchObject({ steps: { matrix_deactivation: true } });
+  expect(deactivateMatrixUser).toHaveBeenCalledWith({
+    homeserverUrl: 'https://matrix.test', token: 'mx', matrixUserId: '@test.person:test',
+  });
+  expect(deactivateMatrixUser.mock.invocationCallOrder[0]).toBeLessThan(request.mock.invocationCallOrder[1]);
+});
+
+it('keeps the handle for retry when Matrix deactivation fails', async () => {
+  deactivateMatrixUser.mockRejectedValue(new Error('M_FORBIDDEN'));
+  expect(await deleteMyAccount(req(), logger)).toMatchObject({
+    error: 'ERROR_SOME_STEPS_FAILED', steps: { matrix_deactivation: false, user_data_anonymization: false },
+  });
+  expect(request).toHaveBeenCalledTimes(1);
+  expect(deleteIdentity).not.toHaveBeenCalled();
+});
+
+it('skips Matrix deactivation when Matrix is not configured', async () => {
+  getMatrixInviteConfig.mockReturnValue(null);
+  expect(await deleteMyAccount(req(), logger)).toMatchObject({ error: null, steps: { matrix_deactivation: true } });
+  expect(deactivateMatrixUser).not.toHaveBeenCalled();
 });

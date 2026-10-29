@@ -3,6 +3,7 @@ import { Storage } from '@google-cloud/storage';
 import { buildCloudStorage } from '../lib/cloud-storage.js';
 import { getKeycloakToken } from '../lib/utils.js';
 import { unsubscribeForAccountDeletion } from '../syncGhostNewsletterSubscription/index.js';
+import { deactivateMatrixUser, getMatrixInviteConfig, toMatrixUserId } from '../lib/matrixInvite.js';
 import axios from 'axios';
 import path from 'node:path';
 import { GET_DELETION_DATA, ERASE_PERSONAL_DATA, getErasureVariables } from './personalData.js';
@@ -38,6 +39,21 @@ async function removeProfileImage(storage, picture, bucket) {
   }
 }
 
+// Needs the handle, so it must run before the database erase clears it.
+async function removeMatrixAccount(matrixUserHandle, logger, userId) {
+  if (!matrixUserHandle) return;
+  const config = getMatrixInviteConfig();
+  if (!config) {
+    logger.warn?.('Matrix not configured; skipping Matrix account deactivation', { userId });
+    return;
+  }
+  await deactivateMatrixUser({
+    homeserverUrl: config.homeserverUrl,
+    token: config.token,
+    matrixUserId: toMatrixUserId(matrixUserHandle, config.serverName),
+  });
+}
+
 async function eraseAccount(req, logger, userId) {
   const result = {
     anonymizedUserId: userId,
@@ -45,6 +61,7 @@ async function eraseAccount(req, logger, userId) {
     error: null,
     steps: {
       keycloak_deletion: false,
+      matrix_deactivation: false,
       user_data_anonymization: false,
       profile_picture_removal: false,
       certificate_anonymization: false,
@@ -67,6 +84,9 @@ async function eraseAccount(req, logger, userId) {
     for (const subscription of user.OrganizationNewsletterSubscriptions) {
       await unsubscribeForAccountDeletion(subscription, user.email);
     }
+
+    await removeMatrixAccount(user.matrixUserHandle, logger, userId);
+    result.steps.matrix_deactivation = true;
 
     const storage = buildCloudStorage(Storage);
     await removeProfileImage(storage, user.picture, req.headers.bucket);

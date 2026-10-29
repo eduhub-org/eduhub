@@ -21,7 +21,8 @@ admin role. Both call the same erasure implementation.
 | Certificates | Delete achievement, attendance/degree and instructor certificate files, including public files at their recorded paths; clear URLs |
 | Profile images | Delete the original and matching resized WebP files |
 | Attendance | Clear recorded identifiers and location; remove matching rows from cached raw session attendance, keeping other participants and a non-null cache to avoid reimport |
-| Newsletters | Synchronously unsubscribe using the original email before deleting local subscription rows, including external subscriber IDs and error details |
+| Newsletters | Synchronously unsubscribe using the original email before deleting local subscription rows, including external subscriber IDs and error details. Rows never synced to Ghost (no external subscriber ID) are only deleted locally, even if the organization's Ghost configuration is incomplete |
+| Matrix / Element | Deactivate the Matrix account via the Synapse admin API (`/_synapse/admin/v1/deactivate`, `erase: true`) before the handle is cleared: logs out all devices, leaves all rooms, removes display name and avatar, and hides sent messages from users who join later. A missing account (never logged in) counts as done; without Matrix configuration the step is skipped |
 | Guest tokens | Delete tokens, including the organization name snapshot |
 | Job preferences | Delete job alerts and saved job postings |
 | Access and authorship links | Remove organization-admin, project author/mentor and legacy achievement author/mentor links |
@@ -29,8 +30,8 @@ admin role. Both call the same erasure implementation.
 | Background writes | Exclude deleted accounts from questionnaire imports; guard questionnaire writes in the mutation; skip identity sync for deleted accounts; deny profile updates on DELETED rows |
 | Queued mail | Existing delivery behavior is retained: Hasura sends the original event payload, so already queued messages can still be delivered after their MailLog records are erased. A delivery-time lookup is deferred pending team discussion. |
 
-External cleanup happens before the database transaction, preserving file paths
-and the original newsletter email if it fails. Missing files count as already
+External cleanup happens before the database transaction, preserving file paths,
+the original newsletter email and the Matrix handle if it fails. Missing files count as already
 deleted, so retries work. All database cleanup runs in one Hasura transaction.
 Keycloak deletion is last, and a missing identity counts as already deleted.
 Incomplete work returns an error and keeps the local session for retry; neither
@@ -46,8 +47,10 @@ Existing invoices, Stripe references/hosted documents and instructor-payment
 invoice documents remain as financial records. This workflow does not implement
 refunds or a financial-document retention policy.
 
-Clearing imported questionnaire answers and the Matrix handle does not erase
-source data in Formbricks, Matrix, Zoom, LimeSurvey or Mailgun. Ghost is
+Clearing imported questionnaire answers does not erase source data in
+Formbricks, Zoom, LimeSurvey or Mailgun. Matrix deactivation cannot rewrite the
+user ID (which contains the name) in messages already sent; with `erase` they
+are hidden only from users who join later. Ghost is
 unsubscribed, which does not guarantee provider-side member erasure. Backups,
 application logs and Hasura event/action history also follow their own retention
 policies. This workflow therefore covers the EduHub account and its operational
@@ -55,7 +58,10 @@ personal data, rather than claiming erasure from every external system.
 
 Keycloak removal stops future login/refresh; an already issued JWT remains
 cryptographically valid until expiry. Profile-update permissions and the sync
-checks prevent the erased profile from being restored through these paths.
+checks prevent the erased profile from being restored through these paths. The
+Keycloak sync refuses to run when the account status cannot be read, and its
+profile update only matches non-deleted rows, so a sync racing the deletion
+cannot write the name and email back.
 
 ## Verification
 
@@ -74,5 +80,8 @@ No SQL schema migration is required. Deploy the updated Node functions
 frontend together. The shared Node function and deletion actions currently allow
 180 seconds for synchronous newsletter and storage cleanup. The Cloud Function
 timeout is configured in `infrastructure/application/06_cloud-functions.tf`.
-Mail delivery requires no additional endpoint configuration. GraphQL types are
+Mail delivery requires no additional endpoint configuration.
+`MATRIX_ADMIN_ACCESS_TOKEN` must belong to a Synapse server admin for the
+Matrix deactivation step; otherwise deletion fails at that step and can be
+retried once the token is fixed. GraphQL types are
 generated from the running schema.

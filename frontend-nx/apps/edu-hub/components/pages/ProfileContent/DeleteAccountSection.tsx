@@ -96,6 +96,7 @@ const DeleteAccountSection: FC<DeleteAccountSectionProps> = ({ email }) => {
       >
         <p>{t('confirmation_description')}</p>
         <p className="mt-3 font-semibold text-red-600">{t('certificates_warning')}</p>
+        <p className="mt-3">{t('connected_services')}</p>
         <p className="mt-3 text-sm">{t('retained_records')}</p>
         <label htmlFor="delete-account-email" className="mt-5 block text-sm font-semibold">
           {t('type_email', { email })}

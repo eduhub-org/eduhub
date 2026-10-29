@@ -27,6 +27,7 @@ beforeEach(() => {
 it('requires a matching email and an explicit confirmation before deleting', async () => {
   openDialog();
   expect(screen.getByRole('dialog')).toHaveTextContent('certificates_warning');
+  expect(screen.getByRole('dialog')).toHaveTextContent('connected_services');
   const confirm = screen.getByRole('button', { name: 'confirm_button' });
   expect(confirm).toBeDisabled();
   fireEvent.change(screen.getByRole('textbox'), { target: { value: 'other@example.com' } });
