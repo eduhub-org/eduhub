@@ -160,7 +160,11 @@ def _send_reminders(client, mail_type, expiring_soon, frontend_url):
         if (enrollment.get("User") or {}).get("email")
     ]
     key_fields = ["enrollmentId", "invitationExpirationDate"]
-    reminded_keys = already_sent_keys(client, mail_type, candidates, key_fields)
+    # One last-day reminder per invitation window, even if the course switched between free and
+    # paid since the other kind went out.
+    reminded_keys = set()
+    for reminder_type in (MAIL_TYPE, PAID_MAIL_TYPE):
+        reminded_keys |= already_sent_keys(client, reminder_type, candidates, key_fields)
 
     reminded = 0
     for candidate in candidates:

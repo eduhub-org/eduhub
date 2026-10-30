@@ -8,6 +8,7 @@ import { Course_Course_by_pk } from '../../../../queries/__generated__/Course';
 import { CourseWithEnrollment_Course_by_pk_CourseEnrollments } from '../../../../queries/__generated__/CourseWithEnrollment';
 import { Button } from '../../../common/Button';
 import { useDisplayDate } from '../../../../helpers/dateTimeHelpers';
+import { isInvitationExpired } from './types';
 
 /**
  * Props for the RegistrationStatus component
@@ -170,7 +171,8 @@ export const RegistrationStatus: FC<RegistrationStatusProps> = ({
       // Check if this is a payment-pending/failed enrollment (vs approval-based)
       if (
         paymentStatus === 'PENDING' ||
-        paymentStatus === 'FAILED'
+        paymentStatus === 'FAILED' ||
+        (paymentStatus === 'NONE' && onRetryPayment !== undefined)
       ) {
         return (
           <div className="flex flex-col space-y-4 w-full">
@@ -216,10 +218,8 @@ export const RegistrationStatus: FC<RegistrationStatusProps> = ({
       );
     }
     case CourseEnrollmentStatus_enum.INVITED: {
-      if (
-        courseEnrollment.invitationExpirationDate &&
-        new Date(courseEnrollment.invitationExpirationDate).setHours(0, 0, 0, 0) >= new Date().setHours(0, 0, 0, 0)
-      ) {
+      // The last day ends at Berlin midnight, as for expire_invitations and the checkout.
+      if (courseEnrollment.invitationExpirationDate && !isInvitationExpired(courseEnrollment.invitationExpirationDate)) {
         if (onPayInvitation) {
           return (
             <div className="flex flex-col space-y-4 w-full">

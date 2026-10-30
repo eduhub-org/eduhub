@@ -11,7 +11,7 @@
 
 const TIME_ZONE = 'Europe/Berlin';
 // Stripe accepts a checkout expiry between 30 minutes and 24 hours ahead.
-const MIN_SESSION_MS = 31 * 60 * 1000;
+export const MIN_SESSION_MS = 31 * 60 * 1000;
 const MAX_SESSION_MS = 23 * 60 * 60 * 1000;
 
 const hourIn = (date, timeZone) =>

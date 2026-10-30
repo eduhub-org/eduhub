@@ -144,4 +144,4 @@ def test_asks_for_payment_in_reminders_of_paid_courses(run_at, monkeypatch):
     monkeypatch.setitem(ENROLLMENT, "Course", {"id": 7, "title": "Course 7", "registrationType": "DIRECT_CONFIRMATION_AND_PAYMENT"})
     _, queued = run_at(NOON_BERLIN)
 
-    assert [mail["metadata"]["type"] for mail in queued] == [mod.PAID_MAIL_TYPE]
+    assert [mail["metadata"]["type"] for mail in queued] == ["INVITATION_EXPIRING_SOON_PAYMENT"]

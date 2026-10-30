@@ -10,7 +10,7 @@ import {
   buildCourseSource,
   buildServicePeriodField,
 } from '../lib/stripeTax.js';
-import { checkoutAccess, placesOpenForRegistration } from '../lib/checkoutAccess.js';
+import { MIN_SESSION_MS, checkoutAccess, placesOpenForRegistration } from '../lib/checkoutAccess.js';
 
 const GET_COURSE_AND_ADDONS = `
   query GetCourseAndAddons($courseId: Int!) {
@@ -590,6 +590,14 @@ export default async function createStripeCheckout(req, logger) {
     };
 
     // Without a customer, let Stripe prompt for the email during checkout.
+
+    // Stripe wants expires_at at least 30 minutes after creation; the calls above take time.
+    if (sessionConfig.expires_at) {
+      sessionConfig.expires_at = Math.max(
+        sessionConfig.expires_at,
+        Math.floor((Date.now() + MIN_SESSION_MS) / 1000)
+      );
+    }
 
     const session = await stripe.checkout.sessions.create(sessionConfig);
 
