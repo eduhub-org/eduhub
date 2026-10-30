@@ -55,7 +55,7 @@ it('keeps the dialog closable and never deletes twice when logout fails after de
   fireEvent.click(confirm);
   await waitFor(() => expect(screen.getByRole('button', { name: 'cancel' })).toBeEnabled());
   expect(confirm).toBeDisabled();
-  expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  expect(screen.getByRole('alert')).toHaveTextContent('logout_error');
   fireEvent.click(confirm);
   expect(mockDelete).toHaveBeenCalledTimes(1);
 });

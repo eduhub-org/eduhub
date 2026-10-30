@@ -1100,6 +1100,7 @@
       "type_email": "Gib zur Bestätigung deine E-Mail-Adresse ein: {email}",
       "confirm_button": "Meinen Account dauerhaft löschen",
       "deleting": "Account wird gelöscht…",
+      "logout_error": "Dein Account wurde gelöscht, aber die Abmeldung ist fehlgeschlagen. Schließe dieses Fenster und melde dich erneut ab.",
       "error": "Dein Account konnte nicht vollständig gelöscht werden. Einige Schritte wurden möglicherweise bereits abgeschlossen. Bitte versuche es erneut. Wenn das Problem bestehen bleibt, wende dich an den Support."
     },
     "first_name": "Vorname",

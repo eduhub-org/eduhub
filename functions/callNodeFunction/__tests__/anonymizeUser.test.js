@@ -173,6 +173,35 @@ it('skips Matrix deactivation when Matrix is not configured', async () => {
   expect(deactivateMatrixUser).not.toHaveBeenCalled();
 });
 
+it('fails before the database erase when the Matrix configuration is incomplete', async () => {
+  getMatrixDeactivationConfig.mockReturnValue(null);
+  process.env.MATRIX_HOMESERVER_URL = 'https://matrix.test';
+  try {
+    expect(await deleteMyAccount(req(), logger)).toMatchObject({
+      error: 'ERROR_SOME_STEPS_FAILED', steps: { matrix_deactivation: false, user_data_anonymization: false },
+    });
+    expect(request).toHaveBeenCalledTimes(1);
+  } finally {
+    delete process.env.MATRIX_HOMESERVER_URL;
+  }
+});
+
+it('stops at the time budget with a retryable result instead of hitting the platform timeout', async () => {
+  const now = jest.spyOn(Date, 'now');
+  let clock = 0;
+  now.mockImplementation(() => clock);
+  unsubscribe.mockImplementation(async () => { clock += 151_000; });
+  try {
+    expect(await deleteMyAccount(req(), logger)).toMatchObject({
+      error: 'ERROR_SOME_STEPS_FAILED', steps: { matrix_deactivation: false, user_data_anonymization: false },
+    });
+    expect(deactivateMatrixUser).not.toHaveBeenCalled();
+    expect(deleteIdentity).not.toHaveBeenCalled();
+  } finally {
+    now.mockRestore();
+  }
+});
+
 it('fails before the database erase when Matrix is configured without the Synapse admin token', async () => {
   getMatrixDeactivationConfig.mockReturnValue({ homeserverUrl: 'https://matrix.test', token: null, serverName: 'test' });
   expect(await deleteMyAccount(req(), logger)).toMatchObject({

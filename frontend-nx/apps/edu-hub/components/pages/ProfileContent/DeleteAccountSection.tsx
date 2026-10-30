@@ -23,6 +23,7 @@ const DeleteAccountSection: FC<DeleteAccountSectionProps> = ({ email }) => {
   const [error, setError] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [deleted, setDeleted] = useState(false);
+  const [logoutFailed, setLogoutFailed] = useState(false);
   const submitting = useRef(false);
   const confirmed = Boolean(email) && confirmation.trim().toLowerCase() === email.trim().toLowerCase();
 
@@ -60,22 +61,23 @@ const DeleteAccountSection: FC<DeleteAccountSectionProps> = ({ email }) => {
       // The account is gone but navigation failed: keep the dialog closable, never delete twice.
       submitting.current = false;
       setDeleting(false);
+      setLogoutFailed(true);
     }
   };
 
   return (
     <section className="mt-12 mb-8" aria-labelledby="delete-account-heading">
-      <h2 id="delete-account-heading" className="text-xl font-semibold text-red-600">
+      <h2 id="delete-account-heading" className="text-xl font-semibold text-error">
         {t('title')}
       </h2>
-      <div className="mt-3 rounded-xl border border-red-500 p-4 sm:p-6 flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between">
+      <div className="mt-3 rounded-xl border border-error p-4 sm:p-6 flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between">
         <div>
           <p className="text-sm text-label-secondary">{t('description')}</p>
-          <p className="mt-2 text-sm font-semibold text-red-600">{t('certificates_warning')}</p>
+          <p className="mt-2 text-sm font-semibold text-error">{t('certificates_warning')}</p>
         </div>
         <Button
           type="button"
-          className="!border-red-600 !text-red-600 hover:!bg-red-50 shrink-0 min-h-11"
+          className="!border-error !text-error hover:opacity-90 shrink-0 min-h-11"
           disabled={!email}
           onClick={() => setOpen(true)}
         >
@@ -93,7 +95,7 @@ const DeleteAccountSection: FC<DeleteAccountSectionProps> = ({ email }) => {
             <Button type="button" onClick={close} disabled={deleting}>{tCommon('cancel')}</Button>
             <Button
               type="button"
-              className="!border-red-600 !bg-red-600 !text-white hover:!bg-red-700 min-h-11 disabled:!bg-gray-400 disabled:!border-gray-400"
+              className="!border-error !bg-error !text-fill-primary hover:opacity-90 min-h-11 disabled:!bg-fill-disabled disabled:!border-fill-disabled disabled:!text-label-disabled"
               onClick={() => void handleDelete()}
               disabled={!confirmed || deleting || deleted}
             >
@@ -103,7 +105,7 @@ const DeleteAccountSection: FC<DeleteAccountSectionProps> = ({ email }) => {
         }
       >
         <p>{t('confirmation_description')}</p>
-        <p className="mt-3 font-semibold text-red-600">{t('certificates_warning')}</p>
+        <p className="mt-3 font-semibold text-error">{t('certificates_warning')}</p>
         <p className="mt-3">{t('connected_services')}</p>
         <p className="mt-3 text-sm">{t('retained_records')}</p>
         <label htmlFor="delete-account-email" className="mt-5 block text-sm font-semibold">
@@ -116,9 +118,10 @@ const DeleteAccountSection: FC<DeleteAccountSectionProps> = ({ email }) => {
           value={confirmation}
           disabled={deleting}
           onChange={(event) => setConfirmation(event.target.value)}
-          className="mt-2 w-full min-h-11 rounded border border-gray-400 bg-white px-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-red-500"
+          className="mt-2 w-full min-h-11 rounded border border-border-primary bg-fill-primary px-3 text-label-primary focus:outline-none focus:ring-2 focus:ring-error"
         />
-        {error && <p role="alert" className="mt-3 text-sm text-red-600">{t('error')}</p>}
+        {error && <p role="alert" className="mt-3 text-sm text-error">{t('error')}</p>}
+        {logoutFailed && <p role="alert" className="mt-3 text-sm text-error">{t('logout_error')}</p>}
       </DialogShell>
     </section>
   );

@@ -8,7 +8,11 @@ import axios from 'axios';
 import path from 'node:path';
 import { GET_DELETION_DATA, ERASE_PERSONAL_DATA, getErasureVariables } from './personalData.js';
 
+// Stay below the 180 s action/function limit, so the caller gets the retryable
+// partial result instead of a generic timeout.
+const DEADLINE_MS = 150_000;
 const MATRIX_TIMEOUT_MS = 60_000;
+const KEYCLOAK_TIMEOUT_MS = 15_000;
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 const missingFile = (error) => error.code === 'ENOENT' || error.code === 404 || error.response?.status === 404;
@@ -41,10 +45,13 @@ async function removeProfileImage(storage, picture, bucket) {
 }
 
 // Needs the handle, so it must run before the database erase clears it.
-async function removeMatrixAccount(matrixUserHandle, logger, userId) {
+async function removeMatrixAccount(matrixUserHandle, logger, userId, timeoutMs) {
   if (!matrixUserHandle) return;
   const config = getMatrixDeactivationConfig();
   if (!config) {
+    // A partial configuration must not clear the handle while the account stays active.
+    if (process.env.MATRIX_HOMESERVER_URL?.trim()) throw new Error('Matrix deactivation config incomplete');
+    // No homeserver at all (e.g. local development): there is no Matrix integration to clean up.
     logger.warn?.('Matrix not configured; skipping Matrix account deactivation', { userId });
     return;
   }
@@ -54,8 +61,7 @@ async function removeMatrixAccount(matrixUserHandle, logger, userId) {
     homeserverUrl: config.homeserverUrl,
     token: config.token,
     matrixUserId: toMatrixUserId(matrixUserHandle, config.serverName),
-    // Well below the 180 s function limit, so a stalled homeserver still yields a retryable error.
-    signal: AbortSignal.timeout(MATRIX_TIMEOUT_MS),
+    signal: AbortSignal.timeout(timeoutMs),
   });
 }
 
@@ -73,6 +79,11 @@ async function eraseAccount(req, logger, userId) {
       motivation_letter_anonymization: false,
     },
   };
+  const startedAt = Date.now();
+  const timeLeft = () => DEADLINE_MS - (Date.now() - startedAt);
+  const checkpoint = () => {
+    if (timeLeft() <= 0) throw new Error('DEADLINE_EXCEEDED');
+  };
   const query = (document, variables) => request(
     process.env.HASURA_ENDPOINT, document, variables,
     { 'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET }
@@ -87,12 +98,15 @@ async function eraseAccount(req, logger, userId) {
     // Finish external cleanup before clearing paths/email. A failure leaves the
     // information needed to retry, and missing files are safe on a later run.
     for (const subscription of user.OrganizationNewsletterSubscriptions) {
+      checkpoint();
       await unsubscribeForAccountDeletion(subscription, user.email);
     }
 
-    await removeMatrixAccount(user.matrixUserHandle, logger, userId);
+    checkpoint();
+    await removeMatrixAccount(user.matrixUserHandle, logger, userId, Math.min(MATRIX_TIMEOUT_MS, timeLeft()));
     result.steps.matrix_deactivation = true;
 
+    checkpoint();
     const storage = buildCloudStorage(Storage);
     await removeProfileImage(storage, user.picture, req.headers.bucket);
     result.steps.profile_picture_removal = true;
@@ -104,12 +118,14 @@ async function eraseAccount(req, logger, userId) {
       ...data.CourseInstructor.map((instructor) => instructor.certificateURL),
     ].filter(Boolean));
     for (const certificate of certificates) {
+      checkpoint();
       await deleteFile(storage, certificate, req.headers.bucket);
     }
     result.steps.certificate_anonymization = true;
 
     // One Hasura mutation is one database transaction. Keep anonymous historical
     // rows and financial documents, but remove personal fields and access grants.
+    checkpoint();
     await query(ERASE_PERSONAL_DATA, getErasureVariables(data, userId));
     result.steps.user_data_anonymization = true;
     result.steps.motivation_letter_anonymization = true;
@@ -119,6 +135,7 @@ async function eraseAccount(req, logger, userId) {
     try {
       await axios.delete(`${process.env.KEYCLOAK_URL}/admin/realms/edu-hub/users/${userId}`, {
         headers: { Authorization: `Bearer ${token}` },
+        timeout: KEYCLOAK_TIMEOUT_MS,
       });
     } catch (error) {
       if (error.response?.status !== 404) throw error;

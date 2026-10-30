@@ -22,7 +22,7 @@ admin role. Both call the same erasure implementation.
 | Profile images | Delete the original and matching resized WebP files |
 | Attendance | Clear recorded identifiers and location; remove matching rows from cached raw session attendance, keeping other participants and a non-null cache to avoid reimport |
 | Newsletters | Synchronously unsubscribe using the original email before deleting local subscription rows, including external subscriber IDs and error details. Rows never synced to Ghost (no external subscriber ID) are only deleted locally, even if the organization's Ghost configuration is incomplete |
-| Matrix / Element | Deactivate the Matrix account via the Synapse admin API (`/_synapse/admin/v1/deactivate`, `erase: true`) before the handle is cleared: logs out all devices, leaves all rooms, removes display name and avatar, and hides sent messages from users who join later. A missing account (never logged in) counts as done; without Matrix configuration the step is skipped |
+| Matrix / Element | Deactivate the Matrix account via the Synapse admin API (`/_synapse/admin/v1/deactivate`, `erase: true`) before the handle is cleared: logs out all devices, leaves all rooms, removes display name and avatar, and hides sent messages from users who join later. Only Synapse's `M_NOT_FOUND` (never logged in) counts as done. Without any homeserver configured (local development) the step is skipped; a partial configuration fails the deletion |
 | Guest tokens | Delete tokens, including the organization name snapshot |
 | Job preferences | Delete job alerts and saved job postings |
 | Access and authorship links | Remove organization-admin, project author/mentor and legacy achievement author/mentor links |
@@ -34,6 +34,8 @@ External cleanup happens before the database transaction, preserving file paths,
 the original newsletter email and the Matrix handle if it fails. Missing files count as already
 deleted, so retries work. All database cleanup runs in one Hasura transaction.
 Keycloak deletion is last, and a missing identity counts as already deleted.
+The whole sequence has a 150-second budget (Matrix 60 s, Keycloak 15 s per call),
+so it ends with the retryable partial result before the 180-second action limit.
 Incomplete work returns an error and keeps the local session for retry; neither
 profile nor admin UI reports partial cleanup as success.
 
