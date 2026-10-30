@@ -135,6 +135,7 @@ services:
       MATRIX_MAIN_SPACE_ID: ${MATRIX_MAIN_SPACE_ID:-}
       MATRIX_ADMIN_USER_ID: ${MATRIX_ADMIN_USER_ID:-}
       MATRIX_ADMIN_ACCESS_TOKEN: ${MATRIX_ADMIN_ACCESS_TOKEN:-}
+      MATRIX_SYNAPSE_ADMIN_TOKEN: ${MATRIX_SYNAPSE_ADMIN_TOKEN:-}
       FRONTEND_URL: http://${DEV_HOST:-localhost}:5000
       # StuJo job board (publishJobPosting / createStripeJobPostingPrices)
       STUJO_FRONTEND_URL: ${STUJO_FRONTEND_URL:-http://${DEV_HOST:-localhost}:5001}

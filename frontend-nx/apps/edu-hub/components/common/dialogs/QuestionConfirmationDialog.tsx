@@ -14,6 +14,8 @@ interface QuestionConfirmationDialogProps {
   onClose: () => void;
   onConfirm: () => void;
   onCancel?: () => void;
+  /** Shown below the question, e.g. a note on the email the action sends. */
+  children?: React.ReactNode;
 }
 
 export const QuestionConfirmationDialog: React.FC<QuestionConfirmationDialogProps> = ({
@@ -26,6 +28,7 @@ export const QuestionConfirmationDialog: React.FC<QuestionConfirmationDialogProp
   onClose,
   onConfirm,
   onCancel,
+  children,
 }) => {
   const t = useTranslations('common');
 
@@ -51,6 +54,7 @@ export const QuestionConfirmationDialog: React.FC<QuestionConfirmationDialogProp
       actions={actions}
     >
       <div className="whitespace-pre-line">{question}</div>
+      {children}
     </DialogShell>
   );
 };

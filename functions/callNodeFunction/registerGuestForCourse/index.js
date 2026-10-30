@@ -49,6 +49,7 @@ const GET_COURSE = gql`
       applicationEnd
       maxParticipants
       activeParticipantCount
+      waitlistCount
       # Caps the confirmation link (see confirmTokenExpiresAt).
       NextSession: Sessions(
         where: { startDateTime: { _gt: $now } }
@@ -263,10 +264,12 @@ export default async function registerGuestForCourse(req, logger) {
     if (isCourseRegistrationClosed(course.applicationEnd)) {
       return { success: false, messageKey: 'REGISTRATION_PERIOD_ENDED' };
     }
+    // Free places are reserved for the waitlist: the organizer moves those
+    // people up first (course_waitlist_count).
     if (
       course.maxParticipants != null &&
       course.activeParticipantCount != null &&
-      course.activeParticipantCount >= course.maxParticipants
+      course.activeParticipantCount + (course.waitlistCount ?? 0) >= course.maxParticipants
     ) {
       return { success: false, messageKey: 'COURSE_FULL' };
     }

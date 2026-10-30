@@ -1,4 +1,4 @@
-import { FC, useState, useCallback, useMemo } from 'react';
+import { FC, useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { MdClose } from 'react-icons/md';
 import { useTranslations } from 'next-intl';
@@ -92,6 +92,7 @@ export const RegistrationModal: FC<RegistrationModalProps> = ({
   const [selectedAddons, setSelectedAddons] = useState<Array<{ id: number; description: string; validatedPrice: number; currency: string; questionId: string; choiceId: string }>>([]);
   const [enrollmentId, setEnrollmentId] = useState<number | null>(null);
   const [isFetchingAddons, setIsFetchingAddons] = useState(false);
+  const creatingEnrollmentRef = useRef(false);
 
   const config = getRegistrationTypeConfig(registrationType);
   
@@ -204,6 +205,51 @@ export const RegistrationModal: FC<RegistrationModalProps> = ({
     }
     return 'summary';
   }, [config, useFormbricks, formbricksSurveyCompleted, isCourseFull]);
+
+  // Without a survey the payment flow starts straight at the summary, so nothing has created the
+  // enrollment the checkout is for yet: create it here (an existing row keeps its status), or use
+  // the one being paid for - a retry, or an invitation whose place is held.
+  useEffect(() => {
+    if (!visible || isCourseFull || !config.requiresPayment || useFormbricks || enrollmentId != null || !userId) {
+      return;
+    }
+    if (retryEnrollmentId) {
+      setEnrollmentId(retryEnrollmentId);
+      return;
+    }
+    if (creatingEnrollmentRef.current) return;
+    creatingEnrollmentRef.current = true;
+    setIsFetchingAddons(true);
+    createEnrollmentWithAddons({
+      variables: { courseId: course.id, userId, motivationLetter: '', formbricksSurveyUrl: null },
+    })
+      .then((result) => {
+        const created = result.data?.createEnrollmentWithAddons;
+        if (created?.success && created.enrollmentId) {
+          setEnrollmentId(created.enrollmentId);
+        } else {
+          setError(created?.error || t('errors.registration_failed'));
+        }
+      })
+      .catch((err: unknown) => {
+        setError(err instanceof Error ? err.message : t('errors.registration_failed'));
+      })
+      .finally(() => {
+        creatingEnrollmentRef.current = false;
+        setIsFetchingAddons(false);
+      });
+  }, [
+    visible,
+    isCourseFull,
+    config.requiresPayment,
+    useFormbricks,
+    enrollmentId,
+    userId,
+    retryEnrollmentId,
+    course.id,
+    createEnrollmentWithAddons,
+    t,
+  ]);
 
   // Format price helper
   const formatPrice = useCallback((priceInCents: number, currency: string): string => {

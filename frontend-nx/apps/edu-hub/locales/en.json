@@ -1,5 +1,15 @@
 {
   "common": {
+    "status_email": {
+      "will_send": "An email will be sent to {count, plural, one {# person} other {# people}} using the template “{template}” ({version}).",
+      "will_send_plain": "An email will be sent to {count, plural, one {# person} other {# people}} using the template “{template}”.",
+      "course_version": "this course's own version",
+      "default_version": "default version",
+      "none": "{count, plural, one {# person receives} other {# people receive}} no email.",
+      "sent": "{count, plural, one {# email is} other {# emails are}} on the way (“{template}”).",
+      "participant_sent": "You will receive a confirmation by email.",
+      "lookup_failed": "Could not check who is already enrolled, so nobody can be added yet. Please reload the page."
+    },
     "confirmation": "Confirmation",
     "warning": "Warning",
     "delete": "Delete",
@@ -161,6 +171,10 @@
       "collapse_row": "Hide details",
       "open_row": "Open",
       "select_all": "All",
+      "page_all_selected": "All {count} entries on this page are selected.",
+      "select_all_matching": "Select all {count}",
+      "select_all_matching_error": "Not all entries could be loaded. Please try again.",
+      "select_all_matching_partial": "Only the first {count} of {total} entries could be selected.",
       "sort_by": "Sort by",
       "sort_default": "Default order",
       "sort_asc": "{column}, ascending",
@@ -652,7 +666,8 @@
       "register_now": "Register Now",
       "accept_invitation": "Accept invitation",
       "placeholder_motivation_letter": "My motivation ...",
-      "retry_payment": "Retry Payment"
+      "retry_payment": "Retry Payment",
+      "pay_now": "Pay now"
     },
     "status": {
       "applied": "Your application is under review",
@@ -660,6 +675,7 @@
       "rejected": "Unfortunately, your application has been rejected",
       "cancelled": "You cancelled your registration",
       "invited": "You have been invited and need to confirm your participation",
+      "invited_payment": "You are invited – please pay by {date} to secure your spot.",
       "invitation_expired": "Your invitation has expired",
       "payment_pending": "Your payment has not been completed yet. You can review your selections and try again.",
       "payment_failed": "Your payment could not be processed. You can review your selections and try again.",
@@ -789,8 +805,10 @@
     },
     "ParticipationExitButton": {
       "cancel_participation": "Cancel registration",
+      "decline_invitation": "Decline spot",
       "abort_participation": "Abort participation",
       "cancel_participation_confirm": "Do you really want to cancel your registration for “{title}”? Your place will be released.",
+      "decline_invitation_confirm": "Do you really want to decline your spot for “{title}”? It will then go to the next person on the waitlist.",
       "abort_participation_confirm": "Do you really want to abort your participation in “{title}”?",
       "exit_failed": "Your registration could not be changed right now. Please try again."
     },
@@ -1100,6 +1118,21 @@
     }
   },
   "profile": {
+    "DeleteAccount": {
+      "title": "Delete account",
+      "description": "Permanently delete your account and anonymize your personal data. This cannot be undone.",
+      "certificates_warning": "All your certificates will be permanently deleted. Download any certificates you want to keep before continuing.",
+      "delete_button": "Delete my account",
+      "confirmation_title": "Permanently delete your account?",
+      "confirmation_description": "You will lose access to your account. Your profile picture, questionnaire answers and personal application details will be deleted, and open enrollments will be cancelled. Job alerts will be stopped.",
+      "connected_services": "You will be unsubscribed from all newsletters you receive through EduHub. If you have an Element chat account, it will be deactivated: you will be removed from all chat rooms, your name and profile picture will be removed there, and your messages will no longer be shown to people who join later.",
+      "retained_records": "Anonymous participation history, shared project content and existing invoices and payment records are retained.",
+      "type_email": "To confirm, type your email address: {email}",
+      "confirm_button": "Permanently delete my account",
+      "deleting": "Deleting account…",
+      "logout_error": "Your account was deleted, but signing out failed. Close this window and sign out again.",
+      "error": "Account deletion could not be completed. Some steps may already have finished. Please retry. If this keeps happening, contact support."
+    },
     "first_name": "First name",
     "last_name": "Last name",
     "university": "University",
@@ -1240,6 +1273,7 @@
       "upload_text": "Click to upload cover image",
       "alt": "Cover image of the offering",
       "help_text": "Shown on the offering's page and in the sliders.",
+      "format_tooltip": "Recommended: landscape, about 2:1, e.g. 1920 × 960 px (max. 5 MB).\nThe image is center-cropped both as a tile (almost 3:2) and as a wide header on the offering page (almost square on phones), so keep the important part in the middle third.\nPlease don't put text in the image: the title is laid over the bottom left automatically, and text in the image usually gets cut off.",
       "credits_label": "Image credits",
       "credits_help": "Who took the cover image or holds its rights, e.g. \"Photo: Jane Doe\". Shown below the title and passed on to event platforms (max. 120 characters)."
     },
@@ -1519,6 +1553,7 @@
     "add_participants": "Add or Edit Participants",
     "selected_users": "Selected Users",
     "name_or_email": "Name or email",
+    "add_paid_no_payment_hint": "No payment is collected: people added here as confirmed take part without paying.",
     "add_as_confirmed": "add or change as confirmed",
     "add_as_applied": "add or change as applied",
     "add_as_invited": "add or change as invited",
@@ -1540,11 +1575,21 @@
     "element_program_instructor_chat_prompt": "Join the program instructor room in Element to coordinate with other instructors.",
     "select_applicants_first": "Please select applicants first",
     "bulk_actions": {
+      "overbook_warning": "That is {count, plural, one {# place} other {# places}} more than are free – the course will be overbooked ({taken} of {max} places).",
+      "single_invite_dialog_title": "Invite {name}",
+      "single_invite_text": "{name} will be invited and can confirm their participation until the date below.",
+      "single_invite_text_payment": "{name} will be invited and can pay for the spot until the date below. It is held until then.",
+      "confirm_waitlist_dialog_title": "Confirm participation",
+      "confirm_waitlist_question": "Give {name} a place? They are number {position} on the waitlist. Their participation will be confirmed right away.",
+      "confirm_waitlist_confirm": "Confirm participation",
+      "waitlist_confirmed": "{name} is now confirmed.",
+      "waitlist_confirm_error": "The participation could not be confirmed: {error}",
+      "waitlist_confirm_stale": "{name} is no longer on the waitlist. The list has been reloaded.",
       "expand_collapse_rows": "Expand/Collapse Rows",
       "expand_selected_rows": "Expand Selected Rows",
       "collapse_selected_rows": "Collapse Selected Rows",
       "email_selected": "Email Selected",
-      "email_all_confirmed": "Email all Confirmed",
+      "email_all_registered": "Email all Registered",
       "email_all_cancelled": "Email all Cancelled",
       "email_all_invited": "Email all Invited",
       "email_all_applied": "Email all Applied",
@@ -1573,8 +1618,7 @@
       "no_eligible_rejections": "None of the selected applicants has a red rating and is still waiting for a decision.",
       "selection_skipped": "{count, plural, one {# selected person is} other {# selected persons are}} left out: only applicants with a matching rating who have not been invited or rejected yet are included.",
       "free_places": "{count, plural, =0 {No place in the course is free.} one {# place in the course is still free.} other {# places in the course are still free.}}",
-      "invitations_withheld": "{count, plural, one {# more person with green rating is} other {# more persons with green rating are}} not invited because there are no more free places. Earlier applications are invited first; the others keep their status.",
-      "not_enough_places": "{selected, plural, one {# selected person would} other {# selected persons would}} be invited, but {count, plural, =0 {no place is} one {only # place is} other {only # places are}} free. Select fewer applicants.",
+      "invitations_withheld": "{count, plural, one {# more person with green rating is} other {# more persons with green rating are}} not invited because there are no more free places. People on the waitlist are invited first, then earlier applications; the others keep their status.",
       "course_full_no_invitations": "The course has no free places, so nobody with a green rating can be invited.",
       "course_full_error": "The invitations were not sent because the course does not have enough free places. Reload the page and try again.",
       "decisions_queued": "{invited} invited, {rejected} rejected; the participants will be notified by email.",
@@ -1893,6 +1937,9 @@
     "application_status_tooltip": "Click on the circles to change the rating",
     "application_deadline_tooltip": "If you want to change the date for the Confirmation deadline you can resend the invitation.",
     "application_details": {
+      "confirm_from_waitlist": "Confirm participation",
+      "invite_single": "Invite now",
+      "waitlist_position": "No. {position} on the waitlist",
       "contact": "Contact",
       "applied_on": "Applied on {date}",
       "registered_on": "Registered on {date}",
@@ -2382,6 +2429,7 @@
     "headline": "Programs",
     "table_header": {
       "published": "Published",
+      "organization": "Organization",
       "application_start": "Registration Start",
       "application_end": "Registration Deadline",
       "course_start": "Course Start",
@@ -2526,7 +2574,7 @@
     "occupation": "Occupation",
     "organization": "Organization",
     "matriculation_number": "Matriculation number",
-    "deletion_confirmation_question": "Are you sure you want to delete the account of {firstName} {lastName}? The following steps will be performed:\n\n1. Deleting the user account from the authentication system\n2. Anonymizing all personal data\n3. Deleting the profile picture\n4. Deleting motivation letters\n5. Replacing the certificates with anonymized versions\n\nThis process cannot be undone. Do you want to proceed with deleting with deleting {firstName} {lastName}'s account?",
+    "deletion_confirmation_question": "Are you sure you want to delete the account of {firstName} {lastName}? The following steps will be performed:\n\n1. Deleting the user account from the authentication system\n2. Anonymizing all personal data\n3. Deleting the profile picture\n4. Deleting motivation letters\n5. Permanently deleting all certificates\n\nThis process cannot be undone. Do you want to proceed with deleting {firstName} {lastName}'s account?",
     "anonymization": {
       "ANONYMIZATION_SUCCESS": "User data anonymized successfully",
       "ANONYMIZATION_PARTIAL_SUCCESS": "User data partially anonymized",
@@ -2540,7 +2588,7 @@
       "user_data_anonymization": "User data anonymization",
       "motivation_letter_anonymization": "Motivation letter anonymization",
       "profile_picture_removal": "Profile picture removal",
-      "certificate_anonymization": "Certificate anonymization"
+      "certificate_anonymization": "Certificate deletion"
     },
     "manage_admins": "Manage admins",
     "create_user": {
@@ -3250,6 +3298,10 @@
       "ENROLLMENT_CANCELLED": "Enrollment Cancelled",
       "ENROLLMENT_ABORTED": "Enrollment Aborted",
       "WAITLIST_PROMOTED": "Promoted from Waitlist",
+      "WAITLIST_CONFIRMED": "Confirmed from Waitlist",
+      "WAITLIST_PROMOTED_PAYMENT": "Promoted from Waitlist (Payment)",
+      "INVITATION_EXPIRING_SOON_PAYMENT": "Invitation Expiring (Payment)",
+      "INVITATION_DECLINED_ORGANIZER": "Invitation Declined (to Organizers)",
       "INVITATION_EXPIRING_SOON": "Invitation Expiring Soon",
       "INVITATION_EXPIRED": "Invitation Expired",
       "PROJECT_JOIN_REQUESTED": "Project Join Requested",
@@ -3308,6 +3360,10 @@
       "ENROLLMENT_CANCELLED": "Sent when an enrollment is cancelled",
       "ENROLLMENT_ABORTED": "Sent when a participant leaves a course without completing it",
       "WAITLIST_PROMOTED": "Sent when a waitlisted user gets a spot in the course",
+      "WAITLIST_CONFIRMED": "Sent when a waitlisted person is moved up on a direct-registration event and their participation is confirmed right away",
+      "WAITLIST_PROMOTED_PAYMENT": "Sent when someone is invited to a paid event and can pay for the spot until the deadline",
+      "INVITATION_EXPIRING_SOON_PAYMENT": "Sent on the last day of an unpaid invitation to a paid event",
+      "INVITATION_DECLINED_ORGANIZER": "Sent to the organizers when an invited person declines their spot",
       "INVITATION_EXPIRING_SOON": "Sent 24 hours before a course invitation expires",
       "INVITATION_EXPIRED": "Sent when a course invitation has expired unused",
       "PROJECT_JOIN_REQUESTED": "Sent to the project team when someone requests to join their project",

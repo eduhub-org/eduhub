@@ -9,6 +9,12 @@ import { Program_order_by, Program_bool_exp } from "./../../__generated__/global
 // GraphQL query operation: ProgramList
 // ====================================================
 
+export interface ProgramList_Program_Organization {
+  __typename: "Organization";
+  id: number;
+  name: string;
+}
+
 export interface ProgramList_Program_Courses {
   __typename: "Course";
   id: number;
@@ -115,6 +121,14 @@ export interface ProgramList_Program {
    * Matrix room id for the program-wide instructor Element chat (!room:server); invites are sent via admin API.
    */
   matrixInstructorRoomId: string | null;
+  /**
+   * Organization that owns the program. References Organization.id (0 = platform default)
+   */
+  organizationId: number;
+  /**
+   * An object relationship
+   */
+  Organization: ProgramList_Program_Organization;
   /**
    * An array relationship
    */

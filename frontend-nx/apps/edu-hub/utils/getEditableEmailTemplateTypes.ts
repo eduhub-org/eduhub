@@ -24,15 +24,23 @@ export function getEditableEmailTemplateTypes(course: EditableEmailTemplateCours
   switch (registrationType) {
     case CourseRegistrationType_enum.DIRECT_CONFIRMATION:
     case CourseRegistrationType_enum.DIRECT_WITH_INPUT:
-      registrationTemplates = ['REGISTRATION_CONFIRMED'];
+      // WAITLIST_CONFIRMED: an organizer moved them up from the waitlist.
+      registrationTemplates = ['REGISTRATION_CONFIRMED', 'WAITLIST_CONFIRMED'];
       break;
     case CourseRegistrationType_enum.DIRECT_CONFIRMATION_AND_PAYMENT:
     case CourseRegistrationType_enum.DIRECT_WITH_INPUT_AND_PAYMENT:
-      registrationTemplates = ['REGISTRATION_CONFIRMED_PAID'];
+      // WAITLIST_PROMOTED_PAYMENT: an organizer invited them from the waitlist to pay for a place.
+      registrationTemplates = ['REGISTRATION_CONFIRMED_PAID', 'WAITLIST_PROMOTED_PAYMENT'];
       break;
     default:
       // APPROVAL_WITH_INPUT, also the column default when the type is missing
-      registrationTemplates = ['APPLICATION_RECEIVED', 'INVITE', 'DECLINE', 'APPLICATION_CONFIRMED'];
+      registrationTemplates = [
+        'APPLICATION_RECEIVED',
+        'INVITE',
+        'WAITLIST_PROMOTED',
+        'DECLINE',
+        'APPLICATION_CONFIRMED',
+      ];
   }
 
   return [
