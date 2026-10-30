@@ -1915,7 +1915,7 @@
     "application_deadline_tooltip": "If you want to change the date for the Confirmation deadline you can resend the invitation.",
     "application_details": {
       "confirm_from_waitlist": "Confirm participation",
-      "invite_single": "Invite",
+      "invite_single": "Invite now",
       "waitlist_position": "No. {position} on the waitlist",
       "paid_waitlist_not_supported": "Moving people up from the waitlist is not available for paid events yet.",
       "contact": "Contact",

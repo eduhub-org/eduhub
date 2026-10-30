@@ -1897,7 +1897,7 @@
     "application_deadline_tooltip": "Wenn du das Datum für die Bestätigungsfrist ändern möchtest, kannst du die Einladung erneut senden.",
     "application_details": {
       "confirm_from_waitlist": "Teilnahme bestätigen",
-      "invite_single": "Einladen",
+      "invite_single": "Jetzt einladen",
       "waitlist_position": "Platz {position} auf der Warteliste",
       "paid_waitlist_not_supported": "Nachrücken von der Warteliste ist bei kostenpflichtigen Veranstaltungen noch nicht möglich.",
       "contact": "Kontakt",
