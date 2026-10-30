@@ -1,10 +1,10 @@
-import { FC, useMemo, useState } from 'react';
+import { FC, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import { ColumnDef } from '@tanstack/react-table';
 
 import TableGrid from '../../common/TableGrid';
 import Loading from '../../common/Loading';
-import { useTableGrid } from '../../common/TableGrid/hooks';
+import { usePersistedPageSize, useTableGrid } from '../../common/TableGrid/hooks';
 import { createMultiWordSearchCondition } from '../../common/TableGrid/utils';
 
 import { useAdminQuery } from '../../../hooks/authedQuery';
@@ -95,7 +95,7 @@ const ExpandableExpertRow: FC<{ row: ExpertsList_User }> = ({ row }) => {
 
 const ManageExpertsContent: FC = () => {
   const t = useTranslations('manageExperts');
-  const [pageSize, setPageSize] = useState(20);
+  const [pageSize, setPageSize] = usePersistedPageSize('manageExperts', 20);
 
   const { data, loading, initialLoading, error, pageIndex, setPageIndex, searchFilter, setSearchFilter } = useTableGrid({
     queryHook: useAdminQuery,

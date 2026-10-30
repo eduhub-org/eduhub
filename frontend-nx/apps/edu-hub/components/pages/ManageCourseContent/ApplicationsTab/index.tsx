@@ -60,7 +60,7 @@ import Modal from '../../../common/Modal';
 import AddParticipantsForm from './AddParticipantsForm';
 import TableGrid from '../../../common/TableGrid';
 import { ParticipantExportMenu } from '../ParticipantExport/ParticipantExportMenu';
-import { useDeferredBulkAction, useTableGrid } from '../../../common/TableGrid/hooks';
+import { useDeferredBulkAction, usePersistedPageSize, useTableGrid } from '../../../common/TableGrid/hooks';
 import { createMultiWordSearchCondition } from '../../../common/TableGrid/utils';
 import { ColumnDef, SortingState } from '@tanstack/react-table';
 import { IconType } from 'react-icons';
@@ -107,6 +107,20 @@ const APPLICATION_TABLE_COLUMN_SIZES = {
 
 /** Statuses in which a participant's cancellation request still awaits the organizer. */
 const CANCELLATION_REQUEST_OPEN_STATUSES: string[] = ['APPLIED', 'WAITLIST', 'INVITED', 'CONFIRMED', 'REGISTERED'];
+
+/**
+ * Email actions that address several statuses at once. "Registered" is everyone holding a place,
+ * whether with an account (CONFIRMED) or as a guest (REGISTERED), and both once the course is
+ * over (COMPLETED); "cancelled" includes enrollments that were aborted.
+ */
+const EMAIL_ACTION_STATUSES: Record<string, CourseEnrollmentStatus_enum[]> = {
+  email_status_REGISTERED: [
+    CourseEnrollmentStatus_enum.CONFIRMED,
+    CourseEnrollmentStatus_enum.REGISTERED,
+    CourseEnrollmentStatus_enum.COMPLETED,
+  ],
+  email_status_CANCELLED: [CourseEnrollmentStatus_enum.CANCELLED, CourseEnrollmentStatus_enum.ABORTED],
+};
 
 /** Guests registered without an account; unconfirmed guest sign-ups have no enrollment yet. */
 const isGuest = (enrollment: ApplicationEnrollment) => enrollment.User.status === UserStatus_enum.GUEST;
@@ -242,6 +256,8 @@ interface ApplicationsTabContentProps {
   setSearchFilter: (value: string) => void;
   sorting: SortingState;
   setSorting: (sorting: SortingState | ((prev: SortingState) => SortingState)) => void;
+  /** Loads up to `limit` enrollments matching the current search, across all pages. */
+  fetchAllRows: (limit: number) => Promise<ManagedCourseApplications | undefined>;
   manageAsOrgAdmin: boolean;
 }
 
@@ -298,7 +314,7 @@ const canRenewInvitation = (enrollment: ApplicationEnrollment) =>
 
 export const ApplicationsTab: FC<IProps> = ({ course, manageAsOrgAdmin = false }) => {
   const t = useTranslations('manageCourse');
-  const [pageSize, setPageSize] = useState(20);
+  const [pageSize, setPageSize] = usePersistedPageSize('manageCourse.applications', 20);
   const {
     data,
     loading,
@@ -310,6 +326,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, manageAsOrgAdmin = false }
     setSearchFilter,
     sorting,
     setSorting,
+    fetchAllRows,
   } = useTableGrid<ManagedCourseApplicationsVariables>({
     queryHook: useRoleQuery,
     query: MANAGED_COURSE_APPLICATIONS,
@@ -370,6 +387,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, manageAsOrgAdmin = false }
       setSearchFilter={setSearchFilter}
       sorting={sorting}
       setSorting={setSorting}
+      fetchAllRows={fetchAllRows}
       manageAsOrgAdmin={manageAsOrgAdmin}
     />
   );
@@ -388,6 +406,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
   setSearchFilter,
   sorting,
   setSorting,
+  fetchAllRows,
   manageAsOrgAdmin,
 }) => {
   const t = useTranslations('manageCourse');
@@ -419,6 +438,11 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
   const courseEnrollments = useMemo(() => {
     return course.CourseEnrollments ?? [];
   }, [course]);
+
+  const loadAllEnrollments = useCallback(async () => {
+    const allData = await fetchAllRows(BULK_EMAIL_RECIPIENT_LIMIT);
+    return allData?.Course_by_pk?.CourseEnrollments ?? [];
+  }, [fetchAllRows]);
 
   const infoDots = (
     <div className="text-gray-400 text-sm">
@@ -912,7 +936,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
       } else if (action.startsWith('email_status_') || action.startsWith('email_rating_')) {
         const isStatusAction = action.startsWith('email_status_');
         const emailActionLabelByValue: Record<string, string> = {
-          email_status_CONFIRMED: t('bulk_actions.email_all_confirmed'),
+          email_status_REGISTERED: t('bulk_actions.email_all_registered'),
           email_status_CANCELLED: t('bulk_actions.email_all_cancelled'),
           email_status_INVITED: t('bulk_actions.email_all_invited'),
           email_status_APPLIED: t('bulk_actions.email_all_applied'),
@@ -922,14 +946,10 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
           email_rating_DECLINE: t('bulk_actions.email_all_decline_rating'),
           email_rating_REVIEW: t('bulk_actions.email_all_review_rating'),
         };
-        // The cancellation email action includes both CANCELLED and ABORTED.
+        const groupedStatuses = EMAIL_ACTION_STATUSES[action];
         const filter = isStatusAction
-          ? action === 'email_status_CANCELLED'
-            ? {
-                status: {
-                  _in: [CourseEnrollmentStatus_enum.CANCELLED, CourseEnrollmentStatus_enum.ABORTED],
-                },
-              }
+          ? groupedStatuses
+            ? { status: { _in: groupedStatuses } }
             : {
                 status: {
                   _eq: action.replace('email_status_', '') as CourseEnrollmentStatus_enum,
@@ -1058,8 +1078,8 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
     // registrations never move through them, so they don't belong in this menu.
     if (!features.hasApplicationProcess) {
       actions.push({
-        value: 'email_status_CONFIRMED',
-        label: t('bulk_actions.email_all_confirmed'),
+        value: 'email_status_REGISTERED',
+        label: t('bulk_actions.email_all_registered'),
         group: t('bulk_actions.email_all_by_status'),
       });
       actions.push({
@@ -1093,8 +1113,8 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
         disabledReason: decisionDisabledReason,
       },
       {
-        value: 'email_status_CONFIRMED',
-        label: t('bulk_actions.email_all_confirmed'),
+        value: 'email_status_REGISTERED',
+        label: t('bulk_actions.email_all_registered'),
         group: t('bulk_actions.email_all_by_status'),
       },
       {
@@ -1404,6 +1424,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
             renderMobileRow={renderMobileRow}
             bulkActions={bulkActions}
             onBulkAction={handleBulkEmailAction}
+            loadAllRows={loadAllEnrollments}
             enablePagination={true}
             totalCount={course.CourseEnrollments_aggregate.aggregate?.count ?? 0}
             pageIndex={pageIndex}

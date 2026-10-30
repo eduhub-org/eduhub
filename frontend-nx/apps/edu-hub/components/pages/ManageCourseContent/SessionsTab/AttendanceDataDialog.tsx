@@ -4,6 +4,7 @@ import { ColumnDef, Row } from '@tanstack/react-table';
 
 import { DialogShell } from '../../../common/dialogs/DialogShell';
 import TableGrid from '../../../common/TableGrid';
+import { usePersistedPageSize } from '../../../common/TableGrid/hooks';
 
 export type AttendanceRow = Record<string, unknown> & { id: number; _idx: string };
 
@@ -169,13 +170,13 @@ const AttendanceDataDialog: FC<AttendanceDataDialogProps> = ({
   const rows = useMemo(() => parseAttendanceData(attendanceData), [attendanceData]);
 
   const [pageIndex, setPageIndex] = useState(0);
-  const [pageSize, setPageSize] = useState(15);
+  const [pageSize, setPageSize] = usePersistedPageSize('manageCourse.attendanceData', 15);
   const [searchFilter, setSearchFilter] = useState('');
 
   const handlePageSizeChange = useCallback((size: number) => {
     setPageSize(size);
     setPageIndex(0);
-  }, []);
+  }, [setPageSize]);
 
   const handleSearchFilterChange = useCallback((value: string) => {
     setSearchFilter(value);

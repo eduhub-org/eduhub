@@ -4,7 +4,7 @@ import { ColumnDef } from '@tanstack/react-table';
 
 import TableGrid from '../../common/TableGrid';
 import Loading from '../../common/Loading';
-import { useTableGrid } from '../../common/TableGrid/hooks';
+import { usePersistedPageSize, useTableGrid } from '../../common/TableGrid/hooks';
 import { createMultiWordSearchCondition } from '../../common/TableGrid/utils';
 
 import { useAdminQuery } from '../../../hooks/authedQuery';
@@ -55,7 +55,7 @@ const ExpandableUserRow: FC<{ row: UsersByLastName_User }> = ({ row }) => {
 
 const ManageUsersContent: FC = () => {
   const t = useTranslations('manageUsers');
-  const [pageSize, setPageSize] = useState(20);
+  const [pageSize, setPageSize] = usePersistedPageSize('manageUsers', 20);
   const [createUserDialogOpen, setCreateUserDialogOpen] = useState(false);
 
   const handlePageSizeChange = (newPageSize: number) => {

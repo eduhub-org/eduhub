@@ -36,7 +36,7 @@ import {
   normalizeAndFilterAliases,
   combineAliases,
 } from '../../../helpers/aliasUtils';
-import { useDeferredBulkAction, useTableGrid } from '../../common/TableGrid/hooks';
+import { useDeferredBulkAction, usePersistedPageSize, useTableGrid } from '../../common/TableGrid/hooks';
 import { createMultiWordSearchCondition } from '../../common/TableGrid/utils';
 import { LocationOption_enum } from '../../../__generated__/globalTypes';
 import {
@@ -174,7 +174,7 @@ const ManageLocationAddressesContent: FC<ManageLocationAddressesContentProps> = 
   const [bulkActionDialogOpen, setBulkActionDialogOpen] = useState(false);
   const [selectedRowsForBulkAction, setSelectedRowsForBulkAction] = useState<LocationAddressListLocationAddress[]>([]);
   const [mergeDialogOpen, setMergeDialogOpen] = useState(false);
-  const [pageSize, setPageSize] = useState(20);
+  const [pageSize, setPageSize] = usePersistedPageSize('manageLocationAddresses', 20);
 
   const {
     data,
