@@ -71,7 +71,8 @@ export const ManageProgramsContent: FC<ManageProgramsContentProps> = ({ inSettin
       // Map table column IDs to GraphQL field names
       const mapping: Record<string, TableGridSortMapping> = {
         'title': 'title',
-        'organization': { Organization: { name: null } },
+        // id breaks ties between programs of the same organization so offset paging stays stable.
+        'organization': [{ Organization: { name: null } }, 'id'],
         'applicationStart': 'applicationStart',
         'applicationEnd': 'defaultApplicationEnd',
         'lectureStart': 'lectureStart',
