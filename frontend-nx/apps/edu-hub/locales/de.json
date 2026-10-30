@@ -2,11 +2,12 @@
   "common": {
     "status_email": {
       "will_send": "{count, plural, one {# Person erhält} other {# Personen erhalten}} eine E-Mail mit der Vorlage „{template}“ ({version}).",
+      "will_send_plain": "{count, plural, one {# Person erhält} other {# Personen erhalten}} eine E-Mail mit der Vorlage „{template}“.",
       "course_version": "eigene Version dieser Veranstaltung",
       "default_version": "Standardversion",
       "none": "Es wird keine E-Mail verschickt.",
-      "sent": "{count, plural, one {# E-Mail} other {# E-Mails}} verschickt („{template}“).",
-      "participant_sent": "Wir haben Dir eine Bestätigung per E-Mail geschickt."
+      "sent": "{count, plural, one {# E-Mail wird} other {# E-Mails werden}} verschickt („{template}“).",
+      "participant_sent": "Du bekommst eine Bestätigung per E-Mail."
     },
     "confirmation": "Bestätigung",
     "warning": "Warnung",
@@ -1577,7 +1578,7 @@
       "no_eligible_rejections": "Keine der ausgewählten Personen hat eine rote Bewertung und wartet noch auf eine Entscheidung.",
       "selection_skipped": "{count, plural, one {# ausgewählte Person wird} other {# ausgewählte Personen werden}} ausgelassen: Berücksichtigt werden nur passend bewertete Personen, die noch nicht eingeladen oder abgelehnt wurden.",
       "free_places": "{count, plural, =0 {Im Kurs ist kein Platz mehr frei.} one {Im Kurs ist noch # Platz frei.} other {Im Kurs sind noch # Plätze frei.}}",
-      "invitations_withheld": "{count, plural, one {# weitere Person mit grüner Bewertung wird} other {# weitere Personen mit grüner Bewertung werden}} nicht eingeladen, weil keine Plätze mehr frei sind. Frühere Bewerbungen werden zuerst eingeladen; die anderen behalten ihren Status.",
+      "invitations_withheld": "{count, plural, one {# weitere Person mit grüner Bewertung wird} other {# weitere Personen mit grüner Bewertung werden}} nicht eingeladen, weil keine Plätze mehr frei sind. Personen auf der Warteliste werden zuerst eingeladen, danach frühere Bewerbungen; die anderen behalten ihren Status.",
       "course_full_no_invitations": "Der Kurs hat keine freien Plätze mehr, deshalb kann niemand mit grüner Bewertung eingeladen werden.",
       "course_full_error": "Die Einladungen wurden nicht verschickt, weil der Kurs nicht genug freie Plätze hat. Lade die Seite neu und versuche es noch einmal.",
       "decisions_queued": "{invited} eingeladen, {rejected} abgelehnt; die Teilnehmenden werden per E-Mail informiert.",

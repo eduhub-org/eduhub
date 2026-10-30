@@ -54,4 +54,13 @@ describe('StatusChangeEmailNotice', () => {
     expect(screen.getAllByRole('listitem')).toHaveLength(1);
     expect(screen.getByText('common.status_email.none')).toBeInTheDocument();
   });
+
+  it('names no version until the course templates are known', () => {
+    mockUseRoleQuery.mockReturnValue({ data: undefined, loading: true });
+    render(<StatusChangeEmailNotice courseId={7} emails={[{ template: MailTemplateType_enum.INVITE, count: 1 }]} />);
+
+    const line = screen.getByRole('listitem');
+    expect(line).toHaveTextContent('common.status_email.will_send_plain');
+    expect(line).not.toHaveTextContent('default_version');
+  });
 });

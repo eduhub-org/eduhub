@@ -74,14 +74,17 @@ export const Registration: FC<RegistrationProps> = ({
   // purpose: this one keeps the button off a page where it would fail, the
   // server-side one is what actually enforces it. The deadline is part of that:
   // without it the link sits directly under the "registration period ended"
-  // notice and offers the way in that the notice just took away.
+  // notice and offers the way in that the notice just took away. The same goes
+  // for a full course: guests cannot join the waitlist, so the server answers
+  // COURSE_FULL.
+  const isCourseFull = placesOpenForRegistration(course) === 0;
+
   const canRegisterAsGuest =
     !!course.guestRegistrationEnabled &&
     !isRegistrationClosed(course.applicationEnd) &&
+    !isCourseFull &&
     (course.registrationType === CourseRegistrationType_enum.DIRECT_CONFIRMATION ||
       course.registrationType === CourseRegistrationType_enum.DIRECT_WITH_INPUT);
-
-  const isCourseFull = placesOpenForRegistration(course) === 0;
 
   const registrationHandler = useRegistrationHandler({
     course,

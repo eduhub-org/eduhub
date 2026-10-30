@@ -17,12 +17,18 @@ export interface StatusChangeEmail {
   count: number;
 }
 
-/** Template types this course has its own copy of. Cached, so every notice on a page shares one request. */
-export const useCourseMailTemplateTypes = (courseId: number): Set<string> => {
-  const { data } = useRoleQuery<CourseMailTemplateTypes, CourseMailTemplateTypesVariables>(COURSE_MAIL_TEMPLATE_TYPES, {
-    variables: { courseId },
-  });
-  return new Set((data?.MailTemplate ?? []).map((template) => template.type ?? ''));
+/**
+ * Template types this course has its own copy of, or null while that is not known (loading or
+ * failed): only a successful answer may say the default is used. Cached, so every notice on a
+ * page shares one request.
+ */
+export const useCourseMailTemplateTypes = (courseId: number): Set<string> | null => {
+  const { data, error } = useRoleQuery<CourseMailTemplateTypes, CourseMailTemplateTypesVariables>(
+    COURSE_MAIL_TEMPLATE_TYPES,
+    { variables: { courseId } }
+  );
+  if (error || !data) return null;
+  return new Set(data.MailTemplate.map((template) => template.type ?? ''));
 };
 
 /** "Platz von der Warteliste" – the name organizers know the template by from the email settings. */
@@ -53,13 +59,15 @@ export const StatusChangeEmailNotice: FC<Props> = ({ courseId, emails }) => {
         <li key={template ?? 'none'} className="flex items-start gap-2">
           <MdMailOutline className="mt-0.5 flex-shrink-0" aria-hidden="true" />
           <span>
-            {template
-              ? t('will_send', {
-                  count,
-                  template: templateLabel(template),
-                  version: courseTemplates.has(template) ? t('course_version') : t('default_version'),
-                })
-              : t('none')}
+            {!template
+              ? t('none')
+              : courseTemplates
+                ? t('will_send', {
+                    count,
+                    template: templateLabel(template),
+                    version: courseTemplates.has(template) ? t('course_version') : t('default_version'),
+                  })
+                : t('will_send_plain', { count, template: templateLabel(template) })}
           </span>
         </li>
       ))}

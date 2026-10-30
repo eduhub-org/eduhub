@@ -7,8 +7,16 @@ import { useRoleQuery } from '../../../../hooks/authedQuery';
 import { useRoleMutation } from '../../../../hooks/authedMutation';
 import { USER_LIST } from '../../../../queries/user';
 import { UpdateEnrollment, UpdateEnrollmentVariables } from '../../../../queries/__generated__/UpdateEnrollment';
-import { UPDATE_ENROLLMENT } from '../../../../queries/insertEnrollment';
-import { CourseEnrollmentStatus_enum, CourseRegistrationType_enum } from '../../../../__generated__/globalTypes';
+import { COURSE_ENROLLMENT_STATUSES_OF_USERS, UPDATE_ENROLLMENT } from '../../../../queries/insertEnrollment';
+import {
+  CourseEnrollmentStatusesOfUsers,
+  CourseEnrollmentStatusesOfUsersVariables,
+} from '../../../../queries/__generated__/CourseEnrollmentStatusesOfUsers';
+import {
+  CourseEnrollmentStatus_enum,
+  CourseRegistrationType_enum,
+  MailTemplateType_enum,
+} from '../../../../__generated__/globalTypes';
 import { MdWarningAmber } from 'react-icons/md';
 import { StatusChangeEmailNotice } from '../../../common/StatusChangeEmailNotice';
 import { enrollmentStatusMailTemplate } from '../../../../helpers/enrollmentStatusEmail';
@@ -26,7 +34,11 @@ interface AddParticipantsFormProps {
 }
 
 /** Statuses that hold a place in the course. */
-const PLACE_TAKING_STATUSES: string[] = [CourseEnrollmentStatus_enum.CONFIRMED, CourseEnrollmentStatus_enum.INVITED];
+const PLACE_TAKING_STATUSES: string[] = [
+  CourseEnrollmentStatus_enum.CONFIRMED,
+  CourseEnrollmentStatus_enum.INVITED,
+  CourseEnrollmentStatus_enum.REGISTERED,
+];
 
 export const AddParticipantsForm: FC<AddParticipantsFormProps> = ({
   courseId,
@@ -88,11 +100,40 @@ export const AddParticipantsForm: FC<AddParticipantsFormProps> = ({
     { value: dropoutStatus, label: dropoutLabel },
   ];
 
-  // Adding people beyond the free places is allowed; the form only warns.
-  const overbooking =
-    freePlaces != null && PLACE_TAKING_STATUSES.includes(selectedStatus)
-      ? Math.max(0, selectedUserIds.length - freePlaces)
-      : 0;
+  // Someone selected may already be enrolled: that decides which email the change sends (from
+  // the waitlist it is WAITLIST_CONFIRMED) and whether it takes a new place at all.
+  const { data: currentEnrollments } = useRoleQuery<
+    CourseEnrollmentStatusesOfUsers,
+    CourseEnrollmentStatusesOfUsersVariables
+  >(COURSE_ENROLLMENT_STATUSES_OF_USERS, {
+    variables: { courseId, userIds: selectedUserIds.map((user) => user.id) },
+    skip: selectedUserIds.length === 0,
+  });
+  const currentStatusOf = useMemo(
+    () => new Map((currentEnrollments?.CourseEnrollment ?? []).map((e) => [e.userId, e.status as string])),
+    [currentEnrollments]
+  );
+
+  // An unchanged status triggers no email.
+  const emails = useMemo(() => {
+    const countByTemplate = new Map<MailTemplateType_enum | null, number>();
+    for (const user of selectedUserIds) {
+      const oldStatus = currentStatusOf.get(user.id) ?? null;
+      const template =
+        oldStatus === selectedStatus
+          ? null
+          : enrollmentStatusMailTemplate({ oldStatus, newStatus: selectedStatus, registrationType });
+      countByTemplate.set(template, (countByTemplate.get(template) ?? 0) + 1);
+    }
+    return [...countByTemplate].map(([template, count]) => ({ template, count }));
+  }, [selectedUserIds, currentStatusOf, selectedStatus, registrationType]);
+
+  // Adding people beyond the free places is allowed; the form only warns. People who already
+  // hold a place take no new one.
+  const newPlaces = PLACE_TAKING_STATUSES.includes(selectedStatus)
+    ? selectedUserIds.filter((user) => !PLACE_TAKING_STATUSES.includes(currentStatusOf.get(user.id) ?? '')).length
+    : 0;
+  const overbooking = freePlaces != null ? Math.max(0, newPlaces - freePlaces) : 0;
 
   // Event handlers
   const handleUserSelection = (newUserIds: { id: string; name: string }[]) => setSelectedUserIds(newUserIds);
@@ -164,20 +205,12 @@ export const AddParticipantsForm: FC<AddParticipantsFormProps> = ({
           <MdWarningAmber className="mt-0.5 flex-shrink-0" aria-hidden="true" />
           {t('bulk_actions.overbook_warning', {
             count: overbooking,
-            taken: takenPlaces + selectedUserIds.length,
+            taken: takenPlaces + newPlaces,
             max: maxParticipants,
           })}
         </p>
       )}
-      <StatusChangeEmailNotice
-        courseId={courseId}
-        emails={[
-          {
-            template: enrollmentStatusMailTemplate({ newStatus: selectedStatus, registrationType }),
-            count: selectedUserIds.length,
-          },
-        ]}
-      />
+      <StatusChangeEmailNotice courseId={courseId} emails={emails} />
       {userSelectionError && <div className="text-red-500 mt-4">{userSelectionError}</div>}
 
       <div className="flex justify-center my-8">

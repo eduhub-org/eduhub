@@ -611,7 +611,9 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
     setIsLoadingInviteRecipients(true);
     try {
       const { inviteIds, rejectionIds, waitlistIds, freePlaces } = await loadUndecidedRated();
-      const enrollmentIds = freePlaces == null ? inviteIds : inviteIds.slice(0, freePlaces);
+      // The waitlist moves up first; within each group, application order (a stable sort).
+      const waitlistFirst = [...inviteIds].sort((a, b) => Number(waitlistIds.has(b)) - Number(waitlistIds.has(a)));
+      const enrollmentIds = freePlaces == null ? inviteIds : waitlistFirst.slice(0, freePlaces);
       const withheldCount = inviteIds.length - enrollmentIds.length;
       if (enrollmentIds.length === 0 && rejectionIds.length === 0) {
         showBulkNotice(

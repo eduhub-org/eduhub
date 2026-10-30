@@ -387,3 +387,16 @@ export const CANCEL_OWN_ENROLLMENT = gql`
     }
   }
 `;
+
+/** The current enrollment status of some users in one course, for previews before adding them. */
+export const COURSE_ENROLLMENT_STATUSES_OF_USERS = gql`
+  query CourseEnrollmentStatusesOfUsers($courseId: Int!, $userIds: [uuid!]!) {
+    CourseEnrollment(
+      where: { courseId: { _eq: $courseId }, userId: { _in: $userIds }, isTest: { _eq: false } }
+    ) {
+      id
+      userId
+      status
+    }
+  }
+`;

@@ -2,11 +2,12 @@
   "common": {
     "status_email": {
       "will_send": "An email will be sent to {count, plural, one {# person} other {# people}} using the template “{template}” ({version}).",
+      "will_send_plain": "An email will be sent to {count, plural, one {# person} other {# people}} using the template “{template}”.",
       "course_version": "this course's own version",
       "default_version": "default version",
       "none": "No email will be sent.",
-      "sent": "{count, plural, one {# email} other {# emails}} sent (“{template}”).",
-      "participant_sent": "We've sent you a confirmation by email."
+      "sent": "{count, plural, one {# email is} other {# emails are}} on the way (“{template}”).",
+      "participant_sent": "You will receive a confirmation by email."
     },
     "confirmation": "Confirmation",
     "warning": "Warning",
@@ -1595,7 +1596,7 @@
       "no_eligible_rejections": "None of the selected applicants has a red rating and is still waiting for a decision.",
       "selection_skipped": "{count, plural, one {# selected person is} other {# selected persons are}} left out: only applicants with a matching rating who have not been invited or rejected yet are included.",
       "free_places": "{count, plural, =0 {No place in the course is free.} one {# place in the course is still free.} other {# places in the course are still free.}}",
-      "invitations_withheld": "{count, plural, one {# more person with green rating is} other {# more persons with green rating are}} not invited because there are no more free places. Earlier applications are invited first; the others keep their status.",
+      "invitations_withheld": "{count, plural, one {# more person with green rating is} other {# more persons with green rating are}} not invited because there are no more free places. People on the waitlist are invited first, then earlier applications; the others keep their status.",
       "course_full_no_invitations": "The course has no free places, so nobody with a green rating can be invited.",
       "course_full_error": "The invitations were not sent because the course does not have enough free places. Reload the page and try again.",
       "decisions_queued": "{invited} invited, {rejected} rejected; the participants will be notified by email.",
