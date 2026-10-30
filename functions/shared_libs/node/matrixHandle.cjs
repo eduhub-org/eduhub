@@ -15,8 +15,15 @@
  * Run tests: node --test matrixHandle.test.cjs
  */
 
-// Greek digraphs (ELOT 743), applied before the per-letter map.
-const DIGRAPHS = [["ου", "ou"], ["αυ", "av"], ["ευ", "ev"], ["γγ", "ng"]];
+// Greek digraphs (ELOT 743), applied before the per-letter map. αυ/ευ/ηυ
+// become af/ef/if before a voiceless consonant or at the end of a word, and
+// av/ev/iv otherwise; rewriting υ to φ/β lets the letter map finish the job.
+const DIGRAPHS = [
+  [/([αεη])υ(?=[θκξπσςτφχψ]|[^α-ω]|$)/g, "$1φ"],
+  [/([αεη])υ/g, "$1β"],
+  [/ου/g, "ou"],
+  [/γγ/g, "ng"],
+];
 
 // Lowercase, after NFD + mark stripping (so й → и, ё → е, ά → α already).
 const TRANSLITERATION = {
@@ -40,7 +47,7 @@ function sanitize(input) {
     .replace(/\p{M}/gu, "")
     .toLowerCase();
   for (const [from, to] of DIGRAPHS) {
-    lowered = lowered.replaceAll(from, to);
+    lowered = lowered.replace(from, to);
   }
   let out = "";
   for (const ch of lowered) {

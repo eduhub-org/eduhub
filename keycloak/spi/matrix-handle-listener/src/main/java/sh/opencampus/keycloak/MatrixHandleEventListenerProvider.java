@@ -31,9 +31,14 @@ public class MatrixHandleEventListenerProvider implements EventListenerProvider 
     private static final Logger LOG = Logger.getLogger(MatrixHandleEventListenerProvider.class);
     private static final String ATTRIBUTE_NAME = "matrix_user_handle";
 
-    // Greek digraphs (ELOT 743), applied before the per-letter map.
+    // Greek digraphs (ELOT 743), applied before the per-letter map. αυ/ευ/ηυ
+    // become af/ef/if before a voiceless consonant or at the end of a word, and
+    // av/ev/iv otherwise; rewriting υ to φ/β lets the letter map finish the job.
     private static final String[][] DIGRAPHS = {
-            {"ου", "ou"}, {"αυ", "av"}, {"ευ", "ev"}, {"γγ", "ng"},
+            {"([αεη])υ(?=[θκξπσςτφχψ]|[^α-ω]|$)", "$1φ"},
+            {"([αεη])υ", "$1β"},
+            {"ου", "ou"},
+            {"γγ", "ng"},
     };
 
     // Lowercase, after NFD + mark stripping (so й -> и, ё -> е, ά -> α already).
@@ -135,7 +140,7 @@ public class MatrixHandleEventListenerProvider implements EventListenerProvider 
                 .replaceAll("\\p{M}", "")
                 .toLowerCase(Locale.ROOT);
         for (String[] digraph : DIGRAPHS) {
-            lowered = lowered.replace(digraph[0], digraph[1]);
+            lowered = lowered.replaceAll(digraph[0], digraph[1]);
         }
         StringBuilder out = new StringBuilder(lowered.length());
         for (int i = 0; i < lowered.length(); i++) {

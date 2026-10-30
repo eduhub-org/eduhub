@@ -25,6 +25,8 @@ class MatrixHandleEventListenerProviderTest {
             "Ђорђе, Јовановић, djordje.jovanovic.4f42bd",
             "Γιώργος, Παπαδόπουλος, giorgos.papadopoulos.4f42bd",
             "Ευάγγελος, Παύλου, evangelos.pavlou.4f42bd",
+            "Ευστάθιος, Αυγερινός, efstathios.avgerinos.4f42bd",
+            "Ηύα, Γαλάτσευ, iva.galatsef.4f42bd",
             "Weiß, Ærø, weiss.aero.4f42bd",
             "Łukasz, Kowalski, lukasz.kowalski.4f42bd",
             "小明, 王, user.user.4f42bd",
