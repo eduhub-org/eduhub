@@ -15,7 +15,7 @@ import { ParticipationExitButton } from './ParticipationExitButton';
 import { CancellationRequestButton } from './CancellationRequestButton';
 import { useRegistrationHandler } from './hooks/useRegistrationHandler';
 import { ParticipationExitOutcome } from './participationExit';
-import { isRegistrationClosed, placesOpenForRegistration } from './types';
+import { isInvitationExpired, isRegistrationClosed, placesOpenForRegistration } from './types';
 
 /**
  * Props for the Registration component
@@ -129,6 +129,12 @@ export const Registration: FC<RegistrationProps> = ({
 
   // If user has an enrollment, show status
   if (courseEnrollment) {
+    // An invitation to a paid course - someone moved up from the waitlist - is accepted by paying
+    // through the same checkout as a registration, for the place it holds.
+    const canPayInvitation =
+      registrationHandler.config.requiresPayment &&
+      courseEnrollment.status === CourseEnrollmentStatus_enum.INVITED &&
+      !isInvitationExpired(courseEnrollment.invitationExpirationDate);
     return (
       <div className="w-full">
         <RegistrationStatus 
@@ -138,6 +144,7 @@ export const Registration: FC<RegistrationProps> = ({
             ? () => registrationHandler.retryPayment(courseEnrollment.id)
             : undefined
           }
+          onPayInvitation={canPayInvitation ? () => registrationHandler.retryPayment(courseEnrollment.id) : undefined}
         />
         <ParticipationExitButton
           courseEnrollment={courseEnrollment}

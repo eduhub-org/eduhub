@@ -6,6 +6,7 @@ import { CANCEL_OWN_ENROLLMENT } from '../../../../queries/insertEnrollment';
 import { CourseWithEnrollment_Course_by_pk_CourseEnrollments } from '../../../../queries/__generated__/CourseWithEnrollment';
 import { Course_Course_by_pk_Sessions } from '../../../../queries/__generated__/Course';
 import { hasPaidInvoice } from '../../../../utils/invoicePaymentStatus';
+import { CourseEnrollmentStatus_enum } from '../../../../__generated__/globalTypes';
 import { useRoleMutation } from '../../../../hooks/authedMutation';
 import { ErrorMessageDialog } from '../../../common/dialogs/ErrorMessageDialog';
 import { QuestionConfirmationDialog } from '../../../common/dialogs/QuestionConfirmationDialog';
@@ -98,6 +99,8 @@ export const ParticipationExitButton: FC<ParticipationExitButtonProps> = ({
   if (!exitKind) return null;
 
   const isCancel = exitKind === 'CANCEL';
+  // Giving up an invitation frees the place it holds for the next person.
+  const isDecline = isCancel && courseEnrollment.status === CourseEnrollmentStatus_enum.INVITED;
 
   return (
     <>
@@ -107,9 +110,11 @@ export const ParticipationExitButton: FC<ParticipationExitButtonProps> = ({
         onClick={() => setIsConfirming(true)}
         className={participationExitButtonClassName}
       >
-        {isCancel
-          ? t('ParticipationExitButton.cancel_participation')
-          : t('ParticipationExitButton.abort_participation')}
+        {isDecline
+          ? t('ParticipationExitButton.decline_invitation')
+          : isCancel
+            ? t('ParticipationExitButton.cancel_participation')
+            : t('ParticipationExitButton.abort_participation')}
       </button>
       <QuestionConfirmationDialog
         open={isConfirming}
@@ -117,7 +122,9 @@ export const ParticipationExitButton: FC<ParticipationExitButtonProps> = ({
         onConfirm={handleConfirm}
         confirmDisabled={isSubmitting}
         question={
-          isCancel
+          isDecline
+            ? t('ParticipationExitButton.decline_invitation_confirm', { title: courseTitle })
+            : isCancel
             ? t('ParticipationExitButton.cancel_participation_confirm', { title: courseTitle })
             : t('ParticipationExitButton.abort_participation_confirm', { title: courseTitle })
         }

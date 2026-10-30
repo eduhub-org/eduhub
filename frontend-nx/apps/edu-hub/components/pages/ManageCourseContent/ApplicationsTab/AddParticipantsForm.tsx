@@ -142,6 +142,11 @@ export const AddParticipantsForm: FC<AddParticipantsFormProps> = ({
     : 0;
   const overbooking = freePlaces != null ? Math.max(0, newPlaces - freePlaces) : 0;
 
+  // An organizer's override: someone confirmed here takes part without the checkout.
+  const isPaidRegistration =
+    registrationType === CourseRegistrationType_enum.DIRECT_CONFIRMATION_AND_PAYMENT ||
+    registrationType === CourseRegistrationType_enum.DIRECT_WITH_INPUT_AND_PAYMENT;
+
   // Event handlers
   const handleUserSelection = (newUserIds: { id: string; name: string }[]) => setSelectedUserIds(newUserIds);
   const handleStatusSelection = (newValue: string) => setSelectedStatus(newValue as CourseEnrollmentStatus_enum);
@@ -207,6 +212,9 @@ export const AddParticipantsForm: FC<AddParticipantsFormProps> = ({
         onSelectedValueChange={handleStatusSelection}
         refetchQueries={[]}
       />
+      {isPaidRegistration && selectedStatus === CourseEnrollmentStatus_enum.CONFIRMED && (
+        <p className="mt-4 text-sm text-label-secondary">{t('add_paid_no_payment_hint')}</p>
+      )}
       {statusesKnown && overbooking > 0 && maxParticipants != null && (
         <p className="mt-4 flex items-start gap-2 text-sm text-warning" role="alert">
           <MdWarningAmber className="mt-0.5 flex-shrink-0" aria-hidden="true" />

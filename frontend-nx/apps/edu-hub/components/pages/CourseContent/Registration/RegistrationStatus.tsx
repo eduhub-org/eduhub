@@ -7,6 +7,7 @@ import { getPaymentStatusFromInvoices } from '../../../../utils/invoicePaymentSt
 import { Course_Course_by_pk } from '../../../../queries/__generated__/Course';
 import { CourseWithEnrollment_Course_by_pk_CourseEnrollments } from '../../../../queries/__generated__/CourseWithEnrollment';
 import { Button } from '../../../common/Button';
+import { useDisplayDate } from '../../../../helpers/dateTimeHelpers';
 
 /**
  * Props for the RegistrationStatus component
@@ -18,6 +19,11 @@ interface RegistrationStatusProps {
   course: Course_Course_by_pk;
   /** Optional callback function to retry payment (opens modal with prefilled survey) */
   onRetryPayment?: () => void;
+  /**
+   * An invitation to a paid course is accepted by paying: opens the registration and checkout
+   * for the held place. Set only while such an invitation is open.
+   */
+  onPayInvitation?: () => void;
 }
 
 /**
@@ -140,8 +146,14 @@ const CourseLinkInfos: FC<{ course: Course_Course_by_pk }> = ({ course }) => {
  * @param props - The component props
  * @returns JSX element representing the enrollment status and available actions
  */
-export const RegistrationStatus: FC<RegistrationStatusProps> = ({ courseEnrollment, course, onRetryPayment }) => {
+export const RegistrationStatus: FC<RegistrationStatusProps> = ({
+  courseEnrollment,
+  course,
+  onRetryPayment,
+  onPayInvitation,
+}) => {
   const t = useTranslations('course');
+  const displayDate = useDisplayDate();
 
   const status = courseEnrollment.status;
   const paymentStatus = getPaymentStatusFromInvoices(courseEnrollment.Invoices);
@@ -208,6 +220,18 @@ export const RegistrationStatus: FC<RegistrationStatusProps> = ({ courseEnrollme
         courseEnrollment.invitationExpirationDate &&
         new Date(courseEnrollment.invitationExpirationDate).setHours(0, 0, 0, 0) >= new Date().setHours(0, 0, 0, 0)
       ) {
+        if (onPayInvitation) {
+          return (
+            <div className="flex flex-col space-y-4 w-full">
+              <StatusCard status="success" icon={<MdMailOutline />}>
+                {t('status.invited_payment', { date: displayDate(courseEnrollment.invitationExpirationDate) })}
+              </StatusCard>
+              <Button onClick={onPayInvitation} filled className="w-full sm:w-auto px-6 py-3">
+                {t('registration.pay_now')}
+              </Button>
+            </div>
+          );
+        }
         return (
           <div className="flex flex-col sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 w-full">
             <div className="flex-1">

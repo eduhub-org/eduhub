@@ -129,14 +129,4 @@ describe('ApplicationDetails', () => {
     fireEvent.click(screen.getByRole('button', { name: 'application_details.confirm_from_waitlist' }));
     expect(onPromote).toHaveBeenCalled();
   });
-
-  it('explains why a paid event has no way up from the waitlist', () => {
-    renderDetails({
-      enrollment: { ...enrollment, status: CourseEnrollmentStatus_enum.WAITLIST },
-      features: getRegistrationFeatures(CourseRegistrationType_enum.DIRECT_CONFIRMATION_AND_PAYMENT),
-      promoteHintKey: 'application_details.paid_waitlist_not_supported',
-    });
-    expect(screen.getByText('application_details.paid_waitlist_not_supported')).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /confirm_from_waitlist/ })).not.toBeInTheDocument();
-  });
 });
