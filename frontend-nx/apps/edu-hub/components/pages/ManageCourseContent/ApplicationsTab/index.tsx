@@ -601,6 +601,14 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
         waitlistIds: new Set(
           recipients.filter((e) => e.status === CourseEnrollmentStatus_enum.WAITLIST).map((e) => e.id)
         ),
+        // Green waitlisted rows in queue order, as WaitlistOrder shows them: created_at, then id.
+        waitlistQueueIds: recipients
+          .filter(
+            (e) =>
+              e.status === CourseEnrollmentStatus_enum.WAITLIST && e.motivationRating === MotivationRating_enum.INVITE
+          )
+          .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime() || a.id - b.id)
+          .map((e) => e.id),
         freePlaces: freePlacesOf(result.data?.Course_by_pk ?? null),
       };
     },
@@ -610,9 +618,9 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
   const handleOpenDecisionsDialog = useCallback(async () => {
     setIsLoadingInviteRecipients(true);
     try {
-      const { inviteIds, rejectionIds, waitlistIds, freePlaces } = await loadUndecidedRated();
-      // The waitlist moves up first; within each group, application order (a stable sort).
-      const waitlistFirst = [...inviteIds].sort((a, b) => Number(waitlistIds.has(b)) - Number(waitlistIds.has(a)));
+      const { inviteIds, rejectionIds, waitlistIds, waitlistQueueIds, freePlaces } = await loadUndecidedRated();
+      // The waitlist moves up first, in queue order; the other applications follow in application order.
+      const waitlistFirst = [...waitlistQueueIds, ...inviteIds.filter((id) => !waitlistIds.has(id))];
       const enrollmentIds = freePlaces == null ? inviteIds : waitlistFirst.slice(0, freePlaces);
       const withheldCount = inviteIds.length - enrollmentIds.length;
       if (enrollmentIds.length === 0 && rejectionIds.length === 0) {

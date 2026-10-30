@@ -102,13 +102,15 @@ export const AddParticipantsForm: FC<AddParticipantsFormProps> = ({
 
   // Someone selected may already be enrolled: that decides which email the change sends (from
   // the waitlist it is WAITLIST_CONFIRMED) and whether it takes a new place at all.
-  const { data: currentEnrollments } = useRoleQuery<
+  const { data: currentEnrollments, error: currentEnrollmentsError } = useRoleQuery<
     CourseEnrollmentStatusesOfUsers,
     CourseEnrollmentStatusesOfUsersVariables
   >(COURSE_ENROLLMENT_STATUSES_OF_USERS, {
     variables: { courseId, userIds: selectedUserIds.map((user) => user.id) },
     skip: selectedUserIds.length === 0,
   });
+  // Until the lookup has answered, nobody's status is known: no preview rather than a wrong one.
+  const statusesKnown = selectedUserIds.length > 0 && !!currentEnrollments && !currentEnrollmentsError;
   const currentStatusOf = useMemo(
     () => new Map((currentEnrollments?.CourseEnrollment ?? []).map((e) => [e.userId, e.status as string])),
     [currentEnrollments]
@@ -200,7 +202,7 @@ export const AddParticipantsForm: FC<AddParticipantsFormProps> = ({
         onSelectedValueChange={handleStatusSelection}
         refetchQueries={[]}
       />
-      {overbooking > 0 && maxParticipants != null && (
+      {statusesKnown && overbooking > 0 && maxParticipants != null && (
         <p className="mt-4 flex items-start gap-2 text-sm text-warning" role="alert">
           <MdWarningAmber className="mt-0.5 flex-shrink-0" aria-hidden="true" />
           {t('bulk_actions.overbook_warning', {
@@ -210,7 +212,7 @@ export const AddParticipantsForm: FC<AddParticipantsFormProps> = ({
           })}
         </p>
       )}
-      <StatusChangeEmailNotice courseId={courseId} emails={emails} />
+      {statusesKnown && <StatusChangeEmailNotice courseId={courseId} emails={emails} />}
       {userSelectionError && <div className="text-red-500 mt-4">{userSelectionError}</div>}
 
       <div className="flex justify-center my-8">

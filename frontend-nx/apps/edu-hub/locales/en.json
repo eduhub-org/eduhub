@@ -5,7 +5,7 @@
       "will_send_plain": "An email will be sent to {count, plural, one {# person} other {# people}} using the template “{template}”.",
       "course_version": "this course's own version",
       "default_version": "default version",
-      "none": "No email will be sent.",
+      "none": "{count, plural, one {# person receives} other {# people receive}} no email.",
       "sent": "{count, plural, one {# email is} other {# emails are}} on the way (“{template}”).",
       "participant_sent": "You will receive a confirmation by email."
     },

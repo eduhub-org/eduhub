@@ -52,7 +52,7 @@ describe('StatusChangeEmailNotice', () => {
     );
 
     expect(screen.getAllByRole('listitem')).toHaveLength(1);
-    expect(screen.getByText('common.status_email.none')).toBeInTheDocument();
+    expect(screen.getByText('common.status_email.none{"count":1}')).toBeInTheDocument();
   });
 
   it('names no version until the course templates are known', () => {

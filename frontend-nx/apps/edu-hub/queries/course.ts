@@ -311,6 +311,7 @@ export const MANAGED_COURSE_APPLICATION_RECIPIENTS = gql`
         id
         status
         motivationRating
+        created_at
         User {
           id
           firstName

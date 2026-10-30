@@ -60,7 +60,7 @@ export const StatusChangeEmailNotice: FC<Props> = ({ courseId, emails }) => {
           <MdMailOutline className="mt-0.5 flex-shrink-0" aria-hidden="true" />
           <span>
             {!template
-              ? t('none')
+              ? t('none', { count })
               : courseTemplates
                 ? t('will_send', {
                     count,
