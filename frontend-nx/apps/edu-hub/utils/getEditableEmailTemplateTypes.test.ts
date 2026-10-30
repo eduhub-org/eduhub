@@ -18,6 +18,7 @@ describe('getEditableEmailTemplateTypes', () => {
     expect(getEditableEmailTemplateTypes(course(CourseRegistrationType_enum.APPROVAL_WITH_INPUT))).toEqual([
       'APPLICATION_RECEIVED',
       'INVITE',
+      'WAITLIST_PROMOTED',
       'DECLINE',
       'APPLICATION_CONFIRMED',
       'WAITLIST_NOTICE',
@@ -26,10 +27,11 @@ describe('getEditableEmailTemplateTypes', () => {
     expect(getEditableEmailTemplateTypes(course(null))).toContain('APPLICATION_RECEIVED');
   });
 
-  it('offers only the registration confirmation for direct registration', () => {
+  it('offers the registration and waitlist confirmations for direct registration', () => {
     for (const type of [CourseRegistrationType_enum.DIRECT_CONFIRMATION, CourseRegistrationType_enum.DIRECT_WITH_INPUT]) {
       expect(getEditableEmailTemplateTypes(course(type))).toEqual([
         'REGISTRATION_CONFIRMED',
+        'WAITLIST_CONFIRMED',
         'WAITLIST_NOTICE',
         'SESSION_REMINDER',
       ]);

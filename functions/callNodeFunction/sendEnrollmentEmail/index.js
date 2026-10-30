@@ -152,15 +152,18 @@ export default async function sendEnrollmentEmail(req, logger) {
         certificateLink = enrollmentDetails.attendanceCertificateURL;
       }
     } else {
-      // A waitlisted user who is moved up to INVITED/CONFIRMED gets the
-      // "a spot opened up" email instead of the plain invite/confirmation.
-      const promotedFromWaitlist =
-        op === 'UPDATE' &&
-        oldEnrollment?.status === 'WAITLIST' &&
-        (enrollment.status === 'INVITED' || enrollment.status === 'CONFIRMED');
+      // A waitlisted user who is moved up gets a "a spot opened up" email
+      // instead of the plain invite/confirmation: as an invitation still to be
+      // accepted (WAITLIST_PROMOTED), or with the place already confirmed
+      // (WAITLIST_CONFIRMED).
+      // Keep in sync with helpers/enrollmentStatusEmail.ts in the frontend,
+      // which tells organizers in advance which template a change sends.
+      const fromWaitlist = op === 'UPDATE' && oldEnrollment?.status === 'WAITLIST';
 
-      if (promotedFromWaitlist) {
+      if (fromWaitlist && enrollment.status === 'INVITED') {
         baseTemplateType = 'WAITLIST_PROMOTED';
+      } else if (fromWaitlist && enrollment.status === 'CONFIRMED') {
+        baseTemplateType = 'WAITLIST_CONFIRMED';
       } else {
         switch (enrollment.status) {
           case 'APPLIED':

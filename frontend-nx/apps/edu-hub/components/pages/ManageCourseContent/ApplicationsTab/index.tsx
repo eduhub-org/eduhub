@@ -33,6 +33,7 @@ import {
 } from '../../../../queries/__generated__/UpdateEnrollmentRating';
 import {
   CANCEL_ENROLLMENTS_BY_ORGANIZER,
+  CONFIRM_WAITLIST_ENROLLMENT,
   UPDATE_ENROLLMENT_STATUS_FOR_INVITE,
   UPDATE_ENROLLMENT_STATUS_BY_RATING,
   UPDATE_ENROLLMENT_RATING,
@@ -41,6 +42,10 @@ import {
   CancelEnrollmentsByOrganizer,
   CancelEnrollmentsByOrganizerVariables,
 } from '../../../../queries/__generated__/CancelEnrollmentsByOrganizer';
+import {
+  ConfirmWaitlistEnrollment,
+  ConfirmWaitlistEnrollmentVariables,
+} from '../../../../queries/__generated__/ConfirmWaitlistEnrollment';
 import { Button as OldButton } from '../../../common/Button';
 import { Dialog, DialogTitle } from '@mui/material';
 import { MdClose } from 'react-icons/md';
@@ -73,7 +78,13 @@ import {
   MdRadioButtonChecked,
   MdWarningAmber,
 } from 'react-icons/md';
-import { CourseEnrollmentStatus_enum, MotivationRating_enum, UserStatus_enum } from '../../../../__generated__/globalTypes';
+import {
+  CourseEnrollmentStatus_enum,
+  CourseRegistrationType_enum,
+  MailTemplateType_enum,
+  MotivationRating_enum,
+  UserStatus_enum,
+} from '../../../../__generated__/globalTypes';
 import { getPaymentStatusFromInvoices } from '../../../../utils/invoicePaymentStatus';
 import { useDisplayDate } from '../../../../helpers/dateTimeHelpers';
 import { BulkAction, ExpandedRowProps } from '../../../common/TableGrid/types';
@@ -84,6 +95,8 @@ import { ApplicationDetails, RATING_OPTIONS } from './ApplicationDetails';
 import { getRegistrationFeatures } from './registrationConfig';
 import NotificationSnackbar from '../../../common/dialogs/NotificationSnackbar';
 import Loading from '../../../common/Loading';
+import { StatusChangeEmail, StatusChangeEmailNotice, useMailTemplateLabel } from '../../../common/StatusChangeEmailNotice';
+import { enrollmentStatusMailTemplate } from '../../../../helpers/enrollmentStatusEmail';
 
 /** Matches TableGrid `gap-3` between columns; keep in sync with expandable row width math. */
 const BULK_EMAIL_MAILTO_URL_LIMIT = 1800;
@@ -298,13 +311,24 @@ const UNDECIDED_RATED_FILTER = {
 };
 
 /**
- * Places still free for invitations, or null when the course has no limit. The server enforces the
- * same limit (course_enrollment_guard_invitation_capacity); this lets the dialog stay within it.
+ * Places still free, or null when the course has no limit. Organizers may overbook: "send by
+ * rating" stays within the free places, every other invitation or confirmation warns first.
  */
-const freePlacesOf = (course: ManagedCourseApplicationRecipients['Course_by_pk']): number | null => {
+const freePlacesOf = (
+  course: { maxParticipants: number | null; TakenPlaces: { aggregate: { count: number } | null } } | null
+): number | null => {
   if (course?.maxParticipants == null) return null;
   return Math.max(0, course.maxParticipants - (course.TakenPlaces.aggregate?.count ?? 0));
 };
+
+/** People an action places beyond the free places; 0 when it fits or the course has no limit. */
+const overbookingOf = (freePlaces: number | null, placesTaken: number) =>
+  freePlaces == null ? 0 : Math.max(0, placesTaken - freePlaces);
+
+/** Direct registration with payment: moving up from the waitlist would skip the payment. */
+const isPaidDirectRegistration = (registrationType: string | null) =>
+  registrationType === CourseRegistrationType_enum.DIRECT_CONFIRMATION_AND_PAYMENT ||
+  registrationType === CourseRegistrationType_enum.DIRECT_WITH_INPUT_AND_PAYMENT;
 
 const isCourseFullError = (error: unknown) => error instanceof Error && error.message.includes('This course is full');
 
@@ -412,6 +436,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
   const t = useTranslations('manageCourse');
   const tCommon = useTranslations('common');
   const tCourse = useTranslations('course');
+  const templateLabel = useMailTemplateLabel();
   const locale = useLocale();
   const displayDate = useDisplayDate();
   // An org admin managing the course acts on registrations like its instructors.
@@ -474,6 +499,10 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
     CancelEnrollmentsByOrganizerVariables
   >(CANCEL_ENROLLMENTS_BY_ORGANIZER);
 
+  const [confirmWaitlistEnrollment] = useRoleMutation<ConfirmWaitlistEnrollment, ConfirmWaitlistEnrollmentVariables>(
+    CONFIRM_WAITLIST_ENROLLMENT
+  );
+
   const [updateEnrollmentStatusByRating] = useRoleMutation<
     UpdateEnrollmentStatusByRating,
     UpdateEnrollmentStatusByRatingVariables
@@ -529,21 +558,25 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
   const dialogBulkAction = useDeferredBulkAction();
 
   // Dialog state for decisions: inviting everyone green and rejecting everyone red at once
-  // (source 'rating'), deciding on the selected rows (source 'selection'), or renewing one
-  // invitation. Invitations never exceed the free places: by rating, the earliest applications are
-  // invited and the rest (withheldCount) keep their status.
+  // (source 'rating'), deciding on the selected rows (source 'selection'), inviting one person from
+  // their row ('single') or renewing one invitation. By rating, invitations never exceed the free
+  // places: the earliest applications are invited and the rest (withheldCount) keep their status.
+  // A selection or a single invitation may overbook the course; the dialog warns first.
   const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
   const [inviteDialogData, setInviteDialogData] = useState<
     | {
         mode: 'decisions';
         source: 'rating' | 'selection';
         enrollmentIds: number[];
+        /** Of enrollmentIds, those on the waitlist: they get WAITLIST_PROMOTED instead of INVITE. */
+        waitlistInviteCount: number;
         rejectionIds: number[];
         freePlaces: number | null;
         withheldCount: number;
         skippedCount: number;
       }
     | { mode: 'renew'; enrollmentIds: number[]; name: string }
+    | { mode: 'single'; enrollmentIds: number[]; name: string; fromWaitlist: boolean; freePlaces: number | null }
     | null
   >(null);
   const [isLoadingInviteRecipients, setIsLoadingInviteRecipients] = useState(false);
@@ -565,6 +598,17 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
       return {
         inviteIds: recipients.filter((e) => e.motivationRating === MotivationRating_enum.INVITE).map((e) => e.id),
         rejectionIds: recipients.filter((e) => e.motivationRating === MotivationRating_enum.DECLINE).map((e) => e.id),
+        waitlistIds: new Set(
+          recipients.filter((e) => e.status === CourseEnrollmentStatus_enum.WAITLIST).map((e) => e.id)
+        ),
+        // Green waitlisted rows in queue order, as WaitlistOrder shows them: created_at, then id.
+        waitlistQueueIds: recipients
+          .filter(
+            (e) =>
+              e.status === CourseEnrollmentStatus_enum.WAITLIST && e.motivationRating === MotivationRating_enum.INVITE
+          )
+          .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime() || a.id - b.id)
+          .map((e) => e.id),
         freePlaces: freePlacesOf(result.data?.Course_by_pk ?? null),
       };
     },
@@ -574,8 +618,10 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
   const handleOpenDecisionsDialog = useCallback(async () => {
     setIsLoadingInviteRecipients(true);
     try {
-      const { inviteIds, rejectionIds, freePlaces } = await loadUndecidedRated();
-      const enrollmentIds = freePlaces == null ? inviteIds : inviteIds.slice(0, freePlaces);
+      const { inviteIds, rejectionIds, waitlistIds, waitlistQueueIds, freePlaces } = await loadUndecidedRated();
+      // The waitlist moves up first, in queue order; the other applications follow in application order.
+      const waitlistFirst = [...waitlistQueueIds, ...inviteIds.filter((id) => !waitlistIds.has(id))];
+      const enrollmentIds = freePlaces == null ? inviteIds : waitlistFirst.slice(0, freePlaces);
       const withheldCount = inviteIds.length - enrollmentIds.length;
       if (enrollmentIds.length === 0 && rejectionIds.length === 0) {
         showBulkNotice(
@@ -588,6 +634,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
         mode: 'decisions',
         source: 'rating',
         enrollmentIds,
+        waitlistInviteCount: enrollmentIds.filter((id) => waitlistIds.has(id)).length,
         rejectionIds,
         freePlaces,
         withheldCount,
@@ -606,14 +653,16 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
   /**
    * Opens the dialog for inviting the selected green-rated or rejecting the selected red-rated
    * applications. Eligibility is checked against the server, not the loaded rows. Returns whether
-   * the dialog opened. A selection that needs more places than are free is refused, so the
-   * organizer decides who is left out.
+   * the dialog opened. A selection that needs more places than are free may overbook the course:
+   * the organizer chose these people, so the dialog only warns.
    */
   const openSelectionDecisionDialog = useCallback(
     async (kind: 'invite' | 'reject', selectedRows: ApplicationEnrollment[]) => {
       setIsLoadingInviteRecipients(true);
       try {
-        const { inviteIds, rejectionIds, freePlaces } = await loadUndecidedRated(selectedRows.map((e) => e.id));
+        const { inviteIds, rejectionIds, waitlistIds, freePlaces } = await loadUndecidedRated(
+          selectedRows.map((e) => e.id)
+        );
         const eligibleIds = kind === 'invite' ? inviteIds : rejectionIds;
         if (eligibleIds.length === 0) {
           showBulkNotice(
@@ -622,14 +671,11 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
           );
           return false;
         }
-        if (kind === 'invite' && freePlaces != null && eligibleIds.length > freePlaces) {
-          showBulkNotice(t('bulk_actions.not_enough_places', { selected: eligibleIds.length, count: freePlaces }), 6000);
-          return false;
-        }
         setInviteDialogData({
           mode: 'decisions',
           source: 'selection',
           enrollmentIds: kind === 'invite' ? eligibleIds : [],
+          waitlistInviteCount: kind === 'invite' ? eligibleIds.filter((id) => waitlistIds.has(id)).length : 0,
           rejectionIds: kind === 'reject' ? eligibleIds : [],
           freePlaces,
           withheldCount: 0,
@@ -662,6 +708,24 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
     [getDefaultInviteExpireDate]
   );
 
+  const courseFreePlaces = freePlacesOf(course);
+
+  /** Invites one applied or waitlisted person from their row, whatever their rating. */
+  const handleOpenSingleInviteDialog = useCallback(
+    (enrollment: ApplicationEnrollment) => {
+      setInviteDialogData({
+        mode: 'single',
+        enrollmentIds: [enrollment.id],
+        name: `${enrollment.User.firstName} ${enrollment.User.lastName}`.trim(),
+        fromWaitlist: enrollment.status === CourseEnrollmentStatus_enum.WAITLIST,
+        freePlaces: courseFreePlaces,
+      });
+      setInviteExpireDate(getDefaultInviteExpireDate());
+      setIsInviteDialogOpen(true);
+    },
+    [courseFreePlaces, getDefaultInviteExpireDate]
+  );
+
   // The dialog cannot be closed while the mutation runs.
   const [isSendingInvitations, setIsSendingInvitations] = useState(false);
 
@@ -692,7 +756,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
       if (enrollmentIds.length > 0) {
         const status = CourseEnrollmentStatus_enum.INVITED;
         const result =
-          inviteDialogData.mode === 'renew'
+          inviteDialogData.mode === 'renew' || inviteDialogData.mode === 'single'
             ? await updateEnrollmentStatusForInvite({ variables: { enrollmentIds, status, expire } })
             : await updateEnrollmentStatusByRating({
                 variables: { enrollmentIds, rating: MotivationRating_enum.INVITE, status, expire },
@@ -795,7 +859,13 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
       dialogBulkAction.fail();
       return;
     }
-    showBulkNotice(t('bulk_actions.registrations_cancelled', { count: cancelledCount }), 4000);
+    showBulkNotice(
+      `${t('bulk_actions.registrations_cancelled', { count: cancelledCount })} ${tCommon('status_email.sent', {
+        count: cancelledCount,
+        template: templateLabel(MailTemplateType_enum.ENROLLMENT_CANCELLED),
+      })}`,
+      5000
+    );
     dialogBulkAction.succeed();
     try {
       await qResult.refetch();
@@ -809,7 +879,65 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
     course.id,
     showBulkNotice,
     t,
+    tCommon,
+    templateLabel,
     dialogBulkAction,
+    qResult,
+  ]);
+
+  // Moving one person up from the waitlist on a direct-registration course: confirmed straight away.
+  const [waitlistConfirmCandidate, setWaitlistConfirmCandidate] = useState<ApplicationEnrollment | null>(null);
+  const [isConfirmingWaitlist, setIsConfirmingWaitlist] = useState(false);
+  const [waitlistConfirmError, setWaitlistConfirmError] = useState<string | null>(null);
+  const handleCloseWaitlistConfirmDialog = useCallback(() => {
+    if (isConfirmingWaitlist) return;
+    setWaitlistConfirmCandidate(null);
+  }, [isConfirmingWaitlist]);
+
+  const handleConfirmWaitlistEnrollment = useCallback(async () => {
+    if (!waitlistConfirmCandidate || isConfirmingWaitlist) return;
+    const name = `${waitlistConfirmCandidate.User.firstName} ${waitlistConfirmCandidate.User.lastName}`.trim();
+    let confirmedCount = 0;
+    setIsConfirmingWaitlist(true);
+    try {
+      const result = await confirmWaitlistEnrollment({
+        variables: { enrollmentId: waitlistConfirmCandidate.id, courseId: course.id },
+      });
+      confirmedCount = result.data?.update_CourseEnrollment?.affected_rows ?? 0;
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      setWaitlistConfirmError(t('bulk_actions.waitlist_confirm_error', { error: errorMessage }));
+      return;
+    } finally {
+      setIsConfirmingWaitlist(false);
+      setWaitlistConfirmCandidate(null);
+    }
+    if (confirmedCount === 0) {
+      // Someone else moved or cancelled them in the meantime.
+      showBulkNotice(t('bulk_actions.waitlist_confirm_stale', { name }), 4000);
+    } else {
+      showBulkNotice(
+        `${t('bulk_actions.waitlist_confirmed', { name })} ${tCommon('status_email.sent', {
+          count: 1,
+          template: templateLabel(MailTemplateType_enum.WAITLIST_CONFIRMED),
+        })}`,
+        5000
+      );
+    }
+    try {
+      await qResult.refetch();
+    } catch (refetchError) {
+      console.error('ApplicationsTab: refetch after confirming from the waitlist failed', refetchError);
+    }
+  }, [
+    waitlistConfirmCandidate,
+    isConfirmingWaitlist,
+    confirmWaitlistEnrollment,
+    course.id,
+    showBulkNotice,
+    t,
+    tCommon,
+    templateLabel,
     qResult,
   ]);
 
@@ -1318,6 +1446,34 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
   const effectiveSurveyUrl =
     course.formbricksEnrollmentSurveyUrl || course.Program?.defaultFormbricksEnrollmentSurveyUrl || null;
 
+  // 1-based place of each waitlisted enrollment, first come first served.
+  const waitlistPositions = useMemo(
+    () => new Map((course.WaitlistOrder ?? []).map((entry, index) => [entry.id, index + 1])),
+    [course.WaitlistOrder]
+  );
+  const paidDirectRegistration = isPaidDirectRegistration(course.registrationType);
+
+  /**
+   * The row's way in: on an application course, invite someone who applied or waits (with a
+   * deadline); on a direct-registration course, give someone waiting a confirmed place. Paid
+   * direct registration has no way in yet, the person would skip the payment.
+   */
+  const promotionOf = (enrollment: ApplicationEnrollment) => {
+    if (!canDecideRegistrations) return {};
+    const isWaiting = enrollment.status === CourseEnrollmentStatus_enum.WAITLIST;
+    if (features.hasApplicationProcess) {
+      return isWaiting || enrollment.status === CourseEnrollmentStatus_enum.APPLIED
+        ? { onPromote: () => handleOpenSingleInviteDialog(enrollment), promoteLabelKey: 'application_details.invite_single' }
+        : {};
+    }
+    if (!isWaiting) return {};
+    if (paidDirectRegistration) return { promoteHintKey: 'application_details.paid_waitlist_not_supported' };
+    return {
+      onPromote: () => setWaitlistConfirmCandidate(enrollment),
+      promoteLabelKey: 'application_details.confirm_from_waitlist',
+    };
+  };
+
   const ExpandableApplicationRow = ({ row: enrollment, ...navigation }: ExpandedRowProps<ApplicationEnrollment>) => (
     <ApplicationDetails
       enrollment={enrollment}
@@ -1329,6 +1485,8 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
           ? () => handleOpenRenewInvitationDialog(enrollment)
           : undefined
       }
+      waitlistPosition={waitlistPositions.get(enrollment.id)}
+      {...promotionOf(enrollment)}
       isInvitationExpired={enrollment.status === 'EXPIRED' || isExpired(enrollment)}
       displayDate={displayDate}
       {...navigation}
@@ -1371,6 +1529,44 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
     [features, displayDate, t]
   );
 
+  // The emails the open invite dialog sends, and how far it would overbook the course.
+  const inviteDialogEmails: StatusChangeEmail[] = [];
+  let inviteDialogOverbooking = 0;
+  if (inviteDialogData?.mode === 'decisions') {
+    const fromWaitlist = inviteDialogData.waitlistInviteCount;
+    inviteDialogEmails.push(
+      {
+        template: enrollmentStatusMailTemplate({ oldStatus: 'APPLIED', newStatus: 'INVITED' }),
+        count: inviteDialogData.enrollmentIds.length - fromWaitlist,
+      },
+      { template: enrollmentStatusMailTemplate({ oldStatus: 'WAITLIST', newStatus: 'INVITED' }), count: fromWaitlist },
+      {
+        template: enrollmentStatusMailTemplate({ oldStatus: 'APPLIED', newStatus: 'REJECTED' }),
+        count: inviteDialogData.rejectionIds.length,
+      }
+    );
+    inviteDialogOverbooking = overbookingOf(inviteDialogData.freePlaces, inviteDialogData.enrollmentIds.length);
+  } else if (inviteDialogData?.mode === 'renew') {
+    inviteDialogEmails.push({ template: enrollmentStatusMailTemplate({ oldStatus: 'INVITED', newStatus: 'INVITED' }), count: 1 });
+  } else if (inviteDialogData?.mode === 'single') {
+    inviteDialogEmails.push({
+      template: enrollmentStatusMailTemplate({
+        oldStatus: inviteDialogData.fromWaitlist ? 'WAITLIST' : 'APPLIED',
+        newStatus: 'INVITED',
+      }),
+      count: 1,
+    });
+    inviteDialogOverbooking = overbookingOf(inviteDialogData.freePlaces, 1);
+  }
+  const takenPlaces = course.TakenPlaces?.aggregate?.count ?? 0;
+  const overbookingWarning = (count: number) =>
+    count > 0 && course.maxParticipants != null ? (
+      <p className="mb-2 flex items-start gap-2 text-sm text-warning" role="alert">
+        <MdWarningAmber className="mt-0.5 flex-shrink-0" aria-hidden="true" />
+        {t('bulk_actions.overbook_warning', { count, taken: takenPlaces + count, max: course.maxParticipants })}
+      </p>
+    ) : null;
+
   const handlePageSizeChange = useCallback((newSize: number) => {
     setPageSize(newSize);
     setPageIndex(0);
@@ -1391,8 +1587,12 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
       >
         <AddParticipantsForm
           courseId={course.id}
+          registrationType={course.registrationType}
           hasApplicationProcess={features.hasApplicationProcess}
           hasCourseStarted={hasCourseStarted}
+          freePlaces={courseFreePlaces}
+          takenPlaces={takenPlaces}
+          maxParticipants={course.maxParticipants}
           onSubmit={closeAddParticipantsModal}
         />
       </Modal>
@@ -1475,6 +1675,8 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
             <div className="text-xl font-semibold text-label-primary">
               {inviteDialogData?.mode === 'renew'
                 ? t('bulk_actions.renew_invitation_dialog_title')
+                : inviteDialogData?.mode === 'single'
+                ? t('bulk_actions.single_invite_dialog_title', { name: inviteDialogData.name })
                 : inviteDialogData?.source === 'selection'
                   ? inviteDialogData.enrollmentIds.length > 0
                     ? t('bulk_actions.send_invitations_dialog_title')
@@ -1499,6 +1701,18 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
                   <p className="text-label-primary mb-4">
                     {t('bulk_actions.renew_invitation_text', { name: inviteDialogData.name })}
                   </p>
+                ) : inviteDialogData.mode === 'single' ? (
+                  <>
+                    <p className="text-label-primary mb-4">
+                      {t('bulk_actions.single_invite_text', { name: inviteDialogData.name })}
+                    </p>
+                    {inviteDialogData.freePlaces != null && (
+                      <p className="text-sm text-label-secondary mb-2">
+                        {t('bulk_actions.free_places', { count: inviteDialogData.freePlaces })}
+                      </p>
+                    )}
+                    {overbookingWarning(inviteDialogOverbooking)}
+                  </>
                 ) : (
                   <>
                     <ul className="text-label-primary mb-4 space-y-2">
@@ -1521,6 +1735,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
                           {t('bulk_actions.free_places', { count: inviteDialogData.freePlaces })}
                         </p>
                       )}
+                    {overbookingWarning(inviteDialogOverbooking)}
                     {inviteDialogData.withheldCount > 0 && (
                       <p className="text-sm text-warning mb-2">
                         {t('bulk_actions.invitations_withheld', { count: inviteDialogData.withheldCount })}
@@ -1551,13 +1766,14 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
                     />
                   </div>
                 )}
+                <StatusChangeEmailNotice courseId={course.id} emails={inviteDialogEmails} />
               </div>
               <div className="flex justify-end gap-3">
                 <OldButton onClick={handleCloseInviteDialog} inverted disabled={isSendingInvitations}>
                   {tCommon('cancel')}
                 </OldButton>
                 <OldButton onClick={handleSendInvitations} filled disabled={isSendingInvitations}>
-                  {inviteDialogData.mode === 'renew'
+                  {inviteDialogData.mode === 'renew' || inviteDialogData.mode === 'single'
                     ? t('bulk_actions.renew_invitation_confirm')
                     : t('bulk_actions.send_decisions_confirm')}
                 </OldButton>
@@ -1574,7 +1790,54 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
         confirmDisabled={isCancellingEnrollments}
         confirmationText={t('bulk_actions.cancel_registrations_confirm')}
         question={t('bulk_actions.cancel_registrations_question', { count: cancelEnrollmentIds?.length ?? 0 })}
-      />
+      >
+        <StatusChangeEmailNotice
+          courseId={course.id}
+          emails={[
+            {
+              template: enrollmentStatusMailTemplate({ oldStatus: 'CONFIRMED', newStatus: 'CANCELLED' }),
+              count: cancelEnrollmentIds?.length ?? 0,
+            },
+          ]}
+        />
+      </QuestionConfirmationDialog>
+
+      <QuestionConfirmationDialog
+        open={waitlistConfirmCandidate != null}
+        title={t('bulk_actions.confirm_waitlist_dialog_title')}
+        onClose={handleCloseWaitlistConfirmDialog}
+        onConfirm={handleConfirmWaitlistEnrollment}
+        confirmDisabled={isConfirmingWaitlist}
+        confirmationText={t('bulk_actions.confirm_waitlist_confirm')}
+        question={
+          waitlistConfirmCandidate
+            ? t('bulk_actions.confirm_waitlist_question', {
+                name: `${waitlistConfirmCandidate.User.firstName} ${waitlistConfirmCandidate.User.lastName}`.trim(),
+                position: waitlistPositions.get(waitlistConfirmCandidate.id) ?? 1,
+              })
+            : ''
+        }
+      >
+        {courseFreePlaces != null && (
+          <p className="mt-3 text-sm text-label-secondary">
+            {t('bulk_actions.free_places', { count: courseFreePlaces })}
+          </p>
+        )}
+        <div className="mt-2">{overbookingWarning(overbookingOf(courseFreePlaces, 1))}</div>
+        <StatusChangeEmailNotice
+          courseId={course.id}
+          emails={[
+            {
+              template: enrollmentStatusMailTemplate({
+                oldStatus: 'WAITLIST',
+                newStatus: 'CONFIRMED',
+                registrationType: course.registrationType,
+              }),
+              count: 1,
+            },
+          ]}
+        />
+      </QuestionConfirmationDialog>
 
       {/* Bulk Email Dialog */}
       <Dialog
@@ -1706,6 +1969,11 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
         errorMessage={inviteError || ''}
         open={!!inviteError}
         onClose={() => setInviteError(null)}
+      />
+      <ErrorMessageDialog
+        errorMessage={waitlistConfirmError || ''}
+        open={!!waitlistConfirmError}
+        onClose={() => setWaitlistConfirmError(null)}
       />
       <ErrorMessageDialog
         errorMessage={cancelError || ''}

@@ -134,9 +134,16 @@ describe('registration confirmation templates', () => {
     });
   });
 
-  it('preserves the waitlist promotion email', async () => {
+  it('confirms a place given from the waitlist', async () => {
     await checkMail({
       status: 'CONFIRMED', userStatus: 'ACTIVE', registrationType: 'DIRECT_CONFIRMATION',
+      templateType: 'WAITLIST_CONFIRMED', oldStatus: 'WAITLIST',
+    });
+  });
+
+  it('invites from the waitlist with the promotion email', async () => {
+    await checkMail({
+      status: 'INVITED', userStatus: 'ACTIVE', registrationType: 'APPROVAL_WITH_INPUT',
       templateType: 'WAITLIST_PROMOTED', oldStatus: 'WAITLIST',
     });
   });

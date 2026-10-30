@@ -63,6 +63,8 @@ import {
   submissionDeadlineToIsoString,
 } from '../../CourseContent/Projects/projectEffectiveSubmissionDeadline';
 import { QuestionConfirmationDialog } from '../../../common/dialogs/QuestionConfirmationDialog';
+import { StatusChangeEmailNotice, useMailTemplateLabel } from '../../../common/StatusChangeEmailNotice';
+import { enrollmentStatusMailTemplate } from '../../../../helpers/enrollmentStatusEmail';
 import {
   AttendanceOverallStatus,
   CourseEnrollmentWithAttendances,
@@ -111,11 +113,15 @@ function getAttendanceStatus(
   return getAttendanceStatusFromMap(attendanceBySession, sessions, maxMissedSessions);
 }
 
+/** Marking a participation aborted emails the participant with this template. */
+const abortMailTemplate = enrollmentStatusMailTemplate({ oldStatus: 'CONFIRMED', newStatus: 'ABORTED' });
+
 export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ course, qResult }) => {
   const t = useTranslations('manageCourse');
   const displayDate = useDisplayDate();
   const tCommon = useTranslations('common');
   const tCoursePage = useTranslations('coursePage');
+  const templateLabel = useMailTemplateLabel();
   const isAdmin = useIsAdmin();
   // An org admin managing the course (the page runs under org_admin) acts like its instructors.
   const managesAsOrgAdmin = useManagementRoleContext() === AuthRoles.org_admin;
@@ -293,7 +299,14 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
         affectedRows === 1
           ? 'participations_bulk_actions.mark_aborted_success_singular'
           : 'participations_bulk_actions.mark_aborted_success_plural';
-      setSnackbarMessage(t(messageKey, { count: affectedRows }));
+      setSnackbarMessage(
+        affectedRows > 0 && abortMailTemplate
+          ? `${t(messageKey, { count: affectedRows })} ${tCommon('status_email.sent', {
+              count: affectedRows,
+              template: templateLabel(abortMailTemplate),
+            })}`
+          : t(messageKey, { count: affectedRows })
+      );
       setSnackbarOpen(true);
       setPendingAbortRows([]);
       refetch();
@@ -320,6 +333,8 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
     updateEnrollmentStatusWhenConfirmed,
     course.id,
     t,
+    tCommon,
+    templateLabel,
     refetch,
     qResult,
   ]);
@@ -834,7 +849,9 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
         abortBulkAction.fail();
       }}
       onConfirm={handleConfirmAbortParticipations}
-    />
+    >
+      <StatusChangeEmailNotice courseId={course.id} emails={[{ template: abortMailTemplate, count: pendingAbortRows.length }]} />
+    </QuestionConfirmationDialog>
   );
 
   if (!course.achievementCertificatePossible) {
