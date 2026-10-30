@@ -2387,6 +2387,7 @@
     "headline": "Programs",
     "table_header": {
       "published": "Published",
+      "organization": "Organization",
       "application_start": "Registration Start",
       "application_end": "Registration Deadline",
       "course_start": "Course Start",
