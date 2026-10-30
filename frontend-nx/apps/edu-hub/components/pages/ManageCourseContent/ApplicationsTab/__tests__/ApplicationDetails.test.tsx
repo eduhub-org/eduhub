@@ -4,7 +4,7 @@ import '@testing-library/jest-dom';
 
 import { ApplicationDetails } from '../ApplicationDetails';
 import { getRegistrationFeatures } from '../registrationConfig';
-import { CourseRegistrationType_enum, MotivationRating_enum } from '../../../../../__generated__/globalTypes';
+import { CourseEnrollmentStatus_enum, CourseRegistrationType_enum, MotivationRating_enum } from '../../../../../__generated__/globalTypes';
 
 jest.mock('next-intl', () => ({
   useTranslations: () => (key: string) => key,
@@ -119,7 +119,7 @@ describe('ApplicationDetails', () => {
   it('confirms someone from the waitlist of a direct registration, with their place in line', () => {
     const onPromote = jest.fn();
     renderDetails({
-      enrollment: { ...enrollment, status: 'WAITLIST' },
+      enrollment: { ...enrollment, status: CourseEnrollmentStatus_enum.WAITLIST },
       features: getRegistrationFeatures(CourseRegistrationType_enum.DIRECT_CONFIRMATION),
       onPromote,
       promoteLabelKey: 'application_details.confirm_from_waitlist',
@@ -132,7 +132,7 @@ describe('ApplicationDetails', () => {
 
   it('explains why a paid event has no way up from the waitlist', () => {
     renderDetails({
-      enrollment: { ...enrollment, status: 'WAITLIST' },
+      enrollment: { ...enrollment, status: CourseEnrollmentStatus_enum.WAITLIST },
       features: getRegistrationFeatures(CourseRegistrationType_enum.DIRECT_CONFIRMATION_AND_PAYMENT),
       promoteHintKey: 'application_details.paid_waitlist_not_supported',
     });
