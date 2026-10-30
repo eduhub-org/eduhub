@@ -51,7 +51,7 @@ import { IoIosCheckmarkCircle } from 'react-icons/io';
 import { GoDotFill } from 'react-icons/go';
 import { ColumnDef, Row } from '@tanstack/react-table';
 import TableGrid from '../../../common/TableGrid';
-import { useDeferredBulkAction, useTableGrid } from '../../../common/TableGrid/hooks';
+import { useDeferredBulkAction, usePersistedPageSize, useTableGrid } from '../../../common/TableGrid/hooks';
 import { createMultiWordSearchCondition } from '../../../common/TableGrid/utils';
 import { BulkAction } from '../../../common/TableGrid/types';
 import NotificationSnackbar from '../../../common/dialogs/NotificationSnackbar';
@@ -121,7 +121,7 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
   const managesAsOrgAdmin = useManagementRoleContext() === AuthRoles.org_admin;
   const isInstructor = useIsInstructor() || managesAsOrgAdmin;
 
-  const [pageSize, setPageSize] = useState(20);
+  const [pageSize, setPageSize] = usePersistedPageSize('manageCourse.participations', 20);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [bulkActionError, setBulkActionError] = useState<string | null>(null);
@@ -269,7 +269,7 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
       setPageSize(newSize);
       setPageIndex(0);
     },
-    [setPageIndex]
+    [setPageIndex, setPageSize]
   );
 
   // Marking participations as aborted finishes in a confirmation dialog, so the selection is only
