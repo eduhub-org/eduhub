@@ -93,6 +93,7 @@ import { ErrorMessageDialog } from '../../../common/dialogs/ErrorMessageDialog';
 import { QuestionConfirmationDialog } from '../../../common/dialogs/QuestionConfirmationDialog';
 import { ApplicationDetails, RATING_OPTIONS } from './ApplicationDetails';
 import { getRegistrationFeatures } from './registrationConfig';
+import { defaultInvitationDeadline } from './invitationDeadline';
 import NotificationSnackbar from '../../../common/dialogs/NotificationSnackbar';
 import Loading from '../../../common/Loading';
 import { StatusChangeEmail, StatusChangeEmailNotice, useMailTemplateLabel } from '../../../common/StatusChangeEmailNotice';
@@ -325,7 +326,7 @@ const freePlacesOf = (
 const overbookingOf = (freePlaces: number | null, placesTaken: number) =>
   freePlaces == null ? 0 : Math.max(0, placesTaken - freePlaces);
 
-/** Direct registration with payment: moving up from the waitlist would skip the payment. */
+/** Direct registration with payment: someone moved up is invited to pay by a deadline. */
 const isPaidDirectRegistration = (registrationType: string | null) =>
   registrationType === CourseRegistrationType_enum.DIRECT_CONFIRMATION_AND_PAYMENT ||
   registrationType === CourseRegistrationType_enum.DIRECT_WITH_INPUT_AND_PAYMENT;
@@ -534,12 +535,11 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
     setBulkNoticeOpen(false);
   }, []);
 
-  // Default invitation expiration date: one week from today
-  const getDefaultInviteExpireDate = useCallback(() => {
-    const defaultDate = new Date();
-    defaultDate.setDate(defaultDate.getDate() + 7);
-    return defaultDate;
-  }, []);
+  const firstSessionStart = course.Sessions[0]?.startDateTime ?? null;
+  const getDefaultInviteExpireDate = useCallback(
+    () => defaultInvitationDeadline(firstSessionStart),
+    [firstSessionStart]
+  );
 
   const [inviteExpireDate, setInviteExpireDate] = useState(() => getDefaultInviteExpireDate());
   const handleSetInviteExpireDate = useCallback(
@@ -1455,8 +1455,8 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
 
   /**
    * The row's way in: on an application course, invite someone who applied or waits (with a
-   * deadline); on a direct-registration course, give someone waiting a confirmed place. Paid
-   * direct registration has no way in yet, the person would skip the payment.
+   * deadline); on a direct-registration course, give someone waiting a confirmed place, or on a
+   * paid one invite them to pay for it by a deadline.
    */
   const promotionOf = (enrollment: ApplicationEnrollment) => {
     if (!canDecideRegistrations) return {};
@@ -1467,7 +1467,9 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
         : {};
     }
     if (!isWaiting) return {};
-    if (paidDirectRegistration) return { promoteHintKey: 'application_details.paid_waitlist_not_supported' };
+    if (paidDirectRegistration) {
+      return { onPromote: () => handleOpenSingleInviteDialog(enrollment), promoteLabelKey: 'application_details.invite_single' };
+    }
     return {
       onPromote: () => setWaitlistConfirmCandidate(enrollment),
       promoteLabelKey: 'application_details.confirm_from_waitlist',
@@ -1536,10 +1538,21 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
     const fromWaitlist = inviteDialogData.waitlistInviteCount;
     inviteDialogEmails.push(
       {
-        template: enrollmentStatusMailTemplate({ oldStatus: 'APPLIED', newStatus: 'INVITED' }),
+        template: enrollmentStatusMailTemplate({
+          oldStatus: 'APPLIED',
+          newStatus: 'INVITED',
+          registrationType: course.registrationType,
+        }),
         count: inviteDialogData.enrollmentIds.length - fromWaitlist,
       },
-      { template: enrollmentStatusMailTemplate({ oldStatus: 'WAITLIST', newStatus: 'INVITED' }), count: fromWaitlist },
+      {
+        template: enrollmentStatusMailTemplate({
+          oldStatus: 'WAITLIST',
+          newStatus: 'INVITED',
+          registrationType: course.registrationType,
+        }),
+        count: fromWaitlist,
+      },
       {
         template: enrollmentStatusMailTemplate({ oldStatus: 'APPLIED', newStatus: 'REJECTED' }),
         count: inviteDialogData.rejectionIds.length,
@@ -1547,12 +1560,20 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
     );
     inviteDialogOverbooking = overbookingOf(inviteDialogData.freePlaces, inviteDialogData.enrollmentIds.length);
   } else if (inviteDialogData?.mode === 'renew') {
-    inviteDialogEmails.push({ template: enrollmentStatusMailTemplate({ oldStatus: 'INVITED', newStatus: 'INVITED' }), count: 1 });
+    inviteDialogEmails.push({
+      template: enrollmentStatusMailTemplate({
+        oldStatus: 'INVITED',
+        newStatus: 'INVITED',
+        registrationType: course.registrationType,
+      }),
+      count: 1,
+    });
   } else if (inviteDialogData?.mode === 'single') {
     inviteDialogEmails.push({
       template: enrollmentStatusMailTemplate({
         oldStatus: inviteDialogData.fromWaitlist ? 'WAITLIST' : 'APPLIED',
         newStatus: 'INVITED',
+        registrationType: course.registrationType,
       }),
       count: 1,
     });
@@ -1704,7 +1725,12 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
                 ) : inviteDialogData.mode === 'single' ? (
                   <>
                     <p className="text-label-primary mb-4">
-                      {t('bulk_actions.single_invite_text', { name: inviteDialogData.name })}
+                      {t(
+                        paidDirectRegistration
+                          ? 'bulk_actions.single_invite_text_payment'
+                          : 'bulk_actions.single_invite_text',
+                        { name: inviteDialogData.name }
+                      )}
                     </p>
                     {inviteDialogData.freePlaces != null && (
                       <p className="text-sm text-label-secondary mb-2">

@@ -54,8 +54,6 @@ interface Props extends Omit<ExpandedRowProps<ApplicationEnrollment>, 'row'> {
    */
   onPromote?: () => void;
   promoteLabelKey?: string;
-  /** Says why there is no promote button although the person is waiting. */
-  promoteHintKey?: string;
   /** 1-based place on the waitlist, for people on it. */
   waitlistPosition?: number;
   isInvitationExpired?: boolean;
@@ -75,7 +73,6 @@ export const ApplicationDetails: FC<Props> = ({
   onRenewInvitation,
   onPromote,
   promoteLabelKey,
-  promoteHintKey,
   waitlistPosition,
   isInvitationExpired = false,
   displayDate,
@@ -108,7 +105,7 @@ export const ApplicationDetails: FC<Props> = ({
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [isActive, hasRating, onRate, expandNext, expandPrevious]);
 
-  const promotion = (onPromote || promoteHintKey || waitlistPosition != null) && (
+  const promotion = (onPromote || waitlistPosition != null) && (
     <div className="space-y-2 text-sm">
       {waitlistPosition != null && (
         <div className="flex items-center gap-2 font-medium">
@@ -125,7 +122,6 @@ export const ApplicationDetails: FC<Props> = ({
           {t(promoteLabelKey)}
         </button>
       )}
-      {promoteHintKey && <p className="text-xs text-label-secondary">{t(promoteHintKey)}</p>}
     </div>
   );
 

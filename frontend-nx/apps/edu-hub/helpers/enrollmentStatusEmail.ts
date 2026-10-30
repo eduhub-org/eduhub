@@ -7,6 +7,11 @@ const DIRECT_REGISTRATION_TYPES: string[] = [
   CourseRegistrationType_enum.DIRECT_WITH_INPUT_AND_PAYMENT,
 ];
 
+const PAID_REGISTRATION_TYPES: string[] = [
+  CourseRegistrationType_enum.DIRECT_CONFIRMATION_AND_PAYMENT,
+  CourseRegistrationType_enum.DIRECT_WITH_INPUT_AND_PAYMENT,
+];
+
 interface StatusChange {
   /** Status before the change; null or undefined for a new enrollment. */
   oldStatus?: CourseEnrollmentStatus_enum | string | null;
@@ -32,6 +37,11 @@ export const enrollmentStatusMailTemplate = ({
   registrationType,
   isPaid = false,
 }: StatusChange): MailTemplateType_enum | null => {
+  // On a paid course an invitation is accepted by paying, whoever it went to.
+  if (newStatus === CourseEnrollmentStatus_enum.INVITED && PAID_REGISTRATION_TYPES.includes(registrationType ?? '')) {
+    return MailTemplateType_enum.WAITLIST_PROMOTED_PAYMENT;
+  }
+
   if (oldStatus === CourseEnrollmentStatus_enum.WAITLIST) {
     if (newStatus === CourseEnrollmentStatus_enum.INVITED) return MailTemplateType_enum.WAITLIST_PROMOTED;
     if (newStatus === CourseEnrollmentStatus_enum.CONFIRMED) return MailTemplateType_enum.WAITLIST_CONFIRMED;

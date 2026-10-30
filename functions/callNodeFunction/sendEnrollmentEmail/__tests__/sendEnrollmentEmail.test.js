@@ -141,6 +141,13 @@ describe('registration confirmation templates', () => {
     });
   });
 
+  it('asks for payment when inviting on a paid course', async () => {
+    await checkMail({
+      status: 'INVITED', userStatus: 'ACTIVE', registrationType: 'DIRECT_CONFIRMATION_AND_PAYMENT',
+      templateType: 'WAITLIST_PROMOTED_PAYMENT', oldStatus: 'WAITLIST',
+    });
+  });
+
   it('invites from the waitlist with the promotion email', async () => {
     await checkMail({
       status: 'INVITED', userStatus: 'ACTIVE', registrationType: 'APPROVAL_WITH_INPUT',

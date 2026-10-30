@@ -43,6 +43,16 @@ describe('enrollmentStatusMailTemplate', () => {
     ).toBe('WAITLIST_PROMOTED');
   });
 
+  it('asks for payment when inviting on a paid course', () => {
+    expect(
+      enrollmentStatusMailTemplate({
+        oldStatus: 'WAITLIST',
+        newStatus: 'INVITED',
+        registrationType: 'DIRECT_WITH_INPUT_AND_PAYMENT',
+      })
+    ).toBe('WAITLIST_PROMOTED_PAYMENT');
+  });
+
   it('sends the invitation again when it is renewed with a new deadline', () => {
     expect(enrollmentStatusMailTemplate({ oldStatus: 'INVITED', newStatus: 'INVITED' })).toBe('INVITE');
   });

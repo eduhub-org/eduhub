@@ -1,6 +1,9 @@
 export default {
   testEnvironment: 'node',
   transform: {},
+  moduleNameMapper: {
+    '^sanitize-html$': '<rootDir>/jest/sanitizeHtml.js',
+  },
   testTimeout: 10000,
   roots: ['<rootDir>', '<rootDir>/../sendMail'],
   testMatch: [

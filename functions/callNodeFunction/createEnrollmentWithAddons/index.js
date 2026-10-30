@@ -22,13 +22,14 @@ const GET_COURSE_ADDONS = `
 // IMPORTANT — on_conflict.update_columns intentionally only contains
 // motivationLetter:
 //
-// - status / paymentStatus are state-machine fields. If the user already
-//   has a CONFIRMED + PAID enrollment and somehow re-triggers this action
-//   (stale UI, retried network call, direct API call), upserting them
-//   back to APPLIED + PENDING would silently regress a paid enrollment.
-//   Excluding them from update_columns makes this mutation a true no-op
-//   for the state of an existing row and lets the dedicated status /
-//   payment-status workflows remain the single source of truth.
+// - status is a state-machine field. If the user already has a CONFIRMED,
+//   paid enrollment and somehow re-triggers this action (stale UI, retried
+//   network call, direct API call), upserting it back to APPLIED would
+//   silently regress a paid enrollment. Excluding it from update_columns
+//   makes this mutation a no-op for the state of an existing row - an
+//   invitation (INVITED) keeps its held place while the invited person goes
+//   through checkout - and lets the dedicated status workflows remain the
+//   single source of truth. Payment state lives on the Invoice rows.
 // - termsAcceptedAt is excluded because terms are accepted later in the
 //   UI (summary step before Stripe checkout) and recorded by a dedicated
 //   mutation; excluding it here guarantees that a retry of
@@ -47,7 +48,6 @@ const CREATE_ENROLLMENT = `
     $userId: uuid!
     $motivationLetter: String!
     $status: CourseEnrollmentStatus_enum!
-    $paymentStatus: PaymentStatus_enum
   ) {
     insert_CourseEnrollment(
       objects: {
@@ -55,7 +55,6 @@ const CREATE_ENROLLMENT = `
         userId: $userId
         motivationLetter: $motivationLetter
         status: $status
-        paymentStatus: $paymentStatus
       }
       on_conflict: {
         constraint: uniqueUserCourse
@@ -94,7 +93,6 @@ const REACTIVATE_CANCELLED_ENROLLMENT = `
       where: { id: { _eq: $enrollmentId }, status: { _eq: CANCELLED } }
       _set: {
         status: APPLIED
-        paymentStatus: PENDING
         cancellationRequestedAt: null
         cancellationRequestReason: null
       }
@@ -421,7 +419,7 @@ export default async function createEnrollmentWithAddons(req, logger) {
       },
     });
 
-    // Step 1: Create CourseEnrollment with status APPLIED and paymentStatus PENDING.
+    // Step 1: Create CourseEnrollment with status APPLIED (an existing row keeps its status).
     // termsAcceptedAt is set later, by a separate mutation, when the user
     // explicitly accepts terms in the summary step before Stripe checkout.
     logger.info('Creating enrollment', { courseId, userId: effectiveUserId });
@@ -431,7 +429,6 @@ export default async function createEnrollmentWithAddons(req, logger) {
       userId: effectiveUserId,
       motivationLetter: motivationLetter || '[Formbricks Survey Completed]',
       status: 'APPLIED',
-      paymentStatus: 'PENDING' // Set to PENDING for payment flows - will be updated by webhook on success/failure
     });
 
     const enrollmentId = enrollmentResult.insert_CourseEnrollment?.returning?.[0]?.id;

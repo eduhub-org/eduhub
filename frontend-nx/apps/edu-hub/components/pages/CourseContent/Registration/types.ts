@@ -93,6 +93,15 @@ export const isRegistrationClosed = (applicationEnd: Date, now: Date = new Date(
 };
 
 /**
+ * Whether an invitation's last day ("invitationExpirationDate", a date pinned to UTC midnight like
+ * applicationEnd) is over, on the same Europe/Berlin day boundary as expire_invitations.
+ */
+export const isInvitationExpired = (invitationExpirationDate: Date | string | null, now: Date = new Date()): boolean => {
+  if (invitationExpirationDate == null) return false;
+  return isRegistrationClosed(new Date(invitationExpirationDate), now);
+};
+
+/**
  * Places still open to new registrations, or null when the course has no limit.
  *
  * A place that frees up on a full course belongs to the waitlist: the organizer

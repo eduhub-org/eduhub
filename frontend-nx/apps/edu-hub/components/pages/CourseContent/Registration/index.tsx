@@ -1,7 +1,7 @@
 import { FC, useCallback, useState } from 'react';
 
 import { CourseEnrollmentStatus_enum, CourseRegistrationType_enum } from '../../../../__generated__/globalTypes';
-import { canRetryPayment } from '../../../../utils/invoicePaymentStatus';
+import { canRetryPayment, hasPaidInvoice } from '../../../../utils/invoicePaymentStatus';
 import { Course_Course_by_pk } from '../../../../queries/__generated__/Course';
 import { CourseWithEnrollment_Course_by_pk_CourseEnrollments } from '../../../../queries/__generated__/CourseWithEnrollment';
 import { useIsLoggedIn } from '../../../../hooks/authentication';
@@ -15,7 +15,7 @@ import { ParticipationExitButton } from './ParticipationExitButton';
 import { CancellationRequestButton } from './CancellationRequestButton';
 import { useRegistrationHandler } from './hooks/useRegistrationHandler';
 import { ParticipationExitOutcome } from './participationExit';
-import { isRegistrationClosed, placesOpenForRegistration } from './types';
+import { isInvitationExpired, isRegistrationClosed, placesOpenForRegistration } from './types';
 
 /**
  * Props for the Registration component
@@ -129,15 +129,28 @@ export const Registration: FC<RegistrationProps> = ({
 
   // If user has an enrollment, show status
   if (courseEnrollment) {
+    // An invitation to a paid course - someone moved up from the waitlist - is accepted by paying
+    // through the same checkout as a registration, for the place it holds.
+    const canPayInvitation =
+      registrationHandler.config.requiresPayment &&
+      courseEnrollment.status === CourseEnrollmentStatus_enum.INVITED &&
+      !isInvitationExpired(courseEnrollment.invitationExpirationDate);
+    // A paid registration that never reached the checkout (the tab was closed first) has no
+    // invoice yet; it continues to the checkout the same way a failed payment is retried.
+    const canResumeUnpaidRegistration =
+      registrationHandler.config.requiresPayment &&
+      courseEnrollment.status === CourseEnrollmentStatus_enum.APPLIED &&
+      !hasPaidInvoice(courseEnrollment.Invoices);
     return (
       <div className="w-full">
         <RegistrationStatus 
           courseEnrollment={courseEnrollment} 
           course={course}
-          onRetryPayment={canRetryPayment(courseEnrollment.Invoices)
+          onRetryPayment={canRetryPayment(courseEnrollment.Invoices) || canResumeUnpaidRegistration
             ? () => registrationHandler.retryPayment(courseEnrollment.id)
             : undefined
           }
+          onPayInvitation={canPayInvitation ? () => registrationHandler.retryPayment(courseEnrollment.id) : undefined}
         />
         <ParticipationExitButton
           courseEnrollment={courseEnrollment}

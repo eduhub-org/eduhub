@@ -127,11 +127,14 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
     },
     fetchPolicy: 'cache-and-network',
     onCompleted(data) {
-      // Check if user has been invited to the course and the invitation has not expired
+      // Check if user has been invited to the course and the invitation has not expired. An
+      // invitation to a paid course is accepted by paying instead (the rail's "pay now").
       const courseEnrollment = getCourseEnrollment(data?.Course_by_pk, userId ?? '');
       const enrollmentStatus = courseEnrollment?.status;
+      const registrationType = data?.Course_by_pk?.registrationType;
       if (
         enrollmentStatus === CourseEnrollmentStatus_enum.INVITED &&
+        !getRegistrationTypeConfig(registrationType || CourseRegistrationType_enum.APPROVAL_WITH_INPUT).requiresPayment &&
         courseEnrollment?.invitationExpirationDate.setHours(0, 0, 0, 0) >= new Date().setHours(0, 0, 0, 0)
       ) {
         setResetValues(true);

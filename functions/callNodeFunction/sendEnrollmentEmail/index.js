@@ -1,6 +1,9 @@
 import { gql, GraphQLClient } from 'graphql-request';
 import { createEnrollmentVariableReplacer } from '../emailTemplateVariables.js';
 import { appendGuestMailFooter, guestSafeCopyRecipients } from '../guestRegistration.js';
+import { isDeclinedByParticipant, notifyOrganizersOfDecline } from './invitationDeclined.js';
+
+const PAID_REGISTRATION_TYPES = ['DIRECT_CONFIRMATION_AND_PAYMENT', 'DIRECT_WITH_INPUT_AND_PAYMENT'];
 
 /**
  * Sends enrollment status emails when CourseEnrollment status or invitationExpirationDate changes
@@ -46,6 +49,10 @@ export default async function sendEnrollmentEmail(req, logger) {
         'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET,
       },
     });
+
+    if (isDeclinedByParticipant(event)) {
+      await notifyOrganizersOfDecline(enrollment.id, client, logger);
+    }
 
     // Get enrollment details with user, course, and add-ons information
     const GET_ENROLLMENT_DETAILS = gql`
@@ -159,8 +166,12 @@ export default async function sendEnrollmentEmail(req, logger) {
       // Keep in sync with helpers/enrollmentStatusEmail.ts in the frontend,
       // which tells organizers in advance which template a change sends.
       const fromWaitlist = op === 'UPDATE' && oldEnrollment?.status === 'WAITLIST';
+      // On a paid course an invitation is accepted by paying, whoever it went to.
+      const paidCourse = PAID_REGISTRATION_TYPES.includes(enrollmentDetails.Course?.registrationType);
 
-      if (fromWaitlist && enrollment.status === 'INVITED') {
+      if (paidCourse && enrollment.status === 'INVITED') {
+        baseTemplateType = 'WAITLIST_PROMOTED_PAYMENT';
+      } else if (fromWaitlist && enrollment.status === 'INVITED') {
         baseTemplateType = 'WAITLIST_PROMOTED';
       } else if (fromWaitlist && enrollment.status === 'CONFIRMED') {
         baseTemplateType = 'WAITLIST_CONFIRMED';
