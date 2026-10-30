@@ -35,6 +35,7 @@ const CATEGORY_BY_TYPE: Record<string, EmailTemplateCategory> = {
   REGISTRATION_CONFIRMED_PAID: 'application',
   WAITLIST_NOTICE: 'application',
   WAITLIST_PROMOTED: 'application',
+  WAITLIST_CONFIRMED: 'application',
   INVITATION_EXPIRING_SOON: 'application',
   INVITATION_EXPIRED: 'application',
   ENROLLMENT_CANCELLED: 'application',

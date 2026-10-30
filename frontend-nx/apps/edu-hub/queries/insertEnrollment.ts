@@ -279,6 +279,23 @@ export const CANCEL_ENROLLMENTS_BY_ORGANIZER = gql`
   }
 `;
 
+/**
+ * An organizer gives a waitlisted person a place on a direct-registration course. Only a row still
+ * on the waitlist moves, so a double click or a stale table cannot confirm anyone else.
+ */
+export const CONFIRM_WAITLIST_ENROLLMENT = gql`
+  mutation ConfirmWaitlistEnrollment($enrollmentId: Int!, $courseId: Int!) {
+    update_CourseEnrollment(
+      where: {
+        _and: [{ id: { _eq: $enrollmentId } }, { courseId: { _eq: $courseId } }, { status: { _eq: WAITLIST } }]
+      }
+      _set: { status: CONFIRMED }
+    ) {
+      affected_rows
+    }
+  }
+`;
+
 /** Bulk invite update for APPLIED, WAITLIST, or already INVITED rows (supports invite resend/deadline changes). */
 export const UPDATE_ENROLLMENT_STATUS_FOR_INVITE = gql`
   mutation UpdateEnrollmentStatusForInvite(

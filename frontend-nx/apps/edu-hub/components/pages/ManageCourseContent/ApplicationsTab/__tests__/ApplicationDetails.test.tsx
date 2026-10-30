@@ -109,4 +109,34 @@ describe('ApplicationDetails', () => {
     } as Partial<React.ComponentProps<typeof ApplicationDetails>>);
     expect(screen.queryByRole('button', { name: 'application_details.reinvite' })).not.toBeInTheDocument();
   });
+  it('invites a single applicant from the rating panel', () => {
+    const onPromote = jest.fn();
+    renderDetails({ onPromote, promoteLabelKey: 'application_details.invite_single' });
+    fireEvent.click(screen.getByRole('button', { name: 'application_details.invite_single' }));
+    expect(onPromote).toHaveBeenCalled();
+  });
+
+  it('confirms someone from the waitlist of a direct registration, with their place in line', () => {
+    const onPromote = jest.fn();
+    renderDetails({
+      enrollment: { ...enrollment, status: 'WAITLIST' },
+      features: getRegistrationFeatures(CourseRegistrationType_enum.DIRECT_CONFIRMATION),
+      onPromote,
+      promoteLabelKey: 'application_details.confirm_from_waitlist',
+      waitlistPosition: 2,
+    });
+    expect(screen.getByText('application_details.waitlist_position')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'application_details.confirm_from_waitlist' }));
+    expect(onPromote).toHaveBeenCalled();
+  });
+
+  it('explains why a paid event has no way up from the waitlist', () => {
+    renderDetails({
+      enrollment: { ...enrollment, status: 'WAITLIST' },
+      features: getRegistrationFeatures(CourseRegistrationType_enum.DIRECT_CONFIRMATION_AND_PAYMENT),
+      promoteHintKey: 'application_details.paid_waitlist_not_supported',
+    });
+    expect(screen.getByText('application_details.paid_waitlist_not_supported')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /confirm_from_waitlist/ })).not.toBeInTheDocument();
+  });
 });

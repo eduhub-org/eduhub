@@ -133,6 +133,23 @@ export const MANAGED_COURSE_APPLICATIONS = gql`
       registrationType
       guestRegistrationEnabled
       matrixRoomId
+      maxParticipants
+      # Places taken, counted like course_active_participant_count. Organizers may
+      # overbook; the dialogs warn when an action takes more than are free.
+      TakenPlaces: CourseEnrollments_aggregate(
+        where: { isTest: { _eq: false }, status: { _in: [CONFIRMED, INVITED, REGISTERED] } }
+      ) {
+        aggregate {
+          count
+        }
+      }
+      # Waitlist order, so the organizer can move people up first come, first served.
+      WaitlistOrder: CourseEnrollments(
+        where: { isTest: { _eq: false }, status: { _eq: WAITLIST } }
+        order_by: [{ created_at: asc }, { id: asc }]
+      ) {
+        id
+      }
       formbricksEnrollmentSurveyUrl
       Program {
         id
@@ -277,8 +294,8 @@ export const MANAGED_COURSE_APPLICATION_RECIPIENTS = gql`
     Course_by_pk(id: $id) {
       id
       maxParticipants
-      # Places taken, counted like course_active_participant_count; invitations are capped by
-      # maxParticipants minus this (enforced by course_enrollment_guard_invitation_capacity).
+      # Places taken, counted like course_active_participant_count. "Send by rating" invites no more
+      # than maxParticipants minus this; other invitations warn before overbooking.
       TakenPlaces: CourseEnrollments_aggregate(
         where: { isTest: { _eq: false }, status: { _in: [CONFIRMED, INVITED, REGISTERED] } }
       ) {

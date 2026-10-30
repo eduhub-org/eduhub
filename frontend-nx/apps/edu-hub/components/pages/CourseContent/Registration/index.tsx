@@ -15,7 +15,7 @@ import { ParticipationExitButton } from './ParticipationExitButton';
 import { CancellationRequestButton } from './CancellationRequestButton';
 import { useRegistrationHandler } from './hooks/useRegistrationHandler';
 import { ParticipationExitOutcome } from './participationExit';
-import { isRegistrationClosed } from './types';
+import { isRegistrationClosed, placesOpenForRegistration } from './types';
 
 /**
  * Props for the Registration component
@@ -81,9 +81,7 @@ export const Registration: FC<RegistrationProps> = ({
     (course.registrationType === CourseRegistrationType_enum.DIRECT_CONFIRMATION ||
       course.registrationType === CourseRegistrationType_enum.DIRECT_WITH_INPUT);
 
-  const isCourseFull =
-    course.maxParticipants != null &&
-    (course.activeParticipantCount ?? 0) >= course.maxParticipants;
+  const isCourseFull = placesOpenForRegistration(course) === 0;
 
   const registrationHandler = useRegistrationHandler({
     course,
