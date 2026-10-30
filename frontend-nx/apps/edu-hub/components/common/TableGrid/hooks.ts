@@ -5,6 +5,8 @@ import { BaseRow, BulkAction, TableGridSortMapping, UseTableGridProps } from './
 import { mergeSortDirection } from './utils';
 
 const DEFAULT_SORT: Record<string, any>[] = [{ updated_at: 'desc' }];
+/** Query variables that page or sort the rows rather than decide which rows match. */
+const NON_MATCH_VARIABLES = ['offset', 'limit', 'order_by'];
 
 /**
  * Returns a referentially stable version of a JSON-serializable value.
@@ -158,6 +160,32 @@ export function useTableGrid<V>({
     setPageIndex(0);
   }, []);
 
+  // Which rows match depends on everything but paging and sort order. fetchAllRows only changes
+  // with these, since TableGrid treats a new loadAllRows as a new query.
+  const matchVariables = useStableValue(
+    Object.fromEntries(Object.entries(effectiveVariables).filter(([key]) => !NON_MATCH_VARIABLES.includes(key)))
+  );
+  const orderByRef = useRef(orderBy);
+  orderByRef.current = orderBy;
+
+  /**
+   * Runs the table's query once more for up to `limit` rows matching the current search and
+   * filters, across all pages and in the current sort order (e.g. for TableGrid's `loadAllRows`).
+   * It keeps the role of the table query and bypasses the cache, so the visible page is untouched.
+   */
+  const fetchAllRows = useCallback(
+    async (limit: number) => {
+      const result = await queryResult.client.query({
+        query,
+        variables: { ...matchVariables, order_by: orderByRef.current, offset: 0, limit },
+        context: queryResult.observable?.options.context,
+        fetchPolicy: 'no-cache',
+      });
+      return result.data;
+    },
+    [matchVariables, query, queryResult.client, queryResult.observable]
+  );
+
   return {
     queryResult,
     data,
@@ -173,6 +201,7 @@ export function useTableGrid<V>({
     setPageSize,
     sorting,
     setSorting: handleSetSorting,
+    fetchAllRows,
   };
 }
 
@@ -209,11 +238,17 @@ export const useDeferredBulkAction = () => {
   return { start, succeed, fail };
 };
 
+/**
+ * Row selection for bulk actions. The selection holds the rows themselves, not just their ids, so
+ * it survives page changes and searches: an action runs on every selected row, including rows
+ * selected on another page.
+ */
 export const useBulkActions = <T extends BaseRow>(
   _bulkActions: BulkAction[],
   onBulkAction: (action: string, selectedRows: T[]) => void | boolean | Promise<void | boolean>
 ) => {
-  const [selectedRowIds, setSelectedRowIds] = useState<Set<number>>(new Set());
+  const [selectedRows, setSelectedRows] = useState<Map<number, T>>(new Map());
+  const selectedRowIds = useMemo(() => new Set(selectedRows.keys()), [selectedRows]);
   const [bulkAction, setBulkAction] = useState<string>('');
   // A second action started while the first is still running would settle the wrong deferred
   // action (see useDeferredBulkAction), so only one runs at a time. The ref guards against a
@@ -221,26 +256,38 @@ export const useBulkActions = <T extends BaseRow>(
   const [isBulkActionPending, setIsBulkActionPending] = useState(false);
   const isBulkActionPendingRef = useRef(false);
 
-  const toggleRowSelection = useCallback((rowId: number) => {
-    setSelectedRowIds(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(rowId)) {
-        newSet.delete(rowId);
+  const toggleRowSelection = useCallback((row: T) => {
+    setSelectedRows(prev => {
+      const next = new Map(prev);
+      if (next.has(row.id)) {
+        next.delete(row.id);
       } else {
-        newSet.add(rowId);
+        next.set(row.id, row);
       }
-      return newSet;
+      return next;
     });
   }, []);
 
+  /** Selects the rows of the current page, or deselects them when all of them are selected already. */
   const toggleAllRows = useCallback((data: T[]) => {
-    setSelectedRowIds(prev => {
+    setSelectedRows(prev => {
+      const next = new Map(prev);
       // Compare by row id, not count: a new page of the same size is not "all selected".
       if (data.length > 0 && data.every(row => prev.has(row.id))) {
-        return new Set();
+        data.forEach(row => next.delete(row.id));
       } else {
-        return new Set(data.map(row => row.id));
+        data.forEach(row => next.set(row.id, row));
       }
+      return next;
+    });
+  }, []);
+
+  /** Adds rows to the selection, e.g. every row matching the current search across all pages. */
+  const selectRows = useCallback((rows: T[]) => {
+    setSelectedRows(prev => {
+      const next = new Map(prev);
+      rows.forEach(row => next.set(row.id, row));
+      return next;
     });
   }, []);
 
@@ -248,13 +295,17 @@ export const useBulkActions = <T extends BaseRow>(
    * Runs the bulk action and only drops the row selection once it actually succeeded: a handler
    * that rejects (or resolves to `false`, e.g. because nothing was applicable) keeps the rows
    * marked so the user can correct the problem and retry without reselecting everything.
+   *
+   * `data` is the current page: its rows replace their selected copies, which may have been
+   * loaded before the last refetch.
    */
   const handleBulkActionChange = useCallback(async (action: string, data: T[]) => {
     if (!onBulkAction || !action || isBulkActionPendingRef.current) {
       return;
     }
 
-    const selectedRowsData = data.filter((row) => selectedRowIds.has(row.id));
+    const currentRows = new Map(data.map((row) => [row.id, row]));
+    const selectedRowsData = Array.from(selectedRows.values(), (row) => currentRows.get(row.id) ?? row);
 
     isBulkActionPendingRef.current = true;
     setIsBulkActionPending(true);
@@ -264,10 +315,10 @@ export const useBulkActions = <T extends BaseRow>(
       if (result !== false) {
         // Only the rows this action ran on: a row selected while it was running was not part
         // of it and stays marked.
-        setSelectedRowIds((currentIds) => {
-          const remainingIds = new Set(currentIds);
-          selectedRowsData.forEach((row) => remainingIds.delete(row.id));
-          return remainingIds;
+        setSelectedRows((current) => {
+          const remaining = new Map(current);
+          selectedRowsData.forEach((row) => remaining.delete(row.id));
+          return remaining;
         });
       }
     } catch {
@@ -278,11 +329,21 @@ export const useBulkActions = <T extends BaseRow>(
       // The dropdown is a menu, not a state, so it always returns to its placeholder.
       setBulkAction('');
     }
-  }, [onBulkAction, selectedRowIds]);
+  }, [onBulkAction, selectedRows]);
 
   const clearSelections = useCallback(() => {
-    setSelectedRowIds(new Set());
+    setSelectedRows(new Map());
     setBulkAction('');
+  }, []);
+
+  /** Drops rows from the selection that no longer exist, e.g. after deleting one. */
+  const deselectRow = useCallback((rowId: number) => {
+    setSelectedRows(prev => {
+      if (!prev.has(rowId)) return prev;
+      const next = new Map(prev);
+      next.delete(rowId);
+      return next;
+    });
   }, []);
 
   const isAllSelected = useMemo(() => (data: T[]) => {
@@ -301,6 +362,8 @@ export const useBulkActions = <T extends BaseRow>(
     setBulkAction,
     toggleRowSelection,
     toggleAllRows,
+    selectRows,
+    deselectRow,
     handleBulkActionChange,
     clearSelections,
     isAllSelected,

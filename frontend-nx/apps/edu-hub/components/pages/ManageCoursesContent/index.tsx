@@ -234,7 +234,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
   }, []);
 
   // Use TableGrid hook with proper refetchFilter for search debouncing
-  const { data, loading, initialLoading, error, refetch, searchFilter, pageIndex, sorting, setSearchFilter, setPageIndex, setSorting } = useTableGrid({
+  const { data, loading, initialLoading, error, refetch, searchFilter, pageIndex, sorting, setSearchFilter, setPageIndex, setSorting, fetchAllRows } = useTableGrid({
     queryHook: useManageQuery,
     query: ADMIN_COURSE_LIST,
     queryVariables: filter,
@@ -279,6 +279,11 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
 
   const courses: AdminCourseList_Course[] = useMemo(() => data?.Course || [], [data?.Course]);
   const totalCount = data?.Course_aggregate?.aggregate?.count || 0;
+
+  const loadAllCourses = useCallback(async (): Promise<AdminCourseList_Course[]> => {
+    const allData = await fetchAllRows(totalCount);
+    return allData?.Course ?? [];
+  }, [fetchAllRows, totalCount]);
 
   // Fetch template counts for visible courses using parallel queries hook
   const courseIds = useMemo(() => courses.map((course) => course.id), [courses]);
@@ -1090,6 +1095,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
           refetchQueries={['AdminCourseList']}
           bulkActions={bulkActions}
           onBulkAction={handleBulkAction}
+          loadAllRows={loadAllCourses}
           onAddButtonClick={handleAddCourse}
           addButtonDisabledHint={addDisabledHint}
           addButtonText={addButtonText}
