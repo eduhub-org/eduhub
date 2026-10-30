@@ -6,6 +6,7 @@ import { Tooltip } from '@mui/material';
 import { Course_Course_by_pk_Sessions as Session, Course_Course_by_pk_CourseLocations as CourseLocation } from '../../../queries/__generated__/Course';
 import { SectionTitle } from '../../common/SectionTitle';
 import UserCard from '../../common/UserCard';
+import InlineMarkdown from '../../common/InlineMarkdown';
 import { useAppSettings } from '../../../contexts/AppSettingsContext';
 import { useDisplayDate, useFormatTimeString } from '../../../helpers/dateTimeHelpers';
 import { formatDayHeading, groupSessionsByDay } from '../../../helpers/sessionSchedule';
@@ -29,6 +30,12 @@ interface SessionsProps {
   isLoggedInParticipant: boolean;
   /** Events publish an agenda: grouped by day, always expanded, no "Termine" heading. */
   isEvent?: boolean;
+  /**
+   * Leaves out the description of the course's own sessions. An event created
+   * from a course session already shows that description in its first info
+   * block, so the agenda would repeat it word for word.
+   */
+  hideSessionDescriptions?: boolean;
 }
 
 interface SessionLocationsProps {
@@ -137,9 +144,18 @@ interface SessionRowProps {
   canSeeOnlineLink: boolean;
   programTitle?: string | null;
   isEvent: boolean;
+  hideDescription: boolean;
 }
 
-const SessionRow: FC<SessionRowProps> = ({ session, locations, showDate, canSeeOnlineLink, programTitle, isEvent }) => {
+const SessionRow: FC<SessionRowProps> = ({
+  session,
+  locations,
+  showDate,
+  canSeeOnlineLink,
+  programTitle,
+  isEvent,
+  hideDescription,
+}) => {
   const t = useTranslations('course');
   const displayDate = useDisplayDate();
   const formatTimeString = useFormatTimeString();
@@ -181,8 +197,8 @@ const SessionRow: FC<SessionRowProps> = ({ session, locations, showDate, canSeeO
             <SessionLocations locations={locations} canSeeOnlineLink={canSeeOnlineLink} />
           </div>
         )}
-        {description ? (
-          <p className="mt-1 text-sm text-label-secondary whitespace-pre-line break-words">{description}</p>
+        {description && !hideDescription ? (
+          <InlineMarkdown markdown={description} className="mt-1 text-sm text-label-secondary" />
         ) : null}
         <div className="flex flex-col">
           {SessionSpeakers &&
@@ -208,6 +224,7 @@ export const Sessions: FC<SessionsProps> = ({
   courseLocations,
   isLoggedInParticipant,
   isEvent = false,
+  hideSessionDescriptions = false,
 }) => {
   const t = useTranslations('course');
   const locale = useLocale();
@@ -310,6 +327,7 @@ export const Sessions: FC<SessionsProps> = ({
                     canSeeOnlineLink={canSeeOnlineLink}
                     programTitle={programTitle}
                     isEvent={isEvent}
+                    hideDescription={hideSessionDescriptions && !isProgramSession(session)}
                   />
                 ))}
               </ul>
@@ -334,6 +352,7 @@ export const Sessions: FC<SessionsProps> = ({
             canSeeOnlineLink={canSeeOnlineLink}
             programTitle={programTitle}
             isEvent={isEvent}
+            hideDescription={hideSessionDescriptions && !isProgramSession(session)}
           />
         ))}
       </ul>

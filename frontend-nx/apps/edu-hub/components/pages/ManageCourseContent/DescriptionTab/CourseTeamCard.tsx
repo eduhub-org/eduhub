@@ -1,4 +1,4 @@
-import { FC, useEffect, useMemo, useState } from 'react';
+import { FC, useMemo, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { SiElement } from 'react-icons/si';
 import { MdLock } from 'react-icons/md';
@@ -7,15 +7,10 @@ import UserCard from '../../../common/UserCard';
 import { Button } from '../../../common/Button';
 import { ErrorMessageDialog } from '../../../common/dialogs/ErrorMessageDialog';
 import { QuestionConfirmationDialog } from '../../../common/dialogs/QuestionConfirmationDialog';
+import InputField from '../../../inputs/InputField';
 import { elementDirectMessageUrl } from '../../../../helpers/matrix';
 import { getCertificateDownloadUrl } from '../../../../helpers/certificateDownload';
-import {
-  centsToEuroInput,
-  formatEuro,
-  parseEuroToCents,
-  isEuroInputAllowed,
-  summarizeSplit,
-} from '../../../../helpers/instructorPayment';
+import { centsToEuroInput, formatEuro, summarizeSplit } from '../../../../helpers/instructorPayment';
 import { useRoleQuery } from '../../../../hooks/authedQuery';
 import { useRoleMutation } from '../../../../hooks/authedMutation';
 import { useCurrentRole } from '../../../../hooks/authentication';
@@ -38,10 +33,6 @@ import {
   GenerateInstructorInvoice,
   GenerateInstructorInvoiceVariables,
 } from '../../../../queries/__generated__/GenerateInstructorInvoice';
-import {
-  UpsertCourseInstructorPaymentShare,
-  UpsertCourseInstructorPaymentShareVariables,
-} from '../../../../queries/__generated__/UpsertCourseInstructorPaymentShare';
 
 type TeamMember = CourseTeam_Course_by_pk_CourseInstructors;
 
@@ -64,82 +55,36 @@ interface ShareInputProps {
 const ShareInput: FC<ShareInputProps> = ({ member, total, otherSharesSum, disabled, onSaved }) => {
   const t = useTranslations('manageCourse.course_team');
   const locale = useLocale();
-  const savedAmount = member.PaymentShare?.amount ?? null;
-  const [value, setValue] = useState(centsToEuroInput(savedAmount, locale));
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    setValue(centsToEuroInput(savedAmount, locale));
-  }, [savedAmount, locale]);
-
-  const [upsertShare] = useRoleMutation<UpsertCourseInstructorPaymentShare, UpsertCourseInstructorPaymentShareVariables>(
-    UPSERT_COURSE_INSTRUCTOR_PAYMENT_SHARE
-  );
-
-  const save = async () => {
-    // An empty field stays "not entered yet"; there is no default amount.
-    if (value.trim() === '') {
-      setValue(centsToEuroInput(savedAmount, locale));
-      setError(null);
-      return;
-    }
-    const cents = parseEuroToCents(value);
-    if (cents === null) {
-      setError(t('invalid_amount'));
-      return;
-    }
-    if (cents === savedAmount) {
-      setError(null);
-      return;
-    }
-    if (otherSharesSum + cents > total) {
-      setError(t('exceeds_total', { max: formatEuro(Math.max(total - otherSharesSum, 0), locale) }));
-      return;
-    }
-    try {
-      await upsertShare({ variables: { courseInstructorId: member.id, amount: cents } });
-      setError(null);
-      onSaved();
-    } catch {
-      setError(t('save_failed'));
-    }
-  };
 
   return (
-    <div className="flex flex-col items-end">
-      <label className="flex items-center gap-2 text-sm text-label-primary">
-        <input
-          type="text"
-          inputMode="decimal"
-          aria-label={t('share_label', { name: `${member.User.firstName} ${member.User.lastName}` })}
-          className="w-28 rounded border border-border-primary bg-transparent px-2 py-1 text-right disabled:opacity-60"
-          placeholder="–"
-          value={value}
-          disabled={disabled}
-          onChange={(e) => {
-            if (isEuroInputAllowed(e.target.value)) setValue(e.target.value);
-          }}
-          onBlur={save}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') (e.target as HTMLInputElement).blur();
-          }}
-        />
-        <span>€</span>
-      </label>
-      {error ? <span className="mt-1 text-xs text-error">{error}</span> : null}
+    <div className="w-48">
+      {/* An empty field stays "not entered yet"; there is no default amount. */}
+      <InputField
+        variant="material"
+        type="currency"
+        label={t('share_label', { name: `${member.User.firstName} ${member.User.lastName}` })}
+        itemId={member.id}
+        value={centsToEuroInput(member.PaymentShare?.amount ?? null, locale)}
+        updateValueMutation={UPSERT_COURSE_INSTRUCTOR_PAYMENT_SHARE}
+        onValueUpdated={onSaved}
+        min={0}
+        max={Math.max(total - otherSharesSum, 0) / 100}
+        disabled={disabled}
+      />
     </div>
   );
 };
 
 interface IProps {
   courseId: number;
+  isEventCourse: boolean;
 }
 
 /**
  * Who teaches the course with me, how to reach them, and how we split the course fee.
  * Payment data is only returned by Hasura to instructors of this course and (org) admins.
  */
-export const CourseTeamCard: FC<IProps> = ({ courseId }) => {
+export const CourseTeamCard: FC<IProps> = ({ courseId, isEventCourse }) => {
   const t = useTranslations('manageCourse.course_team');
   const locale = useLocale();
   const userId = useUserId();
@@ -189,7 +134,7 @@ export const CourseTeamCard: FC<IProps> = ({ courseId }) => {
     ? t('hint_no_template')
     : !split.complete
     ? members.some((member) => !member.PaymentShare)
-      ? t('hint_missing_amounts')
+      ? t(isEventCourse ? 'hint_missing_amounts_event' : 'hint_missing_amounts')
       : t('hint_sum_mismatch', { remaining: formatEuro(split.remaining, locale) })
     : null;
 
@@ -224,7 +169,7 @@ export const CourseTeamCard: FC<IProps> = ({ courseId }) => {
       <h3 className="mb-3 text-lg font-semibold">{t('title')}</h3>
 
       {payment && !isSoleInstructor ? (
-        <p className="mb-4 text-sm text-label-secondary">{t('split_explanation', { total: formatEuro(total, locale) })}</p>
+        <p className="mb-4 text-sm text-label-secondary">{t(isEventCourse ? 'split_explanation_event' : 'split_explanation', { total: formatEuro(total, locale) })}</p>
       ) : null}
 
       <ul className="flex flex-col gap-3">
@@ -305,7 +250,7 @@ export const CourseTeamCard: FC<IProps> = ({ courseId }) => {
       <QuestionConfirmationDialog
         open={confirmLockOpen}
         title={t('confirm_lock_title')}
-        question={t('confirm_lock_question')}
+        question={t(isEventCourse ? 'confirm_lock_question_event' : 'confirm_lock_question')}
         confirmationText={t('confirm_lock_confirm')}
         onClose={() => setConfirmLockOpen(false)}
         onConfirm={runGenerateInvoice}

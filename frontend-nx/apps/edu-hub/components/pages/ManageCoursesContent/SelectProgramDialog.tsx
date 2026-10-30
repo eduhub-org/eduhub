@@ -13,9 +13,11 @@ interface SelectProgramDialogProps {
   onClose: (confirmed: boolean, selectedProgram: Programs_Program | null) => void;
   /** Decides whether the dialog talks about courses, events or degrees. */
   programType: ProgramType;
+  /** Replace the copy-to-program wording when the dialog picks a program for something else. */
+  texts?: { title: string; description: string; button: string };
 }
 
-export const SelectProgramDialog: FC<SelectProgramDialogProps> = ({ open, programs, onClose, programType }) => {
+export const SelectProgramDialog: FC<SelectProgramDialogProps> = ({ open, programs, onClose, programType, texts }) => {
   const t = useTranslations('manageCourses');
   const messageKey = programTypeMessageKey(programType);
   const [selectedProgram, setSelectedProgram] = useState<Programs_Program | null>(null);
@@ -38,7 +40,7 @@ export const SelectProgramDialog: FC<SelectProgramDialogProps> = ({ open, progra
     <Dialog open={open} onClose={handleCancel} maxWidth="sm" fullWidth>
       <DialogTitle className="light">
         <div className="flex justify-between items-center">
-          <span className="text-label-primary">{t(`copy_to_program_dialog.title.${messageKey}`)}</span>
+          <span className="text-label-primary">{texts?.title ?? t(`copy_to_program_dialog.title.${messageKey}`)}</span>
           <button
             onClick={handleCancel}
             className="p-1 rounded-full hover:bg-gray-200 transition-colors text-label-primary"
@@ -51,7 +53,7 @@ export const SelectProgramDialog: FC<SelectProgramDialogProps> = ({ open, progra
 
       <DialogContent className="light">
         <div className="mb-4">
-          <p className="text-label-primary">{t(`copy_to_program_dialog.description.${messageKey}`)}</p>
+          <p className="text-label-primary">{texts?.description ?? t(`copy_to_program_dialog.description.${messageKey}`)}</p>
         </div>
 
         <div className="max-h-96 overflow-auto mb-6">
@@ -74,7 +76,7 @@ export const SelectProgramDialog: FC<SelectProgramDialogProps> = ({ open, progra
         <div className="flex justify-between">
           <Button onClick={handleCancel}>{t('cancel')}</Button>
           <Button filled onClick={handleConfirm} disabled={!selectedProgram}>
-            {t(`copy_to_program_dialog.button.${messageKey}`)}
+            {texts?.button ?? t(`copy_to_program_dialog.button.${messageKey}`)}
           </Button>
         </div>
       </DialogContent>

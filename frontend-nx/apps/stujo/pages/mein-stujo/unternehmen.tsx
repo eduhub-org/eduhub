@@ -265,6 +265,9 @@ const Unternehmen: FC<Props> = ({ portal }) => {
   };
 
   const handleRequestAccess = async () => {
+    // Falsy on purpose: id 0 is the platform's own "EduHub Default" organization,
+    // which employers cannot claim or request access to (the backend handlers
+    // reject ids <= 0 as well).
     if (!claim?.organizationId) return;
     setError(null);
     try {

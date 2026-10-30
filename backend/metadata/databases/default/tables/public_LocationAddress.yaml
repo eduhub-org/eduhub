@@ -5,6 +5,9 @@ object_relationships:
   - name: LocationOption
     using:
       foreign_key_constraint_on: locationOption
+  - name: Category
+    using:
+      foreign_key_constraint_on: category
 array_relationships:
   - name: CourseLocations
     using:
@@ -30,6 +33,22 @@ insert_permissions:
         - address
         - description
         - aliases
+        - street
+        - zipCode
+        - city
+        - country
+        - addressAdditionalInfo
+        - directions
+        - accessibilityInfo
+        - latitude
+        - longitude
+        - category
+        - image
+        - imageCredits
+        - websiteUrl
+        - publicEmail
+        - publicPhone
+        - instagramUrl
   - role: org_admin_access
     permission:
       check: {}
@@ -39,6 +58,22 @@ insert_permissions:
         - address
         - description
         - aliases
+        - street
+        - zipCode
+        - city
+        - country
+        - addressAdditionalInfo
+        - directions
+        - accessibilityInfo
+        - latitude
+        - longitude
+        - category
+        - image
+        - imageCredits
+        - websiteUrl
+        - publicEmail
+        - publicPhone
+        - instagramUrl
 select_permissions:
   - role: anonymous
     permission:
@@ -49,6 +84,22 @@ select_permissions:
         - address
         - description
         - aliases
+        - street
+        - zipCode
+        - city
+        - country
+        - addressAdditionalInfo
+        - directions
+        - accessibilityInfo
+        - latitude
+        - longitude
+        - category
+        - image
+        - imageCredits
+        - websiteUrl
+        - publicEmail
+        - publicPhone
+        - instagramUrl
         - created_at
         - updated_at
       filter: {}
@@ -62,6 +113,24 @@ select_permissions:
         - address
         - description
         - aliases
+        - street
+        - zipCode
+        - city
+        - country
+        - addressAdditionalInfo
+        - directions
+        - accessibilityInfo
+        - latitude
+        - longitude
+        - category
+        - image
+        - imageCredits
+        - websiteUrl
+        - publicEmail
+        - publicPhone
+        - instagramUrl
+        - rausgegangenLocationId
+        - rausgegangenLocationOwned
         - created_at
         - updated_at
       filter: {}
@@ -75,6 +144,22 @@ select_permissions:
         - address
         - description
         - aliases
+        - street
+        - zipCode
+        - city
+        - country
+        - addressAdditionalInfo
+        - directions
+        - accessibilityInfo
+        - latitude
+        - longitude
+        - category
+        - image
+        - imageCredits
+        - websiteUrl
+        - publicEmail
+        - publicPhone
+        - instagramUrl
         - created_at
         - updated_at
       filter: {}
@@ -88,6 +173,24 @@ select_permissions:
         - address
         - description
         - aliases
+        - street
+        - zipCode
+        - city
+        - country
+        - addressAdditionalInfo
+        - directions
+        - accessibilityInfo
+        - latitude
+        - longitude
+        - category
+        - image
+        - imageCredits
+        - websiteUrl
+        - publicEmail
+        - publicPhone
+        - instagramUrl
+        - rausgegangenLocationId
+        - rausgegangenLocationOwned
         - created_at
         - updated_at
       filter: {}
@@ -100,6 +203,22 @@ update_permissions:
         - address
         - description
         - aliases
+        - street
+        - zipCode
+        - city
+        - country
+        - addressAdditionalInfo
+        - directions
+        - accessibilityInfo
+        - latitude
+        - longitude
+        - category
+        - image
+        - imageCredits
+        - websiteUrl
+        - publicEmail
+        - publicPhone
+        - instagramUrl
       filter: {}
       check: {}
   - role: org_admin_access
@@ -109,6 +228,22 @@ update_permissions:
         - address
         - description
         - aliases
+        - street
+        - zipCode
+        - city
+        - country
+        - addressAdditionalInfo
+        - directions
+        - accessibilityInfo
+        - latitude
+        - longitude
+        - category
+        - image
+        - imageCredits
+        - websiteUrl
+        - publicEmail
+        - publicPhone
+        - instagramUrl
       filter: {}
       check: {}
 delete_permissions:
@@ -118,3 +253,37 @@ delete_permissions:
   - role: org_admin_access
     permission:
       filter: {}
+event_triggers:
+  # Resyncs the listed events at this location on rausgegangen.de.
+  - name: rausgegangen_location_address_changed
+    definition:
+      enable_manual: false
+      update:
+        columns:
+          - shortLabel
+          - description
+          - street
+          - zipCode
+          - city
+          - country
+          - addressAdditionalInfo
+          - directions
+          - latitude
+          - longitude
+          - category
+          - image
+          - imageCredits
+          - websiteUrl
+          - publicEmail
+          - publicPhone
+          - instagramUrl
+    retry_conf:
+      interval_sec: 300
+      num_retries: 5
+      timeout_sec: 120
+    webhook: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+    headers:
+      - name: name
+        value: syncRausgegangenEvent
+      - name: secret
+        value_from_env: HASURA_CLOUD_FUNCTION_SECRET

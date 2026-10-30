@@ -9,6 +9,36 @@ import { Weekday_enum, CourseRegistrationType_enum, LocationOption_enum, Organiz
 // GraphQL query operation: CourseWithEnrollment
 // ====================================================
 
+export interface CourseWithEnrollment_Course_by_pk_SourceSession_Course {
+  __typename: "Course";
+  id: number;
+  /**
+   * The title of the course (only editable by an admin user)
+   */
+  title: string;
+  /**
+   * Decides whether the course is published for all users or not.
+   */
+  published: boolean;
+}
+
+export interface CourseWithEnrollment_Course_by_pk_SourceSession {
+  __typename: "Session";
+  id: number;
+  /**
+   * The title of the session
+   */
+  title: string;
+  /**
+   * The day and time of the start of the session
+   */
+  startDateTime: any;
+  /**
+   * An object relationship
+   */
+  Course: CourseWithEnrollment_Course_by_pk_SourceSession_Course | null;
+}
+
 export interface CourseWithEnrollment_Course_by_pk_Sessions_SessionAddresses_CourseLocation {
   __typename: "CourseLocation";
   id: number;
@@ -204,13 +234,9 @@ export interface CourseWithEnrollment_Course_by_pk_Program_Organization {
    */
   ghostNewsletterDoubleOptInEnabled: boolean;
   /**
-   * Optional Ghost newsletter list identifier.
+   * A computed field, executes function "organization_has_ghost_newsletter_configured"
    */
-  ghostNewsletterListId: string | null;
-  /**
-   * Optional Ghost newsletter slug when list ID is not used.
-   */
-  ghostNewsletterSlug: string | null;
+  hasGhostNewsletterConfigured: boolean | null;
 }
 
 export interface CourseWithEnrollment_Course_by_pk_Program_Sessions_SessionAddresses_CourseLocation {
@@ -591,6 +617,7 @@ export interface CourseWithEnrollment_Course_by_pk {
    * The cover image for the course
    */
   coverImage: string | null;
+  coverImageCredits: string | null;
   /**
    * The language the course is given in.
    */
@@ -628,7 +655,7 @@ export interface CourseWithEnrollment_Course_by_pk {
    */
   programId: number;
   /**
-   * The number of maximum participants in the course.
+   * Participant limit; NULL means no limit (0 or less is stored as NULL)
    */
   maxParticipants: number | null;
   /**
@@ -669,9 +696,25 @@ export interface CourseWithEnrollment_Course_by_pk {
   externalRegistrationLink: string | null;
   registrationType: CourseRegistrationType_enum | null;
   /**
+   * German text replacing the default label of the register/apply button on the course page. Null keeps the label derived from the registration type.
+   */
+  registrationButtonLabelDe: string | null;
+  /**
+   * English text replacing the default label of the register/apply button on the course page. Null keeps the label derived from the registration type.
+   */
+  registrationButtonLabelEn: string | null;
+  /**
    * Whether visitors without an account may register for this course/event with just name and email. Only honoured for courses in a Program of type EVENTS with a direct registration type.
    */
   guestRegistrationEnabled: boolean;
+  /**
+   * Set on an event created from a course session; its session, locations and addresses are kept in sync with that session
+   */
+  sourceSessionId: number | null;
+  /**
+   * An object relationship
+   */
+  SourceSession: CourseWithEnrollment_Course_by_pk_SourceSession | null;
   /**
    * Full URL to the Formbricks survey for course enrollment/application (for iframe embedding). Overrides program default if set.
    */

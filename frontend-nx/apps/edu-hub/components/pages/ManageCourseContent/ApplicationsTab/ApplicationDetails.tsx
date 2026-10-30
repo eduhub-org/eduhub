@@ -46,6 +46,9 @@ interface Props extends Omit<ExpandedRowProps<ApplicationEnrollment>, 'row'> {
   /** Formbricks survey of the course (or the program default); null shows the motivation letter. */
   surveyUrl: string | null;
   onRate: (rating: MotivationRating_enum) => void;
+  /** Sends the invitation again with a new deadline; omitted when it cannot be renewed. */
+  onRenewInvitation?: () => void;
+  isInvitationExpired?: boolean;
   displayDate: (date: string | null) => string;
 }
 
@@ -59,6 +62,8 @@ export const ApplicationDetails: FC<Props> = ({
   features,
   surveyUrl,
   onRate,
+  onRenewInvitation,
+  isInvitationExpired = false,
   displayDate,
   isActive,
   expandNext,
@@ -198,13 +203,25 @@ export const ApplicationDetails: FC<Props> = ({
               );
             })}
           </div>
-          {enrollment.status === 'INVITED' && (
+          {(enrollment.status === 'INVITED' || enrollment.status === 'EXPIRED') && (
             <div className="text-sm">
               <div className="mb-1 flex items-center gap-1 font-medium">
                 {t('invitation_deadline')}
                 <HelpIcon title={t('application_deadline_tooltip')} />
               </div>
-              <div className="font-medium">{displayDate(enrollment.invitationExpirationDate)}</div>
+              <div className={`font-medium ${isInvitationExpired ? 'text-error' : ''}`}>
+                {displayDate(enrollment.invitationExpirationDate)}
+                {isInvitationExpired && ` · ${t('status.invitation_expired')}`}
+              </div>
+              {onRenewInvitation && (
+                <button
+                  type="button"
+                  onClick={onRenewInvitation}
+                  className="mt-2 flex min-h-11 w-full items-center justify-center rounded-lg border border-border-primary bg-fill-primary px-3 text-sm font-semibold hover:bg-bg-secondary"
+                >
+                  {t(isInvitationExpired ? 'application_details.reinvite' : 'application_details.extend_invitation')}
+                </button>
+              )}
             </div>
           )}
           <p className="hidden text-[11px] text-label-secondary lg:block">{t('application_details.keyboard_hint')}</p>

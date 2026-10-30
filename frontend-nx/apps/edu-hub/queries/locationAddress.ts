@@ -19,6 +19,24 @@ export const LOCATION_ADDRESS_LIST = gql`
       address
       description
       aliases
+      street
+      zipCode
+      city
+      country
+      addressAdditionalInfo
+      directions
+      accessibilityInfo
+      latitude
+      longitude
+      category
+      image
+      imageCredits
+      websiteUrl
+      publicEmail
+      publicPhone
+      instagramUrl
+      rausgegangenLocationId
+      rausgegangenLocationOwned
       created_at
       updated_at
       LocationOption {
@@ -44,6 +62,15 @@ export const LOCATION_ADDRESS_LIST = gql`
     LocationOption {
       value
       comment
+    }
+    LocationAddressCategory {
+      value
+    }
+    # Whether any organization may share events on Rausgegangen (shows the venue link panel).
+    RausgegangenOrganizations: Organization_aggregate(where: { Features: { feature: { _eq: RAUSGEGANGEN } } }) {
+      aggregate {
+        count
+      }
     }
   }
 `;
@@ -199,6 +226,162 @@ export const LOCATION_ADDRESSES_FOR_FEED = gql`
       address
       aliases
       locationOption
+      latitude
+      longitude
+    }
+  }
+`;
+
+// Structured venue fields (InputField contract: $itemId + $text; a cleared field is stored as null).
+export const UPDATE_LOCATION_ADDRESS_STREET = gql`
+  mutation UpdateLocationAddressStreet($itemId: Int!, $text: String) {
+    update_LocationAddress_by_pk(pk_columns: { id: $itemId }, _set: { street: $text }) {
+      id
+      street
+    }
+  }
+`;
+export const UPDATE_LOCATION_ADDRESS_ZIP_CODE = gql`
+  mutation UpdateLocationAddressZipCode($itemId: Int!, $text: String) {
+    update_LocationAddress_by_pk(pk_columns: { id: $itemId }, _set: { zipCode: $text }) {
+      id
+      zipCode
+    }
+  }
+`;
+export const UPDATE_LOCATION_ADDRESS_CITY = gql`
+  mutation UpdateLocationAddressCity($itemId: Int!, $text: String) {
+    update_LocationAddress_by_pk(pk_columns: { id: $itemId }, _set: { city: $text }) {
+      id
+      city
+    }
+  }
+`;
+export const UPDATE_LOCATION_ADDRESS_COUNTRY = gql`
+  mutation UpdateLocationAddressCountry($itemId: Int!, $text: String) {
+    update_LocationAddress_by_pk(pk_columns: { id: $itemId }, _set: { country: $text }) {
+      id
+      country
+    }
+  }
+`;
+export const UPDATE_LOCATION_ADDRESS_ADDITIONAL_INFO = gql`
+  mutation UpdateLocationAddressAdditionalInfo($itemId: Int!, $text: String) {
+    update_LocationAddress_by_pk(pk_columns: { id: $itemId }, _set: { addressAdditionalInfo: $text }) {
+      id
+      addressAdditionalInfo
+    }
+  }
+`;
+export const UPDATE_LOCATION_ADDRESS_DIRECTIONS = gql`
+  mutation UpdateLocationAddressDirections($itemId: Int!, $text: String) {
+    update_LocationAddress_by_pk(pk_columns: { id: $itemId }, _set: { directions: $text }) {
+      id
+      directions
+    }
+  }
+`;
+export const UPDATE_LOCATION_ADDRESS_ACCESSIBILITY_INFO = gql`
+  mutation UpdateLocationAddressAccessibilityInfo($itemId: Int!, $text: String) {
+    update_LocationAddress_by_pk(pk_columns: { id: $itemId }, _set: { accessibilityInfo: $text }) {
+      id
+      accessibilityInfo
+    }
+  }
+`;
+export const UPDATE_LOCATION_ADDRESS_IMAGE_CREDITS = gql`
+  mutation UpdateLocationAddressImageCredits($itemId: Int!, $text: String) {
+    update_LocationAddress_by_pk(pk_columns: { id: $itemId }, _set: { imageCredits: $text }) {
+      id
+      imageCredits
+    }
+  }
+`;
+export const UPDATE_LOCATION_ADDRESS_WEBSITE_URL = gql`
+  mutation UpdateLocationAddressWebsiteUrl($itemId: Int!, $text: String) {
+    update_LocationAddress_by_pk(pk_columns: { id: $itemId }, _set: { websiteUrl: $text }) {
+      id
+      websiteUrl
+    }
+  }
+`;
+export const UPDATE_LOCATION_ADDRESS_PUBLIC_EMAIL = gql`
+  mutation UpdateLocationAddressPublicEmail($itemId: Int!, $text: String) {
+    update_LocationAddress_by_pk(pk_columns: { id: $itemId }, _set: { publicEmail: $text }) {
+      id
+      publicEmail
+    }
+  }
+`;
+export const UPDATE_LOCATION_ADDRESS_PUBLIC_PHONE = gql`
+  mutation UpdateLocationAddressPublicPhone($itemId: Int!, $text: String) {
+    update_LocationAddress_by_pk(pk_columns: { id: $itemId }, _set: { publicPhone: $text }) {
+      id
+      publicPhone
+    }
+  }
+`;
+export const UPDATE_LOCATION_ADDRESS_INSTAGRAM_URL = gql`
+  mutation UpdateLocationAddressInstagramUrl($itemId: Int!, $text: String) {
+    update_LocationAddress_by_pk(pk_columns: { id: $itemId }, _set: { instagramUrl: $text }) {
+      id
+      instagramUrl
+    }
+  }
+`;
+export const UPDATE_LOCATION_ADDRESS_LATITUDE = gql`
+  mutation UpdateLocationAddressLatitude($itemId: Int!, $text: numeric) {
+    update_LocationAddress_by_pk(pk_columns: { id: $itemId }, _set: { latitude: $text }) {
+      id
+      latitude
+    }
+  }
+`;
+export const UPDATE_LOCATION_ADDRESS_LONGITUDE = gql`
+  mutation UpdateLocationAddressLongitude($itemId: Int!, $text: numeric) {
+    update_LocationAddress_by_pk(pk_columns: { id: $itemId }, _set: { longitude: $text }) {
+      id
+      longitude
+    }
+  }
+`;
+export const UPDATE_LOCATION_ADDRESS_CATEGORY = gql`
+  mutation UpdateLocationAddressCategory($id: Int!, $value: LocationAddressCategory_enum) {
+    update_LocationAddress_by_pk(pk_columns: { id: $id }, _set: { category: $value }) {
+      id
+      category
+    }
+  }
+`;
+
+export const UPDATE_LOCATION_ADDRESS_IMAGE = gql`
+  mutation UpdateLocationAddressImage($id: Int!, $image: String) {
+    update_LocationAddress_by_pk(pk_columns: { id: $id }, _set: { image: $image }) {
+      id
+      image
+    }
+  }
+`;
+
+/** Links a location address to an existing (someone else's) venue on rausgegangen.de, or unlinks it (null). */
+export const UPDATE_LOCATION_ADDRESS_RAUSGEGANGEN_LINK = gql`
+  mutation UpdateLocationAddressRausgegangenLink($id: Int!, $rausgegangenLocationId: String) {
+    update_LocationAddress_by_pk(
+      pk_columns: { id: $id }
+      _set: { rausgegangenLocationId: $rausgegangenLocationId, rausgegangenLocationOwned: false }
+    ) {
+      id
+      rausgegangenLocationId
+      rausgegangenLocationOwned
+    }
+  }
+`;
+
+/** Several columns at once (the merge fills the surviving address's empty venue fields). */
+export const UPDATE_LOCATION_ADDRESS_FIELDS = gql`
+  mutation UpdateLocationAddressFields($id: Int!, $changes: LocationAddress_set_input!) {
+    update_LocationAddress_by_pk(pk_columns: { id: $id }, _set: $changes) {
+      id
     }
   }
 `;

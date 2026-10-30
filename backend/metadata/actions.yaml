@@ -803,6 +803,59 @@ actions:
     permissions:
       - role: anonymous
     comment: Token-authenticated self-service for guests without a login - lists their registrations, cancels one, or erases all their personal data (GDPR Art. 15/17).
+  - name: saveLocationAddressImage
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: bucket
+          value_from_env: HASURA_BUCKET
+        - name: name
+          value: saveImage
+        - name: file-path
+          value: locations/location-${locationaddressid}/public/picture/${filename}
+        - name: is-public
+          value: "true"
+        - name: sizes
+          value: '[460, 768, 1280]'
+    comment: Venue image of a location address (admin only, from the location addresses settings)
+  - name: geocodeLocationAddress
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      headers:
+        - name: name
+          value: geocodeLocationAddress
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+    comment: Looks up and stores latitude/longitude of a location address from its street, zip code and city (OpenStreetMap Nominatim). Admin only.
+  - name: searchRausgegangenLocations
+    definition:
+      kind: ""
+      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      headers:
+        - name: name
+          value: searchRausgegangenLocations
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+    comment: Searches rausgegangen.de for venues matching a location address, so it can be linked instead of duplicated. Admin only.
+  - name: syncRausgegangenEventNow
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      timeout: 120
+      headers:
+        - name: name
+          value: syncRausgegangenEvent
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+    permissions:
+      # Listed as org_admin itself: the inherited role does not pick up an
+      # org_admin_access action permission. The handler checks the grant.
+      - role: org_admin
+    comment: Pushes an event to rausgegangen.de right away instead of waiting for the triggers.
 custom_types:
   enums: []
   input_objects:
@@ -872,4 +925,8 @@ custom_types:
     - name: GuestRegistrationSummary
     - name: UpdateOrganizationWebsiteResult
     - name: SetJobPostingActiveResult
+    - name: GeocodeLocationAddressResult
+    - name: SearchRausgegangenLocationsResult
+    - name: RausgegangenLocation
+    - name: SyncRausgegangenEventResult
   scalars: []

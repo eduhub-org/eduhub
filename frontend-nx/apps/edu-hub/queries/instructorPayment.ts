@@ -63,9 +63,9 @@ export const COURSE_TEAM_WITHOUT_MATRIX = gql`
 `;
 
 export const UPSERT_COURSE_INSTRUCTOR_PAYMENT_SHARE = gql`
-  mutation UpsertCourseInstructorPaymentShare($courseInstructorId: Int!, $amount: Int!) {
+  mutation UpsertCourseInstructorPaymentShare($itemId: Int!, $text: Int!) {
     insert_CourseInstructorPaymentShare_one(
-      object: { courseInstructorId: $courseInstructorId, amount: $amount }
+      object: { courseInstructorId: $itemId, amount: $text }
       on_conflict: { constraint: CourseInstructorPaymentShare_courseInstructorId_key, update_columns: [amount] }
     ) {
       id
@@ -75,9 +75,9 @@ export const UPSERT_COURSE_INSTRUCTOR_PAYMENT_SHARE = gql`
 `;
 
 export const UPSERT_COURSE_INSTRUCTOR_PAYMENT_TOTAL = gql`
-  mutation UpsertCourseInstructorPaymentTotal($courseId: Int!, $totalAmount: Int!) {
+  mutation UpsertCourseInstructorPaymentTotal($itemId: Int!, $text: Int!) {
     insert_CourseInstructorPayment_one(
-      object: { courseId: $courseId, totalAmount: $totalAmount }
+      object: { courseId: $itemId, totalAmount: $text }
       on_conflict: { constraint: CourseInstructorPayment_courseId_key, update_columns: [totalAmount] }
     ) {
       id

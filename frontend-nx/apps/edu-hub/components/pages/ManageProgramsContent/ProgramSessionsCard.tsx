@@ -30,12 +30,13 @@ import {
 import {
   DELETE_SESSION,
   UPDATE_SESSION_ADDRESS,
+  UPDATE_SESSION_DESCRIPTION,
   UPDATE_SESSION_END_TIME,
   UPDATE_SESSION_IS_MANDATORY,
   UPDATE_SESSION_START_TIME,
   UPDATE_SESSION_TITLE,
 } from '../../../queries/course';
-import { LOCATION_ADDRESS_BY_LOCATION_OPTION } from '../../../queries/locationAddress';
+import { CREATE_LOCATION_ADDRESS, LOCATION_ADDRESS_BY_LOCATION_OPTION } from '../../../queries/locationAddress';
 import TableGrid from '../../common/TableGrid';
 import CheckboxSelector from '../../inputs/CheckboxSelector';
 import DropDownSelector from '../../inputs/DropDownSelector';
@@ -107,7 +108,9 @@ const ProgramSessionLocation: FC<{ address: ProgramSessions_Session_SessionAddre
           refetchQueries={REFETCH}
         />
       </div>
-      <div className="flex-1 min-w-0">
+      {/* The inset keeps the address input's border and focus outline inside the TableGrid
+          cell, which clips its overflow. */}
+      <div className="flex-1 min-w-0 py-1 pr-1">
         {isOnline ? (
           <InputField
             variant="material"
@@ -127,10 +130,13 @@ const ProgramSessionLocation: FC<{ address: ProgramSessions_Session_SessionAddre
             value={address.locationAddressId?.toString() ?? ''}
             options={addressOptions}
             updateValueMutation={UPDATE_SESSION_ADDRESS}
-            identifierVariables={{ itemId: address.id }}
-            refetchQueries={REFETCH}
+            // locationOption is for createOptionMutation: a typed address is stored as a new
+            // LocationAddress of this location and selected, as in the course sessions tab.
+            identifierVariables={{ itemId: address.id, locationOption }}
+            creatable
+            createOptionMutation={CREATE_LOCATION_ADDRESS}
+            refetchQueries={[...REFETCH, 'LocationAddressByLocationOption']}
             nullable
-            searchable
           />
         )}
       </div>
@@ -150,6 +156,7 @@ interface ProgramSessionsCardProps {
 const ProgramSessionsCard: FC<ProgramSessionsCardProps> = ({ program }) => {
   const t = useTranslations('managePrograms.program_sessions');
   const tCoursePage = useTranslations('coursePage');
+  const tSessions = useTranslations('manageCourse.SessionsTab');
   const manageRole = useManageRole();
   const [pageIndex, setPageIndex] = useState(0);
   const [searchFilter, setSearchFilter] = useState('');
@@ -313,6 +320,28 @@ const ProgramSessionsCard: FC<ProgramSessionsCardProps> = ({ program }) => {
         role={manageRole}
         generateDeletionConfirmationQuestion={(row) => t('confirm_delete') + (row.title ? ` (${row.title})` : '')}
         refetchQueries={REFETCH}
+        expandableRowComponent={({ row }) => (
+          <div className="flex-1 min-w-0 p-4">
+            <h5 className="mb-3 text-[11px] font-bold uppercase tracking-wider text-label-secondary">
+              {tSessions('session_description.label')}
+            </h5>
+            <InputField
+              variant="eduhub"
+              type="markdown"
+              inlineMarkdown
+              value={row.description || ''}
+              label=""
+              updateValueMutation={UPDATE_SESSION_DESCRIPTION}
+              // The mutation returns the new value, so Apollo updates the cached session.
+              refetchQueries={[]}
+              itemId={row.id}
+              placeholder={tSessions('session_description.placeholder')}
+              helpText=""
+              className="h-32 border border-border-primary rounded-md"
+              maxLength={500}
+            />
+          </div>
+        )}
         onAddButtonClick={handleAdd}
         addButtonText={t('add')}
         pageIndex={pageIndex}

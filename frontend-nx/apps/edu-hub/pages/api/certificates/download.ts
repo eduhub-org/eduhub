@@ -2,6 +2,13 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { getToken } from 'next-auth/jwt';
 import { GraphQLClient, gql } from 'graphql-request';
 import { AuthRoles } from '../../../types/enums';
+import {
+  OPEN_SESSION_QUERY,
+  OpenSessionResult,
+  adminClient,
+  readImpersonationCookie,
+  resolveAdminCaller,
+} from '../../../helpers/impersonation';
 
 type ErrorResponse = {
   error: string;
@@ -52,6 +59,31 @@ const isSafeStoragePath = (path: string) => (
   CERTIFICATE_PATH_PATTERN.test(path)
 );
 
+/**
+ * The user a super-admin is currently viewing as, or null.
+ *
+ * Re-runs the same checks as the impersonation GraphQL proxy (signed cookie,
+ * admin caller, still-open session) so the download link behaves exactly as it
+ * would for that person: if their certificate does not open for them, it does
+ * not open here either, which is the point of viewing as them.
+ */
+const resolveImpersonatedUserId = async (req: NextApiRequest): Promise<string | null> => {
+  const payload = readImpersonationCookie(req);
+  if (!payload) return null;
+
+  const admin = await resolveAdminCaller(req);
+  if (!admin) return null;
+
+  const open = await adminClient().request<OpenSessionResult>(OPEN_SESSION_QUERY, {
+    id: payload.sessionId,
+    adminUserId: admin.userId,
+  });
+  const session = open.ImpersonationSession[0];
+  if (!session || session.targetUserId !== payload.targetUserId) return null;
+
+  return payload.targetUserId;
+};
+
 const getPreferredRole = (claims?: HasuraClaims): AuthRoles | null => {
   const allowedRoles = claims?.['x-hasura-allowed-roles'] ?? [];
 
@@ -85,11 +117,18 @@ export default async function certificateDownload(
   }
 
   try {
+    const impersonatedUserId = await resolveImpersonatedUserId(req);
     const graphQLClient = new GraphQLClient(GRAPHQL_URI, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'x-hasura-role': role,
-      },
+      headers: impersonatedUserId
+        ? {
+            'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET as string,
+            'x-hasura-role': AuthRoles.user,
+            'x-hasura-user-id': impersonatedUserId,
+          }
+        : {
+            Authorization: `Bearer ${accessToken}`,
+            'x-hasura-role': role,
+          },
     });
 
     const result = await graphQLClient.request<GetSignedUrlResponse>(
@@ -102,6 +141,10 @@ export default async function certificateDownload(
     // string so res.redirect (which rejects non-string URLs) does not throw.
     const signedUrl = Array.isArray(link) ? link[0] : link;
     if (!signedUrl) {
+      if (impersonatedUserId) {
+        // Ids only, as in the impersonation audit lines.
+        console.info('Certificate not signed for impersonated user', { targetUserId: impersonatedUserId });
+      }
       return res.status(404).json({ error: 'Certificate not found.' });
     }
 

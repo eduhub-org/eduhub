@@ -930,6 +930,7 @@ export enum CourseStatus_update_column {
  */
 export enum Course_constraint {
   Course_pkey = "Course_pkey",
+  Course_sourceSessionId_key = "Course_sourceSessionId_key",
 }
 
 /**
@@ -948,6 +949,7 @@ export enum Course_select_column {
   cost = "cost",
   courseSeriesId = "courseSeriesId",
   coverImage = "coverImage",
+  coverImageCredits = "coverImageCredits",
   created_at = "created_at",
   currency = "currency",
   ects = "ects",
@@ -971,6 +973,7 @@ export enum Course_select_column {
   requiredEcts = "requiredEcts",
   requiredEventCount = "requiredEventCount",
   showAvailablePlaces = "showAvailablePlaces",
+  sourceSessionId = "sourceSessionId",
   startTime = "startTime",
   status = "status",
   stripePriceId = "stripePriceId",
@@ -1021,6 +1024,7 @@ export enum Course_update_column {
   cost = "cost",
   courseSeriesId = "courseSeriesId",
   coverImage = "coverImage",
+  coverImageCredits = "coverImageCredits",
   created_at = "created_at",
   currency = "currency",
   ects = "ects",
@@ -1044,6 +1048,7 @@ export enum Course_update_column {
   requiredEcts = "requiredEcts",
   requiredEventCount = "requiredEventCount",
   showAvailablePlaces = "showAvailablePlaces",
+  sourceSessionId = "sourceSessionId",
   startTime = "startTime",
   status = "status",
   stripePriceId = "stripePriceId",
@@ -1571,39 +1576,127 @@ export enum Language_update_column {
 }
 
 /**
+ * unique or primary key constraints on table "LocationAddressCategory"
+ */
+export enum LocationAddressCategory_constraint {
+  LocationAddressCategory_pkey = "LocationAddressCategory_pkey",
+}
+
+export enum LocationAddressCategory_enum {
+  BAR = "BAR",
+  CAFE = "CAFE",
+  CINEMA = "CINEMA",
+  CLUB = "CLUB",
+  CONCERT = "CONCERT",
+  GALLERY = "GALLERY",
+  MARKET = "MARKET",
+  MISC = "MISC",
+  MUSEUM = "MUSEUM",
+  OPENAIR = "OPENAIR",
+  PUBLICSPACE = "PUBLICSPACE",
+  RESTAURANT = "RESTAURANT",
+  SHOWROOM = "SHOWROOM",
+  SPORTS = "SPORTS",
+  STORE = "STORE",
+  THEATER = "THEATER",
+  VENUE = "VENUE",
+  WORKSPACE = "WORKSPACE",
+  ZIRKUS = "ZIRKUS",
+}
+
+/**
+ * update columns of table "LocationAddressCategory"
+ */
+export enum LocationAddressCategory_update_column {
+  comment = "comment",
+  value = "value",
+}
+
+/**
  * unique or primary key constraints on table "LocationAddress"
  */
 export enum LocationAddress_constraint {
   LocationAddress_locationOptionId_shortLabel_key = "LocationAddress_locationOptionId_shortLabel_key",
   LocationAddress_pkey = "LocationAddress_pkey",
+  LocationAddress_rausgegangenLocationId_key = "LocationAddress_rausgegangenLocationId_key",
 }
 
 /**
  * select columns of table "LocationAddress"
  */
 export enum LocationAddress_select_column {
+  accessibilityInfo = "accessibilityInfo",
   address = "address",
+  addressAdditionalInfo = "addressAdditionalInfo",
   aliases = "aliases",
+  category = "category",
+  city = "city",
+  country = "country",
   created_at = "created_at",
   description = "description",
+  directions = "directions",
   id = "id",
+  image = "image",
+  imageCredits = "imageCredits",
+  instagramUrl = "instagramUrl",
+  latitude = "latitude",
   locationOption = "locationOption",
+  longitude = "longitude",
+  publicEmail = "publicEmail",
+  publicPhone = "publicPhone",
+  rausgegangenLocationId = "rausgegangenLocationId",
+  rausgegangenLocationOwned = "rausgegangenLocationOwned",
   shortLabel = "shortLabel",
+  street = "street",
   updated_at = "updated_at",
+  websiteUrl = "websiteUrl",
+  zipCode = "zipCode",
+}
+
+/**
+ * select "LocationAddress_aggregate_bool_exp_bool_and_arguments_columns" columns of table "LocationAddress"
+ */
+export enum LocationAddress_select_column_LocationAddress_aggregate_bool_exp_bool_and_arguments_columns {
+  rausgegangenLocationOwned = "rausgegangenLocationOwned",
+}
+
+/**
+ * select "LocationAddress_aggregate_bool_exp_bool_or_arguments_columns" columns of table "LocationAddress"
+ */
+export enum LocationAddress_select_column_LocationAddress_aggregate_bool_exp_bool_or_arguments_columns {
+  rausgegangenLocationOwned = "rausgegangenLocationOwned",
 }
 
 /**
  * update columns of table "LocationAddress"
  */
 export enum LocationAddress_update_column {
+  accessibilityInfo = "accessibilityInfo",
   address = "address",
+  addressAdditionalInfo = "addressAdditionalInfo",
   aliases = "aliases",
+  category = "category",
+  city = "city",
+  country = "country",
   created_at = "created_at",
   description = "description",
+  directions = "directions",
   id = "id",
+  image = "image",
+  imageCredits = "imageCredits",
+  instagramUrl = "instagramUrl",
+  latitude = "latitude",
   locationOption = "locationOption",
+  longitude = "longitude",
+  publicEmail = "publicEmail",
+  publicPhone = "publicPhone",
+  rausgegangenLocationId = "rausgegangenLocationId",
+  rausgegangenLocationOwned = "rausgegangenLocationOwned",
   shortLabel = "shortLabel",
+  street = "street",
   updated_at = "updated_at",
+  websiteUrl = "websiteUrl",
+  zipCode = "zipCode",
 }
 
 /**
@@ -1649,6 +1742,7 @@ export enum MailTemplateType_enum {
   ENROLLMENT_CANCELLED = "ENROLLMENT_CANCELLED",
   GUEST_ALREADY_HAS_ACCOUNT = "GUEST_ALREADY_HAS_ACCOUNT",
   GUEST_REGISTRATION_CONFIRM = "GUEST_REGISTRATION_CONFIRM",
+  INSTRUCTOR_CERTIFICATE_READY = "INSTRUCTOR_CERTIFICATE_READY",
   INVITATION_EXPIRED = "INVITATION_EXPIRED",
   INVITATION_EXPIRING_SOON = "INVITATION_EXPIRING_SOON",
   INVITE = "INVITE",
@@ -1837,6 +1931,40 @@ export enum OrganizationAdmin_update_column {
   userId = "userId",
 }
 
+export enum OrganizationFeatureOption_enum {
+  RAUSGEGANGEN = "RAUSGEGANGEN",
+}
+
+/**
+ * unique or primary key constraints on table "OrganizationFeature"
+ */
+export enum OrganizationFeature_constraint {
+  OrganizationFeature_organizationId_feature_key = "OrganizationFeature_organizationId_feature_key",
+  OrganizationFeature_pkey = "OrganizationFeature_pkey",
+}
+
+/**
+ * select columns of table "OrganizationFeature"
+ */
+export enum OrganizationFeature_select_column {
+  created_at = "created_at",
+  feature = "feature",
+  id = "id",
+  organizationId = "organizationId",
+  updated_at = "updated_at",
+}
+
+/**
+ * update columns of table "OrganizationFeature"
+ */
+export enum OrganizationFeature_update_column {
+  created_at = "created_at",
+  feature = "feature",
+  id = "id",
+  organizationId = "organizationId",
+  updated_at = "updated_at",
+}
+
 /**
  * unique or primary key constraints on table "OrganizationNewsletterSubscription"
  */
@@ -1948,6 +2076,9 @@ export enum Organization_select_column {
   newsletterProvider = "newsletterProvider",
   phone = "phone",
   postalCode = "postalCode",
+  rausgegangenApiKeyConfigured = "rausgegangenApiKeyConfigured",
+  rausgegangenApiKeyEncrypted = "rausgegangenApiKeyEncrypted",
+  rausgegangenTestMode = "rausgegangenTestMode",
   registerCourt = "registerCourt",
   registerNumber = "registerNumber",
   stripePublishableKey = "stripePublishableKey",
@@ -1967,6 +2098,8 @@ export enum Organization_select_column_Organization_aggregate_bool_exp_bool_and_
   allowInvoicePayment = "allowInvoicePayment",
   ghostNewsletterApiKeyConfigured = "ghostNewsletterApiKeyConfigured",
   ghostNewsletterDoubleOptInEnabled = "ghostNewsletterDoubleOptInEnabled",
+  rausgegangenApiKeyConfigured = "rausgegangenApiKeyConfigured",
+  rausgegangenTestMode = "rausgegangenTestMode",
 }
 
 /**
@@ -1976,6 +2109,8 @@ export enum Organization_select_column_Organization_aggregate_bool_exp_bool_or_a
   allowInvoicePayment = "allowInvoicePayment",
   ghostNewsletterApiKeyConfigured = "ghostNewsletterApiKeyConfigured",
   ghostNewsletterDoubleOptInEnabled = "ghostNewsletterDoubleOptInEnabled",
+  rausgegangenApiKeyConfigured = "rausgegangenApiKeyConfigured",
+  rausgegangenTestMode = "rausgegangenTestMode",
 }
 
 /**
@@ -2018,6 +2153,9 @@ export enum Organization_update_column {
   newsletterProvider = "newsletterProvider",
   phone = "phone",
   postalCode = "postalCode",
+  rausgegangenApiKeyConfigured = "rausgegangenApiKeyConfigured",
+  rausgegangenApiKeyEncrypted = "rausgegangenApiKeyEncrypted",
+  rausgegangenTestMode = "rausgegangenTestMode",
   registerCourt = "registerCourt",
   registerNumber = "registerNumber",
   stripePublishableKey = "stripePublishableKey",
@@ -2672,6 +2810,66 @@ export enum Project_update_column {
   tagline = "tagline",
   title = "title",
   type = "type",
+  updated_at = "updated_at",
+}
+
+/**
+ * unique or primary key constraints on table "RausgegangenEventCategory"
+ */
+export enum RausgegangenEventCategory_constraint {
+  RausgegangenEventCategory_pkey = "RausgegangenEventCategory_pkey",
+}
+
+export enum RausgegangenEventCategory_enum {
+  AKTIV_UND_KREATIV = "AKTIV_UND_KREATIV",
+  AUSSTELLUNG = "AUSSTELLUNG",
+  FESTE_UND_FESTIVAL = "FESTE_UND_FESTIVAL",
+  FILM = "FILM",
+  FOOD_UND_DRINKS = "FOOD_UND_DRINKS",
+  GESPROCHENES = "GESPROCHENES",
+  KINDER_UND_FAMILIEN = "KINDER_UND_FAMILIEN",
+  KONZERTE_UND_MUSIK = "KONZERTE_UND_MUSIK",
+  MARKT = "MARKT",
+  PARTY = "PARTY",
+  SHOWS_UND_PERFORMANCES = "SHOWS_UND_PERFORMANCES",
+  SPORT = "SPORT",
+  THEATER = "THEATER",
+}
+
+/**
+ * update columns of table "RausgegangenEventCategory"
+ */
+export enum RausgegangenEventCategory_update_column {
+  comment = "comment",
+  value = "value",
+}
+
+/**
+ * unique or primary key constraints on table "RausgegangenListing"
+ */
+export enum RausgegangenListing_constraint {
+  RausgegangenListing_courseId_key = "RausgegangenListing_courseId_key",
+  RausgegangenListing_pkey = "RausgegangenListing_pkey",
+}
+
+/**
+ * update columns of table "RausgegangenListing"
+ */
+export enum RausgegangenListing_update_column {
+  category = "category",
+  courseId = "courseId",
+  created_at = "created_at",
+  enabled = "enabled",
+  id = "id",
+  lastSyncedAt = "lastSyncedAt",
+  previewUrl = "previewUrl",
+  publicUrl = "publicUrl",
+  published = "published",
+  rausgegangenEventId = "rausgegangenEventId",
+  rausgegangenShowId = "rausgegangenShowId",
+  syncError = "syncError",
+  syncStatus = "syncStatus",
+  tags = "tags",
   updated_at = "updated_at",
 }
 
@@ -6676,6 +6874,7 @@ export interface Course_avg_order_by {
   programId?: order_by | null;
   requiredEcts?: order_by | null;
   requiredEventCount?: order_by | null;
+  sourceSessionId?: order_by | null;
 }
 
 /**
@@ -6710,8 +6909,10 @@ export interface Course_bool_exp {
   Program?: Program_bool_exp | null;
   ProjectCourses?: ProjectCourse_bool_exp | null;
   ProjectCourses_aggregate?: ProjectCourse_aggregate_bool_exp | null;
+  RausgegangenListing?: RausgegangenListing_bool_exp | null;
   Sessions?: Session_bool_exp | null;
   Sessions_aggregate?: Session_aggregate_bool_exp | null;
+  SourceSession?: Session_bool_exp | null;
   Weekday?: Weekday_bool_exp | null;
   _and?: Course_bool_exp[] | null;
   _not?: Course_bool_exp | null;
@@ -6729,6 +6930,7 @@ export interface Course_bool_exp {
   cost?: String_comparison_exp | null;
   courseSeriesId?: Int_comparison_exp | null;
   coverImage?: String_comparison_exp | null;
+  coverImageCredits?: String_comparison_exp | null;
   created_at?: timestamptz_comparison_exp | null;
   currency?: String_comparison_exp | null;
   ects?: String_comparison_exp | null;
@@ -6749,10 +6951,13 @@ export interface Course_bool_exp {
   projectSubmissionDeadline?: timestamptz_comparison_exp | null;
   publicParticipantCount?: bigint_comparison_exp | null;
   published?: Boolean_comparison_exp | null;
+  registrationButtonLabelDe?: String_comparison_exp | null;
+  registrationButtonLabelEn?: String_comparison_exp | null;
   registrationType?: CourseRegistrationType_enum_comparison_exp | null;
   requiredEcts?: numeric_comparison_exp | null;
   requiredEventCount?: Int_comparison_exp | null;
   showAvailablePlaces?: Boolean_comparison_exp | null;
+  sourceSessionId?: Int_comparison_exp | null;
   startTime?: time_comparison_exp | null;
   status?: CourseStatus_enum_comparison_exp | null;
   stripePriceId?: String_comparison_exp | null;
@@ -6785,7 +6990,9 @@ export interface Course_insert_input {
   Language?: Language_obj_rel_insert_input | null;
   Program?: Program_obj_rel_insert_input | null;
   ProjectCourses?: ProjectCourse_arr_rel_insert_input | null;
+  RausgegangenListing?: RausgegangenListing_obj_rel_insert_input | null;
   Sessions?: Session_arr_rel_insert_input | null;
+  SourceSession?: Session_obj_rel_insert_input | null;
   Weekday?: Weekday_obj_rel_insert_input | null;
   achievementCertificatePossible?: boolean | null;
   achievementCertificateTemplateId?: number | null;
@@ -6799,6 +7006,7 @@ export interface Course_insert_input {
   cost?: string | null;
   courseSeriesId?: number | null;
   coverImage?: string | null;
+  coverImageCredits?: string | null;
   created_at?: any | null;
   currency?: string | null;
   ects?: string | null;
@@ -6818,10 +7026,13 @@ export interface Course_insert_input {
   projectProposalsEnabled?: boolean | null;
   projectSubmissionDeadline?: any | null;
   published?: boolean | null;
+  registrationButtonLabelDe?: string | null;
+  registrationButtonLabelEn?: string | null;
   registrationType?: CourseRegistrationType_enum | null;
   requiredEcts?: any | null;
   requiredEventCount?: number | null;
   showAvailablePlaces?: boolean | null;
+  sourceSessionId?: number | null;
   startTime?: any | null;
   status?: CourseStatus_enum | null;
   stripePriceId?: string | null;
@@ -6846,6 +7057,7 @@ export interface Course_max_order_by {
   cost?: order_by | null;
   courseSeriesId?: order_by | null;
   coverImage?: order_by | null;
+  coverImageCredits?: order_by | null;
   created_at?: order_by | null;
   currency?: order_by | null;
   ects?: order_by | null;
@@ -6861,8 +7073,11 @@ export interface Course_max_order_by {
   maxParticipants?: order_by | null;
   programId?: order_by | null;
   projectSubmissionDeadline?: order_by | null;
+  registrationButtonLabelDe?: order_by | null;
+  registrationButtonLabelEn?: order_by | null;
   requiredEcts?: order_by | null;
   requiredEventCount?: order_by | null;
+  sourceSessionId?: order_by | null;
   stripePriceId?: order_by | null;
   stripeProductId?: order_by | null;
   tagline?: order_by | null;
@@ -6884,6 +7099,7 @@ export interface Course_min_order_by {
   cost?: order_by | null;
   courseSeriesId?: order_by | null;
   coverImage?: order_by | null;
+  coverImageCredits?: order_by | null;
   created_at?: order_by | null;
   currency?: order_by | null;
   ects?: order_by | null;
@@ -6899,8 +7115,11 @@ export interface Course_min_order_by {
   maxParticipants?: order_by | null;
   programId?: order_by | null;
   projectSubmissionDeadline?: order_by | null;
+  registrationButtonLabelDe?: order_by | null;
+  registrationButtonLabelEn?: order_by | null;
   requiredEcts?: order_by | null;
   requiredEventCount?: order_by | null;
+  sourceSessionId?: order_by | null;
   stripePriceId?: order_by | null;
   stripeProductId?: order_by | null;
   tagline?: order_by | null;
@@ -6947,7 +7166,9 @@ export interface Course_order_by {
   Language?: Language_order_by | null;
   Program?: Program_order_by | null;
   ProjectCourses_aggregate?: ProjectCourse_aggregate_order_by | null;
+  RausgegangenListing?: RausgegangenListing_order_by | null;
   Sessions_aggregate?: Session_aggregate_order_by | null;
+  SourceSession?: Session_order_by | null;
   Weekday?: Weekday_order_by | null;
   achievementCertificatePossible?: order_by | null;
   achievementCertificateTemplateId?: order_by | null;
@@ -6962,6 +7183,7 @@ export interface Course_order_by {
   cost?: order_by | null;
   courseSeriesId?: order_by | null;
   coverImage?: order_by | null;
+  coverImageCredits?: order_by | null;
   created_at?: order_by | null;
   currency?: order_by | null;
   ects?: order_by | null;
@@ -6982,10 +7204,13 @@ export interface Course_order_by {
   projectSubmissionDeadline?: order_by | null;
   publicParticipantCount?: order_by | null;
   published?: order_by | null;
+  registrationButtonLabelDe?: order_by | null;
+  registrationButtonLabelEn?: order_by | null;
   registrationType?: order_by | null;
   requiredEcts?: order_by | null;
   requiredEventCount?: order_by | null;
   showAvailablePlaces?: order_by | null;
+  sourceSessionId?: order_by | null;
   startTime?: order_by | null;
   status?: order_by | null;
   stripePriceId?: order_by | null;
@@ -7012,6 +7237,7 @@ export interface Course_set_input {
   cost?: string | null;
   courseSeriesId?: number | null;
   coverImage?: string | null;
+  coverImageCredits?: string | null;
   created_at?: any | null;
   currency?: string | null;
   ects?: string | null;
@@ -7031,10 +7257,13 @@ export interface Course_set_input {
   projectProposalsEnabled?: boolean | null;
   projectSubmissionDeadline?: any | null;
   published?: boolean | null;
+  registrationButtonLabelDe?: string | null;
+  registrationButtonLabelEn?: string | null;
   registrationType?: CourseRegistrationType_enum | null;
   requiredEcts?: any | null;
   requiredEventCount?: number | null;
   showAvailablePlaces?: boolean | null;
+  sourceSessionId?: number | null;
   startTime?: any | null;
   status?: CourseStatus_enum | null;
   stripePriceId?: string | null;
@@ -7059,6 +7288,7 @@ export interface Course_stddev_order_by {
   programId?: order_by | null;
   requiredEcts?: order_by | null;
   requiredEventCount?: order_by | null;
+  sourceSessionId?: order_by | null;
 }
 
 /**
@@ -7075,6 +7305,7 @@ export interface Course_stddev_pop_order_by {
   programId?: order_by | null;
   requiredEcts?: order_by | null;
   requiredEventCount?: order_by | null;
+  sourceSessionId?: order_by | null;
 }
 
 /**
@@ -7091,6 +7322,7 @@ export interface Course_stddev_samp_order_by {
   programId?: order_by | null;
   requiredEcts?: order_by | null;
   requiredEventCount?: order_by | null;
+  sourceSessionId?: order_by | null;
 }
 
 /**
@@ -7107,6 +7339,7 @@ export interface Course_sum_order_by {
   programId?: order_by | null;
   requiredEcts?: order_by | null;
   requiredEventCount?: order_by | null;
+  sourceSessionId?: order_by | null;
 }
 
 /**
@@ -7123,6 +7356,7 @@ export interface Course_var_pop_order_by {
   programId?: order_by | null;
   requiredEcts?: order_by | null;
   requiredEventCount?: order_by | null;
+  sourceSessionId?: order_by | null;
 }
 
 /**
@@ -7139,6 +7373,7 @@ export interface Course_var_samp_order_by {
   programId?: order_by | null;
   requiredEcts?: order_by | null;
   requiredEventCount?: order_by | null;
+  sourceSessionId?: order_by | null;
 }
 
 /**
@@ -7155,6 +7390,7 @@ export interface Course_variance_order_by {
   programId?: order_by | null;
   requiredEcts?: order_by | null;
   requiredEventCount?: order_by | null;
+  sourceSessionId?: order_by | null;
 }
 
 /**
@@ -8654,8 +8890,79 @@ export interface Language_order_by {
   value?: order_by | null;
 }
 
+/**
+ * Boolean expression to filter rows from the table "LocationAddressCategory". All fields are combined with a logical 'AND'.
+ */
+export interface LocationAddressCategory_bool_exp {
+  _and?: LocationAddressCategory_bool_exp[] | null;
+  _not?: LocationAddressCategory_bool_exp | null;
+  _or?: LocationAddressCategory_bool_exp[] | null;
+  comment?: String_comparison_exp | null;
+  value?: String_comparison_exp | null;
+}
+
+/**
+ * Boolean expression to compare columns of type "LocationAddressCategory_enum". All fields are combined with logical 'AND'.
+ */
+export interface LocationAddressCategory_enum_comparison_exp {
+  _eq?: LocationAddressCategory_enum | null;
+  _in?: LocationAddressCategory_enum[] | null;
+  _is_null?: boolean | null;
+  _neq?: LocationAddressCategory_enum | null;
+  _nin?: LocationAddressCategory_enum[] | null;
+}
+
+/**
+ * input type for inserting data into table "LocationAddressCategory"
+ */
+export interface LocationAddressCategory_insert_input {
+  comment?: string | null;
+  value?: string | null;
+}
+
+/**
+ * input type for inserting object relation for remote table "LocationAddressCategory"
+ */
+export interface LocationAddressCategory_obj_rel_insert_input {
+  data: LocationAddressCategory_insert_input;
+  on_conflict?: LocationAddressCategory_on_conflict | null;
+}
+
+/**
+ * on_conflict condition type for table "LocationAddressCategory"
+ */
+export interface LocationAddressCategory_on_conflict {
+  constraint: LocationAddressCategory_constraint;
+  update_columns: LocationAddressCategory_update_column[];
+  where?: LocationAddressCategory_bool_exp | null;
+}
+
+/**
+ * Ordering options when selecting data from "LocationAddressCategory".
+ */
+export interface LocationAddressCategory_order_by {
+  comment?: order_by | null;
+  value?: order_by | null;
+}
+
 export interface LocationAddress_aggregate_bool_exp {
+  bool_and?: LocationAddress_aggregate_bool_exp_bool_and | null;
+  bool_or?: LocationAddress_aggregate_bool_exp_bool_or | null;
   count?: LocationAddress_aggregate_bool_exp_count | null;
+}
+
+export interface LocationAddress_aggregate_bool_exp_bool_and {
+  arguments: LocationAddress_select_column_LocationAddress_aggregate_bool_exp_bool_and_arguments_columns;
+  distinct?: boolean | null;
+  filter?: LocationAddress_bool_exp | null;
+  predicate: Boolean_comparison_exp;
+}
+
+export interface LocationAddress_aggregate_bool_exp_bool_or {
+  arguments: LocationAddress_select_column_LocationAddress_aggregate_bool_exp_bool_or_arguments_columns;
+  distinct?: boolean | null;
+  filter?: LocationAddress_bool_exp | null;
+  predicate: Boolean_comparison_exp;
 }
 
 export interface LocationAddress_aggregate_bool_exp_count {
@@ -8695,12 +9002,15 @@ export interface LocationAddress_arr_rel_insert_input {
  */
 export interface LocationAddress_avg_order_by {
   id?: order_by | null;
+  latitude?: order_by | null;
+  longitude?: order_by | null;
 }
 
 /**
  * Boolean expression to filter rows from the table "LocationAddress". All fields are combined with a logical 'AND'.
  */
 export interface LocationAddress_bool_exp {
+  Category?: LocationAddressCategory_bool_exp | null;
   CourseLocations?: CourseLocation_bool_exp | null;
   CourseLocations_aggregate?: CourseLocation_aggregate_bool_exp | null;
   LocationOption?: LocationOption_bool_exp | null;
@@ -8709,55 +9019,124 @@ export interface LocationAddress_bool_exp {
   _and?: LocationAddress_bool_exp[] | null;
   _not?: LocationAddress_bool_exp | null;
   _or?: LocationAddress_bool_exp[] | null;
+  accessibilityInfo?: String_comparison_exp | null;
   address?: String_comparison_exp | null;
+  addressAdditionalInfo?: String_comparison_exp | null;
   aliases?: jsonb_comparison_exp | null;
+  category?: LocationAddressCategory_enum_comparison_exp | null;
+  city?: String_comparison_exp | null;
+  country?: String_comparison_exp | null;
   created_at?: timestamptz_comparison_exp | null;
   description?: String_comparison_exp | null;
+  directions?: String_comparison_exp | null;
   id?: Int_comparison_exp | null;
+  image?: String_comparison_exp | null;
+  imageCredits?: String_comparison_exp | null;
+  instagramUrl?: String_comparison_exp | null;
+  latitude?: numeric_comparison_exp | null;
   locationOption?: LocationOption_enum_comparison_exp | null;
+  longitude?: numeric_comparison_exp | null;
+  publicEmail?: String_comparison_exp | null;
+  publicPhone?: String_comparison_exp | null;
+  rausgegangenLocationId?: String_comparison_exp | null;
+  rausgegangenLocationOwned?: Boolean_comparison_exp | null;
   shortLabel?: String_comparison_exp | null;
+  street?: String_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
+  websiteUrl?: String_comparison_exp | null;
+  zipCode?: String_comparison_exp | null;
 }
 
 /**
  * input type for inserting data into table "LocationAddress"
  */
 export interface LocationAddress_insert_input {
+  Category?: LocationAddressCategory_obj_rel_insert_input | null;
   CourseLocations?: CourseLocation_arr_rel_insert_input | null;
   LocationOption?: LocationOption_obj_rel_insert_input | null;
   SessionAddresses?: SessionAddress_arr_rel_insert_input | null;
+  accessibilityInfo?: string | null;
   address?: string | null;
+  addressAdditionalInfo?: string | null;
   aliases?: any | null;
+  category?: LocationAddressCategory_enum | null;
+  city?: string | null;
+  country?: string | null;
   created_at?: any | null;
   description?: string | null;
+  directions?: string | null;
   id?: number | null;
+  image?: string | null;
+  imageCredits?: string | null;
+  instagramUrl?: string | null;
+  latitude?: any | null;
   locationOption?: LocationOption_enum | null;
+  longitude?: any | null;
+  publicEmail?: string | null;
+  publicPhone?: string | null;
+  rausgegangenLocationId?: string | null;
+  rausgegangenLocationOwned?: boolean | null;
   shortLabel?: string | null;
+  street?: string | null;
   updated_at?: any | null;
+  websiteUrl?: string | null;
+  zipCode?: string | null;
 }
 
 /**
  * order by max() on columns of table "LocationAddress"
  */
 export interface LocationAddress_max_order_by {
+  accessibilityInfo?: order_by | null;
   address?: order_by | null;
+  addressAdditionalInfo?: order_by | null;
+  city?: order_by | null;
+  country?: order_by | null;
   created_at?: order_by | null;
   description?: order_by | null;
+  directions?: order_by | null;
   id?: order_by | null;
+  image?: order_by | null;
+  imageCredits?: order_by | null;
+  instagramUrl?: order_by | null;
+  latitude?: order_by | null;
+  longitude?: order_by | null;
+  publicEmail?: order_by | null;
+  publicPhone?: order_by | null;
+  rausgegangenLocationId?: order_by | null;
   shortLabel?: order_by | null;
+  street?: order_by | null;
   updated_at?: order_by | null;
+  websiteUrl?: order_by | null;
+  zipCode?: order_by | null;
 }
 
 /**
  * order by min() on columns of table "LocationAddress"
  */
 export interface LocationAddress_min_order_by {
+  accessibilityInfo?: order_by | null;
   address?: order_by | null;
+  addressAdditionalInfo?: order_by | null;
+  city?: order_by | null;
+  country?: order_by | null;
   created_at?: order_by | null;
   description?: order_by | null;
+  directions?: order_by | null;
   id?: order_by | null;
+  image?: order_by | null;
+  imageCredits?: order_by | null;
+  instagramUrl?: order_by | null;
+  latitude?: order_by | null;
+  longitude?: order_by | null;
+  publicEmail?: order_by | null;
+  publicPhone?: order_by | null;
+  rausgegangenLocationId?: order_by | null;
   shortLabel?: order_by | null;
+  street?: order_by | null;
   updated_at?: order_by | null;
+  websiteUrl?: order_by | null;
+  zipCode?: order_by | null;
 }
 
 /**
@@ -8781,17 +9160,68 @@ export interface LocationAddress_on_conflict {
  * Ordering options when selecting data from "LocationAddress".
  */
 export interface LocationAddress_order_by {
+  Category?: LocationAddressCategory_order_by | null;
   CourseLocations_aggregate?: CourseLocation_aggregate_order_by | null;
   LocationOption?: LocationOption_order_by | null;
   SessionAddresses_aggregate?: SessionAddress_aggregate_order_by | null;
+  accessibilityInfo?: order_by | null;
   address?: order_by | null;
+  addressAdditionalInfo?: order_by | null;
   aliases?: order_by | null;
+  category?: order_by | null;
+  city?: order_by | null;
+  country?: order_by | null;
   created_at?: order_by | null;
   description?: order_by | null;
+  directions?: order_by | null;
   id?: order_by | null;
+  image?: order_by | null;
+  imageCredits?: order_by | null;
+  instagramUrl?: order_by | null;
+  latitude?: order_by | null;
   locationOption?: order_by | null;
+  longitude?: order_by | null;
+  publicEmail?: order_by | null;
+  publicPhone?: order_by | null;
+  rausgegangenLocationId?: order_by | null;
+  rausgegangenLocationOwned?: order_by | null;
   shortLabel?: order_by | null;
+  street?: order_by | null;
   updated_at?: order_by | null;
+  websiteUrl?: order_by | null;
+  zipCode?: order_by | null;
+}
+
+/**
+ * input type for updating data in table "LocationAddress"
+ */
+export interface LocationAddress_set_input {
+  accessibilityInfo?: string | null;
+  address?: string | null;
+  addressAdditionalInfo?: string | null;
+  aliases?: any | null;
+  category?: LocationAddressCategory_enum | null;
+  city?: string | null;
+  country?: string | null;
+  created_at?: any | null;
+  description?: string | null;
+  directions?: string | null;
+  id?: number | null;
+  image?: string | null;
+  imageCredits?: string | null;
+  instagramUrl?: string | null;
+  latitude?: any | null;
+  locationOption?: LocationOption_enum | null;
+  longitude?: any | null;
+  publicEmail?: string | null;
+  publicPhone?: string | null;
+  rausgegangenLocationId?: string | null;
+  rausgegangenLocationOwned?: boolean | null;
+  shortLabel?: string | null;
+  street?: string | null;
+  updated_at?: any | null;
+  websiteUrl?: string | null;
+  zipCode?: string | null;
 }
 
 /**
@@ -8799,6 +9229,8 @@ export interface LocationAddress_order_by {
  */
 export interface LocationAddress_stddev_order_by {
   id?: order_by | null;
+  latitude?: order_by | null;
+  longitude?: order_by | null;
 }
 
 /**
@@ -8806,6 +9238,8 @@ export interface LocationAddress_stddev_order_by {
  */
 export interface LocationAddress_stddev_pop_order_by {
   id?: order_by | null;
+  latitude?: order_by | null;
+  longitude?: order_by | null;
 }
 
 /**
@@ -8813,6 +9247,8 @@ export interface LocationAddress_stddev_pop_order_by {
  */
 export interface LocationAddress_stddev_samp_order_by {
   id?: order_by | null;
+  latitude?: order_by | null;
+  longitude?: order_by | null;
 }
 
 /**
@@ -8820,6 +9256,8 @@ export interface LocationAddress_stddev_samp_order_by {
  */
 export interface LocationAddress_sum_order_by {
   id?: order_by | null;
+  latitude?: order_by | null;
+  longitude?: order_by | null;
 }
 
 /**
@@ -8827,6 +9265,8 @@ export interface LocationAddress_sum_order_by {
  */
 export interface LocationAddress_var_pop_order_by {
   id?: order_by | null;
+  latitude?: order_by | null;
+  longitude?: order_by | null;
 }
 
 /**
@@ -8834,6 +9274,8 @@ export interface LocationAddress_var_pop_order_by {
  */
 export interface LocationAddress_var_samp_order_by {
   id?: order_by | null;
+  latitude?: order_by | null;
+  longitude?: order_by | null;
 }
 
 /**
@@ -8841,6 +9283,8 @@ export interface LocationAddress_var_samp_order_by {
  */
 export interface LocationAddress_variance_order_by {
   id?: order_by | null;
+  latitude?: order_by | null;
+  longitude?: order_by | null;
 }
 
 /**
@@ -9457,6 +9901,173 @@ export interface OrganizationAdmin_variance_order_by {
   organizationId?: order_by | null;
 }
 
+/**
+ * Boolean expression to compare columns of type "OrganizationFeatureOption_enum". All fields are combined with logical 'AND'.
+ */
+export interface OrganizationFeatureOption_enum_comparison_exp {
+  _eq?: OrganizationFeatureOption_enum | null;
+  _in?: OrganizationFeatureOption_enum[] | null;
+  _is_null?: boolean | null;
+  _neq?: OrganizationFeatureOption_enum | null;
+  _nin?: OrganizationFeatureOption_enum[] | null;
+}
+
+export interface OrganizationFeature_aggregate_bool_exp {
+  count?: OrganizationFeature_aggregate_bool_exp_count | null;
+}
+
+export interface OrganizationFeature_aggregate_bool_exp_count {
+  arguments?: OrganizationFeature_select_column[] | null;
+  distinct?: boolean | null;
+  filter?: OrganizationFeature_bool_exp | null;
+  predicate: Int_comparison_exp;
+}
+
+/**
+ * order by aggregate values of table "OrganizationFeature"
+ */
+export interface OrganizationFeature_aggregate_order_by {
+  avg?: OrganizationFeature_avg_order_by | null;
+  count?: order_by | null;
+  max?: OrganizationFeature_max_order_by | null;
+  min?: OrganizationFeature_min_order_by | null;
+  stddev?: OrganizationFeature_stddev_order_by | null;
+  stddev_pop?: OrganizationFeature_stddev_pop_order_by | null;
+  stddev_samp?: OrganizationFeature_stddev_samp_order_by | null;
+  sum?: OrganizationFeature_sum_order_by | null;
+  var_pop?: OrganizationFeature_var_pop_order_by | null;
+  var_samp?: OrganizationFeature_var_samp_order_by | null;
+  variance?: OrganizationFeature_variance_order_by | null;
+}
+
+/**
+ * input type for inserting array relation for remote table "OrganizationFeature"
+ */
+export interface OrganizationFeature_arr_rel_insert_input {
+  data: OrganizationFeature_insert_input[];
+  on_conflict?: OrganizationFeature_on_conflict | null;
+}
+
+/**
+ * order by avg() on columns of table "OrganizationFeature"
+ */
+export interface OrganizationFeature_avg_order_by {
+  id?: order_by | null;
+  organizationId?: order_by | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "OrganizationFeature". All fields are combined with a logical 'AND'.
+ */
+export interface OrganizationFeature_bool_exp {
+  Organization?: Organization_bool_exp | null;
+  _and?: OrganizationFeature_bool_exp[] | null;
+  _not?: OrganizationFeature_bool_exp | null;
+  _or?: OrganizationFeature_bool_exp[] | null;
+  created_at?: timestamptz_comparison_exp | null;
+  feature?: OrganizationFeatureOption_enum_comparison_exp | null;
+  id?: Int_comparison_exp | null;
+  organizationId?: Int_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "OrganizationFeature"
+ */
+export interface OrganizationFeature_insert_input {
+  Organization?: Organization_obj_rel_insert_input | null;
+  created_at?: any | null;
+  feature?: OrganizationFeatureOption_enum | null;
+  id?: number | null;
+  organizationId?: number | null;
+  updated_at?: any | null;
+}
+
+/**
+ * order by max() on columns of table "OrganizationFeature"
+ */
+export interface OrganizationFeature_max_order_by {
+  created_at?: order_by | null;
+  id?: order_by | null;
+  organizationId?: order_by | null;
+  updated_at?: order_by | null;
+}
+
+/**
+ * order by min() on columns of table "OrganizationFeature"
+ */
+export interface OrganizationFeature_min_order_by {
+  created_at?: order_by | null;
+  id?: order_by | null;
+  organizationId?: order_by | null;
+  updated_at?: order_by | null;
+}
+
+/**
+ * on_conflict condition type for table "OrganizationFeature"
+ */
+export interface OrganizationFeature_on_conflict {
+  constraint: OrganizationFeature_constraint;
+  update_columns: OrganizationFeature_update_column[];
+  where?: OrganizationFeature_bool_exp | null;
+}
+
+/**
+ * order by stddev() on columns of table "OrganizationFeature"
+ */
+export interface OrganizationFeature_stddev_order_by {
+  id?: order_by | null;
+  organizationId?: order_by | null;
+}
+
+/**
+ * order by stddev_pop() on columns of table "OrganizationFeature"
+ */
+export interface OrganizationFeature_stddev_pop_order_by {
+  id?: order_by | null;
+  organizationId?: order_by | null;
+}
+
+/**
+ * order by stddev_samp() on columns of table "OrganizationFeature"
+ */
+export interface OrganizationFeature_stddev_samp_order_by {
+  id?: order_by | null;
+  organizationId?: order_by | null;
+}
+
+/**
+ * order by sum() on columns of table "OrganizationFeature"
+ */
+export interface OrganizationFeature_sum_order_by {
+  id?: order_by | null;
+  organizationId?: order_by | null;
+}
+
+/**
+ * order by var_pop() on columns of table "OrganizationFeature"
+ */
+export interface OrganizationFeature_var_pop_order_by {
+  id?: order_by | null;
+  organizationId?: order_by | null;
+}
+
+/**
+ * order by var_samp() on columns of table "OrganizationFeature"
+ */
+export interface OrganizationFeature_var_samp_order_by {
+  id?: order_by | null;
+  organizationId?: order_by | null;
+}
+
+/**
+ * order by variance() on columns of table "OrganizationFeature"
+ */
+export interface OrganizationFeature_variance_order_by {
+  id?: order_by | null;
+  organizationId?: order_by | null;
+}
+
 export interface OrganizationNewsletterSubscription_aggregate_bool_exp {
   count?: OrganizationNewsletterSubscription_aggregate_bool_exp_count | null;
 }
@@ -9646,6 +10257,8 @@ export interface OrganizationSettings_bool_exp {
   legalForm?: String_comparison_exp | null;
   legalName?: String_comparison_exp | null;
   managingDirector?: String_comparison_exp | null;
+  rausgegangenApiKeyConfigured?: Boolean_comparison_exp | null;
+  rausgegangenTestMode?: Boolean_comparison_exp | null;
   registerCourt?: String_comparison_exp | null;
   registerNumber?: String_comparison_exp | null;
   taxNumber?: String_comparison_exp | null;
@@ -9669,6 +10282,8 @@ export interface OrganizationSettings_insert_input {
   legalForm?: string | null;
   legalName?: string | null;
   managingDirector?: string | null;
+  rausgegangenApiKeyConfigured?: boolean | null;
+  rausgegangenTestMode?: boolean | null;
   registerCourt?: string | null;
   registerNumber?: string | null;
   taxNumber?: string | null;
@@ -9699,6 +10314,8 @@ export interface OrganizationSettings_order_by {
   legalForm?: order_by | null;
   legalName?: order_by | null;
   managingDirector?: order_by | null;
+  rausgegangenApiKeyConfigured?: order_by | null;
+  rausgegangenTestMode?: order_by | null;
   registerCourt?: order_by | null;
   registerNumber?: order_by | null;
   taxNumber?: order_by | null;
@@ -9829,6 +10446,8 @@ export interface Organization_avg_order_by {
  */
 export interface Organization_bool_exp {
   Country?: Country_bool_exp | null;
+  Features?: OrganizationFeature_bool_exp | null;
+  Features_aggregate?: OrganizationFeature_aggregate_bool_exp | null;
   FundedCourses?: CourseFundingOrganization_bool_exp | null;
   FundedCourses_aggregate?: CourseFundingOrganization_aggregate_bool_exp | null;
   JobPortals?: JobPortal_bool_exp | null;
@@ -9876,6 +10495,7 @@ export interface Organization_bool_exp {
   ghostNewsletterLabel?: String_comparison_exp | null;
   ghostNewsletterListId?: String_comparison_exp | null;
   ghostNewsletterSlug?: String_comparison_exp | null;
+  hasGhostNewsletterConfigured?: Boolean_comparison_exp | null;
   id?: Int_comparison_exp | null;
   invoiceFooterText?: String_comparison_exp | null;
   invoiceNumberPrefix?: String_comparison_exp | null;
@@ -9888,6 +10508,9 @@ export interface Organization_bool_exp {
   newsletterProvider?: String_comparison_exp | null;
   phone?: String_comparison_exp | null;
   postalCode?: String_comparison_exp | null;
+  rausgegangenApiKeyConfigured?: Boolean_comparison_exp | null;
+  rausgegangenApiKeyEncrypted?: String_comparison_exp | null;
+  rausgegangenTestMode?: Boolean_comparison_exp | null;
   registerCourt?: String_comparison_exp | null;
   registerNumber?: String_comparison_exp | null;
   stripePublishableKey?: String_comparison_exp | null;
@@ -9905,6 +10528,7 @@ export interface Organization_bool_exp {
  */
 export interface Organization_insert_input {
   Country?: Country_obj_rel_insert_input | null;
+  Features?: OrganizationFeature_arr_rel_insert_input | null;
   FundedCourses?: CourseFundingOrganization_arr_rel_insert_input | null;
   JobPortals?: JobPortal_arr_rel_insert_input | null;
   JobPostingCredits?: JobPostingCredit_arr_rel_insert_input | null;
@@ -9952,6 +10576,9 @@ export interface Organization_insert_input {
   newsletterProvider?: string | null;
   phone?: string | null;
   postalCode?: string | null;
+  rausgegangenApiKeyConfigured?: boolean | null;
+  rausgegangenApiKeyEncrypted?: string | null;
+  rausgegangenTestMode?: boolean | null;
   registerCourt?: string | null;
   registerNumber?: string | null;
   stripePublishableKey?: string | null;
@@ -10000,6 +10627,7 @@ export interface Organization_max_order_by {
   newsletterProvider?: order_by | null;
   phone?: order_by | null;
   postalCode?: order_by | null;
+  rausgegangenApiKeyEncrypted?: order_by | null;
   registerCourt?: order_by | null;
   registerNumber?: order_by | null;
   stripePublishableKey?: order_by | null;
@@ -10047,6 +10675,7 @@ export interface Organization_min_order_by {
   newsletterProvider?: order_by | null;
   phone?: order_by | null;
   postalCode?: order_by | null;
+  rausgegangenApiKeyEncrypted?: order_by | null;
   registerCourt?: order_by | null;
   registerNumber?: order_by | null;
   stripePublishableKey?: order_by | null;
@@ -10080,6 +10709,7 @@ export interface Organization_on_conflict {
  */
 export interface Organization_order_by {
   Country?: Country_order_by | null;
+  Features_aggregate?: OrganizationFeature_aggregate_order_by | null;
   FundedCourses_aggregate?: CourseFundingOrganization_aggregate_order_by | null;
   JobPortals_aggregate?: JobPortal_aggregate_order_by | null;
   JobPostingCredits_aggregate?: JobPostingCredit_aggregate_order_by | null;
@@ -10115,6 +10745,7 @@ export interface Organization_order_by {
   ghostNewsletterLabel?: order_by | null;
   ghostNewsletterListId?: order_by | null;
   ghostNewsletterSlug?: order_by | null;
+  hasGhostNewsletterConfigured?: order_by | null;
   id?: order_by | null;
   invoiceFooterText?: order_by | null;
   invoiceNumberPrefix?: order_by | null;
@@ -10127,6 +10758,9 @@ export interface Organization_order_by {
   newsletterProvider?: order_by | null;
   phone?: order_by | null;
   postalCode?: order_by | null;
+  rausgegangenApiKeyConfigured?: order_by | null;
+  rausgegangenApiKeyEncrypted?: order_by | null;
+  rausgegangenTestMode?: order_by | null;
   registerCourt?: order_by | null;
   registerNumber?: order_by | null;
   stripePublishableKey?: order_by | null;
@@ -12731,6 +13365,150 @@ export interface Project_variance_order_by {
   parentProjectId?: order_by | null;
 }
 
+/**
+ * Boolean expression to filter rows from the table "RausgegangenEventCategory". All fields are combined with a logical 'AND'.
+ */
+export interface RausgegangenEventCategory_bool_exp {
+  _and?: RausgegangenEventCategory_bool_exp[] | null;
+  _not?: RausgegangenEventCategory_bool_exp | null;
+  _or?: RausgegangenEventCategory_bool_exp[] | null;
+  comment?: String_comparison_exp | null;
+  value?: String_comparison_exp | null;
+}
+
+/**
+ * Boolean expression to compare columns of type "RausgegangenEventCategory_enum". All fields are combined with logical 'AND'.
+ */
+export interface RausgegangenEventCategory_enum_comparison_exp {
+  _eq?: RausgegangenEventCategory_enum | null;
+  _in?: RausgegangenEventCategory_enum[] | null;
+  _is_null?: boolean | null;
+  _neq?: RausgegangenEventCategory_enum | null;
+  _nin?: RausgegangenEventCategory_enum[] | null;
+}
+
+/**
+ * input type for inserting data into table "RausgegangenEventCategory"
+ */
+export interface RausgegangenEventCategory_insert_input {
+  comment?: string | null;
+  value?: string | null;
+}
+
+/**
+ * input type for inserting object relation for remote table "RausgegangenEventCategory"
+ */
+export interface RausgegangenEventCategory_obj_rel_insert_input {
+  data: RausgegangenEventCategory_insert_input;
+  on_conflict?: RausgegangenEventCategory_on_conflict | null;
+}
+
+/**
+ * on_conflict condition type for table "RausgegangenEventCategory"
+ */
+export interface RausgegangenEventCategory_on_conflict {
+  constraint: RausgegangenEventCategory_constraint;
+  update_columns: RausgegangenEventCategory_update_column[];
+  where?: RausgegangenEventCategory_bool_exp | null;
+}
+
+/**
+ * Ordering options when selecting data from "RausgegangenEventCategory".
+ */
+export interface RausgegangenEventCategory_order_by {
+  comment?: order_by | null;
+  value?: order_by | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "RausgegangenListing". All fields are combined with a logical 'AND'.
+ */
+export interface RausgegangenListing_bool_exp {
+  Category?: RausgegangenEventCategory_bool_exp | null;
+  Course?: Course_bool_exp | null;
+  _and?: RausgegangenListing_bool_exp[] | null;
+  _not?: RausgegangenListing_bool_exp | null;
+  _or?: RausgegangenListing_bool_exp[] | null;
+  category?: RausgegangenEventCategory_enum_comparison_exp | null;
+  courseId?: Int_comparison_exp | null;
+  created_at?: timestamptz_comparison_exp | null;
+  enabled?: Boolean_comparison_exp | null;
+  id?: Int_comparison_exp | null;
+  lastSyncedAt?: timestamptz_comparison_exp | null;
+  previewUrl?: String_comparison_exp | null;
+  publicUrl?: String_comparison_exp | null;
+  published?: Boolean_comparison_exp | null;
+  rausgegangenEventId?: String_comparison_exp | null;
+  rausgegangenShowId?: String_comparison_exp | null;
+  syncError?: String_comparison_exp | null;
+  syncStatus?: String_comparison_exp | null;
+  tags?: jsonb_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "RausgegangenListing"
+ */
+export interface RausgegangenListing_insert_input {
+  Category?: RausgegangenEventCategory_obj_rel_insert_input | null;
+  Course?: Course_obj_rel_insert_input | null;
+  category?: RausgegangenEventCategory_enum | null;
+  courseId?: number | null;
+  created_at?: any | null;
+  enabled?: boolean | null;
+  id?: number | null;
+  lastSyncedAt?: any | null;
+  previewUrl?: string | null;
+  publicUrl?: string | null;
+  published?: boolean | null;
+  rausgegangenEventId?: string | null;
+  rausgegangenShowId?: string | null;
+  syncError?: string | null;
+  syncStatus?: string | null;
+  tags?: any | null;
+  updated_at?: any | null;
+}
+
+/**
+ * input type for inserting object relation for remote table "RausgegangenListing"
+ */
+export interface RausgegangenListing_obj_rel_insert_input {
+  data: RausgegangenListing_insert_input;
+  on_conflict?: RausgegangenListing_on_conflict | null;
+}
+
+/**
+ * on_conflict condition type for table "RausgegangenListing"
+ */
+export interface RausgegangenListing_on_conflict {
+  constraint: RausgegangenListing_constraint;
+  update_columns: RausgegangenListing_update_column[];
+  where?: RausgegangenListing_bool_exp | null;
+}
+
+/**
+ * Ordering options when selecting data from "RausgegangenListing".
+ */
+export interface RausgegangenListing_order_by {
+  Category?: RausgegangenEventCategory_order_by | null;
+  Course?: Course_order_by | null;
+  category?: order_by | null;
+  courseId?: order_by | null;
+  created_at?: order_by | null;
+  enabled?: order_by | null;
+  id?: order_by | null;
+  lastSyncedAt?: order_by | null;
+  previewUrl?: order_by | null;
+  publicUrl?: order_by | null;
+  published?: order_by | null;
+  rausgegangenEventId?: order_by | null;
+  rausgegangenShowId?: order_by | null;
+  syncError?: order_by | null;
+  syncStatus?: order_by | null;
+  tags?: order_by | null;
+  updated_at?: order_by | null;
+}
+
 export interface SavedJobPosting_aggregate_bool_exp {
   count?: SavedJobPosting_aggregate_bool_exp_count | null;
 }
@@ -13205,6 +13983,7 @@ export interface Session_bool_exp {
   Attendances_aggregate?: Attendance_aggregate_bool_exp | null;
   Course?: Course_bool_exp | null;
   Program?: Program_bool_exp | null;
+  PublicEvent?: Course_bool_exp | null;
   SessionAddresses?: SessionAddress_bool_exp | null;
   SessionAddresses_aggregate?: SessionAddress_aggregate_bool_exp | null;
   SessionSpeakers?: SessionSpeaker_bool_exp | null;
@@ -13233,6 +14012,7 @@ export interface Session_insert_input {
   Attendances?: Attendance_arr_rel_insert_input | null;
   Course?: Course_obj_rel_insert_input | null;
   Program?: Program_obj_rel_insert_input | null;
+  PublicEvent?: Course_obj_rel_insert_input | null;
   SessionAddresses?: SessionAddress_arr_rel_insert_input | null;
   SessionSpeakers?: SessionSpeaker_arr_rel_insert_input | null;
   attendanceData?: string | null;
@@ -13296,6 +14076,30 @@ export interface Session_on_conflict {
   constraint: Session_constraint;
   update_columns: Session_update_column[];
   where?: Session_bool_exp | null;
+}
+
+/**
+ * Ordering options when selecting data from "Session".
+ */
+export interface Session_order_by {
+  Attendances_aggregate?: Attendance_aggregate_order_by | null;
+  Course?: Course_order_by | null;
+  Program?: Program_order_by | null;
+  PublicEvent?: Course_order_by | null;
+  SessionAddresses_aggregate?: SessionAddress_aggregate_order_by | null;
+  SessionSpeakers_aggregate?: SessionSpeaker_aggregate_order_by | null;
+  attendanceData?: order_by | null;
+  courseId?: order_by | null;
+  created_at?: order_by | null;
+  description?: order_by | null;
+  endDateTime?: order_by | null;
+  id?: order_by | null;
+  isMandatory?: order_by | null;
+  programId?: order_by | null;
+  questionaire_sent?: order_by | null;
+  startDateTime?: order_by | null;
+  title?: order_by | null;
+  updated_at?: order_by | null;
 }
 
 /**

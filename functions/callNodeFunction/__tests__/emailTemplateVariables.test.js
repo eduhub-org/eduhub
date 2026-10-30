@@ -228,6 +228,19 @@ describe('Email Template Variables System', () => {
       expect(result).toBe('Hello John, your course Test Course starts formatted-2024-01-15. Link: https://test.example.com/course/123');
     });
 
+    it('should send invited account holders through the login, but not guests', () => {
+      process.env.FRONTEND_URL = 'https://test.example.com';
+      const link = (status, userStatus) =>
+        createEnrollmentVariableReplacer(
+          { status, User: { firstName: 'Ada', status: userStatus }, Course: { id: 7, title: 'Algo' } },
+          mockFormatDate
+        )('[Enrollment:CourseLink]');
+
+      expect(link('INVITED', 'ACTIVE')).toBe('https://test.example.com/course/7?force_login=true');
+      expect(link('INVITED', 'GUEST')).toBe('https://test.example.com/course/7');
+      expect(link('CONFIRMED', 'ACTIVE')).toBe('https://test.example.com/course/7');
+    });
+
     it('should resolve the certificate link, falling back to the course page', () => {
       process.env.FRONTEND_URL = 'https://test.example.com';
 

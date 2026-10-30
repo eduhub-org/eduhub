@@ -1,5 +1,6 @@
 import {
   buildEventsIcal,
+  feedGeo,
   feedLocation,
   htmlToPlainText,
   IcalFeedEvent,
@@ -268,6 +269,35 @@ describe('feedLocation', () => {
   it('writes online places as just "Online" and drops duplicates and empty options', () => {
     expect(feedLocation([location('ONLINE', 'https://meet.example/abc'), location('ONLINE', 'x')])).toBe('Online');
     expect(feedLocation([location(null, 'Somewhere')])).toBeUndefined();
+  });
+});
+
+describe('feedGeo', () => {
+  const kiel = { latitude: 54.3233, longitude: 10.1228 };
+  const place = (key: string, locationOption: string, coordinates?: typeof kiel) => ({
+    key,
+    locationOption,
+    displayAddress: 'Legienstr. 40',
+    coordinates,
+  });
+
+  it('uses the coordinates of the single in-person place', () => {
+    expect(feedGeo([place('cl-1', 'KIEL', kiel), place('cl-2', 'ONLINE')])).toEqual(kiel);
+    expect(feedGeo([place('cl-1', 'KIEL', kiel), place('cl-1', 'KIEL', kiel)])).toEqual(kiel);
+  });
+
+  it('writes no point for several places or missing coordinates', () => {
+    expect(feedGeo([place('cl-1', 'KIEL', kiel), place('cl-2', 'HEIDE', { latitude: 54.19, longitude: 9.09 })])).toBeUndefined();
+    expect(feedGeo([place('cl-1', 'KIEL')])).toBeUndefined();
+    expect(feedGeo([place('cl-1', 'ONLINE', kiel)])).toBeUndefined();
+  });
+
+  it('is written as GEO', () => {
+    const ics = generateICalString(
+      [{ uid: 'u', title: 'T', startDateTime: '2026-11-03T17:00:00Z', endDateTime: '2026-11-03T19:00:00Z', geo: kiel }],
+      'Cal'
+    );
+    expect(ics).toContain('GEO:54.3233;10.1228');
   });
 });
 

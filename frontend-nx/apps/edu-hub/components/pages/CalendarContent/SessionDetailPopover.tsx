@@ -4,6 +4,8 @@ import { useTranslations } from 'next-intl';
 import { format } from 'date-fns';
 import { de, enUS } from 'date-fns/locale';
 import { useLocale } from 'next-intl';
+import InlineMarkdown from '../../common/InlineMarkdown';
+
 interface SessionDetail {
   id: number;
   title: string;
@@ -98,9 +100,10 @@ const SessionDetailPopover: FC<IProps> = ({ session, anchorEl, onClose }) => {
         )}
 
         {session.description && (
-          <p className="text-sm text-label-secondary border-t border-border-primary pt-2 mt-2">
-            {session.description}
-          </p>
+          <InlineMarkdown
+            markdown={session.description}
+            className="text-sm text-label-secondary border-t border-border-primary pt-2 mt-2"
+          />
         )}
       </div>
     </Popover>

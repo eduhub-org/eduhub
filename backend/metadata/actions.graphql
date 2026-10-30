@@ -308,7 +308,7 @@ type Mutation {
 }
 
 type Mutation {
-  notifySessionParticipants(sessionId: Int!): NotifySessionParticipantsResult!
+  notifySessionParticipants(sessionId: Int!, skipCourse: Boolean): NotifySessionParticipantsResult!
 }
 
 type NotifySessionParticipantsResult {
@@ -317,6 +317,11 @@ type NotifySessionParticipantsResult {
   total: Int
   error: String
   messageKey: String
+  """
+  Whether the course participants' mailing went out. A retry passes
+  skipCourse when it did, so only the public event's registrants are mailed again.
+  """
+  courseSent: Boolean
 }
 
 type Mutation {
@@ -933,4 +938,54 @@ type RequestJobOrganizationAccessResult {
   success: Boolean!
   error: String
   messageKey: String
+}
+
+type Mutation {
+  saveLocationAddressImage(
+    base64file: String!
+    filename: String!
+    locationaddressid: Int!
+  ): saveImageResult
+}
+
+type Mutation {
+  geocodeLocationAddress(locationAddressId: Int!): GeocodeLocationAddressResult!
+}
+
+type GeocodeLocationAddressResult {
+  success: Boolean!
+  latitude: Float
+  longitude: Float
+  displayName: String
+  error: String
+}
+
+type Query {
+  searchRausgegangenLocations(locationAddressId: Int!): SearchRausgegangenLocationsResult!
+}
+
+type SearchRausgegangenLocationsResult {
+  success: Boolean!
+  error: String
+  locations: [RausgegangenLocation!]!
+}
+
+type RausgegangenLocation {
+  id: String!
+  title: String!
+  street: String
+  zipCode: String
+  city: String
+}
+
+type Mutation {
+  syncRausgegangenEventNow(courseId: Int!): SyncRausgegangenEventResult!
+}
+
+type SyncRausgegangenEventResult {
+  success: Boolean!
+  syncStatus: String
+  error: String
+  previewUrl: String
+  publicUrl: String
 }

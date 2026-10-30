@@ -43,6 +43,7 @@ export const COURSE_FRAGMENT = gql`
     published
     applicationEnd
     coverImage
+    coverImageCredits
     language
     maxMissedSessions
     chatLink
@@ -63,7 +64,22 @@ export const COURSE_FRAGMENT = gql`
     contentDescriptionField2
     externalRegistrationLink
     registrationType
+    registrationButtonLabelDe
+    registrationButtonLabelEn
     guestRegistrationEnabled
+    # Set when this event was created from a session of another course, which
+    # the event page links to (Course is null while that course is unpublished).
+    sourceSessionId
+    SourceSession {
+      id
+      title
+      startDateTime
+      Course {
+        id
+        title
+        published
+      }
+    }
     formbricksEnrollmentSurveyUrl
     startTime
     endTime
@@ -196,6 +212,7 @@ export const COURSE_FRAGMENT_ANONYMOUS = gql`
     published
     applicationEnd
     coverImage
+    coverImageCredits
     language
     maxMissedSessions
     chatLink
@@ -214,7 +231,22 @@ export const COURSE_FRAGMENT_ANONYMOUS = gql`
     contentDescriptionField2
     externalRegistrationLink
     registrationType
+    registrationButtonLabelDe
+    registrationButtonLabelEn
     guestRegistrationEnabled
+    # Set when this event was created from a session of another course, which
+    # the event page links to (Course is null while that course is unpublished).
+    sourceSessionId
+    SourceSession {
+      id
+      title
+      startDateTime
+      Course {
+        id
+        title
+        published
+      }
+    }
     formbricksEnrollmentSurveyUrl
     startTime
     endTime

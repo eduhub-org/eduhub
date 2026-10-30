@@ -1,3 +1,4 @@
+<#import "social-providers.ftl" as identityProviders>
 <#macro registrationLayout bodyClass="" displayInfo=false displayMessage=true displayRequiredFields=false showAnotherWayIfPresent=true>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" class="${properties.kcHtmlClass!}">
@@ -71,8 +72,12 @@
         <div class="academy_header_guest">
             <nav class="navbar navbar-light navbar-expand-md p-0">
                 <div class="navbar-logo-wrapper">
-                    <img class="navbar-logo" src="${url.resourcesPath}/img/edu_logo.svg" alt="">
-                    <img class="navbar-logo-text" src="${url.resourcesPath}/img/logo_text.svg" alt="EduHub">
+                    <#assign homeUrl = (client.baseUrl)!"">
+                    <#if !homeUrl?has_content><#assign homeUrl = "https://edu.opencampus.sh/"></#if>
+                    <a id="kc-home-link" class="navbar-home-link" href="${homeUrl}" data-login-url="${url.loginUrl}" aria-label="${msg('backToHome')}">
+                        <img class="navbar-logo" src="${url.resourcesPath}/img/edu_logo.svg" alt="">
+                        <img class="navbar-logo-text" src="${url.resourcesPath}/img/logo_text.svg" alt="EduHub">
+                    </a>
                     <#-- Co-brand slot: the EduHub lockup above always stays, the
                          portal mark is added next to it so people recognise that
                          StuJo runs on their EduHub account. Revealed by
@@ -98,7 +103,12 @@
                             <div class="${properties.kcLocaleMainClass!}" id="kc-locale">
                                 <div id="kc-locale-wrapper" class="${properties.kcLocaleWrapperClass!}">
                                     <div id="kc-locale-dropdown" class="${properties.kcLocaleDropDownClass!}">
-                                        <a href="#" id="kc-current-locale-link">${locale.current}</a>
+                                        <a href="#" id="kc-current-locale-link">
+                                            ${locale.current}
+                                            <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                                <path fill="currentColor" d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z"/>
+                                            </svg>
+                                        </a>
                                         <ul class="${properties.kcLocaleListClass!}">
                                             <#list locale.supported as l>
                                                 <li class="${properties.kcLocaleListItemClass!}">
@@ -192,7 +202,11 @@
                             </form>
                         </#if>
                         
-                      <#nested "socialProviders">
+                      <#if bodyClass == "kc-login-page" || bodyClass == "kc-register-page">
+                          <@identityProviders.buttons registration=(bodyClass == "kc-register-page") />
+                      <#else>
+                          <#nested "socialProviders">
+                      </#if>
                     
                     <#if displayInfo>
                         <div id="kc-info" class="${properties.kcSignUpClass!}">

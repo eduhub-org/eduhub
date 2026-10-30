@@ -21,6 +21,14 @@ object_relationships:
     using:
       foreign_key_constraint_on: type
 array_relationships:
+  # Features a super admin activated for this organization (see OrganizationFeature).
+  - name: Features
+    using:
+      foreign_key_constraint_on:
+        column: organizationId
+        table:
+          name: OrganizationFeature
+          schema: public
   - name: FundedCourses
     using:
       foreign_key_constraint_on:
@@ -84,6 +92,16 @@ array_relationships:
         table:
           name: JobPortal
           schema: public
+computed_fields:
+  # True when the Ghost newsletter is ready to sync (API URL, stored key, list ID or slug). Public so
+  # participants can be offered the opt-in; the credential columns themselves stay with
+  # OrganizationSettings (canManageSettings).
+  - name: hasGhostNewsletterConfigured
+    definition:
+      function:
+        name: organization_has_ghost_newsletter_configured
+        schema: public
+      table_argument: organization_row
 insert_permissions:
   # A logged-in user creates an organization in exactly one situation: they name their employer or
   # university in a picker that has no matching entry yet (the profile organization field, the
@@ -128,6 +146,8 @@ select_permissions:
         # website and city are public on the StuJo employer profile pages
         - website
         - city
+      computed_fields:
+        - hasGhostNewsletterConfigured
       filter: {}
       allow_aggregations: true
   # Org admins may read the working record of any organization they administer (regardless of which

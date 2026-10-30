@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { FC, useCallback, useEffect, useMemo, useState } from 'react';
+import { FC, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { ColumnDef } from '@tanstack/react-table';
 import { useManageMutation } from '../../../hooks/authedMutation';
 import {
@@ -44,6 +44,8 @@ import { useManageCourseWhere } from '../../../hooks/manageScope';
 import { ADMIN_COURSE_LIST } from '../../../queries/courseList';
 import { GET_COURSE_TEMPLATES_COUNT } from '../../../queries/emailTemplates';
 import ExpandableCourseRow from './ExpandableCourseRow';
+import ProgramSettingsPanel from '../ManageProgramsContent/ProgramSettingsPanel';
+import { Tooltip } from '@mui/material';
 import { getRegistrationFeatures } from '../ManageCourseContent/ApplicationsTab/registrationConfig';
 import { useParallelQueries } from '../../../hooks/useParallelQueries';
 import { CourseEnrollmentStatus_enum, order_by } from '../../../__generated__/globalTypes';
@@ -62,11 +64,12 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { SelectProgramDialog } from './SelectProgramDialog';
 import { COPY_COURSES_TO_PROGRAM } from '../../../queries/copyCourse';
 import NotificationSnackbar from '../../common/dialogs/NotificationSnackbar';
-import { MdMarkEmailRead, MdOpenInNew } from 'react-icons/md';
+import { MdMarkEmailRead, MdOpenInNew, MdSettings } from 'react-icons/md';
 
 import { ProgramsMenubar } from '../../layout/ProgramsMenubar';
 import type { StaticComponentProperty } from '../../../types/UIComponents';
 import { ProgramType } from '../../../types/enums';
+import { useRausgegangenUnpublishPrompt } from '../ManageCourseContent/useRausgegangenUnpublishPrompt';
 import {
   programTabStorageKey,
   resolveProgramTab,
@@ -114,9 +117,11 @@ interface IProps {
   programType: ProgramType;
   /** Organization the dashboard is scoped to; see ProgramManagementDashboard. */
   organizationId: number;
+  /** Organization dropdown of the dashboard, shown in the header row next to the program settings button. */
+  organizationSelector?: ReactNode;
 }
 
-const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationId }) => {
+const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationId, organizationSelector }) => {
   const t = useTranslations('manageCourses');
   const tCommon = useTranslations('common');
   const locale = useLocale();
@@ -184,6 +189,9 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
     order_by: [{ id: order_by.desc }],
   });
 
+  // Settings panel of the selected program; it follows the program tabs while open.
+  const [showProgramSettings, setShowProgramSettings] = useState(false);
+
   // Menubar configuration
   const allTabId = -1;
   const maxOtherPrograms = 6;
@@ -226,7 +234,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
   }, []);
 
   // Use TableGrid hook with proper refetchFilter for search debouncing
-  const { data, loading, initialLoading, error, refetch, searchFilter, pageIndex, sorting, setSearchFilter, setPageIndex, setSorting } = useTableGrid({
+  const { data, loading, initialLoading, error, refetch, searchFilter, pageIndex, sorting, setSearchFilter, setPageIndex, setSorting, fetchAllRows } = useTableGrid({
     queryHook: useManageQuery,
     query: ADMIN_COURSE_LIST,
     queryVariables: filter,
@@ -271,6 +279,11 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
 
   const courses: AdminCourseList_Course[] = useMemo(() => data?.Course || [], [data?.Course]);
   const totalCount = data?.Course_aggregate?.aggregate?.count || 0;
+
+  const loadAllCourses = useCallback(async (): Promise<AdminCourseList_Course[]> => {
+    const allData = await fetchAllRows(totalCount);
+    return allData?.Course ?? [];
+  }, [fetchAllRows, totalCount]);
 
   // Fetch template counts for visible courses using parallel queries hook
   const courseIds = useMemo(() => courses.map((course) => course.id), [courses]);
@@ -379,6 +392,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
   });
 
   const [updateCourse] = useManageMutation<UpdateCourseByPk, UpdateCourseByPkVariables>(UPDATE_COURSE_PROPERTY);
+  const { confirmUnpublish, dialog: rausgegangenUnpublishDialog } = useRausgegangenUnpublishPrompt();
 
   const [insertCourse] = useManageMutation<InsertCourseWithLocation, InsertCourseWithLocationVariables>(INSERT_COURSE);
 
@@ -465,6 +479,8 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
           );
           setShowSuccessNotification(true);
         } else if (action === 'unpublish') {
+          // Shared on Rausgegangen? Ask whether to unpublish there too (cancel keeps everything).
+          if (!(await confirmUnpublish(courseIds))) return false;
           // Update all selected courses to unpublished
           await Promise.all(
             courseIds.map((id) =>
@@ -509,7 +525,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
         throw error;
       }
     },
-    [copyBulkAction, refetch, updateCourse, createInstructorCertificates, t, messageKey]
+    [copyBulkAction, refetch, updateCourse, createInstructorCertificates, t, messageKey, confirmUnpublish]
   );
 
   const bulkActions = [
@@ -1011,18 +1027,49 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
     [filter, updateFilter, setPageIndex]
   );
 
+  const settingsProgramId = currentProgramId === allTabId ? null : currentProgramId;
+
   return (
     <>
-      {/* Only show the program tab select when there is more than one program to switch between. */}
-      {programs.length > 1 && (
-        <div className="flex justify-start mb-5 text-white">
-          <ProgramsMenubar
-            programs={menubarPrograms}
-            defaultProgramId={defaultProgramId ?? 0}
-            currentSelectedId={currentProgramId}
-            onTabClicked={handleTabClick}
-          />
+      {rausgegangenUnpublishDialog}
+      <div className="flex items-start justify-between gap-4">
+        <div className="min-w-0 flex-1">
+          {organizationSelector}
+          {/* Only show the program tab select when there is more than one program to switch between. */}
+          {programs.length > 1 && (
+            <div className="flex justify-start mb-5 text-white">
+              <ProgramsMenubar
+                programs={menubarPrograms}
+                defaultProgramId={defaultProgramId ?? 0}
+                currentSelectedId={currentProgramId}
+                onTabClicked={handleTabClick}
+              />
+            </div>
+          )}
         </div>
+        {/* The span keeps the tooltip working while the button is disabled on the "All" tab. */}
+        <Tooltip title={settingsProgramId === null ? t('program_settings.select_program_hint') : t('program_settings.open')}>
+          <span className="mb-5 flex-shrink-0">
+            <button
+              type="button"
+              onClick={() => setShowProgramSettings((open) => !open)}
+              disabled={settingsProgramId === null}
+              aria-label={t('program_settings.open')}
+              aria-expanded={showProgramSettings && settingsProgramId !== null}
+              className={`p-2 rounded-lg border border-border-primary transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
+                showProgramSettings && settingsProgramId !== null
+                  ? 'bg-fill-primary text-label-primary'
+                  : 'text-white hover:bg-white/10'
+              }`}
+            >
+              <MdSettings size={22} />
+            </button>
+          </span>
+        </Tooltip>
+      </div>
+
+      {showProgramSettings && settingsProgramId !== null && (
+        <ProgramSettingsPanel programId={settingsProgramId} onClose={() => setShowProgramSettings(false)} />
       )}
 
       {initialLoading ? (
@@ -1048,6 +1095,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
           refetchQueries={['AdminCourseList']}
           bulkActions={bulkActions}
           onBulkAction={handleBulkAction}
+          loadAllRows={loadAllCourses}
           onAddButtonClick={handleAddCourse}
           addButtonDisabledHint={addDisabledHint}
           addButtonText={addButtonText}

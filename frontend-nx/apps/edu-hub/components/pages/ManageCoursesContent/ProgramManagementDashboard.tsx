@@ -162,14 +162,21 @@ const ProgramManagementDashboard: FC<ProgramManagementDashboardProps> = ({ progr
     </div>
   );
 
+  // Until an org admin's initial grant is known, the fallback organization may not be the one the
+  // dashboard settles on — so do not render (and allow creating offerings in) it. Not needed when
+  // the default organization or a remembered one is in effect, as the grant cannot change those.
+  const waitingForInitialOrganization =
+    initialOrganizationLoading &&
+    organizationId !== DEFAULT_ORGANIZATION_ID &&
+    !(typeof storedScope === 'number' && storedScope === organizationId);
+  const showsCourses =
+    !programListRequest.loading &&
+    !waitingForInitialOrganization &&
+    !programListRequest.error &&
+    organizationId !== null &&
+    programs.length > 0;
+
   const body = () => {
-    // Until an org admin's initial grant is known, the fallback organization may not be the one the
-    // dashboard settles on — so do not render (and allow creating offerings in) it. Not needed when
-    // the default organization or a remembered one is in effect, as the grant cannot change those.
-    const waitingForInitialOrganization =
-      initialOrganizationLoading &&
-      organizationId !== DEFAULT_ORGANIZATION_ID &&
-      !(typeof storedScope === 'number' && storedScope === organizationId);
     if (programListRequest.loading || waitingForInitialOrganization) {
       return <Loading />;
     }
@@ -195,6 +202,7 @@ const ProgramManagementDashboard: FC<ProgramManagementDashboardProps> = ({ progr
         programs={programs}
         programType={programType}
         organizationId={organizationId}
+        organizationSelector={organizationSelector}
       />
     );
   };
@@ -202,7 +210,8 @@ const ProgramManagementDashboard: FC<ProgramManagementDashboardProps> = ({ progr
   return (
     <div className="max-w-screen-xl mx-auto">
       <CommonPageHeader headline={headline} />
-      {organizationSelector}
+      {/* Once there are courses to manage, ManageCoursesContent shows the dropdown in its header row. */}
+      {!showsCourses && organizationSelector}
       {body()}
     </div>
   );

@@ -1,7 +1,7 @@
 import { QueryResult } from '@apollo/client';
 import { ProgramType } from '../../../../types/enums';
 import { nextSessionTimes } from './sessionDefaults';
-import { FC, ReactNode, useCallback, useMemo, useState } from 'react';
+import { FC, Fragment, ReactNode, useCallback, useMemo, useState } from 'react';
 import { ColumnDef } from '@tanstack/react-table';
 import {
   identityEventMapper,
@@ -60,9 +60,10 @@ import { USER_SELECTION_WITH_FILTER, buildUserSelectionFilter } from '../../../.
 import TableGrid from '../../../common/TableGrid';
 import { formatTruncatedList, makeFullName } from '../../../../helpers/util';
 import InputField from '../../../inputs/InputField';
+import InlineMarkdown from '../../../common/InlineMarkdown';
 import CheckboxSelector from '../../../inputs/CheckboxSelector';
 import { Tooltip } from '@mui/material';
-import { MdLock, MdVisibility } from 'react-icons/md';
+import { MdLock, MdSync, MdVisibility } from 'react-icons/md';
 import { isProgramSession, mergeSessions } from '../../../../helpers/programSessions';
 import { isMandatorySession } from '../../../../helpers/courseParticipationAttendance';
 import SessionAddresses from './SessionAddresses';
@@ -73,6 +74,7 @@ import { SelectUserDialog } from '../../../common/dialogs/SelectUserDialog';
 import { CreateUserDialog } from '../../../common/dialogs/CreateUserDialog';
 import AttendanceDataDialog from './AttendanceDataDialog';
 import useNotifyParticipantsPrompt from './useNotifyParticipantsPrompt';
+import PublicEventSection from './PublicEventSection';
 import { QuestionConfirmationDialog } from '../../../common/dialogs/QuestionConfirmationDialog';
 import { ErrorMessageDialog } from '../../../common/dialogs/ErrorMessageDialog';
 import NotificationSnackbar from '../../../common/dialogs/NotificationSnackbar';
@@ -136,10 +138,18 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
   // Counts CONFIRMED + REGISTERED enrollees, i.e. exactly the people the
   // reschedule mail would reach. Already selected via AdminCourseFragment.
   const participantCount = Number(course.publicParticipantCount ?? 0);
+  // A session opened as a public event moves its event along, so the event's
+  // registrants are informed too (see notifySessionParticipants).
+  const eventRegistrantCount = useCallback(
+    (sessionId: number) =>
+      Number(course.Sessions.find((session) => session.id === sessionId)?.PublicEvent?.publicParticipantCount ?? 0),
+    [course.Sessions]
+  );
   const {
     registerChange,
     promptOpen,
     pendingCount,
+    pendingRecipients,
     sending,
     confirm: confirmNotification,
     cancel: cancelNotification,
@@ -147,7 +157,7 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
     clearError: clearNotificationError,
     savedMessage: notificationSaved,
     clearSaved: clearNotificationSaved,
-  } = useNotifyParticipantsPrompt(participantCount);
+  } = useNotifyParticipantsPrompt(participantCount, eventRegistrantCount);
 
   const courseSessions = useMemo(() => {
     const result = [...course.Sessions];
@@ -265,6 +275,20 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
 
   const programSessionTooltip = t('SessionsTab.program_session_locked');
 
+  // An event created from a course session follows that session (see
+  // docs/PUBLIC_SESSION_EVENTS.md): its date, title, description and location
+  // are changed in the course, so they are read-only here.
+  const syncedFromSession = course.sourceSessionId != null;
+  const isLocked = useCallback(
+    (session: SessionRow) => syncedFromSession || isProgramSession(session),
+    [syncedFromSession]
+  );
+  const lockedTooltip = useCallback(
+    (session: SessionRow) =>
+      isProgramSession(session) ? programSessionTooltip : t('SessionsTab.synced_session_locked'),
+    [programSessionTooltip, t]
+  );
+
   // Mandatory only matters for passing, so the column is shown only when a
   // certificate can be earned. At least one course session must stay
   // mandatory: the last mandatory one cannot be unticked (which also locks the
@@ -287,9 +311,12 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
       if (isProgramSession(session)) {
         return <Eyebrow icon={<MdLock aria-hidden />}>{tCoursePage('program_session')}</Eyebrow>;
       }
+      if (syncedFromSession) {
+        return <Eyebrow icon={<MdSync aria-hidden />}>{t('SessionsTab.synced_session')}</Eyebrow>;
+      }
       return null;
     },
-    [tCoursePage]
+    [tCoursePage, t, syncedFromSession]
   );
 
   const mandatoryControl = useCallback(
@@ -333,7 +360,7 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
         cell: ({ row }) => (
           <SessionDateTimeCell
             session={row.original}
-            readOnly={isProgramSession(row.original)}
+            readOnly={isLocked(row.original)}
             onSetDate={(event) => handleSetDate(row.original, event)}
             onTimeChanged={() => registerChange(row.original.id)}
             minDate={lectureStart}
@@ -354,8 +381,8 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
               <SessionLocationChips entries={locationsOf(row.original)} iconsOnly />
             </div>
           );
-          return isProgramSession(row.original) ? (
-            <Tooltip title={programSessionTooltip}>
+          return isLocked(row.original) ? (
+            <Tooltip title={lockedTooltip(row.original)}>
               <div className="w-full min-w-0 flex flex-col gap-0.5 px-2">
                 {eyebrow}
                 <span className="truncate text-label-secondary">{row.original.title || tCoursePage('session_title')}</span>
@@ -429,7 +456,8 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
     lectureEnd,
     handleSetDate,
     registerChange,
-    programSessionTooltip,
+    isLocked,
+    lockedTooltip,
     showMandatoryColumn,
     belowXl,
     locationsOf,
@@ -446,7 +474,7 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
           {formatTimeString(session.endDateTime)}
         </span>
         {eyebrowOf(session)}
-        <span className={`font-semibold ${isProgramSession(session) ? 'text-label-secondary' : ''}`}>
+        <span className={`font-semibold ${isLocked(session) ? 'text-label-secondary' : ''}`}>
           {session.title || tCoursePage('session_title')}
         </span>
         <div className="flex items-center justify-between gap-2">
@@ -455,7 +483,7 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
         </div>
       </div>
     ),
-    [dateLabel, formatTimeString, eyebrowOf, tCoursePage, locationsOf, showMandatoryColumn, mandatoryControl]
+    [dateLabel, formatTimeString, eyebrowOf, isLocked, tCoursePage, locationsOf, showMandatoryColumn, mandatoryControl]
   );
 
   return (
@@ -470,6 +498,8 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
           isProgramSession(props.row) ? null : (
             <ExpandableSessionRowContent
               session={props.row as ManagedCourse_Course_by_pk_Sessions}
+              course={course}
+              locked={syncedFromSession}
               courseLocations={course.CourseLocations}
               qResult={qResult}
               onSetDate={(event) => handleSetDate(props.row, event)}
@@ -480,7 +510,7 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
           )
         }
         canExpandRow={(row) => !isProgramSession(row)}
-        showDeleteForRow={(row) => !isProgramSession(row)}
+        showDeleteForRow={(row) => !isLocked(row)}
         renderMobileRow={renderMobileRow}
         deleteMutation={canDeleteSessions ? DELETE_SESSION : undefined}
         deleteIdType="number"
@@ -497,7 +527,8 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
         searchFilter={searchFilter}
         onSearchFilterChange={handleSearchFilterChange}
         refetchQueries={['ManagedCourse']}
-        onAddButtonClick={insertSession}
+        // A synced event has exactly the one session it was created from.
+        onAddButtonClick={syncedFromSession ? undefined : insertSession}
         addButtonText={t('add_session')}
         showGlobalSearchField={true}
       />
@@ -506,7 +537,7 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
         open={promptOpen}
         title={t('SessionsTab.notify_participants.title')}
         question={t('SessionsTab.notify_participants.question', {
-          participants: participantCount,
+          participants: pendingRecipients,
           sessions: pendingCount,
         })}
         confirmationText={t('SessionsTab.notify_participants.confirm')}
@@ -601,6 +632,9 @@ const MissingSessionAddress: FC<{
 
 interface ExpandableSessionRowContentProps {
   session: ManagedCourse_Course_by_pk_Sessions;
+  course: ManagedCourse_Course_by_pk;
+  /** Date, title, description and location are synced from a course session and shown read-only. */
+  locked: boolean;
   courseLocations: ManagedCourse_Course_by_pk_CourseLocations[];
   qResult: QueryResult<ManagedCourse, ManagedCourseVariables>;
   onSetDate: (event: Date | null) => void;
@@ -611,6 +645,8 @@ interface ExpandableSessionRowContentProps {
 
 const ExpandableSessionRowContent: FC<ExpandableSessionRowContentProps> = ({
   session,
+  course,
+  locked,
   courseLocations,
   qResult,
   onSetDate,
@@ -620,6 +656,7 @@ const ExpandableSessionRowContent: FC<ExpandableSessionRowContentProps> = ({
 }) => {
   const t = useTranslations('manageCourse');
   const tCoursePage = useTranslations('coursePage');
+  const tCommon = useTranslations('common');
   const managementRole = useManagementRoleContext();
   const currentRole = useCurrentRole();
   const queryRole = managementRole ?? currentRole;
@@ -712,7 +749,14 @@ const ExpandableSessionRowContent: FC<ExpandableSessionRowContentProps> = ({
     <div className="w-full flex-1 min-w-0">
       {/* One column on phones, two on laptops (description below), three on wide screens. */}
       <div className="bg-bg-secondary/40 text-label-primary p-4 md:p-6 w-full grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-[1fr_1fr_18rem] gap-x-8 gap-y-6">
-        {isPhone && (
+        {isPhone && locked && (
+          <section>
+            <SectionLabel>{t('SessionsTab.schedule')}</SectionLabel>
+            <SessionDateTimeCell session={session} readOnly onTimeChanged={onTimeChanged} />
+            <p className="px-2 font-semibold text-label-secondary">{session.title || tCoursePage('session_title')}</p>
+          </section>
+        )}
+        {isPhone && !locked && (
           <section>
             <SectionLabel>{t('SessionsTab.schedule')}</SectionLabel>
             <div className="flex flex-col gap-3">
@@ -743,7 +787,21 @@ const ExpandableSessionRowContent: FC<ExpandableSessionRowContentProps> = ({
         <section className="order-1 min-w-0">
           <SectionLabel>{t('SessionsTab.location')}</SectionLabel>
           <div className="grid grid-cols-[minmax(5rem,auto)_1fr] gap-x-4 gap-y-3 items-center">
-            {locations.map((entry) =>
+            {locked && locations.length === 0 ? (
+              <span className="text-sm text-label-secondary">–</span>
+            ) : locked ? (
+              locations.map((entry) => (
+                <Fragment key={entry.key}>
+                  <span className="flex items-center gap-2 font-semibold text-label-primary">
+                    <LocationIcon option={entry.option} className="text-label-secondary" />
+                    {tCommon(`location.${entry.option}`)}
+                  </span>
+                  <span className="min-w-0 break-words text-sm text-label-secondary">
+                    {entry.address?.address || entry.address?.CourseLocation?.defaultSessionAddress || '–'}
+                  </span>
+                </Fragment>
+              ))
+            ) : locations.map((entry) =>
               entry.address ? (
                 <SessionAddresses key={entry.key} address={entry.address} refetchQueries={['ManagedCourse']} />
               ) : (
@@ -755,9 +813,17 @@ const ExpandableSessionRowContent: FC<ExpandableSessionRowContentProps> = ({
 
         <section className="order-3 lg:col-span-2 xl:col-span-1 xl:order-2 min-w-0">
           <SectionLabel>{t('SessionsTab.session_description.label')}</SectionLabel>
+          {locked ? (
+            session.description ? (
+              <InlineMarkdown markdown={session.description} className="text-sm text-label-secondary" />
+            ) : (
+              <p className="text-sm text-label-secondary">–</p>
+            )
+          ) : (
           <InputField
             variant="eduhub"
-            type="textarea"
+            type="markdown"
+            inlineMarkdown
             value={session.description || ''}
             label=""
             updateValueMutation={UPDATE_SESSION_DESCRIPTION}
@@ -770,9 +836,26 @@ const ExpandableSessionRowContent: FC<ExpandableSessionRowContentProps> = ({
             className="h-32 border border-border-primary rounded-md"
             maxLength={500}
           />
+          )}
         </section>
 
         <div className="order-2 xl:order-3 min-w-0 flex flex-col gap-5">
+          {locked ? (
+            <section>
+              <SectionLabel>{tCoursePage('external_speakers')}</SectionLabel>
+              {session.SessionSpeakers.length > 0 ? (
+                <ul className="flex flex-col gap-1 text-sm">
+                  {session.SessionSpeakers.map((speaker) => (
+                    <li key={speaker.id} className="text-label-secondary">
+                      {makeFullName(speaker.User.firstName, speaker.User.lastName ?? '')}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-sm text-label-secondary">–</p>
+              )}
+            </section>
+          ) : (
           <ManagedItemList
             title={tCoursePage('external_speakers')}
             items={session.SessionSpeakers}
@@ -793,6 +876,7 @@ const ExpandableSessionRowContent: FC<ExpandableSessionRowContentProps> = ({
               showAddNewUserOption: true,
             }}
           />
+          )}
 
           <section className="border-t border-table-divider pt-4">
             <SectionLabel>{t('SessionsTab.attendance_data.label')}</SectionLabel>
@@ -816,6 +900,8 @@ const ExpandableSessionRowContent: FC<ExpandableSessionRowContentProps> = ({
               </button>
             </div>
           </section>
+
+          <PublicEventSection course={course} session={session} />
         </div>
       </div>
 

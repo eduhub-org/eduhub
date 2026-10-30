@@ -50,6 +50,9 @@ import registerGuestForCourse from "./registerGuestForCourse/index.js";
 import confirmGuestRegistration from "./confirmGuestRegistration/index.js";
 import manageGuestRegistration from "./manageGuestRegistration/index.js";
 import manageTestEnrollment from "./manageTestEnrollment/index.js";
+import syncRausgegangenEvent from "./syncRausgegangenEvent/index.js";
+import searchRausgegangenLocations from "./searchRausgegangenLocations/index.js";
+import geocodeLocationAddress from "./geocodeLocationAddress/index.js";
 
 const require = createRequire(import.meta.url);
 let constantTimeSecretsEqual;
@@ -129,6 +132,9 @@ const functionMap = {
   confirmGuestRegistration,
   manageGuestRegistration,
   manageTestEnrollment,
+  syncRausgegangenEvent,
+  searchRausgegangenLocations,
+  geocodeLocationAddress,
 };
 
 const constantTimeEquals = (providedSecret, expectedSecret) => {

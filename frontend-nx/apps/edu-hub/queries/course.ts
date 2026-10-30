@@ -96,10 +96,18 @@ export const MANAGED_COURSE = gql`
       }
       Sessions(order_by: { startDateTime: asc }) {
         ...AdminSessionFragment
+        # The public event created from this session, if any.
+        PublicEvent {
+          id
+          title
+          published
+          publicParticipantCount
+        }
       }
       Program {
         id
         title
+        organizationId
         Sessions(order_by: { startDateTime: asc }) {
           ...SessionFragment
         }
@@ -268,6 +276,16 @@ export const MANAGED_COURSE_APPLICATION_RECIPIENTS = gql`
   ) {
     Course_by_pk(id: $id) {
       id
+      maxParticipants
+      # Places taken, counted like course_active_participant_count; invitations are capped by
+      # maxParticipants minus this (enforced by course_enrollment_guard_invitation_capacity).
+      TakenPlaces: CourseEnrollments_aggregate(
+        where: { isTest: { _eq: false }, status: { _in: [CONFIRMED, INVITED, REGISTERED] } }
+      ) {
+        aggregate {
+          count
+        }
+      }
       CourseEnrollments(
         limit: $limit
         where: { _and: [{ isTest: { _eq: false } }, $filter] }
@@ -699,7 +717,8 @@ export const UPDATE_COURSE_SHORT_DESCRIPTION = gql`
 export const UPDATE_COURSE_MAX_PARTICIPANTS = gql`
   mutation UpdateCourseMaxParticipants(
     $itemId: Int!
-    $text: Int!
+    # Null (an emptied field) removes the limit.
+    $text: Int
   ) {
     update_Course_by_pk(
       pk_columns: { id: $itemId }

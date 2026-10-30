@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { LocationAddress_bool_exp, LocationAddress_order_by, LocationOption_enum } from "./../../__generated__/globalTypes";
+import { LocationAddress_bool_exp, LocationAddress_order_by, LocationOption_enum, LocationAddressCategory_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: LocationAddressList
@@ -58,6 +58,30 @@ export interface LocationAddressList_LocationAddress {
    * JSON array of alias strings used for autocomplete filtering and search.
    */
   aliases: any | null;
+  /**
+   * Street and house number
+   */
+  street: string | null;
+  zipCode: string | null;
+  city: string | null;
+  country: string | null;
+  addressAdditionalInfo: string | null;
+  directions: string | null;
+  accessibilityInfo: string | null;
+  latitude: any | null;
+  longitude: any | null;
+  category: LocationAddressCategory_enum | null;
+  image: string | null;
+  imageCredits: string | null;
+  websiteUrl: string | null;
+  publicEmail: string | null;
+  publicPhone: string | null;
+  instagramUrl: string | null;
+  /**
+   * UUID of the matching location on rausgegangen.de, linked or created by the event sync
+   */
+  rausgegangenLocationId: string | null;
+  rausgegangenLocationOwned: boolean;
   created_at: any;
   updated_at: any;
   /**
@@ -90,6 +114,21 @@ export interface LocationAddressList_LocationOption {
   comment: string | null;
 }
 
+export interface LocationAddressList_LocationAddressCategory {
+  __typename: "LocationAddressCategory";
+  value: string;
+}
+
+export interface LocationAddressList_RausgegangenOrganizations_aggregate {
+  __typename: "Organization_aggregate_fields";
+  count: number;
+}
+
+export interface LocationAddressList_RausgegangenOrganizations {
+  __typename: "Organization_aggregate";
+  aggregate: LocationAddressList_RausgegangenOrganizations_aggregate | null;
+}
+
 export interface LocationAddressList {
   /**
    * fetch data from the table: "LocationAddress"
@@ -103,6 +142,14 @@ export interface LocationAddressList {
    * fetch data from the table: "LocationOption"
    */
   LocationOption: LocationAddressList_LocationOption[];
+  /**
+   * fetch data from the table: "LocationAddressCategory"
+   */
+  LocationAddressCategory: LocationAddressList_LocationAddressCategory[];
+  /**
+   * fetch aggregated fields from the table: "Organization"
+   */
+  RausgegangenOrganizations: LocationAddressList_RausgegangenOrganizations;
 }
 
 export interface LocationAddressListVariables {

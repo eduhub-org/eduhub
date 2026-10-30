@@ -45,6 +45,8 @@ select_permissions:
         - invoiceNumberPrefix
         - defaultVatRate
         - defaultTaxExemptionNote
+        - rausgegangenApiKeyConfigured
+        - rausgegangenTestMode
       filter:
         OrganizationAdmins:
           _and:
