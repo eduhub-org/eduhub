@@ -1,6 +1,9 @@
 import { gql, GraphQLClient } from 'graphql-request';
 import { createEnrollmentVariableReplacer } from '../emailTemplateVariables.js';
 import { appendGuestMailFooter, guestSafeCopyRecipients } from '../guestRegistration.js';
+import { isDeclinedByParticipant, notifyOrganizersOfDecline } from './invitationDeclined.js';
+
+const PAID_REGISTRATION_TYPES = ['DIRECT_CONFIRMATION_AND_PAYMENT', 'DIRECT_WITH_INPUT_AND_PAYMENT'];
 
 /**
  * Sends enrollment status emails when CourseEnrollment status or invitationExpirationDate changes
@@ -46,6 +49,10 @@ export default async function sendEnrollmentEmail(req, logger) {
         'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET,
       },
     });
+
+    if (isDeclinedByParticipant(event)) {
+      await notifyOrganizersOfDecline(enrollment.id, client, logger);
+    }
 
     // Get enrollment details with user, course, and add-ons information
     const GET_ENROLLMENT_DETAILS = gql`
@@ -152,15 +159,22 @@ export default async function sendEnrollmentEmail(req, logger) {
         certificateLink = enrollmentDetails.attendanceCertificateURL;
       }
     } else {
-      // A waitlisted user who is moved up to INVITED/CONFIRMED gets the
-      // "a spot opened up" email instead of the plain invite/confirmation.
-      const promotedFromWaitlist =
-        op === 'UPDATE' &&
-        oldEnrollment?.status === 'WAITLIST' &&
-        (enrollment.status === 'INVITED' || enrollment.status === 'CONFIRMED');
+      // A waitlisted user who is moved up gets a "a spot opened up" email
+      // instead of the plain invite/confirmation: as an invitation still to be
+      // accepted (WAITLIST_PROMOTED), or with the place already confirmed
+      // (WAITLIST_CONFIRMED).
+      // Keep in sync with helpers/enrollmentStatusEmail.ts in the frontend,
+      // which tells organizers in advance which template a change sends.
+      const fromWaitlist = op === 'UPDATE' && oldEnrollment?.status === 'WAITLIST';
+      // On a paid course an invitation is accepted by paying, whoever it went to.
+      const paidCourse = PAID_REGISTRATION_TYPES.includes(enrollmentDetails.Course?.registrationType);
 
-      if (promotedFromWaitlist) {
+      if (paidCourse && enrollment.status === 'INVITED') {
+        baseTemplateType = 'WAITLIST_PROMOTED_PAYMENT';
+      } else if (fromWaitlist && enrollment.status === 'INVITED') {
         baseTemplateType = 'WAITLIST_PROMOTED';
+      } else if (fromWaitlist && enrollment.status === 'CONFIRMED') {
+        baseTemplateType = 'WAITLIST_CONFIRMED';
       } else {
         switch (enrollment.status) {
           case 'APPLIED':

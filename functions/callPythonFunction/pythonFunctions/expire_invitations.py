@@ -26,6 +26,9 @@ EXPIRY_GRACE_DAYS = 3
 INVITATION_TIME_ZONE = tz.gettz("Europe/Berlin")
 
 MAIL_TYPE = "INVITATION_EXPIRING_SOON"
+# On a paid course an invitation is accepted by paying, so its reminder asks for that.
+PAID_MAIL_TYPE = "INVITATION_EXPIRING_SOON_PAYMENT"
+PAID_REGISTRATION_TYPES = {"DIRECT_CONFIRMATION_AND_PAYMENT", "DIRECT_WITH_INPUT_AND_PAYMENT"}
 
 
 def expire_invitations(arguments):
@@ -80,7 +83,7 @@ def expire_invitations(arguments):
                 id
                 invitationExpirationDate
                 User { email firstName lastName }
-                Course { id title }
+                Course { id title registrationType }
             }
         }
         """
@@ -90,56 +93,16 @@ def expire_invitations(arguments):
             return {"success": False, "error": str(reminder_result)}
 
         expiring_soon = reminder_result["data"]["CourseEnrollment"]
-        template = get_default_mail_template(client, MAIL_TYPE)
         reminded = 0
-        if template:
-            # The expiry date is part of the key: re-inviting someone moves the
-            # date and must produce a fresh reminder rather than matching the
-            # MailLog row of the previous invitation window.
-            candidates = [
-                {
-                    "enrollmentId": enrollment["id"],
-                    "invitationExpirationDate": enrollment.get("invitationExpirationDate"),
-                    "enrollment": enrollment,
-                }
+        for mail_type in (MAIL_TYPE, PAID_MAIL_TYPE):
+            enrollments = [
+                enrollment
                 for enrollment in expiring_soon
-                if (enrollment.get("User") or {}).get("email")
+                if ((enrollment.get("Course") or {}).get("registrationType") in PAID_REGISTRATION_TYPES)
+                == (mail_type == PAID_MAIL_TYPE)
             ]
-            key_fields = ["enrollmentId", "invitationExpirationDate"]
-            reminded_keys = already_sent_keys(client, MAIL_TYPE, candidates, key_fields)
-
-            for candidate in candidates:
-                if (
-                    candidate["enrollmentId"],
-                    candidate["invitationExpirationDate"],
-                ) in reminded_keys:
-                    continue
-                enrollment = candidate["enrollment"]
-                user = enrollment.get("User") or {}
-                course = enrollment.get("Course") or {}
-                queued = queue_mail(
-                    client,
-                    template,
-                    user.get("email"),
-                    {
-                        "[User:FirstName]": user.get("firstName"),
-                        "[User:LastName]": user.get("lastName"),
-                        "[Enrollment:CourseId--Course:Name]": course.get("title"),
-                        "[Enrollment:ExpirationDate]": format_date(
-                            enrollment.get("invitationExpirationDate")
-                        ),
-                        "[Enrollment:CourseLink]": f"{frontend_url}/course/{course.get('id', '')}",
-                    },
-                    metadata={
-                        "type": MAIL_TYPE,
-                        "enrollmentId": candidate["enrollmentId"],
-                        "invitationExpirationDate": candidate["invitationExpirationDate"],
-                    },
-                )
-                if queued:
-                    reminded += 1
-        else:
-            logging.warning(f"{MAIL_TYPE} template missing; skipping reminders")
+            if enrollments:
+                reminded += _send_reminders(client, mail_type, enrollments, frontend_url)
 
         # 2. Flip lapsed INVITED invitations to EXPIRED. The event trigger sends
         # INVITATION_EXPIRED. status is a Hasura enum -> use enum literals.
@@ -175,3 +138,63 @@ def expire_invitations(arguments):
     except Exception as e:
         logging.exception("expire_invitations failed")
         return {"success": False, "error": str(e)}
+
+
+def _send_reminders(client, mail_type, expiring_soon, frontend_url):
+    """Queues the mail_type reminder once per invitation window; returns how many went out."""
+    template = get_default_mail_template(client, mail_type)
+    if not template:
+        logging.warning(f"{mail_type} template missing; skipping reminders")
+        return 0
+
+    # The expiry date is part of the key: re-inviting someone moves the
+    # date and must produce a fresh reminder rather than matching the
+    # MailLog row of the previous invitation window.
+    candidates = [
+        {
+            "enrollmentId": enrollment["id"],
+            "invitationExpirationDate": enrollment.get("invitationExpirationDate"),
+            "enrollment": enrollment,
+        }
+        for enrollment in expiring_soon
+        if (enrollment.get("User") or {}).get("email")
+    ]
+    key_fields = ["enrollmentId", "invitationExpirationDate"]
+    # One last-day reminder per invitation window, even if the course switched between free and
+    # paid since the other kind went out.
+    reminded_keys = set()
+    for reminder_type in (MAIL_TYPE, PAID_MAIL_TYPE):
+        reminded_keys |= already_sent_keys(client, reminder_type, candidates, key_fields)
+
+    reminded = 0
+    for candidate in candidates:
+        if (
+            candidate["enrollmentId"],
+            candidate["invitationExpirationDate"],
+        ) in reminded_keys:
+            continue
+        enrollment = candidate["enrollment"]
+        user = enrollment.get("User") or {}
+        course = enrollment.get("Course") or {}
+        queued = queue_mail(
+            client,
+            template,
+            user.get("email"),
+            {
+                "[User:FirstName]": user.get("firstName"),
+                "[User:LastName]": user.get("lastName"),
+                "[Enrollment:CourseId--Course:Name]": course.get("title"),
+                "[Enrollment:ExpirationDate]": format_date(
+                    enrollment.get("invitationExpirationDate")
+                ),
+                "[Enrollment:CourseLink]": f"{frontend_url}/course/{course.get('id', '')}",
+            },
+            metadata={
+                "type": mail_type,
+                "enrollmentId": candidate["enrollmentId"],
+                "invitationExpirationDate": candidate["invitationExpirationDate"],
+            },
+        )
+        if queued:
+            reminded += 1
+    return reminded

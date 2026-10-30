@@ -38,6 +38,7 @@ import KcAdminClient from '@keycloak/keycloak-admin-client';
 
 const require = createRequire(import.meta.url);
 const { mergeUserPutPayload } = require('../../shared_libs/node/keycloakUserMerge.cjs');
+const { computeMatrixHandle } = require('../../shared_libs/node/matrixHandle.cjs');
 
 const DRY_RUN = process.argv.includes('--dry-run');
 const DELAY_BETWEEN_USERS_MS = 100;
@@ -72,17 +73,6 @@ async function keycloakAuth(kcAdminClient) {
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
-
-function computeMatrixHandle(firstName, lastName, userId) {
-  const sanitize = (input) => {
-    const normalized = input.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-    return normalized.toLowerCase().replace(/[^a-z0-9._\-]/g, '');
-  };
-  const first = sanitize(firstName || 'user');
-  const last = sanitize(lastName || 'user');
-  const uuidPrefix = (userId || '').replace(/-/g, '').substring(0, 6);
-  return `${first}.${last}.${uuidPrefix}`;
-}
 
 function resolvePictureUrl(picturePath) {
   if (!picturePath) return null;

@@ -601,6 +601,8 @@ update_permissions:
       filter:
         id:
           _eq: X-Hasura-User-Id
+        status:
+          _neq: DELETED
       check: null
 event_triggers:
   - name: update_keycloak_user

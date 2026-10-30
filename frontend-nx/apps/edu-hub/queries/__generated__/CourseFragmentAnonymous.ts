@@ -409,6 +409,10 @@ export interface CourseFragmentAnonymous {
    */
   publicParticipantCount: any | null;
   /**
+   * A computed field, executes function "course_waitlist_count"
+   */
+  waitlistCount: any | null;
+  /**
    * An array of texts including the learning goals for the course
    */
   learningGoals: string | null;

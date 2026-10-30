@@ -141,6 +141,12 @@ computed_fields:
         name: course_public_participant_count
         schema: public
       table_argument: course_row
+  - name: waitlistCount
+    definition:
+      function:
+        name: course_waitlist_count
+        schema: public
+      table_argument: course_row
 select_permissions:
   - role: anonymous
     permission:
@@ -193,6 +199,7 @@ select_permissions:
       computed_fields:
         - activeParticipantCount
         - publicParticipantCount
+        - waitlistCount
       filter:
         _and:
           - Program:
@@ -251,6 +258,7 @@ select_permissions:
       computed_fields:
         - activeParticipantCount
         - publicParticipantCount
+        - waitlistCount
       filter: {}
   - role: user_access
     permission:
@@ -302,6 +310,7 @@ select_permissions:
       computed_fields:
         - activeParticipantCount
         - publicParticipantCount
+        - waitlistCount
       filter:
         CourseEnrollments:
           User:
@@ -362,6 +371,7 @@ select_permissions:
       computed_fields:
         - activeParticipantCount
         - publicParticipantCount
+        - waitlistCount
       filter:
         Program:
           Organization:

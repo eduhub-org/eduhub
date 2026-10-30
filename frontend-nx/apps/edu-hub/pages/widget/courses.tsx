@@ -34,9 +34,9 @@ const WidgetCourses: FC = () => {
 
   const { data: coursesData, loading: coursesLoading, error: coursesError } = useQuery<
     CourseTiles | CourseTilesByOrganization
-  >(organizationId ? COURSE_TILES_BY_ORGANIZATION : COURSE_TILES, {
+  >(organizationId != null ? COURSE_TILES_BY_ORGANIZATION : COURSE_TILES, {
     client,
-    variables: organizationId ? { organizationId } : undefined,
+    variables: organizationId != null ? { organizationId } : undefined,
     skip: apiKeyValidating || !router.isReady,
     fetchPolicy: 'network-only',
     context: WIDGET_ANONYMOUS_CONTEXT,

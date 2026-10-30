@@ -7,7 +7,7 @@ import { useStartTimeString, useEndTimeString, getWeekdayString } from '../../..
 import { useAppSettings } from '../../../contexts/AppSettingsContext';
 import { formatSessionDateSpan } from '../../../helpers/sessionSchedule';
 import { Course_Course_by_pk } from '../../../queries/__generated__/Course';
-import { getRegistrationTypeConfig, isRegistrationClosed } from './Registration/types';
+import { getRegistrationTypeConfig, isRegistrationClosed, placesOpenForRegistration } from './Registration/types';
 
 interface IProps {
   course: Course_Course_by_pk;
@@ -178,14 +178,14 @@ export const CourseFacts: FC<IProps> = ({ course }) => {
   // taken their place. How many places are left is measured against
   // activeParticipantCount, which also counts INVITED, because a held seat is
   // not available - so a course can read "18 participants" while being full at
-  // 20, and both statements are true.
+  // 20, and both statements are true. Places reserved for the waitlist are not
+  // available either (placesOpenForRegistration).
   const participantCount = Number(course.publicParticipantCount ?? 0);
-  const occupiedPlaces = Number(course.activeParticipantCount ?? 0);
   // No cap, or a cap of zero, means there is no capacity to report - stated
   // explicitly rather than left to fall out of `placesLeft > 0`, so the rule
   // survives a change to how places are counted.
   const maxParticipants = course.maxParticipants && course.maxParticipants > 0 ? course.maxParticipants : null;
-  const placesLeft = maxParticipants != null ? Math.max(0, maxParticipants - occupiedPlaces) : null;
+  const placesLeft = maxParticipants != null ? placesOpenForRegistration(course) : null;
   const showsPlaces =
     !!course.showAvailablePlaces &&
     maxParticipants != null &&

@@ -327,6 +327,13 @@ variable "matrix_admin_access_token" {
   sensitive   = true
 }
 
+variable "matrix_synapse_admin_token" {
+  description = "Access token of a dedicated Synapse server-admin user, used only to deactivate Matrix accounts on account deletion. Keep the room bot (matrix_admin_access_token) a non-admin. While empty, account deletion fails at the Matrix step."
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
 variable "mailgun_api_key" {
   description = "API key for the Mailgun API"
   type        = string
@@ -508,5 +515,31 @@ variable "stujo_net_canonical_hosts" {
     "stujo-cau"       = "cau.stujo.net"
     "stujo-haw-kiel"  = "haw-kiel.stujo.net"
     "stujo-flensburg" = "flensburg.stujo.net"
+  }
+}
+
+######
+# Error alerting
+###
+variable "alert_slack_channel_id" {
+  description = "Full ID of the Cloud Monitoring Slack notification channel (projects/<project>/notificationChannels/<id>) that receives error alerts. The channel must be created once in the Cloud Console, because Slack requires an interactive OAuth sign-in. Empty disables the error alert."
+  type        = string
+  default     = ""
+}
+
+variable "enable_budget_alert" {
+  description = "Email alert_budget_emails when the month's forecasted spend exceeds last month's actual spend by more than 10%. Needs roles/billing.costsManager on the billing account for the Terraform service account; set to false in workspaces where it lacks that role."
+  type        = bool
+  default     = true
+}
+
+variable "alert_budget_emails" {
+  description = "Email addresses that receive the cost alert. Billing budgets only support email notification channels, not Slack. Empty disables the cost alert."
+  type        = list(string)
+  default     = []
+
+  validation {
+    condition     = length(var.alert_budget_emails) <= 5
+    error_message = "A billing budget accepts at most 5 notification channels."
   }
 }

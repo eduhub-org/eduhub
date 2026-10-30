@@ -92,6 +92,34 @@ export const isRegistrationClosed = (applicationEnd: Date, now: Date = new Date(
   return deadlineDay < today;
 };
 
+/**
+ * Whether an invitation's last day ("invitationExpirationDate", a date pinned to UTC midnight like
+ * applicationEnd) is over, on the same Europe/Berlin day boundary as expire_invitations.
+ */
+export const isInvitationExpired = (invitationExpirationDate: Date | string | null, now: Date = new Date()): boolean => {
+  if (invitationExpirationDate == null) return false;
+  return isRegistrationClosed(new Date(invitationExpirationDate), now);
+};
+
+/**
+ * Places still open to new registrations, or null when the course has no limit.
+ *
+ * A place that frees up on a full course belongs to the waitlist: the organizer
+ * moves someone up from there, so it is not offered to the next visitor. The
+ * course reopens only once it has more free places than people waiting. Same
+ * rule as the server-side guards (course_enrollment_guard_participant_changes,
+ * registerGuestForCourse, confirmGuestRegistration).
+ */
+export const placesOpenForRegistration = (course: {
+  maxParticipants?: number | null;
+  activeParticipantCount?: unknown;
+  waitlistCount?: unknown;
+}): number | null => {
+  if (course.maxParticipants == null) return null;
+  const taken = Number(course.activeParticipantCount ?? 0) + Number(course.waitlistCount ?? 0);
+  return Math.max(0, course.maxParticipants - taken);
+};
+
 export interface SelectedAddon {
   id: number;
   description: string;

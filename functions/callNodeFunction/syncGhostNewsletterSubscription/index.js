@@ -383,3 +383,18 @@ export default async function syncGhostNewsletterSubscription(req, logger) {
     };
   }
 }
+
+// Account deletion must finish this while the original email still exists.
+// Call synchronously rather than relying on the asynchronous subscription trigger.
+export async function unsubscribeForAccountDeletion(subscription, userEmail) {
+  if (!subscription.externalSubscriberId && subscription.status === 'UNSUBSCRIBED') return;
+  if (!hasGhostConfiguration(subscription.Organization)) {
+    // Never synced to Ghost, so there is no remote member; the local row is deleted with the account.
+    if (!subscription.externalSubscriberId) return;
+    throw new Error('Newsletter configuration missing for account deletion');
+  }
+  const result = await callGhostSyncEndpoint({ subscription, userEmail, subscribe: false });
+  if (normalizeRemoteSubscriptionStatus(result.remoteStatus, 'UNSUBSCRIBED') !== 'UNSUBSCRIBED') {
+    throw new Error('Newsletter unsubscribe was not confirmed');
+  }
+}

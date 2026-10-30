@@ -9,6 +9,21 @@ import { CourseEnrollment_bool_exp, CourseEnrollment_order_by, CourseRegistratio
 // GraphQL query operation: ManagedCourseApplications
 // ====================================================
 
+export interface ManagedCourseApplications_Course_by_pk_TakenPlaces_aggregate {
+  __typename: "CourseEnrollment_aggregate_fields";
+  count: number;
+}
+
+export interface ManagedCourseApplications_Course_by_pk_TakenPlaces {
+  __typename: "CourseEnrollment_aggregate";
+  aggregate: ManagedCourseApplications_Course_by_pk_TakenPlaces_aggregate | null;
+}
+
+export interface ManagedCourseApplications_Course_by_pk_WaitlistOrder {
+  __typename: "CourseEnrollment";
+  id: number;
+}
+
 export interface ManagedCourseApplications_Course_by_pk_Program {
   __typename: "Program";
   id: number;
@@ -361,6 +376,18 @@ export interface ManagedCourseApplications_Course_by_pk {
    */
   guestRegistrationEnabled: boolean;
   matrixRoomId: string | null;
+  /**
+   * Participant limit; NULL means no limit (0 or less is stored as NULL)
+   */
+  maxParticipants: number | null;
+  /**
+   * An aggregate relationship
+   */
+  TakenPlaces: ManagedCourseApplications_Course_by_pk_TakenPlaces;
+  /**
+   * An array relationship
+   */
+  WaitlistOrder: ManagedCourseApplications_Course_by_pk_WaitlistOrder[];
   /**
    * Full URL to the Formbricks survey for course enrollment/application (for iframe embedding). Overrides program default if set.
    */

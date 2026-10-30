@@ -1,324 +1,170 @@
-import { request, gql } from "graphql-request";
-import { logger } from "../index.js";
-import { Storage } from "@google-cloud/storage";
-import { buildCloudStorage } from "../lib/cloud-storage.js";
-import { getKeycloakToken } from "../lib/utils.js";
-import path from "path";
-import axios from "axios";
-import fs from 'fs';
+import { request } from 'graphql-request';
+import { Storage } from '@google-cloud/storage';
+import { buildCloudStorage } from '../lib/cloud-storage.js';
+import { getKeycloakToken } from '../lib/utils.js';
+import { unsubscribeForAccountDeletion } from '../syncGhostNewsletterSubscription/index.js';
+import { deactivateMatrixUser, getMatrixDeactivationConfig, toMatrixUserId } from '../lib/matrixInvite.js';
+import axios from 'axios';
+import path from 'node:path';
+import { GET_DELETION_DATA, ERASE_PERSONAL_DATA, getErasureVariables } from './personalData.js';
 
-const shortenHashId = (hashId) => {
-  return hashId.replace(/-/g, '').substr(0, 12);
-};
+// Stay below the 180 s action/function limit, so the caller gets the retryable
+// partial result instead of a generic timeout.
+const DEADLINE_MS = 150_000;
+const MATRIX_TIMEOUT_MS = 60_000;
+const KEYCLOAK_TIMEOUT_MS = 15_000;
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-const anonymizeUserData = (user) => {
-  const shortHashId = shortenHashId(user.id);
-  return {
-    ...user,
-    firstName: "ANON_USER",
-    lastName: "ANON_USER",
-    email: `anon_${shortHashId}@example.com`,
-    matriculationNumber: user.matriculationNumber ? `ANON${shortHashId}` : null,
-  };
-};
+const missingFile = (error) => error.code === 'ENOENT' || error.code === 404 || error.response?.status === 404;
 
-const UPDATE_USER = gql`
-  mutation UpdateUser(
-    $userId: uuid!
-    $firstName: String!
-    $lastName: String!
-    $email: String!
-    $matriculationNumber: String
-  ) {
-    update_User_by_pk(
-      pk_columns: { id: $userId }
-      _set: {
-        firstName: $firstName
-        lastName: $lastName
-        email: $email
-        externalProfile: null
-        matriculationNumber: $matriculationNumber
-        picture: null
-        status: DELETED
-      }
-    ) {
-      id
-    }
-  }
-`;
-
-const GET_USER_AND_ENROLLMENTS = gql`
-  query GetUserAndEnrollments($userId: uuid!) {
-    User_by_pk(id: $userId) {
-      id
-      firstName
-      lastName
-      email
-      externalProfile
-      matriculationNumber
-      picture
-      CourseEnrollments {
-        id
-        courseId
-        achievementCertificateURL
-        attendanceCertificateURL
-        motivationLetter
-      }
-    }
-  }
-`;
-
-const UPDATE_MOTIVATION_LETTERS = gql`
-  mutation UpdateMotivationLetters($updates: [CourseEnrollment_updates!]!) {
-    update_CourseEnrollment_many(updates: $updates) {
-      affected_rows
-    }
-  }
-`;
-
-const removeProfileImage = async (storage, imagePath, bucketName) => {
-  if (!imagePath) return;
-  
-  // Remove the original image
-  await storage.deleteFile(imagePath, bucketName);
-  logger.debug(`Attempted to remove profile picture at ${imagePath}`);
-
-  // Remove any resized versions
-  const directory = path.dirname(imagePath);
-  const filename = path.basename(imagePath, path.extname(imagePath));
-  const files = await storage.listFiles(bucketName, { prefix: directory });
-
-  for (const file of files) {
-    const resizedFilename = file.name;
-    if (resizedFilename.startsWith(`${directory}/${filename}-`) && resizedFilename.endsWith('.webp')) {
-      await storage.deleteFile(resizedFilename, bucketName);
-      logger.debug(`Attempted to remove resized image at ${resizedFilename}`);
-    }
-  }
-};
-
-const deleteKeycloakUser = async (userId, token) => {
+async function deleteFile(storage, filename, bucket) {
   try {
-    await axios.delete(
-      `${process.env.KEYCLOAK_URL}/admin/realms/edu-hub/users/${userId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    logger.debug(`Deleted user from Keycloak: ${userId}`);
-    return true;
+    await storage.deleteFile(filename, bucket);
   } catch (error) {
-    if (error.response && error.response.status === 404) {
-      logger.debug(`User not found in Keycloak: ${userId}. Considering this as a successful deletion.`);
-      return true;
-    }
-    logger.error(`Error deleting user from Keycloak: ${error.message}`);
+    if (!missingFile(error)) throw error;
+  }
+}
+
+async function removeProfileImage(storage, picture, bucket) {
+  if (!picture) return;
+  await deleteFile(storage, picture, bucket);
+  const directory = path.dirname(picture);
+  const basename = path.basename(picture, path.extname(picture));
+  let files;
+  try {
+    files = await storage.listFiles(bucket, { prefix: directory });
+  } catch (error) {
+    if (missingFile(error)) return;
     throw error;
   }
-};
+  for (const file of files) {
+    if (path.basename(file.name).startsWith(`${basename}-`) && file.name.endsWith('.webp')) {
+      await deleteFile(storage, file.name, bucket);
+    }
+  }
+}
 
-const anonymizeUser = async (req, logger) => {
+// Needs the handle, so it must run before the database erase clears it.
+async function removeMatrixAccount(matrixUserHandle, logger, userId, timeoutMs) {
+  if (!matrixUserHandle) return;
+  const config = getMatrixDeactivationConfig();
+  if (!config) {
+    // A partial configuration must not clear the handle while the account stays active.
+    if (process.env.MATRIX_HOMESERVER_URL?.trim()) throw new Error('Matrix deactivation config incomplete');
+    // No homeserver at all (e.g. local development): there is no Matrix integration to clean up.
+    logger.warn?.('Matrix not configured; skipping Matrix account deactivation', { userId });
+    return;
+  }
+  // Fail rather than skip: the confirmation dialog promises the Element account is deactivated.
+  if (!config.token) throw new Error('MATRIX_SYNAPSE_ADMIN_TOKEN missing');
+  await deactivateMatrixUser({
+    homeserverUrl: config.homeserverUrl,
+    token: config.token,
+    matrixUserId: toMatrixUserId(matrixUserHandle, config.serverName),
+    signal: AbortSignal.timeout(timeoutMs),
+  });
+}
+
+async function eraseAccount(req, logger, userId) {
   const result = {
-    anonymizedUserId: null,
-    messageKey: "",
+    anonymizedUserId: userId,
+    messageKey: 'ANONYMIZATION_FAILED',
     error: null,
     steps: {
       keycloak_deletion: false,
+      matrix_deactivation: false,
       user_data_anonymization: false,
       profile_picture_removal: false,
       certificate_anonymization: false,
-      motivation_letter_anonymization: false
-    }
+      motivation_letter_anonymization: false,
+    },
   };
+  const startedAt = Date.now();
+  const timeLeft = () => DEADLINE_MS - (Date.now() - startedAt);
+  const checkpoint = () => {
+    if (timeLeft() <= 0) throw new Error('DEADLINE_EXCEEDED');
+  };
+  const query = (document, variables) => request(
+    process.env.HASURA_ENDPOINT, document, variables,
+    { 'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET }
+  );
 
   try {
-    if (!req.body.input || !req.body.input.userId) {
-      logger.error("Missing required field: userId");
-      return {
-        data: {
-          anonymizeUser: {
-            ...result,
-            error: "ERROR_MISSING_USER_ID",
-            messageKey: "ANONYMIZATION_FAILED_MISSING_USER_ID"
-          }
-        }
-      };
+    if (!UUID.test(userId || '')) throw new Error('ERROR_INVALID_UUID');
+    const data = await query(GET_DELETION_DATA, { userId });
+    const user = data.User_by_pk;
+    if (!user) throw new Error('ERROR_USER_NOT_FOUND');
+
+    // Finish external cleanup before clearing paths/email. A failure leaves the
+    // information needed to retry, and missing files are safe on a later run.
+    for (const subscription of user.OrganizationNewsletterSubscriptions) {
+      checkpoint();
+      await unsubscribeForAccountDeletion(subscription, user.email);
     }
 
-    const userId = req.body.input.userId;
-    result.anonymizedUserId = userId;
-    logger.debug(`Received anonymizeUser request for userId: ${userId}`);
+    checkpoint();
+    await removeMatrixAccount(user.matrixUserHandle, logger, userId, Math.min(MATRIX_TIMEOUT_MS, timeLeft()));
+    result.steps.matrix_deactivation = true;
 
-    let userData;
-    try {
-      userData = await request(
-        process.env.HASURA_ENDPOINT,
-        GET_USER_AND_ENROLLMENTS,
-        { userId },
-        { "x-hasura-admin-secret": process.env.HASURA_ADMIN_SECRET }
-      );
-    } catch (error) {
-      logger.error(`Error fetching user data: ${error.message}`);
-      
-      if (error.message.includes("invalid input syntax for type uuid")) {
-        result.error = "ERROR_INVALID_UUID";
-        result.messageKey = "ANONYMIZATION_FAILED_INVALID_UUID";
-        result.message = `Invalid UUID format: ${userId}`;
-      } else {
-        result.error = "ERROR_FETCHING_USER_DATA";
-        result.messageKey = "ANONYMIZATION_FAILED_FETCHING_USER_DATA";
-        result.message = `Error fetching user data: ${error.message}`;
-      }
-      
-      return {
-        data: {
-          anonymizeUser: result
-        }
-      };
-    }
-    
-    if (!userData.User_by_pk) {
-      logger.error(`User not found: ${userId}`);
-      result.error = "ERROR_USER_NOT_FOUND";
-      result.messageKey = "ANONYMIZATION_FAILED_USER_NOT_FOUND";
-      result.message = `User not found with ID: ${userId}`;
-      return {
-        data: {
-          anonymizeUser: result
-        }
-      };
-    }
-   
-
-    const user = userData.User_by_pk;
-    const anonymizedUser = anonymizeUserData(user);
-
+    checkpoint();
     const storage = buildCloudStorage(Storage);
-    const bucketName = req.headers.bucket;
+    await removeProfileImage(storage, user.picture, req.headers.bucket);
+    result.steps.profile_picture_removal = true;
 
-    // Remove profile picture
-    if (user.picture) {
-      try {
-        await removeProfileImage(storage, user.picture, bucketName);
-        logger.debug(`Removed profile picture for userId: ${userId}`);
-        result.steps.profile_picture_removal = true;
-      } catch (pictureError) {
-        logger.error(`Error removing profile picture: ${pictureError.message}`);
-      }
-    } else {
-      result.steps.profile_picture_removal = true; // No picture to remove
+    const certificates = new Set([
+      ...user.CourseEnrollments.flatMap((enrollment) => [
+        enrollment.achievementCertificateURL, enrollment.attendanceCertificateURL,
+      ]),
+      ...data.CourseInstructor.map((instructor) => instructor.certificateURL),
+    ].filter(Boolean));
+    for (const certificate of certificates) {
+      checkpoint();
+      await deleteFile(storage, certificate, req.headers.bucket);
     }
-  
-    // Update user data
+    result.steps.certificate_anonymization = true;
+
+    // One Hasura mutation is one database transaction. Keep anonymous historical
+    // rows and financial documents, but remove personal fields and access grants.
+    checkpoint();
+    await query(ERASE_PERSONAL_DATA, getErasureVariables(data, userId));
+    result.steps.user_data_anonymization = true;
+    result.steps.motivation_letter_anonymization = true;
+
+    // Last: preserve a working session for retries until all cleanup has landed.
+    const token = await getKeycloakToken();
     try {
-      await request(
-        process.env.HASURA_ENDPOINT,
-        UPDATE_USER,
-        {
-          userId: anonymizedUser.id,
-          firstName: anonymizedUser.firstName,
-          lastName: anonymizedUser.lastName,
-          email: anonymizedUser.email,
-          matriculationNumber: anonymizedUser.matriculationNumber,
-        },
-        { "x-hasura-admin-secret": process.env.HASURA_ADMIN_SECRET }
-      );
-      result.steps.user_data_anonymization = true;
-    } catch (updateError) {
-      logger.error(`Error updating user data: ${updateError.message}`);
+      await axios.delete(`${process.env.KEYCLOAK_URL}/admin/realms/edu-hub/users/${userId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+        timeout: KEYCLOAK_TIMEOUT_MS,
+      });
+    } catch (error) {
+      if (error.response?.status !== 404) throw error;
     }
-
-    // Anonymize motivation letters in all enrollments
-    const enrollmentsToUpdate = user.CourseEnrollments.map(enrollment => ({
-      where: { id: { _eq: enrollment.id } },
-      _set: {
-        motivationLetter: enrollment.motivationLetter 
-          ? "This motivation letter has been anonymized due to user request." 
-          : null
-      }
-    }));
-
-    try {
-      await request(
-        process.env.HASURA_ENDPOINT,
-        UPDATE_MOTIVATION_LETTERS,
-        { updates: enrollmentsToUpdate },  // Changed from 'enrollments' to 'updates'
-        { "x-hasura-admin-secret": process.env.HASURA_ADMIN_SECRET }
-      );
-      logger.debug(`Anonymized motivation letters for userId: ${userId}`);
-      result.steps.motivation_letter_anonymization = true;
-    } catch (motivationLetterError) {
-      logger.error(`Error anonymizing motivation letters: ${motivationLetterError.message}`);
-      result.steps.motivation_letter_anonymization = false;
-    }
-
-    // Handle certificates
-    let allCertificatesAnonymized = true;
-    const currentWorkingDir = process.cwd();
-    const defaultCertificatePath = path.join(currentWorkingDir, 'anonymizeUser','default_deleted_certificate.pdf');
-    const pdfBufferDefaultCertificate = fs.readFileSync(defaultCertificatePath);
-    for (const enrollment of user.CourseEnrollments) {
-      try {
-        if (enrollment.achievementCertificateURL) {
-          await storage.saveToBucket(enrollment.achievementCertificateURL, bucketName, pdfBufferDefaultCertificate);
-          logger.debug(`Replaced achievement certificate for userId: ${userId}, courseId: ${enrollment.courseId}`);
-        }
-        if (enrollment.attendanceCertificateURL) {
-          await storage.saveToBucket(enrollment.attendanceCertificateURL, bucketName, pdfBufferDefaultCertificate);
-          logger.debug(`Replaced attendance certificate for userId: ${userId}, courseId: ${enrollment.courseId}`);
-        }
-      } catch (certError) {
-        logger.error(`Error anonymizing certificates for courseId ${enrollment.courseId}: ${certError.message}`);
-        allCertificatesAnonymized = false;
-      }
-    }
-    
-    result.steps.certificate_anonymization = allCertificatesAnonymized;
-
-    // For unknown reasons, the user is deleted from keycloak even though this part is not executed.
-  /*   // Delete user from Keycloak - moved to end of process
-    try {
-      const keycloakToken = await getKeycloakToken();
-      result.steps.keycloak_deletion = await deleteKeycloakUser(userId, keycloakToken);
-    } catch (keycloakError) {
-      logger.error(`Error in Keycloak operations: ${keycloakError.message}`);
-      // We continue the process even if Keycloak deletion fails
-    }*/
-  
-    logger.debug(`Anonymization process completed for userId: ${userId}`);
-
-    const allStepsSuccessful = Object.values(result.steps).every(Boolean);
-    
-    if (allStepsSuccessful) {
-      result.messageKey = "ANONYMIZATION_SUCCESS";
-    } else {
-      result.messageKey = "ANONYMIZATION_PARTIAL_SUCCESS";
-      result.error = "ERROR_SOME_STEPS_FAILED";
-    }
-
-    logger.info(`Anonymization result: ${JSON.stringify(result, null, 2)}`);
-    
-    return {
-      data: {
-        anonymizeUser: result
-      }
-    };
-
+    result.steps.keycloak_deletion = true;
+    result.messageKey = 'ANONYMIZATION_SUCCESS';
   } catch (error) {
-    logger.error("Error anonymizing user", { error: error.message, stack: error.stack });
-    
-    return {
-      data: {
-        anonymizeUser: {
-          ...result,
-          messageKey: "INTERNAL_SERVER_ERROR",
-          error: error.message || "Unknown error occurred"
-        }
-      }
-    };
+    // Never return backend error details containing personal data to the caller.
+    logger.error('Account deletion failed', { userId, error: error.code || error.name });
+    result.error = 'ERROR_SOME_STEPS_FAILED';
+    result.messageKey = 'ANONYMIZATION_PARTIAL_SUCCESS';
   }
-};
+  return result;
+}
 
-export default anonymizeUser;
+// The existing arbitrary-target action remains admin-only in Hasura and here.
+export default async function anonymizeUser(req, logger) {
+  if (req.body?.session_variables?.['x-hasura-role'] !== 'admin') {
+    return { error: 'UNAUTHORIZED', messageKey: 'UNAUTHORIZED' };
+  }
+  return eraseAccount(req, logger, req.body?.input?.userId);
+}
+
+// No target input: identity comes only from Hasura's verified session variables.
+export async function deleteMyAccount(req, logger) {
+  const session = req.body?.session_variables;
+  if (!['user', 'instructor', 'org_admin', 'admin'].includes(session?.['x-hasura-role']) ||
+      !UUID.test(session?.['x-hasura-user-id'] || '')) {
+    return { error: 'UNAUTHORIZED', messageKey: 'UNAUTHORIZED' };
+  }
+  return eraseAccount(req, logger, session['x-hasura-user-id']);
+}

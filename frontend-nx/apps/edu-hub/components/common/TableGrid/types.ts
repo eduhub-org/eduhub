@@ -122,6 +122,12 @@ export interface TableGridProps<T extends BaseRow> {
   filters?: TableGridFilter[];
   /** Extra controls rendered in the toolbar right after the bulk-action select. */
   toolbarActions?: ReactNode;
+  /**
+   * Loads every row matching the current search and filters, across all pages. When given, the
+   * table offers to extend a selection of the whole page to all `totalCount` rows. Keep it stable
+   * (useCallback) per query: a new function counts as a new query and drops a running request.
+   */
+  loadAllRows?: () => Promise<T[]>;
 }
 
 export interface UseTableGridProps<V> {
@@ -149,6 +155,8 @@ export interface TableGridDeleteButtonProps {
   validateDeleteResult?: (data: unknown) => string | null;
   /** Runs instead of deleteMutation; a rejection is shown in the error dialog. */
   onDelete?: () => Promise<void>;
+  /** Called once the deletion succeeded. */
+  onDeleted?: () => void;
   /** Renders a text button with this label instead of the bare bin icon (e.g. in mobile cards). */
   label?: string;
 }

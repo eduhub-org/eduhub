@@ -359,7 +359,9 @@ export const useRegistrationHandler = ({
 
   const submitRegistration = useCallback(
     async (formData: RegistrationFormData): Promise<RegistrationResult> => {
-      if (isCourseFull) {
+      // Paying for an existing enrollment (a retry, or an invitation whose place is held) is never
+      // a waitlist sign-up, however full the course looks to newcomers.
+      if (isCourseFull && !retryEnrollmentId) {
         return handleDirectRegistration(formData);
       }
 
@@ -369,7 +371,7 @@ export const useRegistrationHandler = ({
 
       return handleDirectRegistration(formData);
     },
-    [config.requiresPayment, handlePaymentRegistration, handleDirectRegistration, isCourseFull]
+    [config.requiresPayment, handlePaymentRegistration, handleDirectRegistration, isCourseFull, retryEnrollmentId]
   );
 
   const retryPayment = useCallback(
