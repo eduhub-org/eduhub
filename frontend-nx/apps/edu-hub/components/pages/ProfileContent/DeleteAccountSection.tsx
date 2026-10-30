@@ -22,6 +22,7 @@ const DeleteAccountSection: FC<DeleteAccountSectionProps> = ({ email }) => {
   const [confirmation, setConfirmation] = useState('');
   const [error, setError] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [deleted, setDeleted] = useState(false);
   const submitting = useRef(false);
   const confirmed = Boolean(email) && confirmation.trim().toLowerCase() === email.trim().toLowerCase();
 
@@ -36,7 +37,7 @@ const DeleteAccountSection: FC<DeleteAccountSectionProps> = ({ email }) => {
   };
 
   const handleDelete = async () => {
-    if (!confirmed || submitting.current) return;
+    if (!confirmed || deleted || submitting.current) return;
     submitting.current = true;
     setDeleting(true);
     setError(false);
@@ -52,7 +53,14 @@ const DeleteAccountSection: FC<DeleteAccountSectionProps> = ({ email }) => {
       setDeleting(false);
       return;
     }
-    await logout();
+    setDeleted(true);
+    try {
+      await logout();
+    } catch {
+      // The account is gone but navigation failed: keep the dialog closable, never delete twice.
+      submitting.current = false;
+      setDeleting(false);
+    }
   };
 
   return (
@@ -87,7 +95,7 @@ const DeleteAccountSection: FC<DeleteAccountSectionProps> = ({ email }) => {
               type="button"
               className="!border-red-600 !bg-red-600 !text-white hover:!bg-red-700 min-h-11 disabled:!bg-gray-400 disabled:!border-gray-400"
               onClick={() => void handleDelete()}
-              disabled={!confirmed || deleting}
+              disabled={!confirmed || deleting || deleted}
             >
               {deleting ? t('deleting') : t('confirm_button')}
             </Button>

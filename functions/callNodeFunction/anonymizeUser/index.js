@@ -8,6 +8,7 @@ import axios from 'axios';
 import path from 'node:path';
 import { GET_DELETION_DATA, ERASE_PERSONAL_DATA, getErasureVariables } from './personalData.js';
 
+const MATRIX_TIMEOUT_MS = 60_000;
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 const missingFile = (error) => error.code === 'ENOENT' || error.code === 404 || error.response?.status === 404;
@@ -53,6 +54,8 @@ async function removeMatrixAccount(matrixUserHandle, logger, userId) {
     homeserverUrl: config.homeserverUrl,
     token: config.token,
     matrixUserId: toMatrixUserId(matrixUserHandle, config.serverName),
+    // Well below the 180 s function limit, so a stalled homeserver still yields a retryable error.
+    signal: AbortSignal.timeout(MATRIX_TIMEOUT_MS),
   });
 }
 

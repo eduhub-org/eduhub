@@ -40,6 +40,26 @@ it('requires a matching email and an explicit confirmation before deleting', asy
   expect(mockDelete).toHaveBeenCalledWith();
 });
 
+it('accepts the confirmation case-insensitively and ignores surrounding whitespace', () => {
+  openDialog();
+  fireEvent.change(screen.getByRole('textbox'), { target: { value: '  PERSON@example.com ' } });
+  expect(screen.getByRole('button', { name: 'confirm_button' })).toBeEnabled();
+});
+
+it('keeps the dialog closable and never deletes twice when logout fails after deletion', async () => {
+  mockDelete.mockResolvedValue({ data: { deleteMyAccount: { error: null, messageKey: 'ANONYMIZATION_SUCCESS' } } });
+  mockLogout.mockRejectedValueOnce(new Error('signout failed'));
+  openDialog();
+  confirmEmail();
+  const confirm = screen.getByRole('button', { name: 'confirm_button' });
+  fireEvent.click(confirm);
+  await waitFor(() => expect(screen.getByRole('button', { name: 'cancel' })).toBeEnabled());
+  expect(confirm).toBeDisabled();
+  expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  fireEvent.click(confirm);
+  expect(mockDelete).toHaveBeenCalledTimes(1);
+});
+
 it('cancels without making a request and resets confirmation on reopening', async () => {
   openDialog();
   confirmEmail();

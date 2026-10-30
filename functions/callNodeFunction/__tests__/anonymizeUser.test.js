@@ -96,6 +96,10 @@ it('deletes every certificate type, the profile image and resized versions', asy
   }
   const variables = request.mock.calls[1][2];
   expect(variables.mailFilter._or[0].to._ilike).toBe('%test\\_\\%@example.com%');
+  // Anchored so the cancelEnrollments alias cannot stand in for the erasure block.
+  const erasure = request.mock.calls[1][1];
+  expect(erasure).toMatch(/^\s*update_CourseEnrollment\(/m);
+  expect(erasure).toMatch(/^\s*update_Attendance\(/m);
   expect(unsubscribe.mock.invocationCallOrder[0]).toBeLessThan(request.mock.invocationCallOrder[1]);
   expect(request.mock.invocationCallOrder[1]).toBeLessThan(deleteIdentity.mock.invocationCallOrder[0]);
 });
@@ -149,6 +153,7 @@ it('deactivates the Matrix account before the database erase clears the handle',
   expect(await deleteMyAccount(req(), logger)).toMatchObject({ steps: { matrix_deactivation: true } });
   expect(deactivateMatrixUser).toHaveBeenCalledWith({
     homeserverUrl: 'https://matrix.test', token: 'mx', matrixUserId: '@test.person:test',
+    signal: expect.any(AbortSignal),
   });
   expect(deactivateMatrixUser.mock.invocationCallOrder[0]).toBeLessThan(request.mock.invocationCallOrder[1]);
 });

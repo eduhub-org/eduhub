@@ -91,8 +91,11 @@ const FIND_EMAIL_HOLDERS = gql`
 
 const SET_USER_EMAIL = gql`
   mutation ($id: uuid!, $email: String!) {
-    update_User_by_pk(pk_columns: { id: $id }, _set: { email: $email }) {
-      id
+    update_User(
+      where: { id: { _eq: $id }, status: { _neq: DELETED } }
+      _set: { email: $email }
+    ) {
+      affected_rows
     }
   }
 `;
@@ -118,7 +121,9 @@ async function releaseStaleEmail(client, kcAdminClient, email, userid) {
     const holderAccount = await kcAdminClient.users.findOne({ id: holder.id });
     const currentEmail = holderAccount?.email;
     if (currentEmail && currentEmail !== email) {
-      await client.request(SET_USER_EMAIL, { id: holder.id, email: currentEmail });
+      const result = await client.request(SET_USER_EMAIL, { id: holder.id, email: currentEmail });
+      // The holder was deleted after the lookup; its anonymized row must keep its placeholder email.
+      if (result.update_User.affected_rows === 0) continue;
       console.log(
         `Released ${email} for user ${userid}: user ${holder.id} now has its Keycloak email`
       );

@@ -438,6 +438,8 @@ resource "google_cloudfunctions2_function" "call_node_function" {
   depends_on = [
     google_secret_manager_secret_version.guest_token_secret,
     google_secret_manager_secret_iam_member.call_node_function_guest_token_secret,
+    google_secret_manager_secret_version.matrix_synapse_admin_token,
+    google_secret_manager_secret_iam_member.call_node_function_matrix_synapse_admin_token,
   ]
 }
 
