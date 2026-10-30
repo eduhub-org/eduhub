@@ -1,4 +1,5 @@
 type Mutation {
+  deleteMyAccount: AnonymizeUserResult
   anonymizeUser(
     userId: uuid!
   ): AnonymizeUserResult
@@ -485,6 +486,7 @@ type AnonymizeUserResult {
 
 type AnonymizationSteps {
   keycloak_deletion: Boolean!
+  matrix_deactivation: Boolean
   user_data_anonymization: Boolean!
   profile_picture_removal: Boolean!
   certificate_anonymization: Boolean!

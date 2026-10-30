@@ -30,6 +30,7 @@ const FIND_USER = gql`
     User_by_pk(id: $id) {
       id
       firstName
+      status
       matrixUserHandle
     }
   }
@@ -67,8 +68,8 @@ const UPDATE_USER = gql`
     $email: String
     $matrixUserHandle: String
   ) {
-    update_User_by_pk(
-      pk_columns: { id: $id }
+    update_User(
+      where: { id: { _eq: $id }, status: { _neq: DELETED } }
       _set: {
         firstName: $firstname
         lastName: $lastname
@@ -76,7 +77,7 @@ const UPDATE_USER = gql`
         matrixUserHandle: $matrixUserHandle
       }
     ) {
-      id
+      affected_rows
     }
   }
 `;
@@ -97,8 +98,11 @@ const FIND_EMAIL_HOLDERS = gql`
 
 const SET_USER_EMAIL = gql`
   mutation ($id: uuid!, $email: String!) {
-    update_User_by_pk(pk_columns: { id: $id }, _set: { email: $email }) {
-      id
+    update_User(
+      where: { id: { _eq: $id }, status: { _neq: DELETED } }
+      _set: { email: $email }
+    ) {
+      affected_rows
     }
   }
 `;
@@ -124,7 +128,9 @@ async function releaseStaleEmail(client, kcAdminClient, email, userid) {
     const holderAccount = await kcAdminClient.users.findOne({ id: holder.id });
     const currentEmail = holderAccount?.email;
     if (currentEmail && currentEmail !== email) {
-      await client.request(SET_USER_EMAIL, { id: holder.id, email: currentEmail });
+      const result = await client.request(SET_USER_EMAIL, { id: holder.id, email: currentEmail });
+      // The holder was deleted after the lookup; its anonymized row must keep its placeholder email.
+      if (result.update_User.affected_rows === 0) continue;
       console.log(
         `Released ${email} for user ${userid}: user ${holder.id} now has its Keycloak email`
       );
@@ -169,7 +175,14 @@ export const updateFromKeycloak = async (req, res) => {
       const response = await client.request(FIND_USER, { id: userid });
       findUserResponse = response.User_by_pk;
     } catch (error) {
+      // An unknown status could be a deleted account; never sync on a guess.
       console.error(error);
+      return res.status(500).json({ error: 'User lookup failed' });
+    }
+
+    // A still-valid token or a delayed login sync must never restore erased data.
+    if (findUserResponse?.status === 'DELETED') {
+      return res.status(403).json({ error: 'Account deleted' });
     }
 
     if (user != null) {
@@ -212,13 +225,17 @@ export const updateFromKeycloak = async (req, res) => {
           const existingHandle = findUserResponse.matrixUserHandle;
           const handleToSet = existingHandle || matrixHandle;
 
-          await client.request(UPDATE_USER, {
+          const response = await client.request(UPDATE_USER, {
             id: userid,
             firstname: user.firstName,
             lastname: user.lastName,
             email: user.email,
             matrixUserHandle: handleToSet,
           });
+          // The account was deleted after the status check above.
+          if (response.update_User.affected_rows === 0) {
+            return res.status(403).json({ error: 'Account deleted' });
+          }
         }
       } catch (error) {
         // Reporting success here would leave the person logged in without a

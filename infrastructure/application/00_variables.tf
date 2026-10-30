@@ -327,6 +327,13 @@ variable "matrix_admin_access_token" {
   sensitive   = true
 }
 
+variable "matrix_synapse_admin_token" {
+  description = "Access token of a dedicated Synapse server-admin user, used only to deactivate Matrix accounts on account deletion. Keep the room bot (matrix_admin_access_token) a non-admin. While empty, account deletion fails at the Matrix step."
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
 variable "mailgun_api_key" {
   description = "API key for the Mailgun API"
   type        = string

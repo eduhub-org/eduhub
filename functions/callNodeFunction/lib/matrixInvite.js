@@ -113,7 +113,7 @@ const parseMatrixResponse = async (response) => {
   throw error;
 };
 
-export const getMatrixInviteConfig = () => {
+export const getMatrixInviteConfig = ({ requireToken = true } = {}) => {
   const homeserverUrl = trimAndNull(process.env.MATRIX_HOMESERVER_URL);
   const token = trimAndNull(process.env.MATRIX_ADMIN_ACCESS_TOKEN);
   const mainSpaceId = trimAndNull(process.env.MATRIX_MAIN_SPACE_ID);
@@ -121,7 +121,7 @@ export const getMatrixInviteConfig = () => {
   const explicitServerName = trimAndNull(process.env.MATRIX_SERVER_NAME);
   const serverName = deriveServerName({ explicitServerName, mainSpaceId, adminUserId });
 
-  if (!homeserverUrl || !token || !serverName) return null;
+  if (!homeserverUrl || (requireToken && !token) || !serverName) return null;
 
   return {
     homeserverUrl: normalizeBaseUrl(homeserverUrl),
@@ -129,6 +129,16 @@ export const getMatrixInviteConfig = () => {
     serverName,
     botUserId: adminUserId,
   };
+};
+
+/**
+ * Same homeserver as the room bot, but a separate server-admin token, so the bot used by
+ * every room function does not need server-admin rights. token is null while it is unset.
+ */
+export const getMatrixDeactivationConfig = () => {
+  const config = getMatrixInviteConfig({ requireToken: false });
+  if (!config) return null;
+  return { ...config, token: trimAndNull(process.env.MATRIX_SYNAPSE_ADMIN_TOKEN) };
 };
 
 /**
@@ -216,5 +226,42 @@ export const inviteUserToMatrixRoom = async ({ homeserverUrl, token, roomId, mat
   const error = new Error(payload?.error || `Matrix invite failed with HTTP ${response.status}`);
   error.status = response.status;
   error.errcode = errcode;
+  throw error;
+};
+
+/**
+ * POST /_synapse/admin/v1/deactivate/{userId} with erase — logs out all devices, leaves all rooms,
+ * removes display name and avatar, and hides sent messages from users joining later.
+ * Requires a Synapse server-admin token (see getMatrixDeactivationConfig).
+ * A user who never logged in to Matrix has no account (404); that counts as done.
+ */
+export const deactivateMatrixUser = async ({ homeserverUrl, token, matrixUserId, signal }) => {
+  const url = `${homeserverUrl}/_synapse/admin/v1/deactivate/${encodeURIComponent(matrixUserId)}`;
+  const response = await fetchMatrixWithRateLimitRetry(
+    url,
+    {
+      method: "POST",
+      headers: matrixHeaders(token),
+      body: JSON.stringify({ erase: true }),
+    },
+    signal
+  );
+
+  if (response.ok) return { deactivated: true };
+
+  let payload = null;
+  try {
+    payload = await response.json();
+  } catch (_e) {
+    payload = null;
+  }
+  // Only Synapse's own "unknown user" counts as done; any other 404 (wrong URL, proxy) must fail.
+  if (response.status === 404 && payload?.errcode === "M_NOT_FOUND") {
+    return { deactivated: false, skipped: true };
+  }
+
+  const error = new Error(payload?.error || `Matrix deactivation failed with HTTP ${response.status}`);
+  error.status = response.status;
+  error.errcode = payload?.errcode;
   throw error;
 };
