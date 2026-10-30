@@ -7,7 +7,8 @@
       "default_version": "Standardversion",
       "none": "{count, plural, one {# Person erhält} other {# Personen erhalten}} keine E-Mail.",
       "sent": "{count, plural, one {# E-Mail wird} other {# E-Mails werden}} verschickt („{template}“).",
-      "participant_sent": "Du bekommst eine Bestätigung per E-Mail."
+      "participant_sent": "Du bekommst eine Bestätigung per E-Mail.",
+      "lookup_failed": "Wir konnten nicht prüfen, wer schon angemeldet ist, deshalb kann gerade niemand hinzugefügt werden. Bitte lade die Seite neu."
     },
     "confirmation": "Bestätigung",
     "warning": "Warnung",

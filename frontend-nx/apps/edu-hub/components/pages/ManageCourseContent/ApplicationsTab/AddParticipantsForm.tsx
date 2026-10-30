@@ -51,6 +51,7 @@ export const AddParticipantsForm: FC<AddParticipantsFormProps> = ({
   onSubmit,
 }) => {
   const t = useTranslations('manageCourse');
+  const tCommon = useTranslations('common');
 
   // Once a course/event has started, "aborted" ("Teilnahme abgebrochen") is the meaningful
   // status for someone dropping out; beforehand it's "cancelled" ("Registrierung storniert").
@@ -108,9 +109,13 @@ export const AddParticipantsForm: FC<AddParticipantsFormProps> = ({
   >(COURSE_ENROLLMENT_STATUSES_OF_USERS, {
     variables: { courseId, userIds: selectedUserIds.map((user) => user.id) },
     skip: selectedUserIds.length === 0,
+    // Statuses change under us (other organizers, our own last submit): never trust the cache.
+    fetchPolicy: 'network-only',
   });
-  // Until the lookup has answered, nobody's status is known: no preview rather than a wrong one.
+  // Until the lookup has answered, nobody's status is known: no preview rather than a wrong one,
+  // and no submit either, so nobody is confirmed without seeing the email and overbooking notes.
   const statusesKnown = selectedUserIds.length > 0 && !!currentEnrollments && !currentEnrollmentsError;
+  const waitingForStatuses = selectedUserIds.length > 0 && !statusesKnown;
   const currentStatusOf = useMemo(
     () => new Map((currentEnrollments?.CourseEnrollment ?? []).map((e) => [e.userId, e.status as string])),
     [currentEnrollments]
@@ -213,10 +218,13 @@ export const AddParticipantsForm: FC<AddParticipantsFormProps> = ({
         </p>
       )}
       {statusesKnown && <StatusChangeEmailNotice courseId={courseId} emails={emails} />}
+      {currentEnrollmentsError && (
+        <div className="text-red-500 mt-4">{tCommon('status_email.lookup_failed')}</div>
+      )}
       {userSelectionError && <div className="text-red-500 mt-4">{userSelectionError}</div>}
 
       <div className="flex justify-center my-8">
-        <Button filled type="submit">
+        <Button filled type="submit" disabled={waitingForStatuses}>
           {t('submit')}
         </Button>
       </div>

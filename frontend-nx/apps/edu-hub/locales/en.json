@@ -7,7 +7,8 @@
       "default_version": "default version",
       "none": "{count, plural, one {# person receives} other {# people receive}} no email.",
       "sent": "{count, plural, one {# email is} other {# emails are}} on the way (“{template}”).",
-      "participant_sent": "You will receive a confirmation by email."
+      "participant_sent": "You will receive a confirmation by email.",
+      "lookup_failed": "Could not check who is already enrolled, so nobody can be added yet. Please reload the page."
     },
     "confirmation": "Confirmation",
     "warning": "Warning",

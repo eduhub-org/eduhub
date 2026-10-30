@@ -55,6 +55,12 @@ describe('StatusChangeEmailNotice', () => {
     expect(screen.getByText('common.status_email.none{"count":1}')).toBeInTheDocument();
   });
 
+  it('counts everyone who gets no email', () => {
+    render(<StatusChangeEmailNotice courseId={7} emails={[{ template: null, count: 2 }]} />);
+
+    expect(screen.getByText('common.status_email.none{"count":2}')).toBeInTheDocument();
+  });
+
   it('names no version until the course templates are known', () => {
     mockUseRoleQuery.mockReturnValue({ data: undefined, loading: true });
     render(<StatusChangeEmailNotice courseId={7} emails={[{ template: MailTemplateType_enum.INVITE, count: 1 }]} />);
