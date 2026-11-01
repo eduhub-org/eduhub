@@ -2,6 +2,7 @@ import { AttendanceStatus_enum } from '../__generated__/globalTypes';
 import {
   applyAttendanceOverrides,
   attendanceOverrideKey,
+  canEditSessionAttendance,
   collapseAttendancesBySession,
   countMandatorySessions,
   getAttendanceStatusFromMap,
@@ -141,5 +142,12 @@ describe('course participation attendance', () => {
   it('treats sessions without an explicit flag as mandatory', () => {
     const unflagged = [{ id: 1 }, { id: 2, isMandatory: null }];
     expect(countMandatorySessions(unflagged)).toBe(2);
+  });
+
+  it('only allows editing attendance once a session has started', () => {
+    const now = new Date('2026-11-01T10:00:00Z');
+    expect(canEditSessionAttendance({ startDateTime: '2026-11-01T09:00:00Z' }, now)).toBe(true);
+    expect(canEditSessionAttendance({ startDateTime: '2026-11-01T10:00:00Z' }, now)).toBe(true);
+    expect(canEditSessionAttendance({ startDateTime: '2026-11-08T09:00:00Z' }, now)).toBe(false);
   });
 });

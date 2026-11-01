@@ -1888,6 +1888,7 @@
     "attendance_program_session": "Kursübergreifend",
     "attendance_program_session_event": "Eventübergreifend",
     "attendance_optional_session": "optional",
+    "attendance_session_not_started": "Session hat noch nicht begonnen – Anwesenheit kann erst ab Beginn gesetzt werden",
     "attendance_status_passed": "Anwesenheitsanforderung erfüllt",
     "attendance_status_failed": "Anwesenheitsanforderung nicht erfüllt",
     "attendance_status_uncertain": "Anwesenheitsstatus noch offen",

@@ -116,6 +116,18 @@ export function getAttendanceStatusFromMap(
   return 'uncertain';
 }
 
+/**
+ * Attendance can only be set once a session has started. This prevents
+ * accidental marks on upcoming sessions, which could not be reset to
+ * "no info" and would override the automatic attendance check.
+ */
+export function canEditSessionAttendance(
+  session: { startDateTime: string | Date },
+  now: Date = new Date()
+): boolean {
+  return new Date(session.startDateTime).getTime() <= now.getTime();
+}
+
 export function getNextAttendanceStatus(
   currentStatus: AttendanceStatus_enum | undefined
 ): AttendanceStatus_enum {

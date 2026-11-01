@@ -10,6 +10,7 @@ import {
   CourseEnrollmentWithAttendances,
   applyAttendanceOverrides,
   attendanceOverrideKey,
+  canEditSessionAttendance,
   collapseAttendancesBySession,
   getNextAttendanceStatus,
 } from '../../../../helpers/courseParticipationAttendance';
@@ -93,6 +94,7 @@ export function useOptimisticAttendance({
 
   const handleDotClick = useCallback(
     (session: CourseParticipations_Course_by_pk_Sessions, userId: string) => {
+      if (!canEditSessionAttendance(session)) return;
       const enrollment = enrollments.find((item) => item.userId === userId);
       if (!enrollment) return;
 

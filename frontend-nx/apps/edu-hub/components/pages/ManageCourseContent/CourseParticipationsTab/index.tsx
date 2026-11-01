@@ -68,6 +68,7 @@ import { enrollmentStatusMailTemplate } from '../../../../helpers/enrollmentStat
 import {
   AttendanceOverallStatus,
   CourseEnrollmentWithAttendances,
+  canEditSessionAttendance,
   collapseAttendancesBySession,
   getAttendanceStatusFromMap,
   groupAttendancesByUser,
@@ -590,30 +591,36 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
             className="grid gap-1 flex-shrink-0"
             style={{ gridTemplateColumns: 'repeat(8, 1.5em)' }}
           >
-            {dotsData.map((d) => (
-              <Dot
-                key={d.session.id}
-                color={d.color}
-                hollow={!isMandatorySession(d.session)}
-                className={
-                  attendanceLoading
-                    ? 'cursor-wait opacity-60'
-                    : 'cursor-pointer hover:border-2 hover:border-indigo-200 hover:rounded-full'
-                }
-                title={[
-                  new Date(d.session.startDateTime).toLocaleString(),
-                  isProgramSession(d.session) ? `${programSessionLabel} (${programTitle})` : null,
-                  isMandatorySession(d.session) ? null : t('attendance_optional_session'),
-                ]
-                  .filter(Boolean)
-                  .join(' · ')}
-                onClick={
-                  attendanceLoading
-                    ? undefined
-                    : () => onDotClick(d.session, enrollment.userId)
-                }
-              />
-            ))}
+            {dotsData.map((d) => {
+              const editable = canEditSessionAttendance(d.session);
+              return (
+                <Dot
+                  key={d.session.id}
+                  color={d.color}
+                  hollow={!isMandatorySession(d.session)}
+                  className={
+                    !editable
+                      ? 'cursor-not-allowed'
+                      : attendanceLoading
+                        ? 'cursor-wait opacity-60'
+                        : 'cursor-pointer hover:border-2 hover:border-indigo-200 hover:rounded-full'
+                  }
+                  title={[
+                    new Date(d.session.startDateTime).toLocaleString(),
+                    isProgramSession(d.session) ? `${programSessionLabel} (${programTitle})` : null,
+                    isMandatorySession(d.session) ? null : t('attendance_optional_session'),
+                    editable ? null : t('attendance_session_not_started'),
+                  ]
+                    .filter(Boolean)
+                    .join(' · ')}
+                  onClick={
+                    attendanceLoading || !editable
+                      ? undefined
+                      : () => onDotClick(d.session, enrollment.userId)
+                  }
+                />
+              );
+            })}
           </div>
           <div className="flex items-center gap-1 flex-shrink-0 w-16">
             <span className="text-label-primary text-sm whitespace-nowrap">{`${attended}/${total}`}</span>
