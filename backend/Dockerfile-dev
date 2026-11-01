@@ -1,4 +1,4 @@
-FROM hasura/graphql-engine:v2.19.0.cli-migrations-v3
+FROM hasura/graphql-engine:v2.45.9.cli-migrations-v3
 
 # Copy entrypoint script and config.yaml needed to execute hasura-cli commands
 COPY ./dockerfile-dev-entrypoint.sh /hasura/dockerfile-dev-entrypoint.sh
