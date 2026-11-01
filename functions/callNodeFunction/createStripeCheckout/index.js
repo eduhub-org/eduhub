@@ -10,6 +10,7 @@ import {
   buildCourseSource,
   buildServicePeriodField,
 } from '../lib/stripeTax.js';
+import { MIN_SESSION_MS, checkoutAccess, placesOpenForRegistration } from '../lib/checkoutAccess.js';
 
 const GET_COURSE_AND_ADDONS = `
   query GetCourseAndAddons($courseId: Int!) {
@@ -20,6 +21,9 @@ const GET_COURSE_AND_ADDONS = `
       currency
       stripeProductId
       stripePriceId
+      maxParticipants
+      activeParticipantCount
+      waitlistCount
       Program {
         type
         lectureStart
@@ -50,6 +54,8 @@ const GET_ENROLLMENT_USER = `
     CourseEnrollment_by_pk(id: $enrollmentId) {
       courseId
       userId
+      status
+      invitationExpirationDate
       User {
         email
       }
@@ -174,6 +180,7 @@ export default async function createStripeCheckout(req, logger) {
     // userEmail would select (and let Checkout update) someone else's
     // customer record, so it is deliberately ignored.
     let emailToUse = null;
+    let access;
     try {
       const enrollmentData = await client.request(GET_ENROLLMENT_USER, { enrollmentId });
       const enrollment = enrollmentData.CourseEnrollment_by_pk;
@@ -198,6 +205,20 @@ export default async function createStripeCheckout(req, logger) {
           success: false,
           error: 'Enrollment course mismatch',
           messageKey: 'INVALID_ENROLLMENT'
+        };
+      }
+
+      access = checkoutAccess({
+        status: enrollment.status,
+        invitationExpirationDate: enrollment.invitationExpirationDate,
+        placesOpen: placesOpenForRegistration(course),
+      });
+      if (!access.allowed) {
+        logger.info('Checkout refused', { enrollmentId, status: enrollment.status, messageKey: access.messageKey });
+        return {
+          success: false,
+          error: 'This enrollment cannot be paid for now',
+          messageKey: access.messageKey,
         };
       }
 
@@ -515,6 +536,8 @@ export default async function createStripeCheckout(req, logger) {
       }),
       success_url: successUrl,
       cancel_url: cancelUrl,
+      // An invitation is paid for by its deadline; the checkout ends with it.
+      ...(access.expiresAt ? { expires_at: Math.floor(access.expiresAt.getTime() / 1000) } : {}),
       metadata: {
         courseId: String(courseId),
         courseName: course.title || '',
@@ -567,6 +590,14 @@ export default async function createStripeCheckout(req, logger) {
     };
 
     // Without a customer, let Stripe prompt for the email during checkout.
+
+    // Stripe wants expires_at at least 30 minutes after creation; the calls above take time.
+    if (sessionConfig.expires_at) {
+      sessionConfig.expires_at = Math.max(
+        sessionConfig.expires_at,
+        Math.floor((Date.now() + MIN_SESSION_MS) / 1000)
+      );
+    }
 
     const session = await stripe.checkout.sessions.create(sessionConfig);
 

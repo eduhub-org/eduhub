@@ -202,7 +202,7 @@ const WidgetTestPage: FC = () => {
               {validationState.status === 'success' && (
                 <>
                   <p style={{ color: 'green', fontWeight: 'bold' }}>✓ {validationState.message}</p>
-                  {validationState.organizationId && (
+                  {validationState.organizationId != null && (
                     <p>
                       <strong>Organization ID:</strong> {validationState.organizationId}
                     </p>

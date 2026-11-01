@@ -4,11 +4,12 @@ import { ColumnDef } from '@tanstack/react-table';
 
 import TableGrid from '../../common/TableGrid';
 import Loading from '../../common/Loading';
-import { useTableGrid } from '../../common/TableGrid/hooks';
+import { usePersistedPageSize, useTableGrid } from '../../common/TableGrid/hooks';
 import { createMultiWordSearchCondition } from '../../common/TableGrid/utils';
 
 import { useAdminQuery } from '../../../hooks/authedQuery';
 import { USERS_BY_LAST_NAME, DELETE_USER } from '../../../queries/user';
+import type { DeleteUser } from '../../../queries/__generated__/DeleteUser';
 import { UsersByLastName_User } from '../../../queries/__generated__/UsersByLastName';
 import { PageBlock } from '../../common/PageBlock';
 import CommonPageHeader from '../../common/CommonPageHeader';
@@ -55,7 +56,7 @@ const ExpandableUserRow: FC<{ row: UsersByLastName_User }> = ({ row }) => {
 
 const ManageUsersContent: FC = () => {
   const t = useTranslations('manageUsers');
-  const [pageSize, setPageSize] = useState(20);
+  const [pageSize, setPageSize] = usePersistedPageSize('manageUsers', 20);
   const [createUserDialogOpen, setCreateUserDialogOpen] = useState(false);
 
   const handlePageSizeChange = (newPageSize: number) => {
@@ -172,6 +173,12 @@ const ManageUsersContent: FC = () => {
               sorting={sorting}
               onSortingChange={setSorting}
               deleteMutation={DELETE_USER}
+              validateDeleteResult={(data) => {
+                const result = (data as DeleteUser | undefined)?.anonymizeUser;
+                return result?.error || result?.messageKey !== 'ANONYMIZATION_SUCCESS'
+                  ? t('anonymization.ERROR_SOME_STEPS_FAILED')
+                  : null;
+              }}
               deleteIdType="uuidString"
               error={error}
               loading={loading}

@@ -1,5 +1,15 @@
 {
   "common": {
+    "status_email": {
+      "will_send": "{count, plural, one {# Person erhält} other {# Personen erhalten}} eine E-Mail mit der Vorlage „{template}“ ({version}).",
+      "will_send_plain": "{count, plural, one {# Person erhält} other {# Personen erhalten}} eine E-Mail mit der Vorlage „{template}“.",
+      "course_version": "eigene Version dieser Veranstaltung",
+      "default_version": "Standardversion",
+      "none": "{count, plural, one {# Person erhält} other {# Personen erhalten}} keine E-Mail.",
+      "sent": "{count, plural, one {# E-Mail wird} other {# E-Mails werden}} verschickt („{template}“).",
+      "participant_sent": "Du bekommst eine Bestätigung per E-Mail.",
+      "lookup_failed": "Wir konnten nicht prüfen, wer schon angemeldet ist, deshalb kann gerade niemand hinzugefügt werden. Bitte lade die Seite neu."
+    },
     "confirmation": "Bestätigung",
     "warning": "Warnung",
     "delete": "Löschen",
@@ -161,6 +171,10 @@
       "collapse_row": "Details ausblenden",
       "open_row": "Öffnen",
       "select_all": "Alle",
+      "page_all_selected": "Alle {count} Einträge auf dieser Seite sind ausgewählt.",
+      "select_all_matching": "Alle {count} auswählen",
+      "select_all_matching_error": "Nicht alle Einträge konnten geladen werden. Bitte versuch es noch einmal.",
+      "select_all_matching_partial": "Nur die ersten {count} von {total} Einträgen konnten ausgewählt werden.",
       "sort_by": "Sortieren",
       "sort_default": "Standardsortierung",
       "sort_asc": "{column}, aufsteigend",
@@ -652,7 +666,8 @@
       "register_now": "Jetzt registrieren",
       "accept_invitation": "Einladung annehmen",
       "placeholder_motivation_letter": "Meine Motivation ...",
-      "retry_payment": "Zahlung erneut versuchen"
+      "retry_payment": "Zahlung erneut versuchen",
+      "pay_now": "Jetzt bezahlen"
     },
     "status": {
       "applied": "Deine Bewerbung ist in der Prüfung",
@@ -660,6 +675,7 @@
       "rejected": "Leider wurde deine Bewerbung abgelehnt",
       "cancelled": "Du hast deine Anmeldung storniert",
       "invited": "Du wurdest eingeladen und musst deine Teilnahme bestätigen",
+      "invited_payment": "Du bist eingeladen – bitte bezahle bis zum {date}, um deinen Platz zu sichern.",
       "invitation_expired": "Deine Einladung ist abgelaufen",
       "payment_pending": "Deine Zahlung wurde noch nicht abgeschlossen. Du kannst deine Auswahl überprüfen und es erneut versuchen.",
       "payment_failed": "Deine Zahlung konnte nicht verarbeitet werden. Du kannst deine Auswahl überprüfen und es erneut versuchen.",
@@ -789,8 +805,10 @@
     },
     "ParticipationExitButton": {
       "cancel_participation": "Anmeldung stornieren",
+      "decline_invitation": "Platz ablehnen",
       "abort_participation": "Teilnahme abbrechen",
       "cancel_participation_confirm": "Möchtest du deine Anmeldung für „{title}“ wirklich stornieren? Dein Platz wird dann wieder frei.",
+      "decline_invitation_confirm": "Möchtest du den Platz bei „{title}“ wirklich ablehnen? Er geht dann an die nächste Person auf der Warteliste.",
       "abort_participation_confirm": "Möchtest du deine Teilnahme an „{title}“ wirklich abbrechen?",
       "exit_failed": "Deine Anmeldung konnte gerade nicht geändert werden. Bitte versuche es erneut."
     },
@@ -1084,6 +1102,21 @@
     }
   },
   "profile": {
+    "DeleteAccount": {
+      "title": "Account löschen",
+      "description": "Lösche deinen Account dauerhaft und anonymisiere deine persönlichen Daten. Dies kann nicht rückgängig gemacht werden.",
+      "certificates_warning": "Alle deine Zertifikate werden unwiderruflich gelöscht. Lade Zertifikate, die du behalten möchtest, vorher herunter.",
+      "delete_button": "Meinen Account löschen",
+      "confirmation_title": "Deinen Account dauerhaft löschen?",
+      "confirmation_description": "Du verlierst den Zugang zu deinem Account. Dein Profilbild, deine Fragebogenantworten und deine persönlichen Bewerbungsangaben werden gelöscht. Offene Anmeldungen werden storniert. Job-Benachrichtigungen werden beendet.",
+      "connected_services": "Du wirst von allen Newslettern abgemeldet, die du über EduHub erhältst. Falls du einen Element-Chat-Account hast, wird er deaktiviert: Du wirst aus allen Chaträumen entfernt, dein Name und dein Profilbild werden dort gelöscht und deine Nachrichten werden Personen, die später beitreten, nicht mehr angezeigt.",
+      "retained_records": "Anonyme Teilnahmehistorien, gemeinsame Projektinhalte sowie vorhandene Rechnungen und Zahlungsnachweise bleiben erhalten.",
+      "type_email": "Gib zur Bestätigung deine E-Mail-Adresse ein: {email}",
+      "confirm_button": "Meinen Account dauerhaft löschen",
+      "deleting": "Account wird gelöscht…",
+      "logout_error": "Dein Account wurde gelöscht, aber die Abmeldung ist fehlgeschlagen. Schließe dieses Fenster und melde dich erneut ab.",
+      "error": "Dein Account konnte nicht vollständig gelöscht werden. Einige Schritte wurden möglicherweise bereits abgeschlossen. Bitte versuche es erneut. Wenn das Problem bestehen bleibt, wende dich an den Support."
+    },
     "first_name": "Vorname",
     "last_name": "Nachname",
     "university": "Hochschule",
@@ -1224,6 +1257,7 @@
       "upload_text": "Klicken um Titelbild hochzuladen oder Datei hier ablegen",
       "alt": "Titelbild des Angebots",
       "help_text": "Wird auf der Seite des Angebots und in den Slidern gezeigt.",
+      "format_tooltip": "Empfohlen: Querformat ca. 2:1, z. B. 1920 × 960 px (max. 5 MB).\nDas Bild wird als Kachel (fast 3:2) und als breiter Header auf der Angebotsseite (am Handy fast quadratisch) mittig zugeschnitten – setze das Wichtige ins mittlere Drittel.\nBitte keinen Text ins Bild: Der Titel wird automatisch unten links darübergelegt, Schrift im Bild wird meist abgeschnitten.",
       "credits_label": "Bildnachweis",
       "credits_help": "Wer das Titelbild gemacht hat bzw. die Rechte daran hält, z. B. „Foto: Max Muster“. Wird unter dem Titel angezeigt und an Veranstaltungsportale übergeben (max. 120 Zeichen)."
     },
@@ -1501,6 +1535,7 @@
     "add_participants": "Teilnehmende hinzufügen/bearbeiten",
     "selected_users": "Ausgewählte User",
     "name_or_email": "Name oder E-Mail",
+    "add_paid_no_payment_hint": "Es wird keine Zahlung erhoben: Wer hier als bestätigt hinzugefügt wird, nimmt ohne Bezahlung teil.",
     "add_as_confirmed": "als bestätigt hinzufügen oder ändern",
     "add_as_applied": "als beworben hinzufügen oder ändern",
     "add_as_invited": "als eingeladen hinzufügen oder ändern",
@@ -1522,11 +1557,21 @@
     "element_program_instructor_chat_prompt": "Tritt dem Programm-Instructor-Raum in Element bei, um dich mit anderen Instructor:innen abzustimmen.",
     "select_applicants_first": "Bitte wähle zuerst Bewerber aus",
     "bulk_actions": {
+      "overbook_warning": "Das {count, plural, one {ist # Platz} other {sind # Plätze}} mehr, als frei {count, plural, one {ist} other {sind}} – die Veranstaltung wird überbucht ({taken} von {max} Plätzen).",
+      "single_invite_dialog_title": "{name} einladen",
+      "single_invite_text": "{name} wird eingeladen und kann die Teilnahme bis zum unten gewählten Datum bestätigen.",
+      "single_invite_text_payment": "{name} wird eingeladen und kann den Platz bis zum unten gewählten Datum bezahlen. Bis dahin ist er reserviert.",
+      "confirm_waitlist_dialog_title": "Teilnahme bestätigen",
+      "confirm_waitlist_question": "Möchtest Du {name} einen Platz geben? {name} steht auf Platz {position} der Warteliste. Die Teilnahme wird sofort bestätigt.",
+      "confirm_waitlist_confirm": "Teilnahme bestätigen",
+      "waitlist_confirmed": "{name} ist jetzt bestätigt.",
+      "waitlist_confirm_error": "Die Teilnahme konnte nicht bestätigt werden: {error}",
+      "waitlist_confirm_stale": "{name} steht nicht mehr auf der Warteliste. Die Liste wurde neu geladen.",
       "expand_collapse_rows": "Zeilen aus-/einklappen",
       "expand_selected_rows": "Ausgewählte Zeilen ausklappen",
       "collapse_selected_rows": "Ausgewählte Zeilen einklappen",
       "email_selected": "E-Mail an Ausgewählte",
-      "email_all_confirmed": "E-Mail an alle Bestätigten",
+      "email_all_registered": "E-Mail an alle Angemeldeten",
       "email_all_cancelled": "E-Mail an alle Stornierten",
       "email_all_invited": "E-Mail an alle Eingeladenen",
       "email_all_applied": "E-Mail an alle Beworbenen",
@@ -1555,8 +1600,7 @@
       "no_eligible_rejections": "Keine der ausgewählten Personen hat eine rote Bewertung und wartet noch auf eine Entscheidung.",
       "selection_skipped": "{count, plural, one {# ausgewählte Person wird} other {# ausgewählte Personen werden}} ausgelassen: Berücksichtigt werden nur passend bewertete Personen, die noch nicht eingeladen oder abgelehnt wurden.",
       "free_places": "{count, plural, =0 {Im Kurs ist kein Platz mehr frei.} one {Im Kurs ist noch # Platz frei.} other {Im Kurs sind noch # Plätze frei.}}",
-      "invitations_withheld": "{count, plural, one {# weitere Person mit grüner Bewertung wird} other {# weitere Personen mit grüner Bewertung werden}} nicht eingeladen, weil keine Plätze mehr frei sind. Frühere Bewerbungen werden zuerst eingeladen; die anderen behalten ihren Status.",
-      "not_enough_places": "{selected, plural, one {# ausgewählte Person würde} other {# ausgewählte Personen würden}} eingeladen, aber {count, plural, =0 {es ist kein Platz} one {es ist nur # Platz} other {es sind nur # Plätze}} frei. Wähle weniger Personen aus.",
+      "invitations_withheld": "{count, plural, one {# weitere Person mit grüner Bewertung wird} other {# weitere Personen mit grüner Bewertung werden}} nicht eingeladen, weil keine Plätze mehr frei sind. Personen auf der Warteliste werden zuerst eingeladen, danach frühere Bewerbungen; die anderen behalten ihren Status.",
       "course_full_no_invitations": "Der Kurs hat keine freien Plätze mehr, deshalb kann niemand mit grüner Bewertung eingeladen werden.",
       "course_full_error": "Die Einladungen wurden nicht verschickt, weil der Kurs nicht genug freie Plätze hat. Lade die Seite neu und versuche es noch einmal.",
       "decisions_queued": "{invited} eingeladen, {rejected} abgelehnt; die Teilnehmenden werden per E-Mail informiert.",
@@ -1875,6 +1919,9 @@
     "application_status_tooltip": "Klicke auf die Kreise, um die Bewertung zu ändern",
     "application_deadline_tooltip": "Wenn du das Datum für die Bestätigungsfrist ändern möchtest, kannst du die Einladung erneut senden.",
     "application_details": {
+      "confirm_from_waitlist": "Teilnahme bestätigen",
+      "invite_single": "Jetzt einladen",
+      "waitlist_position": "Platz {position} auf der Warteliste",
       "contact": "Kontakt",
       "applied_on": "Beworben am {date}",
       "registered_on": "Angemeldet am {date}",
@@ -2367,6 +2414,7 @@
     "headline": "Programme",
     "table_header": {
       "published": "Veröffent- licht",
+      "organization": "Organisation",
       "application_start": "Anmelde- beginn",
       "application_end": "Anmelde- schluss",
       "course_start": "Kursstart",
@@ -2511,7 +2559,7 @@
     "occupation": "Beschäftigung",
     "organization": "Organisation",
     "matriculation_number": "Matrikelnummer",
-    "deletion_confirmation_question": "Bist du sicher, dass du den Account von {firstName} {lastName} löschen möchtest? Die folgenden Schritte werden ausgeführt:\n\n1. Löschung des Benutzerkontos aus dem Authentifizierungssystem\n2. Anonymisierung aller persönlichen Daten\n3. Löschung des Profilbildes\n4. Löschung der Motivationsbriefe\n5. Ersetzung der Zertifikate mit anonymisierten Versionen\n\nDieser Vorgang kann nicht rückgängig gemacht werden. Möchtest du mit der Löschung des Benutzerkontos von {firstName} {lastName} fortfahren?",
+    "deletion_confirmation_question": "Bist du sicher, dass du den Account von {firstName} {lastName} löschen möchtest? Die folgenden Schritte werden ausgeführt:\n\n1. Löschung des Benutzerkontos aus dem Authentifizierungssystem\n2. Anonymisierung aller persönlichen Daten\n3. Löschung des Profilbildes\n4. Löschung der Motivationsbriefe\n5. Unwiderrufliche Löschung aller Zertifikate\n\nDieser Vorgang kann nicht rückgängig gemacht werden. Möchtest du mit der Löschung des Benutzerkontos von {firstName} {lastName} fortfahren?",
     "anonymization": {
       "ANONYMIZATION_SUCCESS": "Benutzerdaten wurden erfolgreich anonymisiert",
       "ANONYMIZATION_PARTIAL_SUCCESS": "Benutzerdaten wurden teilweise anonymisiert",
@@ -2525,7 +2573,7 @@
       "user_data_anonymization": "Anonymisierung der Benutzerdaten",
       "motivation_letter_anonymization": "Anonymisierung der Motivationsbriefe",
       "profile_picture_removal": "Entfernung des Profilbilds",
-      "certificate_anonymization": "Anonymisierung der Zertifikate"
+      "certificate_anonymization": "Löschung der Zertifikate"
     },
     "manage_admins": "Admin-Benutzer verwalten",
     "create_user": {
@@ -3235,6 +3283,10 @@
       "ENROLLMENT_CANCELLED": "Anmeldung storniert",
       "ENROLLMENT_ABORTED": "Teilnahme abgebrochen",
       "WAITLIST_PROMOTED": "Platz von der Warteliste",
+      "WAITLIST_CONFIRMED": "Platz von der Warteliste (bestätigt)",
+      "WAITLIST_PROMOTED_PAYMENT": "Platz von der Warteliste (Zahlung)",
+      "INVITATION_EXPIRING_SOON_PAYMENT": "Einladung läuft ab (Zahlung)",
+      "INVITATION_DECLINED_ORGANIZER": "Einladung abgelehnt (an Organisator:innen)",
       "INVITATION_EXPIRING_SOON": "Einladung läuft ab",
       "INVITATION_EXPIRED": "Einladung abgelaufen",
       "PROJECT_JOIN_REQUESTED": "Projekt-Beitrittsanfrage",
@@ -3293,6 +3345,10 @@
       "ENROLLMENT_CANCELLED": "Gesendet, wenn eine Anmeldung storniert wird",
       "ENROLLMENT_ABORTED": "Gesendet, wenn eine Teilnahme ohne Abschluss beendet wird",
       "WAITLIST_PROMOTED": "Gesendet, wenn eine Person von der Warteliste einen Kursplatz erhält",
+      "WAITLIST_CONFIRMED": "Gesendet, wenn eine Person auf einer Veranstaltung mit Direktanmeldung von der Warteliste nachrückt und ihre Teilnahme direkt bestätigt ist",
+      "WAITLIST_PROMOTED_PAYMENT": "Gesendet, wenn eine Person auf einer kostenpflichtigen Veranstaltung eingeladen wird und den Platz bis zur Frist bezahlen kann",
+      "INVITATION_EXPIRING_SOON_PAYMENT": "Gesendet am letzten Tag einer noch nicht bezahlten Einladung zu einer kostenpflichtigen Veranstaltung",
+      "INVITATION_DECLINED_ORGANIZER": "Gesendet an die Organisator:innen, wenn eine eingeladene Person ihren Platz ablehnt",
       "INVITATION_EXPIRING_SOON": "Gesendet 24 Stunden, bevor eine Kurseinladung abläuft",
       "INVITATION_EXPIRED": "Gesendet, wenn eine Kurseinladung ungenutzt abgelaufen ist",
       "PROJECT_JOIN_REQUESTED": "Gesendet an das Projektteam, wenn jemand dem Projekt beitreten möchte",

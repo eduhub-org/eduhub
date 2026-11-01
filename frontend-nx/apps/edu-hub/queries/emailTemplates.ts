@@ -132,3 +132,12 @@ export const GET_COURSE_TEMPLATES_COUNT = gql`
     }
   }
 `;
+/** Template types a course has its own copy of; every other type uses the default. */
+export const COURSE_MAIL_TEMPLATE_TYPES = gql`
+  query CourseMailTemplateTypes($courseId: Int!) {
+    MailTemplate(where: { courseId: { _eq: $courseId } }) {
+      id
+      type
+    }
+  }
+`;

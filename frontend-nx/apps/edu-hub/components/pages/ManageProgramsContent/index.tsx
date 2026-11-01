@@ -27,7 +27,8 @@ import {
 import { InsertProgram, InsertProgramVariables } from '../../../queries/__generated__/InsertProgram';
 
 import TableGrid from '../../common/TableGrid';
-import { useTableGrid } from '../../common/TableGrid/hooks';
+import { usePersistedPageSize, useTableGrid } from '../../common/TableGrid/hooks';
+import { TableGridSortMapping } from '../../common/TableGrid/types';
 import { createMultiWordSearchCondition } from '../../common/TableGrid/utils';
 import InputField from '../../inputs/InputField';
 import DatePicker from '../../inputs/DatePicker';
@@ -51,9 +52,10 @@ export const ManageProgramsContent: FC<ManageProgramsContentProps> = ({ inSettin
   const manageRole = useManageRole();
   const orgWhere = useManageProgramWhere();
 
+  const [pageSize, setPageSize] = usePersistedPageSize('managePrograms', QUERY_LIMIT);
+
   // Filter state management
   const [filter] = useState({
-    limit: QUERY_LIMIT,
     order_by: [{ id: order_by.desc }],
   });
 
@@ -62,13 +64,15 @@ export const ManageProgramsContent: FC<ManageProgramsContentProps> = ({ inSettin
     queryHook: useManageQuery,
     query: PROGRAM_LIST,
     queryVariables: filter,
-    pageSize: filter.limit || QUERY_LIMIT,
+    pageSize,
     debounceMs: 1000,
     defaultSort: [{ id: order_by.desc }],
     sortColumnMapper: (columnId) => {
       // Map table column IDs to GraphQL field names
-      const mapping: Record<string, string> = {
+      const mapping: Record<string, TableGridSortMapping> = {
         'title': 'title',
+        // id breaks ties between programs of the same organization so offset paging stays stable.
+        'organization': [{ Organization: { name: null } }, 'id'],
         'applicationStart': 'applicationStart',
         'applicationEnd': 'defaultApplicationEnd',
         'lectureStart': 'lectureStart',
@@ -80,7 +84,7 @@ export const ManageProgramsContent: FC<ManageProgramsContentProps> = ({ inSettin
     },
     refetchFilter: useCallback(
       (searchTerm: string) => {
-        const searchCondition = createMultiWordSearchCondition(searchTerm, ['title']);
+        const searchCondition = createMultiWordSearchCondition(searchTerm, ['title', 'Organization.name']);
         const hasOrgScope = Object.keys(orgWhere).length > 0;
         return {
           where: hasOrgScope ? { _and: [orgWhere, searchCondition] } : searchCondition,
@@ -192,7 +196,7 @@ export const ManageProgramsContent: FC<ManageProgramsContentProps> = ({ inSettin
   ];
 
   // Define columns with sizes that fit within screen width
-  // Total column width: 70 + 280 + 130*5 = 1000px (plus gaps and action buttons ≈ 1150px)
+  // Total column width: 70 + 240 + 160 + 130*5 = 1120px (plus gaps and action buttons ≈ 1270px)
   const columns = useMemo<ColumnDef<ProgramList_Program>[]>(
     () => [
       {
@@ -213,7 +217,7 @@ export const ManageProgramsContent: FC<ManageProgramsContentProps> = ({ inSettin
       {
         header: t('title.label'),
         accessorKey: 'title',
-        size: 280,
+        size: 240,
         minSize: 200,
         enableSorting: true,
         cell: ({ row }) => (
@@ -230,6 +234,14 @@ export const ManageProgramsContent: FC<ManageProgramsContentProps> = ({ inSettin
             />
           </div>
         ),
+      },
+      {
+        header: t('table_header.organization'),
+        id: 'organization',
+        accessorFn: (program) => program.Organization?.name ?? '',
+        size: 160,
+        enableSorting: true,
+        cell: ({ row }) => <span className="text-sm">{row.original.Organization?.name ?? '–'}</span>,
       },
       {
         header: t('table_header.application_start'),
@@ -354,11 +366,11 @@ export const ManageProgramsContent: FC<ManageProgramsContentProps> = ({ inSettin
   );
 
   const handlePageSizeChange = useCallback(
-    () => {
-      // Page size change handled by useTableGrid
+    (newPageSize: number) => {
+      setPageSize(newPageSize);
       setPageIndex(0);
     },
-    [setPageIndex]
+    [setPageSize, setPageIndex]
   );
 
   if (initialLoading) {
@@ -375,7 +387,7 @@ export const ManageProgramsContent: FC<ManageProgramsContentProps> = ({ inSettin
         totalCount={totalCount}
         pageIndex={pageIndex}
         onPageChange={setPageIndex}
-        pageSize={filter.limit || QUERY_LIMIT}
+        pageSize={pageSize}
         onPageSizeChange={handlePageSizeChange}
         searchFilter={searchFilter}
         onSearchFilterChange={setSearchFilter}

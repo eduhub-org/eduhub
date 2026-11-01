@@ -2,7 +2,7 @@ import { FC, ReactNode, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { Tooltip } from '@mui/material';
 import { HelpOutline } from '@mui/icons-material';
-import { MdArrowDownward, MdCalendarToday, MdMailOutline, MdOutlineBusiness } from 'react-icons/md';
+import { MdArrowDownward, MdCalendarToday, MdHourglassEmpty, MdMailOutline, MdOutlineBusiness } from 'react-icons/md';
 
 import Dot, { DotColor } from '../../../common/Dot';
 import { EnrollmentHistory } from '../../../common/EnrollmentHistory';
@@ -48,6 +48,14 @@ interface Props extends Omit<ExpandedRowProps<ApplicationEnrollment>, 'row'> {
   onRate: (rating: MotivationRating_enum) => void;
   /** Sends the invitation again with a new deadline; omitted when it cannot be renewed. */
   onRenewInvitation?: () => void;
+  /**
+   * Gives this person a place: invites them on an application course, confirms them from the
+   * waitlist on a direct-registration one. Omitted when it does not apply.
+   */
+  onPromote?: () => void;
+  promoteLabelKey?: string;
+  /** 1-based place on the waitlist, for people on it. */
+  waitlistPosition?: number;
   isInvitationExpired?: boolean;
   displayDate: (date: string | null) => string;
 }
@@ -63,6 +71,9 @@ export const ApplicationDetails: FC<Props> = ({
   surveyUrl,
   onRate,
   onRenewInvitation,
+  onPromote,
+  promoteLabelKey,
+  waitlistPosition,
   isInvitationExpired = false,
   displayDate,
   isActive,
@@ -94,6 +105,26 @@ export const ApplicationDetails: FC<Props> = ({
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [isActive, hasRating, onRate, expandNext, expandPrevious]);
 
+  const promotion = (onPromote || waitlistPosition != null) && (
+    <div className="space-y-2 text-sm">
+      {waitlistPosition != null && (
+        <div className="flex items-center gap-2 font-medium">
+          <MdHourglassEmpty className="flex-shrink-0 text-label-secondary" />
+          {t('application_details.waitlist_position', { position: waitlistPosition })}
+        </div>
+      )}
+      {onPromote && promoteLabelKey && (
+        <button
+          type="button"
+          onClick={onPromote}
+          className="flex min-h-11 w-full items-center justify-center rounded-lg border border-label-primary bg-label-primary px-3 text-sm font-semibold text-fill-primary hover:opacity-90"
+        >
+          {t(promoteLabelKey)}
+        </button>
+      )}
+    </div>
+  );
+
   const contact = (
     <div className={`min-w-0 space-y-2 text-sm ${sideHasRating ? 'lg:border-t lg:border-table-divider lg:pt-5' : ''}`}>
       <SectionHeading>{t('application_details.contact')}</SectionHeading>
@@ -119,6 +150,8 @@ export const ApplicationDetails: FC<Props> = ({
           </span>
         </div>
       )}
+      {/* Without a rating panel the way in sits with the person's details. */}
+      {!hasRating && promotion && <div className="pt-2">{promotion}</div>}
     </div>
   );
 
@@ -203,6 +236,7 @@ export const ApplicationDetails: FC<Props> = ({
               );
             })}
           </div>
+          {promotion}
           {(enrollment.status === 'INVITED' || enrollment.status === 'EXPIRED') && (
             <div className="text-sm">
               <div className="mb-1 flex items-center gap-1 font-medium">

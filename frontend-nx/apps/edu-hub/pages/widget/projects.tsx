@@ -35,9 +35,9 @@ const WidgetProjects: FC = () => {
 
   const { data: projectsData, loading: projectsLoading, error: projectsError } = useQuery<
     HomeProjectTilesAll | HomeProjectTilesByOrganizationResult
-  >(organizationId ? HOME_PROJECT_TILES_BY_ORGANIZATION : HOME_PROJECT_TILES_ALL, {
+  >(organizationId != null ? HOME_PROJECT_TILES_BY_ORGANIZATION : HOME_PROJECT_TILES_ALL, {
     client,
-    variables: organizationId ? { organizationId, limit: 24, offset: 0 } : { limit: 24, offset: 0 },
+    variables: organizationId != null ? { organizationId, limit: 24, offset: 0 } : { limit: 24, offset: 0 },
     skip: apiKeyValidating || !router.isReady,
     fetchPolicy: 'network-only',
     context: WIDGET_ANONYMOUS_CONTEXT,

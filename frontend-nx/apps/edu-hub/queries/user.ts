@@ -31,6 +31,7 @@ export const USER = gql`
   query User($userId: uuid!) {
     User_by_pk(id: $userId) {
       id
+      email
       firstName
       lastName
       matriculationNumber
@@ -197,6 +198,15 @@ export const USER_SELECTION_WITH_FILTER = gql`
     ) {
       ...UserFragment
       updated_at
+    }
+  }
+`;
+
+export const DELETE_MY_ACCOUNT = gql`
+  mutation DeleteMyAccount {
+    deleteMyAccount {
+      messageKey
+      error
     }
   }
 `;

@@ -20,8 +20,9 @@ const DeleteButtonShell: FC<{
   disabled: boolean;
   /** Returns an error message to display, or null when the deletion succeeded. */
   onConfirm: () => Promise<string | null>;
+  onDeleted?: () => void;
   label?: string;
-}> = ({ deletionConfirmationQuestion, disabled, onConfirm, label }) => {
+}> = ({ deletionConfirmationQuestion, disabled, onConfirm, onDeleted, label }) => {
   const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const t = useTranslations('common');
@@ -33,7 +34,9 @@ const DeleteButtonShell: FC<{
   const handleConfirmationClose = async (confirmed: boolean) => {
     setIsConfirmationOpen(false);
     if (confirmed) {
-      setErrorMessage(await onConfirm());
+      const error = await onConfirm();
+      setErrorMessage(error);
+      if (!error) onDeleted?.();
     }
   };
 
@@ -93,6 +96,7 @@ const MutationDeleteButton = ({
   deleteVariableName = 'id',
   disabled = false,
   validateDeleteResult,
+  onDeleted,
   label,
 }: TableGridDeleteButtonProps & { deleteMutation: NonNullable<TableGridDeleteButtonProps['deleteMutation']> }) => {
   const t = useTranslations('common');
@@ -149,6 +153,7 @@ const MutationDeleteButton = ({
       deletionConfirmationQuestion={deletionConfirmationQuestion}
       disabled={disabled}
       onConfirm={performDelete}
+      onDeleted={onDeleted}
       label={label}
     />
   );
@@ -159,6 +164,7 @@ const CallbackDeleteButton = ({
   deletionConfirmationQuestion,
   disabled = false,
   onDelete,
+  onDeleted,
   label,
 }: TableGridDeleteButtonProps & { onDelete: NonNullable<TableGridDeleteButtonProps['onDelete']> }) => {
   const t = useTranslations('common');
@@ -180,6 +186,7 @@ const CallbackDeleteButton = ({
       deletionConfirmationQuestion={deletionConfirmationQuestion}
       disabled={disabled}
       onConfirm={performDelete}
+      onDeleted={onDeleted}
       label={label}
     />
   );

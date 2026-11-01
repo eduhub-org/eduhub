@@ -11,7 +11,7 @@ import type {
 } from '../../../../queries/__generated__/DegreeParticipantsWithDegreeEnrollments';
 import { DEGREE_PARTICIPANTS_WITH_DEGREE_ENROLLMENTS } from '../../../../queries/courseDegree';
 import { CertificateDownload } from '../../../common/CertificateDownload';
-import { useTableGrid } from '../../../common/TableGrid/hooks';
+import { usePersistedPageSize, useTableGrid } from '../../../common/TableGrid/hooks';
 import { createMultiWordSearchCondition } from '../../../common/TableGrid/utils';
 import { useRoleMutation } from '../../../../hooks/authedMutation';
 import { CREATE_CERTIFICATES } from '../../../../queries/actions';
@@ -121,7 +121,7 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
   const tCommon = useTranslations('common');
   const locale = useLocale();
 
-  const [pageSize, setPageSize] = useState(20);
+  const [pageSize, setPageSize] = usePersistedPageSize('manageCourse.degreeParticipations', 20);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [bulkActionError, setBulkActionError] = useState<string | null>(null);

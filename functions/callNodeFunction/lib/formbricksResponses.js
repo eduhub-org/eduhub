@@ -200,8 +200,11 @@ export function toStoredQuestionnaireResponse({ survey, surveyUrl }, formattedRe
 
 const UPDATE_QUESTIONNAIRE_RESPONSE = `
   mutation UpdateEnrollmentQuestionnaireResponse($id: Int!, $questionnaireResponse: jsonb!) {
-    update_CourseEnrollment_by_pk(pk_columns: { id: $id }, _set: { questionnaireResponse: $questionnaireResponse }) {
-      id
+    update_CourseEnrollment(
+      where: { id: { _eq: $id }, User: { status: { _neq: DELETED } } }
+      _set: { questionnaireResponse: $questionnaireResponse }
+    ) {
+      affected_rows
     }
   }
 `;

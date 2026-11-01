@@ -7,23 +7,51 @@ import { useRoleQuery } from '../../../../hooks/authedQuery';
 import { useRoleMutation } from '../../../../hooks/authedMutation';
 import { USER_LIST } from '../../../../queries/user';
 import { UpdateEnrollment, UpdateEnrollmentVariables } from '../../../../queries/__generated__/UpdateEnrollment';
-import { UPDATE_ENROLLMENT } from '../../../../queries/insertEnrollment';
-import { CourseEnrollmentStatus_enum } from '../../../../__generated__/globalTypes';
+import { COURSE_ENROLLMENT_STATUSES_OF_USERS, UPDATE_ENROLLMENT } from '../../../../queries/insertEnrollment';
+import {
+  CourseEnrollmentStatusesOfUsers,
+  CourseEnrollmentStatusesOfUsersVariables,
+} from '../../../../queries/__generated__/CourseEnrollmentStatusesOfUsers';
+import {
+  CourseEnrollmentStatus_enum,
+  CourseRegistrationType_enum,
+  MailTemplateType_enum,
+} from '../../../../__generated__/globalTypes';
+import { MdWarningAmber } from 'react-icons/md';
+import { StatusChangeEmailNotice } from '../../../common/StatusChangeEmailNotice';
+import { enrollmentStatusMailTemplate } from '../../../../helpers/enrollmentStatusEmail';
 
 interface AddParticipantsFormProps {
   courseId: number;
+  registrationType: CourseRegistrationType_enum | null;
   hasApplicationProcess: boolean;
   hasCourseStarted: boolean;
+  /** Places still free, null without a limit. Organizers may add beyond it; the form warns. */
+  freePlaces: number | null;
+  takenPlaces: number;
+  maxParticipants: number | null;
   onSubmit: () => void;
 }
 
+/** Statuses that hold a place in the course. */
+const PLACE_TAKING_STATUSES: string[] = [
+  CourseEnrollmentStatus_enum.CONFIRMED,
+  CourseEnrollmentStatus_enum.INVITED,
+  CourseEnrollmentStatus_enum.REGISTERED,
+];
+
 export const AddParticipantsForm: FC<AddParticipantsFormProps> = ({
   courseId,
+  registrationType,
   hasApplicationProcess,
   hasCourseStarted,
+  freePlaces,
+  takenPlaces,
+  maxParticipants,
   onSubmit,
 }) => {
   const t = useTranslations('manageCourse');
+  const tCommon = useTranslations('common');
 
   // Once a course/event has started, "aborted" ("Teilnahme abgebrochen") is the meaningful
   // status for someone dropping out; beforehand it's "cancelled" ("Registrierung storniert").
@@ -73,6 +101,52 @@ export const AddParticipantsForm: FC<AddParticipantsFormProps> = ({
     { value: dropoutStatus, label: dropoutLabel },
   ];
 
+  // Someone selected may already be enrolled: that decides which email the change sends (from
+  // the waitlist it is WAITLIST_CONFIRMED) and whether it takes a new place at all.
+  const { data: currentEnrollments, error: currentEnrollmentsError } = useRoleQuery<
+    CourseEnrollmentStatusesOfUsers,
+    CourseEnrollmentStatusesOfUsersVariables
+  >(COURSE_ENROLLMENT_STATUSES_OF_USERS, {
+    variables: { courseId, userIds: selectedUserIds.map((user) => user.id) },
+    skip: selectedUserIds.length === 0,
+    // Statuses change under us (other organizers, our own last submit): never trust the cache.
+    fetchPolicy: 'network-only',
+  });
+  // Until the lookup has answered, nobody's status is known: no preview rather than a wrong one,
+  // and no submit either, so nobody is confirmed without seeing the email and overbooking notes.
+  const statusesKnown = selectedUserIds.length > 0 && !!currentEnrollments && !currentEnrollmentsError;
+  const waitingForStatuses = selectedUserIds.length > 0 && !statusesKnown;
+  const currentStatusOf = useMemo(
+    () => new Map((currentEnrollments?.CourseEnrollment ?? []).map((e) => [e.userId, e.status as string])),
+    [currentEnrollments]
+  );
+
+  // An unchanged status triggers no email.
+  const emails = useMemo(() => {
+    const countByTemplate = new Map<MailTemplateType_enum | null, number>();
+    for (const user of selectedUserIds) {
+      const oldStatus = currentStatusOf.get(user.id) ?? null;
+      const template =
+        oldStatus === selectedStatus
+          ? null
+          : enrollmentStatusMailTemplate({ oldStatus, newStatus: selectedStatus, registrationType });
+      countByTemplate.set(template, (countByTemplate.get(template) ?? 0) + 1);
+    }
+    return [...countByTemplate].map(([template, count]) => ({ template, count }));
+  }, [selectedUserIds, currentStatusOf, selectedStatus, registrationType]);
+
+  // Adding people beyond the free places is allowed; the form only warns. People who already
+  // hold a place take no new one.
+  const newPlaces = PLACE_TAKING_STATUSES.includes(selectedStatus)
+    ? selectedUserIds.filter((user) => !PLACE_TAKING_STATUSES.includes(currentStatusOf.get(user.id) ?? '')).length
+    : 0;
+  const overbooking = freePlaces != null ? Math.max(0, newPlaces - freePlaces) : 0;
+
+  // An organizer's override: someone confirmed here takes part without the checkout.
+  const isPaidRegistration =
+    registrationType === CourseRegistrationType_enum.DIRECT_CONFIRMATION_AND_PAYMENT ||
+    registrationType === CourseRegistrationType_enum.DIRECT_WITH_INPUT_AND_PAYMENT;
+
   // Event handlers
   const handleUserSelection = (newUserIds: { id: string; name: string }[]) => setSelectedUserIds(newUserIds);
   const handleStatusSelection = (newValue: string) => setSelectedStatus(newValue as CourseEnrollmentStatus_enum);
@@ -117,7 +191,7 @@ export const AddParticipantsForm: FC<AddParticipantsFormProps> = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white shadow-lg rounded-lg p-6 w-[400px] h-[400px]">
+    <form onSubmit={handleSubmit} className="bg-white shadow-lg rounded-lg p-6 w-[400px] min-h-[400px]">
       <TagSelector
         variant="material"
         label={t('selected_users')}
@@ -138,10 +212,27 @@ export const AddParticipantsForm: FC<AddParticipantsFormProps> = ({
         onSelectedValueChange={handleStatusSelection}
         refetchQueries={[]}
       />
+      {isPaidRegistration && selectedStatus === CourseEnrollmentStatus_enum.CONFIRMED && (
+        <p className="mt-4 text-sm text-label-secondary">{t('add_paid_no_payment_hint')}</p>
+      )}
+      {statusesKnown && overbooking > 0 && maxParticipants != null && (
+        <p className="mt-4 flex items-start gap-2 text-sm text-warning" role="alert">
+          <MdWarningAmber className="mt-0.5 flex-shrink-0" aria-hidden="true" />
+          {t('bulk_actions.overbook_warning', {
+            count: overbooking,
+            taken: takenPlaces + newPlaces,
+            max: maxParticipants,
+          })}
+        </p>
+      )}
+      {statusesKnown && <StatusChangeEmailNotice courseId={courseId} emails={emails} />}
+      {currentEnrollmentsError && (
+        <div className="text-red-500 mt-4">{tCommon('status_email.lookup_failed')}</div>
+      )}
       {userSelectionError && <div className="text-red-500 mt-4">{userSelectionError}</div>}
 
       <div className="flex justify-center my-8">
-        <Button filled type="submit">
+        <Button filled type="submit" disabled={waitingForStatuses}>
           {t('submit')}
         </Button>
       </div>

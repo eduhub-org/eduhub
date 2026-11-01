@@ -51,7 +51,8 @@ export const useWidgetApiKey = (
 
         if (cancelled) return;
 
-        if (data.valid && data.organizationId) {
+        // Checked against null: the default organization has id 0.
+        if (data.valid && data.organizationId != null) {
           setOrganizationId(data.organizationId);
         } else {
           setError(data.error || 'Invalid API key');

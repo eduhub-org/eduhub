@@ -36,7 +36,7 @@ import { DELETE_A_COURSE } from '../../../queries/mutateCourse';
 
 import TableGrid from '../../common/TableGrid';
 import Loading from '../../common/Loading';
-import { useDeferredBulkAction, useTableGrid } from '../../common/TableGrid/hooks';
+import { useDeferredBulkAction, usePersistedPageSize, useTableGrid } from '../../common/TableGrid/hooks';
 import { createMultiWordSearchCondition } from '../../common/TableGrid/utils';
 import { useManageQuery } from '../../../hooks/authedQuery';
 import { useManageRole } from '../../../hooks/authentication';
@@ -179,9 +179,11 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
     return (preferredRegularProgram ?? sortedPrograms[0]).id;
   }, [sortedPrograms]);
 
+  const [persistedPageSize, setPersistedPageSize] = usePersistedPageSize('manageCourses', 100);
+
   // Filter state management (single source of truth)
   const [filter, setFilter] = useState<AdminCourseListVariables>({
-    limit: 100,
+    limit: persistedPageSize,
     where: {
       ...programTypeWhere,
       programId: { _eq: defaultProgramId },
@@ -234,7 +236,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
   }, []);
 
   // Use TableGrid hook with proper refetchFilter for search debouncing
-  const { data, loading, initialLoading, error, refetch, searchFilter, pageIndex, sorting, setSearchFilter, setPageIndex, setSorting } = useTableGrid({
+  const { data, loading, initialLoading, error, refetch, searchFilter, pageIndex, sorting, setSearchFilter, setPageIndex, setSorting, fetchAllRows } = useTableGrid({
     queryHook: useManageQuery,
     query: ADMIN_COURSE_LIST,
     queryVariables: filter,
@@ -279,6 +281,11 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
 
   const courses: AdminCourseList_Course[] = useMemo(() => data?.Course || [], [data?.Course]);
   const totalCount = data?.Course_aggregate?.aggregate?.count || 0;
+
+  const loadAllCourses = useCallback(async (): Promise<AdminCourseList_Course[]> => {
+    const allData = await fetchAllRows(totalCount);
+    return allData?.Course ?? [];
+  }, [fetchAllRows, totalCount]);
 
   // Fetch template counts for visible courses using parallel queries hook
   const courseIds = useMemo(() => courses.map((course) => course.id), [courses]);
@@ -1012,6 +1019,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
 
   const handlePageSizeChange = useCallback(
     (newPageSize: number) => {
+      setPersistedPageSize(newPageSize);
       // Update the filter with new page size (useTableGrid handles offset)
       updateFilter({
         ...filter,
@@ -1019,7 +1027,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
       });
       setPageIndex(0);
     },
-    [filter, updateFilter, setPageIndex]
+    [filter, updateFilter, setPageIndex, setPersistedPageSize]
   );
 
   const settingsProgramId = currentProgramId === allTabId ? null : currentProgramId;
@@ -1090,6 +1098,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
           refetchQueries={['AdminCourseList']}
           bulkActions={bulkActions}
           onBulkAction={handleBulkAction}
+          loadAllRows={loadAllCourses}
           onAddButtonClick={handleAddCourse}
           addButtonDisabledHint={addDisabledHint}
           addButtonText={addButtonText}

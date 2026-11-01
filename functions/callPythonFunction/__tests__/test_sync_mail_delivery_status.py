@@ -247,17 +247,20 @@ class TestResolveBegin:
         assert timedelta(hours=71, minutes=55) < age < timedelta(hours=72, minutes=5)
         assert description == "lookback=72.0h"
 
-    def test_explicit_begin_is_used_verbatim(self):
-        begin, description = resolve_begin({"begin": "2026-09-05T00:00:00Z"})
+    # A start inside the lookback cap; a fixed date would drift out of it and be clamped.
+    RECENT = (datetime.now(timezone.utc) - timedelta(days=5)).replace(hour=0, minute=0, second=0, microsecond=0)
 
-        assert begin == datetime(2026, 9, 5, tzinfo=timezone.utc)
-        assert "2026-09-05" in description
+    def test_explicit_begin_is_used_verbatim(self):
+        begin, description = resolve_begin({"begin": self.RECENT.strftime("%Y-%m-%dT%H:%M:%SZ")})
+
+        assert begin == self.RECENT
+        assert self.RECENT.date().isoformat() in description
 
     def test_a_naive_begin_is_read_as_utc(self):
-        begin, _ = resolve_begin({"begin": "2026-09-05T00:00:00"})
+        begin, _ = resolve_begin({"begin": self.RECENT.strftime("%Y-%m-%dT%H:%M:%S")})
 
         assert begin.tzinfo is not None
-        assert begin == datetime(2026, 9, 5, tzinfo=timezone.utc)
+        assert begin == self.RECENT
 
     def test_an_ancient_begin_is_clamped_rather_than_walking_all_history(self):
         begin, _ = resolve_begin({"begin": "2019-01-01T00:00:00Z"})

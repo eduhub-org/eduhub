@@ -11,6 +11,13 @@ try {
   ({ mergeUserPutPayload } = require("../shared_libs/node/keycloakUserMerge.cjs"));
 }
 
+let computeMatrixHandle;
+try {
+  ({ computeMatrixHandle } = require("./shared_libs/node/matrixHandle.cjs"));
+} catch {
+  ({ computeMatrixHandle } = require("../shared_libs/node/matrixHandle.cjs"));
+}
+
 let secretsMatch;
 try {
   ({ secretsMatch } = require("./shared_libs/node/security.cjs"));
@@ -23,6 +30,7 @@ const FIND_USER = gql`
     User_by_pk(id: $id) {
       id
       firstName
+      status
       matrixUserHandle
     }
   }
@@ -60,8 +68,8 @@ const UPDATE_USER = gql`
     $email: String
     $matrixUserHandle: String
   ) {
-    update_User_by_pk(
-      pk_columns: { id: $id }
+    update_User(
+      where: { id: { _eq: $id }, status: { _neq: DELETED } }
       _set: {
         firstName: $firstname
         lastName: $lastname
@@ -69,20 +77,65 @@ const UPDATE_USER = gql`
         matrixUserHandle: $matrixUserHandle
       }
     ) {
+      affected_rows
+    }
+  }
+`;
+
+const FIND_EMAIL_HOLDERS = gql`
+  query ($email: String!, $id: uuid!) {
+    User(
+      where: {
+        email: { _eq: $email }
+        status: { _neq: GUEST }
+        id: { _neq: $id }
+      }
+    ) {
       id
     }
   }
 `;
 
-function computeMatrixHandle(firstName, lastName, userId) {
-  const sanitize = (input) => {
-    const normalized = input.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-    return normalized.toLowerCase().replace(/[^a-z0-9._\-]/g, '');
-  };
-  const first = sanitize(firstName || 'user');
-  const last = sanitize(lastName || 'user');
-  const uuidPrefix = (userId || '').replace(/-/g, '').substring(0, 6);
-  return `${first}.${last}.${uuidPrefix}`;
+const SET_USER_EMAIL = gql`
+  mutation ($id: uuid!, $email: String!) {
+    update_User(
+      where: { id: { _eq: $id }, status: { _neq: DELETED } }
+      _set: { email: $email }
+    ) {
+      affected_rows
+    }
+  }
+`;
+
+/**
+ * Frees `email` for the account `userid` when another non-guest User row
+ * still holds it only because that row is out of date.
+ *
+ * A row's email is copied from Keycloak only when its own account logs in. If
+ * an account's email is changed in Keycloak and someone then registers with
+ * the old address, the stale row blocks the new account's insert on
+ * User_email_non_guest_key, and that person is logged in without a User row.
+ * When the holder's Keycloak account now has a different email, the row is
+ * brought up to date. Any other holder (deleted Keycloak account, or the same
+ * email in Keycloak) is a real conflict and is left for an admin.
+ */
+async function releaseStaleEmail(client, kcAdminClient, email, userid) {
+  const { User: holders } = await client.request(FIND_EMAIL_HOLDERS, {
+    email,
+    id: userid,
+  });
+  for (const holder of holders) {
+    const holderAccount = await kcAdminClient.users.findOne({ id: holder.id });
+    const currentEmail = holderAccount?.email;
+    if (currentEmail && currentEmail !== email) {
+      const result = await client.request(SET_USER_EMAIL, { id: holder.id, email: currentEmail });
+      // The holder was deleted after the lookup; its anonymized row must keep its placeholder email.
+      if (result.update_User.affected_rows === 0) continue;
+      console.log(
+        `Released ${email} for user ${userid}: user ${holder.id} now has its Keycloak email`
+      );
+    }
+  }
 }
 
 export const updateFromKeycloak = async (req, res) => {
@@ -122,7 +175,14 @@ export const updateFromKeycloak = async (req, res) => {
       const response = await client.request(FIND_USER, { id: userid });
       findUserResponse = response.User_by_pk;
     } catch (error) {
+      // An unknown status could be a deleted account; never sync on a guess.
       console.error(error);
+      return res.status(500).json({ error: 'User lookup failed' });
+    }
+
+    // A still-valid token or a delayed login sync must never restore erased data.
+    if (findUserResponse?.status === 'DELETED') {
+      return res.status(403).json({ error: 'Account deleted' });
     }
 
     if (user != null) {
@@ -143,8 +203,16 @@ export const updateFromKeycloak = async (req, res) => {
         }
       }
 
-      if (!findUserResponse || (findUserResponse.length == 0)) {
+      if (user.email) {
         try {
+          await releaseStaleEmail(client, kcAdminClient, user.email, userid);
+        } catch (error) {
+          console.error(`Failed to check email holders for user ${userid}:`, error);
+        }
+      }
+
+      try {
+        if (!findUserResponse || (findUserResponse.length == 0)) {
           await client.request(INSERT_USER, {
             id: userid,
             firstname: user.firstName,
@@ -152,25 +220,30 @@ export const updateFromKeycloak = async (req, res) => {
             email: user.email,
             matrixUserHandle: matrixHandle,
           });
-        } catch (error) {
-          console.error(error);
-        }
-      } else {
-        // Only update matrixUserHandle if not already set in Hasura (immutable)
-        const existingHandle = findUserResponse.matrixUserHandle;
-        const handleToSet = existingHandle || matrixHandle;
+        } else {
+          // Only update matrixUserHandle if not already set in Hasura (immutable)
+          const existingHandle = findUserResponse.matrixUserHandle;
+          const handleToSet = existingHandle || matrixHandle;
 
-        try {
-          await client.request(UPDATE_USER, {
+          const response = await client.request(UPDATE_USER, {
             id: userid,
             firstname: user.firstName,
             lastname: user.lastName,
             email: user.email,
             matrixUserHandle: handleToSet,
           });
-        } catch (error) {
-          console.error(error);
+          // The account was deleted after the status check above.
+          if (response.update_User.affected_rows === 0) {
+            return res.status(403).json({ error: 'Account deleted' });
+          }
         }
+      } catch (error) {
+        // Reporting success here would leave the person logged in without a
+        // User row, so every later write (e.g. a course application) fails.
+        console.error(error);
+        return res.status(400).json({
+          message: `Could not sync user ${userid} from Keycloak`,
+        });
       }
 
       // Note: Instructor role is now automatically assigned via event trigger when

@@ -95,6 +95,19 @@ describe('CourseFacts participant numbers', () => {
     expect(placesShown()).not.toBeInTheDocument();
   });
 
+  it('does not offer places reserved for the waitlist', () => {
+    // 16 held, 3 waiting: 1 place is still open to newcomers.
+    render(<CourseFacts course={course({ showAvailablePlaces: true, waitlistCount: 3 })} />);
+
+    expect(placesShown()).toHaveTextContent('info.places_left:{"count":1}');
+  });
+
+  it('stops offering places when the waitlist takes up the rest', () => {
+    render(<CourseFacts course={course({ showAvailablePlaces: true, waitlistCount: 4 })} />);
+
+    expect(placesShown()).not.toBeInTheDocument();
+  });
+
   it('states the public count but measures places against held seats', () => {
     // 18 taken, 2 more invited but not yet accepted: 18 people are taking part,
     // and there are no places left to offer.

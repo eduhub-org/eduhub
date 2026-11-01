@@ -28,6 +28,7 @@ const GET_CANDIDATES = gql`
     CourseEnrollment(
       where: {
         isTest: { _eq: false }
+        User: { status: { _neq: DELETED } }
         created_at: { _gte: $after }
         _and: [$page]
         _or: [

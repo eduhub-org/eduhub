@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 
 import { Button } from '../../common/Button';
+import DeleteAccountSection from './DeleteAccountSection';
 import ImageUploader from '../../inputs/ImageUploader';
 
 import { useRoleQuery } from '../../../hooks/authedQuery';
@@ -443,6 +444,7 @@ const ProfileContent: FC = () => {
             {newsletterSaveError && <p className="mt-3 text-sm text-red-700">{newsletterSaveError}</p>}
           </div>
         )}
+        <DeleteAccountSection email={userData?.User_by_pk?.email ?? ''} />
       </>
     </div>
   );
