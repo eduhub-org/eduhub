@@ -29,6 +29,7 @@ const GET_COURSE = gql`
       registrationType
       maxParticipants
       activeParticipantCount
+      waitlistCount
       Program {
         published
         type
@@ -181,10 +182,12 @@ export default async function confirmGuestRegistration(
       };
     }
 
+    // Free places are reserved for the waitlist: the organizer moves those
+    // people up first (course_waitlist_count).
     if (
       course.maxParticipants != null &&
       course.activeParticipantCount != null &&
-      course.activeParticipantCount >= course.maxParticipants
+      course.activeParticipantCount + (course.waitlistCount ?? 0) >= course.maxParticipants
     ) {
       return { success: false, messageKey: 'COURSE_FULL' };
     }

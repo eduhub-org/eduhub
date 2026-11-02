@@ -1743,8 +1743,10 @@ export enum MailTemplateType_enum {
   GUEST_ALREADY_HAS_ACCOUNT = "GUEST_ALREADY_HAS_ACCOUNT",
   GUEST_REGISTRATION_CONFIRM = "GUEST_REGISTRATION_CONFIRM",
   INSTRUCTOR_CERTIFICATE_READY = "INSTRUCTOR_CERTIFICATE_READY",
+  INVITATION_DECLINED_ORGANIZER = "INVITATION_DECLINED_ORGANIZER",
   INVITATION_EXPIRED = "INVITATION_EXPIRED",
   INVITATION_EXPIRING_SOON = "INVITATION_EXPIRING_SOON",
+  INVITATION_EXPIRING_SOON_PAYMENT = "INVITATION_EXPIRING_SOON_PAYMENT",
   INVITE = "INVITE",
   JOB_ALERT = "JOB_ALERT",
   JOB_ORGANIZATION_ACCESS_REQUEST = "JOB_ORGANIZATION_ACCESS_REQUEST",
@@ -1771,8 +1773,10 @@ export enum MailTemplateType_enum {
   SESSION_RESCHEDULED = "SESSION_RESCHEDULED",
   SESSION_SPEAKER_ADDED = "SESSION_SPEAKER_ADDED",
   USER_CREATED = "USER_CREATED",
+  WAITLIST_CONFIRMED = "WAITLIST_CONFIRMED",
   WAITLIST_NOTICE = "WAITLIST_NOTICE",
   WAITLIST_PROMOTED = "WAITLIST_PROMOTED",
+  WAITLIST_PROMOTED_PAYMENT = "WAITLIST_PROMOTED_PAYMENT",
 }
 
 /**
@@ -10509,6 +10513,7 @@ export interface Organization_bool_exp {
   ghostNewsletterLabel?: String_comparison_exp | null;
   ghostNewsletterListId?: String_comparison_exp | null;
   ghostNewsletterSlug?: String_comparison_exp | null;
+  hasGhostNewsletterConfigured?: Boolean_comparison_exp | null;
   id?: Int_comparison_exp | null;
   invoiceFooterText?: String_comparison_exp | null;
   invoiceNumberPrefix?: String_comparison_exp | null;
@@ -10758,6 +10763,7 @@ export interface Organization_order_by {
   ghostNewsletterLabel?: order_by | null;
   ghostNewsletterListId?: order_by | null;
   ghostNewsletterSlug?: order_by | null;
+  hasGhostNewsletterConfigured?: order_by | null;
   id?: order_by | null;
   invoiceFooterText?: order_by | null;
   invoiceNumberPrefix?: order_by | null;

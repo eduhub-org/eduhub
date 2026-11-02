@@ -38,8 +38,7 @@ export const USER_PROGRAM_FRAGMENT = gql`
       newsletterProvider
       ghostNewsletterLabel
       ghostNewsletterDoubleOptInEnabled
-      ghostNewsletterListId
-      ghostNewsletterSlug
+      hasGhostNewsletterConfigured
     }
   }
 `;

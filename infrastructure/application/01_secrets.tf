@@ -311,6 +311,23 @@ resource "google_secret_manager_secret_version" "matrix_admin_access_token" {
   secret_data = var.matrix_admin_access_token
 }
 
+# ===== Matrix Synapse Admin Token (account deletion only) =====
+resource "google_secret_manager_secret" "matrix_synapse_admin_token" {
+  provider  = google-beta
+  secret_id = "matrix-synapse-admin-token"
+  replication {
+    auto {}
+  }
+}
+
+# Secret Manager rejects empty payloads, so the version only exists once the token is set.
+resource "google_secret_manager_secret_version" "matrix_synapse_admin_token" {
+  count       = var.matrix_synapse_admin_token != "" ? 1 : 0
+  provider    = google-beta
+  secret      = google_secret_manager_secret.matrix_synapse_admin_token.name
+  secret_data = var.matrix_synapse_admin_token
+}
+
 # =========================================================================================
 # IAM bindings for default compute engine service account
 # =========================================================================================

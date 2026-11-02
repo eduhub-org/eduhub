@@ -20,6 +20,10 @@ export interface User_User_by_pk {
   __typename: "User";
   id: any;
   /**
+   * The user's email address
+   */
+  email: string;
+  /**
    * The user's first name
    */
   firstName: string;

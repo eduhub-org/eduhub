@@ -30,7 +30,7 @@ export type { AddressMap, ResolvedLocation };
 
 /** Stable identity of a session's places, so two sessions can be compared. */
 export const locationsSignature = (locations: ResolvedLocation[]): string =>
-  locations.map((l) => `${l.key}|${l.locationOption ?? ''}|${l.displayAddress}`).join('||');
+  locations.map((l) => `${l.key}|${l.locationOption ?? ''}|${l.label ?? ''}|${l.displayAddress}`).join('||');
 
 /**
  * The LocationAddress rows referenced by these sessions, by id. Two callers

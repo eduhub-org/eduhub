@@ -172,7 +172,8 @@ const AddAdminDialog: FC<AddAdminDialogProps> = ({
     }
     // An admin is either given an organization role, super-admin rights, or both. Without an
     // organization the capability flags are meaningless, so they are simply ignored in that case.
-    if (!organizationId && !grantSuperAdmin) {
+    // Compared against null, not truthiness: the default organization has id 0.
+    if (organizationId == null && !grantSuperAdmin) {
       setValidationError(
         canGrantSuperAdmin ? t('add_admin_scope_required') : t('add_admin_organization_required')
       );
@@ -181,7 +182,7 @@ const AddAdminDialog: FC<AddAdminDialogProps> = ({
     // A grant with no capabilities still confers org-admin access in the permission model, so a
     // capability must be picked explicitly rather than silently creating a bare admin row.
     if (
-      organizationId &&
+      organizationId != null &&
       !canManageEvents &&
       !canManageCourses &&
       !canManageDegrees &&
@@ -194,7 +195,7 @@ const AddAdminDialog: FC<AddAdminDialogProps> = ({
     }
 
     try {
-      if (organizationId && !grantCreatedRef.current) {
+      if (organizationId != null && !grantCreatedRef.current) {
         const insertResult = await insertOrganizationAdmin({
           variables: {
             input: {
@@ -307,7 +308,7 @@ const AddAdminDialog: FC<AddAdminDialogProps> = ({
             variant="eduhub"
             label={t('organization')}
             placeholder={tCommon('organization_dialog.search_organizations')}
-            value={organizationId ? String(organizationId) : ''}
+            value={organizationId != null ? String(organizationId) : ''}
             options={organizationDropDownOptions}
             searchable
             // A super-admin may add someone as super-admin only, so the organization stays optional

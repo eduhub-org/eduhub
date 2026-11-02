@@ -13,6 +13,7 @@ interface DialogShellProps {
   actions?: ReactNode;
   maxWidth?: 'xs' | 'sm' | 'md' | 'lg';
   fullWidth?: boolean;
+  borderRadius?: string;
   ariaLabelledBy?: string;
   /** Covers the whole screen on phones, e.g. for dialogs holding an editor. */
   fullScreenOnMobile?: boolean;
@@ -26,6 +27,7 @@ export const DialogShell: React.FC<DialogShellProps> = ({
   actions,
   maxWidth = 'sm',
   fullWidth = true,
+  borderRadius,
   ariaLabelledBy,
   fullScreenOnMobile = false,
 }) => {
@@ -42,6 +44,7 @@ export const DialogShell: React.FC<DialogShellProps> = ({
       fullScreen={fullScreenOnMobile && isPhone}
       PaperProps={{
         sx: {
+          borderRadius: fullScreenOnMobile && isPhone ? 0 : borderRadius,
           maxHeight: fullScreenOnMobile && isPhone ? '100%' : '90vh',
           display: 'flex',
           flexDirection: 'column',

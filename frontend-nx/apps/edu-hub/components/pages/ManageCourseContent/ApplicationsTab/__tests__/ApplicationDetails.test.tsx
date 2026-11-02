@@ -4,7 +4,7 @@ import '@testing-library/jest-dom';
 
 import { ApplicationDetails } from '../ApplicationDetails';
 import { getRegistrationFeatures } from '../registrationConfig';
-import { CourseRegistrationType_enum, MotivationRating_enum } from '../../../../../__generated__/globalTypes';
+import { CourseEnrollmentStatus_enum, CourseRegistrationType_enum, MotivationRating_enum } from '../../../../../__generated__/globalTypes';
 
 jest.mock('next-intl', () => ({
   useTranslations: () => (key: string) => key,
@@ -108,5 +108,25 @@ describe('ApplicationDetails', () => {
       isInvitationExpired: true,
     } as Partial<React.ComponentProps<typeof ApplicationDetails>>);
     expect(screen.queryByRole('button', { name: 'application_details.reinvite' })).not.toBeInTheDocument();
+  });
+  it('invites a single applicant from the rating panel', () => {
+    const onPromote = jest.fn();
+    renderDetails({ onPromote, promoteLabelKey: 'application_details.invite_single' });
+    fireEvent.click(screen.getByRole('button', { name: 'application_details.invite_single' }));
+    expect(onPromote).toHaveBeenCalled();
+  });
+
+  it('confirms someone from the waitlist of a direct registration, with their place in line', () => {
+    const onPromote = jest.fn();
+    renderDetails({
+      enrollment: { ...enrollment, status: CourseEnrollmentStatus_enum.WAITLIST },
+      features: getRegistrationFeatures(CourseRegistrationType_enum.DIRECT_CONFIRMATION),
+      onPromote,
+      promoteLabelKey: 'application_details.confirm_from_waitlist',
+      waitlistPosition: 2,
+    });
+    expect(screen.getByText('application_details.waitlist_position')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'application_details.confirm_from_waitlist' }));
+    expect(onPromote).toHaveBeenCalled();
   });
 });

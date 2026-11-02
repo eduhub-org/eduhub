@@ -10,8 +10,8 @@ const rows: TestRow[] = [{ id: 1 }, { id: 2 }];
 
 const selectAllRows = (result: { current: ReturnType<typeof useBulkActions<TestRow>> }) => {
   act(() => {
-    result.current.toggleRowSelection(1);
-    result.current.toggleRowSelection(2);
+    result.current.toggleRowSelection({ id: 1 });
+    result.current.toggleRowSelection({ id: 2 });
   });
 };
 
@@ -70,7 +70,7 @@ describe('useBulkActions selection handling', () => {
     const { result } = renderHook(() => useBulkActions<TestRow>([], onBulkAction));
 
     act(() => {
-      result.current.toggleRowSelection(1);
+      result.current.toggleRowSelection({ id: 1 });
     });
 
     let pending: Promise<void> = Promise.resolve();
@@ -79,7 +79,7 @@ describe('useBulkActions selection handling', () => {
     });
 
     act(() => {
-      result.current.toggleRowSelection(2);
+      result.current.toggleRowSelection({ id: 2 });
     });
 
     await act(async () => {
@@ -125,7 +125,7 @@ describe('useBulkActions selection handling', () => {
     const { result } = renderHook(() => useBulkActions<TestRow>([], onBulkAction));
 
     act(() => {
-      result.current.toggleRowSelection(2);
+      result.current.toggleRowSelection({ id: 2 });
     });
 
     await act(async () => {
@@ -189,10 +189,67 @@ describe('useBulkActions select-all', () => {
     expect(result.current.isAllSelected(nextPage)).toBe(false);
     expect(result.current.isSomeSelected(nextPage)).toBe(false);
 
+    // Selecting a page adds to the selection of other pages; deselecting it only drops its rows.
     act(() => result.current.toggleAllRows(nextPage));
-    expect([...result.current.selectedRowIds].sort()).toEqual([3, 4]);
+    expect([...result.current.selectedRowIds].sort()).toEqual([1, 2, 3, 4]);
 
     act(() => result.current.toggleAllRows(nextPage));
+    expect([...result.current.selectedRowIds].sort()).toEqual([1, 2]);
+  });
+
+  it('adds rows loaded from all pages to the selection', () => {
+    const { result } = renderHook(() => useBulkActions<TestRow>([], jest.fn()));
+
+    act(() => result.current.toggleRowSelection({ id: 1 }));
+    act(() => result.current.selectRows([{ id: 1 }, { id: 2 }, { id: 3 }]));
+
+    expect([...result.current.selectedRowIds].sort()).toEqual([1, 2, 3]);
+  });
+
+  it('drops a deleted row from the selection', () => {
+    const { result } = renderHook(() => useBulkActions<TestRow>([], jest.fn()));
+
+    selectAllRows(result);
+    act(() => result.current.deselectRow(1));
+
+    expect(result.current.selectedRowIds).toEqual(new Set([2]));
+  });
+});
+
+describe('useBulkActions across pages', () => {
+  interface NamedRow {
+    id: number;
+    name: string;
+  }
+
+  it('runs the action on rows selected on other pages, too', async () => {
+    const onBulkAction = jest.fn().mockResolvedValue(undefined);
+    const { result } = renderHook(() => useBulkActions<NamedRow>([], onBulkAction));
+    const firstPage: NamedRow[] = [{ id: 1, name: 'a' }, { id: 2, name: 'b' }];
+    const secondPage: NamedRow[] = [{ id: 3, name: 'c' }];
+
+    act(() => result.current.toggleRowSelection(firstPage[0]));
+    act(() => result.current.toggleRowSelection(secondPage[0]));
+
+    // The action is started while the second page is shown.
+    await act(async () => {
+      await result.current.handleBulkActionChange('publish', secondPage);
+    });
+
+    expect(onBulkAction).toHaveBeenCalledWith('publish', [firstPage[0], secondPage[0]]);
     expect(result.current.selectedRowIds.size).toBe(0);
+  });
+
+  it('passes the current version of a selected row that is on the page', async () => {
+    const onBulkAction = jest.fn().mockResolvedValue(undefined);
+    const { result } = renderHook(() => useBulkActions<NamedRow>([], onBulkAction));
+
+    act(() => result.current.toggleRowSelection({ id: 1, name: 'before refetch' }));
+
+    await act(async () => {
+      await result.current.handleBulkActionChange('publish', [{ id: 1, name: 'after refetch' }]);
+    });
+
+    expect(onBulkAction).toHaveBeenCalledWith('publish', [{ id: 1, name: 'after refetch' }]);
   });
 });

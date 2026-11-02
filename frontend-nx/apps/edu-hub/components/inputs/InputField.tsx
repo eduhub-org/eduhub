@@ -9,6 +9,7 @@ import { useRoleMutation } from '../../hooks/authedMutation';
 import { useTranslations } from 'next-intl';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import InlineMarkdown from '../common/InlineMarkdown';
 import { prioritizeClasses, isLinkFormat, isECTSFormat } from '../../helpers/util';
 import { isEuroInputAllowed, parseEuroToCents } from '../../helpers/instructorPayment';
 import useErrorHandler from '../../hooks/useErrorHandler';
@@ -85,6 +86,13 @@ type InputFieldProps = {
    * @default 'textarea'
    */
   type?: 'input' | 'textarea' | 'markdown' | 'link' | 'email' | 'ects' | 'number' | 'decimal' | 'currency';
+
+  /**
+   * With type 'markdown': the preview renders only links, bold and italics, matching where the
+   * text is shown with `InlineMarkdown`.
+   * @default false
+   */
+  inlineMarkdown?: boolean;
 
   /**
    * The label text for the input field.
@@ -219,6 +227,7 @@ type InputFieldProps = {
 const InputField: React.FC<InputFieldProps> = ({
   variant,
   type = 'textarea',
+  inlineMarkdown = false,
   label,
   placeholder,
   itemId,
@@ -740,12 +749,16 @@ const InputField: React.FC<InputFieldProps> = ({
               className={`${finalClassName} bg-gray-600 overflow-y-auto resize-y`.trim()}
               style={syncedHeight ? { height: syncedHeight } : undefined}
             >
-              <ReactMarkdown
-                className="prose max-w-none text-white whitespace-normal break-words [&_*]:break-words"
-                remarkPlugins={[remarkGfm]}
-              >
-                {localText}
-              </ReactMarkdown>
+              {inlineMarkdown ? (
+                <InlineMarkdown markdown={localText} className="text-sm text-white" />
+              ) : (
+                <ReactMarkdown
+                  className="prose max-w-none text-white whitespace-normal break-words [&_*]:break-words"
+                  remarkPlugins={[remarkGfm]}
+                >
+                  {localText}
+                </ReactMarkdown>
+              )}
             </div>
           ) : (
             <div className="relative">

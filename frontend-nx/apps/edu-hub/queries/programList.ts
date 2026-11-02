@@ -7,6 +7,11 @@ export const PROGRAM_LIST = gql`
   query ProgramList($limit: Int, $offset: Int, $order_by: [Program_order_by!], $where: Program_bool_exp) {
     Program(limit: $limit, offset: $offset, order_by: $order_by, where: $where) {
       ...AdminProgramFragment
+      organizationId
+      Organization {
+        id
+        name
+      }
       Courses {
         id
       }

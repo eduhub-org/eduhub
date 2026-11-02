@@ -31,4 +31,38 @@ describe('CreatableDropDown', () => {
     expect(onValueChange).toHaveBeenCalledTimes(1);
     expect(onValueChange.mock.calls[0][0].target.value).toBe('');
   });
+
+  it('lists every option on focus even though the field shows the current selection', () => {
+    const options = [
+      { value: '0', label: 'EduHub Default' },
+      { value: '1', label: 'opencampus.sh' },
+    ];
+    const Harness = () => {
+      const [inputValue, setInputValue] = React.useState('');
+      return (
+        <CreatableDropDown
+          inputValue={inputValue}
+          localValue="0"
+          variant="eduhub"
+          localOptions={options}
+          onInputChange={setInputValue}
+          onValueChange={jest.fn()}
+          getLabelForValue={(value) => options.find((option) => option.value === value)?.label ?? ''}
+          allowCreate={false}
+        />
+      );
+    };
+
+    render(<Harness />);
+    const input = screen.getByRole('textbox');
+    fireEvent.focus(input);
+
+    expect(input).toHaveValue('EduHub Default');
+    expect(screen.getByText('opencampus.sh')).toBeInTheDocument();
+
+    fireEvent.change(input, { target: { value: 'open' } });
+
+    expect(screen.getByText('opencampus.sh')).toBeInTheDocument();
+    expect(screen.queryByText('EduHub Default')).not.toBeInTheDocument();
+  });
 });

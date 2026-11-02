@@ -48,13 +48,13 @@ function operationName(document) {
   return source.match(/\b(?:query|mutation)\s+(\w+)/)?.[1];
 }
 
-function createClient({ confirmationToken = token(), enrollments = [] } = {}) {
+function createClient({ confirmationToken = token(), enrollments = [], courseRow = course } = {}) {
   const request = jest.fn(async (document) => {
     switch (operationName(document)) {
       case 'FindGuestRegistrationToken':
         return { GuestRegistrationToken: [confirmationToken] };
       case 'GetConfirmCourse':
-        return { Course_by_pk: course };
+        return { Course_by_pk: courseRow };
       case 'FindConfirmEnrollment':
         return { CourseEnrollment: enrollments };
       case 'FindGuestUsersByEmail':
@@ -99,6 +99,21 @@ describe('confirmGuestRegistration', () => {
     expect(result.manageToken).toContain(USER_ID);
     expect(requestedOperations(client)).toContain('InsertGuestEnrollment');
     expect(requestedOperations(client)).toContain('MarkGuestRegistrationTokenUsed');
+  });
+
+  it('keeps the free places for the waitlist', async () => {
+    const client = createClient({
+      courseRow: { ...course, maxParticipants: 5, activeParticipantCount: 3, waitlistCount: 2 },
+    });
+
+    const result = await confirmGuestRegistration(
+      { body: { input: { token: 'raw-confirmation-token' } } },
+      logger,
+      { client }
+    );
+
+    expect(result).toEqual({ success: false, messageKey: 'COURSE_FULL' });
+    expect(requestedOperations(client)).not.toContain('InsertGuestEnrollment');
   });
 
   it('keeps a consumed confirmation link single-use', async () => {

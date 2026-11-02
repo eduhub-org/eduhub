@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { FC, useState, useEffect } from 'react';
+import { FC, useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { CircularProgress } from '@mui/material';
 
@@ -64,20 +64,49 @@ const BODY_GRID = 'grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_360px] gap-x-6 g
 /**
  * Pinned beside the content on wide screens. `self-start` is what gives sticky
  * room to work - a stretched grid item is already as tall as its area and has
- * nowhere to travel - and the max height keeps a tall card (a paid course with
- * add-ons and several instructors) from running off the bottom of the screen.
+ * nowhere to travel. The `top` offset comes from `useRailStickyTop`.
  */
-const RAIL_STICKY =
-  'lg:col-start-2 lg:row-start-1 lg:row-span-2 lg:self-start lg:sticky lg:top-6 ' +
-  'lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto';
+const RAIL_STICKY = 'lg:col-start-2 lg:row-start-1 lg:row-span-2 lg:self-start lg:sticky';
+
+/** Gap kept between the pinned rail and the viewport edge (Tailwind's `6`). */
+const RAIL_GAP_PX = 24;
+
+/**
+ * The sticky `top` for the rail. A card that fits the viewport pins to the top;
+ * a taller one (a paid course with add-ons and several instructors, or a short
+ * window) gets a negative offset, so it scrolls with the page until its bottom
+ * edge is in view and pins there. An inner scroll box would clip the bottom of
+ * the card instead, behind a scrollbar nobody finds.
+ */
+const useRailStickyTop = () => {
+  const [top, setTop] = useState(RAIL_GAP_PX);
+  const [rail, setRail] = useState<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!rail) return;
+    const update = () => setTop(Math.min(RAIL_GAP_PX, window.innerHeight - rail.offsetHeight - RAIL_GAP_PX));
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(rail);
+    window.addEventListener('resize', update);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', update);
+    };
+  }, [rail]);
+
+  return { railRef: useCallback((node: HTMLDivElement | null) => setRail(node), []), railTop: top };
+};
 
 const CourseContent: FC<{ id: number }> = ({ id }) => {
   const t = useTranslations('course');
   const tCoursePage = useTranslations('coursePage');
+  const tCommon = useTranslations('common');
   const isLoggedIn = useIsLoggedIn();
   const userId = useUserId();
   const [resetValues, setResetValues] = useState<boolean | null>(null);
   const [showSuccessSnackbar, setShowSuccessSnackbar] = useState(false);
+  const { railRef, railTop } = useRailStickyTop();
   const [registrationSuccessWaitlist, setRegistrationSuccessWaitlist] = useState(false);
   const [participationExitKind, setParticipationExitKind] = useState<ParticipationExitKind | null>(null);
   const [cancellationRequested, setCancellationRequested] = useState(false);
@@ -98,11 +127,14 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
     },
     fetchPolicy: 'cache-and-network',
     onCompleted(data) {
-      // Check if user has been invited to the course and the invitation has not expired
+      // Check if user has been invited to the course and the invitation has not expired. An
+      // invitation to a paid course is accepted by paying instead (the rail's "pay now").
       const courseEnrollment = getCourseEnrollment(data?.Course_by_pk, userId ?? '');
       const enrollmentStatus = courseEnrollment?.status;
+      const registrationType = data?.Course_by_pk?.registrationType;
       if (
         enrollmentStatus === CourseEnrollmentStatus_enum.INVITED &&
+        !getRegistrationTypeConfig(registrationType || CourseRegistrationType_enum.APPROVAL_WITH_INPUT).requiresPayment &&
         courseEnrollment?.invitationExpirationDate.setHours(0, 0, 0, 0) >= new Date().setHours(0, 0, 0, 0)
       ) {
         setResetValues(true);
@@ -188,18 +220,23 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
     refetchCourse();
   };
 
-  // Get success message based on registration type (waitlist vs approval vs direct)
+  // Get success message based on registration type (waitlist vs approval vs direct). Each of these
+  // status changes also emails the participant (sendEnrollmentEmail), which the message says; the
+  // direct registration message already promises the confirmation email.
   const getSuccessMessage = () => {
     if (cancellationRequested) {
       return t('CourseContent.cancellation_request_success_message');
     }
+    const emailSent = tCommon('status_email.participant_sent');
     if (participationExitKind) {
-      return participationExitKind === 'CANCEL'
-        ? t('CourseContent.cancel_success_message')
-        : t('CourseContent.abort_success_message');
+      return `${
+        participationExitKind === 'CANCEL'
+          ? t('CourseContent.cancel_success_message')
+          : t('CourseContent.abort_success_message')
+      } ${emailSent}`;
     }
     if (registrationSuccessWaitlist) {
-      return t('modal.success_message_waitlist');
+      return `${t('modal.success_message_waitlist')} ${emailSent}`;
     }
     if (!course?.registrationType) return '';
 
@@ -310,7 +347,7 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                     )}
                   </div>
 
-                  <div className={RAIL_STICKY}>
+                  <div ref={railRef} className={RAIL_STICKY} style={{ top: railTop }}>
                     <RegistrationRail
                       course={course}
                       courseEnrollment={courseEnrollment ?? undefined}

@@ -8,7 +8,7 @@ import JobCard from '../../components/JobCard';
 import StuJoLegacyIcon from '../../components/StuJoLegacyIcon';
 import { resolvePortal, PortalBranding } from '../../lib/portal';
 import { portalHost } from '../../lib/requestHost';
-import { fetchJobList, JobListItem } from '../../lib/jobs';
+import { fetchJobList, JobListItem, normalizeRegionParam } from '../../lib/jobs';
 import { fetchAnonymous } from '../../lib/hasura';
 
 type EnumOption = { value: string };
@@ -149,7 +149,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req, query
   const portal = await resolvePortal(portalHost(req));
   const filter = {
     type: typeof query.type === 'string' ? query.type : '',
-    region: typeof query.region === 'string' ? query.region : '',
+    region: typeof query.region === 'string' ? normalizeRegionParam(query.region) : '',
     occupation: typeof query.occupation === 'string' ? query.occupation : '',
     search: typeof query.search === 'string' ? query.search : '',
   };

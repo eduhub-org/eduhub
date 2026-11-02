@@ -1,15 +1,30 @@
 import type { GetServerSideProps } from 'next';
 import { FC } from 'react';
+import Head from 'next/head';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 
 import Layout from '../../components/Layout';
+import UnavailableJob from '../../components/UnavailableJob';
 import { resolvePortal, PortalBranding } from '../../lib/portal';
 import { portalHost } from '../../lib/requestHost';
-import { fetchJobDetail, JobDetail } from '../../lib/jobs';
+import {
+  fetchJobDetail,
+  fetchSimilarJobs,
+  fetchUnavailableJob,
+  JobDetail,
+  JobListItem,
+  UnavailableJob as UnavailableJobData,
+} from '../../lib/jobs';
 import { httpUrlOrNull, sanitizeHtml } from '../../lib/sanitizeHtml';
 
-type Props = { portal: PortalBranding; job: JobDetail };
+type Props =
+  | { portal: PortalBranding; job: JobDetail }
+  | {
+      portal: PortalBranding;
+      unavailable: UnavailableJobData;
+      similarJobs: JobListItem[];
+    };
 
 // Legacy (ETL-imported) postings carry HTML like the Rails app rendered
 // with `raw`; postings written through the plain-textarea form are plain
@@ -21,13 +36,25 @@ const RichText: FC<{ value: string }> = ({ value }) =>
     <div style={{ whiteSpace: 'pre-line' }}>{value}</div>
   );
 
+const JobDetailPage: FC<Props> = (props) =>
+  'job' in props ? (
+    <JobDetailView portal={props.portal} job={props.job} />
+  ) : (
+    <Layout portal={props.portal}>
+      <Head>
+        <meta name="robots" content="noindex" />
+      </Head>
+      <UnavailableJob {...props.unavailable} similarJobs={props.similarJobs} />
+    </Layout>
+  );
+
 /**
  * Job detail, ported from the live /stellenangebot page: pink title +
  * grey company, company logo next to a bold-label/value fact grid
  * (Kategorie, Berufsfeld, Vergütung, Beginn, Arbeitsort, …), description,
  * and the job PDF embedded inline.
  */
-const JobDetailPage: FC<Props> = ({ portal, job }) => {
+const JobDetailView: FC<{ portal: PortalBranding; job: JobDetail }> = ({ portal, job }) => {
   const t = useTranslations('common');
   const tType = useTranslations('jobType');
   const tOccupation = useTranslations('jobOccupation');
@@ -113,16 +140,28 @@ const JobDetailPage: FC<Props> = ({ portal, job }) => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps<Props> = async ({ req, params }) => {
+// A job that is not public (expired, deactivated, unknown, malformed id)
+// still gets a branded page explaining why, but with HTTP 404 so search
+// engines drop it. 404 rather than 410: expired postings can be re-posted
+// under the same id. See docs/APP_ROUTER_MIGRATION_PLAN.md §5 for porting.
+export const getServerSideProps: GetServerSideProps<Props> = async ({ req, res, params }) => {
   const id = Number(params?.id);
-  if (!Number.isInteger(id)) {
-    return { notFound: true };
+  // JobPosting.id is a Postgres integer; anything outside it would make
+  // Hasura reject the query (a 500) rather than simply not match.
+  const isValidId = Number.isInteger(id) && id > 0 && id <= 2_147_483_647;
+  const [portal, job] = await Promise.all([
+    resolvePortal(portalHost(req)),
+    isValidId ? fetchJobDetail(id) : null,
+  ]);
+  if (job) {
+    return { props: { portal, job } };
   }
-  const [portal, job] = await Promise.all([resolvePortal(portalHost(req)), fetchJobDetail(id)]);
-  if (!job) {
-    return { notFound: true };
-  }
-  return { props: { portal, job } };
+  const unavailable: UnavailableJobData = isValidId
+    ? await fetchUnavailableJob(id)
+    : { reason: 'notFound', job: null };
+  const similarJobs = unavailable.job ? await fetchSimilarJobs(unavailable.job) : [];
+  res.statusCode = 404;
+  return { props: { portal, unavailable, similarJobs } };
 };
 
 export default JobDetailPage;

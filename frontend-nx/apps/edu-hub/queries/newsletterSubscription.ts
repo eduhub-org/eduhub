@@ -48,11 +48,7 @@ export const MY_ORGANIZATION_NEWSLETTER_OPTIONS = gql`
       distinct_on: organizationId
       where: {
         Courses: { CourseEnrollments: { userId: { _eq: $userId } } }
-        Organization: {
-          ghostNewsletterApiUrl: { _is_null: false, _neq: "" }
-          ghostNewsletterApiKeyConfigured: { _eq: true }
-          _or: [{ ghostNewsletterListId: { _is_null: false } }, { ghostNewsletterSlug: { _is_null: false } }]
-        }
+        Organization: { hasGhostNewsletterConfigured: { _eq: true } }
       }
       order_by: [{ organizationId: asc }]
     ) {
@@ -64,10 +60,7 @@ export const MY_ORGANIZATION_NEWSLETTER_OPTIONS = gql`
         newsletterProvider
         ghostNewsletterLabel
         ghostNewsletterDoubleOptInEnabled
-        ghostNewsletterListId
-        ghostNewsletterSlug
-        ghostNewsletterApiUrl
-        ghostNewsletterApiKeyConfigured
+        hasGhostNewsletterConfigured
       }
     }
 
@@ -84,10 +77,7 @@ export const MY_ORGANIZATION_NEWSLETTER_OPTIONS = gql`
         newsletterProvider
         ghostNewsletterLabel
         ghostNewsletterDoubleOptInEnabled
-        ghostNewsletterListId
-        ghostNewsletterSlug
-        ghostNewsletterApiUrl
-        ghostNewsletterApiKeyConfigured
+        hasGhostNewsletterConfigured
       }
     }
   }

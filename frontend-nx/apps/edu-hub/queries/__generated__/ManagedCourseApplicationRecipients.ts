@@ -47,6 +47,7 @@ export interface ManagedCourseApplicationRecipients_Course_by_pk_CourseEnrollmen
    * Rating that the user's motivation letter received from the course instructor
    */
   motivationRating: MotivationRating_enum;
+  created_at: any | null;
   /**
    * An object relationship
    */

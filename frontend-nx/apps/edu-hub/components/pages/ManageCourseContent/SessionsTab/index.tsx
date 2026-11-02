@@ -60,6 +60,7 @@ import { USER_SELECTION_WITH_FILTER, buildUserSelectionFilter } from '../../../.
 import TableGrid from '../../../common/TableGrid';
 import { formatTruncatedList, makeFullName } from '../../../../helpers/util';
 import InputField from '../../../inputs/InputField';
+import InlineMarkdown from '../../../common/InlineMarkdown';
 import CheckboxSelector from '../../../inputs/CheckboxSelector';
 import { Tooltip } from '@mui/material';
 import { MdLock, MdSync, MdVisibility } from 'react-icons/md';
@@ -78,6 +79,7 @@ import { QuestionConfirmationDialog } from '../../../common/dialogs/QuestionConf
 import { ErrorMessageDialog } from '../../../common/dialogs/ErrorMessageDialog';
 import NotificationSnackbar from '../../../common/dialogs/NotificationSnackbar';
 import { useFormatTimeString } from '../../../../helpers/dateTimeHelpers';
+import { usePersistedPageSize } from '../../../common/TableGrid/hooks';
 
 /** Course sessions are editable; program sessions are shown read-only. */
 type SessionRow = ManagedCourse_Course_by_pk_Sessions | ManagedCourse_Course_by_pk_Program_Sessions;
@@ -129,7 +131,7 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
   const formatTimeString = useFormatTimeString();
 
   const [pageIndex, setPageIndex] = useState(0);
-  const [pageSize, setPageSize] = useState(15);
+  const [pageSize, setPageSize] = usePersistedPageSize('manageCourse.sessions', 15);
   const isEventCourse = course.Program?.type === ProgramType.EVENTS;
 
   const [searchFilter, setSearchFilter] = useState('');
@@ -253,7 +255,7 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
   const handlePageSizeChange = useCallback((newSize: number) => {
     setPageSize(newSize);
     setPageIndex(0);
-  }, []);
+  }, [setPageSize]);
 
   const handleSearchFilterChange = useCallback((value: string) => {
     setSearchFilter(value);
@@ -813,11 +815,16 @@ const ExpandableSessionRowContent: FC<ExpandableSessionRowContentProps> = ({
         <section className="order-3 lg:col-span-2 xl:col-span-1 xl:order-2 min-w-0">
           <SectionLabel>{t('SessionsTab.session_description.label')}</SectionLabel>
           {locked ? (
-            <p className="whitespace-pre-wrap text-sm text-label-secondary">{session.description || '–'}</p>
+            session.description ? (
+              <InlineMarkdown markdown={session.description} className="text-sm text-label-secondary" />
+            ) : (
+              <p className="text-sm text-label-secondary">–</p>
+            )
           ) : (
           <InputField
             variant="eduhub"
-            type="textarea"
+            type="markdown"
+            inlineMarkdown
             value={session.description || ''}
             label=""
             updateValueMutation={UPDATE_SESSION_DESCRIPTION}

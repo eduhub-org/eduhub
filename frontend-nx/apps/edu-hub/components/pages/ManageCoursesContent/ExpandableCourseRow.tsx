@@ -802,6 +802,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                 maxFileSize={5 * 1024 * 1024}
                 uploadText={t('manageCourses.cover_image.upload_text')}
                 altText={t('manageCourses.cover_image.alt')}
+                infoTooltip={t('manageCourses.cover_image.format_tooltip')}
                 imageWidth={160}
                 imageHeight={96}
                 showFileName={true}

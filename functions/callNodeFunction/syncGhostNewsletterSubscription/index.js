@@ -201,7 +201,9 @@ export default async function syncGhostNewsletterSubscription(req, logger) {
       };
     }
 
-    if (!newRow.userId || !newRow.organizationId) {
+    // organizationId 0 is the default platform organization, so check for a missing value
+    // rather than a falsy one.
+    if (!newRow.userId || newRow.organizationId == null) {
       return {
         success: false,
         messageKey: 'INVALID_EVENT_PAYLOAD',
@@ -351,7 +353,7 @@ export default async function syncGhostNewsletterSubscription(req, logger) {
       })
     );
 
-    if (userId && organizationId) {
+    if (userId && organizationId != null) {
       try {
         const client = getGraphqlClient();
         await updateSubscriptionState(client, {
@@ -379,5 +381,20 @@ export default async function syncGhostNewsletterSubscription(req, logger) {
       messageKey: 'GHOST_SYNC_FAILED',
       error: error.message,
     };
+  }
+}
+
+// Account deletion must finish this while the original email still exists.
+// Call synchronously rather than relying on the asynchronous subscription trigger.
+export async function unsubscribeForAccountDeletion(subscription, userEmail) {
+  if (!subscription.externalSubscriberId && subscription.status === 'UNSUBSCRIBED') return;
+  if (!hasGhostConfiguration(subscription.Organization)) {
+    // Never synced to Ghost, so there is no remote member; the local row is deleted with the account.
+    if (!subscription.externalSubscriberId) return;
+    throw new Error('Newsletter configuration missing for account deletion');
+  }
+  const result = await callGhostSyncEndpoint({ subscription, userEmail, subscribe: false });
+  if (normalizeRemoteSubscriptionStatus(result.remoteStatus, 'UNSUBSCRIBED') !== 'UNSUBSCRIBED') {
+    throw new Error('Newsletter unsubscribe was not confirmed');
   }
 }

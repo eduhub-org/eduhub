@@ -1,4 +1,4 @@
-import { fetchAnonymous, incrementJobViews } from './hasura';
+import { fetchAdmin, fetchAnonymous, incrementJobViews } from './hasura';
 import { resolveStorageUrl } from './storage';
 
 /**
@@ -63,6 +63,28 @@ const REGION_WIDENING: Record<string, string[]> = {
   SCHLESWIG_HOLSTEIN_HAMBURG: ['FLENSBURG', 'KIEL', 'SCHLESWIG_HOLSTEIN_HAMBURG'],
   GERMANY: ['FLENSBURG', 'KIEL', 'SCHLESWIG_HOLSTEIN_HAMBURG', 'GERMANY'],
 };
+
+// The Rails app used numeric region ids in its URLs (`?region=-2`), and old
+// links and crawlers still send them. The comments on the JobRegion seed rows
+// record the mapping.
+const LEGACY_REGION_IDS: Record<string, string> = {
+  '-2': 'FLENSBURG',
+  '0': 'KIEL',
+  '1': 'SCHLESWIG_HOLSTEIN_HAMBURG',
+  '2': 'GERMANY',
+  '3': 'DENMARK',
+  '4': 'ABROAD',
+};
+
+/**
+ * Turns a `region` URL parameter into a JobRegion enum value. Legacy numeric
+ * ids are mapped; anything else that cannot be an enum value becomes '' (no
+ * region filter), since Hasura rejects the whole query for an invalid enum.
+ */
+export function normalizeRegionParam(region: string): string {
+  const mapped = LEGACY_REGION_IDS[region] ?? region;
+  return /^[A-Z_]+$/.test(mapped) ? mapped : '';
+}
 
 const LIST_FIELDS = /* GraphQL */ `
   id
@@ -197,4 +219,120 @@ export async function fetchJobDetail(id: number): Promise<JobDetail | null> {
     pdfUrl: resolveStorageUrl(job.pdfUrl),
     Organization: { ...job.Organization, logo: resolveStorageUrl(job.Organization.logo) },
   };
+}
+
+/**
+ * Why a job id is not shown on the public detail page:
+ * - `expired`: the posting was public and its window has ended (EXPIRED,
+ *   ARCHIVED, or still PUBLISHED / DEACTIVATED past expiresAt because the
+ *   nightly expire cron has not run yet).
+ * - `deactivated`: the employer took it offline and can still reactivate it.
+ * - `notFound`: never existed, or must not be revealed (drafts, pending
+ *   payment, postings restricted to an organization).
+ *
+ * Every case is answered with HTTP 404, not 410: an EXPIRED or DEACTIVATED
+ * posting can be re-posted under the same id (publishJobPosting).
+ */
+export type UnavailableReason = 'expired' | 'deactivated' | 'notFound';
+
+export type JobTombstone = {
+  status: string;
+  expiresAt: string | null;
+  restrictedToOrganizationId: number | null;
+  title: string;
+  type: string;
+  occupation: string;
+  customCompany: string | null;
+  Organization: { name: string };
+};
+
+export type UnavailableJob = {
+  reason: UnavailableReason;
+  /** Only set for postings that were public once — never for `notFound`. */
+  job: { title: string; company: string; type: string; occupation: string } | null;
+};
+
+export function classifyUnavailableJob(
+  tombstone: JobTombstone | null,
+  now: Date = new Date()
+): UnavailableReason {
+  if (!tombstone || tombstone.restrictedToOrganizationId != null) {
+    return 'notFound';
+  }
+  const windowOver = tombstone.expiresAt != null && new Date(tombstone.expiresAt) <= now;
+  switch (tombstone.status) {
+    case 'EXPIRED':
+    case 'ARCHIVED':
+      return 'expired';
+    case 'PUBLISHED':
+      return windowOver ? 'expired' : 'notFound';
+    case 'DEACTIVATED':
+      return windowOver ? 'expired' : 'deactivated';
+    default:
+      return 'notFound';
+  }
+}
+
+/**
+ * Looks up a job the anonymous role could not see, to tell the visitor why.
+ * Runs with the admin secret (the anonymous filter hides exactly these rows),
+ * so it selects only what the unavailable page shows. Any failure — including
+ * a missing secret — degrades to `notFound`.
+ */
+export async function fetchUnavailableJob(id: number): Promise<UnavailableJob> {
+  let tombstone: JobTombstone | null = null;
+  try {
+    const data = await fetchAdmin<{ JobPosting_by_pk: JobTombstone | null }>(
+      /* GraphQL */ `
+        query UnavailableJob($id: Int!) {
+          JobPosting_by_pk(id: $id) {
+            status
+            expiresAt
+            restrictedToOrganizationId
+            title
+            type
+            occupation
+            customCompany
+            Organization {
+              name
+            }
+          }
+        }
+      `,
+      { id }
+    );
+    tombstone = data?.JobPosting_by_pk ?? null;
+  } catch {
+    // fall through to notFound
+  }
+  const reason = classifyUnavailableJob(tombstone);
+  if (reason === 'notFound' || !tombstone) {
+    return { reason: 'notFound', job: null };
+  }
+  return {
+    reason,
+    job: {
+      title: tombstone.title,
+      company: tombstone.customCompany || tombstone.Organization.name,
+      type: tombstone.type,
+      occupation: tombstone.occupation,
+    },
+  };
+}
+
+/**
+ * Open offers to suggest instead of an unavailable one: same category and
+ * occupation, else the same category, else nothing.
+ */
+export async function fetchSimilarJobs(
+  job: { type: string; occupation: string },
+  limit = 5
+): Promise<JobListItem[]> {
+  try {
+    const exact = await fetchJobList({ type: job.type, occupation: job.occupation, limit });
+    if (exact.jobs.length) return exact.jobs;
+    return (await fetchJobList({ type: job.type, limit })).jobs;
+  } catch {
+    return [];
+  }
 }

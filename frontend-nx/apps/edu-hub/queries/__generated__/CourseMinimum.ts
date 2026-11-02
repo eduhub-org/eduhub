@@ -143,6 +143,10 @@ export interface CourseMinimum_Course_by_pk {
    */
   publicParticipantCount: any | null;
   /**
+   * A computed field, executes function "course_waitlist_count"
+   */
+  waitlistCount: any | null;
+  /**
    * The time the course ends each week.
    */
   endTime: any | null;
