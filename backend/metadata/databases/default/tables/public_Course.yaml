@@ -228,6 +228,7 @@ select_permissions:
         - maxMissedSessions
         - maxParticipants
         - showAvailablePlaces
+        - sessionReminderLeadHours
         - registrationButtonLabelDe
         - registrationButtonLabelEn
         - programId
@@ -337,6 +338,7 @@ select_permissions:
         - maxMissedSessions
         - maxParticipants
         - showAvailablePlaces
+        - sessionReminderLeadHours
         - registrationButtonLabelDe
         - registrationButtonLabelEn
         - programId
@@ -392,6 +394,7 @@ update_permissions:
         - maxMissedSessions
         - maxParticipants
         - showAvailablePlaces
+        - sessionReminderLeadHours
         - registrationButtonLabelDe
         - registrationButtonLabelEn
         - projectProposalsEnabled
@@ -437,6 +440,7 @@ update_permissions:
         - maxMissedSessions
         - maxParticipants
         - showAvailablePlaces
+        - sessionReminderLeadHours
         - registrationButtonLabelDe
         - registrationButtonLabelEn
         - projectProposalsEnabled

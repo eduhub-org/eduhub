@@ -1,49 +1,165 @@
 import { gql, GraphQLClient } from 'graphql-request';
-import { createSessionVariableReplacer } from '../emailTemplateVariables.js';
-import { appendGuestMailFooter, guestSafeCopyRecipients } from '../guestRegistration.js';
+import { createVariableReplacer } from '../emailTemplateVariables.js';
+import { queueEmail } from '../lib/queueEmail.js';
+
+const HOUR_MS = 60 * 60 * 1000;
+const TIME_ZONE = 'Europe/Berlin';
+
+// The longest lead time a course can choose (1 week). Only courses whose first
+// session starts within this horizon can be due, which keeps the query small.
+export const MAX_LEAD_HOURS = 168;
+
+// Placeholder the migration gave LocationAddress rows it could not match; not
+// worth showing to a participant (same rule as the frontend's meaningfulLabel).
+const PLACEHOLDER_LABEL = 'generic address';
 
 /**
- * Calculates time window for a reminder based on current time
- * @param {Date} now - Current time
- * @param {Object} window - Reminder window config { type, hours, tolerance }
- * @returns {Object} { startTime, endTime, targetTime }
+ * Whether a course's reminder is due: its first session has not started yet
+ * and we are inside its lead time. There is no lower bound on purpose, so a
+ * participant who enrolls late, or a cron run that was missed, still gets it.
  */
-export function calculateReminderTimeWindow(now, window) {
-  const targetTime = new Date(now.getTime() + window.hours * 60 * 60 * 1000);
-  const toleranceMs = window.tolerance * 60 * 60 * 1000;
-  const startTime = new Date(targetTime.getTime() - toleranceMs);
-  const endTime = new Date(targetTime.getTime() + toleranceMs);
-  
-  return { startTime, endTime, targetTime };
+export function isReminderDue(firstSessionStart, leadHours, now) {
+  if (!firstSessionStart || leadHours == null) return false;
+  const start = new Date(firstSessionStart).getTime();
+  return start > now.getTime() && start - leadHours * HOUR_MS <= now.getTime();
+}
+
+const dateFormat = new Intl.DateTimeFormat('de-DE', {
+  timeZone: TIME_ZONE,
+  day: '2-digit',
+  month: '2-digit',
+  year: 'numeric',
+});
+const timeFormat = new Intl.DateTimeFormat('de-DE', {
+  timeZone: TIME_ZONE,
+  hour: '2-digit',
+  minute: '2-digit',
+  hour12: false,
+});
+
+/**
+ * "27.10.2026, 17:00" in Berlin time. Numeric and 24h because the template
+ * carries German and English in one body, and this reads right in both.
+ */
+export function formatReminderDateTime(value) {
+  if (!value) return '';
+  const date = new Date(value);
+  return `${dateFormat.format(date)}, ${timeFormat.format(date)}`;
 }
 
 /**
- * Gets the default reminder window configurations
- * @returns {Array} Array of reminder window configs
+ * "27.10.2026, 17:00–19:00", or both full timestamps when the session ends on
+ * another day.
  */
-export function getReminderWindows() {
-  return [
-    { type: '24_HOURS', hours: 24, tolerance: 0.25 }, // 24 hours ± 15 minutes
-    { type: '1_HOUR', hours: 1, tolerance: 0.25 },    // 1 hour ± 15 minutes
-    { type: '15_MINUTES', hours: 0.25, tolerance: 0.1 } // 15 minutes ± 6 minutes
-  ];
+export function formatReminderDateTimeRange(start, end) {
+  if (!start) return '';
+  if (!end) return formatReminderDateTime(start);
+  const sameDay = dateFormat.format(new Date(start)) === dateFormat.format(new Date(end));
+  return sameDay
+    ? `${formatReminderDateTime(start)}–${timeFormat.format(new Date(end))}`
+    : `${formatReminderDateTime(start)} – ${formatReminderDateTime(end)}`;
+}
+
+// Still filled for customized templates that use [Session:Duration].
+function formatDuration(start, end) {
+  if (!start || !end) return '';
+  const minutes = Math.round((new Date(end).getTime() - new Date(start).getTime()) / 60000);
+  const hours = Math.floor(minutes / 60);
+  return hours > 0 ? `${hours}h ${minutes % 60}m` : `${minutes}m`;
 }
 
 /**
- * Sends session reminder emails for upcoming course sessions
- * ONLY sends reminders for the FIRST session in each course
- * Uses MailLog metadata to track sent reminders (no separate table needed)
- * 
- * @param {Object} req - Request object (can be from cron or manual trigger)
+ * Where the session takes place, as display strings: a linked venue as
+ * "Label (Address)", else the free-text address, which for online sessions is
+ * the meeting link. Online without a link yet just says "Online".
+ */
+export function resolveSessionLocations(sessionAddresses = []) {
+  const locations = sessionAddresses.map((sa) => {
+    const venue = sa.LocationAddress;
+    const label = venue?.shortLabel?.trim();
+    const venueAddress = venue?.address?.trim();
+    if (venueAddress) {
+      return label && label.toLowerCase() !== PLACEHOLDER_LABEL && label !== venueAddress
+        ? `${label} (${venueAddress})`
+        : venueAddress;
+    }
+    const address = sa.address?.trim();
+    if (address) return address;
+    return sa.CourseLocation?.locationOption === 'ONLINE' ? 'Online' : '';
+  });
+  return [...new Set(locations.filter(Boolean))];
+}
+
+const GET_REMINDER_CANDIDATES = gql`
+  query GetSessionReminderCandidates($now: timestamptz!, $horizon: timestamptz!) {
+    Course(
+      where: {
+        sessionReminderLeadHours: { _is_null: false }
+        Sessions: { startDateTime: { _gt: $now, _lte: $horizon } }
+        # REGISTERED sits alongside CONFIRMED: it is what the direct
+        # registration flows write when there is no approval step, guest
+        # signup included. Those people are attending, so they get the reminder.
+        CourseEnrollments: { isTest: { _eq: false }, status: { _in: [CONFIRMED, REGISTERED] } }
+      }
+    ) {
+      id
+      title
+      sessionReminderLeadHours
+      # The course's first session overall; if it already started, the course
+      # is under way and no reminder is due.
+      Sessions(order_by: { startDateTime: asc }, limit: 1) {
+        id
+        title
+        startDateTime
+        endDateTime
+        SessionAddresses(order_by: { id: asc }) {
+          address
+          CourseLocation {
+            locationOption
+          }
+          LocationAddress {
+            shortLabel
+            address
+          }
+        }
+      }
+      CourseEnrollments(where: { isTest: { _eq: false }, status: { _in: [CONFIRMED, REGISTERED] } }) {
+        id
+        User {
+          id
+          firstName
+          lastName
+          email
+          status
+        }
+      }
+    }
+  }
+`;
+
+// Every reminder ever queued for the course, whatever became of it: a reminder
+// goes out at most once, so a bounced or failed one is not retried.
+const GET_SENT_REMINDERS = gql`
+  query GetSentSessionReminders($metadata: jsonb!) {
+    MailLog(where: { metadata: { _contains: $metadata } }) {
+      metadata
+    }
+  }
+`;
+
+/**
+ * Queues the one session reminder each participant gets per course, a
+ * course-chosen number of hours before the course's first session. Runs from a
+ * cron trigger every 15 minutes; MailLog metadata records who already has it.
+ *
+ * @param {Object} req - Request object (from the cron trigger)
  * @param {Object} logger - Winston logger instance
  * @returns {Object} Response object
  */
 export default async function sendSessionReminders(req, logger) {
-  logger.info("########## Send Session Reminders ##########");
-  logger.debug(`Request body: ${JSON.stringify(req.body)}`);
+  logger.info('########## Send Session Reminders ##########');
 
   try {
-    // Create GraphQL client
     const client = new GraphQLClient(process.env.HASURA_ENDPOINT, {
       headers: {
         'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET,
@@ -51,380 +167,104 @@ export default async function sendSessionReminders(req, logger) {
     });
 
     const now = new Date();
-    const reminderWindows = getReminderWindows();
+    const horizon = new Date(now.getTime() + MAX_LEAD_HOURS * HOUR_MS);
+    const data = await client.request(GET_REMINDER_CANDIDATES, {
+      now: now.toISOString(),
+      horizon: horizon.toISOString(),
+    });
+
+    const dueCourses = (data?.Course ?? []).filter((course) =>
+      isReminderDue(course.Sessions[0]?.startDateTime, course.sessionReminderLeadHours, now)
+    );
 
     let totalEmailsSent = 0;
     const processedSessions = [];
 
-    for (const window of reminderWindows) {
-      const { startTime, endTime } = calculateReminderTimeWindow(now, window);
-
-      logger.info(`Processing ${window.type} reminders for FIRST sessions between ${startTime.toISOString()} and ${endTime.toISOString()}`);
-
-      // Find sessions that need reminders - ONLY first session in each course
-      const GET_SESSIONS_FOR_REMINDERS = gql`
-        query GetSessionsForReminders($startTime: timestamptz!, $endTime: timestamptz!) {
-          Course(
-            where: {
-              Sessions: {
-                startDateTime: { _gte: $startTime, _lte: $endTime }
-              }
-              # REGISTERED sits alongside CONFIRMED here: it is what the direct
-              # registration flows write when there is no approval step, guest
-              # signup included. Those people are attending, so they get the
-              # reminder.
-              CourseEnrollments: {
-                isTest: { _eq: false }
-                status: { _in: [CONFIRMED, REGISTERED] }
-              }
-            }
-          ) {
-            id
-            title
-            # Get the first session (earliest startDateTime) for this course that falls within the reminder window
-            Sessions(
-              where: {
-                startDateTime: { _gte: $startTime, _lte: $endTime }
-              }
-              order_by: { startDateTime: asc }
-              limit: 1
-            ) {
-              id
-              title
-              startDateTime
-              endDateTime
-            }
-            # Get all sessions for this course to determine if this is the first session
-            AllSessions: Sessions(order_by: { startDateTime: asc }) {
-              id
-              startDateTime
-            }
-            CourseEnrollments(where: { isTest: { _eq: false }, status: { _in: [CONFIRMED, REGISTERED] } }) {
-              id
-              User {
-                id
-                firstName
-                lastName
-                email
-                status
-              }
-            }
-          }
-        }
-      `;
-
-      const coursesData = await client.request(GET_SESSIONS_FOR_REMINDERS, {
-        startTime: startTime.toISOString(),
-        endTime: endTime.toISOString(),
+    for (const course of dueCourses) {
+      const session = course.Sessions[0];
+      const sentData = await client.request(GET_SENT_REMINDERS, {
+        metadata: { type: 'SESSION_REMINDER', courseId: course.id },
       });
+      const alreadyReminded = new Set(
+        (sentData?.MailLog ?? []).map((mail) => mail.metadata?.userId).filter(Boolean)
+      );
 
-      if (!coursesData?.Course?.length) {
-        logger.info(`No courses with sessions found for ${window.type} reminders`);
-        continue;
-      }
+      const location = resolveSessionLocations(session.SessionAddresses);
+      let sessionEmailsSent = 0;
 
-      // Filter to only process courses where the session in the reminder window is the first session
-      const validSessions = [];
-      coursesData.Course.forEach(course => {
-        if (course.Sessions.length > 0 && course.AllSessions.length > 0) {
-          const sessionInWindow = course.Sessions[0]; // Session within reminder window
-          const firstSessionInCourse = course.AllSessions[0]; // First session in course
-          
-          // Only process if the session in the reminder window is the first session of the course
-          if (sessionInWindow.id === firstSessionInCourse.id) {
-            validSessions.push({
-              id: sessionInWindow.id,
-              title: sessionInWindow.title,
-              startDateTime: sessionInWindow.startDateTime,
-              endDateTime: sessionInWindow.endDateTime,
-              Course: {
-                id: course.id,
-                title: course.title,
-                CourseEnrollments: course.CourseEnrollments
-              }
-            });
-          }
-        }
-      });
+      for (const enrollment of course.CourseEnrollments) {
+        const user = enrollment.User;
+        // Anonymized records keep past enrollments but their address is a
+        // placeholder that goes nowhere.
+        if (!user?.email || user.status === 'DELETED') continue;
+        if (alreadyReminded.has(user.id)) continue;
 
-      if (!validSessions.length) {
-        logger.info(`No first sessions found for ${window.type} reminders`);
-        continue;
-      }
+        const replaceVariables = createVariableReplacer({
+          user,
+          course: { id: course.id, title: course.title },
+          session: {
+            title: session.title,
+            startDateTime: formatReminderDateTime(session.startDateTime),
+            endDateTime: formatReminderDateTime(session.endDateTime),
+            dateTimeRange: formatReminderDateTimeRange(session.startDateTime, session.endDateTime),
+            duration: formatDuration(session.startDateTime, session.endDateTime),
+            location,
+          },
+          courseLink: `${process.env.FRONTEND_URL || 'https://edu.opencampus.sh'}/course/${course.id}`,
+        });
 
-      // Check which reminders have already been sent using MailLog metadata
-      // No variables: Hasura rejects a query that declares one it never uses
-      // ("unexpected variables in variableValues"), which is what this used to
-      // do with $sessionIds. Every run died here, so no session reminder has
-      // ever been sent. The dedupe below reads the metadata of every reminder
-      // logged so far, which is correct but unscoped -- worth narrowing to the
-      // sessions in the current window once that table grows.
-      const GET_SENT_REMINDERS = gql`
-        query GetSentReminders {
-          MailLog(
-            where: {
-              metadata: { _contains: { type: "SESSION_REMINDER" } }
-              status: { _in: ["SENT", "READY_TO_SEND"] }
-            }
-          ) {
-            metadata
-            to
-          }
-        }
-      `;
-
-      const sentRemindersData = await client.request(GET_SENT_REMINDERS);
-
-      // Create a set of already sent reminders: "sessionId:userId:reminderType"
-      const sentReminders = new Set();
-      sentRemindersData?.MailLog?.forEach(mail => {
-        const metadata = mail.metadata;
-        // userId is a uuid, so a `typeof === 'number'` guard here rejected every
-        // entry and left the set permanently empty.
-        if (
-          typeof metadata?.sessionId === 'number' &&
-          typeof metadata?.userId === 'string' &&
-          typeof metadata?.reminderType === 'string'
-        ) {
-          sentReminders.add(`${metadata.sessionId}:${metadata.userId}:${metadata.reminderType}`);
-        }
-      });
-
-      // Get email template for reminders
-      // First try course-specific template, then fall back to default template
-      const GET_EMAIL_TEMPLATE = gql`
-        query GetEmailTemplate($type: MailTemplateType_enum!, $courseId: Int) {
-          MailTemplate(
-            where: {
-              _and: [
-                { type: { _eq: $type } }
-                { courseId: { _eq: $courseId } }
-              ]
-            }
-            limit: 1
-          ) {
-            id
-            type
-            courseId
-            subject
-            content
-            from
-            cc
-            bcc
-          }
-        }
-      `;
-
-      // In-memory cache for templates keyed by courseId to avoid repeated network calls
-      const templateCache = new Map();
-
-      // Process each session
-      for (const session of validSessions) {
-        // Derive courseId from the current session
-        const courseId = session.Course?.id;
-
-        // Get template for this course (with caching)
-        let template = templateCache.get(courseId);
-        
-        if (!template) {
-          // First try to get course-specific template
-          let templateData = await client.request(GET_EMAIL_TEMPLATE, {
+        const result = await queueEmail({
+          templateType: 'SESSION_REMINDER',
+          variableReplacer: replaceVariables,
+          recipientEmail: user.email,
+          courseId: course.id,
+          // A guest has no account page to check the session details on, so
+          // queueEmail appends their manage link like on every other mail.
+          recipientUser: user,
+          // This *is* the sent-reminder record GET_SENT_REMINDERS reads back.
+          metadata: {
             type: 'SESSION_REMINDER',
-            courseId: courseId
-          });
+            courseId: course.id,
+            sessionId: session.id,
+            userId: user.id,
+          },
+          client,
+          logger,
+        });
 
-          // If no course-specific template found, fall back to default template (courseId = NULL)
-          if (!templateData?.MailTemplate?.length) {
-            // Check if default template is already cached
-            const defaultTemplate = templateCache.get(null);
-            if (defaultTemplate) {
-              template = defaultTemplate;
-            } else {
-              const GET_DEFAULT_TEMPLATE = gql`
-                query GetDefaultTemplate($type: MailTemplateType_enum!) {
-                  MailTemplate(
-                    where: {
-                      _and: [
-                        { type: { _eq: $type } }
-                        { courseId: { _is_null: true } }
-                      ]
-                    }
-                    limit: 1
-                  ) {
-                    id
-                    type
-                    courseId
-                    subject
-                    content
-                    from
-                    cc
-                    bcc
-                  }
-                }
-              `;
-              templateData = await client.request(GET_DEFAULT_TEMPLATE, {
-                type: 'SESSION_REMINDER'
-              });
-              
-              if (!templateData?.MailTemplate?.length) {
-                logger.error(`SESSION_REMINDER email template not found for courseId: ${courseId || 'default'}`);
-                continue; // Skip this session if no template found
-              }
-              
-              template = templateData.MailTemplate[0];
-              // Cache the default template
-              templateCache.set(null, template);
-            }
-          } else {
-            template = templateData.MailTemplate[0];
-          }
-          
-          // Cache the template for this courseId (either course-specific or default)
-          templateCache.set(courseId, template);
-        }
-        let sessionEmailsSent = 0;
-
-        for (const enrollment of session.Course.CourseEnrollments) {
-          // Anonymized records keep past enrollments but their address is a
-          // placeholder that goes nowhere.
-          if (enrollment.User?.status === 'DELETED') continue;
-
-          const reminderKey = `${session.id}:${enrollment.User.id}:${window.type}`;
-          
-          if (sentReminders.has(reminderKey)) {
-            continue; // Already sent this reminder type to this user
-          }
-
-          // Calculate reminder text based on type
-          let reminderText, reminderTime;
-          switch (window.type) {
-            case '24_HOURS':
-              reminderText = 'starts tomorrow';
-              reminderTime = 'tomorrow';
-              break;
-            case '1_HOUR':
-              reminderText = 'starts in 1 hour';
-              reminderTime = 'in 1 hour';
-              break;
-            case '15_MINUTES':
-              reminderText = 'starts in 15 minutes';
-              reminderTime = 'in 15 minutes';
-              break;
-            default:
-              reminderText = 'is starting soon';
-              reminderTime = 'soon';
-          }
-
-          // Calculate session duration
-          const sessionStart = new Date(session.startDateTime);
-          const sessionEnd = new Date(session.endDateTime);
-          const durationMs = sessionEnd.getTime() - sessionStart.getTime();
-          const durationHours = Math.floor(durationMs / (1000 * 60 * 60));
-          const durationMinutes = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60));
-          const duration = durationHours > 0 
-            ? `${durationHours}h ${durationMinutes}m`
-            : `${durationMinutes}m`;
-
-          // Replace placeholders in email content using centralized system
-          const replaceVariables = createSessionVariableReplacer(session, enrollment, {
-            startDateTime: sessionStart.toLocaleString(),
-            duration,
-            reminderText,
-            reminderTime
-          });
-
-          // The subject is plain text, so variables must not be HTML-escaped there
-          const emailSubject = replaceVariables(template.subject, { html: false });
-          // A guest has no account page to check the session details on, so the
-          // reminder carries their manage link like every other mail they get.
-          const emailContent = appendGuestMailFooter(
-            replaceVariables(template.content),
-            enrollment.User,
-            logger
-          );
-
-          // Insert email into MailLog for sending
-          const INSERT_MAIL_LOG = gql`
-            mutation InsertMailLog(
-              $subject: String!
-              $content: String!
-              $from: String!
-              $to: String!
-              $cc: String
-              $bcc: String
-              $status: String!
-              $metadata: jsonb
-            ) {
-              insert_MailLog_one(
-                object: {
-                  subject: $subject
-                  content: $content
-                  from: $from
-                  to: $to
-                  cc: $cc
-                  bcc: $bcc
-                  status: $status
-                  metadata: $metadata
-                }
-              ) {
-                id
-              }
-            }
-          `;
-
-          const mailResult = await client.request(INSERT_MAIL_LOG, {
-            subject: emailSubject,
-            content: emailContent,
-            from: template.from || 'noreply@opencampus.sh',
-            to: enrollment.User.email,
-            ...guestSafeCopyRecipients(enrollment.User, {
-              cc: template.cc,
-              bcc: template.bcc,
-            }),
-            status: 'READY_TO_SEND',
-            // This *is* the sent-reminder record. GET_SENT_REMINDERS reads it
-            // back to decide what has already gone out, so omitting it made the
-            // dedupe permanently empty and every run a repeat send.
-            metadata: {
-              type: 'SESSION_REMINDER',
-              sessionId: session.id,
-              userId: enrollment.User.id,
-              reminderType: window.type,
-            },
-          });
-
+        if (result?.success) {
           totalEmailsSent++;
           sessionEmailsSent++;
-          logger.info(`Sent ${window.type} reminder for FIRST session ${session.id} to user ${enrollment.User.id}, mailId: ${mailResult.insert_MailLog_one.id}`);
+          alreadyReminded.add(user.id);
         }
+      }
 
-        if (sessionEmailsSent > 0) {
-          processedSessions.push({
-            sessionId: session.id,
-            sessionTitle: session.title,
-            reminderType: window.type,
-            emailsSent: sessionEmailsSent
-          });
-        }
+      if (sessionEmailsSent > 0) {
+        logger.info(`Queued ${sessionEmailsSent} session reminder(s) for course ${course.id}`);
+        processedSessions.push({
+          sessionId: session.id,
+          sessionTitle: session.title,
+          reminderType: `${course.sessionReminderLeadHours}_HOURS`,
+          emailsSent: sessionEmailsSent,
+        });
       }
     }
 
-    logger.info(`First session reminders processing completed. Total emails sent: ${totalEmailsSent}`);
+    logger.info(`Session reminders processed. Total emails queued: ${totalEmailsSent}`);
 
     return {
       success: true,
       messageKey: 'SESSION_REMINDERS_PROCESSED',
       totalEmailsSent,
       processedSessions,
-      processedAt: new Date().toISOString()
+      processedAt: new Date().toISOString(),
     };
-
   } catch (error) {
     logger.error(`Error sending session reminders: ${error.message}`, { error });
     return {
       success: false,
       error: error.message,
-      messageKey: 'SESSION_REMINDERS_FAILED'
+      messageKey: 'SESSION_REMINDERS_FAILED',
     };
   }
-} 
+}

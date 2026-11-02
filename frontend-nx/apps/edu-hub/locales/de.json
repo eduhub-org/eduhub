@@ -1311,7 +1311,17 @@
       "reset_confirm": "Möchtest Du die Anpassung von „{name}“ löschen? Danach wird wieder die Standardvorlage verschickt.",
       "other_customized": "Weitere angepasste Vorlagen",
       "dialog_hint": "Änderungen werden automatisch gespeichert und gelten nur für dieses Angebot.",
-      "default_missing": "Für diese E-Mail gibt es keine Standardvorlage, die kopiert werden kann."
+      "default_missing": "Für diese E-Mail gibt es keine Standardvorlage, die kopiert werden kann.",
+      "session_reminder": {
+        "label": "Wann wird diese E-Mail verschickt?",
+        "help_text": "Wird einmal an alle Teilnehmenden vor der ersten Sitzung verschickt.",
+        "off": "Aus",
+        "lead_2": "2 Stunden vor der ersten Sitzung",
+        "lead_24": "24 Stunden vor der ersten Sitzung",
+        "lead_48": "48 Stunden vor der ersten Sitzung",
+        "lead_72": "72 Stunden vor der ersten Sitzung",
+        "lead_168": "1 Woche vor der ersten Sitzung"
+      }
     },
     "ects": {
       "label": "ECTS-Punkte",
@@ -3281,7 +3291,7 @@
       "REGISTRATION_CONFIRMED": "Gesendet, wenn sich ein Benutzer direkt für ein Angebot registriert",
       "REGISTRATION_CONFIRMED_PAID": "Gesendet, wenn die Zahlung eines Benutzers für ein Angebot bestätigt wurde",
       "APPLICATION_RECEIVED_PAID": "Gesendet, wenn eine Bewerbung für einen kostenpflichtigen Kurs eingegangen ist",
-      "SESSION_REMINDER": "Gesendet vor Beginn der Sitzungen (24h, 1h, 15min vorher)",
+      "SESSION_REMINDER": "Wird einmal vor der ersten Sitzung an die Teilnehmenden verschickt: standardmäßig 24 Stunden vorher, jeder Kurs kann das ändern oder ausschalten",
       "USER_CREATED": "Gesendet, wenn ein neues Benutzerkonto erstellt wird",
       "ORGANIZER_ADDED": "Gesendet, wenn ein Benutzer als Organisator zu einem Kurs oder Event hinzugefügt wird",
       "SESSION_SPEAKER_ADDED": "Gesendet, wenn eine Person zum ersten Mal als Referent*in in einem Kurs oder Event eingetragen wird",

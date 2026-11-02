@@ -766,6 +766,15 @@ export const UPDATE_COURSE_SHOW_AVAILABLE_PLACES = gql`
   }
 `;
 
+export const UPDATE_COURSE_SESSION_REMINDER_LEAD_HOURS = gql`
+  mutation UpdateCourseSessionReminderLeadHours($courseId: Int!, $leadHours: Int) {
+    update_Course_by_pk(pk_columns: { id: $courseId }, _set: { sessionReminderLeadHours: $leadHours }) {
+      id
+      sessionReminderLeadHours
+    }
+  }
+`;
+
 export const UPDATE_COURSE_ACHIEVEMENT_CERTIFICATE_POSSIBLE = gql`
   mutation UpdateCourseAchievementCertificatePossible(
     $courseId: Int!

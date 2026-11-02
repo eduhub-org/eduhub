@@ -1329,7 +1329,17 @@
       "reset_confirm": "Delete the customized \"{name}\"? The default template will be sent again afterwards.",
       "other_customized": "Other customized templates",
       "dialog_hint": "Changes are saved automatically and apply to this offering only.",
-      "default_missing": "There is no default template to copy for this email."
+      "default_missing": "There is no default template to copy for this email.",
+      "session_reminder": {
+        "label": "When is this email sent?",
+        "help_text": "Sent once to all participants before the first session.",
+        "off": "Off",
+        "lead_2": "2 hours before the first session",
+        "lead_24": "24 hours before the first session",
+        "lead_48": "48 hours before the first session",
+        "lead_72": "72 hours before the first session",
+        "lead_168": "1 week before the first session"
+      }
     },
     "ects": {
       "label": "ECTS Credits",
@@ -3296,7 +3306,7 @@
       "REGISTRATION_CONFIRMED": "Sent when a user directly registers for an offering",
       "REGISTRATION_CONFIRMED_PAID": "Sent when a user's payment for a registration is confirmed",
       "APPLICATION_RECEIVED_PAID": "Sent when an application for a paid course is received",
-      "SESSION_REMINDER": "Sent before sessions start (24h, 1h, 15min before)",
+      "SESSION_REMINDER": "Sent once to participants before the first session: 24 hours before by default, each course can change this or turn it off",
       "USER_CREATED": "Sent when a new user account is created",
       "ORGANIZER_ADDED": "Sent when a user is added as an organizer to a course or event",
       "SESSION_SPEAKER_ADDED": "Sent when a user is first listed as a speaker in a course or event",
