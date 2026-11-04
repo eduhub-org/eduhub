@@ -253,6 +253,7 @@ export function replaceJobPostingVariables(text, vars, options = {}) {
   return result;
 }
 
+/** @returns true when the mail was inserted into the queue */
 export async function sendJobPostingMail(
   client,
   logger,
@@ -269,7 +270,7 @@ export async function sendJobPostingMail(
     const template = templateData?.MailTemplate?.[0];
     if (!template) {
       logger.warn(`Mail template ${templateType} not found, skipping mail`);
-      return;
+      return false;
     }
     await client.request(INSERT_MAIL_LOG, {
       subject: replaceJobPostingVariables(applyConditionalBlocks(template.subject, flags), vars, {
@@ -286,15 +287,17 @@ export async function sendJobPostingMail(
       metadata: jobPostingId === null ? null : { type: templateType, jobPostingId },
       attachments,
     });
+    return true;
   } catch (error) {
     // Losing the race against the unique dedup index means the mail is already
     // queued -- that is the guard working, not a failure.
     if (String(error?.message ?? error).includes('MailLog_job_posting_mail_unique')) {
       logger.info(`${templateType} already queued for job posting ${jobPostingId}`);
-      return;
+      return false;
     }
     // Mails must never break the publish flow.
     logger.error(`Failed to queue ${templateType} mail`, { error: error.message });
+    return false;
   }
 }
 

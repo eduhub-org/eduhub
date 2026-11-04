@@ -74,6 +74,7 @@ const GET_PENDING = gql`
       currency
       status
       created_at
+      stripeCheckoutSessionId
       stripeInvoiceId
       stripeInvoicePdfUrl
       stripeHostedInvoiceUrl
@@ -201,13 +202,19 @@ export default async function sendPendingJobPostingMails(req, logger) {
     }
 
     const paid = invoice.status === 'PAID';
+    // An unpaid Checkout invoice is a direct debit not yet collected: Stripe
+    // raises its document only then, and JOB_POSTING_INVOICE delivers it.
+    const directDebitPending = !paid && Boolean(invoice.stripeCheckoutSessionId);
     const number = documentNumber || invoice.invoiceNumber;
+    const amount = formatJobPostingAmount(invoice.grossTotal, invoice.currency);
+    let paymentDescription = `${amount} (${paid ? 'bezahlt' : 'Zahlung ausstehend'})`;
+    if (directDebitPending) {
+      paymentDescription = `${amount} per Lastschrift (Einzug ausstehend)`;
+    }
     const vars = buildJobPostingMailVars(posting, {
       expiresAt: posting.expiresAt ? new Date(posting.expiresAt) : null,
       publishedAt: posting.publishedAt ? new Date(posting.publishedAt) : null,
-      paymentDescription: `${formatJobPostingAmount(invoice.grossTotal, invoice.currency)} (${
-        paid ? 'bezahlt' : 'Zahlung ausstehend'
-      })`,
+      paymentDescription,
       invoice: {
         number,
         date: invoice.invoiceDate ? new Date(invoice.invoiceDate) : new Date(invoice.created_at),
@@ -220,7 +227,12 @@ export default async function sendPendingJobPostingMails(req, logger) {
       },
     });
 
-    if (!pdfUrl) {
+    if (!pdfUrl && directDebitPending) {
+      logger.info('Sending direct debit confirmation; the invoice PDF follows once collected', {
+        jobPostingId: posting.id,
+        invoiceId: invoice.id,
+      });
+    } else if (!pdfUrl) {
       // Deliberate: an email without the attachment beats no email at all. The
       // employer still gets the invoice figures and, usually, the hosted link.
       logger.error('Sending job posting confirmation without the invoice PDF', {

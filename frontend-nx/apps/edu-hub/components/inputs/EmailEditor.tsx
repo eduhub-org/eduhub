@@ -54,6 +54,7 @@ export function getTemplateCategory(templateType?: string): string {
     'JOB_POSTING_EXPIRED',
     'JOB_POSTING_ADMIN_NOTICE',
     'JOB_POSTING_PAYMENT_FAILED',
+    'JOB_POSTING_INVOICE',
   ];
   // Also on the job board, but about an organization's access rather than a
   // posting, so they get their own placeholders instead of the posting ones.
@@ -118,9 +119,9 @@ const EMAIL_PLACEHOLDERS: EditorVariable[] = [
   { text: '[Enrollment:CourseLink]', label: 'Course Link', categories: ['enrollment', 'session', 'organizer'] },
   { text: '[Session:Title]', label: 'Session Title', categories: ['session'] },
   { text: '[Session:StartDateTime]', label: 'Session Start', categories: ['session'] },
+  { text: '[Session:DateTimeRange]', label: 'Session Date & Time', categories: ['session'] },
+  { text: '[Session:Location]', label: 'Session Location', categories: ['session'] },
   { text: '[Session:Duration]', label: 'Session Duration', categories: ['session'] },
-  { text: '[Session:ReminderText]', label: 'Reminder Text', categories: ['session'] },
-  { text: '[Session:ReminderTime]', label: 'Reminder Time', categories: ['session'] },
   { text: '[System:PasswordResetLink]', label: 'Password Reset Link', categories: ['general'] },
   { text: '[System:PortalUrl]', label: 'Portal URL', categories: ['general', 'organizer'] },
   { text: '[System:PrivacyPolicyLink]', label: 'Privacy Policy Link', categories: ['general', 'organizer'] },

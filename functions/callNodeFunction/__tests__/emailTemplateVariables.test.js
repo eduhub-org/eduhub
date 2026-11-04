@@ -180,6 +180,24 @@ describe('Email Template Variables System', () => {
       expect(result).toBe('Introduction Session starts tomorrow at 2024-01-15 14:00');
     });
 
+    it('should render session locations, linking meeting URLs only in HTML', () => {
+      const replacer = createVariableReplacer(
+        { session: { location: ['ZBW Kiel <Raum 1>', 'https://meet.example.com/x'], dateTimeRange: '27.10.2026, 17:00–19:00' } },
+        mockFormatDate
+      );
+
+      expect(replacer('[Session:Location]')).toBe(
+        'ZBW Kiel &lt;Raum 1&gt; / <a href="https://meet.example.com/x">https://meet.example.com/x</a>'
+      );
+      expect(replacer('[Session:Location]', { html: false })).toBe('ZBW Kiel <Raum 1> / https://meet.example.com/x');
+      expect(replacer('[Session:DateTimeRange]')).toBe('27.10.2026, 17:00–19:00');
+    });
+
+    it('should fall back to neutral phrases for the deprecated reminder variables', () => {
+      const replacer = createVariableReplacer({ session: {} }, mockFormatDate);
+      expect(replacer('[Session:ReminderText] / [Session:ReminderTime]')).toBe('is starting soon / soon');
+    });
+
     it('should handle enrollment expiration dates', () => {
       const data = {
         enrollment: {

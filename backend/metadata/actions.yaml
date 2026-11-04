@@ -701,8 +701,7 @@ actions:
           value: sendSessionReminders
         - name: secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
-    permissions:
-      - role: instructor_access
+    comment: Run by the send_session_reminders cron trigger; admin only.
   - name: notifySessionParticipants
     definition:
       kind: synchronous

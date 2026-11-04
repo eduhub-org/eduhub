@@ -261,24 +261,6 @@ export const UPDATE_USER_ADMIN_STATUS = gql`
   }
 `;
 
-export const SEND_SESSION_REMINDERS = gql`
-  mutation SendSessionReminders {
-    sendSessionReminders {
-      success
-      messageKey
-      error
-      totalEmailsSent
-      processedSessions {
-        sessionId
-        sessionTitle
-        reminderType
-        emailsSent
-      }
-      processedAt
-    }
-  }
-`;
-
 export const NOTIFY_SESSION_PARTICIPANTS = gql`
   mutation NotifySessionParticipants($sessionId: Int!, $skipCourse: Boolean) {
     notifySessionParticipants(sessionId: $sessionId, skipCourse: $skipCourse) {

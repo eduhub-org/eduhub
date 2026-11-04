@@ -483,6 +483,10 @@ export interface AdminCourseFragment {
    */
   formbricksEnrollmentSurveyUrl: string | null;
   /**
+   * How many hours before the first session participants get the session reminder email. Null sends none.
+   */
+  sessionReminderLeadHours: number | null;
+  /**
    * The time the course starts each week.
    */
   startTime: any | null;
