@@ -39,7 +39,7 @@ More places held than the course has. Only organizers can overbook, and are warn
 ### Paying
 
 **Invoice**:
-The numbered document (Rechnung) a buyer receives for a paid course or job posting. It exists only once the money is collected, so for a direct debit it follows days after the purchase.
+The numbered document (Rechnung) a buyer receives for a paid course or job posting. Paid by card or **Direct debit**, it exists only once the money is collected, so for a direct debit it follows days after the purchase. Bought on account (bank transfer), it is issued first and paid afterwards.
 _Avoid_: Receipt, Beleg (for the invoice itself)
 
 **Direct debit**:

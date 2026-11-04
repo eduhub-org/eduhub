@@ -365,7 +365,7 @@ async function queueMail(
   flags: Record<string, boolean> = {},
   attachments: Array<{ url: string; filename: string; contentType: string }> | null = null,
   jobPostingId: number | null = null
-) {
+): Promise<boolean> {
   try {
     const templateData = await client.request<{
       MailTemplate: Array<{ subject: string; content: string; from: string | null; bcc: string | null }>;
@@ -373,7 +373,7 @@ async function queueMail(
     const template = templateData?.MailTemplate?.[0];
     if (!template) {
       console.warn(`Mail template ${templateType} not found, skipping`);
-      return;
+      return false;
     }
     await client.request(INSERT_MAIL_LOG, {
       subject: replaceVars(applyConditionalBlocks(template.subject, flags), vars, { html: false }),
@@ -385,16 +385,18 @@ async function queueMail(
       attachments,
       metadata: jobPostingId === null ? null : { type: templateType, jobPostingId },
     });
+    return true;
   } catch (error) {
     // The unique index on the job posting dedup key is the real guard against
     // two deliveries racing past hasQueuedJobPostingMail. Losing that race is
     // the mechanism working, not a failure.
     if (isDuplicateMailError(error)) {
       console.info(`${templateType} already queued for job posting ${jobPostingId}`);
-      return;
+      return false;
     }
     // Mails must never fail the webhook.
     console.error(`Failed to queue ${templateType} mail:`, error);
+    return false;
   }
 }
 
@@ -522,7 +524,7 @@ export async function deliverJobPostingInvoice(
   if (await confirmationCarriedPdf(client, posting.id)) return null;
   if (await hasQueuedJobPostingMail(client, 'JOB_POSTING_INVOICE', posting.id)) return null;
 
-  await queueMail(
+  const queued = await queueMail(
     client,
     'JOB_POSTING_INVOICE',
     posting.ContactUser.email,
@@ -531,7 +533,7 @@ export async function deliverJobPostingInvoice(
     [invoiceAttachment(invoice.number, pdfUrl)],
     posting.id
   );
-  return 'JOB_POSTING_INVOICE';
+  return queued ? 'JOB_POSTING_INVOICE' : null;
 }
 
 // One request, one transaction: each update carries its own "still empty"

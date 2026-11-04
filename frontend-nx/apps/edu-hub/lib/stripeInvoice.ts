@@ -86,8 +86,11 @@ export async function resolveStripeInvoice(
 }
 
 const GET_UNLINKED_CHECKOUT_INVOICE = gql`
-  query GetUnlinkedCheckoutInvoice($where: Invoice_bool_exp!) {
+  query GetUnlinkedCheckoutInvoice($where: Invoice_bool_exp!, $stripeInvoiceId: String!) {
     Invoice(where: $where, order_by: { created_at: asc }, limit: 1) {
+      id
+    }
+    linked: Invoice(where: { stripeInvoiceId: { _eq: $stripeInvoiceId } }, limit: 1) {
       id
     }
   }
@@ -114,6 +117,9 @@ const LINK_STRIPE_INVOICE = gql`
  * is matched instead on the invoice_creation metadata the checkout set
  * (jobPostingId or enrollmentId) and on its amount; of several candidates the
  * oldest wins, since Stripe raises the invoices in the order it collects.
+ * A cancelled row is a failed debit and never gets the document. Losing the
+ * conditional update to a concurrent delivery moves on to the next candidate,
+ * unless that delivery linked this very invoice.
  *
  * @returns true when a row was linked
  */
@@ -133,22 +139,28 @@ export async function linkCheckoutInvoice(
     return false;
   }
 
-  const { Invoice: rows } = await client.request<{ Invoice: Array<{ id: number }> }>(
-    GET_UNLINKED_CHECKOUT_INVOICE,
-    {
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    const { Invoice: rows, linked } = await client.request<{
+      Invoice: Array<{ id: number }>;
+      linked: Array<{ id: number }>;
+    }>(GET_UNLINKED_CHECKOUT_INVOICE, {
+      stripeInvoiceId: invoiceDoc.id,
       where: {
         ...owner,
         stripeInvoiceId: { _is_null: true },
         stripeCheckoutSessionId: { _is_null: false },
+        status: { _neq: 'CANCELLED' },
         grossTotal: { _eq: invoiceDoc.total },
       },
-    }
-  );
-  if (rows.length === 0) return false;
+    });
+    if (linked.length > 0) return true;
+    if (rows.length === 0) return false;
 
-  const { update_Invoice } = await client.request<{ update_Invoice: { affected_rows: number } }>(
-    LINK_STRIPE_INVOICE,
-    { id: rows[0].id, stripeInvoiceId: invoiceDoc.id }
-  );
-  return update_Invoice.affected_rows > 0;
+    const { update_Invoice } = await client.request<{ update_Invoice: { affected_rows: number } }>(
+      LINK_STRIPE_INVOICE,
+      { id: rows[0].id, stripeInvoiceId: invoiceDoc.id }
+    );
+    if (update_Invoice.affected_rows > 0) return true;
+  }
+  return false;
 }

@@ -17,6 +17,10 @@
  *   --send      --apply, plus queues the JOB_POSTING_INVOICE mail with the
  *               PDF for job postings whose confirmation went out without it
  *
+ * --apply is for rows whose employer got the PDF another way (e.g. a manual
+ * reply). It is final: a row it links is no longer selected, so a later
+ * --send run will not mail it. Use --send directly when the mail is wanted.
+ *
  * Course enrollment rows are linked but never mailed: the app sends no
  * course invoice mail.
  *
@@ -149,95 +153,113 @@ async function main() {
   const { Invoice: rows } = await client.request(GET_UNLINKED);
   console.log(`${rows.length} Checkout invoice row(s) without a Stripe invoice\n`);
 
-  const summary = { linked: 0, mailed: 0, pending: 0 };
+  const summary = { linked: 0, mailed: 0, pending: 0, failed: 0 };
 
   for (const row of rows) {
     const owner = row.jobPostingId ? `job posting ${row.jobPostingId}` : `enrollment ${row.courseEnrollmentId}`;
     const label = `Invoice #${row.id} (${owner}, ${row.created_at.slice(0, 10)})`;
-
-    const session = await stripe.checkout.sessions.retrieve(row.stripeCheckoutSessionId);
-    if (!session.invoice) {
-      console.log(`${label}: no invoice yet, session payment_status ${session.payment_status}`);
-      summary.pending += 1;
-      continue;
+    try {
+      await backfillRow(client, stripe, row, label, summary);
+    } catch (error) {
+      console.error(`${label}: failed, ${error.message}`);
+      summary.failed += 1;
     }
-    const invoiceDoc =
-      typeof session.invoice === 'string' ? await stripe.invoices.retrieve(session.invoice) : session.invoice;
-    if (invoiceDoc.status === 'draft') {
-      console.log(`${label}: invoice ${invoiceDoc.id} is still a draft`);
-      summary.pending += 1;
-      continue;
-    }
-
-    const status = invoiceDoc.status === 'paid' ? 'PAID' : row.status;
-    console.log(
-      `${label}: ${invoiceDoc.number} (${invoiceDoc.status}), ${row.JobPosting?.ContactUser?.email ?? '-'}` +
-        (status !== row.status ? `, ${row.status} -> ${status}` : '')
-    );
-    if (!APPLY) continue;
-
-    const { update_Invoice } = await client.request(LINK_INVOICE, {
-      id: row.id,
-      status,
-      stripeInvoiceId: invoiceDoc.id,
-      stripeInvoiceNumber: invoiceDoc.number ?? null,
-      stripeHostedInvoiceUrl: invoiceDoc.hosted_invoice_url ?? null,
-      stripeInvoicePdfUrl: invoiceDoc.invoice_pdf ?? null,
-    });
-    if (update_Invoice.affected_rows === 0) {
-      console.log('  already linked meanwhile, skipped');
-      continue;
-    }
-    summary.linked += 1;
-
-    const posting = row.JobPosting;
-    if (!SEND || !posting?.ContactUser?.email || !invoiceDoc.invoice_pdf) continue;
-
-    const decision = await invoiceMailDecision(client, posting.id);
-    if (decision !== 'send') {
-      console.log(`  ${decision}`);
-      continue;
-    }
-
-    const finalizedAt = invoiceDoc.status_transitions?.finalized_at;
-    const number = invoiceDoc.number ?? row.invoiceNumber;
-    const vars = buildJobPostingMailVars(posting, {
-      expiresAt: posting.expiresAt ? new Date(posting.expiresAt) : null,
-      publishedAt: posting.publishedAt ? new Date(posting.publishedAt) : null,
-      paymentDescription: '',
-      invoice: {
-        number,
-        date: finalizedAt ? new Date(finalizedAt * 1000) : new Date(row.created_at),
-        hostedUrl: invoiceDoc.hosted_invoice_url ?? null,
-        netTotal: row.netTotal,
-        vatTotal: row.vatTotal,
-        grossTotal: row.grossTotal,
-        currency: row.currency,
-        paid: status === 'PAID',
-      },
-    });
-    await sendJobPostingMail(
-      client,
-      logger,
-      'JOB_POSTING_INVOICE',
-      posting.ContactUser.email,
-      vars,
-      null,
-      { InvoiceLink: Boolean(invoiceDoc.hosted_invoice_url), TermsAccepted: Boolean(posting.termsAcceptedAt) },
-      posting.id,
-      [
-        {
-          url: invoiceDoc.invoice_pdf,
-          filename: `rechnung-${String(number).replace(/[^A-Za-z0-9._-]+/g, '-')}.pdf`,
-          contentType: 'application/pdf',
-        },
-      ]
-    );
-    console.log(`  JOB_POSTING_INVOICE queued to ${posting.ContactUser.email}`);
-    summary.mailed += 1;
   }
 
   console.log('\nSummary:', summary);
+  if (summary.failed > 0) process.exitCode = 1;
+}
+
+async function backfillRow(client, stripe, row, label, summary) {
+  const session = await stripe.checkout.sessions.retrieve(row.stripeCheckoutSessionId);
+  if (!session.invoice) {
+    console.log(`${label}: no invoice yet, session payment_status ${session.payment_status}`);
+    summary.pending += 1;
+    return;
+  }
+  const invoiceDoc =
+    typeof session.invoice === 'string' ? await stripe.invoices.retrieve(session.invoice) : session.invoice;
+  if (invoiceDoc.status === 'draft') {
+    console.log(`${label}: invoice ${invoiceDoc.id} is still a draft`);
+    summary.pending += 1;
+    return;
+  }
+
+  const status = invoiceDoc.status === 'paid' ? 'PAID' : row.status;
+  console.log(
+    `${label}: ${invoiceDoc.number} (${invoiceDoc.status}), ${row.JobPosting?.ContactUser?.email ?? '-'}` +
+      (status !== row.status ? `, ${row.status} -> ${status}` : '')
+  );
+  if (!APPLY) return;
+
+  const { update_Invoice } = await client.request(LINK_INVOICE, {
+    id: row.id,
+    status,
+    stripeInvoiceId: invoiceDoc.id,
+    stripeInvoiceNumber: invoiceDoc.number ?? null,
+    stripeHostedInvoiceUrl: invoiceDoc.hosted_invoice_url ?? null,
+    stripeInvoicePdfUrl: invoiceDoc.invoice_pdf ?? null,
+  });
+  if (update_Invoice.affected_rows === 0) {
+    console.log('  already linked meanwhile, skipped');
+    return;
+  }
+  summary.linked += 1;
+
+  const posting = row.JobPosting;
+  if (!posting?.ContactUser?.email || !invoiceDoc.invoice_pdf) return;
+
+  const decision = await invoiceMailDecision(client, posting.id);
+  if (decision !== 'send') {
+    console.log(`  ${decision}`);
+    return;
+  }
+  if (!SEND) {
+    console.log('  linked without the invoice mail; a later --send will not mail it');
+    return;
+  }
+
+  const finalizedAt = invoiceDoc.status_transitions?.finalized_at;
+  const number = invoiceDoc.number ?? row.invoiceNumber;
+  const vars = buildJobPostingMailVars(posting, {
+    expiresAt: posting.expiresAt ? new Date(posting.expiresAt) : null,
+    publishedAt: posting.publishedAt ? new Date(posting.publishedAt) : null,
+    paymentDescription: '',
+    invoice: {
+      number,
+      date: finalizedAt ? new Date(finalizedAt * 1000) : new Date(row.created_at),
+      hostedUrl: invoiceDoc.hosted_invoice_url ?? null,
+      netTotal: row.netTotal,
+      vatTotal: row.vatTotal,
+      grossTotal: row.grossTotal,
+      currency: row.currency,
+      paid: status === 'PAID',
+    },
+  });
+  const queued = await sendJobPostingMail(
+    client,
+    logger,
+    'JOB_POSTING_INVOICE',
+    posting.ContactUser.email,
+    vars,
+    null,
+    { InvoiceLink: Boolean(invoiceDoc.hosted_invoice_url), TermsAccepted: Boolean(posting.termsAcceptedAt) },
+    posting.id,
+    [
+      {
+        url: invoiceDoc.invoice_pdf,
+        filename: `rechnung-${String(number).replace(/[^A-Za-z0-9._-]+/g, '-')}.pdf`,
+        contentType: 'application/pdf',
+      },
+    ]
+  );
+  if (!queued) {
+    console.error(`  JOB_POSTING_INVOICE NOT queued to ${posting.ContactUser.email}, send the PDF by hand`);
+    summary.failed += 1;
+    return;
+  }
+  console.log(`  JOB_POSTING_INVOICE queued to ${posting.ContactUser.email}`);
+  summary.mailed += 1;
 }
 
 main().catch((error) => {

@@ -37,15 +37,29 @@ type Call = { query: string; variables: Record<string, unknown> };
 const makeClient = ({
   unlinked = [unlinkedRow] as Array<typeof unlinkedRow>,
   queuedMails = {} as Record<string, Array<{ id: number; attachments: unknown[] | null }>>,
+  lostUpdates = 0,
+  alreadyLinked = false,
 } = {}) => {
   const calls: Call[] = [];
   let linked = false;
+  let candidates = unlinked;
   const request = jest.fn(async (query: unknown, variables: Record<string, unknown>) => {
     const text = String((query as { loc?: { source: { body: string } } })?.loc?.source.body ?? query);
     calls.push({ query: text, variables });
     if (text.includes('GetJobInvoiceByStripeId')) return { Invoice: linked ? unlinked.slice(0, 1) : [] };
-    if (text.includes('GetUnlinkedCheckoutInvoice')) return { Invoice: unlinked.map(({ id }) => ({ id })) };
+    if (text.includes('GetUnlinkedCheckoutInvoice')) {
+      return {
+        Invoice: candidates.slice(0, 1).map(({ id }) => ({ id })),
+        linked: alreadyLinked ? [{ id: 41 }] : [],
+      };
+    }
     if (text.includes('LinkStripeInvoice')) {
+      if (lostUpdates > 0) {
+        // A concurrent delivery linked this row to another invoice first.
+        lostUpdates -= 1;
+        candidates = candidates.slice(1);
+        return { update_Invoice: { affected_rows: 0 } };
+      }
       linked = true;
       return { update_Invoice: { affected_rows: 1 } };
     }
@@ -90,6 +104,7 @@ describe('handleJobPostingInvoiceFinalized for a collected direct debit', () => 
       jobPostingId: { _eq: 7 },
       stripeInvoiceId: { _is_null: true },
       stripeCheckoutSessionId: { _is_null: false },
+      status: { _neq: 'CANCELLED' },
       grossTotal: { _eq: 5950 },
     });
     expect(calls.find((call) => call.query.includes('LinkStripeInvoice'))?.variables).toEqual({
@@ -101,6 +116,20 @@ describe('handleJobPostingInvoiceFinalized for a collected direct debit', () => 
       stripeInvoiceNumber: 'CBB-0042',
       stripeInvoicePdfUrl: 'https://pay.stripe.com/invoice/x/pdf',
     });
+  });
+
+  it('moves on to the next candidate when a concurrent delivery took the row', async () => {
+    const { client, calls } = makeClient({ unlinked: [{ ...unlinkedRow, id: 41 }, unlinkedRow], lostUpdates: 1 });
+    await handleJobPostingInvoiceFinalized(client, collectedInvoice({ jobPostingId: '7' }));
+
+    const links = calls.filter((call) => call.query.includes('LinkStripeInvoice')).map((call) => call.variables.id);
+    expect(links).toEqual([41, 42]);
+  });
+
+  it('does not link a second row once this invoice is linked', async () => {
+    const { client, calls } = makeClient({ alreadyLinked: true });
+    await handleJobPostingInvoiceFinalized(client, collectedInvoice({ jobPostingId: '7' }));
+    expect(calls.some((call) => call.query.includes('LinkStripeInvoice'))).toBe(false);
   });
 
   it('sends the PDF in JOB_POSTING_INVOICE when the confirmation went out without it', async () => {
