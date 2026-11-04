@@ -54,6 +54,7 @@ export function getTemplateCategory(templateType?: string): string {
     'JOB_POSTING_EXPIRED',
     'JOB_POSTING_ADMIN_NOTICE',
     'JOB_POSTING_PAYMENT_FAILED',
+    'JOB_POSTING_INVOICE',
   ];
   // Also on the job board, but about an organization's access rather than a
   // posting, so they get their own placeholders instead of the posting ones.

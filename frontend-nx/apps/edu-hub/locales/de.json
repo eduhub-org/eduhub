@@ -3306,6 +3306,7 @@
       "JOB_POSTING_EXPIRED": "Stellenanzeige abgelaufen",
       "JOB_POSTING_ADMIN_NOTICE": "Stellenanzeige: Hinweis an Admins",
       "JOB_POSTING_PAYMENT_FAILED": "Stellenanzeige: Zahlung fehlgeschlagen",
+      "JOB_POSTING_INVOICE": "Stellenanzeige: Rechnung",
       "JOB_ALERT": "Job-Benachrichtigung",
       "JOB_ORGANIZATION_CLAIMED": "Stellen-Zugang: neu übernommen",
       "JOB_ORGANIZATION_ACCESS_REQUEST": "Stellen-Zugang: Anfrage an Verwalter:innen"
@@ -3368,6 +3369,7 @@
       "JOB_POSTING_EXPIRED": "Geht an den Arbeitgeber, wenn die Laufzeit der Anzeige endet, mit Link zum erneuten Schalten",
       "JOB_POSTING_ADMIN_NOTICE": "Geht an die Plattform-Admins, wenn eine Anzeige veröffentlicht wurde (Prüfung im Nachhinein)",
       "JOB_POSTING_PAYMENT_FAILED": "Geht an den Arbeitgeber, wenn eine verzögerte Zahlung (SEPA) fehlschlägt und die Anzeige offline genommen wird",
+      "JOB_POSTING_INVOICE": "Geht an den Arbeitgeber mit der Rechnung als PDF-Anhang, wenn die Rechnung erst nach der Bestätigung entsteht – bei Lastschrift, sobald der Betrag eingezogen ist. [#if:InvoiceLink] nur, wenn ein Online-Link existiert.",
       "JOB_ALERT": "Geht an Abonnenten mit neuen Anzeigen, die zu ihrem Suchprofil passen",
       "JOB_ORGANIZATION_CLAIMED": "Geht an die StuJo-Kontaktadresse, wenn jemand die Stellen-Verwaltung eines Unternehmens selbst übernimmt",
       "JOB_ORGANIZATION_ACCESS_REQUEST": "Geht an die bisherigen Verwalter:innen, wenn jemand anderes Zugang zu ihren Stellenanzeigen anfragt"
