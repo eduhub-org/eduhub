@@ -72,7 +72,7 @@ The email organizers send by hand when Sessions are rescheduled. Separate from t
 - A **Course** has a number of **Places** and at most one **Registration** per person
 - A **Waitlist** belongs to one **Course**; **Moving up** takes someone off it
 - An **Invitation** holds one **Place** until it is accepted, declined or expires
-- A **Course** has one or more **Sessions**, exactly one of them its **First Session**
+- A **Course** has zero or more **Sessions**; when it has any, exactly one of them is its **First Session**
 - A **Participant** receives at most one **Session Reminder** per **Course**
 
 ## Example dialogue

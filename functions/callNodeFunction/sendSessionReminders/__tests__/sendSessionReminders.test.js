@@ -138,7 +138,21 @@ describe('sendSessionReminders', () => {
 
     const result = await sendSessionReminders({ body: {} }, mockLogger);
 
-    expect(result).toEqual(expect.objectContaining({ success: false, messageKey: 'SESSION_REMINDERS_FAILED' }));
+    expect(result).toEqual(
+      expect.objectContaining({ success: false, retryable: true, messageKey: 'SESSION_REMINDERS_FAILED' })
+    );
+  });
+
+  it('logs and counts a reminder queueEmail rejects, and keeps going', async () => {
+    respondWith([buildCourse()]);
+    mockQueueEmail
+      .mockResolvedValueOnce({ success: false, messageKey: 'INVALID_EMAIL_FORMAT' })
+      .mockResolvedValueOnce({ success: true, mailId: 2 });
+
+    const result = await sendSessionReminders({ body: {} }, mockLogger);
+
+    expect(result).toEqual(expect.objectContaining({ success: true, totalEmailsSent: 1, totalEmailsFailed: 1 }));
+    expect(mockLogger.error).toHaveBeenCalledWith(expect.stringContaining('INVALID_EMAIL_FORMAT'));
   });
 });
 

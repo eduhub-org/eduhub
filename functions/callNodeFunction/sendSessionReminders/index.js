@@ -178,6 +178,7 @@ export default async function sendSessionReminders(req, logger) {
     );
 
     let totalEmailsSent = 0;
+    let totalEmailsFailed = 0;
     const processedSessions = [];
 
     for (const course of dueCourses) {
@@ -236,6 +237,12 @@ export default async function sendSessionReminders(req, logger) {
           totalEmailsSent++;
           sessionEmailsSent++;
           alreadyReminded.add(user.id);
+        } else {
+          // Nothing was logged for this participant, so the next run tries again.
+          totalEmailsFailed++;
+          logger.error(
+            `Session reminder for course ${course.id} not queued for user ${user.id}: ${result?.messageKey ?? 'unknown error'}`
+          );
         }
       }
 
@@ -250,19 +257,25 @@ export default async function sendSessionReminders(req, logger) {
       }
     }
 
-    logger.info(`Session reminders processed. Total emails queued: ${totalEmailsSent}`);
+    logger.info(
+      `Session reminders processed. Total emails queued: ${totalEmailsSent}, not queued: ${totalEmailsFailed}`
+    );
 
     return {
       success: true,
       messageKey: 'SESSION_REMINDERS_PROCESSED',
       totalEmailsSent,
+      totalEmailsFailed,
       processedSessions,
       processedAt: new Date().toISOString(),
     };
   } catch (error) {
     logger.error(`Error sending session reminders: ${error.message}`, { error });
+    // Retrying is safe: every reminder queued before the failure has its
+    // MailLog row, so the retry skips those participants.
     return {
       success: false,
+      retryable: true,
       error: error.message,
       messageKey: 'SESSION_REMINDERS_FAILED',
     };

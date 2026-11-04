@@ -7,7 +7,8 @@
 -- still ahead.
 ALTER TABLE "public"."Course"
   ADD COLUMN "sessionReminderLeadHours" integer NULL DEFAULT 24
-  CONSTRAINT "Course_sessionReminderLeadHours_positive" CHECK ("sessionReminderLeadHours" > 0);
+  -- The lead times the course settings offer: 2h, 24h, 48h, 72h, 1 week.
+  CONSTRAINT "Course_sessionReminderLeadHours_offered" CHECK ("sessionReminderLeadHours" IN (2, 24, 48, 72, 168));
 
 COMMENT ON COLUMN "public"."Course"."sessionReminderLeadHours" IS
   E'How many hours before the first session participants get the session reminder email. Null sends none.';
