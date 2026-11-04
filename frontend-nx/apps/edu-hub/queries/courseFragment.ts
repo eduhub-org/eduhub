@@ -159,6 +159,7 @@ export const ADMIN_COURSE_FRAGMENT = gql`
     registrationType
     guestRegistrationEnabled
     formbricksEnrollmentSurveyUrl
+    sessionReminderLeadHours
     basePrice
     currency
     stripeProductId
