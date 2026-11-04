@@ -36,6 +36,16 @@ An invited person giving up their invitation. Its place is free again and the or
 **Overbooking**:
 More places held than the course has. Only organizers can overbook, and are warned before they do; people registering themselves never can.
 
+### Paying
+
+**Invoice**:
+The numbered document (Rechnung) a buyer receives for a paid course or job posting. Paid by card or **Direct debit**, it exists only once the money is collected, so for a direct debit it follows days after the purchase. Bought on account (bank transfer), it is issued first and paid afterwards.
+_Avoid_: Receipt, Beleg (for the invoice itself)
+
+**Direct debit**:
+Paying by SEPA Lastschrift: the course place or job posting is granted at checkout, but the money is collected days later, and the invoice is sent separately once it is.
+_Avoid_: SEPA (on its own, in copy)
+
 ### Organizers
 
 **Organizer**:

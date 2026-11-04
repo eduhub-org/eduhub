@@ -3321,6 +3321,7 @@
       "JOB_POSTING_EXPIRED": "Job posting expired",
       "JOB_POSTING_ADMIN_NOTICE": "Job posting: admin notice",
       "JOB_POSTING_PAYMENT_FAILED": "Job posting: payment failed",
+      "JOB_POSTING_INVOICE": "Job posting: invoice",
       "JOB_ALERT": "Job alert",
       "JOB_ORGANIZATION_CLAIMED": "Job access: newly taken over",
       "JOB_ORGANIZATION_ACCESS_REQUEST": "Job access: request to the current admins"
@@ -3383,6 +3384,7 @@
       "JOB_POSTING_EXPIRED": "Sent to the employer when the posting run ends, with a link to post it again",
       "JOB_POSTING_ADMIN_NOTICE": "Sent to the platform admins when a posting is published (post-hoc moderation)",
       "JOB_POSTING_PAYMENT_FAILED": "Sent to the employer when a delayed payment (SEPA) fails and the posting is taken offline",
+      "JOB_POSTING_INVOICE": "Sent to the employer with the invoice PDF attached when the invoice is raised after the confirmation – for a direct debit, once the money is collected. [#if:InvoiceLink] only when an online link exists.",
       "JOB_ALERT": "Sent to subscribers with new postings matching their search profile",
       "JOB_ORGANIZATION_CLAIMED": "Goes to the StuJo contact address when someone takes over job management for a company themselves",
       "JOB_ORGANIZATION_ACCESS_REQUEST": "Goes to the current admins when someone else asks for access to their job offers"
