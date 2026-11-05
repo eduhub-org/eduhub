@@ -56,7 +56,7 @@ const Privacy: FC = () => {
           <PrivacyFormbricks n={5} />
           <PrivacyPayments n={6} />
           <PrivacyAnalytics n={7} />
-          <PrivacyChangeHistory n={8} />
+          <PrivacyChangeHistory n={8} site="eduhub" />
           <PrivacyAsOfDate />
         </div>
       </Page>

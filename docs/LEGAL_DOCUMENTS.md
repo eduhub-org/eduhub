@@ -106,9 +106,12 @@ For a material change:
 
 1. Add an entry for the new version at the top of `PRIVACY_POLICY_CHANGES`
    (same file as the policy version): one or two sentences per language,
-   written for users. It appears in the change history at the end of the
-   EduHub policy (`#aenderungen`) and is the summary in the notice. Add one
-   for every version, material or not; never edit an old entry.
+   written for users, and `sites` - EduHub, StuJo or both, depending on whose
+   users the change concerns. It appears in the change history at the end of
+   that site's policy (`#aenderungen`) and is the summary in the EduHub notice.
+   Add one for every version, material or not; never edit an old entry.
+   StuJo's history starts with its first entry (none yet; the 2026-11-05
+   changes only documented existing processing there).
 2. Set `PRIVACY_NOTICE_VERSION` (same file) to the new
    `PRIVACY_POLICY_VERSION`. Every account created before that date then sees a
    dismissible notice on its next visit; the dismissal is stored in
@@ -164,5 +167,5 @@ All legal pages support both German and English translations. The language is au
 | 2026-02-05 | Terms & Privacy | Initial versions with payment registration |
 | 2026-08-27 | Privacy         | Added guest registration (Art. 6(1)(b), 12-month retention, self-service deletion) and the newsletter section (Art. 6(1)(a), Ghost as processor) |
 | 2026-09-09 | Privacy         | Text moved into shared components so the StuJo app renders the same wording. Added company/organization accounts (Art. 6(1)(b) for the account and admin grant, Art. 6(1)(f) for the authorization check and admin notification) and, for StuJo only, job postings (Art. 6(1)(b) for publication, Art. 6(1)(f) for the aggregate view counter). Generalized "Profilinformationen" from course participants to the user account, since the section is now shared with a site that has no courses. Replaced the numeric "sections 7 and 8" cross-reference with the section names |
-| 2026-11-05 | Privacy         | Removed the Meta Pixel and the Cookiebot consent banner and their sections. Plausible now runs without consent on Art. 6(1)(f) (no cookies, nothing stored on the device; right to object under Art. 21). Rewrote the tracking overview. Added "Cookies und lokale Speicherung" (strictly necessary storage only, § 25(2) Nr. 2 TDDDG) and single sign-on via Digital Learning Campus, Google, LinkedIn and GitHub (name and email only, Art. 6(1)(b), providers as independent controllers) to the shared data-collection section, so StuJo shows both too |
+| 2026-11-05 | Privacy         | Removed the Meta Pixel and the Cookiebot consent banner and their sections. Plausible now runs without consent on Art. 6(1)(f) (no cookies, nothing stored on the device; right to object under Art. 21). Rewrote the tracking overview. Added "Cookies und lokale Speicherung" (strictly necessary storage only, § 25(2) Nr. 2 TDDDG) and single sign-on via Digital Learning Campus, Google, LinkedIn and GitHub (name and email only, Art. 6(1)(b), providers as independent controllers) to the shared data-collection section, so StuJo shows both too. The Art. 21 objection notice is now set in normal case inside a framed box instead of capitals (Art. 21(4) asks for a separate, explicit notice, not capitals) |
 | 2026-11-05 | Privacy & AGB   | Information chain: notice with AGB and privacy links on the Keycloak registration and login pages (also covering SSO), on course registration, StuJo publishing and the Job-Letter. Paid and guest checkbox now reads "accept the AGB, take note of the privacy policy". `termsAcceptedAt` is stamped by the server and only by the participant. Policy versioning with a one-time in-app notice (`User.privacyNoticeSeenVersion`) and the `PRIVACY_POLICY_UPDATED` mail |

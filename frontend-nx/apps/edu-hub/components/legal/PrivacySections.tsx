@@ -6,7 +6,7 @@ import { useRoleQuery } from '../../hooks/authedQuery';
 import { GUEST_DATA_RETENTION_MONTHS } from '../../queries/guestRegistration';
 import { GuestDataRetentionMonths } from '../../queries/__generated__/GuestDataRetentionMonths';
 import { AuthRoles } from '../../types/enums';
-import { PRIVACY_POLICY_CHANGES, PRIVACY_POLICY_VERSION } from './privacyPolicyVersion';
+import { getPrivacyPolicyChanges, PRIVACY_POLICY_VERSION, PrivacyPolicySite } from './privacyPolicyVersion';
 
 /**
  * The privacy policy, as composable sections shared by the edu-hub and StuJo
@@ -255,16 +255,25 @@ export const PrivacyGeneralInfo: FC<SectionProps & { imprintHref: string }> = ({
           ? 'Right to Object to Data Collection in Special Cases and to Direct Advertising (Art. 21 GDPR)'
           : 'Widerspruchsrecht gegen die Datenerhebung in besonderen Fällen sowie gegen Direktwerbung (Art. 21 DSGVO)'}
       </h3>
-      <p>
-        {isEnglish
-          ? 'IF DATA PROCESSING IS CARRIED OUT ON THE BASIS OF ART. 6 PARA. 1 LIT. E OR F GDPR, YOU HAVE THE RIGHT TO OBJECT TO THE PROCESSING OF YOUR PERSONAL DATA AT ANY TIME FOR REASONS ARISING FROM YOUR PARTICULAR SITUATION; THIS ALSO APPLIES TO PROFILING BASED ON THESE PROVISIONS. THE RESPECTIVE LEGAL BASIS ON WHICH PROCESSING IS BASED CAN BE FOUND IN THIS PRIVACY POLICY. IF YOU OBJECT, WE WILL NO LONGER PROCESS YOUR AFFECTED PERSONAL DATA UNLESS WE CAN DEMONSTRATE COMPELLING LEGITIMATE GROUNDS FOR PROCESSING THAT OVERRIDE YOUR INTERESTS, RIGHTS, AND FREEDOMS OR THE PROCESSING SERVES TO ASSERT, EXERCISE, OR DEFEND LEGAL CLAIMS (OBJECTION PURSUANT TO ART. 21 PARA. 1 GDPR).'
-          : 'WENN DIE DATENVERARBEITUNG AUF GRUNDLAGE VON ART. 6 ABS. 1 LIT. E ODER F DSGVO ERFOLGT, HAST DU JEDERZEIT DAS RECHT, AUS GRÜNDEN, DIE SICH AUS DEINER BESONDEREN SITUATION ERGEBEN, GEGEN DIE VERARBEITUNG DEINER PERSONENBEZOGENEN DATEN WIDERSPRUCH EINZULEGEN; DIES GILT AUCH FÜR EIN AUF DIESE BESTIMMUNGEN GESTÜTZTES PROFILING. DIE JEWEILIGE RECHTSGRUNDLAGE, AUF DENEN EINE VERARBEITUNG BERUHT, ENTNIMMST DU DIESER DATENSCHUTZERKLÄRUNG. WENN DU WIDERSPRUCH EINLEGST, WERDEN WIR DEINE BETROFFENEN PERSONENBEZOGENEN DATEN NICHT MEHR VERARBEITEN, ES SEI DENN, WIR KÖNNEN ZWINGENDE SCHUTZWÜRDIGE GRÜNDE FÜR DIE VERARBEITUNG NACHWEISEN, DIE DEINE INTERESSEN, RECHTE UND FREIHEITEN ÜBERWIEGEN ODER DIE VERARBEITUNG DIENT DER GELTENDMACHUNG, AUSÜBUNG ODER VERTEIDIGUNG VON RECHTSANSPRÜCHEN (WIDERSPRUCH NACH ART. 21 ABS. 1 DSGVO).'}
-      </p>
-      <p>
-        {isEnglish
-          ? 'IF YOUR PERSONAL DATA IS PROCESSED FOR THE PURPOSE of DIRECT ADVERTISING, YOU HAVE THE RIGHT TO OBJECT AT ANY TIME TO THE PROCESSING OF PERSONAL DATA CONCERNING YOU FOR THE PURPOSE OF SUCH ADVERTISING; THIS ALSO APPLIES TO PROFILING INSOFAR AS IT IS RELATED TO SUCH DIRECT ADVERTISING. IF YOU OBJECT, YOUR PERSONAL DATA WILL SUBSEQUENTLY NO LONGER BE USED FOR THE PURPOSE OF DIRECT ADVERTISING (OBJECTION PURSUANT TO ART. 21 PARA. 2 GDPR).'
-          : 'WERDEN DEINE PERSONENBEZOGENEN DATEN VERARBEITET, UM DIREKTWERBUNG ZU BETREIBEN, SO HAST DU DAS RECHT, JEDERZEIT WIDERSPRUCH GEGEN DIE VERARBEITUNG DICH BETREFFENDER PERSONENBEZOGENER DATEN ZUM ZWECKE DERARTIGER WERBUNG EINZULEGEN; DIES GILT AUCH FÜR DAS PROFILING, SOWEIT ES MIT SOLCHER DIREKTWERBUNG IN VERBINDUNG STEHT. WENN DU WIDERSPRICHST, WERDEN DEINE PERSONENBEZOGENEN DATEN ANSCHLIESSEND NICHT MEHR ZUM ZWECKE DER DIREKTWERBUNG VERWENDET (WIDERSPRUCH NACH ART. 21 ABS. 2 DSGVO).'}
-      </p>
+      {/* Art. 21(4) GDPR: the right to object must be pointed out explicitly and
+          separately from other information. A framed box does that and stays
+          readable; the template text used to set it in capitals instead.
+          border-solid: StuJo runs without Tailwind preflight. */}
+      <div className="my-3 p-4 rounded-lg border-2 border-solid border-border-primary">
+        <p className="font-semibold">
+          {isEnglish ? 'Important: you can object.' : 'Wichtig: Du kannst widersprechen.'}
+        </p>
+        <p className="mt-2">
+          {isEnglish
+            ? 'If data processing is carried out on the basis of Art. 6 para. 1 lit. e or f GDPR, you have the right to object to the processing of your personal data at any time for reasons arising from your particular situation; this also applies to profiling based on these provisions. The respective legal basis on which processing is based can be found in this privacy policy. If you object, we will no longer process your affected personal data unless we can demonstrate compelling legitimate grounds for processing that override your interests, rights, and freedoms, or the processing serves to assert, exercise, or defend legal claims (objection pursuant to Art. 21 para. 1 GDPR).'
+            : 'Wenn die Datenverarbeitung auf Grundlage von Art. 6 Abs. 1 lit. e oder f DSGVO erfolgt, hast du jederzeit das Recht, aus Gründen, die sich aus deiner besonderen Situation ergeben, gegen die Verarbeitung deiner personenbezogenen Daten Widerspruch einzulegen; dies gilt auch für ein auf diese Bestimmungen gestütztes Profiling. Die jeweilige Rechtsgrundlage, auf der eine Verarbeitung beruht, entnimmst du dieser Datenschutzerklärung. Wenn du Widerspruch einlegst, werden wir deine betroffenen personenbezogenen Daten nicht mehr verarbeiten, es sei denn, wir können zwingende schutzwürdige Gründe für die Verarbeitung nachweisen, die deine Interessen, Rechte und Freiheiten überwiegen, oder die Verarbeitung dient der Geltendmachung, Ausübung oder Verteidigung von Rechtsansprüchen (Widerspruch nach Art. 21 Abs. 1 DSGVO).'}
+        </p>
+        <p className="mt-2">
+          {isEnglish
+            ? 'If your personal data is processed for the purpose of direct advertising, you have the right to object at any time to the processing of personal data concerning you for the purpose of such advertising; this also applies to profiling insofar as it is related to such direct advertising. If you object, your personal data will subsequently no longer be used for the purpose of direct advertising (objection pursuant to Art. 21 para. 2 GDPR).'
+            : 'Werden deine personenbezogenen Daten verarbeitet, um Direktwerbung zu betreiben, so hast du das Recht, jederzeit Widerspruch gegen die Verarbeitung dich betreffender personenbezogener Daten zum Zwecke derartiger Werbung einzulegen; dies gilt auch für das Profiling, soweit es mit solcher Direktwerbung in Verbindung steht. Wenn du widersprichst, werden deine personenbezogenen Daten anschließend nicht mehr zum Zwecke der Direktwerbung verwendet (Widerspruch nach Art. 21 Abs. 2 DSGVO).'}
+        </p>
+      </div>
       <h3 className="text-lg mt-2 mb-2 italic">
         {isEnglish
           ? 'Right to Lodge a Complaint with the Competent Supervisory Authority'
@@ -869,12 +878,15 @@ const formatVersionDate = (version: string, isEnglish: boolean) =>
   });
 
 /**
- * edu-hub only: the summaries are written for EduHub (StuJo never loaded the
- * Meta Pixel, for instance). Anchored as #aenderungen so the "policy updated"
+ * Shared: each site lists only the changes recorded for it (`sites` in
+ * PRIVACY_POLICY_CHANGES), and renders nothing until it has one - so keep it
+ * the last numbered section. Anchored as #aenderungen so the "policy updated"
  * notice and mails can link straight to it.
  */
-export const PrivacyChangeHistory: FC<SectionProps> = ({ n }) => {
+export const PrivacyChangeHistory: FC<SectionProps & { site: PrivacyPolicySite }> = ({ n, site }) => {
   const isEnglish = useIsEnglish();
+  const changes = getPrivacyPolicyChanges(site);
+  if (changes.length === 0) return null;
 
   return (
     <>
@@ -882,7 +894,7 @@ export const PrivacyChangeHistory: FC<SectionProps> = ({ n }) => {
         {n}. {isEnglish ? 'Changes to This Privacy Policy' : 'Änderungen dieser Datenschutzerklärung'}
       </h2>
       <ul className="list-disc list-inside pl-5">
-        {PRIVACY_POLICY_CHANGES.map((change) => (
+        {changes.map((change) => (
           <li key={change.version}>
             <strong>{formatVersionDate(change.version, isEnglish)}:</strong> {isEnglish ? change.en : change.de}
           </li>

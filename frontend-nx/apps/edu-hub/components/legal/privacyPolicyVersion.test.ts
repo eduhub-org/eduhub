@@ -1,5 +1,6 @@
 import {
   getPrivacyPolicyChange,
+  getPrivacyPolicyChanges,
   isNoticeDue,
   PRIVACY_NOTICE_VERSION,
   PRIVACY_POLICY_CHANGES,
@@ -45,6 +46,19 @@ describe('PRIVACY_POLICY_CHANGES', () => {
       expect(change.de.trim()).not.toBe('');
       expect(change.en.trim()).not.toBe('');
     });
+  });
+
+  it('names at least one site per entry', () => {
+    PRIVACY_POLICY_CHANGES.forEach((change) => expect(change.sites.length).toBeGreaterThan(0));
+  });
+
+  it('gives the EduHub notice an EduHub summary', () => {
+    expect(getPrivacyPolicyChange(PRIVACY_NOTICE_VERSION)?.sites).toContain('eduhub');
+  });
+
+  it('filters the history per site', () => {
+    expect(getPrivacyPolicyChanges('eduhub').every((change) => change.sites.includes('eduhub'))).toBe(true);
+    expect(getPrivacyPolicyChanges('stujo').every((change) => change.sites.includes('stujo'))).toBe(true);
   });
 
   it('starts with the current version', () => {
