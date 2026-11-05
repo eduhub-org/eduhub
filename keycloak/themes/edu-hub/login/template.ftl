@@ -204,6 +204,16 @@
                         
                       <#if bodyClass == "kc-login-page" || bodyClass == "kc-register-page">
                           <@identityProviders.buttons registration=(bodyClass == "kc-register-page") />
+                          <#-- Art. 13 GDPR: point to the terms and the privacy policy where the
+                               account is created, including through an SSO button. A notice, not
+                               a checkbox. js/home-link.js retargets the links to the portal the
+                               person came from (EduHub or a StuJo portal). -->
+                          <#assign legalBase = (client.baseUrl)!"">
+                          <#if !legalBase?has_content><#assign legalBase = "https://edu.opencampus.sh/"></#if>
+                          <#if !legalBase?ends_with("/")><#assign legalBase = legalBase + "/"></#if>
+                          <p id="kc-legal-notice" class="kc-legal-notice" data-legal-base="${legalBase}">
+                              ${kcSanitize(msg((bodyClass == "kc-register-page")?then("legalNoticeRegister", "legalNoticeLogin"), legalBase + "agb", legalBase + "datenschutz"))?no_esc}
+                          </p>
                       <#else>
                           <#nested "socialProviders">
                       </#if>

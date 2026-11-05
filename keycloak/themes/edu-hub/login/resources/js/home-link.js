@@ -9,6 +9,26 @@
    *
    * @returns {void}
    */
+  /**
+   * Points the terms and privacy links of the legal notice at the same portal
+   * as the logo, keeping their paths (agb, datenschutz).
+   *
+   * @param {string} base - The portal origin with a trailing slash.
+   * @returns {void}
+   */
+  function setLegalLinks(base) {
+    var notice = document.getElementById('kc-legal-notice');
+    if (!notice) return;
+    var oldBase = notice.dataset.legalBase || '';
+    var links = notice.querySelectorAll('a[href]');
+    for (var i = 0; i < links.length; i++) {
+      var href = links[i].getAttribute('href');
+      if (oldBase && href.indexOf(oldBase) === 0) {
+        links[i].setAttribute('href', base + href.slice(oldBase.length));
+      }
+    }
+  }
+
   function setHomeLink() {
     var link = document.getElementById('kc-home-link');
     if (!link) return;
@@ -25,6 +45,7 @@
       var callback = new URL(redirect);
       if (callback.protocol === 'https:' || callback.protocol === 'http:') {
         link.href = callback.origin + '/';
+        setLegalLinks(callback.origin + '/');
       }
     } catch (e) {
       /* Keep the client home URL (or EduHub fallback) if no callback is available. */

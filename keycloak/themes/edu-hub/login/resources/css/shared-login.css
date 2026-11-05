@@ -510,6 +510,20 @@ h1#kc-page-title {
   text-align: left;
 }
 
+/* Terms and privacy notice under the form and SSO buttons (template.ftl). */
+.kc-legal-notice {
+  margin: 16px 0 0;
+  color: #77737a;
+  font-size: 12px;
+  line-height: 1.5;
+  text-align: left;
+}
+
+.kc-legal-notice a {
+  color: inherit;
+  text-decoration: underline;
+}
+
 /* Keep account switching next to the primary action on both pages. */
 #kc-form-login .kc-account-actions {
   margin-left: auto;
