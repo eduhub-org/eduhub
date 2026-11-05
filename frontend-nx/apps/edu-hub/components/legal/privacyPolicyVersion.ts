@@ -28,7 +28,8 @@ export type PrivacyPolicyChange = { version: string; sites: PrivacyPolicySite[];
  * `sites`), and the entry for PRIVACY_NOTICE_VERSION is the summary in the
  * EduHub "policy updated" notice. A version that changed nothing a site's
  * users would notice simply leaves that site out.
- * Newest first; never edit or drop an old entry. Kept in code rather than in
+ * Newest first; never edit or drop an entry once its version is in production
+ * (until then, extend it instead of adding a version). Kept in code rather than in
  * the locale files so the history is recoverable from git like the policy
  * itself, and because StuJo renders the policy sections with its own locales.
  * Tracked from 2026-11-05 on (StuJo from its first entry); older versions are

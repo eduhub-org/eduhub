@@ -109,7 +109,15 @@ For a material change:
    written for users, and `sites` - EduHub, StuJo or both, depending on whose
    users the change concerns. It appears in the change history at the end of
    that site's policy (`#aenderungen`) and is the summary in the EduHub notice.
-   Add one for every version, material or not; never edit an old entry.
+   Add one for every version, material or not; never edit an entry whose
+   version is already in production.
+
+   **Not yet in production?** Then do not start a new version: change the text
+   under the existing `PRIVACY_POLICY_VERSION`, extend its
+   `PRIVACY_POLICY_CHANGES` entry, and leave both version constants alone.
+   Only one version per production deploy, so users never see a change history
+   with versions they could not read. If the deploy happens on a later day, the
+   date may be moved to the deploy day (version constants and entry together).
    StuJo's history starts with its first entry (none yet; the 2026-11-05
    changes only documented existing processing there).
 2. Set `PRIVACY_NOTICE_VERSION` (same file) to the new

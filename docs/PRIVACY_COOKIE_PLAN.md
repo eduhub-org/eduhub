@@ -57,6 +57,12 @@ GitBook help page.
 
 ## C: Complete processors and recipients in the policy
 
+**No new policy version.** The 2026-11-05 version (merged in #2104) is not in
+production yet, so C goes into that version: keep `PRIVACY_POLICY_VERSION`
+and `PRIVACY_NOTICE_VERSION` at `2026-11-05` and extend its
+`PRIVACY_POLICY_CHANGES` entry (e.g. "… und nennen alle Dienstleister, die wir
+einsetzen"). See "Not yet in production?" in `docs/LEGAL_DOCUMENTS.md`.
+
 Rule: an **external processor** gets its own section (provider, purpose, legal
 basis, DPA, third-country transfer). A **self-hosted tool** on our own GCP
 infrastructure is covered by `PrivacyHosting` and is only mentioned by
