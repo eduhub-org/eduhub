@@ -104,15 +104,18 @@ material.
 
 For a material change:
 
-1. Write a two-line summary into `privacy_update.summary` in both
-   `locales/de.json` and `locales/en.json`.
-2. Set `PRIVACY_NOTICE_VERSION` (same file as the policy version) to the new
+1. Add an entry for the new version at the top of `PRIVACY_POLICY_CHANGES`
+   (same file as the policy version): one or two sentences per language,
+   written for users. It appears in the change history at the end of the
+   EduHub policy (`#aenderungen`) and is the summary in the notice. Add one
+   for every version, material or not; never edit an old entry.
+2. Set `PRIVACY_NOTICE_VERSION` (same file) to the new
    `PRIVACY_POLICY_VERSION`. Every account created before that date then sees a
    dismissible notice on its next visit; the dismissal is stored in
    `User.privacyNoticeSeenVersion`. Accounts created later saw the new policy
    when they registered and are not shown it.
-3. After the deploy, edit the `PRIVACY_POLICY_UPDATED` mail template in the
-   admin UI (replace the placeholder bullet with the summary) and send it once:
+3. Optionally, after the deploy, send the `PRIVACY_POLICY_UPDATED` mail once.
+   It links to the change history, so the template needs no editing:
    ```bash
    cd functions/callNodeFunction
    HASURA_ENDPOINT=https://hasura.opencampus.sh/v1/graphql \
@@ -124,7 +127,8 @@ For a material change:
    The version is stored in `MailLog.metadata`, so the script never mails
    anyone twice for the same version and can be re-run after an interruption.
 
-For a change that is not material, leave `PRIVACY_NOTICE_VERSION` alone.
+For a change that is not material, add the `PRIVACY_POLICY_CHANGES` entry but
+leave `PRIVACY_NOTICE_VERSION` alone.
 
 ## How to Find Which Version a User Accepted
 

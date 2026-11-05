@@ -1,9 +1,9 @@
 import Link from 'next/link';
 import { FC, useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { MdClose } from 'react-icons/md';
 
-import { isNoticeDue, PRIVACY_NOTICE_VERSION } from '../legal/privacyPolicyVersion';
+import { getPrivacyPolicyChange, isNoticeDue, PRIVACY_NOTICE_VERSION } from '../legal/privacyPolicyVersion';
 import { useImpersonation } from '../../contexts/ImpersonationContext';
 import { useRoleMutation } from '../../hooks/authedMutation';
 import { useRoleQuery } from '../../hooks/authedQuery';
@@ -28,6 +28,7 @@ const USER_ROLE_CONTEXT = { role: AuthRoles.user };
  */
 export const PrivacyUpdateNotice: FC = () => {
   const t = useTranslations('privacy_update');
+  const locale = useLocale();
   const userId = useCurrentUserId();
   const { target: impersonating } = useImpersonation();
   const [dismissed, setDismissed] = useState(false);
@@ -47,6 +48,8 @@ export const PrivacyUpdateNotice: FC = () => {
     return null;
   }
 
+  const change = getPrivacyPolicyChange(PRIVACY_NOTICE_VERSION);
+
   const handleDismiss = () => {
     setDismissed(true);
     // Best effort: if this fails the notice simply shows again next time.
@@ -58,11 +61,11 @@ export const PrivacyUpdateNotice: FC = () => {
       <div className="max-w-screen-xl mx-auto flex items-start gap-4 px-3 md:px-16 py-4">
         <div className="flex-1 text-sm leading-relaxed">
           <p className="font-semibold">{t('title')}</p>
-          <p className="mt-1">{t('summary')}</p>
+          {change && <p className="mt-1">{locale === 'en' ? change.en : change.de}</p>}
           <p className="mt-1">
             {t.rich('more', {
               privacy: (chunks) => (
-                <Link href="/privacy" className="underline hover:text-label-secondary">
+                <Link href="/privacy#aenderungen" className="underline hover:text-label-secondary">
                   {chunks}
                 </Link>
               ),

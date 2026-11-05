@@ -3363,7 +3363,7 @@
       "APPLICATION_RECEIVED_PAID": "Sent when an application for a paid course is received",
       "SESSION_REMINDER": "Sent once to participants before the first session: 24 hours before by default, each course can change this or turn it off",
       "USER_CREATED": "Sent when a new user account is created",
-      "PRIVACY_POLICY_UPDATED": "Sent once to every active account when the privacy policy changes materially. Sent by script (functions/callNodeFunction/scripts/send-privacy-policy-update.js); enter the changes into the template first.",
+      "PRIVACY_POLICY_UPDATED": "Sent once to every active account when the privacy policy changes materially; links to the change history at the end of the policy. Sent by script (functions/callNodeFunction/scripts/send-privacy-policy-update.js).",
       "ORGANIZER_ADDED": "Sent when a user is added as an organizer to a course or event",
       "SESSION_SPEAKER_ADDED": "Sent when a user is first listed as a speaker in a course or event",
       "CANCELLATION_REQUEST_ORGANIZER": "Sent to organizers and organization admins when someone asks to cancel a paid registration",
@@ -3827,8 +3827,7 @@
   },
   "privacy_update": {
     "title": "We have updated our privacy policy",
-    "summary": "We no longer use the Meta Pixel or a cookie banner, measure visits only anonymously and without cookies, and now name every service you can sign in with.",
-    "more": "You do not need to do anything. All details are in the <privacy>privacy policy</privacy>.",
+    "more": "You do not need to do anything. All changes are listed in the <privacy>privacy policy</privacy>.",
     "dismiss": "Close notice"
   }
 }

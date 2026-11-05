@@ -6,7 +6,7 @@ import { useRoleQuery } from '../../hooks/authedQuery';
 import { GUEST_DATA_RETENTION_MONTHS } from '../../queries/guestRegistration';
 import { GuestDataRetentionMonths } from '../../queries/__generated__/GuestDataRetentionMonths';
 import { AuthRoles } from '../../types/enums';
-import { PRIVACY_POLICY_VERSION } from './privacyPolicyVersion';
+import { PRIVACY_POLICY_CHANGES, PRIVACY_POLICY_VERSION } from './privacyPolicyVersion';
 
 /**
  * The privacy policy, as composable sections shared by the edu-hub and StuJo
@@ -860,14 +860,41 @@ export const PrivacyAnalytics: FC<SectionProps> = ({ n }) => {
   );
 };
 
-export const PrivacyAsOfDate: FC = () => {
-  const isEnglish = useIsEnglish();
-  const asOf = new Date(`${PRIVACY_POLICY_VERSION}T12:00:00Z`).toLocaleDateString(isEnglish ? 'en-US' : 'de-DE', {
+const formatVersionDate = (version: string, isEnglish: boolean) =>
+  new Date(`${version}T12:00:00Z`).toLocaleDateString(isEnglish ? 'en-US' : 'de-DE', {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
     timeZone: 'Europe/Berlin',
   });
+
+/**
+ * edu-hub only: the summaries are written for EduHub (StuJo never loaded the
+ * Meta Pixel, for instance). Anchored as #aenderungen so the "policy updated"
+ * notice and mails can link straight to it.
+ */
+export const PrivacyChangeHistory: FC<SectionProps> = ({ n }) => {
+  const isEnglish = useIsEnglish();
+
+  return (
+    <>
+      <h2 id="aenderungen" className="text-xl mt-6 mb-2 scroll-mt-24">
+        {n}. {isEnglish ? 'Changes to This Privacy Policy' : 'Änderungen dieser Datenschutzerklärung'}
+      </h2>
+      <ul className="list-disc list-inside pl-5">
+        {PRIVACY_POLICY_CHANGES.map((change) => (
+          <li key={change.version}>
+            <strong>{formatVersionDate(change.version, isEnglish)}:</strong> {isEnglish ? change.en : change.de}
+          </li>
+        ))}
+      </ul>
+    </>
+  );
+};
+
+export const PrivacyAsOfDate: FC = () => {
+  const isEnglish = useIsEnglish();
+  const asOf = formatVersionDate(PRIVACY_POLICY_VERSION, isEnglish);
 
   return (
     <>

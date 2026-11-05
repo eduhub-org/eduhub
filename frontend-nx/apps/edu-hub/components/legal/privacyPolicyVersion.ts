@@ -1,11 +1,11 @@
 /**
  * The version of the privacy policy, as the ISO date of its "Stand".
  *
- * Bump it together with the text in PrivacySections.tsx. A bump also shows
- * every account created before this date the one-time "policy updated" notice
- * (components/layout/PrivacyUpdateNotice.tsx); write what changed into
- * `privacy_update.summary` in both locale files first. For changes that are
- * not material (wording, removed processing) leave the notice off by keeping
+ * Bump it together with the text in PrivacySections.tsx and add an entry to
+ * PRIVACY_POLICY_CHANGES below. For a material change also set
+ * PRIVACY_NOTICE_VERSION: every account created before that date then sees
+ * the one-time "policy updated" notice (components/layout/PrivacyUpdateNotice.tsx).
+ * For changes that are not material (wording, removed processing) leave
  * PRIVACY_NOTICE_VERSION at its old value. Process: docs/LEGAL_DOCUMENTS.md.
  */
 export const PRIVACY_POLICY_VERSION = '2026-11-05';
@@ -16,6 +16,30 @@ export const PRIVACY_POLICY_VERSION = '2026-11-05';
  * the last version that was.
  */
 export const PRIVACY_NOTICE_VERSION = '2026-11-05';
+
+export type PrivacyPolicyChange = { version: string; de: string; en: string };
+
+/**
+ * What changed in each version, in words for users: shown as the change
+ * history at the end of the EduHub privacy policy, and the entry for
+ * PRIVACY_NOTICE_VERSION is the summary in the "policy updated" notice.
+ * Newest first; never edit or drop an old entry. Kept in code rather than in
+ * the locale files so the history is recoverable from git like the policy
+ * itself, and because StuJo renders the policy sections with its own locales.
+ * Tracked from 2026-11-05 on; older versions are listed (for the team) in
+ * docs/LEGAL_DOCUMENTS.md.
+ */
+export const PRIVACY_POLICY_CHANGES: PrivacyPolicyChange[] = [
+  {
+    version: '2026-11-05',
+    de: 'Wir verzichten auf das Meta Pixel und auf das Cookie-Banner, messen Besuche nur noch anonym und ohne Cookies und nennen jetzt alle Dienste, über die du dich anmelden kannst.',
+    en: 'We no longer use the Meta Pixel or a cookie banner, measure visits only anonymously and without cookies, and now name every service you can sign in with.',
+  },
+];
+
+/** The change summary for a version, or null if none was recorded. */
+export const getPrivacyPolicyChange = (version: string): PrivacyPolicyChange | null =>
+  PRIVACY_POLICY_CHANGES.find((change) => change.version === version) ?? null;
 
 /**
  * Whether a user still has to be told about the current notice version: their

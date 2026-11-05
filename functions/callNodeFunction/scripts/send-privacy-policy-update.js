@@ -4,9 +4,9 @@
  * Tell every account holder once that the privacy policy changed materially
  * (new purposes, recipients or legal bases). Process: docs/LEGAL_DOCUMENTS.md.
  *
- * Queues the PRIVACY_POLICY_UPDATED mail for every ACTIVE and GUEST user.
- * Before running it, edit that template in the admin UI (Settings -> Emails)
- * and replace the placeholder bullet with what changed.
+ * Queues the PRIVACY_POLICY_UPDATED mail for every ACTIVE and GUEST user. The
+ * mail links to the change history at the end of the policy, so the summary
+ * comes from PRIVACY_POLICY_CHANGES (privacyPolicyVersion.ts), not from here.
  *
  *   (no flag)   reports how many mails it would queue; changes nothing
  *   --send      queues them

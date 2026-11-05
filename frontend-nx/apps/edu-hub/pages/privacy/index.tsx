@@ -5,6 +5,7 @@ import { Page } from '../../components/layout/Page';
 import {
   PrivacyAnalytics,
   PrivacyAsOfDate,
+  PrivacyChangeHistory,
   PrivacyCourseParticipation,
   PrivacyDataCollection,
   PrivacyFormbricks,
@@ -55,6 +56,7 @@ const Privacy: FC = () => {
           <PrivacyFormbricks n={5} />
           <PrivacyPayments n={6} />
           <PrivacyAnalytics n={7} />
+          <PrivacyChangeHistory n={8} />
           <PrivacyAsOfDate />
         </div>
       </Page>

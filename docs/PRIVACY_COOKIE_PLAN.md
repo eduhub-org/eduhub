@@ -38,9 +38,9 @@ Cookiebot, Google Fonts or GitBook; notices, the paid checkbox, the server-side
 - [ ] Check the Formbricks registration iframe for cookies the Formbricks host
       sets. It is already in the policy as part of the requested service.
 - [ ] Decide whether to send the `PRIVACY_POLICY_UPDATED` mail for this
-      version (the in-app notice shows anyway). If yes, fill in the template
-      and run `scripts/send-privacy-policy-update.js` as described in
-      `docs/LEGAL_DOCUMENTS.md`.
+      version (the in-app notice shows anyway). If yes, run
+      `scripts/send-privacy-policy-update.js` as described in
+      `docs/LEGAL_DOCUMENTS.md`; the mail links to the change history.
 
 ## Why the banner could go
 

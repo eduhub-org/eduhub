@@ -3348,7 +3348,7 @@
       "APPLICATION_RECEIVED_PAID": "Gesendet, wenn eine Bewerbung für einen kostenpflichtigen Kurs eingegangen ist",
       "SESSION_REMINDER": "Wird einmal vor der ersten Sitzung an die Teilnehmenden verschickt: standardmäßig 24 Stunden vorher, jeder Kurs kann das ändern oder ausschalten",
       "USER_CREATED": "Gesendet, wenn ein neues Benutzerkonto erstellt wird",
-      "PRIVACY_POLICY_UPDATED": "Wird einmalig an alle aktiven Konten verschickt, wenn sich die Datenschutzerklärung wesentlich ändert. Versand per Skript (functions/callNodeFunction/scripts/send-privacy-policy-update.js); trage die Änderungen vorher in die Vorlage ein.",
+      "PRIVACY_POLICY_UPDATED": "Wird einmalig an alle aktiven Konten verschickt, wenn sich die Datenschutzerklärung wesentlich ändert, und verlinkt auf die Änderungsübersicht am Ende der Datenschutzerklärung. Versand per Skript (functions/callNodeFunction/scripts/send-privacy-policy-update.js).",
       "ORGANIZER_ADDED": "Gesendet, wenn ein Benutzer als Organisator zu einem Kurs oder Event hinzugefügt wird",
       "SESSION_SPEAKER_ADDED": "Gesendet, wenn eine Person zum ersten Mal als Referent*in in einem Kurs oder Event eingetragen wird",
       "CANCELLATION_REQUEST_ORGANIZER": "Gesendet an Veranstalter und Organisations-Admins, wenn jemand die Stornierung einer bezahlten Anmeldung anfragt",
@@ -3812,8 +3812,7 @@
   },
   "privacy_update": {
     "title": "Wir haben unsere Datenschutzerklärung aktualisiert",
-    "summary": "Wir verzichten auf das Meta Pixel und auf das Cookie-Banner, messen Besuche nur noch anonym und ohne Cookies und nennen jetzt alle Dienste, über die du dich anmelden kannst.",
-    "more": "Du musst nichts tun. Alle Details findest du in der <privacy>Datenschutzerklärung</privacy>.",
+    "more": "Du musst nichts tun. Alle Änderungen findest du in der <privacy>Datenschutzerklärung</privacy>.",
     "dismiss": "Hinweis schließen"
   }
 }
