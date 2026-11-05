@@ -147,19 +147,32 @@ export const EMAIL_VARIABLES = {
       example: '16:00',
       categories: ['session']
     },
+    '[Session:DateTimeRange]': {
+      description: 'Session date with start and end time (Berlin time); both full timestamps when it ends on another day',
+      example: '27.10.2026, 17:00–19:00',
+      categories: ['session']
+    },
+    '[Session:Location]': {
+      description: 'Where the session takes place: venue or address, or the meeting link for online sessions',
+      example: 'ZBW Kiel (Düsternbrooker Weg 120, 24105 Kiel)',
+      categories: ['session']
+    },
     '[Session:Duration]': {
       description: 'Session duration (calculated)',
       example: '2 hours',
       categories: ['session']
     },
+    // Kept so customized templates that still use them read sensibly. They
+    // are fixed phrases now, since the reminder's lead time is per course and a
+    // late enrollee gets it closer to the start; no longer offered in the editor.
     '[Session:ReminderText]': {
-      description: 'Dynamic reminder text based on timing',
-      example: 'starts tomorrow',
+      description: 'Deprecated: always "is starting soon"',
+      example: 'is starting soon',
       categories: ['session']
     },
     '[Session:ReminderTime]': {
-      description: 'Dynamic time text based on timing',
-      example: 'tomorrow',
+      description: 'Deprecated: always "soon"',
+      example: 'soon',
       categories: ['session']
     }
   },
@@ -337,6 +350,21 @@ export function validateTemplate(template) {
  *   targets such as the mail subject, where HTML entities would show up
  *   literally instead of being rendered.
  */
+/**
+ * The session's locations joined with " / ". In HTML a meeting link becomes a
+ * clickable link; everything is escaped since addresses are instructor input.
+ */
+function formatSessionLocation(locations, isHtml) {
+  if (!Array.isArray(locations) || locations.length === 0) return '';
+  return locations
+    .map((location) => {
+      if (!isHtml) return String(location);
+      const escaped = escapeHtml(location);
+      return /^https?:\/\/\S+$/i.test(String(location).trim()) ? `<a href="${escaped}">${escaped}</a>` : escaped;
+    })
+    .join(' / ');
+}
+
 export function createVariableReplacer(data, formatDate) {
   return function replaceVariables(text, options = {}) {
     if (!text) return text;
@@ -464,9 +492,11 @@ export function createVariableReplacer(data, formatDate) {
       .replaceAll('[Session:Title]', escape(data.session?.title || ''))
       .replaceAll('[Session:StartDateTime]', data.session?.startDateTime || '')
       .replaceAll('[Session:EndDateTime]', data.session?.endDateTime || '')
+      .replaceAll('[Session:DateTimeRange]', data.session?.dateTimeRange || '')
+      .replaceAll('[Session:Location]', formatSessionLocation(data.session?.location, isHtml))
       .replaceAll('[Session:Duration]', data.session?.duration || '')
-      .replaceAll('[Session:ReminderText]', data.session?.reminderText || '')
-      .replaceAll('[Session:ReminderTime]', data.session?.reminderTime || '');
+      .replaceAll('[Session:ReminderText]', data.session?.reminderText || 'is starting soon')
+      .replaceAll('[Session:ReminderTime]', data.session?.reminderTime || 'soon');
 
     // Cancellation request variables. The reason is participant-authored text,
     // so it is substituted last - never rescanned for the placeholders above -

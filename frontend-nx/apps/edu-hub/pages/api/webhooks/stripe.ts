@@ -338,6 +338,33 @@ const handleStripeWebhook = async (
     });
   };
 
+  /**
+   * A direct debit has been collected: Stripe raises the Checkout invoice now
+   * rather than at checkout, so link it to our row and, for a job posting,
+   * send its PDF. invoice.finalized does the same and covers the case where
+   * the document does not exist yet at this point; both are idempotent.
+   */
+  const recordCollectedInvoice = async (session: Stripe.Checkout.Session) => {
+    const fresh = await refreshSession(stripe, session);
+    if (!fresh.invoice) return;
+    try {
+      const invoiceDoc =
+        typeof fresh.invoice === 'string'
+          ? await stripe.invoices.retrieve(fresh.invoice)
+          : fresh.invoice;
+      if (invoiceDoc.status !== 'draft') {
+        await handleJobPostingInvoiceFinalized(client, invoiceDoc);
+      }
+    } catch (err) {
+      // invoice.finalized remains the path for the document; the payment
+      // itself is already recorded.
+      console.warn('Could not record the invoice of a collected direct debit', {
+        sessionId: session.id,
+        error: err instanceof Error ? err.message : String(err),
+      });
+    }
+  };
+
   try {
     switch (event.type) {
       case 'checkout.session.completed': {
@@ -417,6 +444,7 @@ const handleStripeWebhook = async (
         const session = event.data.object as Stripe.Checkout.Session;
         if (parseJobPostingId(session.metadata?.jobPostingId) !== null) {
           await handleJobPostingAsyncPaymentSucceeded(client, session);
+          await recordCollectedInvoice(session);
           return res.status(200).json({ received: true });
         }
         // Course enrollment: delayed payment settled, invoice ISSUED -> PAID
@@ -425,6 +453,7 @@ const handleStripeWebhook = async (
             sessionId: session.id,
             status: 'PAID',
           });
+          await recordCollectedInvoice(session);
         }
         return res.status(200).json({ received: true });
       }

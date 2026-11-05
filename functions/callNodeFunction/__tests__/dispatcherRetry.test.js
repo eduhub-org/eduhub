@@ -44,6 +44,18 @@ describe('callNodeFunction event retries', () => {
     expect(res.status).toHaveBeenCalledWith(500);
   });
 
+  it('answers 500 for a retryable cron failure', async () => {
+    handlerMock.mockResolvedValue({ success: false, retryable: true, messageKey: 'EMAIL_QUEUE_FAILED' });
+    const res = response();
+
+    await callNodeFunction(
+      { ...eventRequest(), body: { scheduled_time: '2026-11-04T10:00:00Z', payload: {} } },
+      res
+    );
+
+    expect(res.status).toHaveBeenCalledWith(500);
+  });
+
   it('answers 200 for a failure that is not retryable', async () => {
     handlerMock.mockResolvedValue({ success: false, messageKey: 'SPEAKER_NO_EMAIL' });
     const res = response();

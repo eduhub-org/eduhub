@@ -221,3 +221,23 @@
     Resyncs every event shared on rausgegangen.de. Catches trigger deliveries
     that failed for good, sold-out changes (enrollments do not trigger a sync)
     and unpublished programs.
+- name: send_session_reminders
+  webhook: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+  schedule: '*/15 * * * *'
+  include_in_metadata: true
+  payload: {}
+  retry_conf:
+    num_retries: 2
+    retry_interval_seconds: 60
+    timeout_seconds: 600
+    tolerance_seconds: 21600
+  headers:
+    - name: name
+      value: sendSessionReminders
+    - name: secret
+      value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+  comment: >-
+    Queues the one session reminder each participant gets per course,
+    Course.sessionReminderLeadHours before the first session. A late enrollee
+    or a missed run is caught by the next run; MailLog metadata keeps it to one
+    mail per participant and course.

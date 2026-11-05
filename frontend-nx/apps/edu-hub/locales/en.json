@@ -1363,7 +1363,17 @@
       "reset_confirm": "Delete the customized \"{name}\"? The default template will be sent again afterwards.",
       "other_customized": "Other customized templates",
       "dialog_hint": "Changes are saved automatically and apply to this offering only.",
-      "default_missing": "There is no default template to copy for this email."
+      "default_missing": "There is no default template to copy for this email.",
+      "session_reminder": {
+        "label": "When is this email sent?",
+        "help_text": "Sent once to all participants before the first session.",
+        "off": "Off",
+        "lead_2": "2 hours before the first session",
+        "lead_24": "24 hours before the first session",
+        "lead_48": "48 hours before the first session",
+        "lead_72": "72 hours before the first session",
+        "lead_168": "1 week before the first session"
+      }
     },
     "ects": {
       "label": "ECTS Credits",
@@ -3321,6 +3331,7 @@
       "JOB_POSTING_EXPIRED": "Job posting expired",
       "JOB_POSTING_ADMIN_NOTICE": "Job posting: admin notice",
       "JOB_POSTING_PAYMENT_FAILED": "Job posting: payment failed",
+      "JOB_POSTING_INVOICE": "Job posting: invoice",
       "JOB_ALERT": "Job alert",
       "JOB_ORGANIZATION_CLAIMED": "Job access: newly taken over",
       "JOB_ORGANIZATION_ACCESS_REQUEST": "Job access: request to the current admins"
@@ -3348,7 +3359,7 @@
       "REGISTRATION_CONFIRMED": "Sent when a user directly registers for an offering",
       "REGISTRATION_CONFIRMED_PAID": "Sent when a user's payment for a registration is confirmed",
       "APPLICATION_RECEIVED_PAID": "Sent when an application for a paid course is received",
-      "SESSION_REMINDER": "Sent before sessions start (24h, 1h, 15min before)",
+      "SESSION_REMINDER": "Sent once to participants before the first session: 24 hours before by default, each course can change this or turn it off",
       "USER_CREATED": "Sent when a new user account is created",
       "ORGANIZER_ADDED": "Sent when a user is added as an organizer to a course or event",
       "SESSION_SPEAKER_ADDED": "Sent when a user is first listed as a speaker in a course or event",
@@ -3383,6 +3394,7 @@
       "JOB_POSTING_EXPIRED": "Sent to the employer when the posting run ends, with a link to post it again",
       "JOB_POSTING_ADMIN_NOTICE": "Sent to the platform admins when a posting is published (post-hoc moderation)",
       "JOB_POSTING_PAYMENT_FAILED": "Sent to the employer when a delayed payment (SEPA) fails and the posting is taken offline",
+      "JOB_POSTING_INVOICE": "Sent to the employer with the invoice PDF attached when the invoice is raised after the confirmation – for a direct debit, once the money is collected. [#if:InvoiceLink] only when an online link exists.",
       "JOB_ALERT": "Sent to subscribers with new postings matching their search profile",
       "JOB_ORGANIZATION_CLAIMED": "Goes to the StuJo contact address when someone takes over job management for a company themselves",
       "JOB_ORGANIZATION_ACCESS_REQUEST": "Goes to the current admins when someone else asks for access to their job offers"

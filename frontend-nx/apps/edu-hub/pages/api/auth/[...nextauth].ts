@@ -68,7 +68,14 @@ const refreshAccessToken = async (token: JWT) => {
         Date.now() + refreshedTokens.data.refresh_expires_in * 1000,
     };
   } catch (e) {
-    console.error(e);
+    // Keycloak answers `invalid_grant` once the SSO session has expired; the
+    // client then logs the user out. That is routine, so keep it off stderr,
+    // which Cloud Run records as ERROR and the production alert fires on.
+    if (axios.isAxiosError(e) && e.response?.status === 400 && e.response.data?.error === 'invalid_grant') {
+      console.log(`Keycloak refresh rejected (${e.response.data.error_description}); logging the user out.`);
+    } else {
+      console.error(e);
+    }
     return {
       ...token,
       error: 'RefreshAccessTokenError',

@@ -1753,6 +1753,7 @@ export enum MailTemplateType_enum {
   JOB_ORGANIZATION_CLAIMED = "JOB_ORGANIZATION_CLAIMED",
   JOB_POSTING_ADMIN_NOTICE = "JOB_POSTING_ADMIN_NOTICE",
   JOB_POSTING_EXPIRED = "JOB_POSTING_EXPIRED",
+  JOB_POSTING_INVOICE = "JOB_POSTING_INVOICE",
   JOB_POSTING_PAYMENT_FAILED = "JOB_POSTING_PAYMENT_FAILED",
   JOB_POSTING_PUBLISHED = "JOB_POSTING_PUBLISHED",
   ORGANIZER_ADDED = "ORGANIZER_ADDED",
@@ -6878,6 +6879,7 @@ export interface Course_avg_order_by {
   programId?: order_by | null;
   requiredEcts?: order_by | null;
   requiredEventCount?: order_by | null;
+  sessionReminderLeadHours?: order_by | null;
   sourceSessionId?: order_by | null;
 }
 
@@ -6960,6 +6962,7 @@ export interface Course_bool_exp {
   registrationType?: CourseRegistrationType_enum_comparison_exp | null;
   requiredEcts?: numeric_comparison_exp | null;
   requiredEventCount?: Int_comparison_exp | null;
+  sessionReminderLeadHours?: Int_comparison_exp | null;
   showAvailablePlaces?: Boolean_comparison_exp | null;
   sourceSessionId?: Int_comparison_exp | null;
   startTime?: time_comparison_exp | null;
@@ -7035,6 +7038,7 @@ export interface Course_insert_input {
   registrationType?: CourseRegistrationType_enum | null;
   requiredEcts?: any | null;
   requiredEventCount?: number | null;
+  sessionReminderLeadHours?: number | null;
   showAvailablePlaces?: boolean | null;
   sourceSessionId?: number | null;
   startTime?: any | null;
@@ -7081,6 +7085,7 @@ export interface Course_max_order_by {
   registrationButtonLabelEn?: order_by | null;
   requiredEcts?: order_by | null;
   requiredEventCount?: order_by | null;
+  sessionReminderLeadHours?: order_by | null;
   sourceSessionId?: order_by | null;
   stripePriceId?: order_by | null;
   stripeProductId?: order_by | null;
@@ -7123,6 +7128,7 @@ export interface Course_min_order_by {
   registrationButtonLabelEn?: order_by | null;
   requiredEcts?: order_by | null;
   requiredEventCount?: order_by | null;
+  sessionReminderLeadHours?: order_by | null;
   sourceSessionId?: order_by | null;
   stripePriceId?: order_by | null;
   stripeProductId?: order_by | null;
@@ -7213,6 +7219,7 @@ export interface Course_order_by {
   registrationType?: order_by | null;
   requiredEcts?: order_by | null;
   requiredEventCount?: order_by | null;
+  sessionReminderLeadHours?: order_by | null;
   showAvailablePlaces?: order_by | null;
   sourceSessionId?: order_by | null;
   startTime?: order_by | null;
@@ -7266,6 +7273,7 @@ export interface Course_set_input {
   registrationType?: CourseRegistrationType_enum | null;
   requiredEcts?: any | null;
   requiredEventCount?: number | null;
+  sessionReminderLeadHours?: number | null;
   showAvailablePlaces?: boolean | null;
   sourceSessionId?: number | null;
   startTime?: any | null;
@@ -7292,6 +7300,7 @@ export interface Course_stddev_order_by {
   programId?: order_by | null;
   requiredEcts?: order_by | null;
   requiredEventCount?: order_by | null;
+  sessionReminderLeadHours?: order_by | null;
   sourceSessionId?: order_by | null;
 }
 
@@ -7309,6 +7318,7 @@ export interface Course_stddev_pop_order_by {
   programId?: order_by | null;
   requiredEcts?: order_by | null;
   requiredEventCount?: order_by | null;
+  sessionReminderLeadHours?: order_by | null;
   sourceSessionId?: order_by | null;
 }
 
@@ -7326,6 +7336,7 @@ export interface Course_stddev_samp_order_by {
   programId?: order_by | null;
   requiredEcts?: order_by | null;
   requiredEventCount?: order_by | null;
+  sessionReminderLeadHours?: order_by | null;
   sourceSessionId?: order_by | null;
 }
 
@@ -7343,6 +7354,7 @@ export interface Course_sum_order_by {
   programId?: order_by | null;
   requiredEcts?: order_by | null;
   requiredEventCount?: order_by | null;
+  sessionReminderLeadHours?: order_by | null;
   sourceSessionId?: order_by | null;
 }
 
@@ -7360,6 +7372,7 @@ export interface Course_var_pop_order_by {
   programId?: order_by | null;
   requiredEcts?: order_by | null;
   requiredEventCount?: order_by | null;
+  sessionReminderLeadHours?: order_by | null;
   sourceSessionId?: order_by | null;
 }
 
@@ -7377,6 +7390,7 @@ export interface Course_var_samp_order_by {
   programId?: order_by | null;
   requiredEcts?: order_by | null;
   requiredEventCount?: order_by | null;
+  sessionReminderLeadHours?: order_by | null;
   sourceSessionId?: order_by | null;
 }
 
@@ -7394,6 +7408,7 @@ export interface Course_variance_order_by {
   programId?: order_by | null;
   requiredEcts?: order_by | null;
   requiredEventCount?: order_by | null;
+  sessionReminderLeadHours?: order_by | null;
   sourceSessionId?: order_by | null;
 }
 

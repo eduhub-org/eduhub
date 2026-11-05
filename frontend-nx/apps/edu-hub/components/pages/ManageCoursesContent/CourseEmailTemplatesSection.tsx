@@ -21,6 +21,7 @@ import { DialogShell } from '../../common/dialogs/DialogShell';
 import { QuestionConfirmationDialog } from '../../common/dialogs/QuestionConfirmationDialog';
 import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';
 import ManageEmailTemplateEditor from '../ManageEmailTemplateEditor';
+import SessionReminderLeadTimeSelect from './SessionReminderLeadTimeSelect';
 import useErrorHandler from '../../../hooks/useErrorHandler';
 
 interface CourseEmailTemplatesSectionProps {
@@ -30,6 +31,7 @@ interface CourseEmailTemplatesSectionProps {
     registrationType: CourseRegistrationType_enum | null;
     attendanceCertificatePossible: boolean | null;
     achievementCertificatePossible: boolean | null;
+    sessionReminderLeadHours: number | null;
   };
 }
 
@@ -156,13 +158,18 @@ const CourseEmailTemplatesSection: FC<CourseEmailTemplatesSectionProps> = ({ cou
   }, [resetCandidate, deleteEmailTemplate, refetchCourseTemplates, handleError]);
 
   const editingTemplate = courseTemplates.find((template) => template.id === editingTemplateId);
+  // The lead time belongs to the course, not to its copy of the template, so it can be set
+  // without customizing the mail and survives a reset.
+  const leadTimeSelect = (
+    <SessionReminderLeadTimeSelect courseId={course.id} leadHours={course.sessionReminderLeadHours} />
+  );
 
   const renderRow = (type: string) => {
     const customTemplate = courseTemplateByType.get(type);
     return (
       <li
         key={type}
-        className="flex flex-col gap-2 py-2 sm:flex-row sm:items-center sm:justify-between border-b border-border-primary last:border-b-0"
+        className="flex flex-col gap-2 py-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between border-b border-border-primary last:border-b-0"
       >
         <div className="flex flex-wrap items-center gap-2 min-w-0">
           <span className="text-sm text-label-primary">{templateName(type)}</span>
@@ -206,6 +213,7 @@ const CourseEmailTemplatesSection: FC<CourseEmailTemplatesSectionProps> = ({ cou
             </button>
           )}
         </div>
+        {type === 'SESSION_REMINDER' && !customTemplate && <div className="w-full sm:max-w-sm">{leadTimeSelect}</div>}
       </li>
     );
   };
@@ -232,7 +240,12 @@ const CourseEmailTemplatesSection: FC<CourseEmailTemplatesSectionProps> = ({ cou
         fullScreenOnMobile
       >
         <p className="text-sm text-label-secondary mb-4">{t('dialog_hint')}</p>
-        {editingTemplate && <ManageEmailTemplateEditor templateId={editingTemplate.id} />}
+        {editingTemplate && (
+          <ManageEmailTemplateEditor
+            templateId={editingTemplate.id}
+            trigger={editingTemplate.type === 'SESSION_REMINDER' ? leadTimeSelect : undefined}
+          />
+        )}
       </DialogShell>
 
       <QuestionConfirmationDialog

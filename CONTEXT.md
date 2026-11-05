@@ -33,8 +33,31 @@ _Avoid_: Promotion (in copy), automatic moving up — it is always the organizer
 **Declining**:
 An invited person giving up their invitation. Its place is free again and the organizers are told.
 
+**Event**:
+A Course whose Program has type `EVENTS`. It follows every Course rule; it is not a separate concept.
+_Avoid_: treating externally synced listings (e.g. Rausgegangen) as Events
+
+**Session**:
+One scheduled meeting of a Course, with a start and an end.
+
+**First Session**:
+The Course's Session with the earliest start time.
+
+**Participant**:
+Someone whose Registration is confirmed or registered and is not a test enrollment.
+
 **Overbooking**:
 More places held than the course has. Only organizers can overbook, and are warned before they do; people registering themselves never can.
+
+### Paying
+
+**Invoice**:
+The numbered document (Rechnung) a buyer receives for a paid course or job posting. Paid by card or **Direct debit**, it exists only once the money is collected, so for a direct debit it follows days after the purchase. Bought on account (bank transfer), it is issued first and paid afterwards.
+_Avoid_: Receipt, Beleg (for the invoice itself)
+
+**Direct debit**:
+Paying by SEPA Lastschrift: the course place or job posting is granted at checkout, but the money is collected days later, and the invoice is sent separately once it is.
+_Avoid_: SEPA (on its own, in copy)
 
 ### Organizers
 
@@ -42,11 +65,25 @@ More places held than the course has. Only organizers can overbook, and are warn
 Someone who runs a course: its instructors and the admins of its organization who manage that kind of program.
 _Avoid_: Kursleitung (as a role name in code)
 
+### Communication
+
+**Session Reminder**:
+One email per Participant per Course, sent a set Reminder Lead Time before the Course's First Session. It is sent at most once: moving the First Session or adding an earlier one does not send another. A Participant who registers after the reminder time but before the First Session starts gets it late rather than not at all.
+_Avoid_: reminders for later Sessions, multiple reminders per Course
+
+**Reminder Lead Time**:
+How long before the First Session the Session Reminder goes out, set per Course in hours, or off to send none.
+
+**Session Change Notification**:
+The email organizers send by hand when Sessions are rescheduled. Separate from the Session Reminder.
+
 ## Relationships
 
 - A **Course** has a number of **Places** and at most one **Registration** per person
 - A **Waitlist** belongs to one **Course**; **Moving up** takes someone off it
 - An **Invitation** holds one **Place** until it is accepted, declined or expires
+- A **Course** has zero or more **Sessions**; when it has any, exactly one of them is its **First Session**
+- A **Participant** receives at most one **Session Reminder** per **Course**
 
 ## Example dialogue
 
@@ -56,3 +93,4 @@ _Avoid_: Kursleitung (as a role name in code)
 ## Flagged ambiguities
 
 - "Invite" meant both the application decision (green rating) and moving someone up from the waitlist. Both are an **Invitation**: the same held place with a deadline; how it is accepted depends on the course (confirm or pay).
+- "Session reminder" meant three emails (24h, 1h, 15min) before sessions. Resolved: one email, before the First Session only, at the Course's Reminder Lead Time.

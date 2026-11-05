@@ -1,7 +1,7 @@
 import { GraphQLClient, gql } from 'graphql-request';
 import type Stripe from 'stripe';
 
-import { generateInvoiceNumber, resolveStripeInvoice } from './stripeInvoice';
+import { generateInvoiceNumber, linkCheckoutInvoice, resolveStripeInvoice } from './stripeInvoice';
 
 /**
  * StuJo job posting handling for the Stripe webhook (phase 4 of
@@ -16,6 +16,9 @@ import { generateInvoiceNumber, resolveStripeInvoice } from './stripeInvoice';
  *   flipped to PAID on async_payment_succeeded.
  * - On async_payment_failed the posting is taken offline again (DRAFT),
  *   the invoice is CANCELLED and the employer is notified.
+ * - Stripe raises a direct debit's invoice document only once the money is
+ *   collected, so the confirmation goes out at checkout without it and the
+ *   PDF follows in a separate JOB_POSTING_INVOICE mail.
  */
 
 const GET_POSTING_FOR_WEBHOOK = gql`
@@ -130,6 +133,7 @@ const GET_QUEUED_JOB_MAIL = gql`
   query GetQueuedJobPostingMail($contains: jsonb!) {
     MailLog(where: { metadata: { _contains: $contains } }, limit: 1) {
       id
+      attachments
     }
   }
 `;
@@ -338,6 +342,15 @@ export async function hasQueuedJobPostingMail(
   return MailLog.length > 0;
 }
 
+/** True when the queued confirmation went out with the invoice PDF attached. */
+async function confirmationCarriedPdf(client: GraphQLClient, jobPostingId: number): Promise<boolean> {
+  const { MailLog } = await client.request<{ MailLog: Array<{ attachments: unknown[] | null }> }>(
+    GET_QUEUED_JOB_MAIL,
+    { contains: { type: 'JOB_POSTING_PUBLISHED', jobPostingId } }
+  );
+  return MailLog.some((mail) => Array.isArray(mail.attachments) && mail.attachments.length > 0);
+}
+
 /** True for a violation of MailLog_job_posting_mail_unique. */
 function isDuplicateMailError(error: unknown): boolean {
   const message = error instanceof Error ? error.message : String(error);
@@ -352,7 +365,7 @@ async function queueMail(
   flags: Record<string, boolean> = {},
   attachments: Array<{ url: string; filename: string; contentType: string }> | null = null,
   jobPostingId: number | null = null
-) {
+): Promise<boolean> {
   try {
     const templateData = await client.request<{
       MailTemplate: Array<{ subject: string; content: string; from: string | null; bcc: string | null }>;
@@ -360,7 +373,7 @@ async function queueMail(
     const template = templateData?.MailTemplate?.[0];
     if (!template) {
       console.warn(`Mail template ${templateType} not found, skipping`);
-      return;
+      return false;
     }
     await client.request(INSERT_MAIL_LOG, {
       subject: replaceVars(applyConditionalBlocks(template.subject, flags), vars, { html: false }),
@@ -372,16 +385,18 @@ async function queueMail(
       attachments,
       metadata: jobPostingId === null ? null : { type: templateType, jobPostingId },
     });
+    return true;
   } catch (error) {
     // The unique index on the job posting dedup key is the real guard against
     // two deliveries racing past hasQueuedJobPostingMail. Losing that race is
     // the mechanism working, not a failure.
     if (isDuplicateMailError(error)) {
       console.info(`${templateType} already queued for job posting ${jobPostingId}`);
-      return;
+      return false;
     }
     // Mails must never fail the webhook.
     console.error(`Failed to queue ${templateType} mail:`, error);
+    return false;
   }
 }
 
@@ -448,9 +463,11 @@ export async function queueJobPostingConfirmation(
   if (!posting.ContactUser?.email) return false;
   if (await hasQueuedJobPostingMail(client, 'JOB_POSTING_PUBLISHED', posting.id)) return false;
 
-  const paymentDescription = `${formatAmount(invoice.grossTotal, invoice.currency)} (${
-    invoice.paid ? 'bezahlt' : 'Zahlung ausstehend'
-  })`;
+  // Checkout invoices are unpaid at this point only for a direct debit;
+  // "Kauf auf Rechnung" mails are queued by publishJobPosting instead.
+  const paymentDescription = invoice.paid
+    ? `${formatAmount(invoice.grossTotal, invoice.currency)} (bezahlt)`
+    : `${formatAmount(invoice.grossTotal, invoice.currency)} per Lastschrift (Einzug ausstehend)`;
   const vars = buildMailVars(posting, expiresAt, paymentDescription, invoice);
   // InvoicePdf and InvoiceLink are separate from Invoice on purpose: the
   // section must not claim a PDF is attached when the sweep had to send without
@@ -462,15 +479,7 @@ export async function queueJobPostingConfirmation(
     InvoicePending: !pdfUrl && !invoice.hostedUrl,
     TermsAccepted: Boolean(posting.termsAcceptedAt),
   };
-  const attachments = pdfUrl
-    ? [
-        {
-          url: pdfUrl,
-          filename: `rechnung-${invoice.number.replace(/[^A-Za-z0-9._-]+/g, '-')}.pdf`,
-          contentType: 'application/pdf',
-        },
-      ]
-    : null;
+  const attachments = pdfUrl ? [invoiceAttachment(invoice.number, pdfUrl)] : null;
 
   await queueMail(
     client,
@@ -482,6 +491,49 @@ export async function queueJobPostingConfirmation(
     posting.id
   );
   return true;
+}
+
+function invoiceAttachment(number: string, pdfUrl: string) {
+  return {
+    url: pdfUrl,
+    filename: `rechnung-${number.replace(/[^A-Za-z0-9._-]+/g, '-')}.pdf`,
+    contentType: 'application/pdf',
+  };
+}
+
+/**
+ * Gets the invoice PDF to the employer once Stripe has raised it: inside the
+ * confirmation if that has not gone out yet, otherwise in the separate
+ * JOB_POSTING_INVOICE mail -- the direct debit case, where the confirmation
+ * went out at checkout and the invoice only exists once the money is
+ * collected. Never sends the PDF twice.
+ *
+ * @returns which mail was queued, or null
+ */
+export async function deliverJobPostingInvoice(
+  client: GraphQLClient,
+  posting: NonNullable<PostingForWebhook['JobPosting_by_pk']>,
+  invoice: InvoiceMailData,
+  pdfUrl: string | null
+): Promise<'JOB_POSTING_PUBLISHED' | 'JOB_POSTING_INVOICE' | null> {
+  const expiresAt = posting.expiresAt ? new Date(posting.expiresAt) : null;
+  if (await queueJobPostingConfirmation(client, posting, expiresAt, invoice, pdfUrl)) {
+    return 'JOB_POSTING_PUBLISHED';
+  }
+  if (!pdfUrl || !posting.ContactUser?.email) return null;
+  if (await confirmationCarriedPdf(client, posting.id)) return null;
+  if (await hasQueuedJobPostingMail(client, 'JOB_POSTING_INVOICE', posting.id)) return null;
+
+  const queued = await queueMail(
+    client,
+    'JOB_POSTING_INVOICE',
+    posting.ContactUser.email,
+    buildMailVars(posting, expiresAt, '', invoice),
+    { InvoiceLink: Boolean(invoice.hostedUrl), TermsAccepted: Boolean(posting.termsAcceptedAt) },
+    [invoiceAttachment(invoice.number, pdfUrl)],
+    posting.id
+  );
+  return queued ? 'JOB_POSTING_INVOICE' : null;
 }
 
 // One request, one transaction: each update carries its own "still empty"
@@ -683,14 +735,17 @@ export async function handleJobPostingCheckoutCompleted(
     paid,
   };
 
-  // The employer's copy carries the PDF, so it only goes out once the document
-  // exists. When Stripe has not finalized yet, invoice.finalized sends it (and
-  // the sendPendingJobPostingMails sweep is the backstop for that). Dedup is on
+  // The employer's copy carries the PDF, so for a card payment it only goes
+  // out once the document exists. When Stripe has not finalized yet,
+  // invoice.finalized sends it (and the sendPendingJobPostingMails sweep is
+  // the backstop for that). A direct debit's invoice only exists once the
+  // money is collected, days from now, so its confirmation goes out right
+  // away and the PDF follows in JOB_POSTING_INVOICE. Dedup is on
   // MailLog.metadata rather than the invoiceCreated branch, because the mail
   // can legitimately be queued by a later delivery than the one that inserted
   // the invoice row.
   if (posting.ContactUser?.email) {
-    if (invoiceDoc.pdfUrl) {
+    if (invoiceDoc.pdfUrl || !paid) {
       await queueJobPostingConfirmation(client, posting, mailExpiresAt, invoice, invoiceDoc.pdfUrl);
     } else {
       console.info('Stripe invoice not finalized yet, deferring the confirmation mail', {
@@ -824,8 +879,11 @@ export async function handleJobPostingCheckoutExpired(
  * checkout.session.completed, which cannot outrun a finalization that Stripe
  * may delay by an hour, or by up to 72 hours while deliveries are failing.
  *
- * Backfills the document columns and, if the confirmation has not gone out yet,
- * sends it now. Safe to receive more than once: the send is deduped on
+ * Backfills the document columns -- for course invoices too -- and gets the
+ * PDF to the employer (deliverJobPostingInvoice). A direct debit's row was
+ * recorded before Stripe raised the document, so it is linked here first.
+ * Also called from checkout.session.async_payment_succeeded once the debit
+ * is collected. Safe to receive more than once: the send is deduped on
  * MailLog.metadata and the backfill is an idempotent _set.
  */
 export async function handleJobPostingInvoiceFinalized(
@@ -834,7 +892,7 @@ export async function handleJobPostingInvoiceFinalized(
 ): Promise<void> {
   if (!invoiceDoc.id) return;
 
-  const { Invoice: rows } = await client.request<{
+  type InvoiceRow = {
     Invoice: Array<{
       id: number;
       jobPostingId: number | null;
@@ -846,10 +904,15 @@ export async function handleJobPostingInvoiceFinalized(
       currency: string;
       status: string;
     }>;
-  }>(GET_INVOICE_BY_STRIPE_ID, { stripeInvoiceId: invoiceDoc.id });
+  };
+  const findRow = async () =>
+    (await client.request<InvoiceRow>(GET_INVOICE_BY_STRIPE_ID, { stripeInvoiceId: invoiceDoc.id })).Invoice[0];
 
-  const row = rows[0];
-  // Not ours, or a course invoice: nothing to do beyond the backfill below.
+  let row = await findRow();
+  if (!row && (await linkCheckoutInvoice(client, invoiceDoc))) {
+    row = await findRow();
+  }
+  // Not ours: nothing to do.
   if (!row) return;
 
   await client.request(BACKFILL_INVOICE_DOCUMENT, {
@@ -871,19 +934,22 @@ export async function handleJobPostingInvoiceFinalized(
   const posting = data.JobPosting_by_pk;
   if (!posting) return;
 
-  const sent = await queueJobPostingConfirmation(
+  // The date printed on the PDF: for a direct debit that is when the money
+  // was collected, days after our row was written.
+  const finalizedAt = invoiceDoc.status_transitions?.finalized_at;
+  const queued = await deliverJobPostingInvoice(
     client,
     posting,
-    posting.expiresAt ? new Date(posting.expiresAt) : null,
     {
       number: invoiceDoc.number ?? row.invoiceNumber,
-      date: row.invoiceDate ? new Date(row.invoiceDate) : new Date(),
+      date: finalizedAt ? new Date(finalizedAt * 1000) : new Date(row.invoiceDate ?? Date.now()),
       hostedUrl: invoiceDoc.hosted_invoice_url ?? null,
       netTotal: row.netTotal,
       vatTotal: row.vatTotal,
       grossTotal: row.grossTotal,
       currency: row.currency,
-      paid: row.status === 'PAID',
+      // A Checkout invoice is only raised for money already collected.
+      paid: row.status === 'PAID' || invoiceDoc.status === 'paid',
     },
     invoiceDoc.invoice_pdf ?? null
   );
@@ -892,7 +958,7 @@ export async function handleJobPostingInvoiceFinalized(
     jobPostingId: row.jobPostingId,
     stripeInvoiceId: invoiceDoc.id,
     stripeInvoiceNumber: invoiceDoc.number,
-    confirmationQueuedNow: sent,
+    mailQueuedNow: queued,
   });
 }
 

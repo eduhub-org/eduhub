@@ -1,4 +1,4 @@
-import { FC, useCallback, useMemo, useState } from 'react';
+import { FC, ReactNode, useCallback, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import DOMPurify from 'dompurify';
 import { MdPreview } from 'react-icons/md';
@@ -26,9 +26,11 @@ const getTranslation = (t: (key: string) => string, key: string, fallback: strin
 
 type ManageEmailTemplateEditorProps = {
   templateId: number;
+  /** Replaces the read-only "when is this sent" text, for a trigger the caller lets the user set. */
+  trigger?: ReactNode;
 };
 
-const ManageEmailTemplateEditor: FC<ManageEmailTemplateEditorProps> = ({ templateId }) => {
+const ManageEmailTemplateEditor: FC<ManageEmailTemplateEditorProps> = ({ templateId, trigger }) => {
   const t = useTranslations('manageEmailTemplates');
   const [preview, setPreview] = useState('');
   const [showPreview, setShowPreview] = useState(false);
@@ -65,10 +67,12 @@ const ManageEmailTemplateEditor: FC<ManageEmailTemplateEditorProps> = ({ templat
         '\\[Enrollment:ExpirationDate\\]': '25. Januar 2024',
         '\\[Enrollment:CourseLink\\]': 'https://edu.opencampus.sh/course/123',
         '\\[Session:Title\\]': 'Introduction Session',
-        '\\[Session:StartDateTime\\]': '15.1.2024, 14:00:00',
-        '\\[Session:Duration\\]': '2 hours',
-        '\\[Session:ReminderText\\]': 'starts tomorrow',
-        '\\[Session:ReminderTime\\]': 'tomorrow',
+        '\\[Session:StartDateTime\\]': '15.01.2024, 14:00',
+        '\\[Session:DateTimeRange\\]': '15.01.2024, 14:00–16:00',
+        '\\[Session:Location\\]': 'ZBW Kiel (Düsternbrooker Weg 120, 24105 Kiel)',
+        '\\[Session:Duration\\]': '2h 0m',
+        '\\[Session:ReminderText\\]': 'is starting soon',
+        '\\[Session:ReminderTime\\]': 'soon',
         '\\[System:PasswordResetLink\\]': 'https://keycloak.example.com/reset',
         '\\[System:PortalUrl\\]': 'https://edu.opencampus.sh',
         '\\[System:PrivacyPolicyLink\\]': 'https://edu.opencampus.sh/privacy',
@@ -169,14 +173,16 @@ const ManageEmailTemplateEditor: FC<ManageEmailTemplateEditorProps> = ({ templat
         />
       </div>
 
-      <div>
-        <h2 className="text-sm font-semibold text-label-primary mb-2">
-          {t('expandable.trigger_description')}
-        </h2>
-        <p className="text-sm text-label-secondary bg-bg-secondary p-3 rounded">
-          {triggerDescription}
-        </p>
-      </div>
+      {trigger ?? (
+        <div>
+          <h2 className="text-sm font-semibold text-label-primary mb-2">
+            {t('expandable.trigger_description')}
+          </h2>
+          <p className="text-sm text-label-secondary bg-bg-secondary p-3 rounded">
+            {triggerDescription}
+          </p>
+        </div>
+      )}
 
       <div>
         <h2 className="text-sm font-semibold text-label-primary mb-2">
