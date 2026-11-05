@@ -239,8 +239,7 @@ update_permissions:
                   - canManageSettings:
                       _eq: true
 insert_permissions:
-  # A new program may only be created in an organization the admin manages, and only of a type
-  # they are allowed to manage (the check reuses the same per-type scope as update).
+  # A new program may only be created by a settings admin of its organization.
   - role: org_admin_access
     permission:
       columns:
@@ -270,85 +269,23 @@ insert_permissions:
         - type
         - visibility
       check:
-        _or:
-          - _and:
-              - type:
-                  _eq: EVENTS
-              - Organization:
-                  OrganizationAdmins:
-                    _and:
-                      - userId:
-                          _eq: X-Hasura-User-Id
-                      - canManageEvents:
-                          _eq: true
-          - _and:
-              - type:
-                  _eq: COURSES
-              - Organization:
-                  OrganizationAdmins:
-                    _and:
-                      - userId:
-                          _eq: X-Hasura-User-Id
-                      - canManageCourses:
-                          _eq: true
-          - _and:
-              - type:
-                  _eq: DEGREES
-              - Organization:
-                  OrganizationAdmins:
-                    _and:
-                      - userId:
-                          _eq: X-Hasura-User-Id
-                      - canManageDegrees:
-                          _eq: true
-          # A settings admin manages every program type for their organization (no type constraint).
-          - Organization:
-              OrganizationAdmins:
-                _and:
-                  - userId:
-                      _eq: X-Hasura-User-Id
-                  - canManageSettings:
-                      _eq: true
+        # Only settings admins add programs; the per-type rights cover editing only.
+        Organization:
+          OrganizationAdmins:
+            _and:
+              - userId:
+                  _eq: X-Hasura-User-Id
+              - canManageSettings:
+                  _eq: true
 delete_permissions:
   - role: org_admin_access
     permission:
       filter:
-        _or:
-          - _and:
-              - type:
-                  _eq: EVENTS
-              - Organization:
-                  OrganizationAdmins:
-                    _and:
-                      - userId:
-                          _eq: X-Hasura-User-Id
-                      - canManageEvents:
-                          _eq: true
-          - _and:
-              - type:
-                  _eq: COURSES
-              - Organization:
-                  OrganizationAdmins:
-                    _and:
-                      - userId:
-                          _eq: X-Hasura-User-Id
-                      - canManageCourses:
-                          _eq: true
-          - _and:
-              - type:
-                  _eq: DEGREES
-              - Organization:
-                  OrganizationAdmins:
-                    _and:
-                      - userId:
-                          _eq: X-Hasura-User-Id
-                      - canManageDegrees:
-                          _eq: true
-          # A settings admin manages every program type for their organization (no type constraint).
-          - Organization:
-              OrganizationAdmins:
-                _and:
-                  - userId:
-                      _eq: X-Hasura-User-Id
-                  - canManageSettings:
-                      _eq: true
+        # Only settings admins delete programs; the per-type rights cover editing only.
+        Organization:
+          OrganizationAdmins:
+            _and:
+              - userId:
+                  _eq: X-Hasura-User-Id
+              - canManageSettings:
+                  _eq: true

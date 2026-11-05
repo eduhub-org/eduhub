@@ -1,9 +1,11 @@
 import { gql } from "@apollo/client";
 
 export const INSERT_PROGRAM = gql`
-  mutation InsertProgram($title: String!, $today: date!) {
+  mutation InsertProgram($title: String!, $today: date!, $organizationId: Int!, $type: String!) {
     insert_Program(
       objects: {
+        organizationId: $organizationId
+        type: $type
         lectureStart: $today
         lectureEnd: $today
         applicationStart: $today

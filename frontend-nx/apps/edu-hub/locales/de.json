@@ -2558,7 +2558,14 @@
       "programs_published_success_plural": "{count} Programme wurden erfolgreich veröffentlicht",
       "programs_unpublished_success_singular": "Programm wurde erfolgreich zurückgezogen",
       "programs_unpublished_success_plural": "{count} Programme wurden erfolgreich zurückgezogen",
-      "bulk_action_failed": "Die Massenaktion ist fehlgeschlagen. Bitte versuche es erneut."
+      "bulk_action_failed": "Die Massenaktion ist fehlgeschlagen. Bitte versuche es erneut.",
+      "program_added_success": "Programm wurde hinzugefügt."
+    },
+    "rename_requires_settings": "Nur Admins mit dem Recht für Einstellungen können Programme umbenennen.",
+    "add_program_dialog": {
+      "title": "Programm hinzufügen",
+      "organization": "Organisation",
+      "type": "Programmart"
     }
   },
   "manageUsers": {

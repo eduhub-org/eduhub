@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 
 import { MY_ORG_ADMIN_CAPABILITIES } from '../queries/organizationAdmin';
 import { MyOrgAdminCapabilities } from '../queries/__generated__/MyOrgAdminCapabilities';
-import { useIsOrgAdmin } from './authentication';
+import { useIsAdmin, useIsOrgAdmin } from './authentication';
 import { useOrgAdminQuery } from './authedQuery';
 import { useUserId } from './user';
 
@@ -47,4 +47,24 @@ export const useOrgAdminCapabilities = (): OrgAdminCapabilities => {
       canViewStatistics: data.OrganizationAdmin.some((grant) => grant.canViewStatistics),
     };
   }, [isOrgAdmin, data]);
+};
+
+/**
+ * Whether the current user may add, delete and rename programs of the given organization: always for
+ * super-admins, for org admins only with canManageSettings on that organization's grant.
+ */
+export const useCanManageProgramsOf = (organizationId: number | null | undefined): boolean => {
+  const isAdmin = useIsAdmin();
+  const isOrgAdmin = useIsOrgAdmin();
+  const userId = useUserId();
+  const { data } = useOrgAdminQuery<MyOrgAdminCapabilities>(MY_ORG_ADMIN_CAPABILITIES, {
+    variables: { userId },
+    skip: isAdmin || !isOrgAdmin || !userId,
+  });
+
+  if (isAdmin) return true;
+  if (organizationId == null) return false;
+  return (data?.OrganizationAdmin ?? []).some(
+    (grant) => grant.organizationId === organizationId && grant.canManageSettings
+  );
 };

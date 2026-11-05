@@ -5,6 +5,8 @@ import { MdClose } from 'react-icons/md';
 
 import { useManageQuery } from '../../../hooks/authedQuery';
 import { useManageRole } from '../../../hooks/authentication';
+import { useCanManageProgramsOf } from '../../../hooks/orgAdminCapabilities';
+import { ProgramType } from '../../../types/enums';
 import { PROGRAM_LIST } from '../../../queries/programList';
 import { ProgramList, ProgramListVariables, ProgramList_Program } from '../../../queries/__generated__/ProgramList';
 import {
@@ -21,6 +23,7 @@ import CheckboxSelector from '../../inputs/CheckboxSelector';
 import DatePicker from '../../inputs/DatePicker';
 import InputField from '../../inputs/InputField';
 import ExpandableProgramRow from './ExpandableProgramRow';
+import ReadOnlyProgramField from './ReadOnlyProgramField';
 
 // 'Programs' is the program list of the courses page, whose tabs show the program titles.
 const REFETCH = ['ProgramList', 'Programs'];
@@ -72,22 +75,29 @@ const ProgramBasicsCard: FC<{ program: ProgramList_Program }> = ({ program }) =>
   // The table headers of the settings page contain hyphenation for their narrow columns.
   const tLabels = useTranslations('manageCourses.program_settings');
   const manageRole = useManageRole();
+  const canRename = useCanManageProgramsOf(program.organizationId);
+  // Events have no course period and no projects, so their programs skip those dates.
+  const isEventProgram = program.type === ProgramType.EVENTS;
 
   return (
     <div className="bg-fill-primary border border-border-primary rounded-lg p-4 space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center gap-4">
         <div className="flex-1 min-w-0">
-          <InputField
-            variant="material"
-            type="input"
-            label={t('title.label')}
-            placeholder={t('title.placeholder')}
-            helpText={t('title.help_text')}
-            itemId={program.id}
-            value={program.title || ''}
-            updateValueMutation={UPDATE_PROGRAM_TITLE}
-            refetchQueries={REFETCH}
-          />
+          {canRename ? (
+            <InputField
+              variant="material"
+              type="input"
+              label={t('title.label')}
+              placeholder={t('title.placeholder')}
+              helpText={t('title.help_text')}
+              itemId={program.id}
+              value={program.title || ''}
+              updateValueMutation={UPDATE_PROGRAM_TITLE}
+              refetchQueries={REFETCH}
+            />
+          ) : (
+            <ReadOnlyProgramField label={t('title.label')} value={program.title} />
+          )}
         </div>
         <CheckboxSelector
           variant="switch"
@@ -100,7 +110,7 @@ const ProgramBasicsCard: FC<{ program: ProgramList_Program }> = ({ program }) =>
           role={manageRole}
         />
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+      <div className={`grid grid-cols-1 sm:grid-cols-2 gap-4 ${isEventProgram ? '' : 'lg:grid-cols-5'}`}>
         <ProgramDateField
           label={tLabels('application_start')}
           value={program.applicationStart}
@@ -117,30 +127,34 @@ const ProgramBasicsCard: FC<{ program: ProgramList_Program }> = ({ program }) =>
           identifierVariables={{ programId: program.id }}
           programId={program.id}
         />
-        <ProgramDateField
-          label={tLabels('course_start')}
-          value={program.lectureStart}
-          mutation={UPDATE_PROGRAM_LECTURE_START}
-          dateFieldName="lectureStart"
-          identifierVariables={{ programId: program.id }}
-          programId={program.id}
-        />
-        <ProgramDateField
-          label={tLabels('course_end')}
-          value={program.lectureEnd}
-          mutation={UPDATE_PROGRAM_LECTURE_END}
-          dateFieldName="lectureEnd"
-          identifierVariables={{ programId: program.id }}
-          programId={program.id}
-        />
-        <ProgramDateField
-          label={tLabels('project_submission_deadline')}
-          value={program.defaultProjectSubmissionDeadline}
-          mutation={UPDATE_PROGRAM_DEFAULT_PROJECT_SUBMISSION_DEADLINE}
-          dateFieldName="value"
-          identifierVariables={{ itemId: program.id }}
-          programId={program.id}
-        />
+        {!isEventProgram && (
+          <>
+            <ProgramDateField
+              label={tLabels('course_start')}
+              value={program.lectureStart}
+              mutation={UPDATE_PROGRAM_LECTURE_START}
+              dateFieldName="lectureStart"
+              identifierVariables={{ programId: program.id }}
+              programId={program.id}
+            />
+            <ProgramDateField
+              label={tLabels('course_end')}
+              value={program.lectureEnd}
+              mutation={UPDATE_PROGRAM_LECTURE_END}
+              dateFieldName="lectureEnd"
+              identifierVariables={{ programId: program.id }}
+              programId={program.id}
+            />
+            <ProgramDateField
+              label={tLabels('project_submission_deadline')}
+              value={program.defaultProjectSubmissionDeadline}
+              mutation={UPDATE_PROGRAM_DEFAULT_PROJECT_SUBMISSION_DEADLINE}
+              dateFieldName="value"
+              identifierVariables={{ itemId: program.id }}
+              programId={program.id}
+            />
+          </>
+        )}
       </div>
     </div>
   );

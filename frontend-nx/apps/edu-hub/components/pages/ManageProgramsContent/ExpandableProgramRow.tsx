@@ -53,6 +53,9 @@ import {
 } from '../../../queries/__generated__/loadParticipationData';
 import InputField from '../../inputs/InputField';
 import ProgramSessionsCard from './ProgramSessionsCard';
+import ReadOnlyProgramField from './ReadOnlyProgramField';
+import { useCanManageProgramsOf } from '../../../hooks/orgAdminCapabilities';
+import { ProgramType } from '../../../types/enums';
 import { Button } from '../../common/Button';
 import FileUploadField from '../../inputs/FileUploadField';
 import NotificationSnackbar from '../../common/dialogs/NotificationSnackbar';
@@ -146,6 +149,9 @@ const InstructorTemplateSelector: FC<InstructorTemplateSelectorProps> = ({
 
 const ExpandableProgramRow: FC<ExpandableProgramRowProps> = ({ program }) => {
   const t = useTranslations('managePrograms');
+  const canRename = useCanManageProgramsOf(program.organizationId);
+  // Events have no projects, so their programs skip the project defaults.
+  const isEventProgram = program.type === ProgramType.EVENTS;
   const [syncNotice, setSyncNotice] = useState<{ open: boolean; message: string }>({
     open: false,
     message: '',
@@ -354,17 +360,21 @@ const ExpandableProgramRow: FC<ExpandableProgramRowProps> = ({ program }) => {
           <div className="space-y-4 w-full min-w-0">
             {/* 0. Short Title */}
             <div className="bg-fill-primary border border-border-primary rounded-lg p-4">
-              <InputField
-                variant="material"
-                type="input"
-                label={t('short_title.label')}
-                placeholder={t('short_title.placeholder')}
-                helpText={t('short_title.help_text')}
-                itemId={program.id}
-                value={program.shortTitle ?? ''}
-                updateValueMutation={UPDATE_PROGRAM_SHORT_TITLE}
-                refetchQueries={['ProgramList']}
-              />
+              {canRename ? (
+                <InputField
+                  variant="material"
+                  type="input"
+                  label={t('short_title.label')}
+                  placeholder={t('short_title.placeholder')}
+                  helpText={t('short_title.help_text')}
+                  itemId={program.id}
+                  value={program.shortTitle ?? ''}
+                  updateValueMutation={UPDATE_PROGRAM_SHORT_TITLE}
+                  refetchQueries={['ProgramList']}
+                />
+              ) : (
+                <ReadOnlyProgramField label={t('short_title.label')} value={program.shortTitle} />
+              )}
             </div>
 
             {/* Instructor Element room (program-wide) */}
@@ -406,41 +416,43 @@ const ExpandableProgramRow: FC<ExpandableProgramRowProps> = ({ program }) => {
             </div>
 
             {/* Project defaults */}
-            <div className="bg-fill-primary border border-border-primary rounded-lg p-4 space-y-4">
-              <h4 className="text-sm font-medium text-label-primary mb-1">
-                {t('project_defaults.section_title')}
-              </h4>
-              <CheckboxSelector
-                variant="material"
-                label={t('project_defaults.proposals_enabled_by_default.label')}
-                helpText={t('project_defaults.proposals_enabled_by_default.help_text')}
-                checked={Boolean(program.projectProposalsEnabledByDefault)}
-                updateValueMutation={UPDATE_PROGRAM_PROJECT_PROPOSALS_ENABLED_BY_DEFAULT}
-                identifierVariables={{ programId: program.id }}
-                refetchQueries={['ProgramList']}
-              />
-              <DropDownSelector
-                variant="material"
-                label={t('project_defaults.default_project_type.label')}
-                helpText={t('project_defaults.default_project_type.help_text')}
-                value={program.defaultProjectType ?? ''}
-                options={projectTypeOptions}
-                updateValueMutation={UPDATE_PROGRAM_DEFAULT_PROJECT_TYPE}
-                identifierVariables={{ itemId: program.id }}
-                refetchQueries={['ProgramList']}
-              />
-              <DatePicker
-                variant="material"
-                label={t('project_defaults.default_submission_deadline.label')}
-                helpText={t('project_defaults.default_submission_deadline.help_text')}
-                itemId={program.id}
-                value={defaultProjectSubmissionDeadline}
-                updateValueMutation={UPDATE_PROGRAM_DEFAULT_PROJECT_SUBMISSION_DEADLINE}
-                identifierVariables={{ itemId: program.id }}
-                dateFieldName="value"
-                refetchQueries={['ProgramList']}
-              />
-            </div>
+            {!isEventProgram && (
+              <div className="bg-fill-primary border border-border-primary rounded-lg p-4 space-y-4">
+                <h4 className="text-sm font-medium text-label-primary mb-1">
+                  {t('project_defaults.section_title')}
+                </h4>
+                <CheckboxSelector
+                  variant="material"
+                  label={t('project_defaults.proposals_enabled_by_default.label')}
+                  helpText={t('project_defaults.proposals_enabled_by_default.help_text')}
+                  checked={Boolean(program.projectProposalsEnabledByDefault)}
+                  updateValueMutation={UPDATE_PROGRAM_PROJECT_PROPOSALS_ENABLED_BY_DEFAULT}
+                  identifierVariables={{ programId: program.id }}
+                  refetchQueries={['ProgramList']}
+                />
+                <DropDownSelector
+                  variant="material"
+                  label={t('project_defaults.default_project_type.label')}
+                  helpText={t('project_defaults.default_project_type.help_text')}
+                  value={program.defaultProjectType ?? ''}
+                  options={projectTypeOptions}
+                  updateValueMutation={UPDATE_PROGRAM_DEFAULT_PROJECT_TYPE}
+                  identifierVariables={{ itemId: program.id }}
+                  refetchQueries={['ProgramList']}
+                />
+                <DatePicker
+                  variant="material"
+                  label={t('project_defaults.default_submission_deadline.label')}
+                  helpText={t('project_defaults.default_submission_deadline.help_text')}
+                  itemId={program.id}
+                  value={defaultProjectSubmissionDeadline}
+                  updateValueMutation={UPDATE_PROGRAM_DEFAULT_PROJECT_SUBMISSION_DEADLINE}
+                  identifierVariables={{ itemId: program.id }}
+                  dateFieldName="value"
+                  refetchQueries={['ProgramList']}
+                />
+              </div>
+            )}
 
             {/* 1. Questionnaires Card */}
             <div className="bg-fill-primary border border-border-primary rounded-lg p-4 space-y-4">

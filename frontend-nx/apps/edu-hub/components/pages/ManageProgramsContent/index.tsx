@@ -35,9 +35,36 @@ import DatePicker from '../../inputs/DatePicker';
 import NotificationSnackbar from '../../common/dialogs/NotificationSnackbar';
 import CommonPageHeader from '../../common/CommonPageHeader';
 import ExpandableProgramRow from './ExpandableProgramRow';
+import AddProgramDialog from './AddProgramDialog';
+import { useCanManageProgramsOf } from '../../../hooks/orgAdminCapabilities';
+import { ProgramType } from '../../../types/enums';
 import { useTranslations } from 'next-intl';
 
 const QUERY_LIMIT = 100;
+
+/** Event programs have no course period and no projects; their rows leave those columns empty. */
+const isEventProgram = (program: ProgramList_Program) => program.type === ProgramType.EVENTS;
+
+/** Editable title for super-admins and settings admins of the program's organization, plain text otherwise. */
+const ProgramTitleCell: FC<{ program: ProgramList_Program }> = ({ program }) => {
+  const t = useTranslations('managePrograms');
+  const canRename = useCanManageProgramsOf(program.organizationId);
+  if (!canRename) {
+    return <span className="text-sm">{program.title || '–'}</span>;
+  }
+  return (
+    <InputField
+      variant="material"
+      type="input"
+      placeholder={t('title.placeholder')}
+      helpText={t('title.help_text')}
+      itemId={program.id}
+      value={program.title || ''}
+      updateValueMutation={UPDATE_PROGRAM_TITLE}
+      refetchQueries={['ProgramList']}
+    />
+  );
+};
 
 type ManageProgramsContentProps = {
   /** When true, rendered inside SettingsLayout (no page header wrapper). */
@@ -115,24 +142,31 @@ export const ManageProgramsContent: FC<ManageProgramsContentProps> = ({ inSettin
     }
   );
 
-  // Add program handler
-  const handleAddProgram = useCallback(async () => {
-    try {
-      await insertProgram({
-        variables: {
-          title: t('title.placeholder'),
-          today: new Date(),
-        },
-      });
+  const [showAddDialog, setShowAddDialog] = useState(false);
 
-      setSuccessMessage(t('notifications.programs_published_success_singular'));
-      setShowSuccessNotification(true);
-    } catch (error) {
-      console.error('Error adding program:', error);
-      setErrorMessage(t('notifications.bulk_action_failed', { action: 'add' }));
-      setShowErrorNotification(true);
-    }
-  }, [insertProgram, t]);
+  // Add program handler
+  const handleAddProgram = useCallback(
+    async (organizationId: number, type: ProgramType) => {
+      try {
+        await insertProgram({
+          variables: {
+            title: t('title.placeholder'),
+            today: new Date(),
+            organizationId,
+            type,
+          },
+        });
+
+        setSuccessMessage(t('notifications.program_added_success'));
+        setShowSuccessNotification(true);
+      } catch (error) {
+        console.error('Error adding program:', error);
+        setErrorMessage(t('notifications.bulk_action_failed', { action: 'add' }));
+        setShowErrorNotification(true);
+      }
+    },
+    [insertProgram, t]
+  );
 
   // Bulk action handlers
   const handleBulkAction = useCallback(
@@ -222,16 +256,7 @@ export const ManageProgramsContent: FC<ManageProgramsContentProps> = ({ inSettin
         enableSorting: true,
         cell: ({ row }) => (
           <div className="w-full">
-            <InputField
-              variant="material"
-              type="input"
-              placeholder={t('title.placeholder')}
-              helpText={t('title.help_text')}
-              itemId={row.original.id}
-              value={row.original.title || ''}
-              updateValueMutation={UPDATE_PROGRAM_TITLE}
-              refetchQueries={['ProgramList']}
-            />
+            <ProgramTitleCell program={row.original} />
           </div>
         ),
       },
@@ -296,6 +321,7 @@ export const ManageProgramsContent: FC<ManageProgramsContentProps> = ({ inSettin
         enableSorting: true,
         meta: { className: 'text-center' },
         cell: ({ row }) => {
+          if (isEventProgram(row.original)) return <div className="text-center w-full">–</div>;
           const startDate = row.original.lectureStart ? new Date(row.original.lectureStart) : null;
           return (
             <div className="text-center w-full">
@@ -319,6 +345,7 @@ export const ManageProgramsContent: FC<ManageProgramsContentProps> = ({ inSettin
         enableSorting: true,
         meta: { className: 'text-center' },
         cell: ({ row }) => {
+          if (isEventProgram(row.original)) return <div className="text-center w-full">–</div>;
           const endDate = row.original.lectureEnd ? new Date(row.original.lectureEnd) : null;
           return (
             <div className="text-center w-full">
@@ -343,6 +370,7 @@ export const ManageProgramsContent: FC<ManageProgramsContentProps> = ({ inSettin
         enableSorting: true,
         meta: { className: 'text-center' },
         cell: ({ row }) => {
+          if (isEventProgram(row.original)) return <div className="text-center w-full">–</div>;
           const deadline = row.original.defaultProjectSubmissionDeadline
             ? new Date(row.original.defaultProjectSubmissionDeadline)
             : null;
@@ -396,7 +424,7 @@ export const ManageProgramsContent: FC<ManageProgramsContentProps> = ({ inSettin
         refetchQueries={['ProgramList']}
         bulkActions={bulkActions}
         onBulkAction={handleBulkAction}
-        onAddButtonClick={handleAddProgram}
+        onAddButtonClick={() => setShowAddDialog(true)}
         addButtonText={t('add_program_button')}
         expandableRowComponent={(props) => <ExpandableProgramRow program={props.row} />}
         deleteMutation={DELETE_PROGRAM}
@@ -412,6 +440,7 @@ export const ManageProgramsContent: FC<ManageProgramsContentProps> = ({ inSettin
 
   const notifications = (
     <>
+      <AddProgramDialog open={showAddDialog} onClose={() => setShowAddDialog(false)} onSubmit={handleAddProgram} />
       <NotificationSnackbar
         open={showSuccessNotification}
         onClose={() => setShowSuccessNotification(false)}

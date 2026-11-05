@@ -2573,7 +2573,14 @@
       "programs_published_success_plural": "{count} programs were successfully published",
       "programs_unpublished_success_singular": "Program was successfully unpublished",
       "programs_unpublished_success_plural": "{count} programs were successfully unpublished",
-      "bulk_action_failed": "The bulk action failed. Please try again."
+      "bulk_action_failed": "The bulk action failed. Please try again.",
+      "program_added_success": "Program added."
+    },
+    "rename_requires_settings": "Only admins with the settings privilege can rename programs.",
+    "add_program_dialog": {
+      "title": "Add program",
+      "organization": "Organization",
+      "type": "Program type"
     }
   },
   "manageUsers": {

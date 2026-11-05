@@ -6,6 +6,7 @@ import { Menu } from '../Menu';
 const logout = jest.fn();
 let mockIsOrgAdmin = false;
 let mockCanViewStatistics = false;
+let mockCanManageSettings = false;
 
 jest.mock('next-intl', () => ({
   useTranslations: () => (key: string) => key,
@@ -26,7 +27,7 @@ jest.mock('../../../hooks/orgAdminCapabilities', () => ({
     canManageCourses: false,
     canManageEvents: false,
     canManageDegrees: false,
-    canManageSettings: false,
+    canManageSettings: mockCanManageSettings,
     canViewStatistics: mockCanViewStatistics,
   }),
 }));
@@ -49,6 +50,7 @@ describe('account Menu', () => {
     logout.mockClear();
     mockIsOrgAdmin = false;
     mockCanViewStatistics = false;
+    mockCanManageSettings = false;
   });
 
   it('leaves an 8px gap below the avatar trigger', async () => {
@@ -117,5 +119,21 @@ describe('account Menu', () => {
 
     expect(screen.getByRole('menuitem', { name: 'menu.statistics' })).toHaveAttribute('href', '/statistics');
     expect(screen.getByText('menu.section_management')).toBeInTheDocument();
+  });
+
+  it('hides the settings entry from org admins without canManageSettings', async () => {
+    mockIsOrgAdmin = true;
+    mockCanViewStatistics = true;
+    await renderMenu();
+
+    expect(screen.queryByRole('menuitem', { name: 'menu.settings' })).toBeNull();
+  });
+
+  it('shows the settings entry to org admins with canManageSettings', async () => {
+    mockIsOrgAdmin = true;
+    mockCanManageSettings = true;
+    await renderMenu();
+
+    expect(screen.getByRole('menuitem', { name: 'menu.settings' })).toHaveAttribute('href', '/manage/settings');
   });
 });
