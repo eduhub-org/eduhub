@@ -15,21 +15,55 @@
 --
 -- The salt is a secret: no Hasura role but admin may read it (none is listed
 -- in public_Organization.yaml), and the API reads it with the admin secret.
-ALTER TABLE "public"."Organization" ADD COLUMN "participantIdSalt" text NULL
-  DEFAULT replace(gen_random_uuid()::text, '-', '') || replace(gen_random_uuid()::text, '-', '');
+-- Idempotent: down.sql keeps the column (see there), so a re-run must neither
+-- add it again nor reset salts that funders already rely on.
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'Organization' AND column_name = 'participantIdSalt'
+  ) THEN
+    ALTER TABLE "public"."Organization" ADD COLUMN "participantIdSalt" text NULL
+      DEFAULT replace(gen_random_uuid()::text, '-', '') || replace(gen_random_uuid()::text, '-', '');
+
+    -- ADD COLUMN with a volatile default filled every existing row; reset the
+    -- existing API users to the legacy id.
+    UPDATE "public"."Organization"
+    SET "participantIdSalt" = NULL
+    WHERE "apiKeyHash" IS NOT NULL
+       OR upper(btrim("name")) IN ('DIGITAL LEARNING CAMPUS', 'DLC')
+       OR EXISTS (
+         SELECT 1 FROM jsonb_array_elements_text(
+           CASE WHEN jsonb_typeof("aliases") = 'array' THEN "aliases" ELSE '[]'::jsonb END
+         ) AS alias
+         WHERE upper(btrim(alias)) IN ('DIGITAL LEARNING CAMPUS', 'DLC')
+       );
+  END IF;
+END
+$$;
 
 COMMENT ON COLUMN "public"."Organization"."participantIdSalt" IS
   E'Secret salt for the participant ids this funder sees in the participants API. NULL = legacy unsalted id, kept for funders that used the API before salting. Never expose to non-admin roles.';
 
--- ADD COLUMN with a volatile default already filled every existing row; reset
--- the existing API users to the legacy id.
-UPDATE "public"."Organization"
-SET "participantIdSalt" = NULL
-WHERE "apiKeyHash" IS NOT NULL
-   OR upper(btrim("name")) IN ('DIGITAL LEARNING CAMPUS', 'DLC')
-   OR EXISTS (
-     SELECT 1 FROM jsonb_array_elements_text(
-       CASE WHEN jsonb_typeof("aliases") = 'array' THEN "aliases" ELSE '[]'::jsonb END
-     ) AS alias
-     WHERE upper(btrim(alias)) IN ('DIGITAL LEARNING CAMPUS', 'DLC')
-   );
+-- Only the legacy funders above may have NULL: a new organization always gets
+-- a salt, even if an insert passes NULL explicitly, and a salt once set is
+-- never removed (that would switch a funder to ids shared with others).
+CREATE OR REPLACE FUNCTION "public"."organization_keep_participant_id_salt"()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  IF TG_OP = 'INSERT' AND NEW."participantIdSalt" IS NULL THEN
+    NEW."participantIdSalt" := replace(gen_random_uuid()::text, '-', '') || replace(gen_random_uuid()::text, '-', '');
+  ELSIF TG_OP = 'UPDATE' AND OLD."participantIdSalt" IS NOT NULL AND NEW."participantIdSalt" IS NULL THEN
+    NEW."participantIdSalt" := OLD."participantIdSalt";
+  END IF;
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS "organization_keep_participant_id_salt" ON "public"."Organization";
+CREATE TRIGGER "organization_keep_participant_id_salt"
+BEFORE INSERT OR UPDATE OF "participantIdSalt" ON "public"."Organization"
+FOR EACH ROW
+EXECUTE PROCEDURE "public"."organization_keep_participant_id_salt"();

@@ -805,8 +805,9 @@ def process_participant_data(enrollment, user, attendance_data, course_info, aut
     # TODO: Future enhancement - add participantLocation field to indicate which location
     # the participant is enrolled in. Use course_info["selectedLocation"] as reference.
     # Example: "participantLocation": {"id": location_id, "locationOption": "ONLINE"}
+    salt = auth_info.get("participant_id_salt")
     participant = {
-        "id": hash_user_id(user["id"], auth_info.get("participant_id_salt")),
+        "id": hash_user_id(user["id"], salt),
         "enrollmentStatus": enrollment["status"],
         "enrollmentDate": enrollment["created_at"],
         "completionStatus": {
@@ -823,14 +824,14 @@ def process_participant_data(enrollment, user, attendance_data, course_info, aut
     achievements = []
     if has_attendance_cert:
         achievements.append({
-            "id": f"urn:achievement:attendance:{enrollment['id']}",
+            "id": f"urn:achievement:attendance:{scope_enrollment_id(enrollment['id'], salt)}",
             "title": f"Attendance Certificate - {course_info['title']}",
             "type": "attendance"
         })
     
     if has_achievement_cert:
         achievements.append({
-            "id": f"urn:achievement:completion:{enrollment['id']}",
+            "id": f"urn:achievement:completion:{scope_enrollment_id(enrollment['id'], salt)}",
             "title": f"Achievement Certificate - {course_info['title']}",
             "type": "achievement"
         })
@@ -850,11 +851,23 @@ def hash_user_id(user_id, salt=None):
     Without a salt it is the legacy unsalted id, kept for funders that used the
     API before salting so their stored reports still match.
     """
-    if salt:
+    if salt is not None:
         digest = hmac.new(salt.encode(), str(user_id).encode(), hashlib.sha256).hexdigest()
     else:
         digest = hashlib.sha256(str(user_id).encode()).hexdigest()
     return f"urn:hash:{digest[:16]}"
+
+
+def scope_enrollment_id(enrollment_id, salt=None):
+    """
+    The enrollment reference in a funder's achievement ids. With a salt it is an
+    HMAC like the participant id, so two funders of the same course cannot match
+    their reports through it; without one it stays the raw enrollment id that
+    legacy funders already hold.
+    """
+    if salt is None:
+        return str(enrollment_id)
+    return hmac.new(salt.encode(), f"enrollment:{enrollment_id}".encode(), hashlib.sha256).hexdigest()[:16]
 
 
 def handle_participants_request(request):
@@ -1274,7 +1287,7 @@ def handle_participants_schema():
         "data_model": {
             "privacy_policy": "No personally identifiable information (PII) is returned. Participant IDs are stable cryptographic hashes. Only enrollment status, completion certificates, and occupation category are provided.",
             "participant_data": {
-                "id": "urn:hash:{16 hex chars} - Pseudonymous identifier, stable for your organization, different for every other funder",
+                "id": "urn:hash:{16 hex chars} - Pseudonymous identifier, stable for your organization and different from other funders' ids (funders connected before per-funder ids keep the earlier shared format)",
                 "enrollmentStatus": "Enum: ABORTED, APPLIED, CANCELLED, COMPLETED, CONFIRMED, INVITED, REGISTERED, REJECTED",
                 "enrollmentDate": "ISO 8601 timestamp of enrollment",
                 "occupationStatus": "Optional occupation category (STUDENT, EMPLOYEE, etc.)",
