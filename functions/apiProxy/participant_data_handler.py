@@ -6,6 +6,7 @@ Provides participant enrollment and completion status for courses
 import os
 import logging
 import hashlib
+import hmac
 import time
 from datetime import datetime, UTC
 import jwt
@@ -257,6 +258,7 @@ def authenticate_api_key(api_key):
                 name
                 type
                 description
+                participantIdSalt
             }
         }
         """
@@ -301,6 +303,7 @@ def authenticate_api_key(api_key):
             'organization_type': organization.get("type", "unknown"),
             'security_level': security_level,
             'access_level': 'basic',  # basic, detailed, full - can be extended based on organization type
+            'participant_id_salt': organization.get("participantIdSalt"),
             'can_access_pii': security_level.value in ['premium', 'enterprise'],  # Enhanced PII access for higher security levels
             'can_access_grades': security_level.value == 'enterprise',  # Only enterprise can access grades
             'course_access': []  # Empty means access to all funded courses
@@ -356,6 +359,7 @@ def authenticate_jwt(token):
                 id
                 name
                 type
+                participantIdSalt
             }
         }
         """
@@ -410,6 +414,7 @@ def authenticate_jwt(token):
             'organization_name': organization["name"],
             'organization_type': organization.get("type", "unknown"),
             'access_level': access_level,
+            'participant_id_salt': organization.get("participantIdSalt"),
             'can_access_pii': security_level.value in ['premium', 'enterprise'],
             'can_access_grades': security_level.value == 'enterprise',
             'course_access': course_access,
@@ -801,7 +806,7 @@ def process_participant_data(enrollment, user, attendance_data, course_info, aut
     # the participant is enrolled in. Use course_info["selectedLocation"] as reference.
     # Example: "participantLocation": {"id": location_id, "locationOption": "ONLINE"}
     participant = {
-        "id": hash_user_id(user["id"]),
+        "id": hash_user_id(user["id"], auth_info.get("participant_id_salt")),
         "enrollmentStatus": enrollment["status"],
         "enrollmentDate": enrollment["created_at"],
         "completionStatus": {
@@ -836,11 +841,20 @@ def process_participant_data(enrollment, user, attendance_data, course_info, aut
     return participant
 
 
-def hash_user_id(user_id):
+def hash_user_id(user_id, salt=None):
     """
-    Create a consistent hash of user ID for privacy protection
+    The participant id a funder sees: stable for that funder, but not linkable
+    across funders or recomputable from a user id without the funder's secret
+    salt (Organization.participantIdSalt).
+
+    Without a salt it is the legacy unsalted id, kept for funders that used the
+    API before salting so their stored reports still match.
     """
-    return f"urn:hash:{hashlib.sha256(str(user_id).encode()).hexdigest()[:16]}"
+    if salt:
+        digest = hmac.new(salt.encode(), str(user_id).encode(), hashlib.sha256).hexdigest()
+    else:
+        digest = hashlib.sha256(str(user_id).encode()).hexdigest()
+    return f"urn:hash:{digest[:16]}"
 
 
 def handle_participants_request(request):
@@ -1260,7 +1274,7 @@ def handle_participants_schema():
         "data_model": {
             "privacy_policy": "No personally identifiable information (PII) is returned. Participant IDs are stable cryptographic hashes. Only enrollment status, completion certificates, and occupation category are provided.",
             "participant_data": {
-                "id": "urn:hash:{first_16_chars_of_sha256} - Privacy-preserving stable identifier",
+                "id": "urn:hash:{16 hex chars} - Pseudonymous identifier, stable for your organization, different for every other funder",
                 "enrollmentStatus": "Enum: ABORTED, APPLIED, CANCELLED, COMPLETED, CONFIRMED, INVITED, REGISTERED, REJECTED",
                 "enrollmentDate": "ISO 8601 timestamp of enrollment",
                 "occupationStatus": "Optional occupation category (STUDENT, EMPLOYEE, etc.)",

@@ -108,7 +108,9 @@ External, each needing its own section in `components/legal/PrivacySections.tsx`
   funders: pseudonymised, not anonymous, for us (CJEU C-413/23 P: we still
   inform at collection). This is a *recipient* (Art. 13(1)(e)), so it needs the
   recipients (by name or "the funder of the course"), purpose and legal basis.
-  Optional hardening: a secret salt per funder. The MOOCHub feed carries only
+  Hardened: each funder now has its own secret salt
+  (`Organization.participantIdSalt`, HMAC); funders that used the API before
+  (DLC) keep the legacy unsalted id. The MOOCHub feed carries only
   public course data and needs no section.
 
 Self-hosted, so only the purpose is mentioned:
