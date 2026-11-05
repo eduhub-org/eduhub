@@ -96,6 +96,11 @@ External, each needing its own section in `components/legal/PrivacySections.tsx`
   sub-processor. Used for course chat rooms and the Matrix handle
   (`createMatrixRoom`, Keycloak `matrix-handle-listener`). Legal basis
   Art. 6(1)(b). EU location.
+  Provider: **Scheurer Technologies UG (haftungsbeschränkt)**, Kuhnkestraße 6,
+  24118 Kiel, Germany. Managing director Ben Scheurer; Amtsgericht Hamm,
+  HRB 10050; https://startandconnect.com. Contract partner is Campus Business
+  Box e.V. (source: invoice RE0241, 2026-03-11). No DPA under Art. 28 GDPR yet;
+  requested on 2026-11-05.
 - **Participants API** (`functions/apiProxy/participant_data_handler.py`): the
   funding organization of a course receives, per participant, a hashed id,
   enrolment status and date, occupation status and certificate flags. The id
@@ -136,8 +141,10 @@ code is a separate cleanup task.
 - [ ] Mailgun: is the DPA accepted for the account?
 - [x] Zoom: direct contract, EU region, opencampus account only; recordings
       in the cloud, kept 3 months after the course.
-- [ ] Matrix: the service provider's legal name and address, whether a DPA with
-      them exists, and the Hetzner location (DE or FI).
+- [x] Matrix: the service provider's legal name and address (Scheurer
+      Technologies UG, Kiel; see above).
+- [ ] Matrix: DPA with Scheurer Technologies (requested 2026-11-05), and the
+      Hetzner location (DE or FI).
 - [ ] Participants API: which funders have a key, the purpose and legal basis
       (funding agreement means Art. 6(1)(c)/(e), otherwise (f)), and whether
       funders keep the data.
