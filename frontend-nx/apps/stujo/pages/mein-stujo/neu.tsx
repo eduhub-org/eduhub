@@ -388,6 +388,21 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
     );
   }
 
+  // Art. 13 GDPR: where the posting's details are entered (step 1, which can
+  // save a draft) and again before publishing; dashboard publishes act on
+  // drafts entered here.
+  const privacyNotice = (
+    <p className="stujo-muted stujo-privacy-notice">
+      {t.rich('privacyNotice', {
+        privacy: (chunks) => (
+          <Link href="/datenschutz" target="_blank" rel="noreferrer">
+            {chunks}
+          </Link>
+        ),
+      })}
+    </p>
+  );
+
   return (
     <Layout portal={portal}>
       <h1>{editId ? tOffer('edit_offer_title') : tOffer('create_offer_title')}</h1>
@@ -476,6 +491,7 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
               {tOffer('pdf_hint')}
             </span>
           </label>
+          {privacyNotice}
           <div className="stujo-form-actions">
             <button className="stujo-btn stujo-btn--ghost" disabled={busy} onClick={saveDraft}>
               {tOffer('save_draft')}
@@ -575,17 +591,7 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
               </span>
             </label>
           )}
-          {!isLive && (
-            <p className="stujo-muted stujo-privacy-notice">
-              {t.rich('privacyNotice', {
-                privacy: (chunks) => (
-                  <Link href="/datenschutz" target="_blank" rel="noreferrer">
-                    {chunks}
-                  </Link>
-                ),
-              })}
-            </p>
-          )}
+          {!isLive && privacyNotice}
           <div className="stujo-form-actions">
             <button className="stujo-btn stujo-btn--ghost" disabled={busy} onClick={() => setStep(1)}>
               {tOffer('back')}

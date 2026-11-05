@@ -337,6 +337,6 @@
     "similarJobs": "Similar offers"
   },
   "jobLetter": {
-    "privacyNotice": "For the Job-Letter we store your email address and your filters until you unsubscribe. More in our <privacy>privacy policy</privacy>."
+    "privacyNotice": "For the Job-Letter we store your filters with your account and send the mails to your account email address. Unsubscribing stops the mails; the filters stay stored until you delete your account. More in our <privacy>privacy policy</privacy>."
   }
 }

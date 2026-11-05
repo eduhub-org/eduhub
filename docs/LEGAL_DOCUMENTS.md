@@ -113,7 +113,7 @@ For a material change:
    StuJo's history starts with its first entry (none yet; the 2026-11-05
    changes only documented existing processing there).
 2. Set `PRIVACY_NOTICE_VERSION` (same file) to the new
-   `PRIVACY_POLICY_VERSION`. Every account created before that date then sees a
+   `PRIVACY_POLICY_VERSION`. Every account created up to that date then sees a
    dismissible notice on its next visit; the dismissal is stored in
    `User.privacyNoticeSeenVersion`. Accounts created later saw the new policy
    when they registered and are not shown it.

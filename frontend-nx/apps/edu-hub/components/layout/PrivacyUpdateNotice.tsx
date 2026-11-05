@@ -21,8 +21,8 @@ const USER_ROLE_CONTEXT = { role: AuthRoles.user };
  *
  * The policy is information, not a contract, so nobody has to accept it: this
  * only makes sure existing users hear about the change. Shown to accounts
- * created before PRIVACY_NOTICE_VERSION (newer ones saw that policy when they
- * registered) until dismissed; the dismissal is stored on the user, so it
+ * created up to the PRIVACY_NOTICE_VERSION day (later ones saw that policy
+ * when they registered) until dismissed; the dismissal is stored on the user, so it
  * follows them across devices. Hidden while an admin impersonates someone, so
  * the admin cannot dismiss it on their behalf.
  */
@@ -31,7 +31,8 @@ export const PrivacyUpdateNotice: FC = () => {
   const locale = useLocale();
   const userId = useCurrentUserId();
   const { target: impersonating } = useImpersonation();
-  const [dismissed, setDismissed] = useState(false);
+  // Per user, so an account switch in another tab does not inherit the dismissal.
+  const [dismissedFor, setDismissedFor] = useState<string | null>(null);
 
   const { data } = useRoleQuery<MyPrivacyNoticeState, MyPrivacyNoticeStateVariables>(MY_PRIVACY_NOTICE_STATE, {
     variables: { userId },
@@ -44,14 +45,14 @@ export const PrivacyUpdateNotice: FC = () => {
   );
 
   const user = data?.User_by_pk;
-  if (dismissed || impersonating || !user || !isNoticeDue(user.created_at, user.privacyNoticeSeenVersion)) {
+  if (dismissedFor === userId || impersonating || !user || !isNoticeDue(user.created_at, user.privacyNoticeSeenVersion)) {
     return null;
   }
 
   const change = getPrivacyPolicyChange(PRIVACY_NOTICE_VERSION);
 
   const handleDismiss = () => {
-    setDismissed(true);
+    setDismissedFor(userId);
     // Best effort: if this fails the notice simply shows again next time.
     markSeen({ variables: { userId, version: PRIVACY_NOTICE_VERSION } }).catch(() => undefined);
   };

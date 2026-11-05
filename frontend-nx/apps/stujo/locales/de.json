@@ -337,6 +337,6 @@
     "similarJobs": "Ähnliche Angebote"
   },
   "jobLetter": {
-    "privacyNotice": "Für den Job-Letter speichern wir Deine E-Mail-Adresse und Deine Filter, bis Du ihn abbestellst. Mehr dazu in unserer <privacy>Datenschutzerklärung</privacy>."
+    "privacyNotice": "Für den Job-Letter speichern wir Deine Filter zu Deinem Konto und schicken die Mails an Deine Konto-E-Mail-Adresse. Abbestellen stoppt den Versand; die Filter bleiben gespeichert, bis Du Dein Konto löschst. Mehr dazu in unserer <privacy>Datenschutzerklärung</privacy>."
   }
 }

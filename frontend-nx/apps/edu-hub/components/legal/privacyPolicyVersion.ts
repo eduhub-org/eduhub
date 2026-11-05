@@ -53,11 +53,13 @@ export const getPrivacyPolicyChange = (version: string): PrivacyPolicyChange | n
 
 /**
  * Whether a user still has to be told about the current notice version: their
- * account predates it and they have not dismissed it (or a later one).
- * Versions are ISO dates, so they compare as strings.
+ * account dates from the version day or earlier and they have not dismissed it
+ * (or a later one). The version day itself counts, because accounts created
+ * that day before the deploy registered under the old policy. Versions are ISO
+ * dates, so they compare as strings.
  */
 export const isNoticeDue = (createdAt: string | null, seenVersion: string | null): boolean => {
   if (seenVersion && seenVersion >= PRIVACY_NOTICE_VERSION) return false;
   if (!createdAt) return false;
-  return createdAt.slice(0, 10) < PRIVACY_NOTICE_VERSION;
+  return createdAt.slice(0, 10) <= PRIVACY_NOTICE_VERSION;
 };

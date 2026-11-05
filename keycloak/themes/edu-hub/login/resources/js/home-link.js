@@ -45,7 +45,11 @@
       var callback = new URL(redirect);
       if (callback.protocol === 'https:' || callback.protocol === 'http:') {
         link.href = callback.origin + '/';
-        setLegalLinks(callback.origin + '/');
+        // Keycloak's own clients (account console) call back to this host,
+        // which has no legal pages: keep the template's portal fallback.
+        if (callback.origin !== window.location.origin) {
+          setLegalLinks(callback.origin + '/');
+        }
       }
     } catch (e) {
       /* Keep the client home URL (or EduHub fallback) if no callback is available. */

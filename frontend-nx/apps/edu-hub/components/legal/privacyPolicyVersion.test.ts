@@ -23,8 +23,12 @@ describe('isNoticeDue', () => {
     expect(isNoticeDue(before, '2999-01-01')).toBe(false);
   });
 
-  it('is not due for accounts created on or after the version date', () => {
-    expect(isNoticeDue(`${PRIVACY_NOTICE_VERSION}T08:00:00+00:00`, null)).toBe(false);
+  it('is due for accounts created on the version day, possibly before the deploy', () => {
+    expect(isNoticeDue(`${PRIVACY_NOTICE_VERSION}T08:00:00+00:00`, null)).toBe(true);
+  });
+
+  it('is not due for accounts created after the version day', () => {
+    expect(isNoticeDue('2999-01-01T08:00:00+00:00', null)).toBe(false);
   });
 
   it('is not due without a creation date', () => {

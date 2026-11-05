@@ -209,7 +209,9 @@
                                a checkbox. js/home-link.js retargets the links to the portal the
                                person came from (EduHub or a StuJo portal). -->
                           <#assign legalBase = (client.baseUrl)!"">
-                          <#if !legalBase?has_content><#assign legalBase = "https://edu.opencampus.sh/"></#if>
+                          <#-- Keycloak's own clients (account console) have a base URL under
+                               /realms/ - or a relative one - with no legal pages: use EduHub's. -->
+                          <#if !legalBase?has_content || legalBase?contains("/realms/") || !(legalBase?starts_with("https://") || legalBase?starts_with("http://"))><#assign legalBase = "https://edu.opencampus.sh/"></#if>
                           <#if !legalBase?ends_with("/")><#assign legalBase = legalBase + "/"></#if>
                           <p id="kc-legal-notice" class="kc-legal-notice" data-legal-base="${legalBase}">
                               ${kcSanitize(msg((bodyClass == "kc-register-page")?then("legalNoticeRegister", "legalNoticeLogin"), legalBase + "agb", legalBase + "datenschutz"))?no_esc}
