@@ -14,10 +14,12 @@ Branch: `claude/magical-allen-oy9lrv` (based on `develop` @ 60b24123).
 | A: Remove Meta Pixel and Cookiebot, update policy (Plausible, cookies, SSO) | Done | 5b07252b, d12d9c6e |
 | B: Self-host Plus Jakarta Sans (app and Keycloak), redirect `/help` to GitBook | Done | 14ed8e9a |
 | C: Complete processors and recipients in the policy | Open, partly blocked on team input | |
-| D: Information chain (notices, server-side acceptance, policy versioning) | Open | |
+| D: Information chain (notices, server-side acceptance, policy versioning) | Done | see PR |
 
-Lint, type-check, all Jest tests and `yarn build` pass for A and B. Nothing has
-been checked in a browser yet.
+Lint, type-check, all Jest tests and `yarn build` pass. A, B and D were tested
+end to end in the local Docker stack with Playwright (no requests to Facebook,
+Cookiebot, Google Fonts or GitBook; notices, the paid checkbox, the server-side
+`termsAcceptedAt` stamp and the policy-update notice and mail).
 
 ### After A and B are merged and deployed
 
@@ -35,6 +37,10 @@ been checked in a browser yet.
       Jakarta Sans.
 - [ ] Check the Formbricks registration iframe for cookies the Formbricks host
       sets. It is already in the policy as part of the requested service.
+- [ ] Decide whether to send the `PRIVACY_POLICY_UPDATED` mail for this
+      version (the in-app notice shows anyway). If yes, fill in the template
+      and run `scripts/send-privacy-policy-update.js` as described in
+      `docs/LEGAL_DOCUMENTS.md`.
 
 ## Why the banner could go
 

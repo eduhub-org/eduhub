@@ -41,6 +41,30 @@ When users accept terms during paid course registration:
 1. The timestamp is stored in `CourseEnrollment.termsAcceptedAt`
 2. Git history tracks which version of the document was active at that time
 
+The timestamp is the server's, not the browser's: the
+`course_enrollment_stamp_terms_acceptance` trigger replaces whatever a signed-in
+caller sends with `now()`, and rejects an acceptance written on somebody else's
+enrollment (an instructor or org admin cannot accept on a participant's behalf).
+Only calls with the admin secret, such as `confirmGuestRegistration`, keep the
+value they send. Changing or clearing an existing acceptance is blocked by
+`course_enrollment_guard_participant_changes`.
+
+The checkbox asks to **accept the AGB** and to **take note of** the privacy
+policy. The privacy policy is information (Art. 13 GDPR), not something to
+consent to, so it is never phrased as "I accept the privacy policy".
+
+## Where people are told about the privacy policy
+
+| Where | How |
+| ----- | --- |
+| Keycloak registration and login (including the SSO buttons) | Notice under the form linking `/agb` and `/datenschutz` of the portal the person came from (`template.ftl`, `legalNotice*` messages, `js/home-link.js`) |
+| Course page, every non-external registration type | Notice under the registration button (`RegistrationPrivacyNotice`) |
+| Paid course registration | AGB checkbox plus privacy note, recorded in `termsAcceptedAt` |
+| Guest registration | Same checkbox, required by the server |
+| StuJo: publishing a posting, Job-Letter | Notice linking `/datenschutz` |
+| Admin-created accounts and speakers | `USER_CREATED` / `SESSION_SPEAKER_ADDED` mails link the policy |
+| Policy changes | In-app notice and, for material changes, a one-off mail (below) |
+
 Guest registrations use the same column: `confirmGuestRegistration` sets
 `termsAcceptedAt` when the double opt-in link is redeemed, so the timestamp
 records the moment the registration became valid.
@@ -56,9 +80,9 @@ because it is per organization and can be withdrawn independently.
 ## How to Update Legal Documents
 
 1. **Edit the document content** in the respective file
-2. **Update the version date.** For the privacy policy that is the
-   `PrivacyAsOfDate` component in `PrivacySections.tsx`; the AGB pages carry
-   their own stamp:
+2. **Update the version date.** For the privacy policy that is
+   `PRIVACY_POLICY_VERSION` in `components/legal/privacyPolicyVersion.ts`,
+   which `PrivacyAsOfDate` displays; the AGB pages carry their own stamp:
    ```tsx
    {isEnglish ? 'As of: [NEW DATE]' : 'Stand: [NEW DATE]'}
    ```
@@ -70,6 +94,37 @@ because it is per organization and can be withdrawn independently.
    git commit -m "docs: Update Terms & Conditions"
    ```
 4. **Deploy the changes**
+
+### Changing the privacy policy: who has to be told
+
+Nobody has to accept a new version. Account holders must be **told** when a
+change is material for them: new purposes, new recipients or processors, or a
+new legal basis. Rewording, corrections and removing processing are not
+material.
+
+For a material change:
+
+1. Write a two-line summary into `privacy_update.summary` in both
+   `locales/de.json` and `locales/en.json`.
+2. Set `PRIVACY_NOTICE_VERSION` (same file as the policy version) to the new
+   `PRIVACY_POLICY_VERSION`. Every account created before that date then sees a
+   dismissible notice on its next visit; the dismissal is stored in
+   `User.privacyNoticeSeenVersion`. Accounts created later saw the new policy
+   when they registered and are not shown it.
+3. After the deploy, edit the `PRIVACY_POLICY_UPDATED` mail template in the
+   admin UI (replace the placeholder bullet with the summary) and send it once:
+   ```bash
+   cd functions/callNodeFunction
+   HASURA_ENDPOINT=https://hasura.opencampus.sh/v1/graphql \
+   HASURA_ADMIN_SECRET=<hasura-admin-secret> \
+   FRONTEND_URL=https://edu.opencampus.sh \
+   node scripts/send-privacy-policy-update.js --version <PRIVACY_NOTICE_VERSION>         # dry run
+   node scripts/send-privacy-policy-update.js --version <PRIVACY_NOTICE_VERSION> --send  # queue the mails
+   ```
+   The version is stored in `MailLog.metadata`, so the script never mails
+   anyone twice for the same version and can be re-run after an interruption.
+
+For a change that is not material, leave `PRIVACY_NOTICE_VERSION` alone.
 
 ## How to Find Which Version a User Accepted
 
@@ -85,8 +140,8 @@ because it is per organization and can be withdrawn independently.
    git show <commit-hash>:frontend-nx/apps/edu-hub/pages/terms/index.tsx
    # AGB (StuJo job postings)
    git log --until="YYYY-MM-DDTHH:MM:SSZ" -1 -- frontend-nx/apps/stujo/pages/agb.tsx
-   # Privacy policy (both sites)
-   git log --until="YYYY-MM-DDTHH:MM:SSZ" -1 -- frontend-nx/apps/edu-hub/components/legal/PrivacySections.tsx
+   # Privacy policy (both sites; the version file carries the "Stand" date)
+   git log --until="YYYY-MM-DDTHH:MM:SSZ" -1 -- frontend-nx/apps/edu-hub/components/legal/PrivacySections.tsx frontend-nx/apps/edu-hub/components/legal/privacyPolicyVersion.ts
    ```
 
    The whole privacy policy deliberately lives in that one file so this
@@ -106,3 +161,4 @@ All legal pages support both German and English translations. The language is au
 | 2026-08-27 | Privacy         | Added guest registration (Art. 6(1)(b), 12-month retention, self-service deletion) and the newsletter section (Art. 6(1)(a), Ghost as processor) |
 | 2026-09-09 | Privacy         | Text moved into shared components so the StuJo app renders the same wording. Added company/organization accounts (Art. 6(1)(b) for the account and admin grant, Art. 6(1)(f) for the authorization check and admin notification) and, for StuJo only, job postings (Art. 6(1)(b) for publication, Art. 6(1)(f) for the aggregate view counter). Generalized "Profilinformationen" from course participants to the user account, since the section is now shared with a site that has no courses. Replaced the numeric "sections 7 and 8" cross-reference with the section names |
 | 2026-11-05 | Privacy         | Removed the Meta Pixel and the Cookiebot consent banner and their sections. Plausible now runs without consent on Art. 6(1)(f) (no cookies, nothing stored on the device; right to object under Art. 21). Rewrote the tracking overview. Added "Cookies und lokale Speicherung" (strictly necessary storage only, § 25(2) Nr. 2 TDDDG) and single sign-on via Digital Learning Campus, Google, LinkedIn and GitHub (name and email only, Art. 6(1)(b), providers as independent controllers) to the shared data-collection section, so StuJo shows both too |
+| 2026-11-05 | Privacy & AGB   | Information chain: notice with AGB and privacy links on the Keycloak registration and login pages (also covering SSO), on course registration, StuJo publishing and the Job-Letter. Paid and guest checkbox now reads "accept the AGB, take note of the privacy policy". `termsAcceptedAt` is stamped by the server and only by the participant. Policy versioning with a one-time in-app notice (`User.privacyNoticeSeenVersion`) and the `PRIVACY_POLICY_UPDATED` mail |
