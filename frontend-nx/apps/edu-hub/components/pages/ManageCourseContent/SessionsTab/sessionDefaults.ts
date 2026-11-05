@@ -29,6 +29,16 @@ export const nextSessionTimes = (
   isEventCourse: boolean,
   now: Date = new Date()
 ): { startTime: Date; endTime: Date } => {
+  // An event's sessions are usually its agenda for one day, so the next item
+  // starts when the previous one ends and lasts as long.
+  if (previousSession && isEventCourse) {
+    const startTime = new Date(previousSession.endDateTime);
+    const duration =
+      new Date(previousSession.endDateTime).getTime() - new Date(previousSession.startDateTime).getTime();
+    const endTime = new Date(startTime.getTime() + (duration > 0 ? duration : TWO_HOURS_MS));
+    return { startTime, endTime };
+  }
+
   // A course repeats weekly, so the obvious next slot is a week after the last.
   if (previousSession) {
     const startTime = new Date(previousSession.startDateTime);

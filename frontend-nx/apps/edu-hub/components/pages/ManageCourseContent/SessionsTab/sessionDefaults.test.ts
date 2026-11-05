@@ -14,6 +14,28 @@ describe('nextSessionTimes', () => {
     expect(endTime.toISOString()).toBe('2025-09-17T18:00:00.000Z');
   });
 
+  it('starts the next event session when the previous one ends, for the same duration', () => {
+    const { startTime, endTime } = nextSessionTimes(
+      { startTime: '18:00', endTime: '20:00' },
+      { startDateTime: '2025-09-10T16:00:00Z', endDateTime: '2025-09-10T16:45:00Z' },
+      true,
+      NOW
+    );
+    expect(startTime.toISOString()).toBe('2025-09-10T16:45:00.000Z');
+    expect(endTime.toISOString()).toBe('2025-09-10T17:30:00.000Z');
+  });
+
+  it('gives the next event session two hours when the previous one has no duration', () => {
+    const { startTime, endTime } = nextSessionTimes(
+      { startTime: null, endTime: null },
+      { startDateTime: '2025-09-10T16:00:00Z', endDateTime: '2025-09-10T16:00:00Z' },
+      true,
+      NOW
+    );
+    expect(startTime.toISOString()).toBe('2025-09-10T16:00:00.000Z');
+    expect(endTime.toISOString()).toBe('2025-09-10T18:00:00.000Z');
+  });
+
   it('uses the weekly times for a first course session', () => {
     const { startTime, endTime } = nextSessionTimes({ startTime: '18:00', endTime: '20:00' }, undefined, false, NOW);
     expect(startTime.getHours()).toBe(18);
