@@ -869,6 +869,7 @@ export const PrivacyAnalytics: FC<SectionProps> = ({ n }) => {
   );
 };
 
+/** A policy version (ISO date) as the long date the policy shows, e.g. "5. November 2026". */
 const formatVersionDate = (version: string, isEnglish: boolean) =>
   new Date(`${version}T12:00:00Z`).toLocaleDateString(isEnglish ? 'en-US' : 'de-DE', {
     day: 'numeric',

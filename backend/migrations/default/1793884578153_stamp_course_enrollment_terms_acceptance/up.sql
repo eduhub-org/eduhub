@@ -45,12 +45,16 @@ BEGIN
   -- An upsert (REGISTER_OWN_ENROLLMENT) runs this INSERT branch on the proposed
   -- row before Postgres finds the conflict. Leave the value alone then: the
   -- conflict UPDATE fires this trigger again, keeps it when it equals the
-  -- stored acceptance and stamps it when it is new.
-  IF TG_OP = 'INSERT' AND EXISTS (
-    SELECT 1 FROM "public"."CourseEnrollment"
-    WHERE "userId" = NEW."userId" AND "courseId" = NEW."courseId"
-  ) THEN
-    RETURN NEW;
+  -- stored acceptance and stamps it when it is new. The row is locked so a
+  -- concurrent delete (removeTestEnrollment) cannot turn the upsert into a
+  -- plain insert that keeps the client's value.
+  IF TG_OP = 'INSERT' THEN
+    PERFORM 1 FROM "public"."CourseEnrollment"
+      WHERE "userId" = NEW."userId" AND "courseId" = NEW."courseId"
+      FOR UPDATE;
+    IF FOUND THEN
+      RETURN NEW;
+    END IF;
   END IF;
 
   NEW."termsAcceptedAt" := now();
