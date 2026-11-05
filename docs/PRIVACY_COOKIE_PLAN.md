@@ -67,22 +67,38 @@ External, each needing its own section in `components/legal/PrivacySections.tsx`
 - **Mailgun** (Mailgun Technologies, Inc. / Sinch, USA). Sends all transactional
   mail (`functions/sendMail`) and syncs delivery status
   (`sync_mail_delivery_status.py`). The account is on the EU region
-  (`api.eu.mailgun.net`). Data: email, name, mail content, delivery and open
-  events. Legal basis Art. 6(1)(b)/(f). Possible US access under the DPF and
+  (`api.eu.mailgun.net`). Data: email, name, mail content and delivery events
+  (delivered, failed, complained). Open and click tracking is off for platform
+  mails (`'o:tracking': 'no'` per message in `sendMail`); the account-level
+  tracking is for marketing mails sent outside EduHub, covered by their own
+  consent. Legal basis Art. 6(1)(b)/(f). Possible US access under the DPF and
   SCCs.
 - **Zoom** (Zoom Communications, Inc., USA). Runs online sessions. Attendance
   reports (name, email, join and leave times) are pulled through the Reports
   API (`zoom_client.py`) for attendance tracking and certificates. Legal basis
-  Art. 6(1)(b). Transfer under the DPF and SCCs.
+  Art. 6(1)(b). Transfer under the DPF and SCCs. Contract directly with Zoom
+  (Global DPA part of the terms), data region EU, all sessions on the
+  opencampus account.
+  Recordings: rare, by instructors, cloud recording allowed (EU region). Policy
+  text: only announced in advance, consent prompt in Zoom, camera/microphone
+  can stay off, kept at most 3 months after the course ends, not published.
+  To do outside the code: enable Zoom's recording consent prompt, set cloud
+  recording auto-deletion (Zoom only supports a fixed number of days, so pick
+  one that covers course length + 3 months), and tell instructors the rule.
 - **Matrix/Element**. The homeserver is run by a paid service provider on
   Hetzner servers. That provider is our processor, with Hetzner as its
   sub-processor. Used for course chat rooms and the Matrix handle
   (`createMatrixRoom`, Keycloak `matrix-handle-listener`). Legal basis
   Art. 6(1)(b). EU location.
-- **Funder participant data API / MOOCHub**
-  (`functions/apiProxy/participant_data_handler.py`, pseudonymised enrolment
-  and certificate status). This is a *recipient* (Art. 13(1)(e)), so it needs a
-  named recipient and legal basis.
+- **Participants API** (`functions/apiProxy/participant_data_handler.py`): the
+  funding organization of a course receives, per participant, a hashed id,
+  enrolment status and date, occupation status and certificate flags. The id
+  is `sha256(userId)` truncated, unsalted, so it is the same across courses and
+  funders: pseudonymised, not anonymous, for us (CJEU C-413/23 P: we still
+  inform at collection). This is a *recipient* (Art. 13(1)(e)), so it needs the
+  recipients (by name or "the funder of the course"), purpose and legal basis.
+  Optional hardening: a secret salt per funder. The MOOCHub feed carries only
+  public course data and needs no section.
 
 Self-hosted, so only the purpose is mentioned:
 
@@ -110,13 +126,15 @@ code is a separate cleanup task.
 
 ### Open questions for the team (block C)
 
-- [ ] Are the Mailgun and Zoom DPAs accepted for opencampus' accounts? Both are
-      standard or click-through, so check the account settings or contracts.
-- [ ] Zoom: which account type, and is the data region set to the EU?
+- [x] Mailgun: EU region; open/click tracking off for platform mails.
+- [ ] Mailgun: is the DPA accepted for the account?
+- [x] Zoom: direct contract, EU region, opencampus account only; recordings
+      in the cloud, kept 3 months after the course.
 - [ ] Matrix: the service provider's legal name and address, whether a DPA with
       them exists, and the Hetzner location (DE or FI).
-- [ ] MOOCHub: which funder or recipient receives the data, and on what legal
-      basis (funding agreement means Art. 6(1)(c)/(e), otherwise (f)).
+- [ ] Participants API: which funders have a key, the purpose and legal basis
+      (funding agreement means Art. 6(1)(c)/(e), otherwise (f)), and whether
+      funders keep the data.
 
 ## D: Information chain
 

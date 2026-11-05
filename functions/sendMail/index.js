@@ -263,8 +263,15 @@ exports.sendMail = async (req, res) => {
     subject: process.env.ENVIRONMENT === 'staging' ? '[STAGING] ' + subject : subject,
     text: content,
     html: content, // Support both plain text and HTML formats
-    'o:tag': [mailTag], // Add tags for email categorization and tracking
-    'o:tracking': true  // Enable Mailgun's email tracking features
+    'o:tag': [mailTag], // Add tags for email categorization
+    // No open pixel and no click redirects: platform mails are not tracked
+    // (that would need consent under § 25 TDDDG), and nothing reads opens or
+    // clicks - delivery status comes from delivered/failed/complained events,
+    // which Mailgun records regardless. Set per message so the domain's
+    // tracking default, used for marketing mails, does not apply here.
+    'o:tracking': 'no',
+    'o:tracking-opens': 'no',
+    'o:tracking-clicks': 'no'
   };
 
   // Mailgun echoes custom `v:` variables on every event it records for this
@@ -293,6 +300,11 @@ exports.sendMail = async (req, res) => {
         // Development mode: Log all email attempts without actually sending
         console.log('Development email:', {
           maillogId: msg['v:maillogId'],
+          tracking: {
+            all: msg['o:tracking'],
+            opens: msg['o:tracking-opens'],
+            clicks: msg['o:tracking-clicks'],
+          },
           to: msg.to,
           from: msg.from,
           subject: msg.subject,
