@@ -432,12 +432,12 @@ export const PrivacyDataCollection: FC<SectionProps & { children?: ReactNode }> 
         <li>
           <strong>Digital Learning Campus (DLC)</strong>: {isEnglish ? 'Wissenschaftszentrum Kiel GmbH, Geschäftsstelle Digital Learning Campus, Fraunhoferstraße 13, 24118 Kiel, Germany' : 'Wissenschaftszentrum Kiel GmbH, Geschäftsstelle Digital Learning Campus, Fraunhoferstraße 13, 24118 Kiel'} –{' '}
           <a
-            href="https://dlc.sh"
+            href="https://dlc.sh/datenschutz"
             target="_blank"
             rel="noopener noreferrer"
             className="underline hover:text-label-secondary"
           >
-            https://dlc.sh
+            https://dlc.sh/datenschutz
           </a>
         </li>
         <li>
