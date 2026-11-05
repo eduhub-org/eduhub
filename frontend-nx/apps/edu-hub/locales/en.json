@@ -392,7 +392,7 @@
     "funded_by": "Funded by:",
     "learning": {
       "you_will_learn": "You will learn",
-      "general_achievement_certificate_conditions": "**Online Participation:**\nIf online participation is possible, attendances are only counted as present if the camera is continuously turned on!"
+      "general_achievement_certificate_conditions": "**Online Participation:**\nIf online participation is possible, attendance only counts if your camera is on and you take part with the same email address or name as in EduHub. During an announced recording you may switch off your camera without it counting as an absence. More in the [privacy policy](/privacy)."
     },
     "sessions": {
       "show_all_dates": "Show all dates",

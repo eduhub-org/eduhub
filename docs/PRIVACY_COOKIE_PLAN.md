@@ -13,7 +13,7 @@ Branch: `claude/magical-allen-oy9lrv` (based on `develop` @ 60b24123).
 | --- | --- | --- |
 | A: Remove Meta Pixel and Cookiebot, update policy (Plausible, cookies, SSO) | Done | 5b07252b, d12d9c6e |
 | B: Self-host Plus Jakarta Sans (app and Keycloak), redirect `/help` to GitBook | Done | 14ed8e9a |
-| C: Complete processors and recipients in the policy | Open, partly blocked on team input | |
+| C: Complete processors and recipients in the policy | Done | see PR |
 | D: Information chain (notices, server-side acceptance, policy versioning) | Done | see PR |
 
 Lint, type-check, all Jest tests and `yarn build` pass. A, B and D were tested

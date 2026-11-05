@@ -392,7 +392,7 @@
     "funded_by": "Gefördert durch:",
     "learning": {
       "you_will_learn": "Du wirst lernen",
-      "general_achievement_certificate_conditions": "**Online-Teilnahme:**\nWenn eine Online-Teilnahme möglich ist, wird die Teilnahme nur dann als anwesend gewertet, wenn die Kamera eingeschaltet ist."
+      "general_achievement_certificate_conditions": "**Online-Teilnahme:**\nWenn eine Online-Teilnahme möglich ist, wird die Teilnahme nur dann als anwesend gewertet, wenn die Kamera eingeschaltet ist und du mit derselben E-Mail-Adresse bzw. demselben Namen wie in EduHub teilnimmst. Während einer angekündigten Aufzeichnung darfst du die Kamera ausschalten, ohne dass das als Fehlzeit zählt. Mehr dazu in der [Datenschutzerklärung](/privacy)."
     },
     "sessions": {
       "show_all_dates": "Alle Termine anzeigen",
