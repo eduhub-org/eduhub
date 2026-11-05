@@ -18,10 +18,14 @@ class MyDocument extends Document<MyDocumentProps> {
     return (
       <Html>
         <Head>
-          <link rel="preconnect" href="https://fonts.gstatic.com" />
+          {/* Self-hosted Plus Jakarta Sans (@font-face in styles/globals.css); preload the
+              Latin subset every page uses so text doesn't flash in the fallback font. */}
           <link
-            href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200..800&display=swap"
-            rel="stylesheet"
+            rel="preload"
+            href="/fonts/plus-jakarta-sans/plus-jakarta-sans-latin-wght-normal.woff2"
+            as="font"
+            type="font/woff2"
+            crossOrigin="anonymous"
           />
           {/* Pass the combined props to DocumentHeadTags */}
           <DocumentHeadTags {...this.props} />
