@@ -1138,6 +1138,18 @@ button.stujo-header-action:hover {
   opacity: 0.7;
 }
 
+.stujo-privacy-notice {
+  margin: 0.75rem 0 0;
+  max-width: 30rem;
+  font-size: 0.85em;
+  line-height: 1.4;
+}
+
+.stujo-privacy-notice a {
+  color: inherit;
+  text-decoration: underline;
+}
+
 .stujo-consent {
   display: flex;
   align-items: flex-start;

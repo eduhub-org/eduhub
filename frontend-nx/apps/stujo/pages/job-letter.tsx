@@ -1,6 +1,8 @@
 import { gql, useMutation, useQuery } from '@apollo/client';
 import type { GetServerSideProps } from 'next';
+import Link from 'next/link';
 import { signIn, useSession } from 'next-auth/react';
+import { useTranslations } from 'next-intl';
 import { FC, useEffect, useState } from 'react';
 
 import Layout from '../components/Layout';
@@ -60,6 +62,7 @@ const UPDATE_SUBSCRIPTION = gql`
  * jobletterconfig UI — this time with a cron that actually sends.
  */
 const JobLetter: FC<Props> = ({ portal }) => {
+  const t = useTranslations('jobLetter');
   const { status: sessionStatus } = useSession();
   const [type, setType] = useState('');
   const [region, setRegion] = useState('');
@@ -180,6 +183,15 @@ const JobLetter: FC<Props> = ({ portal }) => {
               </button>
             )}
           </div>
+          <p className="stujo-muted stujo-privacy-notice">
+            {t.rich('privacyNotice', {
+              privacy: (chunks) => (
+                <Link href="/datenschutz" target="_blank" rel="noreferrer">
+                  {chunks}
+                </Link>
+              ),
+            })}
+          </p>
         </div>
       )}
     </Layout>

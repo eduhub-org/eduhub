@@ -270,7 +270,8 @@
     "accessRequestFailed": "The request could not be sent: {error}",
     "claimOptionsLoading": "Loading companies …",
     "claimOptionsError": "The list of companies could not be loaded.",
-    "claimOptionsRetry": "Try again"
+    "claimOptionsRetry": "Try again",
+    "privacyNotice": "Our <privacy>privacy policy</privacy> explains how we process the details of your posting and your contact data."
   },
   "jobType": {
     "MINIJOB": "Mini jobs",
@@ -334,5 +335,8 @@
     "notFoundText": "This job offer does not exist or no longer exists. Maybe the link is incomplete. You can find all current offers in the overview.",
     "jobByCompany": "“{title}” at {company}",
     "similarJobs": "Similar offers"
+  },
+  "jobLetter": {
+    "privacyNotice": "For the Job-Letter we store your email address and your filters until you unsubscribe. More in our <privacy>privacy policy</privacy>."
   }
 }

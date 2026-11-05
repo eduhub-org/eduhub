@@ -575,6 +575,17 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
               </span>
             </label>
           )}
+          {!isLive && (
+            <p className="stujo-muted stujo-privacy-notice">
+              {t.rich('privacyNotice', {
+                privacy: (chunks) => (
+                  <Link href="/datenschutz" target="_blank" rel="noreferrer">
+                    {chunks}
+                  </Link>
+                ),
+              })}
+            </p>
+          )}
           <div className="stujo-form-actions">
             <button className="stujo-btn stujo-btn--ghost" disabled={busy} onClick={() => setStep(1)}>
               {tOffer('back')}

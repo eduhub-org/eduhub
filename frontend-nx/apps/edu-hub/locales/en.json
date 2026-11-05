@@ -704,7 +704,7 @@
       "addons": "Add-ons",
       "no_addons": "No add-ons",
       "total": "Total",
-      "accept_terms": "I have read and accept the <terms>Terms and Conditions</terms> and the <privacy>Privacy Policy</privacy>.",
+      "accept_terms": "I accept the <terms>Terms and Conditions</terms>. I have taken note of the <privacy>Privacy Policy</privacy>.",
       "cancel": "Cancel",
       "payment": {
         "verifying": "Verifying payment...",
@@ -826,7 +826,8 @@
       "cancel_success_message": "Your registration has been cancelled.",
       "abort_success_message": "Your participation has been aborted.",
       "cancellation_request_success_message": "Your request has been sent to the organizers."
-    }
+    },
+    "privacy_notice": "Our <privacy>Privacy Policy</privacy> explains how we process your data when you register."
   },
   "coursePage": {
     "courseCosts": "This course costs {price}",
@@ -3298,6 +3299,7 @@
       "REGISTRATION_CONFIRMED_PAID": "Payment Confirmed",
       "APPLICATION_RECEIVED_PAID": "Application Received (Paid)",
       "USER_CREATED": "User Created",
+      "PRIVACY_POLICY_UPDATED": "Privacy policy updated",
       "ORGANIZER_ADDED": "Organizer Added",
       "SESSION_SPEAKER_ADDED": "Speaker Added",
       "CANCELLATION_REQUEST_ORGANIZER": "Cancellation Request (to Organizers)",
@@ -3361,6 +3363,7 @@
       "APPLICATION_RECEIVED_PAID": "Sent when an application for a paid course is received",
       "SESSION_REMINDER": "Sent once to participants before the first session: 24 hours before by default, each course can change this or turn it off",
       "USER_CREATED": "Sent when a new user account is created",
+      "PRIVACY_POLICY_UPDATED": "Sent once to every active account when the privacy policy changes materially. Sent by script (functions/callNodeFunction/scripts/send-privacy-policy-update.js); enter the changes into the template first.",
       "ORGANIZER_ADDED": "Sent when a user is added as an organizer to a course or event",
       "SESSION_SPEAKER_ADDED": "Sent when a user is first listed as a speaker in a course or event",
       "CANCELLATION_REQUEST_ORGANIZER": "Sent to organizers and organization admins when someone asks to cancel a paid registration",
@@ -3723,7 +3726,7 @@
       "last_name": "Last name",
       "email": "Email address",
       "organization": "Organization (optional)",
-      "accept_terms": "I have read and accept the <terms>Terms and Conditions</terms> and the <privacy>Privacy Policy</privacy>.",
+      "accept_terms": "I accept the <terms>Terms and Conditions</terms>. I have taken note of the <privacy>Privacy Policy</privacy>.",
       "newsletter_opt_in": "Email me about future events from this organiser. This is optional and you can withdraw it at any time.",
       "data_notice": "We store your name, email address and, if given, your organization in order to run the event and to tell you about changes to it. After that we delete them automatically. The link in every email lets you view or delete your data at any time.",
       "submit": "Send registration",
@@ -3821,5 +3824,11 @@
       "REJECTED": "rejected",
       "ABORTED": "aborted"
     }
+  },
+  "privacy_update": {
+    "title": "We have updated our privacy policy",
+    "summary": "We no longer use the Meta Pixel or a cookie banner, measure visits only anonymously and without cookies, and now name every service you can sign in with.",
+    "more": "You do not need to do anything. All details are in the <privacy>privacy policy</privacy>.",
+    "dismiss": "Close notice"
   }
 }
