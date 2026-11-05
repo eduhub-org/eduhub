@@ -23,8 +23,8 @@ The pages that render them are thin frames (title, page chrome, section order):
 ### Why StuJo renders fewer privacy sections
 
 Campus Business Box e.V. runs both sites and is the controller on both, but the
-sites do not process the same data. StuJo loads no Cookiebot, Plausible, Meta
-Pixel or Formbricks and has no courses, guest registrations or newsletter;
+sites do not process the same data. StuJo loads no Plausible or Formbricks
+and has no courses, guest registrations or newsletter;
 only StuJo publishes job postings. Each page therefore composes the sections
 that apply to it, so neither site claims processing that does not happen there.
 The organization-accounts section IS shared: a StuJo "employer account" is an
@@ -105,3 +105,4 @@ All legal pages support both German and English translations. The language is au
 | 2026-02-05 | Terms & Privacy | Initial versions with payment registration |
 | 2026-08-27 | Privacy         | Added guest registration (Art. 6(1)(b), 12-month retention, self-service deletion) and the newsletter section (Art. 6(1)(a), Ghost as processor) |
 | 2026-09-09 | Privacy         | Text moved into shared components so the StuJo app renders the same wording. Added company/organization accounts (Art. 6(1)(b) for the account and admin grant, Art. 6(1)(f) for the authorization check and admin notification) and, for StuJo only, job postings (Art. 6(1)(b) for publication, Art. 6(1)(f) for the aggregate view counter). Generalized "Profilinformationen" from course participants to the user account, since the section is now shared with a site that has no courses. Replaced the numeric "sections 7 and 8" cross-reference with the section names |
+| 2026-11-05 | Privacy         | Removed the Meta Pixel and the Cookiebot consent banner and their sections. Plausible now runs without consent on Art. 6(1)(f) (no cookies, nothing stored on the device; right to object under Art. 21). Rewrote the tracking overview. Added "Cookies und lokale Speicherung" (strictly necessary storage only, § 25(2) Nr. 2 TDDDG) and single sign-on via Digital Learning Campus, Google, LinkedIn and GitHub (name and email only, Art. 6(1)(b), providers as independent controllers) to the shared data-collection section, so StuJo shows both too |

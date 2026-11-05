@@ -27,8 +27,7 @@ type Props = { portal: PortalBranding };
  * The wording is the shared one from edu-hub, but StuJo renders only the
  * sections that describe what it actually does. Deliberately NOT rendered,
  * because none of it happens here: the tracking summary, Formbricks,
- * Cookiebot, Plausible, the Meta Pixel, course participation, guest
- * registration and the newsletter. Section numbers are passed in for that
+ * Plausible, course participation, guest registration and the newsletter. Section numbers are passed in for that
  * reason -- see the note in the shared file before adding a cross-reference.
  *
  * The route name matches the legacy stujo.net URL, so old links keep working

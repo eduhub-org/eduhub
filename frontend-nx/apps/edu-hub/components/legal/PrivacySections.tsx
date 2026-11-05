@@ -12,8 +12,8 @@ import { AuthRoles } from '../../types/enums';
  * apps (StuJo reaches them through the `@eduhub/*` alias).
  *
  * Both sites are run by Campus Business Box e.V. and share this wording, but
- * they do NOT do the same things: StuJo loads no Cookiebot, Plausible, Meta
- * Pixel or Formbricks and has no courses, guest registrations or newsletter,
+ * they do NOT do the same things: StuJo loads no Plausible or Formbricks and
+ * has no courses, guest registrations or newsletter,
  * while only StuJo publishes job postings. A single rendered document would
  * therefore have to claim processing that does not happen on one of the two
  * domains. Each page instead composes the sections that apply to it and passes
@@ -132,8 +132,8 @@ export const PrivacyOverviewTracking: FC = () => {
       </h3>
       <p>
         {isEnglish
-          ? 'When you visit this website, your surfing behavior may be statistically analyzed. This is done primarily with cookies and with so-called analysis programs. Detailed information about these analysis programs can be found in the sections on consent management and web analytics of this privacy policy.'
-          : 'Beim Besuch dieser Website kann dein Surf-Verhalten statistisch ausgewertet werden. Das geschieht vor allem mit Cookies und mit sogenannten Analyseprogrammen. Detaillierte Informationen zu diesen Analyseprogrammen findest du in den Abschnitten zur Einwilligungsverwaltung und zur Webanalyse dieser Datenschutzerklärung.'}
+          ? 'When you visit this website, we collect anonymous, aggregated usage statistics with Plausible Analytics. No cookies are set for this and no information is stored on your device. Details can be found in the section on web analytics of this privacy policy.'
+          : 'Beim Besuch dieser Website erfassen wir mit Plausible Analytics anonyme, zusammengefasste Nutzungsstatistiken. Dabei werden keine Cookies gesetzt und keine Informationen auf deinem Endgerät gespeichert. Details findest du im Abschnitt zur Webanalyse dieser Datenschutzerklärung.'}
       </p>
     </>
   );
@@ -414,6 +414,83 @@ export const PrivacyDataCollection: FC<SectionProps & { children?: ReactNode }> 
         {isEnglish
           ? 'The website operator stores the profile data of your user account (name, email address and, where applicable, student status and university) in order to provide and support the services you use (Art. 6 para. 1 lit. f GDPR).'
           : 'Der Websitebetreiber speichert die Profildaten deines Nutzerkontos (Name, E-Mail-Adresse sowie ggf. Studentenstatus und Hochschule), um die von dir genutzten Angebote bereitzustellen und zu unterstützen (Art. 6 Abs. 1 lit. f DSGVO).'}
+      </p>
+      <h3 className="text-lg mt-2 mb-2 italic">
+        {isEnglish ? 'Registration and Login via Third-Party Providers (Single Sign-On)' : 'Registrierung und Login über Drittanbieter (Single Sign-On)'}
+      </h3>
+      <p>
+        {isEnglish
+          ? 'Instead of registering with your email address, you can register and log in with an existing account from one of the providers listed below. This only happens if you actively select the respective button. You are then redirected to the provider, log in there and are sent back to us. We only receive your name and email address as well as a technical identifier of your account with the provider, which we use to link the two accounts. The provider learns that you are logging in to our website.'
+          : 'Statt dich mit deiner E-Mail-Adresse zu registrieren, kannst du dich mit einem bestehenden Konto eines der unten genannten Anbieter registrieren und anmelden. Das geschieht nur, wenn du den jeweiligen Button aktiv auswählst. Du wirst dann zum Anbieter weitergeleitet, meldest dich dort an und wirst zu uns zurückgeleitet. Wir erhalten dabei nur deinen Namen und deine E-Mail-Adresse sowie eine technische Kennung deines Kontos beim Anbieter, mit der wir die beiden Konten verknüpfen. Der Anbieter erfährt, dass du dich auf unserer Website anmeldest.'}
+      </p>
+      <p>
+        {isEnglish
+          ? 'The legal basis is Art. 6 para. 1 lit. b GDPR, as you choose this login method to create and use your user account. You can always register and log in with your email address instead. The providers process the data on their side under their own responsibility; their privacy policies apply to this processing:'
+          : 'Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO, da du diesen Anmeldeweg wählst, um dein Nutzerkonto anzulegen und zu nutzen. Du kannst dich stattdessen jederzeit mit deiner E-Mail-Adresse registrieren und anmelden. Die Anbieter verarbeiten die Daten auf ihrer Seite in eigener Verantwortung; für diese Verarbeitung gelten ihre Datenschutzerklärungen:'}
+      </p>
+      <ul className="list-disc list-inside pl-5">
+        <li>
+          <strong>Digital Learning Campus (DLC)</strong>: {isEnglish ? 'Wissenschaftszentrum Kiel GmbH, Geschäftsstelle Digital Learning Campus, Fraunhoferstraße 13, 24118 Kiel, Germany' : 'Wissenschaftszentrum Kiel GmbH, Geschäftsstelle Digital Learning Campus, Fraunhoferstraße 13, 24118 Kiel'} –{' '}
+          <a
+            href="https://dlc.sh"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline hover:text-label-secondary"
+          >
+            https://dlc.sh
+          </a>
+        </li>
+        <li>
+          <strong>Google</strong>: {isEnglish ? 'Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Ireland' : 'Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland'} –{' '}
+          <a
+            href="https://policies.google.com/privacy"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline hover:text-label-secondary"
+          >
+            https://policies.google.com/privacy
+          </a>
+        </li>
+        <li>
+          <strong>LinkedIn</strong>: {isEnglish ? 'LinkedIn Ireland Unlimited Company, Wilton Plaza, Wilton Place, Dublin 2, Ireland' : 'LinkedIn Ireland Unlimited Company, Wilton Plaza, Wilton Place, Dublin 2, Irland'} –{' '}
+          <a
+            href="https://www.linkedin.com/legal/privacy-policy"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline hover:text-label-secondary"
+          >
+            https://www.linkedin.com/legal/privacy-policy
+          </a>
+        </li>
+        <li>
+          <strong>GitHub</strong>: {isEnglish ? 'GitHub, Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, USA' : 'GitHub, Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, USA'} –{' '}
+          <a
+            href="https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline hover:text-label-secondary"
+          >
+            https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement
+          </a>
+        </li>
+      </ul>
+      <p>
+        {isEnglish
+          ? 'Google and LinkedIn may transfer data to their parent companies in the USA, and GitHub is based in the USA. Such transfers are based on the EU-US Data Privacy Framework, under which these companies are certified.'
+          : 'Google und LinkedIn können Daten an ihre Muttergesellschaften in den USA übermitteln, GitHub hat seinen Sitz in den USA. Diese Übermittlungen erfolgen auf Grundlage des EU-US Data Privacy Framework, unter dem diese Unternehmen zertifiziert sind.'}
+      </p>
+      <h3 className="text-lg mt-2 mb-2 italic">
+        {isEnglish ? 'Cookies and Local Storage' : 'Cookies und lokale Speicherung'}
+      </h3>
+      <p>
+        {isEnglish
+          ? 'This website only stores information on your device that is strictly necessary to provide the service you have requested. These are cookies for your login session (and its security), as well as settings in your browser\'s local storage, for example that you have closed a notice or which tab you last opened. We do not use cookies for advertising or tracking.'
+          : 'Diese Website speichert auf deinem Endgerät nur Informationen, die für die Bereitstellung des von dir gewünschten Dienstes unbedingt erforderlich sind. Das sind Cookies für deine Anmeldesitzung (und deren Absicherung) sowie Einstellungen im lokalen Speicher deines Browsers, z. B. dass du einen Hinweis geschlossen hast oder welchen Reiter du zuletzt geöffnet hattest. Cookies zu Werbe- oder Trackingzwecken setzen wir nicht ein.'}
+      </p>
+      <p>
+        {isEnglish
+          ? 'The storage is based on Section 25 para. 2 no. 2 TDDDG and does not require consent; any processing of personal data in this context is based on Art. 6 para. 1 lit. b and f GDPR. Session cookies are deleted when you log out or after the session expires. You can delete stored information at any time in your browser settings; you may then have to log in again.'
+          : 'Die Speicherung erfolgt auf Grundlage von § 25 Abs. 2 Nr. 2 TDDDG und bedarf keiner Einwilligung; eine damit verbundene Verarbeitung personenbezogener Daten erfolgt auf Grundlage von Art. 6 Abs. 1 lit. b und f DSGVO. Sitzungs-Cookies werden beim Abmelden bzw. nach Ablauf der Sitzung gelöscht. Gespeicherte Informationen kannst du jederzeit in deinen Browsereinstellungen löschen; danach musst du dich gegebenenfalls neu anmelden.'}
       </p>
       {children}
     </>
@@ -742,51 +819,6 @@ export const PrivacyPayments: FC<SectionProps> = ({ n }) => {
 };
 
 /** edu-hub only. */
-export const PrivacyConsentManagement: FC<SectionProps> = ({ n }) => {
-  const isEnglish = useIsEnglish();
-
-  return (
-    <>
-      <h2 className="text-xl mt-6 mb-2">
-        {n}. {isEnglish ? 'Consent Management' : 'Einwilligungsverwaltung'}
-      </h2>
-      <h3 className="text-lg mt-2 mb-2 italic">Cookiebot</h3>
-      <p>
-        {isEnglish
-          ? 'This website uses Cookiebot to obtain your consent for storing cookies and similar technologies on your device, and to document and manage these consents. The provider is Cybot A/S, Havnegade 39, 1058 Copenhagen, Denmark.'
-          : 'Diese Website nutzt Cookiebot, um deine Einwilligung zur Speicherung von Cookies und ähnlichen Technologien auf deinem Endgerät einzuholen sowie diese Einwilligungen zu dokumentieren und zu verwalten. Anbieter ist Cybot A/S, Havnegade 39, 1058 Kopenhagen, Dänemark.'}
-      </p>
-      <p>
-        {isEnglish
-          ? 'When you access our website, a connection is established to Cookiebot servers to obtain your consents and provide other explanations regarding cookie usage. Cookiebot then stores a cookie in your browser to identify the consents you have given or their revocation. The data collected in this way is stored until you request deletion, delete the Cookiebot cookie yourself, or the purpose for data storage no longer applies. Mandatory legal retention obligations remain unaffected.'
-          : 'Wenn du unsere Website aufrufst, wird eine Verbindung zu den Servern von Cookiebot hergestellt, um deine Einwilligungen und sonstigen Erklärungen zur Cookie-Nutzung einzuholen. Cookiebot speichert dann einen Cookie in deinem Browser, um dir die erteilten Einwilligungen bzw. deren Widerruf zuordnen zu können. Die so erfassten Daten werden gespeichert, bis du uns zur Löschung aufforderst, den Cookiebot-Cookie selbst löschst oder der Zweck für die Datenspeicherung entfällt. Zwingende gesetzliche Aufbewahrungspflichten bleiben unberührt.'}
-      </p>
-      <p>
-        {isEnglish
-          ? 'Cookiebot is used to obtain the legally required consents for the use of cookies. The legal basis is Art. 6 para. 1 lit. c GDPR.'
-          : 'Der Einsatz von Cookiebot erfolgt, um die gesetzlich vorgeschriebenen Einwilligungen für den Einsatz von Cookies einzuholen. Rechtsgrundlage ist Art. 6 Abs. 1 lit. c DSGVO.'}
-      </p>
-      <p>
-        {isEnglish
-          ? 'A contract for data processing (DPA) exists with the provider.'
-          : 'Mit dem Anbieter besteht ein Vertrag zur Auftragsverarbeitung (AVV).'}
-      </p>
-      <p>
-        {isEnglish ? 'Further information: ' : 'Weitere Informationen: '}
-        <a
-          href="https://www.cookiebot.com/de/privacy-policy/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="underline hover:text-label-secondary"
-        >
-          https://www.cookiebot.com/de/privacy-policy/
-        </a>
-      </p>
-    </>
-  );
-};
-
-/** edu-hub only. */
 export const PrivacyAnalytics: FC<SectionProps> = ({ n }) => {
   const isEnglish = useIsEnglish();
 
@@ -808,8 +840,8 @@ export const PrivacyAnalytics: FC<SectionProps> = ({ n }) => {
       </p>
       <p>
         {isEnglish
-          ? 'The use of Plausible Analytics is based on your consent (Art. 6 para. 1 lit. a GDPR). The consent can be revoked at any time via the cookie settings.'
-          : 'Die Nutzung von Plausible Analytics erfolgt auf Grundlage deiner Einwilligung (Art. 6 Abs. 1 lit. a DSGVO). Die Einwilligung kann jederzeit über die Cookie-Einstellungen widerrufen werden.'}
+          ? 'Plausible Analytics does not store any information on your device and does not read any from it, so no consent is required for this. The use is based on our legitimate interest in anonymous reach measurement to improve our offering (Art. 6 para. 1 lit. f GDPR). You can object to this at any time (Art. 21 GDPR), for example by blocking the loading of the script in your browser with a content blocker.'
+          : 'Plausible Analytics speichert keine Informationen auf deinem Endgerät und liest keine aus; eine Einwilligung ist dafür daher nicht erforderlich. Die Nutzung erfolgt auf Grundlage unseres berechtigten Interesses an einer anonymen Reichweitenmessung zur Verbesserung unseres Angebots (Art. 6 Abs. 1 lit. f DSGVO). Du kannst dem jederzeit widersprechen (Art. 21 DSGVO), z. B. indem du das Laden des Skripts in deinem Browser mit einem Content-Blocker unterbindest.'}
       </p>
       <p>
         {isEnglish ? 'Further information: ' : 'Weitere Informationen: '}
@@ -826,56 +858,6 @@ export const PrivacyAnalytics: FC<SectionProps> = ({ n }) => {
   );
 };
 
-/** edu-hub only. */
-export const PrivacyMarketing: FC<SectionProps> = ({ n }) => {
-  const isEnglish = useIsEnglish();
-
-  return (
-    <>
-      <h2 className="text-xl mt-6 mb-2">
-        {n}. {isEnglish ? 'Marketing' : 'Marketing'}
-      </h2>
-      <h3 className="text-lg mt-2 mb-2 italic">Meta Pixel (Facebook Pixel)</h3>
-      <p>
-        {isEnglish
-          ? 'This website uses the Meta Pixel (formerly Facebook Pixel) for conversion measurement. The provider is Meta Platforms Ireland Limited, 4 Grand Canal Square, Dublin 2, Ireland.'
-          : 'Diese Website nutzt das Meta Pixel (ehemals Facebook Pixel) zur Konversionsmessung. Anbieter ist Meta Platforms Ireland Limited, 4 Grand Canal Square, Dublin 2, Irland.'}
-      </p>
-      <p>
-        {isEnglish
-          ? 'The Meta Pixel allows us to track the behavior of website visitors after they have been redirected to our website by clicking on a Facebook ad. This enables us to evaluate the effectiveness of Facebook ads for statistical and market research purposes.'
-          : 'Mit dem Meta Pixel kann das Verhalten von Seitenbesuchern nachverfolgt werden, nachdem diese durch Klick auf eine Facebook-Werbeanzeige auf unsere Website weitergeleitet wurden. So kann die Wirksamkeit der Facebook-Werbeanzeigen für statistische und Marktforschungszwecke ausgewertet werden.'}
-      </p>
-      <p>
-        {isEnglish
-          ? "The data collected in this way is anonymous to us, i.e., we do not see the personal data of individual users. However, this data is stored and processed by Meta. Meta can link this data to your Facebook account and use it for its own advertising purposes in accordance with Meta's data policy."
-          : 'Die so erhobenen Daten sind für uns anonym, d. h. wir sehen nicht die personenbezogenen Daten einzelner Nutzer. Diese Daten werden jedoch von Meta gespeichert und verarbeitet. Meta kann diese Daten mit deinem Facebook-Konto verbinden und für eigene Werbezwecke entsprechend der Datenrichtlinie von Meta verwenden.'}
-      </p>
-      <p>
-        {isEnglish
-          ? 'The use of Meta Pixel is based on your consent (Art. 6 para. 1 lit. a GDPR). The consent can be revoked at any time via the cookie settings.'
-          : 'Die Nutzung des Meta Pixels erfolgt auf Grundlage deiner Einwilligung (Art. 6 Abs. 1 lit. a DSGVO). Die Einwilligung kann jederzeit über die Cookie-Einstellungen widerrufen werden.'}
-      </p>
-      <p>
-        {isEnglish
-          ? 'Data transfer to the USA is based on the EU-US Data Privacy Framework. Meta Platforms Inc. is certified under this framework.'
-          : 'Die Datenübertragung in die USA erfolgt auf Grundlage des EU-US Data Privacy Framework. Meta Platforms Inc. ist unter diesem Rahmenwerk zertifiziert.'}
-      </p>
-      <p>
-        {isEnglish ? 'Further information: ' : 'Weitere Informationen: '}
-        <a
-          href="https://www.facebook.com/privacy/policy/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="underline hover:text-label-secondary"
-        >
-          https://www.facebook.com/privacy/policy/
-        </a>
-      </p>
-    </>
-  );
-};
-
 export const PrivacyAsOfDate: FC = () => {
   const isEnglish = useIsEnglish();
 
@@ -883,7 +865,7 @@ export const PrivacyAsOfDate: FC = () => {
     <>
       <div className="mt-12 mb-8">
         <p className="text-sm text-label-secondary">
-          {isEnglish ? 'As of: September 9, 2026' : 'Stand: 9. September 2026'}
+          {isEnglish ? 'As of: November 5, 2026' : 'Stand: 5. November 2026'}
         </p>
       </div>
     </>
