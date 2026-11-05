@@ -25,12 +25,12 @@ plan; every stage is revertable with a plain `git revert`.
 | Auth | `next-auth` v4 (Keycloak provider) + client-side token store (`AuthStoreUpdater`, `config/authStore.ts`); API routes for refresh + logout |
 | i18n | `next-intl` v4 in **Pages Router mode**: `NextIntlClientProvider` in `_app.tsx` with full `locales/{de,en}.json` (~2 700 lines each) bundled client-side; locale comes from Next's built-in i18n routing (`router.locale`); 151 files use `useTranslations` |
 | MUI | v6 + `@mui/material-nextjs` v7 with the `v15-pagesRouter` Emotion cache adapter in `_app`/`_document` |
-| `next/router` | Imported in 28 files; `router.events` used in `_app.tsx` (FB pixel pageviews); shallow routing in `pages/index.tsx` and `hooks/useWidgetLocale.ts` |
+| `next/router` | Imported in 28 files; `router.events` no longer used in `_app.tsx`; shallow routing in `pages/index.tsx` and `hooks/useWidgetLocale.ts` |
 | `next/head` | Used in 23 pages (SEO meta, mostly on `index.tsx`) |
 | Special routes | `/widget/*` pages are embedded in third-party iframes and get permissive CSP/CORS headers via `next.config.js` `headers()`; locale is passed by query param (`useWidgetLocale`) |
 | Middleware | None |
 | Styling | Tailwind 3 + Emotion/MUI; Google Fonts `<link>` (Space Grotesk) in `_document` |
-| Scripts | Cookiebot (`beforeInteractive`, `_document`), FB pixel + Plausible (`afterInteractive`, `_app`) |
+| Scripts | Plausible (`afterInteractive`, `_app`) |
 | Tests | Jest 29 + RTL 16 (a handful of unit tests); `cypress`/`playwright` are in devDependencies but no specs live in the repo |
 | CI | `.github/workflows/frontend-code-checks.yml`, Node 20, `yarn build` + `yarn lint` |
 | Docker | `frontend-nx/Dockerfile-edu` builds on **`node:18-alpine`** and copies the `standalone` output |
@@ -325,9 +325,7 @@ Mapping of everything `_app`/`_document` do today:
 |-------|-----------------|
 | MUI `AppCacheProvider` (`v15-pagesRouter`) + `DocumentHeadTags` | `AppRouterCacheProvider` from `@mui/material-nextjs/v16-appRouter` (single component, no `_document` part needed) |
 | Google Fonts `<link>` (Space Grotesk) | `next/font/google` in root layout (removes a render-blocking request; set `--font-body` var for Tailwind) |
-| Cookiebot `<Script strategy="beforeInteractive">` | Same `next/script` in root layout |
-| FB pixel + Plausible `afterInteractive` scripts | `providers.tsx` (client) |
-| FB pixel pageview on `router.events.routeChangeComplete` | `router.events` doesn't exist in App Router → dedicated client component with a `useEffect` on `usePathname()`/`useSearchParams()`. **Must preserve all existing guards**: fire only after the pixel script's `onLoad` has set the loaded flag AND `typeof window.fbq === 'function'`, keep the effect cleanup, and keep the Cookiebot consent gating (`type="text/plain"` + `data-cookieconsent="marketing"`) so no tracking runs before marketing consent. |
+| Plausible `afterInteractive` script | `providers.tsx` (client), keep the admin/org-admin exclusion |
 | `<body className="font-body text-edu-black bg-edu-bg-gray">` | Root layout `<body>` |
 | `globals.css` / `widget.css` imports | Root layout (importing in both routers during coexistence is fine — each router bundles separately) |
 | `pageProps.session` for `SessionProvider` | Omit (v4's provider fetches the session client-side; this app never SSRs the session) |
@@ -367,7 +365,6 @@ export default function CoursePage() {
 | `useRouter().push/replace(string)` | Same, but import from `i18n/navigation` (next-intl) for locale awareness |
 | `router.query.foo` | `useParams()` (path params) or `useSearchParams().get('foo')` |
 | `router.locale` (`_app`, `ProfileContent`, widgets) | `useLocale()` from next-intl (already used in most places) |
-| `router.events` (`_app` FB pixel) | `usePathname` effect (§4.3) |
 | `router.isReady` | Gone — search params are always ready; delete the guards |
 | Shallow routing (`pages/index.tsx` sessionExpired-param strip, `useWidgetLocale`) | `window.history.replaceState` (officially supported for this in App Router), or `router.replace(..., { scroll: false })` where a re-render is fine |
 | `withAuthRedirect` / `getServerSideProps` (`course/[courseId]`) | Server component: `getServerSession(authOptions)` + `redirect()` for the `?force_login` case |
@@ -499,8 +496,7 @@ lookup — it would add a round trip to every job view.
 - Widgets embedded cross-origin: `/widget/courses?locale=en`, headers via
   `curl -I`
 - Redirects from `next.config.js` (`/impressum`, `/manage/app-settings`, …)
-- FB pixel + Plausible fire on client-side navigation; Cookiebot consent
-  gating still blocks them before consent
+- Plausible fires on client-side navigation and stays off for admins
 - SEO: `view-source` head parity on `/` (de + en)
 - `yarn test`, `yarn lint`, `yarn type-check`, both app builds, Docker
   image boots

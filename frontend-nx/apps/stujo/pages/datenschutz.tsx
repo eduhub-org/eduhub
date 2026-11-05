@@ -5,9 +5,12 @@ import { GetServerSideProps } from 'next';
 
 import {
   PrivacyAsOfDate,
+  PrivacyChangeHistory,
   PrivacyDataCollection,
+  PrivacyEmail,
   PrivacyGeneralInfo,
   PrivacyHosting,
+  PrivacyJobLetter,
   PrivacyJobPostings,
   PrivacyOrganizationAccounts,
   PrivacyOverview,
@@ -27,8 +30,7 @@ type Props = { portal: PortalBranding };
  * The wording is the shared one from edu-hub, but StuJo renders only the
  * sections that describe what it actually does. Deliberately NOT rendered,
  * because none of it happens here: the tracking summary, Formbricks,
- * Cookiebot, Plausible, the Meta Pixel, course participation, guest
- * registration and the newsletter. Section numbers are passed in for that
+ * Plausible, course participation, guest registration and the newsletter. Section numbers are passed in for that
  * reason -- see the note in the shared file before adding a cross-reference.
  *
  * The route name matches the legacy stujo.net URL, so old links keep working
@@ -54,7 +56,11 @@ const Datenschutz: FC<Props> = ({ portal }) => {
           <PrivacyOrganizationAccounts />
         </PrivacyDataCollection>
         <PrivacyJobPostings n={5} />
-        <PrivacyPayments n={6} />
+        <PrivacyJobLetter n={6} />
+        <PrivacyEmail n={7} />
+        <PrivacyPayments n={8} />
+        {/* Empty until the first StuJo entry in PRIVACY_POLICY_CHANGES. */}
+        <PrivacyChangeHistory n={9} site="stujo" />
         <PrivacyAsOfDate />
       </div>
     </Layout>

@@ -392,7 +392,7 @@
     "funded_by": "Funded by:",
     "learning": {
       "you_will_learn": "You will learn",
-      "general_achievement_certificate_conditions": "**Online Participation:**\nIf online participation is possible, attendances are only counted as present if the camera is continuously turned on!"
+      "general_achievement_certificate_conditions": "**Online Participation:**\nIf online participation is possible, attendance only counts if your camera is on and you take part with the same email address or name as in EduHub. During an announced recording you may switch off your camera without it counting as an absence. More in the [privacy policy](/privacy)."
     },
     "sessions": {
       "show_all_dates": "Show all dates",
@@ -704,7 +704,7 @@
       "addons": "Add-ons",
       "no_addons": "No add-ons",
       "total": "Total",
-      "accept_terms": "I have read and accept the <terms>Terms and Conditions</terms> and the <privacy>Privacy Policy</privacy>.",
+      "accept_terms": "I accept the <terms>Terms and Conditions</terms>. I have taken note of the <privacy>Privacy Policy</privacy>.",
       "cancel": "Cancel",
       "payment": {
         "verifying": "Verifying payment...",
@@ -826,7 +826,8 @@
       "cancel_success_message": "Your registration has been cancelled.",
       "abort_success_message": "Your participation has been aborted.",
       "cancellation_request_success_message": "Your request has been sent to the organizers."
-    }
+    },
+    "privacy_notice": "Our <privacy>Privacy Policy</privacy> explains how we process your data when you register."
   },
   "coursePage": {
     "courseCosts": "This course costs {price}",
@@ -3723,7 +3724,7 @@
       "last_name": "Last name",
       "email": "Email address",
       "organization": "Organization (optional)",
-      "accept_terms": "I have read and accept the <terms>Terms and Conditions</terms> and the <privacy>Privacy Policy</privacy>.",
+      "accept_terms": "I accept the <terms>Terms and Conditions</terms>. I have taken note of the <privacy>Privacy Policy</privacy>.",
       "newsletter_opt_in": "Email me about future events from this organiser. This is optional and you can withdraw it at any time.",
       "data_notice": "We store your name, email address and, if given, your organization in order to run the event and to tell you about changes to it. After that we delete them automatically. The link in every email lets you view or delete your data at any time.",
       "submit": "Send registration",
@@ -3765,12 +3766,12 @@
     "errors": {
       "name_required": "Please enter your first and last name.",
       "email_required": "Please enter your email address.",
-      "terms_required": "Please accept the terms and the privacy policy.",
+      "terms_required": "Please accept the terms and conditions.",
       "invalid_name": "Please check your name.",
       "invalid_organization": "The organization name can be at most 200 characters long.",
       "invalid_email": "Please check your email address.",
       "invalid_course": "This event could not be found.",
-      "terms_not_accepted": "Please accept the terms and the privacy policy.",
+      "terms_not_accepted": "Please accept the terms and conditions.",
       "course_not_available": "This event is currently not available.",
       "guest_registration_not_enabled": "Registration without an account is not available for this event.",
       "course_full": "This event is already full.",
@@ -3821,5 +3822,10 @@
       "REJECTED": "rejected",
       "ABORTED": "aborted"
     }
+  },
+  "privacy_update": {
+    "title": "We have updated our privacy policy",
+    "more": "You do not need to do anything. All changes are listed in the <privacy>privacy policy</privacy>.",
+    "dismiss": "Close notice"
   }
 }

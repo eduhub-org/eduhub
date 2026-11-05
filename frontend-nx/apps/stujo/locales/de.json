@@ -270,7 +270,8 @@
     "accessRequestFailed": "Die Anfrage konnte nicht gesendet werden: {error}",
     "claimOptionsLoading": "Unternehmen werden geladen …",
     "claimOptionsError": "Die Unternehmensliste konnte nicht geladen werden.",
-    "claimOptionsRetry": "Erneut versuchen"
+    "claimOptionsRetry": "Erneut versuchen",
+    "privacyNotice": "Wie wir die Angaben zu Deinem Angebot und Deine Kontaktdaten verarbeiten, erfährst Du in unserer <privacy>Datenschutzerklärung</privacy>."
   },
   "jobType": {
     "MINIJOB": "Minijobs",
@@ -334,5 +335,8 @@
     "notFoundText": "Dieses Stellenangebot gibt es nicht oder nicht mehr. Vielleicht ist der Link unvollständig. In der Übersicht findest Du alle aktuellen Angebote.",
     "jobByCompany": "„{title}“ bei {company}",
     "similarJobs": "Ähnliche Angebote"
+  },
+  "jobLetter": {
+    "privacyNotice": "Für den Job-Letter speichern wir Deine Filter zu Deinem Konto und schicken die Mails an Deine Konto-E-Mail-Adresse. Abbestellen stoppt den Versand; die Filter bleiben gespeichert, bis Du Dein Konto löschst. Mehr dazu in unserer <privacy>Datenschutzerklärung</privacy>."
   }
 }

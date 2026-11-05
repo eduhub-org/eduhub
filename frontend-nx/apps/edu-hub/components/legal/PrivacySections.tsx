@@ -6,14 +6,15 @@ import { useRoleQuery } from '../../hooks/authedQuery';
 import { GUEST_DATA_RETENTION_MONTHS } from '../../queries/guestRegistration';
 import { GuestDataRetentionMonths } from '../../queries/__generated__/GuestDataRetentionMonths';
 import { AuthRoles } from '../../types/enums';
+import { getPrivacyPolicyChanges, PRIVACY_POLICY_VERSION, PrivacyPolicySite } from './privacyPolicyVersion';
 
 /**
  * The privacy policy, as composable sections shared by the edu-hub and StuJo
  * apps (StuJo reaches them through the `@eduhub/*` alias).
  *
  * Both sites are run by Campus Business Box e.V. and share this wording, but
- * they do NOT do the same things: StuJo loads no Cookiebot, Plausible, Meta
- * Pixel or Formbricks and has no courses, guest registrations or newsletter,
+ * they do NOT do the same things: StuJo loads no Plausible or Formbricks and
+ * has no courses, guest registrations or newsletter,
  * while only StuJo publishes job postings. A single rendered document would
  * therefore have to claim processing that does not happen on one of the two
  * domains. Each page instead composes the sections that apply to it and passes
@@ -34,7 +35,8 @@ import { AuthRoles } from '../../types/enums';
  *     `git log --until=<timestamp> -- <this file>`, which only works while the
  *     text is in git and not spread across many files.
  *     Process: docs/LEGAL_DOCUMENTS.md.
- *   - Bump the date in `PrivacyAsOfDate` whenever the text changes.
+ *   - Bump PRIVACY_POLICY_VERSION (privacyPolicyVersion.ts) whenever the text
+ *     changes; it is the date `PrivacyAsOfDate` shows.
  */
 
 type SectionProps = { n: number };
@@ -132,8 +134,8 @@ export const PrivacyOverviewTracking: FC = () => {
       </h3>
       <p>
         {isEnglish
-          ? 'When you visit this website, your surfing behavior may be statistically analyzed. This is done primarily with cookies and with so-called analysis programs. Detailed information about these analysis programs can be found in the sections on consent management and web analytics of this privacy policy.'
-          : 'Beim Besuch dieser Website kann dein Surf-Verhalten statistisch ausgewertet werden. Das geschieht vor allem mit Cookies und mit sogenannten Analyseprogrammen. Detaillierte Informationen zu diesen Analyseprogrammen findest du in den Abschnitten zur Einwilligungsverwaltung und zur Webanalyse dieser Datenschutzerklärung.'}
+          ? 'When you visit this website, we collect anonymous, aggregated usage statistics with Plausible Analytics. No cookies are set for this and no information is stored on your device. Details can be found in the section on web analytics of this privacy policy.'
+          : 'Beim Besuch dieser Website erfassen wir mit Plausible Analytics anonyme, zusammengefasste Nutzungsstatistiken. Dabei werden keine Cookies gesetzt und keine Informationen auf deinem Endgerät gespeichert. Details findest du im Abschnitt zur Webanalyse dieser Datenschutzerklärung.'}
       </p>
     </>
   );
@@ -167,6 +169,11 @@ export const PrivacyHosting: FC<SectionProps> = ({ n }) => {
         {isEnglish
           ? 'Data processing takes place on servers within the European Union (EU region europe-west).'
           : 'Die Datenverarbeitung erfolgt auf Servern innerhalb der Europäischen Union (EU-Region europe-west).'}
+      </p>
+      <p>
+        {isEnglish
+          ? 'We operate further services ourselves on this infrastructure, in particular the login system and the online surveys used to record attendance. No data is passed to other providers for these.'
+          : 'Weitere Dienste betreiben wir selbst auf dieser Infrastruktur, insbesondere das Anmeldesystem (Login) und die Online-Umfragen zur Erfassung der Anwesenheit. Dafür werden keine Daten an weitere Anbieter weitergegeben.'}
       </p>
       <p>
         {isEnglish
@@ -253,16 +260,25 @@ export const PrivacyGeneralInfo: FC<SectionProps & { imprintHref: string }> = ({
           ? 'Right to Object to Data Collection in Special Cases and to Direct Advertising (Art. 21 GDPR)'
           : 'Widerspruchsrecht gegen die Datenerhebung in besonderen Fällen sowie gegen Direktwerbung (Art. 21 DSGVO)'}
       </h3>
-      <p>
-        {isEnglish
-          ? 'IF DATA PROCESSING IS CARRIED OUT ON THE BASIS OF ART. 6 PARA. 1 LIT. E OR F GDPR, YOU HAVE THE RIGHT TO OBJECT TO THE PROCESSING OF YOUR PERSONAL DATA AT ANY TIME FOR REASONS ARISING FROM YOUR PARTICULAR SITUATION; THIS ALSO APPLIES TO PROFILING BASED ON THESE PROVISIONS. THE RESPECTIVE LEGAL BASIS ON WHICH PROCESSING IS BASED CAN BE FOUND IN THIS PRIVACY POLICY. IF YOU OBJECT, WE WILL NO LONGER PROCESS YOUR AFFECTED PERSONAL DATA UNLESS WE CAN DEMONSTRATE COMPELLING LEGITIMATE GROUNDS FOR PROCESSING THAT OVERRIDE YOUR INTERESTS, RIGHTS, AND FREEDOMS OR THE PROCESSING SERVES TO ASSERT, EXERCISE, OR DEFEND LEGAL CLAIMS (OBJECTION PURSUANT TO ART. 21 PARA. 1 GDPR).'
-          : 'WENN DIE DATENVERARBEITUNG AUF GRUNDLAGE VON ART. 6 ABS. 1 LIT. E ODER F DSGVO ERFOLGT, HAST DU JEDERZEIT DAS RECHT, AUS GRÜNDEN, DIE SICH AUS DEINER BESONDEREN SITUATION ERGEBEN, GEGEN DIE VERARBEITUNG DEINER PERSONENBEZOGENEN DATEN WIDERSPRUCH EINZULEGEN; DIES GILT AUCH FÜR EIN AUF DIESE BESTIMMUNGEN GESTÜTZTES PROFILING. DIE JEWEILIGE RECHTSGRUNDLAGE, AUF DENEN EINE VERARBEITUNG BERUHT, ENTNIMMST DU DIESER DATENSCHUTZERKLÄRUNG. WENN DU WIDERSPRUCH EINLEGST, WERDEN WIR DEINE BETROFFENEN PERSONENBEZOGENEN DATEN NICHT MEHR VERARBEITEN, ES SEI DENN, WIR KÖNNEN ZWINGENDE SCHUTZWÜRDIGE GRÜNDE FÜR DIE VERARBEITUNG NACHWEISEN, DIE DEINE INTERESSEN, RECHTE UND FREIHEITEN ÜBERWIEGEN ODER DIE VERARBEITUNG DIENT DER GELTENDMACHUNG, AUSÜBUNG ODER VERTEIDIGUNG VON RECHTSANSPRÜCHEN (WIDERSPRUCH NACH ART. 21 ABS. 1 DSGVO).'}
-      </p>
-      <p>
-        {isEnglish
-          ? 'IF YOUR PERSONAL DATA IS PROCESSED FOR THE PURPOSE of DIRECT ADVERTISING, YOU HAVE THE RIGHT TO OBJECT AT ANY TIME TO THE PROCESSING OF PERSONAL DATA CONCERNING YOU FOR THE PURPOSE OF SUCH ADVERTISING; THIS ALSO APPLIES TO PROFILING INSOFAR AS IT IS RELATED TO SUCH DIRECT ADVERTISING. IF YOU OBJECT, YOUR PERSONAL DATA WILL SUBSEQUENTLY NO LONGER BE USED FOR THE PURPOSE OF DIRECT ADVERTISING (OBJECTION PURSUANT TO ART. 21 PARA. 2 GDPR).'
-          : 'WERDEN DEINE PERSONENBEZOGENEN DATEN VERARBEITET, UM DIREKTWERBUNG ZU BETREIBEN, SO HAST DU DAS RECHT, JEDERZEIT WIDERSPRUCH GEGEN DIE VERARBEITUNG DICH BETREFFENDER PERSONENBEZOGENER DATEN ZUM ZWECKE DERARTIGER WERBUNG EINZULEGEN; DIES GILT AUCH FÜR DAS PROFILING, SOWEIT ES MIT SOLCHER DIREKTWERBUNG IN VERBINDUNG STEHT. WENN DU WIDERSPRICHST, WERDEN DEINE PERSONENBEZOGENEN DATEN ANSCHLIESSEND NICHT MEHR ZUM ZWECKE DER DIREKTWERBUNG VERWENDET (WIDERSPRUCH NACH ART. 21 ABS. 2 DSGVO).'}
-      </p>
+      {/* Art. 21(4) GDPR: the right to object must be pointed out explicitly and
+          separately from other information. A framed box does that and stays
+          readable; the template text used to set it in capitals instead.
+          border-solid: StuJo runs without Tailwind preflight. */}
+      <div className="my-3 p-4 rounded-lg border-2 border-solid border-border-primary">
+        <p className="font-semibold">
+          {isEnglish ? 'Important: you can object.' : 'Wichtig: Du kannst widersprechen.'}
+        </p>
+        <p className="mt-2">
+          {isEnglish
+            ? 'If data processing is carried out on the basis of Art. 6 para. 1 lit. e or f GDPR, you have the right to object to the processing of your personal data at any time for reasons arising from your particular situation; this also applies to profiling based on these provisions. The respective legal basis on which processing is based can be found in this privacy policy. If you object, we will no longer process your affected personal data unless we can demonstrate compelling legitimate grounds for processing that override your interests, rights, and freedoms, or the processing serves to assert, exercise, or defend legal claims (objection pursuant to Art. 21 para. 1 GDPR).'
+            : 'Wenn die Datenverarbeitung auf Grundlage von Art. 6 Abs. 1 lit. e oder f DSGVO erfolgt, hast du jederzeit das Recht, aus Gründen, die sich aus deiner besonderen Situation ergeben, gegen die Verarbeitung deiner personenbezogenen Daten Widerspruch einzulegen; dies gilt auch für ein auf diese Bestimmungen gestütztes Profiling. Die jeweilige Rechtsgrundlage, auf der eine Verarbeitung beruht, entnimmst du dieser Datenschutzerklärung. Wenn du Widerspruch einlegst, werden wir deine betroffenen personenbezogenen Daten nicht mehr verarbeiten, es sei denn, wir können zwingende schutzwürdige Gründe für die Verarbeitung nachweisen, die deine Interessen, Rechte und Freiheiten überwiegen, oder die Verarbeitung dient der Geltendmachung, Ausübung oder Verteidigung von Rechtsansprüchen (Widerspruch nach Art. 21 Abs. 1 DSGVO).'}
+        </p>
+        <p className="mt-2">
+          {isEnglish
+            ? 'If your personal data is processed for the purpose of direct advertising, you have the right to object at any time to the processing of personal data concerning you for the purpose of such advertising; this also applies to profiling insofar as it is related to such direct advertising. If you object, your personal data will subsequently no longer be used for the purpose of direct advertising (objection pursuant to Art. 21 para. 2 GDPR).'
+            : 'Werden deine personenbezogenen Daten verarbeitet, um Direktwerbung zu betreiben, so hast du das Recht, jederzeit Widerspruch gegen die Verarbeitung dich betreffender personenbezogener Daten zum Zwecke derartiger Werbung einzulegen; dies gilt auch für das Profiling, soweit es mit solcher Direktwerbung in Verbindung steht. Wenn du widersprichst, werden deine personenbezogenen Daten anschließend nicht mehr zum Zwecke der Direktwerbung verwendet (Widerspruch nach Art. 21 Abs. 2 DSGVO).'}
+        </p>
+      </div>
       <h3 className="text-lg mt-2 mb-2 italic">
         {isEnglish
           ? 'Right to Lodge a Complaint with the Competent Supervisory Authority'
@@ -305,6 +321,19 @@ export const PrivacyGeneralInfo: FC<SectionProps & { imprintHref: string }> = ({
           {isEnglish ? 'Imprint' : 'Impressum'}
         </Link>
         {isEnglish ? '.' : ' angegebenen Adresse an uns wenden.'}
+      </p>
+      <h3 className="text-lg mt-2 mb-2 italic">
+        {isEnglish ? 'Deleting Your Account' : 'Löschen deines Kontos'}
+      </h3>
+      <p>
+        {isEnglish
+          ? 'You can delete your account yourself at any time at the end of your profile. We then delete or anonymize your profile data, your profile picture, your certificates (please download them beforehand), your motivation letters and questionnaire answers, your newsletter subscriptions and job alerts, and the emails sent to you. Your login account is removed and your chat account is deactivated.'
+          : 'Du kannst dein Konto jederzeit selbst am Ende deines Profils löschen. Wir löschen bzw. anonymisieren dann deine Profildaten, dein Profilbild, deine Zertifikate (bitte lade sie vorher herunter), deine Motivationsschreiben und Fragebogenantworten, deine Newsletter-Abonnements und Job-Benachrichtigungen sowie die an dich versandten E-Mails. Dein Login-Konto wird entfernt und dein Chat-Konto deaktiviert.'}
+      </p>
+      <p>
+        {isEnglish
+          ? 'We keep invoices and payment records for the statutory retention periods (section 147 AO, section 257 HGB), anonymous statistics on participation, and content you created together with others (e.g. shared projects). Chat messages you have already sent remain in the course rooms but are hidden from people who join later. Data held by external services (e.g. Zoom or the email service) is deleted on request; please contact us for this.'
+          : 'Wir behalten Rechnungen und Zahlungsbelege für die gesetzlichen Aufbewahrungsfristen (§ 147 AO, § 257 HGB), anonyme Statistiken zur Teilnahme sowie Inhalte, die du gemeinsam mit anderen erstellt hast (z. B. gemeinsame Projekte). Bereits gesendete Chat-Nachrichten bleiben in den Kursräumen, werden aber für später Hinzukommende ausgeblendet. Daten bei externen Diensten (z. B. Zoom oder dem E-Mail-Dienst) löschen wir auf Anfrage; wende dich dazu an uns.'}
       </p>
       <h3 className="text-lg mt-2 mb-2 italic">
         {isEnglish ? 'Right to Restriction of Processing' : 'Recht auf Einschränkung der Verarbeitung'}
@@ -415,6 +444,88 @@ export const PrivacyDataCollection: FC<SectionProps & { children?: ReactNode }> 
           ? 'The website operator stores the profile data of your user account (name, email address and, where applicable, student status and university) in order to provide and support the services you use (Art. 6 para. 1 lit. f GDPR).'
           : 'Der Websitebetreiber speichert die Profildaten deines Nutzerkontos (Name, E-Mail-Adresse sowie ggf. Studentenstatus und Hochschule), um die von dir genutzten Angebote bereitzustellen und zu unterstützen (Art. 6 Abs. 1 lit. f DSGVO).'}
       </p>
+      <p>
+        {isEnglish
+          ? 'Registration, login and password reset run through a login system that we operate ourselves (see "Hosting").'
+          : 'Registrierung, Anmeldung und das Zurücksetzen des Passworts laufen über ein Anmeldesystem, das wir selbst betreiben (siehe „Hosting“).'}
+      </p>
+      <h3 className="text-lg mt-2 mb-2 italic">
+        {isEnglish ? 'Registration and Login via Third-Party Providers (Single Sign-On)' : 'Registrierung und Login über Drittanbieter (Single Sign-On)'}
+      </h3>
+      <p>
+        {isEnglish
+          ? 'Instead of registering with your email address, you can register and log in with an existing account from one of the providers listed below. This only happens if you actively select the respective button. You are then redirected to the provider, log in there and are sent back to us. We only receive your name and email address as well as a technical identifier of your account with the provider, which we use to link the two accounts. The provider learns that you are logging in to our website.'
+          : 'Statt dich mit deiner E-Mail-Adresse zu registrieren, kannst du dich mit einem bestehenden Konto eines der unten genannten Anbieter registrieren und anmelden. Das geschieht nur, wenn du den jeweiligen Button aktiv auswählst. Du wirst dann zum Anbieter weitergeleitet, meldest dich dort an und wirst zu uns zurückgeleitet. Wir erhalten dabei nur deinen Namen und deine E-Mail-Adresse sowie eine technische Kennung deines Kontos beim Anbieter, mit der wir die beiden Konten verknüpfen. Der Anbieter erfährt, dass du dich auf unserer Website anmeldest.'}
+      </p>
+      <p>
+        {isEnglish
+          ? 'The legal basis is Art. 6 para. 1 lit. b GDPR, as you choose this login method to create and use your user account. You can always register and log in with your email address instead. The providers process the data on their side under their own responsibility; their privacy policies apply to this processing:'
+          : 'Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO, da du diesen Anmeldeweg wählst, um dein Nutzerkonto anzulegen und zu nutzen. Du kannst dich stattdessen jederzeit mit deiner E-Mail-Adresse registrieren und anmelden. Die Anbieter verarbeiten die Daten auf ihrer Seite in eigener Verantwortung; für diese Verarbeitung gelten ihre Datenschutzerklärungen:'}
+      </p>
+      <ul className="list-disc list-inside pl-5">
+        <li>
+          <strong>Digital Learning Campus (DLC)</strong>: {isEnglish ? 'Wissenschaftszentrum Kiel GmbH, Geschäftsstelle Digital Learning Campus, Fraunhoferstraße 13, 24118 Kiel, Germany' : 'Wissenschaftszentrum Kiel GmbH, Geschäftsstelle Digital Learning Campus, Fraunhoferstraße 13, 24118 Kiel'} –{' '}
+          <a
+            href="https://dlc.sh/datenschutz"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline hover:text-label-secondary"
+          >
+            https://dlc.sh/datenschutz
+          </a>
+        </li>
+        <li>
+          <strong>Google</strong>: {isEnglish ? 'Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Ireland' : 'Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland'} –{' '}
+          <a
+            href="https://policies.google.com/privacy"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline hover:text-label-secondary"
+          >
+            https://policies.google.com/privacy
+          </a>
+        </li>
+        <li>
+          <strong>LinkedIn</strong>: {isEnglish ? 'LinkedIn Ireland Unlimited Company, Wilton Plaza, Wilton Place, Dublin 2, Ireland' : 'LinkedIn Ireland Unlimited Company, Wilton Plaza, Wilton Place, Dublin 2, Irland'} –{' '}
+          <a
+            href="https://www.linkedin.com/legal/privacy-policy"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline hover:text-label-secondary"
+          >
+            https://www.linkedin.com/legal/privacy-policy
+          </a>
+        </li>
+        <li>
+          <strong>GitHub</strong>: {isEnglish ? 'GitHub, Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, USA' : 'GitHub, Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, USA'} –{' '}
+          <a
+            href="https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline hover:text-label-secondary"
+          >
+            https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement
+          </a>
+        </li>
+      </ul>
+      <p>
+        {isEnglish
+          ? 'Google and LinkedIn may transfer data to their parent companies in the USA, and GitHub is based in the USA. Such transfers are based on the EU-US Data Privacy Framework, under which these companies are certified.'
+          : 'Google und LinkedIn können Daten an ihre Muttergesellschaften in den USA übermitteln, GitHub hat seinen Sitz in den USA. Diese Übermittlungen erfolgen auf Grundlage des EU-US Data Privacy Framework, unter dem diese Unternehmen zertifiziert sind.'}
+      </p>
+      <h3 className="text-lg mt-2 mb-2 italic">
+        {isEnglish ? 'Cookies and Local Storage' : 'Cookies und lokale Speicherung'}
+      </h3>
+      <p>
+        {isEnglish
+          ? 'This website only stores information on your device that is strictly necessary to provide the service you have requested. These are cookies for your login session (and its security), as well as settings in your browser\'s local storage, for example that you have closed a notice or which tab you last opened. We do not use cookies for advertising or tracking.'
+          : 'Diese Website speichert auf deinem Endgerät nur Informationen, die für die Bereitstellung des von dir gewünschten Dienstes unbedingt erforderlich sind. Das sind Cookies für deine Anmeldesitzung (und deren Absicherung) sowie Einstellungen im lokalen Speicher deines Browsers, z. B. dass du einen Hinweis geschlossen hast oder welchen Reiter du zuletzt geöffnet hattest. Cookies zu Werbe- oder Trackingzwecken setzen wir nicht ein.'}
+      </p>
+      <p>
+        {isEnglish
+          ? 'The storage is based on Section 25 para. 2 no. 2 TDDDG and does not require consent; any processing of personal data in this context is based on Art. 6 para. 1 lit. b and f GDPR. Session cookies are deleted when you log out or after the session expires. You can delete stored information at any time in your browser settings; you may then have to log in again.'
+          : 'Die Speicherung erfolgt auf Grundlage von § 25 Abs. 2 Nr. 2 TDDDG und bedarf keiner Einwilligung; eine damit verbundene Verarbeitung personenbezogener Daten erfolgt auf Grundlage von Art. 6 Abs. 1 lit. b und f DSGVO. Sitzungs-Cookies werden beim Abmelden bzw. nach Ablauf der Sitzung gelöscht. Gespeicherte Informationen kannst du jederzeit in deinen Browsereinstellungen löschen; danach musst du dich gegebenenfalls neu anmelden.'}
+      </p>
       {children}
     </>
   );
@@ -478,6 +589,19 @@ export const PrivacyCourseParticipation: FC = () => {
         {isEnglish
           ? 'The website operator stores data on courses for which registered users have applied or participated, as well as related information about the fulfillment of the set performance criteria for the courses that are needed for certificate issuance (Art. 6 para. 1 lit. f GDPR).'
           : 'Der Websitebetreiber speichert Daten zu Kursen, für die sich registrierte Nutzer:innen beworben haben bzw. an denen sie teilgenommen haben sowie zugehörige Informationen über die Erfüllung der angesetzten Leistungskriterien für die Kurse, die zur Ausstellung der Zertifikate benötigt werden (Art. 6 Abs. 1 lit. f DSGVO).'}
+      </p>
+      <p>
+        {isEnglish
+          ? 'One of the criteria is attendance at the mandatory sessions. For online sessions, attendance only counts if your camera is on and you take part with the same email address or name as in EduHub (see "Online Sessions"). For on-site sessions, attendance is recorded by scanning a QR code; for some courses we also ask about attendance and location in short online surveys that we operate ourselves.'
+          : 'Eines der Kriterien ist die Anwesenheit bei den Pflichtterminen. Bei Online-Terminen zählt die Anwesenheit nur, wenn deine Kamera eingeschaltet ist und du mit derselben E-Mail-Adresse bzw. demselben Namen wie in EduHub teilnimmst (siehe „Online-Sitzungen“). Bei Präsenzterminen wird die Anwesenheit über einen QR-Code erfasst; bei einigen Kursen fragen wir Anwesenheit und Ort außerdem über kurze Online-Umfragen ab, die wir selbst betreiben.'}
+      </p>
+      <h3 className="text-lg mt-2 mb-2 italic">
+        {isEnglish ? 'Public Profiles of Instructors and Speakers' : 'Öffentliche Profile von Kursleitungen und Referent:innen'}
+      </h3>
+      <p>
+        {isEnglish
+          ? 'If you lead a course or speak at an event, your name and, if you have uploaded one, your profile picture are shown publicly on the page of the course or event. For instructors the legal basis is Art. 6 para. 1 lit. b GDPR, for speakers our legitimate interest in presenting the event (Art. 6 para. 1 lit. f GDPR). The profile picture is voluntary; you can remove it in your profile at any time.'
+          : 'Wenn du einen Kurs leitest oder bei einer Veranstaltung sprichst, werden dein Name und, falls du eines hochgeladen hast, dein Profilbild öffentlich auf der Seite des Kurses bzw. der Veranstaltung angezeigt. Rechtsgrundlage ist für Kursleitungen Art. 6 Abs. 1 lit. b DSGVO, für Referent:innen unser berechtigtes Interesse an der Vorstellung der Veranstaltung (Art. 6 Abs. 1 lit. f DSGVO). Das Profilbild ist freiwillig; du kannst es jederzeit in deinem Profil entfernen.'}
       </p>
     </>
   );
@@ -627,6 +751,179 @@ export const PrivacyJobPostings: FC<SectionProps> = ({ n }) => {
   );
 };
 
+/** Shared: both sites send their mails through Mailgun. */
+export const PrivacyEmail: FC<SectionProps> = ({ n }) => {
+  const isEnglish = useIsEnglish();
+
+  return (
+    <>
+      <h2 className="text-xl mt-6 mb-2">
+        {n}. {isEnglish ? 'Sending Emails' : 'E-Mail-Versand'}
+      </h2>
+      <p>
+        {isEnglish
+          ? 'We send emails (e.g. registration confirmations, reminders, certificates) via the service Mailgun. The provider is Mailgun Technologies, Inc., San Antonio, Texas, USA. Mailgun processes your email address, your name and the content of the email; we use an EU data center.'
+          : 'E-Mails (z. B. Anmeldebestätigungen, Erinnerungen, Zertifikate) versenden wir über den Dienst Mailgun. Anbieter ist die Mailgun Technologies, Inc., San Antonio, Texas, USA. Mailgun verarbeitet dafür deine E-Mail-Adresse, deinen Namen und den Inhalt der E-Mail; wir nutzen ein Rechenzentrum in der EU.'}
+      </p>
+      <p>
+        {isEnglish
+          ? 'We only evaluate whether an email was delivered, could not be delivered or was marked as spam, so that we can correct invalid addresses. Our emails contain no tracking pixels and no tracked links; we do not record whether you open an email or click a link.'
+          : 'Wir werten nur aus, ob eine E-Mail zugestellt wurde, nicht zugestellt werden konnte oder als Spam markiert wurde, um ungültige Adressen korrigieren zu können. Unsere E-Mails enthalten keine Zählpixel und keine nachverfolgten Links; ob du eine E-Mail öffnest oder einen Link anklickst, erfassen wir nicht.'}
+      </p>
+      <p>
+        {isEnglish
+          ? 'The legal basis is Art. 6 para. 1 lit. b GDPR, for the delivery status our legitimate interest in reliable delivery (Art. 6 para. 1 lit. f GDPR). A contract for data processing (DPA) exists with the provider. Any access from the USA is covered by the EU-US Data Privacy Framework or standard contractual clauses.'
+          : 'Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO, für den Zustellstatus unser berechtigtes Interesse an einer zuverlässigen Zustellung (Art. 6 Abs. 1 lit. f DSGVO). Mit dem Anbieter besteht ein Vertrag zur Auftragsverarbeitung (AVV). Ein möglicher Zugriff aus den USA ist durch das EU-US Data Privacy Framework bzw. Standardvertragsklauseln abgesichert.'}
+      </p>
+      <p>
+        {isEnglish ? 'Further information: ' : 'Weitere Informationen: '}
+        <a
+          href="https://www.mailgun.com/legal/privacy-policy/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline hover:text-label-secondary"
+        >
+          https://www.mailgun.com/legal/privacy-policy/
+        </a>
+      </p>
+    </>
+  );
+};
+
+/** edu-hub only. */
+export const PrivacyOnlineSessions: FC<SectionProps> = ({ n }) => {
+  const isEnglish = useIsEnglish();
+
+  return (
+    <>
+      <h2 className="text-xl mt-6 mb-2">
+        {n}. {isEnglish ? 'Online Sessions (Zoom)' : 'Online-Sitzungen (Zoom)'}
+      </h2>
+      <p>
+        {isEnglish
+          ? 'Online sessions take place via Zoom. The provider is Zoom Communications, Inc., 55 Almaden Boulevard, Suite 600, San Jose, CA 95113, USA. All sessions run on our Zoom account; we have set the data region to the EU. Zoom processes in particular your name, your email address if you are signed in to Zoom, your image and voice if you switch on camera or microphone, chat messages in the session, and technical connection data.'
+          : 'Online-Sitzungen finden über Zoom statt. Anbieter ist die Zoom Communications, Inc., 55 Almaden Boulevard, Suite 600, San Jose, CA 95113, USA. Alle Sitzungen laufen über unser Zoom-Konto; als Datenregion haben wir die EU eingestellt. Zoom verarbeitet dabei insbesondere deinen Namen, deine E-Mail-Adresse, wenn du bei Zoom angemeldet bist, Bild und Ton, wenn du Kamera bzw. Mikrofon einschaltest, Chatnachrichten in der Sitzung sowie technische Verbindungsdaten.'}
+      </p>
+      <h3 className="text-lg mt-2 mb-2 italic">
+        {isEnglish ? 'Attendance' : 'Anwesenheit'}
+      </h3>
+      <p>
+        {isEnglish
+          ? 'After each session we retrieve the list of participants from Zoom (name, email address of the Zoom account if signed in, joining and leaving times) and match it with the participants of the course: first by email address, otherwise by name. Please therefore take part with the same email address or name as in EduHub; otherwise your attendance cannot be recognized and counts as missed until the organizers correct it.'
+          : 'Nach jeder Sitzung rufen wir bei Zoom die Teilnehmendenliste ab (Name, E-Mail-Adresse des Zoom-Kontos, falls angemeldet, Beitritts- und Austrittszeiten) und gleichen sie mit den Teilnehmenden des Kurses ab: zuerst über die E-Mail-Adresse, sonst über den Namen. Nimm deshalb bitte mit derselben E-Mail-Adresse bzw. demselben Namen wie in EduHub teil; sonst kann deine Anwesenheit nicht erkannt werden und gilt als verpasst, bis die Organisator:innen sie korrigieren.'}
+      </p>
+      <p>
+        {isEnglish
+          ? 'For courses with a certificate, attendance at an online session only counts if your camera is on, so that the organizers can confirm your participation. The video is only transmitted live and not stored (except for recordings, see below). The legal basis is Art. 6 para. 1 lit. b GDPR, as attendance is one of the certificate criteria.'
+          : 'Bei Kursen mit Zertifikat zählt die Anwesenheit in einer Online-Sitzung nur, wenn deine Kamera eingeschaltet ist, damit die Organisator:innen deine Teilnahme bestätigen können. Das Video wird nur live übertragen und nicht gespeichert (außer bei Aufzeichnungen, siehe unten). Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO, da die Anwesenheit zu den Kriterien für das Zertifikat gehört.'}
+      </p>
+      <h3 className="text-lg mt-2 mb-2 italic">
+        {isEnglish ? 'Recordings' : 'Aufzeichnungen'}
+      </h3>
+      <p>
+        {isEnglish
+          ? 'Sessions are recorded only in exceptional cases, for example so that participants can watch a presentation again. A recording is announced in advance, and Zoom asks for your consent when it starts. If anyone objects, the session is not recorded. Only the presentation is recorded (active speaker and shared screen), not discussions or group work. During a recording you may switch off your camera and microphone without this counting as an absence.'
+          : 'Sitzungen werden nur in Ausnahmefällen aufgezeichnet, etwa damit Teilnehmende einen Vortrag noch einmal ansehen können. Eine Aufzeichnung wird vorher angekündigt, und Zoom fragt beim Start nach deinem Einverständnis. Widerspricht jemand, wird nicht aufgezeichnet. Aufgezeichnet wird nur der Vortrag (aktive:r Sprecher:in und geteilter Bildschirm), nicht Diskussionen oder Gruppenarbeit. Während einer Aufzeichnung darfst du Kamera und Mikrofon ausschalten, ohne dass das als Fehlzeit zählt.'}
+      </p>
+      <p>
+        {isEnglish
+          ? 'Recordings are stored in the Zoom cloud in the EU, shared only with the participants of the course and not published. They are deleted no later than three months after the end of the course. The legal basis is your consent (Art. 6 para. 1 lit. a GDPR), which you can revoke at any time with effect for the future.'
+          : 'Aufzeichnungen werden in der Zoom-Cloud in der EU gespeichert, nur mit den Teilnehmenden des Kurses geteilt und nicht veröffentlicht. Sie werden spätestens drei Monate nach Kursende gelöscht. Rechtsgrundlage ist deine Einwilligung (Art. 6 Abs. 1 lit. a DSGVO), die du jederzeit mit Wirkung für die Zukunft widerrufen kannst.'}
+      </p>
+      <p>
+        {isEnglish
+          ? 'A contract for data processing (DPA) exists with Zoom. Any access from the USA is covered by the EU-US Data Privacy Framework, under which Zoom is certified, and standard contractual clauses.'
+          : 'Mit Zoom besteht ein Vertrag zur Auftragsverarbeitung (AVV). Ein möglicher Zugriff aus den USA ist durch das EU-US Data Privacy Framework, unter dem Zoom zertifiziert ist, sowie Standardvertragsklauseln abgesichert.'}
+      </p>
+      <p>
+        {isEnglish ? 'Further information: ' : 'Weitere Informationen: '}
+        <a
+          href="https://www.zoom.com/de/trust/privacy/privacy-statement/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline hover:text-label-secondary"
+        >
+          https://www.zoom.com/de/trust/privacy/privacy-statement/
+        </a>
+      </p>
+    </>
+  );
+};
+
+/** edu-hub only. */
+export const PrivacyCourseChat: FC<SectionProps> = ({ n }) => {
+  const isEnglish = useIsEnglish();
+
+  return (
+    <>
+      <h2 className="text-xl mt-6 mb-2">
+        {n}. {isEnglish ? 'Course Chat (Matrix/Element)' : 'Kurs-Chat (Matrix/Element)'}
+      </h2>
+      <p>
+        {isEnglish
+          ? 'For exchanges within a course we provide chat rooms based on the open Matrix protocol, which you can use e.g. with the Element app. For this we create a chat account for you, whose user name is derived from your name, and add you to the rooms of your courses. The chat server is operated for us by Scheurer Technologies UG (haftungsbeschränkt), Kuhnkestraße 6, 24118 Kiel, on servers of Hetzner Online GmbH in Germany.'
+          : 'Für den Austausch innerhalb eines Kurses stellen wir Chat-Räume auf Basis des offenen Matrix-Protokolls bereit, die du z. B. mit der App Element nutzen kannst. Dafür legen wir dir ein Chat-Konto an, dessen Benutzername aus deinem Namen gebildet wird, und fügen dich den Räumen deiner Kurse hinzu. Den Chat-Server betreibt für uns die Scheurer Technologies UG (haftungsbeschränkt), Kuhnkestraße 6, 24118 Kiel, auf Servern der Hetzner Online GmbH in Deutschland.'}
+      </p>
+      <p>
+        {isEnglish
+          ? 'Processed are your user name, display name and, if set, profile picture, your room memberships and the messages and files you send. Messages remain in a course room as long as the room exists. If you delete your EduHub account, your chat account is deactivated: you leave all rooms, your name and picture are removed, and your messages are hidden from people who join later.'
+          : 'Verarbeitet werden dein Benutzername, dein Anzeigename und ggf. dein Profilbild, deine Raum-Mitgliedschaften sowie die Nachrichten und Dateien, die du sendest. Nachrichten bleiben in einem Kursraum, solange der Raum besteht. Löschst du dein EduHub-Konto, wird dein Chat-Konto deaktiviert: Du verlässt alle Räume, Name und Bild werden entfernt, und deine Nachrichten werden für später Hinzukommende ausgeblendet.'}
+      </p>
+      <p>
+        {isEnglish
+          ? 'The legal basis is Art. 6 para. 1 lit. b GDPR. A contract for data processing (DPA) exists with the operator. The data is processed exclusively in Germany.'
+          : 'Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO. Mit dem Betreiber besteht ein Vertrag zur Auftragsverarbeitung (AVV). Die Daten werden ausschließlich in Deutschland verarbeitet.'}
+      </p>
+    </>
+  );
+};
+
+/** edu-hub only: the participants API (functions/apiProxy). */
+export const PrivacyFunderReports: FC<SectionProps> = ({ n }) => {
+  const isEnglish = useIsEnglish();
+
+  return (
+    <>
+      <h2 className="text-xl mt-6 mb-2">
+        {n}. {isEnglish ? 'Reports to Funding Organizations' : 'Berichte an Fördermittelgeber'}
+      </h2>
+      <p>
+        {isEnglish
+          ? 'Some courses are financed by funding organizations. To show how the funding was used, the funder of a course can retrieve a report on its participants via an interface. The report contains no names or email addresses, only a pseudonymized identifier per participant, the enrollment status and date, the occupation status (e.g. student) and whether a certificate was issued.'
+          : 'Einige Kurse werden von Fördermittelgebern finanziert. Um die Verwendung der Fördermittel nachzuweisen, kann der Fördermittelgeber eines Kurses über eine Schnittstelle einen Bericht zu dessen Teilnehmenden abrufen. Der Bericht enthält keine Namen oder E-Mail-Adressen, sondern nur eine pseudonymisierte Kennung je Teilnehmer:in, Anmeldestatus und -datum, den Beschäftigungsstatus (z. B. Studierende:r) sowie, ob ein Zertifikat ausgestellt wurde.'}
+      </p>
+      <p>
+        {isEnglish
+          ? 'Each funder only receives data on the courses it funds. The legal basis is our legitimate interest in proving the proper use of the funding (Art. 6 para. 1 lit. f GDPR). The funders process the data under their own responsibility; their own privacy policies apply. You can object to this processing (Art. 21 GDPR).'
+          : 'Jeder Fördermittelgeber erhält nur Daten zu den Kursen, die er fördert. Rechtsgrundlage ist unser berechtigtes Interesse am Nachweis der ordnungsgemäßen Verwendung der Fördermittel (Art. 6 Abs. 1 lit. f DSGVO). Die Fördermittelgeber verarbeiten die Daten in eigener Verantwortung; es gelten ihre eigenen Datenschutzerklärungen. Du kannst dieser Verarbeitung widersprechen (Art. 21 DSGVO).'}
+      </p>
+    </>
+  );
+};
+
+/** StuJo only. */
+export const PrivacyJobLetter: FC<SectionProps> = ({ n }) => {
+  const isEnglish = useIsEnglish();
+
+  return (
+    <>
+      <h2 className="text-xl mt-6 mb-2">
+        {n}. {isEnglish ? 'Job-Letter' : 'Job-Letter'}
+      </h2>
+      <p>
+        {isEnglish
+          ? 'If you subscribe to the Job-Letter, we store your selected filters (category, region) with your account and send you new job postings by email once a week, to the email address of your account (see "Sending Emails"). The legal basis is your consent (Art. 6 para. 1 lit. a GDPR), which you give by subscribing.'
+          : 'Wenn du den Job-Letter abonnierst, speichern wir die gewählten Filter (Kategorie, Region) zu deinem Konto und schicken dir einmal pro Woche neue Stellenangebote per E-Mail an die E-Mail-Adresse deines Kontos (siehe „E-Mail-Versand“). Rechtsgrundlage ist deine Einwilligung (Art. 6 Abs. 1 lit. a DSGVO), die du mit dem Abonnieren erteilst.'}
+      </p>
+      <p>
+        {isEnglish
+          ? 'You can unsubscribe at any time on the Job-Letter page; the emails then stop. Your filters stay stored so that you can resume the subscription later, and are deleted with your account.'
+          : 'Du kannst den Job-Letter jederzeit auf der Job-Letter-Seite abbestellen; dann endet der Versand. Deine Filter bleiben gespeichert, damit du das Abo später fortsetzen kannst, und werden mit deinem Konto gelöscht.'}
+      </p>
+    </>
+  );
+};
+
 /** edu-hub only. */
 export const PrivacyFormbricks: FC<SectionProps> = ({ n }) => {
   const isEnglish = useIsEnglish();
@@ -723,6 +1020,11 @@ export const PrivacyPayments: FC<SectionProps> = ({ n }) => {
       </p>
       <p>
         {isEnglish
+          ? 'You can pay by card or by SEPA direct debit. Stripe also creates the invoice and provides it as a PDF and online; for this it processes your name, email address and, where provided, your billing address. We keep invoices for the statutory retention periods (section 147 AO, section 257 HGB).'
+          : 'Du kannst per Karte oder per SEPA-Lastschrift bezahlen. Stripe erstellt außerdem die Rechnung und stellt sie als PDF und online bereit; dafür verarbeitet Stripe deinen Namen, deine E-Mail-Adresse und ggf. deine Rechnungsadresse. Rechnungen bewahren wir für die gesetzlichen Aufbewahrungsfristen auf (§ 147 AO, § 257 HGB).'}
+      </p>
+      <p>
+        {isEnglish
           ? 'The legal basis is Art. 6 para. 1 lit. b GDPR.'
           : 'Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO.'}
       </p>
@@ -735,51 +1037,6 @@ export const PrivacyPayments: FC<SectionProps> = ({ n }) => {
           className="underline hover:text-label-secondary"
         >
           https://stripe.com/privacy
-        </a>
-      </p>
-    </>
-  );
-};
-
-/** edu-hub only. */
-export const PrivacyConsentManagement: FC<SectionProps> = ({ n }) => {
-  const isEnglish = useIsEnglish();
-
-  return (
-    <>
-      <h2 className="text-xl mt-6 mb-2">
-        {n}. {isEnglish ? 'Consent Management' : 'Einwilligungsverwaltung'}
-      </h2>
-      <h3 className="text-lg mt-2 mb-2 italic">Cookiebot</h3>
-      <p>
-        {isEnglish
-          ? 'This website uses Cookiebot to obtain your consent for storing cookies and similar technologies on your device, and to document and manage these consents. The provider is Cybot A/S, Havnegade 39, 1058 Copenhagen, Denmark.'
-          : 'Diese Website nutzt Cookiebot, um deine Einwilligung zur Speicherung von Cookies und ähnlichen Technologien auf deinem Endgerät einzuholen sowie diese Einwilligungen zu dokumentieren und zu verwalten. Anbieter ist Cybot A/S, Havnegade 39, 1058 Kopenhagen, Dänemark.'}
-      </p>
-      <p>
-        {isEnglish
-          ? 'When you access our website, a connection is established to Cookiebot servers to obtain your consents and provide other explanations regarding cookie usage. Cookiebot then stores a cookie in your browser to identify the consents you have given or their revocation. The data collected in this way is stored until you request deletion, delete the Cookiebot cookie yourself, or the purpose for data storage no longer applies. Mandatory legal retention obligations remain unaffected.'
-          : 'Wenn du unsere Website aufrufst, wird eine Verbindung zu den Servern von Cookiebot hergestellt, um deine Einwilligungen und sonstigen Erklärungen zur Cookie-Nutzung einzuholen. Cookiebot speichert dann einen Cookie in deinem Browser, um dir die erteilten Einwilligungen bzw. deren Widerruf zuordnen zu können. Die so erfassten Daten werden gespeichert, bis du uns zur Löschung aufforderst, den Cookiebot-Cookie selbst löschst oder der Zweck für die Datenspeicherung entfällt. Zwingende gesetzliche Aufbewahrungspflichten bleiben unberührt.'}
-      </p>
-      <p>
-        {isEnglish
-          ? 'Cookiebot is used to obtain the legally required consents for the use of cookies. The legal basis is Art. 6 para. 1 lit. c GDPR.'
-          : 'Der Einsatz von Cookiebot erfolgt, um die gesetzlich vorgeschriebenen Einwilligungen für den Einsatz von Cookies einzuholen. Rechtsgrundlage ist Art. 6 Abs. 1 lit. c DSGVO.'}
-      </p>
-      <p>
-        {isEnglish
-          ? 'A contract for data processing (DPA) exists with the provider.'
-          : 'Mit dem Anbieter besteht ein Vertrag zur Auftragsverarbeitung (AVV).'}
-      </p>
-      <p>
-        {isEnglish ? 'Further information: ' : 'Weitere Informationen: '}
-        <a
-          href="https://www.cookiebot.com/de/privacy-policy/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="underline hover:text-label-secondary"
-        >
-          https://www.cookiebot.com/de/privacy-policy/
         </a>
       </p>
     </>
@@ -808,8 +1065,8 @@ export const PrivacyAnalytics: FC<SectionProps> = ({ n }) => {
       </p>
       <p>
         {isEnglish
-          ? 'The use of Plausible Analytics is based on your consent (Art. 6 para. 1 lit. a GDPR). The consent can be revoked at any time via the cookie settings.'
-          : 'Die Nutzung von Plausible Analytics erfolgt auf Grundlage deiner Einwilligung (Art. 6 Abs. 1 lit. a DSGVO). Die Einwilligung kann jederzeit über die Cookie-Einstellungen widerrufen werden.'}
+          ? 'Plausible Analytics stores nothing on your device (no cookies, no local storage). With each page view the script transmits the page visited, the referring page (referrer) and the width of your browser window. To count visits without recognizing you, Plausible derives an anonymous identifier from your IP address and browser that changes every day; the IP address itself is not stored. The use is based on our legitimate interest in anonymous reach measurement to improve our offering (Art. 6 para. 1 lit. f GDPR). You can object to this at any time (Art. 21 GDPR), for example by blocking the loading of the script in your browser with a content blocker.'
+          : 'Plausible Analytics speichert nichts auf deinem Endgerät (keine Cookies, kein lokaler Speicher). Bei jedem Seitenaufruf übermittelt das Skript die aufgerufene Seite, die verweisende Seite (Referrer) und die Breite deines Browserfensters. Um Besuche zu zählen, ohne dich wiederzuerkennen, bildet Plausible aus deiner IP-Adresse und deinem Browser eine anonyme Kennung, die sich täglich ändert; die IP-Adresse selbst wird nicht gespeichert. Die Nutzung erfolgt auf Grundlage unseres berechtigten Interesses an einer anonymen Reichweitenmessung zur Verbesserung unseres Angebots (Art. 6 Abs. 1 lit. f DSGVO). Du kannst dem jederzeit widersprechen (Art. 21 DSGVO), z. B. indem du das Laden des Skripts in deinem Browser mit einem Content-Blocker unterbindest.'}
       </p>
       <p>
         {isEnglish ? 'Further information: ' : 'Weitere Informationen: '}
@@ -826,64 +1083,51 @@ export const PrivacyAnalytics: FC<SectionProps> = ({ n }) => {
   );
 };
 
-/** edu-hub only. */
-export const PrivacyMarketing: FC<SectionProps> = ({ n }) => {
+/** A policy version (ISO date) as the long date the policy shows, e.g. "5. November 2026". */
+const formatVersionDate = (version: string, isEnglish: boolean) =>
+  new Date(`${version}T12:00:00Z`).toLocaleDateString(isEnglish ? 'en-US' : 'de-DE', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'Europe/Berlin',
+  });
+
+/**
+ * Shared: each site lists only the changes recorded for it (`sites` in
+ * PRIVACY_POLICY_CHANGES), and renders nothing until it has one - so keep it
+ * the last numbered section. Anchored as #aenderungen so the "policy updated"
+ * notice can link straight to it.
+ */
+export const PrivacyChangeHistory: FC<SectionProps & { site: PrivacyPolicySite }> = ({ n, site }) => {
   const isEnglish = useIsEnglish();
+  const changes = getPrivacyPolicyChanges(site);
+  if (changes.length === 0) return null;
 
   return (
     <>
-      <h2 className="text-xl mt-6 mb-2">
-        {n}. {isEnglish ? 'Marketing' : 'Marketing'}
+      <h2 id="aenderungen" className="text-xl mt-6 mb-2 scroll-mt-24">
+        {n}. {isEnglish ? 'Changes to This Privacy Policy' : 'Änderungen dieser Datenschutzerklärung'}
       </h2>
-      <h3 className="text-lg mt-2 mb-2 italic">Meta Pixel (Facebook Pixel)</h3>
-      <p>
-        {isEnglish
-          ? 'This website uses the Meta Pixel (formerly Facebook Pixel) for conversion measurement. The provider is Meta Platforms Ireland Limited, 4 Grand Canal Square, Dublin 2, Ireland.'
-          : 'Diese Website nutzt das Meta Pixel (ehemals Facebook Pixel) zur Konversionsmessung. Anbieter ist Meta Platforms Ireland Limited, 4 Grand Canal Square, Dublin 2, Irland.'}
-      </p>
-      <p>
-        {isEnglish
-          ? 'The Meta Pixel allows us to track the behavior of website visitors after they have been redirected to our website by clicking on a Facebook ad. This enables us to evaluate the effectiveness of Facebook ads for statistical and market research purposes.'
-          : 'Mit dem Meta Pixel kann das Verhalten von Seitenbesuchern nachverfolgt werden, nachdem diese durch Klick auf eine Facebook-Werbeanzeige auf unsere Website weitergeleitet wurden. So kann die Wirksamkeit der Facebook-Werbeanzeigen für statistische und Marktforschungszwecke ausgewertet werden.'}
-      </p>
-      <p>
-        {isEnglish
-          ? "The data collected in this way is anonymous to us, i.e., we do not see the personal data of individual users. However, this data is stored and processed by Meta. Meta can link this data to your Facebook account and use it for its own advertising purposes in accordance with Meta's data policy."
-          : 'Die so erhobenen Daten sind für uns anonym, d. h. wir sehen nicht die personenbezogenen Daten einzelner Nutzer. Diese Daten werden jedoch von Meta gespeichert und verarbeitet. Meta kann diese Daten mit deinem Facebook-Konto verbinden und für eigene Werbezwecke entsprechend der Datenrichtlinie von Meta verwenden.'}
-      </p>
-      <p>
-        {isEnglish
-          ? 'The use of Meta Pixel is based on your consent (Art. 6 para. 1 lit. a GDPR). The consent can be revoked at any time via the cookie settings.'
-          : 'Die Nutzung des Meta Pixels erfolgt auf Grundlage deiner Einwilligung (Art. 6 Abs. 1 lit. a DSGVO). Die Einwilligung kann jederzeit über die Cookie-Einstellungen widerrufen werden.'}
-      </p>
-      <p>
-        {isEnglish
-          ? 'Data transfer to the USA is based on the EU-US Data Privacy Framework. Meta Platforms Inc. is certified under this framework.'
-          : 'Die Datenübertragung in die USA erfolgt auf Grundlage des EU-US Data Privacy Framework. Meta Platforms Inc. ist unter diesem Rahmenwerk zertifiziert.'}
-      </p>
-      <p>
-        {isEnglish ? 'Further information: ' : 'Weitere Informationen: '}
-        <a
-          href="https://www.facebook.com/privacy/policy/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="underline hover:text-label-secondary"
-        >
-          https://www.facebook.com/privacy/policy/
-        </a>
-      </p>
+      <ul className="list-disc list-inside pl-5">
+        {changes.map((change) => (
+          <li key={change.version}>
+            <strong>{formatVersionDate(change.version, isEnglish)}:</strong> {isEnglish ? change.en : change.de}
+          </li>
+        ))}
+      </ul>
     </>
   );
 };
 
 export const PrivacyAsOfDate: FC = () => {
   const isEnglish = useIsEnglish();
+  const asOf = formatVersionDate(PRIVACY_POLICY_VERSION, isEnglish);
 
   return (
     <>
       <div className="mt-12 mb-8">
         <p className="text-sm text-label-secondary">
-          {isEnglish ? 'As of: September 9, 2026' : 'Stand: 9. September 2026'}
+          {isEnglish ? `As of: ${asOf}` : `Stand: ${asOf}`}
         </p>
       </div>
     </>

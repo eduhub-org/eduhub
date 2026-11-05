@@ -27,7 +27,7 @@
 - Security headers (CSP, HSTS, X-Frame-Options, etc.)
 
 #### PII and data policy
-- PII is not returned. Participant `id` is a stable hash.
+- PII is not returned. Participant `id` is a pseudonymous hash, stable per funder: HMAC-SHA256 with the funder's secret `Organization.participantIdSalt`, so ids cannot be linked across funders. Funders that used the API before salting (salt `NULL`) keep the legacy unsalted `sha256(userId)` id.
 - `occupationStatus` is included when available.
 - Completion data only signals presence of certificates (no dates or rates).
 

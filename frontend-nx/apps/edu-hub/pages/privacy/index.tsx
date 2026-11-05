@@ -5,15 +5,18 @@ import { Page } from '../../components/layout/Page';
 import {
   PrivacyAnalytics,
   PrivacyAsOfDate,
-  PrivacyConsentManagement,
+  PrivacyChangeHistory,
+  PrivacyCourseChat,
   PrivacyCourseParticipation,
   PrivacyDataCollection,
+  PrivacyEmail,
   PrivacyFormbricks,
+  PrivacyFunderReports,
   PrivacyGeneralInfo,
   PrivacyGuestRegistration,
   PrivacyHosting,
-  PrivacyMarketing,
   PrivacyNewsletter,
+  PrivacyOnlineSessions,
   PrivacyOrganizationAccounts,
   PrivacyOverview,
   PrivacyOverviewTracking,
@@ -54,11 +57,14 @@ const Privacy: FC = () => {
             <PrivacyGuestRegistration />
             <PrivacyNewsletter />
           </PrivacyDataCollection>
-          <PrivacyFormbricks n={5} />
-          <PrivacyPayments n={6} />
-          <PrivacyConsentManagement n={7} />
-          <PrivacyAnalytics n={8} />
-          <PrivacyMarketing n={9} />
+          <PrivacyOnlineSessions n={5} />
+          <PrivacyCourseChat n={6} />
+          <PrivacyEmail n={7} />
+          <PrivacyFormbricks n={8} />
+          <PrivacyPayments n={9} />
+          <PrivacyFunderReports n={10} />
+          <PrivacyAnalytics n={11} />
+          <PrivacyChangeHistory n={12} site="eduhub" />
           <PrivacyAsOfDate />
         </div>
       </Page>

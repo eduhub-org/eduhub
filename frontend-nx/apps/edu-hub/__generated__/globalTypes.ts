@@ -2079,6 +2079,7 @@ export enum Organization_select_column {
   name = "name",
   newsletterDescription = "newsletterDescription",
   newsletterProvider = "newsletterProvider",
+  participantIdSalt = "participantIdSalt",
   phone = "phone",
   postalCode = "postalCode",
   rausgegangenApiKeyConfigured = "rausgegangenApiKeyConfigured",
@@ -2156,6 +2157,7 @@ export enum Organization_update_column {
   name = "name",
   newsletterDescription = "newsletterDescription",
   newsletterProvider = "newsletterProvider",
+  participantIdSalt = "participantIdSalt",
   phone = "phone",
   postalCode = "postalCode",
   rausgegangenApiKeyConfigured = "rausgegangenApiKeyConfigured",
@@ -3116,6 +3118,7 @@ export enum User_select_column {
   organizationId = "organizationId",
   organizationName = "organizationName",
   picture = "picture",
+  privacyNoticeSeenVersion = "privacyNoticeSeenVersion",
   status = "status",
   updated_at = "updated_at",
   zipCode = "zipCode",
@@ -3158,6 +3161,7 @@ export enum User_update_column {
   organizationId = "organizationId",
   organizationName = "organizationName",
   picture = "picture",
+  privacyNoticeSeenVersion = "privacyNoticeSeenVersion",
   status = "status",
   updated_at = "updated_at",
   zipCode = "zipCode",
@@ -10525,6 +10529,7 @@ export interface Organization_bool_exp {
   name?: String_comparison_exp | null;
   newsletterDescription?: String_comparison_exp | null;
   newsletterProvider?: String_comparison_exp | null;
+  participantIdSalt?: String_comparison_exp | null;
   phone?: String_comparison_exp | null;
   postalCode?: String_comparison_exp | null;
   rausgegangenApiKeyConfigured?: Boolean_comparison_exp | null;
@@ -10593,6 +10598,7 @@ export interface Organization_insert_input {
   name?: string | null;
   newsletterDescription?: string | null;
   newsletterProvider?: string | null;
+  participantIdSalt?: string | null;
   phone?: string | null;
   postalCode?: string | null;
   rausgegangenApiKeyConfigured?: boolean | null;
@@ -10644,6 +10650,7 @@ export interface Organization_max_order_by {
   name?: order_by | null;
   newsletterDescription?: order_by | null;
   newsletterProvider?: order_by | null;
+  participantIdSalt?: order_by | null;
   phone?: order_by | null;
   postalCode?: order_by | null;
   rausgegangenApiKeyEncrypted?: order_by | null;
@@ -10692,6 +10699,7 @@ export interface Organization_min_order_by {
   name?: order_by | null;
   newsletterDescription?: order_by | null;
   newsletterProvider?: order_by | null;
+  participantIdSalt?: order_by | null;
   phone?: order_by | null;
   postalCode?: order_by | null;
   rausgegangenApiKeyEncrypted?: order_by | null;
@@ -10775,6 +10783,7 @@ export interface Organization_order_by {
   name?: order_by | null;
   newsletterDescription?: order_by | null;
   newsletterProvider?: order_by | null;
+  participantIdSalt?: order_by | null;
   phone?: order_by | null;
   postalCode?: order_by | null;
   rausgegangenApiKeyConfigured?: order_by | null;
@@ -14439,6 +14448,7 @@ export interface User_bool_exp {
   organizationId?: Int_comparison_exp | null;
   organizationName?: String_comparison_exp | null;
   picture?: String_comparison_exp | null;
+  privacyNoticeSeenVersion?: String_comparison_exp | null;
   status?: UserStatus_enum_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
   zipCode?: String_comparison_exp | null;
@@ -14482,6 +14492,7 @@ export interface User_insert_input {
   organizationId?: number | null;
   organizationName?: string | null;
   picture?: string | null;
+  privacyNoticeSeenVersion?: string | null;
   status?: UserStatus_enum | null;
   updated_at?: any | null;
   zipCode?: string | null;
@@ -14508,6 +14519,7 @@ export interface User_max_order_by {
   organizationId?: order_by | null;
   organizationName?: order_by | null;
   picture?: order_by | null;
+  privacyNoticeSeenVersion?: order_by | null;
   updated_at?: order_by | null;
   zipCode?: order_by | null;
 }
@@ -14533,6 +14545,7 @@ export interface User_min_order_by {
   organizationId?: order_by | null;
   organizationName?: order_by | null;
   picture?: order_by | null;
+  privacyNoticeSeenVersion?: order_by | null;
   updated_at?: order_by | null;
   zipCode?: order_by | null;
 }
@@ -14592,6 +14605,7 @@ export interface User_order_by {
   organizationId?: order_by | null;
   organizationName?: order_by | null;
   picture?: order_by | null;
+  privacyNoticeSeenVersion?: order_by | null;
   status?: order_by | null;
   updated_at?: order_by | null;
   zipCode?: order_by | null;
