@@ -63,7 +63,7 @@ consent to, so it is never phrased as "I accept the privacy policy".
 | Guest registration | Same checkbox, required by the server |
 | StuJo: publishing a posting, Job-Letter | Notice linking `/datenschutz` |
 | Admin-created accounts and speakers | `USER_CREATED` / `SESSION_SPEAKER_ADDED` mails link the policy |
-| Policy changes | In-app notice and, for material changes, a one-off mail (below) |
+| Policy changes | One-time in-app notice for material changes, and the change history at the end of the policy (below) |
 
 Guest registrations use the same column: `confirmGuestRegistration` sets
 `termsAcceptedAt` when the double opt-in link is redeemed, so the timestamp
@@ -117,18 +117,9 @@ For a material change:
    dismissible notice on its next visit; the dismissal is stored in
    `User.privacyNoticeSeenVersion`. Accounts created later saw the new policy
    when they registered and are not shown it.
-3. Optionally, after the deploy, send the `PRIVACY_POLICY_UPDATED` mail once.
-   It links to the change history, so the template needs no editing:
-   ```bash
-   cd functions/callNodeFunction
-   HASURA_ENDPOINT=https://hasura.opencampus.sh/v1/graphql \
-   HASURA_ADMIN_SECRET=<hasura-admin-secret> \
-   FRONTEND_URL=https://edu.opencampus.sh \
-   node scripts/send-privacy-policy-update.js --version <PRIVACY_NOTICE_VERSION>         # dry run
-   node scripts/send-privacy-policy-update.js --version <PRIVACY_NOTICE_VERSION> --send  # queue the mails
-   ```
-   The version is stored in `MailLog.metadata`, so the script never mails
-   anyone twice for the same version and can be re-run after an interruption.
+There is no mail for policy changes yet; the in-app notice reaches people who
+log in. If one is needed (a change that matters to people who rarely visit),
+add a mail template and a send script in the same PR as the policy change.
 
 For a change that is not material, add the `PRIVACY_POLICY_CHANGES` entry but
 leave `PRIVACY_NOTICE_VERSION` alone.
@@ -168,4 +159,4 @@ All legal pages support both German and English translations. The language is au
 | 2026-08-27 | Privacy         | Added guest registration (Art. 6(1)(b), 12-month retention, self-service deletion) and the newsletter section (Art. 6(1)(a), Ghost as processor) |
 | 2026-09-09 | Privacy         | Text moved into shared components so the StuJo app renders the same wording. Added company/organization accounts (Art. 6(1)(b) for the account and admin grant, Art. 6(1)(f) for the authorization check and admin notification) and, for StuJo only, job postings (Art. 6(1)(b) for publication, Art. 6(1)(f) for the aggregate view counter). Generalized "Profilinformationen" from course participants to the user account, since the section is now shared with a site that has no courses. Replaced the numeric "sections 7 and 8" cross-reference with the section names |
 | 2026-11-05 | Privacy         | Removed the Meta Pixel and the Cookiebot consent banner and their sections. Plausible now runs without consent on Art. 6(1)(f) (no cookies, nothing stored on the device; right to object under Art. 21). Rewrote the tracking overview. Added "Cookies und lokale Speicherung" (strictly necessary storage only, § 25(2) Nr. 2 TDDDG) and single sign-on via Digital Learning Campus, Google, LinkedIn and GitHub (name and email only, Art. 6(1)(b), providers as independent controllers) to the shared data-collection section, so StuJo shows both too. The Art. 21 objection notice is now set in normal case inside a framed box instead of capitals (Art. 21(4) asks for a separate, explicit notice, not capitals) |
-| 2026-11-05 | Privacy & AGB   | Information chain: notice with AGB and privacy links on the Keycloak registration and login pages (also covering SSO), on course registration, StuJo publishing and the Job-Letter. Paid and guest checkbox now reads "accept the AGB, take note of the privacy policy". `termsAcceptedAt` is stamped by the server and only by the participant. Policy versioning with a one-time in-app notice (`User.privacyNoticeSeenVersion`) and the `PRIVACY_POLICY_UPDATED` mail |
+| 2026-11-05 | Privacy & AGB   | Information chain: notice with AGB and privacy links on the Keycloak registration and login pages (also covering SSO), on course registration, StuJo publishing and the Job-Letter. Paid and guest checkbox now reads "accept the AGB, take note of the privacy policy". `termsAcceptedAt` is stamped by the server and only by the participant. Policy versioning with a one-time in-app notice (`User.privacyNoticeSeenVersion`) |

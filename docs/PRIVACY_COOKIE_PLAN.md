@@ -19,7 +19,7 @@ Branch: `claude/magical-allen-oy9lrv` (based on `develop` @ 60b24123).
 Lint, type-check, all Jest tests and `yarn build` pass. A, B and D were tested
 end to end in the local Docker stack with Playwright (no requests to Facebook,
 Cookiebot, Google Fonts or GitBook; notices, the paid checkbox, the server-side
-`termsAcceptedAt` stamp and the policy-update notice and mail).
+`termsAcceptedAt` stamp and the policy-update notice).
 
 ### After A and B are merged and deployed
 
@@ -37,10 +37,6 @@ Cookiebot, Google Fonts or GitBook; notices, the paid checkbox, the server-side
       Jakarta Sans.
 - [ ] Check the Formbricks registration iframe for cookies the Formbricks host
       sets. It is already in the policy as part of the requested service.
-- [ ] Decide whether to send the `PRIVACY_POLICY_UPDATED` mail for this
-      version (the in-app notice shows anyway). If yes, run
-      `scripts/send-privacy-policy-update.js` as described in
-      `docs/LEGAL_DOCUMENTS.md`; the mail links to the change history.
 
 ## Why the banner could go
 
@@ -177,8 +173,8 @@ once C adds the previously undisclosed processors.
      to the user's own row; follow the five-layer rule in `/create-migration`).
    - Show a dismissible in-app notice while the stored version is older than
      the current one.
-   - For material changes, send a one-off email using a new
-     `PRIVACY_POLICY_UPDATED` template with `[System:PrivacyPolicyLink]`.
+   - No email for now: add a template and send script in the PR of a policy
+     change that needs one.
    - Document the process in `docs/LEGAL_DOCUMENTS.md`: what counts as
      material, who decides, and the steps.
 

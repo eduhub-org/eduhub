@@ -42,7 +42,7 @@ export function getTemplateCategory(templateType?: string): string {
     'DECLINE',
     'REGISTRATION_CONFIRMED',
   ];
-  const generalTemplates = ['USER_CREATED', 'PRIVACY_POLICY_UPDATED'];
+  const generalTemplates = ['USER_CREATED'];
   const organizerTemplates = ['ORGANIZER_ADDED', 'SESSION_SPEAKER_ADDED', 'INSTRUCTOR_CERTIFICATE_READY'];
   // Cancellation request of a paid enrollment: [User:*] is the recipient, the
   // participant has their own [Cancellation:*] placeholders.

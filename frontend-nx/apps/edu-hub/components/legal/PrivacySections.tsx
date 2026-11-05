@@ -881,7 +881,7 @@ const formatVersionDate = (version: string, isEnglish: boolean) =>
  * Shared: each site lists only the changes recorded for it (`sites` in
  * PRIVACY_POLICY_CHANGES), and renders nothing until it has one - so keep it
  * the last numbered section. Anchored as #aenderungen so the "policy updated"
- * notice and mails can link straight to it.
+ * notice can link straight to it.
  */
 export const PrivacyChangeHistory: FC<SectionProps & { site: PrivacyPolicySite }> = ({ n, site }) => {
   const isEnglish = useIsEnglish();
