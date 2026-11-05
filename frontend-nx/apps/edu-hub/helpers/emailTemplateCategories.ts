@@ -66,6 +66,7 @@ const CATEGORY_BY_TYPE: Record<string, EmailTemplateCategory> = {
   COURSE_CONTINUATION_INQUIRY: 'sessions',
   // System / account
   USER_CREATED: 'system',
+  PRIVACY_POLICY_UPDATED: 'system',
   ORGANIZER_ADDED: 'system',
   SESSION_SPEAKER_ADDED: 'system',
   INSTRUCTOR_CERTIFICATE_READY: 'system',

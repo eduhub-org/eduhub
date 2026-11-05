@@ -6,6 +6,7 @@ import { useRoleQuery } from '../../hooks/authedQuery';
 import { GUEST_DATA_RETENTION_MONTHS } from '../../queries/guestRegistration';
 import { GuestDataRetentionMonths } from '../../queries/__generated__/GuestDataRetentionMonths';
 import { AuthRoles } from '../../types/enums';
+import { PRIVACY_POLICY_VERSION } from './privacyPolicyVersion';
 
 /**
  * The privacy policy, as composable sections shared by the edu-hub and StuJo
@@ -34,7 +35,8 @@ import { AuthRoles } from '../../types/enums';
  *     `git log --until=<timestamp> -- <this file>`, which only works while the
  *     text is in git and not spread across many files.
  *     Process: docs/LEGAL_DOCUMENTS.md.
- *   - Bump the date in `PrivacyAsOfDate` whenever the text changes.
+ *   - Bump PRIVACY_POLICY_VERSION (privacyPolicyVersion.ts) whenever the text
+ *     changes; it is the date `PrivacyAsOfDate` shows.
  */
 
 type SectionProps = { n: number };
@@ -860,12 +862,18 @@ export const PrivacyAnalytics: FC<SectionProps> = ({ n }) => {
 
 export const PrivacyAsOfDate: FC = () => {
   const isEnglish = useIsEnglish();
+  const asOf = new Date(`${PRIVACY_POLICY_VERSION}T12:00:00Z`).toLocaleDateString(isEnglish ? 'en-US' : 'de-DE', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'Europe/Berlin',
+  });
 
   return (
     <>
       <div className="mt-12 mb-8">
         <p className="text-sm text-label-secondary">
-          {isEnglish ? 'As of: November 5, 2026' : 'Stand: 5. November 2026'}
+          {isEnglish ? `As of: ${asOf}` : `Stand: ${asOf}`}
         </p>
       </div>
     </>

@@ -3116,6 +3116,7 @@ export enum User_select_column {
   organizationId = "organizationId",
   organizationName = "organizationName",
   picture = "picture",
+  privacyNoticeSeenVersion = "privacyNoticeSeenVersion",
   status = "status",
   updated_at = "updated_at",
   zipCode = "zipCode",
@@ -3158,6 +3159,7 @@ export enum User_update_column {
   organizationId = "organizationId",
   organizationName = "organizationName",
   picture = "picture",
+  privacyNoticeSeenVersion = "privacyNoticeSeenVersion",
   status = "status",
   updated_at = "updated_at",
   zipCode = "zipCode",
@@ -14439,6 +14441,7 @@ export interface User_bool_exp {
   organizationId?: Int_comparison_exp | null;
   organizationName?: String_comparison_exp | null;
   picture?: String_comparison_exp | null;
+  privacyNoticeSeenVersion?: String_comparison_exp | null;
   status?: UserStatus_enum_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
   zipCode?: String_comparison_exp | null;
@@ -14482,6 +14485,7 @@ export interface User_insert_input {
   organizationId?: number | null;
   organizationName?: string | null;
   picture?: string | null;
+  privacyNoticeSeenVersion?: string | null;
   status?: UserStatus_enum | null;
   updated_at?: any | null;
   zipCode?: string | null;
@@ -14508,6 +14512,7 @@ export interface User_max_order_by {
   organizationId?: order_by | null;
   organizationName?: order_by | null;
   picture?: order_by | null;
+  privacyNoticeSeenVersion?: order_by | null;
   updated_at?: order_by | null;
   zipCode?: order_by | null;
 }
@@ -14533,6 +14538,7 @@ export interface User_min_order_by {
   organizationId?: order_by | null;
   organizationName?: order_by | null;
   picture?: order_by | null;
+  privacyNoticeSeenVersion?: order_by | null;
   updated_at?: order_by | null;
   zipCode?: order_by | null;
 }
@@ -14592,6 +14598,7 @@ export interface User_order_by {
   organizationId?: order_by | null;
   organizationName?: order_by | null;
   picture?: order_by | null;
+  privacyNoticeSeenVersion?: order_by | null;
   status?: order_by | null;
   updated_at?: order_by | null;
   zipCode?: order_by | null;
