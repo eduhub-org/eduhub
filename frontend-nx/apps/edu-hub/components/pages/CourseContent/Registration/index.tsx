@@ -10,6 +10,7 @@ import { useTranslations } from 'next-intl';
 import { RegistrationButton } from './RegistrationButton';
 import { RegistrationStatus } from './RegistrationStatus';
 import { RegistrationModal } from './RegistrationModal';
+import { RegistrationPrivacyNotice } from './RegistrationPrivacyNotice';
 import { GuestRegistrationModal } from './GuestRegistrationModal';
 import { ParticipationExitButton } from './ParticipationExitButton';
 import { CancellationRequestButton } from './CancellationRequestButton';
@@ -112,6 +113,7 @@ export const Registration: FC<RegistrationProps> = ({
             isCourseFull={isCourseFull}
             onClick={registrationHandler.handleRegistration}
           />
+          {!registrationHandler.config.isExternal && <RegistrationPrivacyNotice />}
         </div>
         <RegistrationModal
           visible={registrationHandler.isModalOpen}
@@ -229,6 +231,7 @@ export const Registration: FC<RegistrationProps> = ({
         isCourseFull={isCourseFull}
         onClick={registrationHandler.handleRegistration}
       />
+      {!registrationHandler.config.isExternal && <RegistrationPrivacyNotice />}
       <RegistrationModal
         visible={registrationHandler.isModalOpen}
         closeModal={registrationHandler.closeModal}

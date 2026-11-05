@@ -113,11 +113,15 @@ async function queueEmail({
       }
     `;
 
-    // First try to get course-specific template
-    let templateData = await client.request(GET_EMAIL_TEMPLATE, {
-      type: templateType,
-      courseId: courseId
-    });
+    // First try to get course-specific template. Without a course go straight to
+    // the default: Hasura rejects `_eq: null` ("unexpected null value").
+    let templateData =
+      courseId == null
+        ? null
+        : await client.request(GET_EMAIL_TEMPLATE, {
+            type: templateType,
+            courseId: courseId
+          });
 
     // If no course-specific template found, fall back to default template (courseId = NULL)
     if (!templateData?.MailTemplate?.length) {

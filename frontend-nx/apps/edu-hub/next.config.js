@@ -115,6 +115,9 @@ const nextConfig = {
     return [
       { source: '/impressum', destination: '/imprint', permanent: true },
       { source: '/datenschutz', destination: '/privacy', permanent: true },
+      // The Keycloak login links /agb and /datenschutz on whichever portal
+      // the person came from; StuJo serves both natively.
+      { source: '/agb', destination: '/terms', permanent: true },
       // Settings reorganization: old admin routes live on as redirects
       { source: '/manage/app-settings', destination: '/manage/settings', permanent: false },
       { source: '/manage/email-templates', destination: '/manage/settings/emails', permanent: false },
