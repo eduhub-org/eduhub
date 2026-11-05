@@ -1199,7 +1199,6 @@
     "organization_scope_label": "Organisation",
     "program_settings": {
       "open": "Programmeinstellungen",
-      "select_program_hint": "Wähle ein Programm aus, um seine Einstellungen zu öffnen",
       "title": "Einstellungen: {title}",
       "close": "Programmeinstellungen schließen",
       "load_error": "Die Programmeinstellungen konnten nicht geladen werden.",

@@ -45,7 +45,6 @@ import { ADMIN_COURSE_LIST } from '../../../queries/courseList';
 import { GET_COURSE_TEMPLATES_COUNT } from '../../../queries/emailTemplates';
 import ExpandableCourseRow from './ExpandableCourseRow';
 import ProgramSettingsPanel from '../ManageProgramsContent/ProgramSettingsPanel';
-import { Tooltip } from '@mui/material';
 import { getRegistrationFeatures } from '../ManageCourseContent/ApplicationsTab/registrationConfig';
 import { useParallelQueries } from '../../../hooks/useParallelQueries';
 import { CourseEnrollmentStatus_enum, order_by } from '../../../__generated__/globalTypes';
@@ -64,9 +63,10 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { SelectProgramDialog } from './SelectProgramDialog';
 import { COPY_COURSES_TO_PROGRAM } from '../../../queries/copyCourse';
 import NotificationSnackbar from '../../common/dialogs/NotificationSnackbar';
-import { MdMarkEmailRead, MdOpenInNew, MdSettings } from 'react-icons/md';
+import { MdMarkEmailRead, MdOpenInNew } from 'react-icons/md';
 
 import { ProgramsMenubar } from '../../layout/ProgramsMenubar';
+import ProgramSettingsButton from './ProgramSettingsButton';
 import type { StaticComponentProperty } from '../../../types/UIComponents';
 import { ProgramType } from '../../../types/enums';
 import { useRausgegangenUnpublishPrompt } from '../ManageCourseContent/useRausgegangenUnpublishPrompt';
@@ -1035,40 +1035,24 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
   return (
     <>
       {rausgegangenUnpublishDialog}
-      <div className="flex items-start justify-between gap-4">
-        <div className="min-w-0 flex-1">
-          {organizationSelector}
-          {/* Only show the program tab select when there is more than one program to switch between. */}
-          {programs.length > 1 && (
-            <div className="flex justify-start mb-5 text-white">
-              <ProgramsMenubar
-                programs={menubarPrograms}
-                defaultProgramId={defaultProgramId ?? 0}
-                currentSelectedId={currentProgramId}
-                onTabClicked={handleTabClick}
-              />
-            </div>
-          )}
-        </div>
-        {/* The span keeps the tooltip working while the button is disabled on the "All" tab. */}
-        <Tooltip title={settingsProgramId === null ? t('program_settings.select_program_hint') : t('program_settings.open')}>
-          <span className="mb-5 flex-shrink-0">
-            <button
-              type="button"
-              onClick={() => setShowProgramSettings((open) => !open)}
-              disabled={settingsProgramId === null}
-              aria-label={t('program_settings.open')}
-              aria-expanded={showProgramSettings && settingsProgramId !== null}
-              className={`p-2 rounded-lg border border-border-primary transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
-                showProgramSettings && settingsProgramId !== null
-                  ? 'bg-fill-primary text-label-primary'
-                  : 'text-white hover:bg-white/10'
-              }`}
-            >
-              <MdSettings size={22} />
-            </button>
-          </span>
-        </Tooltip>
+      {organizationSelector}
+      {/* The program tabs (only when there is more than one program) with the selected program's
+          settings right next to them; the "All" tab has no single program to configure. */}
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-3 mb-5 text-white">
+        {programs.length > 1 && (
+          <ProgramsMenubar
+            programs={menubarPrograms}
+            defaultProgramId={defaultProgramId ?? 0}
+            currentSelectedId={currentProgramId}
+            onTabClicked={handleTabClick}
+          />
+        )}
+        {settingsProgramId !== null && (
+          <ProgramSettingsButton
+            open={showProgramSettings}
+            onToggle={() => setShowProgramSettings((open) => !open)}
+          />
+        )}
       </div>
 
       {showProgramSettings && settingsProgramId !== null && (

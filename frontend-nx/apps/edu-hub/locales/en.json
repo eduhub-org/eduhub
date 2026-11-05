@@ -1215,7 +1215,6 @@
     "organization_scope_label": "Organization",
     "program_settings": {
       "open": "Program settings",
-      "select_program_hint": "Select a program to open its settings",
       "title": "Settings: {title}",
       "close": "Close program settings",
       "load_error": "The program settings could not be loaded.",
