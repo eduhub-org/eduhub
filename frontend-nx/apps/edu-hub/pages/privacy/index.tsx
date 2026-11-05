@@ -6,13 +6,17 @@ import {
   PrivacyAnalytics,
   PrivacyAsOfDate,
   PrivacyChangeHistory,
+  PrivacyCourseChat,
   PrivacyCourseParticipation,
   PrivacyDataCollection,
+  PrivacyEmail,
   PrivacyFormbricks,
+  PrivacyFunderReports,
   PrivacyGeneralInfo,
   PrivacyGuestRegistration,
   PrivacyHosting,
   PrivacyNewsletter,
+  PrivacyOnlineSessions,
   PrivacyOrganizationAccounts,
   PrivacyOverview,
   PrivacyOverviewTracking,
@@ -53,10 +57,14 @@ const Privacy: FC = () => {
             <PrivacyGuestRegistration />
             <PrivacyNewsletter />
           </PrivacyDataCollection>
-          <PrivacyFormbricks n={5} />
-          <PrivacyPayments n={6} />
-          <PrivacyAnalytics n={7} />
-          <PrivacyChangeHistory n={8} site="eduhub" />
+          <PrivacyOnlineSessions n={5} />
+          <PrivacyCourseChat n={6} />
+          <PrivacyEmail n={7} />
+          <PrivacyFormbricks n={8} />
+          <PrivacyPayments n={9} />
+          <PrivacyFunderReports n={10} />
+          <PrivacyAnalytics n={11} />
+          <PrivacyChangeHistory n={12} site="eduhub" />
           <PrivacyAsOfDate />
         </div>
       </Page>

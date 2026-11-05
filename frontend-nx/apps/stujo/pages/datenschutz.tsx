@@ -7,8 +7,10 @@ import {
   PrivacyAsOfDate,
   PrivacyChangeHistory,
   PrivacyDataCollection,
+  PrivacyEmail,
   PrivacyGeneralInfo,
   PrivacyHosting,
+  PrivacyJobLetter,
   PrivacyJobPostings,
   PrivacyOrganizationAccounts,
   PrivacyOverview,
@@ -54,9 +56,11 @@ const Datenschutz: FC<Props> = ({ portal }) => {
           <PrivacyOrganizationAccounts />
         </PrivacyDataCollection>
         <PrivacyJobPostings n={5} />
-        <PrivacyPayments n={6} />
+        <PrivacyJobLetter n={6} />
+        <PrivacyEmail n={7} />
+        <PrivacyPayments n={8} />
         {/* Empty until the first StuJo entry in PRIVACY_POLICY_CHANGES. */}
-        <PrivacyChangeHistory n={7} site="stujo" />
+        <PrivacyChangeHistory n={9} site="stujo" />
         <PrivacyAsOfDate />
       </div>
     </Layout>

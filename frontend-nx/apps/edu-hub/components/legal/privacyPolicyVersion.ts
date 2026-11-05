@@ -39,8 +39,8 @@ export const PRIVACY_POLICY_CHANGES: PrivacyPolicyChange[] = [
   {
     version: '2026-11-05',
     sites: ['eduhub'],
-    de: 'Wir verzichten auf das Meta Pixel und auf das Cookie-Banner, messen Besuche nur noch anonym und ohne Cookies und nennen jetzt alle Dienste, über die du dich anmelden kannst.',
-    en: 'We no longer use the Meta Pixel or a cookie banner, measure visits only anonymously and without cookies, and now name every service you can sign in with.',
+    de: 'Wir verzichten auf das Meta Pixel und auf das Cookie-Banner, messen Besuche nur noch anonym und ohne Cookies und nennen jetzt alle Dienste, über die du dich anmelden kannst, sowie alle Dienstleister, die wir einsetzen (u. a. für E-Mails, Online-Sitzungen und den Kurs-Chat). Neu beschrieben sind außerdem Aufzeichnungen von Online-Sitzungen und die Berichte an Fördermittelgeber.',
+    en: 'We no longer use the Meta Pixel or a cookie banner, measure visits only anonymously and without cookies, and now name every service you can sign in with as well as every service provider we use (including for emails, online sessions and the course chat). We also newly describe recordings of online sessions and the reports to funding organizations.',
   },
 ];
 

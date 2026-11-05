@@ -172,6 +172,11 @@ export const PrivacyHosting: FC<SectionProps> = ({ n }) => {
       </p>
       <p>
         {isEnglish
+          ? 'We operate further services ourselves on this infrastructure, in particular the login system and the online surveys used to record attendance. No data is passed to other providers for these.'
+          : 'Weitere Dienste betreiben wir selbst auf dieser Infrastruktur, insbesondere das Anmeldesystem (Login) und die Online-Umfragen zur Erfassung der Anwesenheit. Dafür werden keine Daten an weitere Anbieter weitergegeben.'}
+      </p>
+      <p>
+        {isEnglish
           ? 'A contract for data processing (DPA) exists with Google in accordance with Art. 28 GDPR.'
           : 'Mit Google besteht ein Vertrag zur Auftragsverarbeitung (AVV) gemäß Art. 28 DSGVO.'}
       </p>
@@ -318,6 +323,19 @@ export const PrivacyGeneralInfo: FC<SectionProps & { imprintHref: string }> = ({
         {isEnglish ? '.' : ' angegebenen Adresse an uns wenden.'}
       </p>
       <h3 className="text-lg mt-2 mb-2 italic">
+        {isEnglish ? 'Deleting Your Account' : 'Löschen deines Kontos'}
+      </h3>
+      <p>
+        {isEnglish
+          ? 'You can delete your account yourself at any time at the end of your profile. We then delete or anonymize your profile data, your profile picture, your certificates (please download them beforehand), your motivation letters and questionnaire answers, your newsletter subscriptions and job alerts, and the emails sent to you. Your login account is removed and your chat account is deactivated.'
+          : 'Du kannst dein Konto jederzeit selbst am Ende deines Profils löschen. Wir löschen bzw. anonymisieren dann deine Profildaten, dein Profilbild, deine Zertifikate (bitte lade sie vorher herunter), deine Motivationsschreiben und Fragebogenantworten, deine Newsletter-Abonnements und Job-Benachrichtigungen sowie die an dich versandten E-Mails. Dein Login-Konto wird entfernt und dein Chat-Konto deaktiviert.'}
+      </p>
+      <p>
+        {isEnglish
+          ? 'We keep invoices and payment records for the statutory retention periods (section 147 AO, section 257 HGB), anonymous statistics on participation, and content you created together with others (e.g. shared projects). Chat messages you have already sent remain in the course rooms but are hidden from people who join later. Data held by external services (e.g. Zoom or the email service) is deleted on request; please contact us for this.'
+          : 'Wir behalten Rechnungen und Zahlungsbelege für die gesetzlichen Aufbewahrungsfristen (§ 147 AO, § 257 HGB), anonyme Statistiken zur Teilnahme sowie Inhalte, die du gemeinsam mit anderen erstellt hast (z. B. gemeinsame Projekte). Bereits gesendete Chat-Nachrichten bleiben in den Kursräumen, werden aber für später Hinzukommende ausgeblendet. Daten bei externen Diensten (z. B. Zoom oder dem E-Mail-Dienst) löschen wir auf Anfrage; wende dich dazu an uns.'}
+      </p>
+      <h3 className="text-lg mt-2 mb-2 italic">
         {isEnglish ? 'Right to Restriction of Processing' : 'Recht auf Einschränkung der Verarbeitung'}
       </h3>
       <p>
@@ -425,6 +443,11 @@ export const PrivacyDataCollection: FC<SectionProps & { children?: ReactNode }> 
         {isEnglish
           ? 'The website operator stores the profile data of your user account (name, email address and, where applicable, student status and university) in order to provide and support the services you use (Art. 6 para. 1 lit. f GDPR).'
           : 'Der Websitebetreiber speichert die Profildaten deines Nutzerkontos (Name, E-Mail-Adresse sowie ggf. Studentenstatus und Hochschule), um die von dir genutzten Angebote bereitzustellen und zu unterstützen (Art. 6 Abs. 1 lit. f DSGVO).'}
+      </p>
+      <p>
+        {isEnglish
+          ? 'Registration, login and password reset run through a login system that we operate ourselves (see "Hosting").'
+          : 'Registrierung, Anmeldung und das Zurücksetzen des Passworts laufen über ein Anmeldesystem, das wir selbst betreiben (siehe „Hosting“).'}
       </p>
       <h3 className="text-lg mt-2 mb-2 italic">
         {isEnglish ? 'Registration and Login via Third-Party Providers (Single Sign-On)' : 'Registrierung und Login über Drittanbieter (Single Sign-On)'}
@@ -566,6 +589,19 @@ export const PrivacyCourseParticipation: FC = () => {
         {isEnglish
           ? 'The website operator stores data on courses for which registered users have applied or participated, as well as related information about the fulfillment of the set performance criteria for the courses that are needed for certificate issuance (Art. 6 para. 1 lit. f GDPR).'
           : 'Der Websitebetreiber speichert Daten zu Kursen, für die sich registrierte Nutzer:innen beworben haben bzw. an denen sie teilgenommen haben sowie zugehörige Informationen über die Erfüllung der angesetzten Leistungskriterien für die Kurse, die zur Ausstellung der Zertifikate benötigt werden (Art. 6 Abs. 1 lit. f DSGVO).'}
+      </p>
+      <p>
+        {isEnglish
+          ? 'One of the criteria is attendance at the mandatory sessions. For online sessions, attendance only counts if your camera is on and you take part with the same email address or name as in EduHub (see "Online Sessions"). For on-site sessions, attendance is recorded by scanning a QR code; for some courses we also ask about attendance and location in short online surveys that we operate ourselves.'
+          : 'Eines der Kriterien ist die Anwesenheit bei den Pflichtterminen. Bei Online-Terminen zählt die Anwesenheit nur, wenn deine Kamera eingeschaltet ist und du mit derselben E-Mail-Adresse bzw. demselben Namen wie in EduHub teilnimmst (siehe „Online-Sitzungen“). Bei Präsenzterminen wird die Anwesenheit über einen QR-Code erfasst; bei einigen Kursen fragen wir Anwesenheit und Ort außerdem über kurze Online-Umfragen ab, die wir selbst betreiben.'}
+      </p>
+      <h3 className="text-lg mt-2 mb-2 italic">
+        {isEnglish ? 'Public Profiles of Instructors and Speakers' : 'Öffentliche Profile von Kursleitungen und Referent:innen'}
+      </h3>
+      <p>
+        {isEnglish
+          ? 'If you lead a course or speak at an event, your name and, if you have uploaded one, your profile picture are shown publicly on the page of the course or event. For instructors the legal basis is Art. 6 para. 1 lit. b GDPR, for speakers our legitimate interest in presenting the event (Art. 6 para. 1 lit. f GDPR). The profile picture is voluntary; you can remove it in your profile at any time.'
+          : 'Wenn du einen Kurs leitest oder bei einer Veranstaltung sprichst, werden dein Name und, falls du eines hochgeladen hast, dein Profilbild öffentlich auf der Seite des Kurses bzw. der Veranstaltung angezeigt. Rechtsgrundlage ist für Kursleitungen Art. 6 Abs. 1 lit. b DSGVO, für Referent:innen unser berechtigtes Interesse an der Vorstellung der Veranstaltung (Art. 6 Abs. 1 lit. f DSGVO). Das Profilbild ist freiwillig; du kannst es jederzeit in deinem Profil entfernen.'}
       </p>
     </>
   );
@@ -715,6 +751,179 @@ export const PrivacyJobPostings: FC<SectionProps> = ({ n }) => {
   );
 };
 
+/** Shared: both sites send their mails through Mailgun. */
+export const PrivacyEmail: FC<SectionProps> = ({ n }) => {
+  const isEnglish = useIsEnglish();
+
+  return (
+    <>
+      <h2 className="text-xl mt-6 mb-2">
+        {n}. {isEnglish ? 'Sending Emails' : 'E-Mail-Versand'}
+      </h2>
+      <p>
+        {isEnglish
+          ? 'We send emails (e.g. registration confirmations, reminders, certificates) via the service Mailgun. The provider is Mailgun Technologies, Inc., San Antonio, Texas, USA. Mailgun processes your email address, your name and the content of the email; we use an EU data center.'
+          : 'E-Mails (z. B. Anmeldebestätigungen, Erinnerungen, Zertifikate) versenden wir über den Dienst Mailgun. Anbieter ist die Mailgun Technologies, Inc., San Antonio, Texas, USA. Mailgun verarbeitet dafür deine E-Mail-Adresse, deinen Namen und den Inhalt der E-Mail; wir nutzen ein Rechenzentrum in der EU.'}
+      </p>
+      <p>
+        {isEnglish
+          ? 'We only evaluate whether an email was delivered, could not be delivered or was marked as spam, so that we can correct invalid addresses. Our emails contain no tracking pixels and no tracked links; we do not record whether you open an email or click a link.'
+          : 'Wir werten nur aus, ob eine E-Mail zugestellt wurde, nicht zugestellt werden konnte oder als Spam markiert wurde, um ungültige Adressen korrigieren zu können. Unsere E-Mails enthalten keine Zählpixel und keine nachverfolgten Links; ob du eine E-Mail öffnest oder einen Link anklickst, erfassen wir nicht.'}
+      </p>
+      <p>
+        {isEnglish
+          ? 'The legal basis is Art. 6 para. 1 lit. b GDPR, for the delivery status our legitimate interest in reliable delivery (Art. 6 para. 1 lit. f GDPR). A contract for data processing (DPA) exists with the provider. Any access from the USA is covered by the EU-US Data Privacy Framework or standard contractual clauses.'
+          : 'Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO, für den Zustellstatus unser berechtigtes Interesse an einer zuverlässigen Zustellung (Art. 6 Abs. 1 lit. f DSGVO). Mit dem Anbieter besteht ein Vertrag zur Auftragsverarbeitung (AVV). Ein möglicher Zugriff aus den USA ist durch das EU-US Data Privacy Framework bzw. Standardvertragsklauseln abgesichert.'}
+      </p>
+      <p>
+        {isEnglish ? 'Further information: ' : 'Weitere Informationen: '}
+        <a
+          href="https://www.mailgun.com/legal/privacy-policy/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline hover:text-label-secondary"
+        >
+          https://www.mailgun.com/legal/privacy-policy/
+        </a>
+      </p>
+    </>
+  );
+};
+
+/** edu-hub only. */
+export const PrivacyOnlineSessions: FC<SectionProps> = ({ n }) => {
+  const isEnglish = useIsEnglish();
+
+  return (
+    <>
+      <h2 className="text-xl mt-6 mb-2">
+        {n}. {isEnglish ? 'Online Sessions (Zoom)' : 'Online-Sitzungen (Zoom)'}
+      </h2>
+      <p>
+        {isEnglish
+          ? 'Online sessions take place via Zoom. The provider is Zoom Communications, Inc., 55 Almaden Boulevard, Suite 600, San Jose, CA 95113, USA. All sessions run on our Zoom account; we have set the data region to the EU. Zoom processes in particular your name, your email address if you are signed in to Zoom, your image and voice if you switch on camera or microphone, chat messages in the session, and technical connection data.'
+          : 'Online-Sitzungen finden über Zoom statt. Anbieter ist die Zoom Communications, Inc., 55 Almaden Boulevard, Suite 600, San Jose, CA 95113, USA. Alle Sitzungen laufen über unser Zoom-Konto; als Datenregion haben wir die EU eingestellt. Zoom verarbeitet dabei insbesondere deinen Namen, deine E-Mail-Adresse, wenn du bei Zoom angemeldet bist, Bild und Ton, wenn du Kamera bzw. Mikrofon einschaltest, Chatnachrichten in der Sitzung sowie technische Verbindungsdaten.'}
+      </p>
+      <h3 className="text-lg mt-2 mb-2 italic">
+        {isEnglish ? 'Attendance' : 'Anwesenheit'}
+      </h3>
+      <p>
+        {isEnglish
+          ? 'After each session we retrieve the list of participants from Zoom (name, email address of the Zoom account if signed in, joining and leaving times) and match it with the participants of the course: first by email address, otherwise by name. Please therefore take part with the same email address or name as in EduHub; otherwise your attendance cannot be recognized and counts as missed until the organizers correct it.'
+          : 'Nach jeder Sitzung rufen wir bei Zoom die Teilnehmendenliste ab (Name, E-Mail-Adresse des Zoom-Kontos, falls angemeldet, Beitritts- und Austrittszeiten) und gleichen sie mit den Teilnehmenden des Kurses ab: zuerst über die E-Mail-Adresse, sonst über den Namen. Nimm deshalb bitte mit derselben E-Mail-Adresse bzw. demselben Namen wie in EduHub teil; sonst kann deine Anwesenheit nicht erkannt werden und gilt als verpasst, bis die Organisator:innen sie korrigieren.'}
+      </p>
+      <p>
+        {isEnglish
+          ? 'For courses with a certificate, attendance at an online session only counts if your camera is on, so that the organizers can confirm your participation. The video is only transmitted live and not stored (except for recordings, see below). The legal basis is Art. 6 para. 1 lit. b GDPR, as attendance is one of the certificate criteria.'
+          : 'Bei Kursen mit Zertifikat zählt die Anwesenheit in einer Online-Sitzung nur, wenn deine Kamera eingeschaltet ist, damit die Organisator:innen deine Teilnahme bestätigen können. Das Video wird nur live übertragen und nicht gespeichert (außer bei Aufzeichnungen, siehe unten). Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO, da die Anwesenheit zu den Kriterien für das Zertifikat gehört.'}
+      </p>
+      <h3 className="text-lg mt-2 mb-2 italic">
+        {isEnglish ? 'Recordings' : 'Aufzeichnungen'}
+      </h3>
+      <p>
+        {isEnglish
+          ? 'Sessions are recorded only in exceptional cases, for example so that participants can watch a presentation again. A recording is announced in advance, and Zoom asks for your consent when it starts. If anyone objects, the session is not recorded. Only the presentation is recorded (active speaker and shared screen), not discussions or group work. During a recording you may switch off your camera and microphone without this counting as an absence.'
+          : 'Sitzungen werden nur in Ausnahmefällen aufgezeichnet, etwa damit Teilnehmende einen Vortrag noch einmal ansehen können. Eine Aufzeichnung wird vorher angekündigt, und Zoom fragt beim Start nach deinem Einverständnis. Widerspricht jemand, wird nicht aufgezeichnet. Aufgezeichnet wird nur der Vortrag (aktive:r Sprecher:in und geteilter Bildschirm), nicht Diskussionen oder Gruppenarbeit. Während einer Aufzeichnung darfst du Kamera und Mikrofon ausschalten, ohne dass das als Fehlzeit zählt.'}
+      </p>
+      <p>
+        {isEnglish
+          ? 'Recordings are stored in the Zoom cloud in the EU, shared only with the participants of the course and not published. They are deleted no later than three months after the end of the course. The legal basis is your consent (Art. 6 para. 1 lit. a GDPR), which you can revoke at any time with effect for the future.'
+          : 'Aufzeichnungen werden in der Zoom-Cloud in der EU gespeichert, nur mit den Teilnehmenden des Kurses geteilt und nicht veröffentlicht. Sie werden spätestens drei Monate nach Kursende gelöscht. Rechtsgrundlage ist deine Einwilligung (Art. 6 Abs. 1 lit. a DSGVO), die du jederzeit mit Wirkung für die Zukunft widerrufen kannst.'}
+      </p>
+      <p>
+        {isEnglish
+          ? 'A contract for data processing (DPA) exists with Zoom. Any access from the USA is covered by the EU-US Data Privacy Framework, under which Zoom is certified, and standard contractual clauses.'
+          : 'Mit Zoom besteht ein Vertrag zur Auftragsverarbeitung (AVV). Ein möglicher Zugriff aus den USA ist durch das EU-US Data Privacy Framework, unter dem Zoom zertifiziert ist, sowie Standardvertragsklauseln abgesichert.'}
+      </p>
+      <p>
+        {isEnglish ? 'Further information: ' : 'Weitere Informationen: '}
+        <a
+          href="https://www.zoom.com/de/trust/privacy/privacy-statement/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline hover:text-label-secondary"
+        >
+          https://www.zoom.com/de/trust/privacy/privacy-statement/
+        </a>
+      </p>
+    </>
+  );
+};
+
+/** edu-hub only. */
+export const PrivacyCourseChat: FC<SectionProps> = ({ n }) => {
+  const isEnglish = useIsEnglish();
+
+  return (
+    <>
+      <h2 className="text-xl mt-6 mb-2">
+        {n}. {isEnglish ? 'Course Chat (Matrix/Element)' : 'Kurs-Chat (Matrix/Element)'}
+      </h2>
+      <p>
+        {isEnglish
+          ? 'For exchanges within a course we provide chat rooms based on the open Matrix protocol, which you can use e.g. with the Element app. For this we create a chat account for you, whose user name is derived from your name, and add you to the rooms of your courses. The chat server is operated for us by Scheurer Technologies UG (haftungsbeschränkt), Kuhnkestraße 6, 24118 Kiel, on servers of Hetzner Online GmbH in Germany.'
+          : 'Für den Austausch innerhalb eines Kurses stellen wir Chat-Räume auf Basis des offenen Matrix-Protokolls bereit, die du z. B. mit der App Element nutzen kannst. Dafür legen wir dir ein Chat-Konto an, dessen Benutzername aus deinem Namen gebildet wird, und fügen dich den Räumen deiner Kurse hinzu. Den Chat-Server betreibt für uns die Scheurer Technologies UG (haftungsbeschränkt), Kuhnkestraße 6, 24118 Kiel, auf Servern der Hetzner Online GmbH in Deutschland.'}
+      </p>
+      <p>
+        {isEnglish
+          ? 'Processed are your user name, display name and, if set, profile picture, your room memberships and the messages and files you send. Messages remain in a course room as long as the room exists. If you delete your EduHub account, your chat account is deactivated: you leave all rooms, your name and picture are removed, and your messages are hidden from people who join later.'
+          : 'Verarbeitet werden dein Benutzername, dein Anzeigename und ggf. dein Profilbild, deine Raum-Mitgliedschaften sowie die Nachrichten und Dateien, die du sendest. Nachrichten bleiben in einem Kursraum, solange der Raum besteht. Löschst du dein EduHub-Konto, wird dein Chat-Konto deaktiviert: Du verlässt alle Räume, Name und Bild werden entfernt, und deine Nachrichten werden für später Hinzukommende ausgeblendet.'}
+      </p>
+      <p>
+        {isEnglish
+          ? 'The legal basis is Art. 6 para. 1 lit. b GDPR. A contract for data processing (DPA) exists with the operator. The data is processed exclusively in Germany.'
+          : 'Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO. Mit dem Betreiber besteht ein Vertrag zur Auftragsverarbeitung (AVV). Die Daten werden ausschließlich in Deutschland verarbeitet.'}
+      </p>
+    </>
+  );
+};
+
+/** edu-hub only: the participants API (functions/apiProxy). */
+export const PrivacyFunderReports: FC<SectionProps> = ({ n }) => {
+  const isEnglish = useIsEnglish();
+
+  return (
+    <>
+      <h2 className="text-xl mt-6 mb-2">
+        {n}. {isEnglish ? 'Reports to Funding Organizations' : 'Berichte an Fördermittelgeber'}
+      </h2>
+      <p>
+        {isEnglish
+          ? 'Some courses are financed by funding organizations. To show how the funding was used, the funder of a course can retrieve a report on its participants via an interface. The report contains no names or email addresses, only a pseudonymized identifier per participant, the enrollment status and date, the occupation status (e.g. student) and whether a certificate was issued.'
+          : 'Einige Kurse werden von Fördermittelgebern finanziert. Um die Verwendung der Fördermittel nachzuweisen, kann der Fördermittelgeber eines Kurses über eine Schnittstelle einen Bericht zu dessen Teilnehmenden abrufen. Der Bericht enthält keine Namen oder E-Mail-Adressen, sondern nur eine pseudonymisierte Kennung je Teilnehmer:in, Anmeldestatus und -datum, den Beschäftigungsstatus (z. B. Studierende:r) sowie, ob ein Zertifikat ausgestellt wurde.'}
+      </p>
+      <p>
+        {isEnglish
+          ? 'Each funder only receives data on the courses it funds. The legal basis is our legitimate interest in proving the proper use of the funding (Art. 6 para. 1 lit. f GDPR). The funders process the data under their own responsibility; their own privacy policies apply. You can object to this processing (Art. 21 GDPR).'
+          : 'Jeder Fördermittelgeber erhält nur Daten zu den Kursen, die er fördert. Rechtsgrundlage ist unser berechtigtes Interesse am Nachweis der ordnungsgemäßen Verwendung der Fördermittel (Art. 6 Abs. 1 lit. f DSGVO). Die Fördermittelgeber verarbeiten die Daten in eigener Verantwortung; es gelten ihre eigenen Datenschutzerklärungen. Du kannst dieser Verarbeitung widersprechen (Art. 21 DSGVO).'}
+      </p>
+    </>
+  );
+};
+
+/** StuJo only. */
+export const PrivacyJobLetter: FC<SectionProps> = ({ n }) => {
+  const isEnglish = useIsEnglish();
+
+  return (
+    <>
+      <h2 className="text-xl mt-6 mb-2">
+        {n}. {isEnglish ? 'Job-Letter' : 'Job-Letter'}
+      </h2>
+      <p>
+        {isEnglish
+          ? 'If you subscribe to the Job-Letter, we store your selected filters (category, region) with your account and send you new job postings by email once a week, to the email address of your account (see "Sending Emails"). The legal basis is your consent (Art. 6 para. 1 lit. a GDPR), which you give by subscribing.'
+          : 'Wenn du den Job-Letter abonnierst, speichern wir die gewählten Filter (Kategorie, Region) zu deinem Konto und schicken dir einmal pro Woche neue Stellenangebote per E-Mail an die E-Mail-Adresse deines Kontos (siehe „E-Mail-Versand“). Rechtsgrundlage ist deine Einwilligung (Art. 6 Abs. 1 lit. a DSGVO), die du mit dem Abonnieren erteilst.'}
+      </p>
+      <p>
+        {isEnglish
+          ? 'You can unsubscribe at any time on the Job-Letter page; the emails then stop. Your filters stay stored so that you can resume the subscription later, and are deleted with your account.'
+          : 'Du kannst den Job-Letter jederzeit auf der Job-Letter-Seite abbestellen; dann endet der Versand. Deine Filter bleiben gespeichert, damit du das Abo später fortsetzen kannst, und werden mit deinem Konto gelöscht.'}
+      </p>
+    </>
+  );
+};
+
 /** edu-hub only. */
 export const PrivacyFormbricks: FC<SectionProps> = ({ n }) => {
   const isEnglish = useIsEnglish();
@@ -808,6 +1017,11 @@ export const PrivacyPayments: FC<SectionProps> = ({ n }) => {
         {isEnglish
           ? 'The provider only receives the data necessary for payment processing. The platform operator does not have access to complete payment data (e.g., credit card numbers).'
           : 'Der Anbieter erhält nur die für die Zahlungsabwicklung erforderlichen Daten. Der Plattformbetreiber erhält keinen Zugriff auf vollständige Zahlungsdaten (z. B. Kreditkartennummern).'}
+      </p>
+      <p>
+        {isEnglish
+          ? 'You can pay by card or by SEPA direct debit. Stripe also creates the invoice and provides it as a PDF and online; for this it processes your name, email address and, where provided, your billing address. We keep invoices for the statutory retention periods (section 147 AO, section 257 HGB).'
+          : 'Du kannst per Karte oder per SEPA-Lastschrift bezahlen. Stripe erstellt außerdem die Rechnung und stellt sie als PDF und online bereit; dafür verarbeitet Stripe deinen Namen, deine E-Mail-Adresse und ggf. deine Rechnungsadresse. Rechnungen bewahren wir für die gesetzlichen Aufbewahrungsfristen auf (§ 147 AO, § 257 HGB).'}
       </p>
       <p>
         {isEnglish
