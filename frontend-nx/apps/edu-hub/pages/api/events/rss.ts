@@ -1,10 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { createServerApolloClient } from '../../../config/apolloServer';
 import { buildEventsRss } from '../../../helpers/eventsRss';
+import { loadFeedOrganizationIds } from '../../../helpers/feedOrganizations';
 import { markdownToHtml } from '../../../helpers/markdownToHtml';
 import { requestOrigin } from '../../../helpers/requestOrigin';
 import { EVENTS_FEED } from '../../../queries/eventsFeed';
-import { EventsFeed } from '../../../queries/__generated__/EventsFeed';
+import { EventsFeed, EventsFeedVariables } from '../../../queries/__generated__/EventsFeed';
 import de from '../../../locales/de.json';
 import en from '../../../locales/en.json';
 
@@ -25,7 +26,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const localePrefix = locale === 'en' ? '/en' : '';
 
   try {
-    const { data } = await createServerApolloClient().query<EventsFeed>({ query: EVENTS_FEED });
+    const client = createServerApolloClient();
+    const organizationIds = await loadFeedOrganizationIds(client);
+    const { data } = await client.query<EventsFeed, EventsFeedVariables>({
+      query: EVENTS_FEED,
+      variables: { organizationIds },
+    });
 
     const xml = buildEventsRss(data?.Course ?? [], {
       title: messages.title,

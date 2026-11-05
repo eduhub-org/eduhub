@@ -25,6 +25,9 @@ import { AuthRoles } from '../types/enums';
 import { COURSE_GROUP_OPTIONS } from '../queries/courseGroupOptions';
 import { isKnownCourseGroupOptionTitle } from '../helpers/courseGroupOptions';
 import { sortEventCoursesByUpcoming } from '../helpers/sessionSchedule';
+import { filterByIncludedOrganizations, includedOrganizationIds } from '../helpers/homeSliderOrganizations';
+import { HOME_SLIDER_ORGANIZATIONS } from '../queries/homeSliderOrganizations';
+import { HomeSliderOrganizations } from '../queries/__generated__/HomeSliderOrganizations';
 import { COURSE_TILES, COURSES_BY_INSTRUCTOR, COURSES_ENROLLED_BY_USER } from '../queries/courseQueries';
 import { APP_SETTINGS, HOMEPAGE_HERO } from '../queries/appSettings';
 import { CourseGroupOptions } from '../queries/__generated__/CourseGroupOptions';
@@ -116,6 +119,14 @@ const Home: FC<HomeProps> = ({ heroHeadline }) => {
 
   const { data: courseGroupOptionsData } = useAuthedQuery<CourseGroupOptions>(COURSE_GROUP_OPTIONS);
 
+  const { data: homeSliderOrganizationsData } = useQuery<HomeSliderOrganizations>(HOME_SLIDER_ORGANIZATIONS, {
+    context: { role: AuthRoles.anonymous },
+  });
+  const sliderOrganizationIds = useMemo(
+    () => includedOrganizationIds(homeSliderOrganizationsData?.HomeSliderOrganization),
+    [homeSliderOrganizationsData]
+  );
+
   const { data: appSettingsData } = useQuery<AppSettings>(APP_SETTINGS, {
     variables: { appName: 'edu' },
   });
@@ -150,8 +161,12 @@ const Home: FC<HomeProps> = ({ heroHeadline }) => {
           }
           const filteredCourses = option.programType
             ? // Program-type based groups (Courses, Events, Degrees) are populated
-              // automatically from the published courses of that program type.
-              publishedCourses.filter((course) => course.Program?.type === option.programType)
+              // automatically from the published courses of that program type, limited to the
+              // default organization and the organizations a super-admin added.
+              filterByIncludedOrganizations(
+                publishedCourses.filter((course) => course.Program?.type === option.programType),
+                sliderOrganizationIds
+              )
             : // Other groups still rely on manual CourseGroup assignments.
               publishedCourses.filter((course) =>
                 course.CourseGroups.some((courseGroup) => courseGroup.CourseGroupOption.id === option.id)
@@ -163,7 +178,7 @@ const Home: FC<HomeProps> = ({ heroHeadline }) => {
             courses: sortEventCoursesByUpcoming(filteredCourses),
           };
         }),
-    [publishedCourses, courseGroupOptionsData]
+    [publishedCourses, courseGroupOptionsData, sliderOrganizationIds]
   );
 
   // Translate known built-in CourseGroupOption titles; otherwise use the title verbatim.

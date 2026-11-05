@@ -598,7 +598,7 @@ export interface ManagedCourse_Course_by_pk {
    */
   publicParticipantCount: any | null;
   /**
-   * A computed field, executes function "course_waitlist_count"
+   * People on the waitlist of a course (preview enrollments excluded). Free places are reserved for them: new registrations need maxParticipants > active participants + this count.
    */
   waitlistCount: any | null;
   /**
@@ -650,10 +650,6 @@ export interface ManagedCourse_Course_by_pk {
    * Full URL to the Formbricks survey for course enrollment/application (for iframe embedding). Overrides program default if set.
    */
   formbricksEnrollmentSurveyUrl: string | null;
-  /**
-   * How many hours before the first session participants get the session reminder email. Null sends none.
-   */
-  sessionReminderLeadHours: number | null;
   /**
    * The time the course starts each week.
    */
@@ -711,6 +707,10 @@ export interface ManagedCourse_Course_by_pk {
    */
   requiredEventCount: number | null;
   matrixRoomId: string | null;
+  /**
+   * How many hours before the first session participants get the session reminder email. Null sends none.
+   */
+  sessionReminderLeadHours: number | null;
   /**
    * Stripe Product ID for the base course price
    */

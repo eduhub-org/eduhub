@@ -18,6 +18,7 @@ export const COURSE_TILE_FRAGMENT = gql`
       defaultApplicationEnd
       showExtendedApplicationPeriodBanner
       type
+      organizationId
     }
     CourseLocations {
       locationOption

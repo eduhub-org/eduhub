@@ -3,8 +3,9 @@
 
 type OrganizationScopeOption = { value: string; label: string };
 
-/** Organization id of the platform default organization ("EduHub Default"). */
-export const DEFAULT_ORGANIZATION_ID = 0;
+import { DEFAULT_ORGANIZATION_ID } from '../../../helpers/homeSliderOrganizations';
+
+export { DEFAULT_ORGANIZATION_ID };
 
 /** Stored scope: an organization id, or null when nothing was chosen yet. */
 export type StoredOrganizationScope = number | null;

@@ -1,12 +1,16 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { createServerApolloClient } from '../../../config/apolloServer';
 import { buildEventsIcal, htmlToPlainText, labelLookup } from '../../../helpers/eventsIcal';
+import { loadFeedOrganizationIds } from '../../../helpers/feedOrganizations';
 import { markdownToHtml } from '../../../helpers/markdownToHtml';
 import { requestOrigin } from '../../../helpers/requestOrigin';
 import { AddressMap } from '../../../helpers/sessionLocationResolution';
 import { EVENTS_CALENDAR_FEED } from '../../../queries/eventsCalendarFeed';
 import { LOCATION_ADDRESSES_FOR_FEED } from '../../../queries/locationAddress';
-import { EventsCalendarFeed } from '../../../queries/__generated__/EventsCalendarFeed';
+import {
+  EventsCalendarFeed,
+  EventsCalendarFeedVariables,
+} from '../../../queries/__generated__/EventsCalendarFeed';
 import { LocationAddressesForFeed } from '../../../queries/__generated__/LocationAddressesForFeed';
 import de from '../../../locales/de.json';
 import en from '../../../locales/en.json';
@@ -29,8 +33,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     const client = createServerApolloClient();
+    const organizationIds = await loadFeedOrganizationIds(client);
     const [{ data }, { data: addressData }] = await Promise.all([
-      client.query<EventsCalendarFeed>({ query: EVENTS_CALENDAR_FEED }),
+      client.query<EventsCalendarFeed, EventsCalendarFeedVariables>({
+        query: EVENTS_CALENDAR_FEED,
+        variables: { organizationIds },
+      }),
       client.query<LocationAddressesForFeed>({ query: LOCATION_ADDRESSES_FOR_FEED }),
     ]);
     const events = data?.Course ?? [];

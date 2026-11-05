@@ -28,6 +28,10 @@ export interface CourseTilesByOrganization_Course_Program {
    */
   showExtendedApplicationPeriodBanner: boolean;
   type: string;
+  /**
+   * Organization that owns the program. References Organization.id (0 = platform default)
+   */
+  organizationId: number;
 }
 
 export interface CourseTilesByOrganization_Course_CourseLocations {

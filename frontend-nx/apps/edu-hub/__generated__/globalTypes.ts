@@ -969,9 +969,12 @@ export enum Course_select_column {
   projectProposalsEnabled = "projectProposalsEnabled",
   projectSubmissionDeadline = "projectSubmissionDeadline",
   published = "published",
+  registrationButtonLabelDe = "registrationButtonLabelDe",
+  registrationButtonLabelEn = "registrationButtonLabelEn",
   registrationType = "registrationType",
   requiredEcts = "requiredEcts",
   requiredEventCount = "requiredEventCount",
+  sessionReminderLeadHours = "sessionReminderLeadHours",
   showAvailablePlaces = "showAvailablePlaces",
   sourceSessionId = "sourceSessionId",
   startTime = "startTime",
@@ -1044,9 +1047,12 @@ export enum Course_update_column {
   projectProposalsEnabled = "projectProposalsEnabled",
   projectSubmissionDeadline = "projectSubmissionDeadline",
   published = "published",
+  registrationButtonLabelDe = "registrationButtonLabelDe",
+  registrationButtonLabelEn = "registrationButtonLabelEn",
   registrationType = "registrationType",
   requiredEcts = "requiredEcts",
   requiredEventCount = "requiredEventCount",
+  sessionReminderLeadHours = "sessionReminderLeadHours",
   showAvailablePlaces = "showAvailablePlaces",
   sourceSessionId = "sourceSessionId",
   startTime = "startTime",
@@ -6972,6 +6978,7 @@ export interface Course_bool_exp {
   tagline?: String_comparison_exp | null;
   title?: String_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
+  waitlistCount?: bigint_comparison_exp | null;
   weekDay?: Weekday_enum_comparison_exp | null;
 }
 
@@ -7229,6 +7236,7 @@ export interface Course_order_by {
   tagline?: order_by | null;
   title?: order_by | null;
   updated_at?: order_by | null;
+  waitlistCount?: order_by | null;
   weekDay?: order_by | null;
 }
 

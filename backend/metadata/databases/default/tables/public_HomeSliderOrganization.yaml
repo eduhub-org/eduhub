@@ -1,0 +1,15 @@
+table:
+  name: HomeSliderOrganization
+  schema: public
+object_relationships:
+  - name: Organization
+    using:
+      foreign_key_constraint_on: organizationId
+# Read publicly by the homepage and the event feeds; only super-admins (admin role) write.
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - id
+        - organizationId
+      filter: {}

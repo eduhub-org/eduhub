@@ -10,9 +10,12 @@ import { gql } from '@apollo/client';
  * writes into the public feed.
  */
 export const EVENTS_CALENDAR_FEED = gql`
-  query EventsCalendarFeed {
+  query EventsCalendarFeed($organizationIds: [Int!]!) {
     Course(
-      where: { published: { _eq: true }, Program: { published: { _eq: true }, type: { _eq: "EVENTS" } } }
+      where: {
+        published: { _eq: true }
+        Program: { published: { _eq: true }, type: { _eq: "EVENTS" }, organizationId: { _in: $organizationIds } }
+      }
     ) {
       id
       title

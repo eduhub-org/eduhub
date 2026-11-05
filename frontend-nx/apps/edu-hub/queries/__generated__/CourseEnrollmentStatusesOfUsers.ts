@@ -12,7 +12,13 @@ import { CourseEnrollmentStatus_enum } from "./../../__generated__/globalTypes";
 export interface CourseEnrollmentStatusesOfUsers_CourseEnrollment {
   __typename: "CourseEnrollment";
   id: number;
+  /**
+   * The ID of the user that enrolled for the given course
+   */
   userId: any;
+  /**
+   * The users current enrollment status to this course
+   */
   status: CourseEnrollmentStatus_enum;
 }
 

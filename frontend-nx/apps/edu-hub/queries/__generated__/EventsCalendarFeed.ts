@@ -139,3 +139,7 @@ export interface EventsCalendarFeed {
    */
   Course: EventsCalendarFeed_Course[];
 }
+
+export interface EventsCalendarFeedVariables {
+  organizationIds: number[];
+}

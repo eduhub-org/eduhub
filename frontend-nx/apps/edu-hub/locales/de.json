@@ -2902,6 +2902,18 @@
         "create_failed": "Das Badge konnte nicht erstellt werden.",
         "duplicate_title": "Ein Badge mit diesem Titel existiert bereits."
       }
+    },
+    "home_slider_organizations": {
+      "label": "Organisationen in den Startseiten-Slidern",
+      "help_text": "Die automatischen Slider (Kurse, Veranstaltungen, Degrees) auf der Startseite sowie der RSS- und Kalender-Feed der Veranstaltungen zeigen nur Angebote dieser Organisationen. Die Standard-Organisation ist immer dabei.",
+      "loading": "Lädt …",
+      "error_loading": "Die Organisationen konnten nicht geladen werden.",
+      "default_organization": "EduHub Default (immer enthalten)",
+      "remove": "{name} entfernen",
+      "add_button": "Organisation hinzufügen",
+      "dialog_title": "Organisation für die Startseiten-Slider wählen",
+      "error_add": "Die Organisation konnte nicht hinzugefügt werden.",
+      "error_remove": "Die Organisation konnte nicht entfernt werden."
     }
   },
   "manageExperts": {

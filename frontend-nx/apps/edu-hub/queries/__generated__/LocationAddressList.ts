@@ -81,6 +81,9 @@ export interface LocationAddressList_LocationAddress {
    * UUID of the matching location on rausgegangen.de, linked or created by the event sync
    */
   rausgegangenLocationId: string | null;
+  /**
+   * True when the event sync created the Rausgegangen location (and keeps it updated); false when it links a location owned by someone else
+   */
   rausgegangenLocationOwned: boolean;
   created_at: any;
   updated_at: any;

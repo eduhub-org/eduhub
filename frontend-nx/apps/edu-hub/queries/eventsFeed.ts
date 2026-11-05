@@ -10,9 +10,12 @@ import { gql } from '@apollo/client';
  * a session's end may be null and falls back to its start.
  */
 export const EVENTS_FEED = gql`
-  query EventsFeed {
+  query EventsFeed($organizationIds: [Int!]!) {
     Course(
-      where: { published: { _eq: true }, Program: { published: { _eq: true }, type: { _eq: "EVENTS" } } }
+      where: {
+        published: { _eq: true }
+        Program: { published: { _eq: true }, type: { _eq: "EVENTS" }, organizationId: { _in: $organizationIds } }
+      }
     ) {
       id
       title

@@ -60,3 +60,7 @@ export interface EventsFeed {
    */
   Course: EventsFeed_Course[];
 }
+
+export interface EventsFeedVariables {
+  organizationIds: number[];
+}

@@ -1,3 +1,4 @@
+import HomeSliderOrganizationsManager from '../../../components/pages/ManageAppSettingsContent/HomeSliderOrganizationsManager';
 import CourseGroupOptionsManager from '../../../components/pages/ManageAppSettingsContent/CourseGroupOptionsManager';
 import ProjectGroupOptionsManager from '../../../components/pages/ManageAppSettingsContent/ProjectGroupOptionsManager';
 import ProjectSlidersManager from '../../../components/pages/ManageAppSettingsContent/ProjectSlidersManager';
@@ -7,6 +8,7 @@ import SettingsSectionPage from '../../../components/pages/ManageSettings/Settin
 export default function CourseGroupsSettingsPage() {
   return (
     <SettingsSectionPage itemId="course-groups">
+      <HomeSliderOrganizationsManager />
       <CourseGroupOptionsManager />
       <ProjectGroupOptionsManager />
       <ProjectSlidersManager />

@@ -501,7 +501,7 @@ export interface InsertEnrollment_insert_CourseEnrollment_returning_Course {
    */
   publicParticipantCount: any | null;
   /**
-   * A computed field, executes function "course_waitlist_count"
+   * People on the waitlist of a course (preview enrollments excluded). Free places are reserved for them: new registrations need maxParticipants > active participants + this count.
    */
   waitlistCount: any | null;
   /**
