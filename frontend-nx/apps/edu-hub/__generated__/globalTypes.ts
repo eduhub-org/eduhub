@@ -2079,6 +2079,7 @@ export enum Organization_select_column {
   name = "name",
   newsletterDescription = "newsletterDescription",
   newsletterProvider = "newsletterProvider",
+  participantIdSalt = "participantIdSalt",
   phone = "phone",
   postalCode = "postalCode",
   rausgegangenApiKeyConfigured = "rausgegangenApiKeyConfigured",
@@ -2156,6 +2157,7 @@ export enum Organization_update_column {
   name = "name",
   newsletterDescription = "newsletterDescription",
   newsletterProvider = "newsletterProvider",
+  participantIdSalt = "participantIdSalt",
   phone = "phone",
   postalCode = "postalCode",
   rausgegangenApiKeyConfigured = "rausgegangenApiKeyConfigured",
@@ -10527,6 +10529,7 @@ export interface Organization_bool_exp {
   name?: String_comparison_exp | null;
   newsletterDescription?: String_comparison_exp | null;
   newsletterProvider?: String_comparison_exp | null;
+  participantIdSalt?: String_comparison_exp | null;
   phone?: String_comparison_exp | null;
   postalCode?: String_comparison_exp | null;
   rausgegangenApiKeyConfigured?: Boolean_comparison_exp | null;
@@ -10595,6 +10598,7 @@ export interface Organization_insert_input {
   name?: string | null;
   newsletterDescription?: string | null;
   newsletterProvider?: string | null;
+  participantIdSalt?: string | null;
   phone?: string | null;
   postalCode?: string | null;
   rausgegangenApiKeyConfigured?: boolean | null;
@@ -10646,6 +10650,7 @@ export interface Organization_max_order_by {
   name?: order_by | null;
   newsletterDescription?: order_by | null;
   newsletterProvider?: order_by | null;
+  participantIdSalt?: order_by | null;
   phone?: order_by | null;
   postalCode?: order_by | null;
   rausgegangenApiKeyEncrypted?: order_by | null;
@@ -10694,6 +10699,7 @@ export interface Organization_min_order_by {
   name?: order_by | null;
   newsletterDescription?: order_by | null;
   newsletterProvider?: order_by | null;
+  participantIdSalt?: order_by | null;
   phone?: order_by | null;
   postalCode?: order_by | null;
   rausgegangenApiKeyEncrypted?: order_by | null;
@@ -10777,6 +10783,7 @@ export interface Organization_order_by {
   name?: order_by | null;
   newsletterDescription?: order_by | null;
   newsletterProvider?: order_by | null;
+  participantIdSalt?: order_by | null;
   phone?: order_by | null;
   postalCode?: order_by | null;
   rausgegangenApiKeyConfigured?: order_by | null;
