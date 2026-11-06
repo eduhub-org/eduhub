@@ -628,8 +628,17 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
                   />
                 }
               >
-                {/* A ring marks a Manual Attendance; clicking back to the automatic result removes it. */}
-                <span className={`inline-flex rounded-full ${d.attendances.manual ? 'ring-1 ring-label-secondary' : ''}`}>
+                {/* A badge marks a Manual Attendance; clicking back to the automatic result removes it. */}
+                <span className="relative inline-flex">
+                  {d.attendances.manual && (
+                    // The dot is a 12px circle in the middle of its 24px icon box; whole-pixel
+                    // offsets put the badge on its upper right edge without sub-pixel blur.
+                    <span
+                      aria-hidden
+                      data-testid="manual-attendance-badge"
+                      className="pointer-events-none absolute right-[4px] top-[4px] h-[7px] w-[7px] rounded-full bg-label-secondary ring-[1.5px] ring-white"
+                    />
+                  )}
                   <Dot
                     color={d.color}
                     hollow={!isMandatorySession(d.session)}
