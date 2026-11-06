@@ -3810,7 +3810,8 @@
   },
   "privacy_update": {
     "title": "Wir haben unsere Datenschutzerklärung aktualisiert",
-    "more": "Du musst nichts tun. Alle Änderungen findest du in der <privacy>Datenschutzerklärung</privacy>.",
+    "nothing_to_do": "Du musst nichts unternehmen. Wir möchten dich lediglich darüber informieren, wie wir mit deinen Daten umgehen.",
+    "more": "Alle Änderungen findest du in unserer <privacy>Datenschutzerklärung</privacy>.",
     "dismiss": "Hinweis schließen"
   }
 }

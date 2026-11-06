@@ -6,7 +6,7 @@ import { useRoleQuery } from '../../hooks/authedQuery';
 import { GUEST_DATA_RETENTION_MONTHS } from '../../queries/guestRegistration';
 import { GuestDataRetentionMonths } from '../../queries/__generated__/GuestDataRetentionMonths';
 import { AuthRoles } from '../../types/enums';
-import { getPrivacyPolicyChanges, PRIVACY_POLICY_VERSION, PrivacyPolicySite } from './privacyPolicyVersion';
+import { PRIVACY_POLICY_VERSION } from './privacyPolicyVersion';
 
 /**
  * The privacy policy, as composable sections shared by the edu-hub and StuJo
@@ -1091,33 +1091,6 @@ const formatVersionDate = (version: string, isEnglish: boolean) =>
     year: 'numeric',
     timeZone: 'Europe/Berlin',
   });
-
-/**
- * Shared: each site lists only the changes recorded for it (`sites` in
- * PRIVACY_POLICY_CHANGES), and renders nothing until it has one - so keep it
- * the last numbered section. Anchored as #aenderungen so the "policy updated"
- * notice can link straight to it.
- */
-export const PrivacyChangeHistory: FC<SectionProps & { site: PrivacyPolicySite }> = ({ n, site }) => {
-  const isEnglish = useIsEnglish();
-  const changes = getPrivacyPolicyChanges(site);
-  if (changes.length === 0) return null;
-
-  return (
-    <>
-      <h2 id="aenderungen" className="text-xl mt-6 mb-2 scroll-mt-24">
-        {n}. {isEnglish ? 'Changes to This Privacy Policy' : 'Änderungen dieser Datenschutzerklärung'}
-      </h2>
-      <ul className="list-disc list-inside pl-5">
-        {changes.map((change) => (
-          <li key={change.version}>
-            <strong>{formatVersionDate(change.version, isEnglish)}:</strong> {isEnglish ? change.en : change.de}
-          </li>
-        ))}
-      </ul>
-    </>
-  );
-};
 
 export const PrivacyAsOfDate: FC = () => {
   const isEnglish = useIsEnglish();

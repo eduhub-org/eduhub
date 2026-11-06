@@ -2,8 +2,9 @@ import Link from 'next/link';
 import { FC, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { MdClose } from 'react-icons/md';
+import ReactMarkdown from 'react-markdown';
 
-import { getPrivacyPolicyChange, isNoticeDue, PRIVACY_NOTICE_VERSION } from '../legal/privacyPolicyVersion';
+import { getPrivacyNotice, isNoticeDue, PRIVACY_NOTICE_VERSION } from '../legal/privacyPolicyVersion';
 import { useImpersonation } from '../../contexts/ImpersonationContext';
 import { useRoleMutation } from '../../hooks/authedMutation';
 import { useRoleQuery } from '../../hooks/authedQuery';
@@ -15,6 +16,9 @@ import { AuthRoles } from '../../types/enums';
 
 // Every account holds the `user` role; org admins do not inherit user_access.
 const USER_ROLE_CONTEXT = { role: AuthRoles.user };
+
+// The notice body is our own text, but keep it to paragraphs and lists anyway.
+const NOTICE_ELEMENTS = ['p', 'ul', 'li', 'strong', 'em'];
 
 /**
  * Tells account holders once that the privacy policy changed materially.
@@ -49,7 +53,7 @@ export const PrivacyUpdateNotice: FC = () => {
     return null;
   }
 
-  const change = getPrivacyPolicyChange(PRIVACY_NOTICE_VERSION);
+  const notice = getPrivacyNotice(PRIVACY_NOTICE_VERSION);
 
   const handleDismiss = () => {
     setDismissedFor(userId);
@@ -62,11 +66,23 @@ export const PrivacyUpdateNotice: FC = () => {
       <div className="max-w-screen-xl mx-auto flex items-start gap-4 px-3 md:px-16 py-4">
         <div className="flex-1 text-sm leading-relaxed">
           <p className="font-semibold">{t('title')}</p>
-          {change && <p className="mt-1">{locale === 'en' ? change.en : change.de}</p>}
+          {notice && (
+            <ReactMarkdown
+              allowedElements={NOTICE_ELEMENTS}
+              unwrapDisallowed
+              components={{
+                p: ({ children }) => <p className="mt-1">{children}</p>,
+                ul: ({ children }) => <ul className="mt-1 list-disc pl-5">{children}</ul>,
+              }}
+            >
+              {locale === 'en' ? notice.en : notice.de}
+            </ReactMarkdown>
+          )}
+          <p className="mt-1">{t('nothing_to_do')}</p>
           <p className="mt-1">
             {t.rich('more', {
               privacy: (chunks) => (
-                <Link href="/privacy#aenderungen" className="underline hover:text-label-secondary">
+                <Link href="/privacy" className="underline hover:text-label-secondary">
                   {chunks}
                 </Link>
               ),
