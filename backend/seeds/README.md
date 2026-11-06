@@ -46,7 +46,7 @@ These fixtures load automatically with a fresh database. To add just these
 fixtures to an existing local Docker database, run from the repository root:
 
 ```bash
-sed -n '/^-- Course funding-logo fixtures/,$p' backend/seeds/default/initial_seeds.sql |
+sed -n '/^-- Course funding-logo fixtures/,/^-- BEGIN GENERATED COURSE_ATTENDANCE_SEED/{/^-- BEGIN GENERATED/!p}' backend/seeds/default/initial_seeds.sql |
   docker compose exec -T db_hasura psql -U postgres -d postgres \
     -v ON_ERROR_STOP=1 --single-transaction
 ```

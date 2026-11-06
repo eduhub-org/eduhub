@@ -1927,6 +1927,7 @@
       "automatic_not_checked": "Not recorded automatically yet",
       "attended": "attended",
       "missed": "missed",
+      "unknown": "unknown",
       "checked_in": "checked in {time}",
       "interruptions": "{count, plural, one {# interruption} other {# interruptions}}",
       "below_minimum": "below minimum time",

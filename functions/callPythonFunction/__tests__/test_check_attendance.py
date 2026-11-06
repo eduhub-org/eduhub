@@ -276,14 +276,9 @@ class TestCheckAttendanceOrchestration:
             def get_course_participants_from_session_id(self, _sid):
                 return participants_df
 
-            def insert_attendance(self, df):
-                self.inserts.append(df.iloc[0].to_dict())
-
-            def delete_automatic_attendances(self, sid):
-                self.deleted_sessions = getattr(self, "deleted_sessions", []) + [sid]
-
-            def update_session_attendanceData(self, df, sid):
-                self.session_updates.append((sid, df))
+            def replace_session_attendances(self, sid, rows, records):
+                self.inserts.extend(dict(row) for row in rows)
+                self.session_updates.append((sid, records))
 
         class FakeZoom:
             def get_session_attendance(
@@ -363,14 +358,9 @@ class TestCheckAttendanceOrchestration:
                     ]
                 )
 
-            def insert_attendance(self, df):
-                self.inserts.append(df.iloc[0].to_dict())
-
-            def delete_automatic_attendances(self, sid):
-                self.deleted_sessions = getattr(self, "deleted_sessions", []) + [sid]
-
-            def update_session_attendanceData(self, df, sid):
-                self.session_updates.append((sid, df))
+            def replace_session_attendances(self, sid, rows, records):
+                self.inserts.extend(dict(row) for row in rows)
+                self.session_updates.append((sid, records))
 
         class FakeZoom:
             def get_session_attendance(
@@ -466,14 +456,9 @@ class TestCheckAttendanceOrchestration:
                     ]
                 )
 
-            def insert_attendance(self, df):
-                self.inserts.append(df.iloc[0].to_dict())
-
-            def delete_automatic_attendances(self, sid):
-                pass
-
-            def update_session_attendanceData(self, df, sid):
-                self.session_updates.append((sid, df))
+            def replace_session_attendances(self, sid, rows, records):
+                self.inserts.extend(dict(row) for row in rows)
+                self.session_updates.append((sid, records))
 
         fake_eduhub = FakeEduHub()
         monkeypatch.setattr(mod, "EduHubClient", lambda: fake_eduhub)
@@ -486,7 +471,7 @@ class TestCheckAttendanceOrchestration:
 
         monkeypatch.setattr(mod, "ZoomClient", _boom)
         monkeypatch.setattr(
-            mod, "get_offline_session_attendance", lambda s: offline_df.copy()
+            mod, "get_offline_session_attendance", lambda s, options=None: offline_df.copy()
         )
 
         import logging as _logging
@@ -527,7 +512,7 @@ class TestCheckAttendanceOrchestration:
         }
         fetches = []
 
-        def _fetch(s):
+        def _fetch(s, options=None):
             fetches.append(s["id"])
             return pd.DataFrame([{"name": "Bob Builder", "location": "Starterkitchen"}])
 
@@ -550,7 +535,7 @@ class TestCheckAttendanceOrchestration:
             "SessionAddresses": [],
         }
 
-        def _fail(_s):
+        def _fail(_s, options=None):
             raise RuntimeError("LimeSurvey down")
 
         monkeypatch.setattr(mod, "get_offline_session_attendance", _fail)
@@ -630,14 +615,8 @@ class TestProgramSessions:
                 assert sid == 21
                 return participants_df
 
-            def insert_attendance(self, df):
-                self.inserts.append(df.iloc[0].to_dict())
-
-            def delete_automatic_attendances(self, sid):
-                pass
-
-            def update_session_attendanceData(self, df, sid):
-                pass
+            def replace_session_attendances(self, sid, rows, records):
+                self.inserts.extend(dict(row) for row in rows)
 
         class FakeZoom:
             def get_session_attendance(self, url, session_start=None, session_end=None):
@@ -704,3 +683,92 @@ class TestOfflineAttendance:
         )
         parsed = json.loads(records.to_json())
         assert set(parsed["joinDateTime"].keys()) == {"0", "1"}
+
+
+class TestFinalizingSessions:
+    def _on_site_session(self, end):
+        return {
+            "id": 30,
+            "title": "On site",
+            "startDateTime": end - pd.Timedelta(hours=2),
+            "endDateTime": end,
+            "Course": {"CourseLocations": [{"locationOption": "KIEL", "defaultSessionAddress": None}]},
+            "SessionAddresses": [],
+        }
+
+    def test_on_site_session_waits_for_the_check_in_window(self):
+        from pythonFunctions.check_attendance import check_in_window_closed
+
+        end = pd.Timestamp("2026-11-03T17:45:00+01:00")
+        session = self._on_site_session(end)
+        assert not check_in_window_closed(session, now=end + pd.Timedelta(minutes=10))
+        assert check_in_window_closed(session, now=end + pd.Timedelta(minutes=31))
+        online = {**session, "Course": {"CourseLocations": [{"locationOption": "ONLINE", "defaultSessionAddress": "x"}]}}
+        assert check_in_window_closed(online, now=end + pd.Timedelta(minutes=1))
+
+    def test_failed_write_leaves_session_unchecked(self, monkeypatch):
+        """If storing fails, attendanceData is not set, so the cron retries."""
+        from pythonFunctions import check_attendance as mod
+
+        session = self._on_site_session(pd.Timestamp("2026-01-01T11:30:00Z"))
+
+        class FakeEduHub:
+            url = "http://fake"
+
+            def get_finished_sessions_without_attendance_check(self):
+                return [session]
+
+            def get_course_participants_from_session_id(self, _sid):
+                return pd.DataFrame([{"id": "u-bob", "firstName": "Bob", "lastName": "Builder", "email": "b@example.com"}])
+
+            def replace_session_attendances(self, sid, rows, records):
+                raise ValueError("replace_session_attendances failed: constraint violation")
+
+        monkeypatch.setattr(mod, "EduHubClient", lambda: FakeEduHub())
+        monkeypatch.setattr(mod, "ZoomClient", lambda: None)
+        monkeypatch.setattr(
+            mod, "get_offline_session_attendance",
+            lambda s, options=None: pd.DataFrame([{"name": "Bob Builder", "location": "SK"}]),
+        )
+        assert mod.check_attendance({})["success"] is True
+
+
+class TestCheckInLocations:
+    def test_check_ins_from_other_locations_are_dropped(self, monkeypatch):
+        """A HEIDE-only session ignores Kiel check-ins but keeps Heide and unmapped codes."""
+        from pythonFunctions import check_attendance as mod
+        from api_clients.limesurvey_client import LimeSurveyClient
+
+        answers = pd.DataFrame(
+            [
+                {"datestamp": "2026-11-03 16:05:00", "submitdate": "2026-11-03 16:05:00", "N1": "Kiel", "N2": "Person", "Place": "SK"},
+                {"datestamp": "2026-11-03 16:06:00", "submitdate": "2026-11-03 16:06:00", "N1": "Heide", "N2": "Person", "Place": "H04"},
+                {"datestamp": "2026-11-03 16:07:00", "submitdate": "2026-11-03 16:07:00", "N1": "Unknown", "N2": "Code", "Place": "XYZ"},
+            ]
+        )
+
+        class FakeLimeSurvey(LimeSurveyClient):
+            def __init__(self, sid):
+                pass
+
+            def get_session_key(self):
+                return "key"
+
+            def get_responses(self):
+                return answers.copy()
+
+        monkeypatch.setattr(mod, "LimeSurveyClient", FakeLimeSurvey)
+        session = {
+            "startDateTime": pd.Timestamp("2026-11-03T16:00:00+01:00"),
+            "endDateTime": pd.Timestamp("2026-11-03T17:45:00+01:00"),
+        }
+        records = mod.get_offline_session_attendance(session, ["HEIDE"])
+        assert list(records["name"]) == ["Heide Person", "Unknown Code"]
+
+    def test_check_in_in_the_repeated_clock_change_hour_is_kept(self):
+        from api_clients.limesurvey_client import LimeSurveyClient
+
+        client = LimeSurveyClient.__new__(LimeSurveyClient)
+        times = client.to_datetime(pd.Series(["2026-10-25 02:30:00", "2026-10-25 12:00:00"]))
+        assert not times.isna().any()
+        assert times.iloc[0] == pd.Timestamp("2026-10-25T02:30:00+02:00")

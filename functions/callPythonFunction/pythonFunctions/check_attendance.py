@@ -127,6 +127,16 @@ def check_attendance(arguments):
                 f"########## Checking session {session['title']} from {session['startDateTime']} to {session['endDateTime']}"
             )
 
+            if not check_in_window_closed(session):
+                # Check-ins are accepted until CHECK_IN_WINDOW after the end;
+                # checking earlier would finalize late check-ins as MISSED.
+                logging.info(
+                    "Check-in window of session %s (id=%s) is still open; checking it on a later run.",
+                    session.get("title"),
+                    session.get("id"),
+                )
+                continue
+
             records, incomplete_reason = collect_attendance_records(session, zoom_client)
             if incomplete_reason is not None:
                 # Leave Session.attendanceData NULL and skip Attendance
@@ -156,30 +166,32 @@ def check_attendance(arguments):
             )
 
             attendance_rows = match_participants(course_participants, records, session)
-
-            # A re-check (attendanceData reset to NULL) replaces the automatic
-            # Attendances; Manual Attendances stay untouched.
-            eduhub_client.delete_automatic_attendances(session["id"])
             for row in attendance_rows:
-                try:
-                    eduhub_client.insert_attendance(pd.DataFrame([row]))
-                    logging.info(
-                        "### %s: %s via %s [%s: %s to %s; recorded identifier: %s]",
-                        row["userId"],
-                        row["status"],
-                        row["matchType"],
-                        row["source"],
-                        row["joinDateTime"],
-                        row["leaveDateTime"],
-                        row["recordedIdentifier"],
-                    )
-                except Exception as e:
-                    logging.error(
-                        "Error while inserting the attendance of user %s: %s",
-                        row["userId"],
-                        e,
-                    )
-            eduhub_client.update_session_attendanceData(records, session["id"])
+                logging.info(
+                    "### %s: %s via %s [%s: %s to %s; recorded identifier: %s]",
+                    row["userId"],
+                    row["status"],
+                    row["matchType"],
+                    row["source"],
+                    row["joinDateTime"],
+                    row["leaveDateTime"],
+                    row["recordedIdentifier"],
+                )
+
+            # One transaction: a re-check (attendanceData reset to NULL) replaces the
+            # automatic Attendances, Manual Attendances stay, and attendanceData is
+            # only set when everything was stored, so a failure is retried.
+            try:
+                eduhub_client.replace_session_attendances(session["id"], attendance_rows, records)
+            except Exception as exc:
+                logging.error(
+                    "Storing the attendances of session %s (id=%s) failed: %s. "
+                    "Session remains eligible for retry on next cron run.",
+                    session.get("title"),
+                    session.get("id"),
+                    exc,
+                )
+                continue
             logging.info("Attendance data updated for session %s", session["title"])
 
         return {
@@ -218,6 +230,18 @@ def session_locations(session):
         for sa in session.get("SessionAddresses", [])
         if sa.get("locationOption")
     ]
+
+
+ON_SITE_OPTIONS = ("KIEL", "HEIDE")
+
+
+def check_in_window_closed(session, now=None):
+    """Sessions held on site are checked only once their Check-in Window has
+    closed; online-only sessions right after they end."""
+    if not any(loc["locationOption"] in ON_SITE_OPTIONS for loc in session_locations(session)):
+        return True
+    now = now or pd.Timestamp.now(tz="UTC")
+    return now >= session["endDateTime"] + CHECK_IN_WINDOW
 
 
 def collect_attendance_records(session, zoom_client):
@@ -275,14 +299,18 @@ def collect_attendance_records(session, zoom_client):
             zoom_attendance["location"] = SOURCE_ZOOM
             frames.append(zoom_attendance)
 
-        elif option in ["KIEL", "HEIDE"]:
+        elif option in ON_SITE_OPTIONS:
             # One check-in survey serves all on-site locations; fetching it
             # per location would duplicate every record.
             if survey_fetched:
                 continue
             survey_fetched = True
             try:
-                offline_attendance = get_offline_session_attendance(session)
+                on_site = [
+                    loc["locationOption"] for loc in session_locations(session)
+                    if loc["locationOption"] in ON_SITE_OPTIONS
+                ]
+                offline_attendance = get_offline_session_attendance(session, on_site)
             except Exception as exc:
                 logging.error(
                     "Error while getting LimeSurvey check-ins for session %s: %s",
@@ -304,9 +332,14 @@ def collect_attendance_records(session, zoom_client):
     return records, None
 
 
-def get_offline_session_attendance(session):
+def get_offline_session_attendance(session, on_site_options=None):
     """Submitted LimeSurvey check-ins inside the session's Check-in Window,
-    as Attendance Records. Raises when LimeSurvey cannot be read."""
+    as Attendance Records. Raises when LimeSurvey cannot be read.
+
+    With ``on_site_options`` (e.g. ["HEIDE"]), check-ins whose Place maps to
+    another location are dropped. Places that map to no location are kept:
+    the Place codes are not maintained exhaustively, and dropping unknown
+    codes once discarded every check-in."""
     if session.get("startDateTime") is None or session.get("endDateTime") is None:
         raise ValueError("start or end time of the session is missing")
 
@@ -327,6 +360,14 @@ def get_offline_session_attendance(session):
     in_window = (check_in_time >= session["startDateTime"] - CHECK_IN_WINDOW) & (
         check_in_time <= session["endDateTime"] + CHECK_IN_WINDOW
     )
+    if on_site_options:
+        place = submitted["Place"].fillna("").astype(str).str.strip() if "Place" in submitted.columns else ""
+        mapped = place.map(LIMESURVEY_LOCATION_MAPPING) if "Place" in submitted.columns else None
+        if mapped is not None:
+            unmapped = place[mapped.isna() & (place != "")]
+            if len(unmapped):
+                logging.info("Keeping check-ins with unmapped Place codes: %s", sorted(set(unmapped)))
+            in_window &= mapped.isna() | mapped.isin(on_site_options)
     submitted = submitted[in_window]
     check_in_time = check_in_time[in_window]
 
@@ -335,10 +376,8 @@ def get_offline_session_attendance(session):
             return pd.Series("", index=submitted.index)
         return submitted[column].fillna("").astype(str).str.strip()
 
-    # NOTE: We intentionally do not filter by ``location`` (the raw Place
-    # value). The Place answer codes configured in LimeSurvey don't line up
-    # cleanly with LocationOption. The raw value is persisted on each
-    # Attendance (``location``) and mapped downstream.
+    # The raw Place value is persisted on each Attendance (``location``) and
+    # mapped to a LocationOption downstream.
     return pd.DataFrame(
         {
             "name": (_text("N1") + " " + _text("N2")).str.strip(),

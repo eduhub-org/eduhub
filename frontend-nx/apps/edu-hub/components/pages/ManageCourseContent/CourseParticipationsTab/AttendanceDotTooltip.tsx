@@ -117,7 +117,11 @@ export const AttendanceDotTooltip: FC<Props> = ({
   const automaticLines = useAutomaticLines(sessionStart, sessionEnd, showMatchQuality);
   const { manual, automatic } = attendances;
   const statusLabel = (status: AttendanceStatus_enum) =>
-    status === AttendanceStatus_enum.ATTENDED ? t('attended') : t('missed');
+    status === AttendanceStatus_enum.ATTENDED
+      ? t('attended')
+      : status === AttendanceStatus_enum.MISSED
+        ? t('missed')
+        : t('unknown');
 
   let lines: string[];
   if (manual) {

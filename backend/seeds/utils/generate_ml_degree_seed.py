@@ -10,6 +10,7 @@ change.
 from __future__ import annotations
 
 import argparse
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable
@@ -368,10 +369,17 @@ def attended_event_count_for(index: int, pattern_variant: int) -> int:
     return EVENT_COUNT_PATTERNS[(index - 1) % len(EVENT_COUNT_PATTERNS)]
 
 
+# Running (7009, 7010) and upcoming (7011) courses: nobody can have passed them yet.
+NOT_YET_FINISHED_COURSE_IDS = {7009, 7010, 7011}
+
+
 def build_participant(index: int) -> Participant:
     first_name, last_name = name_for(index)
     pattern_variant = ((index - 1) // 12) % 6
-    passed_courses = passed_courses_for(index, pattern_variant)
+    passed_courses = [
+        course_id for course_id in passed_courses_for(index, pattern_variant)
+        if course_id not in NOT_YET_FINISHED_COURSE_IDS
+    ]
     enrolled_courses = enrolled_courses_for(index, pattern_variant)
     attended_event_count = attended_event_count_for(index, pattern_variant)
     passed_ects_total = sum(COURSE_ECTS[course_id] for course_id in passed_courses)
@@ -429,14 +437,14 @@ INSERT INTO public."Course" (id, title, status, ects, tagline, language, "applic
   (7001, 'Data Science and Machine Learning Foundations', 'APPLICANTS_INVITED', '5', 'Core data science and machine learning foundations.', 'EN', '2024-03-31', '0', true, true, 2, 'TUESDAY', NULL, '2024-01-15 10:00:00+00', '2024-09-04 12:00:00+00', 4, NULL, NULL, NULL, NULL, NULL, NULL, 120, '18:00:00', '16:00:00', true, NULL, 'APPROVAL_WITH_INPUT'),
   (7002, 'Machine Learning with TensorFlow', 'APPLICANTS_INVITED', '5', 'Applied neural network modeling with TensorFlow.', 'EN', '2024-03-31', '0', true, true, 2, 'WEDNESDAY', NULL, '2024-01-15 10:00:00+00', '2024-09-04 12:00:00+00', 4, NULL, NULL, NULL, NULL, NULL, NULL, 120, '18:00:00', '16:00:00', true, NULL, 'APPROVAL_WITH_INPUT'),
   (7003, 'Intermediate Machine Learning', 'APPLICANTS_INVITED', '5', 'Model selection, feature engineering, and validation.', 'EN', '2024-09-30', '0', true, true, 2, 'THURSDAY', NULL, '2024-08-15 10:00:00+00', '2025-03-25 12:00:00+00', 5, NULL, NULL, NULL, NULL, NULL, NULL, 120, '18:00:00', '16:00:00', true, NULL, 'APPROVAL_WITH_INPUT'),
-  (7004, 'From LLMs to AI Agents', 'APPLICANTS_INVITED', '5', 'Design patterns for agentic AI systems.', 'EN', '2025-03-31', '0', true, true, 2, 'MONDAY', NULL, '2025-01-15 10:00:00+00', '2025-11-13 11:30:00+00', 5, NULL, NULL, NULL, NULL, NULL, NULL, 160, '18:00:00', '16:00:00', true, NULL, 'APPROVAL_WITH_INPUT'),
-  (7005, 'Introduction to Data Science & Machine Learning', 'APPLICANTS_INVITED', '5', 'English-language introduction to ML workflows.', 'EN', '2025-09-30', '0', true, true, 2, 'TUESDAY', NULL, '2025-08-15 10:00:00+00', '2026-03-25 07:50:00+00', 5, NULL, NULL, NULL, NULL, NULL, NULL, 160, '18:00:00', '16:00:00', true, NULL, 'APPROVAL_WITH_INPUT'),
-  (7006, 'Advanced Time Series Prediction', 'APPLICANTS_INVITED', '5', 'Forecasting with statistical and neural models.', 'EN', '2025-03-31', '0', true, true, 2, 'WEDNESDAY', NULL, '2025-01-15 10:00:00+00', '2025-11-13 11:20:00+00', 5, NULL, NULL, NULL, NULL, NULL, NULL, 120, '18:00:00', '16:00:00', true, NULL, 'APPROVAL_WITH_INPUT'),
-  (7007, 'Scientific Machine Learning', 'APPLICANTS_INVITED', '5', 'Scientific computing with ML methods.', 'EN', '2025-09-30', '0', true, true, 2, 'THURSDAY', NULL, '2025-08-15 10:00:00+00', '2026-03-25 07:50:00+00', 5, NULL, NULL, NULL, NULL, NULL, NULL, 120, '18:00:00', '16:00:00', true, NULL, 'APPROVAL_WITH_INPUT'),
+  (7004, 'From LLMs to AI Agents', 'APPLICANTS_INVITED', '5', 'Design patterns for agentic AI systems.', 'EN', '2024-09-30', '0', true, true, 2, 'MONDAY', NULL, '2024-08-15 10:00:00+00', '2025-11-13 11:30:00+00', 5, NULL, NULL, NULL, NULL, NULL, NULL, 160, '18:00:00', '16:00:00', true, NULL, 'APPROVAL_WITH_INPUT'),
+  (7005, 'Introduction to Data Science & Machine Learning', 'APPLICANTS_INVITED', '5', 'English-language introduction to ML workflows.', 'EN', '2024-09-30', '0', true, true, 2, 'TUESDAY', NULL, '2024-08-15 10:00:00+00', '2026-03-25 07:50:00+00', 5, NULL, NULL, NULL, NULL, NULL, NULL, 160, '18:00:00', '16:00:00', true, NULL, 'APPROVAL_WITH_INPUT'),
+  (7006, 'Advanced Time Series Prediction', 'APPLICANTS_INVITED', '5', 'Forecasting with statistical and neural models.', 'EN', '2024-09-30', '0', true, true, 2, 'WEDNESDAY', NULL, '2024-08-15 10:00:00+00', '2025-11-13 11:20:00+00', 5, NULL, NULL, NULL, NULL, NULL, NULL, 120, '18:00:00', '16:00:00', true, NULL, 'APPROVAL_WITH_INPUT'),
+  (7007, 'Scientific Machine Learning', 'APPLICANTS_INVITED', '5', 'Scientific computing with ML methods.', 'EN', '2024-09-30', '0', true, true, 2, 'THURSDAY', NULL, '2024-08-15 10:00:00+00', '2026-03-25 07:50:00+00', 5, NULL, NULL, NULL, NULL, NULL, NULL, 120, '18:00:00', '16:00:00', true, NULL, 'APPROVAL_WITH_INPUT'),
   (7008, 'Fine-Tuning and Deployment of Large Language Models', 'APPLICANTS_INVITED', '2.5', 'Hands-on LLM adaptation and deployment.', 'EN', '2024-03-31', '0', true, true, 2, 'FRIDAY', NULL, '2024-01-15 10:00:00+00', '2024-09-04 13:13:00+00', 4, NULL, NULL, NULL, NULL, NULL, NULL, 120, '18:00:00', '16:00:00', true, NULL, 'APPROVAL_WITH_INPUT'),
   (7009, 'Applied Machine Learning', 'APPLICANTS_INVITED', '5', 'Current applied ML project course.', 'EN', '2026-04-30', '0', true, true, 2, 'MONDAY', NULL, '2026-03-01 10:00:00+00', '2026-04-20 05:00:00+00', 6, NULL, NULL, NULL, NULL, NULL, NULL, 180, '18:00:00', '16:00:00', true, NULL, 'APPROVAL_WITH_INPUT'),
   (7010, 'Introduction to Deep Reinforcement Learning', 'APPLICANTS_INVITED', '5', 'Foundations of reinforcement learning.', 'EN', '2026-04-30', '0', true, true, 2, 'TUESDAY', NULL, '2026-03-01 10:00:00+00', '2026-04-20 05:00:00+00', 6, NULL, NULL, NULL, NULL, NULL, NULL, 180, '18:00:00', '16:00:00', true, NULL, 'APPROVAL_WITH_INPUT'),
-  (7011, 'Causal Inference and ML', 'APPLICANTS_INVITED', '5', 'Causal reasoning for machine learning systems.', 'EN', '2026-04-30', '0', true, true, 2, 'WEDNESDAY', NULL, '2026-03-01 10:00:00+00', '2026-04-20 05:00:00+00', 6, NULL, NULL, NULL, NULL, NULL, NULL, 180, '18:00:00', '16:00:00', true, NULL, 'APPROVAL_WITH_INPUT'),
+  (7011, 'Causal Inference and ML', 'APPLICANTS_INVITED', '5', 'Causal reasoning for machine learning systems.', 'EN', (now() AT TIME ZONE 'Europe/Berlin')::date + 14, '0', true, true, 2, 'WEDNESDAY', NULL, '2026-03-01 10:00:00+00', '2026-04-20 05:00:00+00', 6, NULL, NULL, NULL, NULL, NULL, NULL, 180, '18:00:00', '16:00:00', true, NULL, 'APPROVAL_WITH_INPUT'),
   (7012, 'AI Builder''s Arena', 'APPLICANTS_INVITED', 'NONE', 'Experimental AI prototyping format.', 'EN', '2024-09-30', '0', false, true, 2, 'THURSDAY', NULL, '2024-08-15 10:00:00+00', '2024-11-13 11:20:00+00', 5, NULL, NULL, NULL, NULL, NULL, NULL, 120, '18:00:00', '16:00:00', true, NULL, 'APPROVAL_WITH_INPUT'),
   (7101, 'Coding.Waterkant 2021', 'APPLICANTS_INVITED', 'NONE', 'Machine-learning community event.', 'EN', '2021-09-01', '0', false, true, 0, 'NONE', NULL, '2021-08-01 10:00:00+00', '2021-09-04 12:00:00+00', 10, NULL, NULL, NULL, NULL, NULL, NULL, 350, '18:00:00', '10:00:00', true, NULL, 'APPROVAL_WITH_INPUT'),
   (7102, 'Coding.Waterkant 2024', 'APPLICANTS_INVITED', 'NONE', 'Machine-learning community event.', 'EN', '2024-09-01', '0', false, true, 0, 'NONE', NULL, '2024-08-01 10:00:00+00', '2024-09-04 12:00:00+00', 10, NULL, NULL, NULL, NULL, NULL, NULL, 350, '18:00:00', '10:00:00', true, NULL, 'APPROVAL_WITH_INPUT'),
@@ -656,8 +664,7 @@ def build_sql(user_count: int) -> str:
     return sql
 
 
-def replace_generated_block(seed_file: Path, generated_sql: str) -> None:
-    original = seed_file.read_text()
+def with_generated_block(original: str, generated_sql: str) -> str:
     if BEGIN_MARKER in original and END_MARKER in original:
         start = original.index(BEGIN_MARKER)
         end = original.index(END_MARKER, start) + len(END_MARKER)
@@ -670,7 +677,21 @@ def replace_generated_block(seed_file: Path, generated_sql: str) -> None:
         if end < len(original) and original[end] == "\n":
             end += 1
         updated = original[:start] + generated_sql + original[end:]
-    seed_file.write_text(updated)
+    return updated
+
+
+ARCHIVE_PROGRAM_ID = 10
+
+
+def check_archive_program_id(seed_text: str) -> None:
+    """The past-events archive program is inserted by this generator; a hand-written
+    program with the same id would silently take its place (ON CONFLICT DO NOTHING)."""
+    hand_written = re.sub(r"-- BEGIN GENERATED (\w+)\n.*?-- END GENERATED \1\n?", "", seed_text, flags=re.S)
+    if re.search(rf'INSERT INTO public\."Program"[^;]*?VALUES\s*\(\s*{ARCHIVE_PROGRAM_ID}\s*,', hand_written):
+        raise ValueError(
+            f"Program id {ARCHIVE_PROGRAM_ID} is reserved for the generated past-events archive; "
+            "the seed file already inserts another program with that id."
+        )
 
 
 def course_participants(user_count: int, seed_text: str) -> dict[int, list[CourseParticipant]]:
@@ -717,15 +738,17 @@ def main() -> None:
     if args.users < 1:
         parser.error("--users must be at least 1")
 
+    original = args.seed_file.read_text()
+    check_archive_program_id(original)
     generated_sql = build_sql(args.users)
+    # Both blocks are built in memory and written once, so a failure leaves the file untouched.
+    seed_text = with_generated_block(original, generated_sql)
+    # Sessions and attendances go last: they cover the dev accounts' enrollments too.
+    attendance_sql = attendance_block(args.users, seed_text)
     if args.print_only:
         print(generated_sql, end="")
-        print(attendance_block(args.users, args.seed_file.read_text()), end="")
+        print(attendance_sql, end="")
         return
-    replace_generated_block(args.seed_file, generated_sql)
-    # Sessions and attendances go last: they cover the dev accounts' enrollments too.
-    seed_text = args.seed_file.read_text()
-    attendance_sql = attendance_block(args.users, seed_text)
     args.seed_file.write_text(replace_block(seed_text, attendance_sql))
 
 

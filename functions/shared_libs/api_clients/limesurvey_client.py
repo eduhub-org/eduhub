@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 import sys
 import os
 from requests.structures import CaseInsensitiveDict
+import numpy as np
 import pandas as pd
 
 
@@ -39,8 +40,12 @@ class LimeSurveyClient:
         # a 16:00 session arrive from 15:50), not UTC.
         limesurvey_format = '%Y-%m-%d %H:%M:%S'
         limesurvey_timezone = 'Europe/Berlin'
-        return pd.to_datetime(date_time, format=limesurvey_format).dt.tz_localize(
-            limesurvey_timezone, ambiguous='NaT', nonexistent='shift_forward'
+        local = pd.to_datetime(date_time, format=limesurvey_format)
+        # The hour repeated when clocks go back (02:00-03:00 on the last Sunday
+        # of October) is read as summer time instead of being dropped, so such a
+        # check-in is at most an hour off rather than lost.
+        return local.dt.tz_localize(
+            limesurvey_timezone, ambiguous=np.ones(len(local), dtype=bool), nonexistent='shift_forward'
         )
 
     def create_lms_request(self, payload):

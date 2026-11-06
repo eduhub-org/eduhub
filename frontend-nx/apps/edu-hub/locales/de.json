@@ -1909,6 +1909,7 @@
       "automatic_not_checked": "Automatisch noch nicht erfasst",
       "attended": "anwesend",
       "missed": "verpasst",
+      "unknown": "unbekannt",
       "checked_in": "erfasst {time}",
       "interruptions": "{count, plural, one {# Unterbrechung} other {# Unterbrechungen}}",
       "below_minimum": "unter Mindestzeit",

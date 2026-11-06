@@ -286,7 +286,8 @@ def build_event_sql(user_pool: list[CourseParticipant]) -> EventSeed:
         rng.shuffle(pool)
         picks: list[tuple[CourseParticipant, str]] = []
         for status, count in event.statuses.items():
-            picks += [(pool.pop(), status) for _ in range(count)]
+            # A small --users run cannot fill every event; take what is there.
+            picks += [(pool.pop(), status) for _ in range(min(count, len(pool)))]
         if event.dev_user_status:
             picks.append((DEV_USER, event.dev_user_status))
         for k in range(event.guest_count):
@@ -299,13 +300,16 @@ def build_event_sql(user_pool: list[CourseParticipant]) -> EventSeed:
         paid_confirmed = 0
         for k, (person, status) in enumerate(picks):
             # Above the generated ML degree enrollments (700000 + index * 10000 + ...).
-            enrollment_id = 4_000_000 + (event.course_id - 7200) * 1000 + k
+            # Generated course enrollments use 700000 + index * 10000 + ..., which grows
+            # with --users; this range stays clear of it for any realistic user count.
+            enrollment_id = 900_000_000 + (event.course_id - 7200) * 1000 + k
             with_input = event.registration_type in ("APPROVAL_WITH_INPUT", "DIRECT_WITH_INPUT", "DIRECT_WITH_INPUT_AND_PAYMENT")
             motivation = (
                 "Ich arbeite gerade an einem eigenen ML-Projekt und möchte mich mit anderen austauschen."
                 if with_input and status != "REGISTERED" else ""
             )
-            registered = SqlRaw(f"{_date(first_day)} - {10 + k % 20}")
+            # Before the event, but never after the seeding day.
+            registered = SqlRaw(f"LEAST({_date(first_day)} - {10 + k % 20}, {_date(0)})")
             enrollment_rows.append(
                 (enrollment_id, event.course_id, person.user_id, status, motivation,
                  "INVITE" if status in ("INVITED", "CONFIRMED", "COMPLETED") and event.registration_type == "APPROVAL_WITH_INPUT"

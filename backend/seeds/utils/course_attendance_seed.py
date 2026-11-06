@@ -119,6 +119,9 @@ class SessionSpec:
     end: str
     seconds: int
     checked: bool
+    # In the seeding week or day: whether it has ended is only known when the
+    # SQL runs, so its attendance is generated but stored only if it has.
+    if_ended: bool = False
 
 
 COURSE_SCHEDULES = [
@@ -197,6 +200,7 @@ class SessionPlan:
     number: int
     checked: bool
     seconds: int
+    if_ended: bool = False
     records: list[SeedRecord] = field(default_factory=list)
 
 
@@ -218,10 +222,14 @@ def _local_start(schedule: CourseSchedule, number: int, hour: int) -> SqlRaw:
 
 
 def _is_checked(schedule: CourseSchedule, number: int) -> bool:
-    """Finished sessions only; a relative session in the seeding week may still be ahead."""
+    """Sessions up to the seeding week; those in the seeding week only if they have ended (if_ended)."""
     if not schedule.relative:
         return True
-    return schedule.first_week + number - 1 < 0
+    return schedule.first_week + number - 1 <= 0
+
+
+def _in_seeding_week(schedule: CourseSchedule, number: int) -> bool:
+    return schedule.relative and schedule.first_week + number - 1 == 0
 
 
 def _day_time(day: object, hour: int) -> SqlRaw:
@@ -260,12 +268,12 @@ def session_specs(schedule: CourseSchedule) -> list[SessionSpec]:
     if schedule.days:
         return [
             SessionSpec(n, _day_time(day, h1), _day_time(day, h2), (h2 - h1) * 3600,
-                        isinstance(day, str) or day < 0)
+                        isinstance(day, str) or day <= 0, if_ended=day == 0)
             for n, (day, h1, h2) in enumerate(schedule.days, start=1)
         ]
     return [
         SessionSpec(n, _local_start(schedule, n, 16), _local_start(schedule, n, 18), SESSION_SECONDS,
-                    _is_checked(schedule, n))
+                    _is_checked(schedule, n), if_ended=_in_seeding_week(schedule, n))
         for n in range(1, schedule.session_count + 1)
     ]
 
@@ -297,7 +305,11 @@ def _plan_course(schedule: CourseSchedule, participants: list[CourseParticipant]
         rng = _rng(schedule.course_id, p.user_id)
         place = rng.choices(schedule.locations, weights=[3 if loc == "ONLINE" else 2 for loc in schedule.locations])[0]
         style = rng.choices(["full", "email", "last_first", "first"], weights=[75, 10, 7, 8])[0]
-        attend_rate = schedule.attend_rate or {"COMPLETED": 0.93}.get(p.status, 0.6 if not schedule.relative else 0.85)
+        attend_rate = (
+            schedule.attend_rate
+            if schedule.attend_rate is not None
+            else {"COMPLETED": 0.93}.get(p.status, 0.6 if not schedule.relative else 0.85)
+        )
         attends = [rng.random() < attend_rate for _ in specs]
         if p.status == "COMPLETED":
             # Completed means at most two missed sessions (maxMissedSessions).
@@ -310,7 +322,7 @@ def _plan_course(schedule: CourseSchedule, participants: list[CourseParticipant]
     for spec in specs:
         number = spec.number
         session_id = 72000 + (schedule.course_id - 7000) * 100 + number
-        plan = SessionPlan(session_id, number, spec.checked, spec.seconds)
+        plan = SessionPlan(session_id, number, spec.checked, spec.seconds, spec.if_ended)
         plans.append(plan)
         if not plan.checked:
             continue
@@ -453,7 +465,7 @@ def _attendance_data_sql(plan: SessionPlan) -> str:
     return (
         f'UPDATE public."Session" s SET "attendanceData" = ($j${fixed}$j$::jsonb\n'
         f"  || jsonb_build_object('joinDateTime', {times(joins)}, 'leaveDateTime', {times(leaves)}))::text\n"
-        f"WHERE s.id = {plan.session_id};\n"
+        f'WHERE s.id = {plan.session_id} AND s."endDateTime" < now();\n'
     )
 
 
@@ -488,7 +500,7 @@ def build_attendance_sql(
             title = _session_title(schedule, plan.number)
             session_rows.append(
                 (plan.session_id, title, SESSION_DETAILS.get((schedule.course_id, plan.number), ("", ""))[1],
-                 spec.start, spec.end, schedule.course_id, seeded_at, seeded_at, plan.checked)
+                 spec.start, spec.end, schedule.course_id, seeded_at, seeded_at, plan.checked and not plan.if_ended)
             )
             for k, option in enumerate(schedule.locations, start=1):
                 venue = venue_for(schedule.course_id, option)
@@ -563,6 +575,8 @@ def build_attendance_sql(
             ") AS v(id, session_id, user_id, status, kind, identifier, source, join_offset, leave_offset, duration,\n"
             "       interruptions, location, match_type, score, record_index, candidates)\n"
             'JOIN public."Session" s ON s.id = v.session_id\n'
+            "-- Sessions of the seeding week/day count only once they have ended.\n"
+            'WHERE s."endDateTime" < now()\n'
             "ON CONFLICT (id) DO NOTHING;\n"
         )
     sql.append(END_MARKER)
@@ -604,8 +618,15 @@ def fixture_participants(seed_text: str) -> list[tuple[int, CourseParticipant]]:
     (the dev accounts), joined with their single-row User INSERTs."""
     course_ids = {s.course_id for s in COURSE_SCHEDULES}
     users, enrollments = {}, []
-    for line in seed_text.split("\n"):
+    hand_written = re.sub(r"-- BEGIN GENERATED (\w+)\n.*?-- END GENERATED \1\n?", "", seed_text, flags=re.S)
+    for line in hand_written.split("\n"):
         m = _INSERT_RE.match(line)
+        if not m and line.startswith('INSERT INTO public."CourseEnrollment"'):
+            # Anything else would be skipped silently and leave its sessions without attendance.
+            raise ValueError(
+                "Hand-written CourseEnrollment rows must be single-row, single-line INSERTs "
+                f"for the attendance generator: {line[:120]}"
+            )
         if not m or m.group(1) not in ("User", "CourseEnrollment"):
             continue
         cols = [c.strip().strip('"') for c in m.group(2).split(",")]
