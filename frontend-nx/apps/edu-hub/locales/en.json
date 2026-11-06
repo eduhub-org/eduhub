@@ -3865,7 +3865,7 @@
     }
   },
   "privacy_update": {
-    "title": "We have updated our privacy policy",
+    "title": "Our privacy policy has changed",
     "nothing_to_do": "You do not need to do anything. We simply want to let you know how we handle your data.",
     "more": "All changes are listed in our <privacy>privacy policy</privacy>.",
     "dismiss": "Close notice"

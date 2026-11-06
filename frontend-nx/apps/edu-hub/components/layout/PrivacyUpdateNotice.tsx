@@ -17,7 +17,7 @@ import { AuthRoles } from '../../types/enums';
 // Every account holds the `user` role; org admins do not inherit user_access.
 const USER_ROLE_CONTEXT = { role: AuthRoles.user };
 
-// The notice body is our own text, but keep it to paragraphs and lists anyway.
+// The notice body is our own text, but keep it to paragraphs, lists and bold lead-ins anyway.
 const NOTICE_ELEMENTS = ['p', 'ul', 'li', 'strong', 'em'];
 
 /**
@@ -71,8 +71,9 @@ export const PrivacyUpdateNotice: FC = () => {
               allowedElements={NOTICE_ELEMENTS}
               unwrapDisallowed
               components={{
-                p: ({ children }) => <p className="mt-1">{children}</p>,
-                ul: ({ children }) => <ul className="mt-1 list-disc pl-5">{children}</ul>,
+                p: ({ children }) => <p className="mt-2">{children}</p>,
+                ul: ({ children }) => <ul className="mt-2 list-disc pl-5 space-y-1">{children}</ul>,
+                strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
               }}
             >
               {locale === 'en' ? notice.en : notice.de}

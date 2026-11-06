@@ -17,7 +17,7 @@ export const PRIVACY_POLICY_VERSION = '2026-11-05';
  */
 export const PRIVACY_NOTICE_VERSION = '2026-11-05';
 
-/** A notice body as Markdown (paragraphs and `-` lists); the notice adds the title and the closing lines itself. */
+/** A notice body as Markdown (an intro paragraph and a `-` list with `**bold:**` lead-ins); the notice adds the title and the closing lines itself. */
 export type PrivacyNotice = { version: string; de: string; en: string };
 
 /**
@@ -33,22 +33,18 @@ export const PRIVACY_NOTICES: PrivacyNotice[] = [
   {
     version: '2026-11-05',
     de: [
-      'Der Schutz deiner Daten und ein transparenter Umgang damit sind uns wichtig. Deshalb haben wir unsere Datenschutzerklärung überarbeitet:',
+      'Du sollst jederzeit nachvollziehen können, was mit deinen Daten passiert. Deshalb haben wir unsere Datenschutzerklärung überarbeitet. Das sind die wichtigsten Änderungen:',
       '',
-      '- Wir verzichten auf das Meta Pixel und messen die Nutzung unserer Plattform nur noch anonym und ohne Cookies.',
-      '- Wir machen transparenter, welche Anmeldedienste und technischen Dienstleister wir für unsere Plattform nutzen, beispielsweise für E-Mails, Online-Sitzungen und den Kurs-Chat.',
-      '- Wir erläutern genauer, wie wir mit Aufzeichnungen von Online-Sitzungen umgehen und welche Informationen wir im Rahmen unserer Förderprojekte an Fördermittelgeber weitergeben.',
-      '',
-      'Einige Änderungen betreffen das, was wir tatsächlich tun; andere beschreiben genauer, was wir schon bisher so gehandhabt haben.',
+      '- **Kein Meta Pixel mehr:** Wir messen die Nutzung unserer Plattform nur noch anonym und ohne Cookies.',
+      '- **Mehr Transparenz bei Dienstleistern:** Wir nennen jetzt konkret, welche Anmeldedienste und technischen Dienstleister wir nutzen, zum Beispiel für E-Mails, Online-Sitzungen und den Kurs-Chat.',
+      '- **Aufzeichnungen und Förderprojekte:** Wir erklären genauer, wie wir mit Aufzeichnungen von Online-Sitzungen umgehen und welche Daten wir im Rahmen unserer Förderprojekte an Fördermittelgeber weitergeben.',
     ].join('\n'),
     en: [
-      'Protecting your data and handling it transparently matter to us. That is why we have revised our privacy policy:',
+      'You should always be able to understand what happens to your data. That is why we have revised our privacy policy. These are the most important changes:',
       '',
-      '- We have dropped the Meta Pixel and now measure the use of our platform only anonymously and without cookies.',
-      '- We are more transparent about which sign-in services and technical service providers we use for our platform, for example for emails, online sessions and the course chat.',
-      '- We explain in more detail how we handle recordings of online sessions and what information we pass on to funding organizations as part of our funded projects.',
-      '',
-      'Some of these changes are to what we actually do; others describe more precisely what we were already doing.',
+      '- **No more Meta Pixel:** We now measure the use of our platform only anonymously and without cookies.',
+      '- **More transparency about service providers:** We now name specifically which sign-in services and technical service providers we use, for example for emails, online sessions and the course chat.',
+      '- **Recordings and funded projects:** We explain in more detail how we handle recordings of online sessions and what data we pass on to funding organizations as part of our funded projects.',
     ].join('\n'),
   },
 ];
