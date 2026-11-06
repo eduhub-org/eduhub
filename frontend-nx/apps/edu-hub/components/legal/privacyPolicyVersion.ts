@@ -39,7 +39,7 @@ export const PRIVACY_NOTICES: PrivacyNotice[] = [
       '- Wir machen transparenter, welche Anmeldedienste und technischen Dienstleister wir für unsere Plattform nutzen, beispielsweise für E-Mails, Online-Sitzungen und den Kurs-Chat.',
       '- Wir erläutern genauer, wie wir mit Aufzeichnungen von Online-Sitzungen umgehen und welche Informationen wir im Rahmen unserer Förderprojekte an Fördermittelgeber weitergeben.',
       '',
-      'Einige Änderungen betreffen unsere tatsächlichen Praktiken, andere machen bereits bestehende Abläufe transparenter und nachvollziehbarer.',
+      'Einige Änderungen betreffen das, was wir tatsächlich tun; andere beschreiben genauer, was wir schon bisher so gehandhabt haben.',
     ].join('\n'),
     en: [
       'Protecting your data and handling it transparently matter to us. That is why we have revised our privacy policy:',
@@ -48,7 +48,7 @@ export const PRIVACY_NOTICES: PrivacyNotice[] = [
       '- We are more transparent about which sign-in services and technical service providers we use for our platform, for example for emails, online sessions and the course chat.',
       '- We explain in more detail how we handle recordings of online sessions and what information we pass on to funding organizations as part of our funded projects.',
       '',
-      'Some of these changes concern our actual practices; others make existing processes more transparent and easier to follow.',
+      'Some of these changes are to what we actually do; others describe more precisely what we were already doing.',
     ].join('\n'),
   },
 ];

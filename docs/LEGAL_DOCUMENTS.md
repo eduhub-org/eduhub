@@ -148,8 +148,10 @@ the wording must keep two kinds of change apart:
   processing - "Wir machen transparenter, welche ...", "Wir erläutern genauer,
   wie ...". Avoid "neu", "jetzt", "ab sofort" or "neu beschrieben" for these.
 - When both kinds appear, add one sentence that says so, e.g. "Einige
-  Änderungen betreffen unsere tatsächlichen Praktiken, andere machen bereits
-  bestehende Abläufe transparenter und nachvollziehbarer."
+  Änderungen betreffen das, was wir tatsächlich tun; andere beschreiben
+  genauer, was wir schon bisher so gehandhabt haben." Keep it to that one
+  distinction; do not pad it with near-synonyms ("transparenter und
+  nachvollziehbarer").
 - Lead with the benefit to users where there is one (data we no longer
   collect), keep a calm, informative tone, and say that nothing has to be done
   when that is true. Informal "Du" in German, as everywhere.
@@ -170,8 +172,8 @@ Example (version 2026-11-05):
 >   umgehen und welche Informationen wir im Rahmen unserer Förderprojekte an
 >   Fördermittelgeber weitergeben.
 >
-> Einige Änderungen betreffen unsere tatsächlichen Praktiken, andere machen
-> bereits bestehende Abläufe transparenter und nachvollziehbarer.
+> Einige Änderungen betreffen das, was wir tatsächlich tun; andere beschreiben
+> genauer, was wir schon bisher so gehandhabt haben.
 
 ## How to Find Which Version a User Accepted
 
