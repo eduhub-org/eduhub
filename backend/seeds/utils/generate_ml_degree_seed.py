@@ -14,6 +14,13 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable
 
+from course_attendance_seed import (
+    CourseParticipant,
+    build_attendance_sql,
+    fixture_participants,
+    replace_block,
+)
+
 
 BEGIN_MARKER = "-- BEGIN GENERATED ML_DEGREE_SEED"
 END_MARKER = "-- END GENERATED ML_DEGREE_SEED"
@@ -660,6 +667,23 @@ def replace_generated_block(seed_file: Path, generated_sql: str) -> None:
     seed_file.write_text(updated)
 
 
+def course_participants(user_count: int, seed_text: str) -> dict[int, list[CourseParticipant]]:
+    """Everyone who takes part in each course: the generated participants (as
+    enrolled by build_sql) and the dev accounts' enrollments in the seed file."""
+    by_course: dict[int, list[CourseParticipant]] = {}
+    for index in range(1, user_count + 1):
+        p = build_participant(index)
+        courses = [(c, "COMPLETED") for c in p.passed_courses]
+        courses += [(c, "CONFIRMED") for c in p.enrolled_courses if c not in p.passed_courses]
+        for course_id, status in courses:
+            by_course.setdefault(course_id, []).append(
+                CourseParticipant(p.user_id, p.first_name, p.last_name, p.email, status)
+            )
+    for course_id, participant in fixture_participants(seed_text):
+        by_course.setdefault(course_id, []).append(participant)
+    return by_course
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Generate ML degree seed SQL.")
     parser.add_argument("--users", type=int, default=DEFAULT_USER_COUNT)
@@ -677,8 +701,13 @@ def main() -> None:
     generated_sql = build_sql(args.users)
     if args.print_only:
         print(generated_sql, end="")
+        print(build_attendance_sql(course_participants(args.users, args.seed_file.read_text())), end="")
         return
     replace_generated_block(args.seed_file, generated_sql)
+    # Sessions and attendances go last: they cover the dev accounts' enrollments too.
+    seed_text = args.seed_file.read_text()
+    attendance_sql = build_attendance_sql(course_participants(args.users, seed_text))
+    args.seed_file.write_text(replace_block(seed_text, attendance_sql))
 
 
 if __name__ == "__main__":

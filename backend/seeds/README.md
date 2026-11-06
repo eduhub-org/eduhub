@@ -36,8 +36,9 @@ There are two ways to manage seed data:
 The default seed reuses the footer's checked-in SVGs so course funding sections
 work without uploading images to the storage emulator:
 
-- `Present Course 1` (4) and `Current Course A` (301): one wide EU/SH logo band.
-- `Current Course B` (302): DLC, EU/SH, and Kiel logos to exercise wrapping.
+- `Applied Machine Learning` (7009) and `Introduction to Data Science & Machine
+  Learning` (7005): one wide EU/SH logo band.
+- `From LLMs to AI Agents` (7004): DLC, EU/SH, and Kiel logos to exercise wrapping.
 - `This is a Degree` (7): DLC and EU/SH logos.
 - Other courses retain the empty funding-logo state.
 
@@ -68,6 +69,33 @@ python3 backend/seeds/utils/generate_ml_degree_seed.py --users 300
 
 This dataset is still part of the default seed. Larger performance datasets
 should be kept in a separate opt-in seed profile.
+
+The same command also regenerates the `COURSE_ATTENDANCE_SEED` block at the end
+of the file (`utils/course_attendance_seed.py`): course locations, weekly
+sessions and attendances for the realistic courses.
+
+- Past courses (7001–7008, 7012) have fixed dates in 2024 and every session is
+  checked.
+- `Applied Machine Learning` (7009) and `Introduction to Deep Reinforcement
+  Learning` (7010) are running and `Causal Inference and ML` (7011) is
+  upcoming. Their sessions are scheduled relative to the week the database is
+  seeded, so they stay running/upcoming on every fresh database.
+- Checked sessions carry Attendance Records (`Session.attendanceData`) and one
+  automatic Attendance per participant like `check_attendance` writes them:
+  email, name and partial-name matches, too-short Zoom stays, unmatched
+  participants with closest candidates, and a few Manual Attendances.
+- The block covers the generated participants and the dev accounts'
+  enrollments written further up in the file, so add hand-written enrollments
+  above it and rerun the generator.
+
+### Dev Accounts
+
+- `admin@example.com` and `instructor@example.com` teach a past course (with an
+  instructor certificate), a running course and the upcoming course 7011.
+- `user@example.com` took four past courses (7001 with achievement and
+  attendance certificates, 7003 with an attendance certificate) and takes the
+  running course 7009.
+- The certificate PDFs live in `backend/init.d/file_storage/<userId>/<courseId>/`.
 
 ### Loading the Performance Test Degree Seed
 
