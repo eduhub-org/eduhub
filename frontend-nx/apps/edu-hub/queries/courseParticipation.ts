@@ -91,6 +91,15 @@ export const COURSE_PARTICIPATION_ATTENDANCES = gql`
       sessionId
       status
       source
+      startDateTime
+      endDateTime
+      totalAttendanceTime
+      interruptionCount
+      location
+      recordedIdentifier
+      matchType
+      matchScore
+      closestCandidates
     }
   }
 `;

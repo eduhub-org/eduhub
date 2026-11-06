@@ -5,7 +5,6 @@ import { Page } from '../../components/layout/Page';
 import {
   PrivacyAnalytics,
   PrivacyAsOfDate,
-  PrivacyChangeHistory,
   PrivacyCourseChat,
   PrivacyCourseParticipation,
   PrivacyDataCollection,
@@ -64,7 +63,6 @@ const Privacy: FC = () => {
           <PrivacyPayments n={9} />
           <PrivacyFunderReports n={10} />
           <PrivacyAnalytics n={11} />
-          <PrivacyChangeHistory n={12} site="eduhub" />
           <PrivacyAsOfDate />
         </div>
       </Page>

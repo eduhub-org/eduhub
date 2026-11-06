@@ -70,6 +70,8 @@ import { ProgramsMenubar } from '../../layout/ProgramsMenubar';
 import type { StaticComponentProperty } from '../../../types/UIComponents';
 import { ProgramType } from '../../../types/enums';
 import { useRausgegangenUnpublishPrompt } from '../ManageCourseContent/useRausgegangenUnpublishPrompt';
+import { SessionAttendanceSummary } from '../ManageCourseContent/SessionsTab/SessionAttendanceSummary';
+import { summarizeSessionAttendances } from '../../../helpers/attendanceDetails';
 import {
   programTabStorageKey,
   resolveProgramTab,
@@ -249,10 +251,6 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
           return 'title';
         case 'applications':
           // Return nested structure for aggregate field sorting
-          return { CourseEnrollments_aggregate: { count: null } };
-        case 'confirmed':
-          // Note: This sorts by total enrollments, not filtered confirmed count
-          // For filtered aggregate sorting, a computed field would be needed in Hasura
           return { CourseEnrollments_aggregate: { count: null } };
         case 'applicationEnd':
           return 'applicationEnd';
@@ -839,7 +837,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
         header: t('table_header.published'),
         accessorKey: 'published',
         size: 70,
-        meta: { className: 'text-center' },
+        meta: { align: 'center' },
         cell: ({ row }) => (
           <div className="flex justify-center">
             <div
@@ -855,6 +853,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
         size: 320,
         minSize: 250,
         enableSorting: true,
+        meta: { align: 'center' },
         cell: ({ row }) => {
           const defaultTitle = t(`default_title.${messageKey}`);
 
@@ -886,26 +885,58 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
         },
       },
       {
-        header: t('table_header.applications'),
+        // Sorted by the number of applications (all enrollments).
+        header: t('table_header.applications_confirmed'),
         accessorKey: 'applications',
         size: 130,
         enableSorting: true,
-        meta: { className: 'justify-center' },
-        cell: ({ row }) => <div className="text-center w-full">{getApplicationsCount(row.original)}</div>,
+        meta: { align: 'center' },
+        cell: ({ row }) => {
+          const applications = getApplicationsCount(row.original);
+          const confirmed = getConfirmedCount(row.original);
+          return (
+            <div className="text-center w-full tabular-nums">
+              {applications === '' ? confirmed : `${applications} / ${confirmed}`}
+            </div>
+          );
+        },
       },
       {
-        header: t('table_header.confirmed'),
-        accessorKey: 'confirmed',
-        size: 120,
-        enableSorting: true,
-        meta: { className: 'justify-center' },
-        cell: ({ row }) => <div className="text-center w-full">{getConfirmedCount(row.original)}</div>,
+        header: t('table_header.last_session_attendance'),
+        id: 'lastSessionAttendance',
+        size: 150,
+        meta: { align: 'center' },
+        cell: ({ row }) => {
+          const session = row.original.LastCheckedSession[0];
+          if (!session) return <div className="text-center w-full text-label-secondary">–</div>;
+          const date = new Intl.DateTimeFormat(locale, { day: '2-digit', month: '2-digit', year: 'numeric' }).format(
+            new Date(session.startDateTime)
+          );
+          const locationOptions = Array.from(
+            new Set(
+              (row.original.CourseLocations ?? [])
+                .map((location) => location.locationOption)
+                .filter((option): option is LocationOption_enum => Boolean(option))
+            )
+          );
+          return (
+            <Tooltip title={t('table_header.last_session_attendance_hint', { title: session.title ?? '', date })}>
+              <div className="w-full">
+                <SessionAttendanceSummary
+                  summary={summarizeSessionAttendances(session.Attendances)}
+                  locationOptions={locationOptions}
+                  compact
+                />
+              </div>
+            </Tooltip>
+          );
+        },
       },
       {
         header: t('table_header.unrated_rated_not_informed'),
         accessorKey: 'unratedRatedNotInformed',
         size: 140,
-        meta: { className: 'justify-center' },
+        meta: { align: 'center' },
         cell: ({ row }) => <div className="text-center w-full">{getUnratedAndRatedButNotInformed(row.original)}</div>,
       },
       {
@@ -913,7 +944,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
         accessorKey: 'applicationEnd',
         size: 110,
         enableSorting: true,
-        meta: { className: 'text-center' },
+        meta: { align: 'center' },
         cell: ({ row }) => {
           const endDate = row.original.applicationEnd ? new Date(row.original.applicationEnd) : null;
           return (
@@ -935,7 +966,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
         header: t('table_header.status'),
         accessorKey: 'status',
         size: 80,
-        meta: { className: 'text-center' },
+        meta: { align: 'center' },
         cell: ({ row }) => {
           const templateCount = courseTemplateCounts.get(row.original.id) || 0;
           const hasCustomTemplates = templateCount > 0;
@@ -1010,6 +1041,15 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
             <span>
               {t('table_header.confirmed')}: {getConfirmedCount(course)}
             </span>
+            {course.LastCheckedSession[0] && (
+              <span>
+                {t('table_header.last_session_attendance')}:{' '}
+                {(() => {
+                  const summary = summarizeSessionAttendances(course.LastCheckedSession[0].Attendances);
+                  return `${summary.attended} / ${summary.total}`;
+                })()}
+              </span>
+            )}
           </div>
         </div>
       );

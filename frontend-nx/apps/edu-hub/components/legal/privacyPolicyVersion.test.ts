@@ -1,9 +1,8 @@
 import {
-  getPrivacyPolicyChange,
-  getPrivacyPolicyChanges,
+  getPrivacyNotice,
   isNoticeDue,
   PRIVACY_NOTICE_VERSION,
-  PRIVACY_POLICY_CHANGES,
+  PRIVACY_NOTICES,
   PRIVACY_POLICY_VERSION,
 } from './privacyPolicyVersion';
 
@@ -36,36 +35,21 @@ describe('isNoticeDue', () => {
   });
 });
 
-describe('PRIVACY_POLICY_CHANGES', () => {
-  it('has an entry for the current version and for the notice version', () => {
-    expect(getPrivacyPolicyChange(PRIVACY_POLICY_VERSION)).not.toBeNull();
-    expect(getPrivacyPolicyChange(PRIVACY_NOTICE_VERSION)).not.toBeNull();
+describe('PRIVACY_NOTICES', () => {
+  it('has a text in both languages for the notice version', () => {
+    const notice = getPrivacyNotice(PRIVACY_NOTICE_VERSION);
+    expect(notice?.de.trim()).toBeTruthy();
+    expect(notice?.en.trim()).toBeTruthy();
   });
 
-  it('is sorted newest first with unique ISO-date versions and both languages', () => {
-    const versions = PRIVACY_POLICY_CHANGES.map((change) => change.version);
+  it('is sorted newest first with unique ISO-date versions', () => {
+    const versions = PRIVACY_NOTICES.map((notice) => notice.version);
     expect(versions).toEqual([...new Set(versions)].sort().reverse());
-    PRIVACY_POLICY_CHANGES.forEach((change) => {
-      expect(change.version).toMatch(/^\d{4}-\d{2}-\d{2}$/);
-      expect(change.de.trim()).not.toBe('');
-      expect(change.en.trim()).not.toBe('');
-    });
+    versions.forEach((version) => expect(version).toMatch(/^\d{4}-\d{2}-\d{2}$/));
   });
 
-  it('names at least one site per entry', () => {
-    PRIVACY_POLICY_CHANGES.forEach((change) => expect(change.sites.length).toBeGreaterThan(0));
-  });
-
-  it('gives the EduHub notice an EduHub summary', () => {
-    expect(getPrivacyPolicyChange(PRIVACY_NOTICE_VERSION)?.sites).toContain('eduhub');
-  });
-
-  it('filters the history per site', () => {
-    expect(getPrivacyPolicyChanges('eduhub').every((change) => change.sites.includes('eduhub'))).toBe(true);
-    expect(getPrivacyPolicyChanges('stujo').every((change) => change.sites.includes('stujo'))).toBe(true);
-  });
-
-  it('starts with the current version', () => {
-    expect(PRIVACY_POLICY_CHANGES[0].version).toBe(PRIVACY_POLICY_VERSION);
+  it('starts with the notice version, which is not newer than the policy', () => {
+    expect(PRIVACY_NOTICES[0].version).toBe(PRIVACY_NOTICE_VERSION);
+    expect(PRIVACY_NOTICE_VERSION <= PRIVACY_POLICY_VERSION).toBe(true);
   });
 });
