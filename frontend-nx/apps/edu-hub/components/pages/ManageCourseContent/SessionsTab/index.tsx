@@ -51,7 +51,7 @@ import {
 } from '../../../../queries/__generated__/UserSelectionWithFilter';
 import { useTranslations } from 'next-intl';
 import { order_by, SessionAddress_insert_input } from '../../../../__generated__/globalTypes';
-import { useLazyRoleQuery } from '../../../../hooks/authedQuery';
+import { useLazyRoleQuery, useRoleQuery } from '../../../../hooks/authedQuery';
 import { useCurrentRole, useIsAdmin } from '../../../../hooks/authentication';
 import { useManagementRoleContext } from '../../../../hooks/managementRole';
 import { useMediaQuery } from '../../../../hooks/useMediaQuery';
@@ -73,6 +73,10 @@ import ManagedItemList from '../../../common/ManagedItemList';
 import { SelectUserDialog } from '../../../common/dialogs/SelectUserDialog';
 import { CreateUserDialog } from '../../../common/dialogs/CreateUserDialog';
 import AttendanceDataDialog from './AttendanceDataDialog';
+import { SessionAttendanceSummary } from './SessionAttendanceSummary';
+import { SESSION_ATTENDANCES } from '../../../../queries/sessionAttendance';
+import { SessionAttendances, SessionAttendancesVariables } from '../../../../queries/__generated__/SessionAttendances';
+import { summarizeSessionAttendances } from '../../../../helpers/attendanceDetails';
 import useNotifyParticipantsPrompt from './useNotifyParticipantsPrompt';
 import PublicEventSection from './PublicEventSection';
 import { QuestionConfirmationDialog } from '../../../common/dialogs/QuestionConfirmationDialog';
@@ -673,6 +677,18 @@ const ExpandableSessionRowContent: FC<ExpandableSessionRowContentProps> = ({
 
   const locations = useMemo(() => sessionLocationEntries(session, courseLocations), [session, courseLocations]);
 
+  const { data: attendanceRows } = useRoleQuery<SessionAttendances, SessionAttendancesVariables>(SESSION_ATTENDANCES, {
+    variables: { sessionId: session.id },
+    skip: !hasAttendanceData,
+    fetchPolicy: 'cache-and-network',
+  });
+  const sessionAttendances = useMemo(() => attendanceRows?.Attendance ?? [], [attendanceRows]);
+  const attendanceSummary = useMemo(() => summarizeSessionAttendances(sessionAttendances), [sessionAttendances]);
+  const locationOptions = useMemo(
+    () => Array.from(new Set(locations.map((location) => location.option))),
+    [locations]
+  );
+
   const [insertSessionSpeaker] = useRoleMutation<InsertNewSessionSpeaker, InsertNewSessionSpeakerVariables>(
     INSERT_NEW_SESSION_SPEAKER
   );
@@ -882,8 +898,10 @@ const ExpandableSessionRowContent: FC<ExpandableSessionRowContentProps> = ({
           <section className="border-t border-table-divider pt-4">
             <SectionLabel>{t('SessionsTab.attendance_data.label')}</SectionLabel>
             <div className="flex flex-wrap items-center justify-between gap-3">
-              {!hasAttendanceData && (
-                <output className="text-sm text-label-secondary">{t('SessionsTab.attendance_data.no_data')}</output>
+              {hasAttendanceData ? (
+                <SessionAttendanceSummary summary={attendanceSummary} locationOptions={locationOptions} />
+              ) : (
+                <output className="text-sm text-label-secondary">{t('SessionsTab.attendance_data.not_checked')}</output>
               )}
               <button
                 type="button"
@@ -910,6 +928,9 @@ const ExpandableSessionRowContent: FC<ExpandableSessionRowContentProps> = ({
         open={attendanceOpen}
         onClose={() => setAttendanceOpen(false)}
         attendanceData={session.attendanceData}
+        attendances={sessionAttendances}
+        sessionStart={session.startDateTime}
+        sessionEnd={session.endDateTime}
         sessionTitle={session.title ?? undefined}
       />
 

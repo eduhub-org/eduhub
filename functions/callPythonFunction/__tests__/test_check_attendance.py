@@ -6,163 +6,191 @@ from pythonFunctions.check_attendance import (
     MATCH_TYPE_EMAIL,
     MATCH_TYPE_NAME,
     MATCH_TYPE_NONE,
-    prepare_participant_attendance_data,
+    MATCH_TYPE_PARTIAL_NAME,
+    clean_display_name,
+    match_participants,
 )
 
 
-SESSION_ID = 42
+SESSION = {
+    "id": 42,
+    "startDateTime": pd.Timestamp("2026-01-01T10:00:00Z"),
+    "endDateTime": pd.Timestamp("2026-01-01T11:00:00Z"),
+}
 
 
-def _participant(first="Jane", last="Doe", email="jane@example.com"):
-    return pd.Series(
+def _participants(*people):
+    rows = [
         {
-            "id": "11111111-1111-1111-1111-111111111111",
+            "id": f"u-{i}",
             "firstName": first,
             "lastName": last,
             "email": email,
         }
+        for i, (first, last, email) in enumerate(people)
+    ]
+    return pd.DataFrame(rows, columns=["id", "firstName", "lastName", "email"])
+
+
+def _zoom(name, email=None, duration=3600):
+    return {
+        "name": name,
+        "email": email,
+        "joinDateTime": "2026-01-01T10:00:00+00:00",
+        "leaveDateTime": "2026-01-01T11:00:00+00:00",
+        "duration": duration,
+        "interruptionCount": 0,
+        "source": "ZOOM",
+        "location": "ZOOM",
+    }
+
+
+def _check_in(name, place="Starterkitchen"):
+    return {
+        "name": name,
+        "email": None,
+        "joinDateTime": "2026-01-01T09:55:00+00:00",
+        "leaveDateTime": None,
+        "duration": None,
+        "interruptionCount": None,
+        "source": "LIMESURVEY",
+        "location": place,
+    }
+
+
+def _records(rows):
+    return pd.DataFrame(
+        rows,
+        columns=[
+            "name",
+            "email",
+            "joinDateTime",
+            "leaveDateTime",
+            "duration",
+            "interruptionCount",
+            "source",
+            "location",
+        ],
     )
 
 
-def _attendance_df(rows):
-    df = pd.DataFrame(rows)
-    # Ensure all expected columns exist even when a given test omits them.
-    for col in (
-        "name",
-        "email",
-        "joinDateTime",
-        "leaveDateTime",
-        "duration",
-        "interruptionCount",
-        "source",
-        "location",
-    ):
-        if col not in df.columns:
-            df[col] = None
-    return df
+def _match(participants, records):
+    return {row["userId"]: row for row in match_participants(participants, records, SESSION)}
 
 
-class TestPrepareParticipantAttendanceData:
+JANE = ("Jane", "Doe", "jane@example.com")
+
+
+class TestMatchParticipants:
     def test_email_match_wins_over_fuzzy_name(self):
         # Display name in Zoom is a company account that doesn't match the
         # enrolled user's real name at all, but the email does.
-        att = _attendance_df(
-            [
-                {
-                    "name": "Work Laptop",
-                    "email": "jane@example.com",
-                    "joinDateTime": "2026-01-01T10:00:00+00:00",
-                    "leaveDateTime": "2026-01-01T11:00:00+00:00",
-                    "duration": 3600,
-                    "interruptionCount": 0,
-                    "source": "ZOOM",
-                    "location": "ZOOM",
-                },
-                {
-                    "name": "Jane Doe",
-                    "email": "someone_else@example.com",
-                    "joinDateTime": "2026-01-01T10:00:00+00:00",
-                    "leaveDateTime": "2026-01-01T10:30:00+00:00",
-                    "duration": 1800,
-                    "interruptionCount": 0,
-                    "source": "ZOOM",
-                    "location": "ZOOM",
-                },
-            ]
+        records = _records(
+            [_zoom("Work Laptop", "jane@example.com"), _zoom("Jane Doe", "someone_else@example.com", 1800)]
         )
-
-        result = prepare_participant_attendance_data(
-            _participant(), att, SESSION_ID
-        )
-        row = result.iloc[0]
+        row = _match(_participants(JANE), records)["u-0"]
         assert row["status"] == "ATTENDED"
         assert row["matchType"] == MATCH_TYPE_EMAIL
         assert row["recordedIdentifier"] == "jane@example.com"
         assert row["duration"] == 3600
+        assert row["attendanceRecordIndex"] == 0
+        assert row["matchScore"] is None
 
     def test_email_match_is_case_insensitive(self):
-        att = _attendance_df(
-            [
-                {
-                    "name": "jd",
-                    "email": "JANE@EXAMPLE.COM",
-                    "joinDateTime": "2026-01-01T10:00:00+00:00",
-                    "leaveDateTime": "2026-01-01T11:00:00+00:00",
-                    "duration": 3600,
-                    "interruptionCount": 0,
-                    "source": "ZOOM",
-                    "location": "ZOOM",
-                }
-            ]
-        )
-        result = prepare_participant_attendance_data(
-            _participant(email="jane@example.com"), att, SESSION_ID
-        )
-        row = result.iloc[0]
+        records = _records([_zoom("jd", "JANE@EXAMPLE.COM")])
+        row = _match(_participants(JANE), records)["u-0"]
         assert row["matchType"] == MATCH_TYPE_EMAIL
         assert row["recordedIdentifier"] == "jane@example.com"
 
     def test_falls_back_to_fuzzy_name_match(self):
-        att = _attendance_df(
-            [
-                {
-                    "name": "Jane Doe",
-                    "email": None,
-                    "joinDateTime": "2026-01-01T10:00:00+00:00",
-                    "leaveDateTime": "2026-01-01T10:30:00+00:00",
-                    "duration": 1800,
-                    "interruptionCount": 0,
-                    "source": "ZOOM",
-                    "location": "ZOOM",
-                }
-            ]
-        )
-        result = prepare_participant_attendance_data(
-            _participant(email=None), att, SESSION_ID
-        )
-        row = result.iloc[0]
+        records = _records([_zoom("Jane Doe")])
+        row = _match(_participants(JANE), records)["u-0"]
         assert row["status"] == "ATTENDED"
         assert row["matchType"] == MATCH_TYPE_NAME
-        assert row["recordedIdentifier"] == "Jane Doe"
+        assert row["matchScore"] == 100
 
-    def test_no_match_records_closest_candidate_as_none(self):
-        att = _attendance_df(
-            [
-                {
-                    "name": "Completely Unrelated Person",
-                    "email": "other@example.com",
-                    "joinDateTime": "2026-01-01T10:00:00+00:00",
-                    "leaveDateTime": "2026-01-01T10:30:00+00:00",
-                    "duration": 1800,
-                    "interruptionCount": 0,
-                    "source": "ZOOM",
-                    "location": "ZOOM",
-                }
-            ]
-        )
-        result = prepare_participant_attendance_data(
-            _participant(), att, SESSION_ID
-        )
-        row = result.iloc[0]
+    def test_no_match_lists_closest_candidate_per_location(self):
+        records = _records([_zoom("Totally Different"), _check_in("Janet Dorn")])
+        row = _match(_participants(JANE), records)["u-0"]
         assert row["status"] == "MISSED"
         assert row["matchType"] == MATCH_TYPE_NONE
-        # Closest candidate is kept for audit purposes.
-        assert row["recordedIdentifier"] == "other@example.com"
+        assert row["attendanceRecordIndex"] is None
+        locations = [c["location"] for c in row["closestCandidates"]]
+        assert sorted(locations) == ["KIEL", "ONLINE"]
+        assert row["closestCandidates"][0]["identifier"] == "Janet Dorn"
+        assert row["recordedIdentifier"] == "Janet Dorn"
 
-    def test_empty_attendance_data_yields_missed_row(self):
-        result = prepare_participant_attendance_data(
-            _participant(), pd.DataFrame(), SESSION_ID
-        )
-        row = result.iloc[0]
+    def test_empty_records_yield_missed_row(self):
+        row = _match(_participants(JANE), _records([]))["u-0"]
         assert row["status"] == "MISSED"
         assert row["matchType"] == MATCH_TYPE_NONE
-        assert row["recordedIdentifier"] is None
-        assert row["sessionId"] == SESSION_ID
+        assert row["closestCandidates"] is None
+
+    def test_short_zoom_stay_is_missed_but_keeps_match(self):
+        records = _records([_zoom("Jane Doe", duration=1200)])
+        row = _match(_participants(JANE), records)["u-0"]
+        assert row["status"] == "MISSED"
+        assert row["matchType"] == MATCH_TYPE_NAME
+        assert row["duration"] == 1200
+        assert row["attendanceRecordIndex"] == 0
+
+    def test_check_in_counts_over_short_zoom_stay(self):
+        records = _records([_zoom("Jane Doe", duration=600), _check_in("Jane Doe")])
+        row = _match(_participants(JANE), records)["u-0"]
+        assert row["status"] == "ATTENDED"
+        assert row["source"] == "LIMESURVEY"
+        assert row["location"] == "Starterkitchen"
+
+    def test_check_in_wins_when_both_count(self):
+        records = _records([_zoom("Jane Doe"), _check_in("Jane Doe")])
+        row = _match(_participants(JANE), records)["u-0"]
+        assert row["source"] == "LIMESURVEY"
+
+    def test_single_first_name_matches_when_unique(self):
+        participants = _participants(("Christine", "Avery", "c@example.com"), ("Hellena", "Sam", "h@example.com"))
+        records = _records([_zoom("Christine"), _zoom("Hellena")])
+        result = _match(participants, records)
+        assert result["u-0"]["status"] == "ATTENDED"
+        assert result["u-0"]["matchType"] == MATCH_TYPE_PARTIAL_NAME
+        assert result["u-1"]["status"] == "ATTENDED"
+
+    def test_single_first_name_ignored_when_ambiguous(self):
+        participants = _participants(
+            ("Christian", "Diestel", "a@example.com"), ("Christian", "Hase", "b@example.com")
+        )
+        result = _match(participants, _records([_zoom("Christian")]))
+        assert {row["status"] for row in result.values()} == {"MISSED"}
+
+    def test_initial_and_last_name(self):
+        participants = _participants(("Hyun-Jin", "Lee", "x@example.com"), ("Jane", "Doe", "j@example.com"))
+        result = _match(participants, _records([_zoom("HLee")]))
+        assert result["u-0"]["status"] == "ATTENDED"
+        assert result["u-0"]["matchType"] == MATCH_TYPE_PARTIAL_NAME
+
+    def test_handle_is_cleaned_before_fuzzy_matching(self):
+        participants = _participants(("saikiran", "Panchireddi", "s@example.com"))
+        records = _records([_zoom("@saikiran.panchireddi.20311a:opencampus.sh")])
+        row = _match(participants, records)["u-0"]
+        assert row["status"] == "ATTENDED"
+        assert row["matchType"] == MATCH_TYPE_NAME
+
+    def test_each_record_goes_to_one_participant(self):
+        participants = _participants(("Jane", "Doe", "j1@example.com"), ("Jane", "Doe", "j2@example.com"))
+        result = _match(participants, _records([_zoom("Jane Doe")]))
+        statuses = sorted(row["status"] for row in result.values())
+        assert statuses == ["ATTENDED", "MISSED"]
+
+    def test_record_goes_to_the_better_match(self):
+        participants = _participants(("Jan", "Winkel", "a@example.com"), ("Jana", "Winkel", "b@example.com"))
+        result = _match(participants, _records([_zoom("Jana Winkel")]))
+        assert result["u-1"]["status"] == "ATTENDED"
+        assert result["u-0"]["status"] == "MISSED"
 
 
-# ----------------------------------------------------------------------
-# End-to-end orchestration (mocked dependencies)
-# ----------------------------------------------------------------------
+def test_clean_display_name():
+    assert clean_display_name("@saikiran.panchireddi.20311a:opencampus.sh") == "saikiran panchireddi"
+    assert clean_display_name("Hase, Christian") == "hase christian"
+    assert clean_display_name(None) == ""
 
 
 class TestCheckAttendanceOrchestration:
@@ -251,6 +279,9 @@ class TestCheckAttendanceOrchestration:
             def insert_attendance(self, df):
                 self.inserts.append(df.iloc[0].to_dict())
 
+            def delete_automatic_attendances(self, sid):
+                self.deleted_sessions = getattr(self, "deleted_sessions", []) + [sid]
+
             def update_session_attendanceData(self, df, sid):
                 self.session_updates.append((sid, df))
 
@@ -335,6 +366,9 @@ class TestCheckAttendanceOrchestration:
             def insert_attendance(self, df):
                 self.inserts.append(df.iloc[0].to_dict())
 
+            def delete_automatic_attendances(self, sid):
+                self.deleted_sessions = getattr(self, "deleted_sessions", []) + [sid]
+
             def update_session_attendanceData(self, df, sid):
                 self.session_updates.append((sid, df))
 
@@ -362,16 +396,16 @@ class TestCheckAttendanceOrchestration:
         # And we never even queried participants (short-circuit before).
         assert fake_eduhub.participants_calls == 0
 
-    def test_missing_zoom_credentials_skips_online_but_keeps_offline(
+    def test_missing_zoom_credentials_leaves_online_sessions_unchecked(
         self, monkeypatch, caplog
     ):
-        """When Zoom credentials are missing we must not abort the cron
-        run. ONLINE attendance collection is skipped with a clear log
-        message; LimeSurvey / offline attendance collection continues
-        normally for all sessions."""
+        """Without Zoom credentials the cron run must not abort, and a
+        session that needs Zoom stays unchecked (no wrong MISSED) so the
+        next run retries it. Sessions that are on site only are still
+        checked."""
         from pythonFunctions import check_attendance as mod
 
-        session = {
+        mixed_session = {
             "id": 9,
             "title": "Mixed location session",
             "startDateTime": pd.Timestamp("2026-01-01T10:00:00Z"),
@@ -390,13 +424,17 @@ class TestCheckAttendanceOrchestration:
             },
             "SessionAddresses": [],
         }
+        on_site_session = {
+            **mixed_session,
+            "id": 10,
+            "title": "On-site session",
+            "Course": {"CourseLocations": [{"locationOption": "KIEL", "defaultSessionAddress": None}]},
+        }
 
         offline_df = pd.DataFrame(
             [
                 {
                     "name": "Bob Builder",
-                    "firstName": "Bob",
-                    "lastName": "Builder",
                     "email": None,
                     "joinDateTime": pd.Timestamp("2026-01-01T10:05:00Z"),
                     "leaveDateTime": None,
@@ -414,7 +452,7 @@ class TestCheckAttendanceOrchestration:
                 self.session_updates = []
 
             def get_finished_sessions_without_attendance_check(self):
-                return [session]
+                return [mixed_session, on_site_session]
 
             def get_course_participants_from_session_id(self, _sid):
                 return pd.DataFrame(
@@ -431,6 +469,9 @@ class TestCheckAttendanceOrchestration:
             def insert_attendance(self, df):
                 self.inserts.append(df.iloc[0].to_dict())
 
+            def delete_automatic_attendances(self, sid):
+                pass
+
             def update_session_attendanceData(self, df, sid):
                 self.session_updates.append((sid, df))
 
@@ -445,7 +486,7 @@ class TestCheckAttendanceOrchestration:
 
         monkeypatch.setattr(mod, "ZoomClient", _boom)
         monkeypatch.setattr(
-            mod, "get_offline_session_attendance", lambda s, loc: offline_df.copy()
+            mod, "get_offline_session_attendance", lambda s: offline_df.copy()
         )
 
         import logging as _logging
@@ -458,11 +499,64 @@ class TestCheckAttendanceOrchestration:
             "Zoom API credentials not configured" in rec.getMessage()
             for rec in caplog.records
         )
+        # Only the on-site session was checked.
+        assert [sid for sid, _ in fake_eduhub.session_updates] == [10]
         assert len(fake_eduhub.inserts) == 1
+        assert fake_eduhub.inserts[0]["sessionId"] == 10
         assert fake_eduhub.inserts[0]["status"] == "ATTENDED"
         assert fake_eduhub.inserts[0]["matchType"] == MATCH_TYPE_NAME
         assert fake_eduhub.inserts[0]["source"] == "LIMESURVEY"
-        assert len(fake_eduhub.session_updates) == 1
+
+    def test_on_site_locations_share_one_survey_fetch(self, monkeypatch):
+        """KIEL and HEIDE use the same check-in survey; it must be fetched
+        once, or every check-in would appear twice."""
+        from pythonFunctions import check_attendance as mod
+
+        session = {
+            "id": 11,
+            "title": "Two sites",
+            "startDateTime": pd.Timestamp("2026-01-01T10:00:00Z"),
+            "endDateTime": pd.Timestamp("2026-01-01T11:30:00Z"),
+            "Course": {
+                "CourseLocations": [
+                    {"locationOption": "KIEL", "defaultSessionAddress": None},
+                    {"locationOption": "HEIDE", "defaultSessionAddress": None},
+                ]
+            },
+            "SessionAddresses": [],
+        }
+        fetches = []
+
+        def _fetch(s):
+            fetches.append(s["id"])
+            return pd.DataFrame([{"name": "Bob Builder", "location": "Starterkitchen"}])
+
+        monkeypatch.setattr(mod, "get_offline_session_attendance", _fetch)
+        records, reason = mod.collect_attendance_records(session, None)
+        assert reason is None
+        assert fetches == [11]
+        assert len(records) == 1
+        assert list(records.columns) == mod.RECORD_COLUMNS
+
+    def test_limesurvey_failure_leaves_session_unchecked(self, monkeypatch):
+        from pythonFunctions import check_attendance as mod
+
+        session = {
+            "id": 12,
+            "title": "On site",
+            "startDateTime": pd.Timestamp("2026-01-01T10:00:00Z"),
+            "endDateTime": pd.Timestamp("2026-01-01T11:30:00Z"),
+            "Course": {"CourseLocations": [{"locationOption": "KIEL", "defaultSessionAddress": None}]},
+            "SessionAddresses": [],
+        }
+
+        def _fail(_s):
+            raise RuntimeError("LimeSurvey down")
+
+        monkeypatch.setattr(mod, "get_offline_session_attendance", _fail)
+        records, reason = mod.collect_attendance_records(session, None)
+        assert records is None
+        assert "LimeSurvey down" in reason
 
 
 # ----------------------------------------------------------------------
@@ -539,6 +633,9 @@ class TestProgramSessions:
             def insert_attendance(self, df):
                 self.inserts.append(df.iloc[0].to_dict())
 
+            def delete_automatic_attendances(self, sid):
+                pass
+
             def update_session_attendanceData(self, df, sid):
                 pass
 
@@ -554,3 +651,56 @@ class TestProgramSessions:
         assert mod.check_attendance({})["success"] is True
         assert zoom_urls == ["https://zoom.us/j/9"]
         assert [(r["userId"], r["status"]) for r in fake_eduhub.inserts] == [("u-alice", "ATTENDED")]
+
+
+class TestOfflineAttendance:
+    def test_only_submitted_check_ins_inside_the_window_in_berlin_time(self, monkeypatch):
+        """LimeSurvey stores Berlin local time. For a 16:00-17:45 session
+        (Berlin) a check-in at 15:52 belongs to it, one at 19:34 does not,
+        and an opened but unsubmitted response is dropped."""
+        from pythonFunctions import check_attendance as mod
+        from api_clients.limesurvey_client import LimeSurveyClient
+
+        answers = pd.DataFrame(
+            [
+                {"datestamp": "2026-11-03 15:52:01", "submitdate": "2026-11-03 15:52:01", "N1": "Ian", "N2": "Christ", "Place": "SK "},
+                {"datestamp": "2026-11-03 17:58:06", "submitdate": "2026-11-03 17:58:06", "N1": "Annika", "N2": "Boock", "Place": "SK"},
+                {"datestamp": "2026-11-03 19:34:48", "submitdate": "2026-11-03 19:34:48", "N1": "Jan", "N2": "Winkel", "Place": "SK"},
+                {"datestamp": "2026-11-03 16:30:00", "submitdate": None, "N1": None, "N2": None, "Place": "SK"},
+                {"datestamp": "2026-11-03 15:20:00", "submitdate": "2026-11-03 15:20:00", "N1": "Too", "N2": "Early", "Place": "SK"},
+            ]
+        )
+
+        class FakeLimeSurvey(LimeSurveyClient):
+            def __init__(self, sid):
+                pass
+
+            def get_session_key(self):
+                return "key"
+
+            def get_responses(self):
+                return answers.copy()
+
+        monkeypatch.setattr(mod, "LimeSurveyClient", FakeLimeSurvey)
+        session = {
+            "startDateTime": pd.Timestamp("2026-11-03T16:00:00+01:00"),
+            "endDateTime": pd.Timestamp("2026-11-03T17:45:00+01:00"),
+        }
+        records = mod.get_offline_session_attendance(session)
+        assert list(records["name"]) == ["Ian Christ", "Annika Boock"]
+        assert list(records["location"]) == ["SK", "SK"]
+        assert records["joinDateTime"].iloc[0] == pd.Timestamp("2026-11-03T15:52:01+01:00")
+
+    def test_records_serialise_for_session_attendance_data(self):
+        """Mixed Zoom (string) and LimeSurvey (timestamp) times must survive
+        Session.attendanceData's to_json()."""
+        import json
+
+        records = pd.DataFrame(
+            [
+                {"name": "A", "joinDateTime": "2026-01-01T10:00:00+00:00", "source": "ZOOM"},
+                {"name": "B", "joinDateTime": pd.Timestamp("2026-01-01T10:05:00+01:00"), "source": "LIMESURVEY"},
+            ]
+        )
+        parsed = json.loads(records.to_json())
+        assert set(parsed["joinDateTime"].keys()) == {"0", "1"}

@@ -90,9 +90,16 @@ class EduHubClient:
         return result_list
 
     def get_course_participants_from_session_id(self, session_id):
+        """Participants (confirmed or registered) and people who completed the
+        course; cancelled, expired, aborted or rejected enrollments get no
+        Attendance."""
         variables = {"session_id": f"{session_id}"}
         query = """query($session_id: Int) {
-            CourseEnrollment(where: {isTest: {_eq: false}, Course: {Sessions: {id: {_eq: $session_id}}}}) {
+            CourseEnrollment(where: {
+                isTest: {_eq: false},
+                status: {_in: [CONFIRMED, REGISTERED, COMPLETED]},
+                Course: {Sessions: {id: {_eq: $session_id}}}
+            }) {
                 User {
                     id
                     firstName
@@ -497,6 +504,9 @@ class EduHubClient:
         if hasattr(series, "empty") and series.empty:
             return None
         val = series.iloc[0]
+        # JSON values (e.g. closestCandidates); pd.isnull would test elementwise.
+        if isinstance(val, (list, dict)):
+            return val
         if pd.isnull(val):
             return None
         return cast(val) if cast else val
@@ -515,14 +525,19 @@ class EduHubClient:
             "totalAttendanceTime": self._safe_iloc(col("duration"), cast=int),
             "userId": self._safe_iloc(col("userId")),
             "location": self._safe_iloc(col("location"), cast=str),
+            "matchScore": self._safe_iloc(col("matchScore"), cast=int),
+            "attendanceRecordIndex": self._safe_iloc(col("attendanceRecordIndex"), cast=int),
+            "closestCandidates": self._safe_iloc(col("closestCandidates")),
         }
         mutation = """mutation($leaveDateTime: timestamptz, $interruptionCount: Int, $recordedIdentifier: String,
                                $matchType: String, $sessionId: Int, $source: String, $joinDateTime: timestamptz,
-                               $status: AttendanceStatus_enum, $totalAttendanceTime: Int, $userId: uuid, $location: String) {
+                               $status: AttendanceStatus_enum, $totalAttendanceTime: Int, $userId: uuid, $location: String,
+                               $matchScore: Int, $attendanceRecordIndex: Int, $closestCandidates: jsonb) {
             insert_Attendance(objects: {endDateTime: $leaveDateTime, interruptionCount: $interruptionCount,
             recordedIdentifier: $recordedIdentifier, matchType: $matchType, sessionId: $sessionId, source: $source,
             startDateTime: $joinDateTime, status: $status, totalAttendanceTime: $totalAttendanceTime, userId: $userId,
-            location: $location}) {
+            location: $location, matchScore: $matchScore, attendanceRecordIndex: $attendanceRecordIndex,
+            closestCandidates: $closestCandidates}) {
                 returning {
                     id
                     created_at
@@ -542,6 +557,22 @@ class EduHubClient:
             }
         }"""
         return self.send_query(mutation, variables)
+
+    def delete_automatic_attendances(self, session_id):
+        """Remove the automatic Attendances of a Session so a re-check does not
+        duplicate them. Manual Attendances (source INSTRUCTOR) are kept."""
+        variables = {"sessionId": int(session_id)}
+        mutation = """mutation($sessionId: Int!) {
+            delete_Attendance(where: {
+                sessionId: {_eq: $sessionId},
+                _or: [{source: {_neq: "INSTRUCTOR"}}, {source: {_is_null: true}}]
+            }) {
+                affected_rows
+            }
+        }"""
+        result = self.send_query(mutation, variables)
+        self._raise_on_graphql_errors(result, "delete_automatic_attendances")
+        return result
 
     def update_session_attendanceData(self, attendance_data, session_id):
         variables = {

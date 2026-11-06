@@ -4,20 +4,20 @@ import { ColumnDef, Row } from '@tanstack/react-table';
 
 import { DialogShell } from '../../../common/dialogs/DialogShell';
 import TableGrid from '../../../common/TableGrid';
+import { TableGridFilter } from '../../../common/TableGrid/types';
 import { usePersistedPageSize } from '../../../common/TableGrid/hooks';
+import { LocationOption_enum } from '../../../../__generated__/globalTypes';
+import { SessionAttendances_Attendance } from '../../../../queries/__generated__/SessionAttendances';
+import {
+  MIN_ATTENDANCE_SHARE,
+  assignRecordsToParticipants,
+  attendanceLocationOption,
+  attendanceShare,
+  formatMinutes,
+  formatPercent,
+} from '../../../../helpers/attendanceDetails';
 
 export type AttendanceRow = Record<string, unknown> & { id: number; _idx: string };
-
-const PREFERRED_COLUMN_ORDER = [
-  'name',
-  'email',
-  'joinDateTime',
-  'leaveDateTime',
-  'duration',
-  'interruptionCount',
-  'source',
-  'location',
-];
 
 /**
  * Parses Session.attendanceData written by Python pandas
@@ -62,13 +62,9 @@ export const parseAttendanceData = (raw: string | null | undefined): AttendanceR
   }
 };
 
-const isDateTimeKey = (key: string) => key === 'joinDateTime' || key === 'leaveDateTime';
-const isDurationKey = (key: string) => key === 'duration';
-
 /**
  * Coerces a raw attendance value to a millisecond timestamp.
- * Returns NaN when the value cannot be interpreted as a date so callers can
- * decide how to order unparsable rows.
+ * Returns NaN when the value cannot be interpreted as a date.
  */
 const toDateMs = (value: unknown): number => {
   if (value == null) return Number.NaN;
@@ -82,52 +78,17 @@ const toDateMs = (value: unknown): number => {
   return Number.NaN;
 };
 
-const toDurationSeconds = (value: unknown): number => {
-  if (value == null || value === '') return Number.NaN;
-  const seconds = typeof value === 'number' ? value : Number(value);
-  return Number.isFinite(seconds) ? seconds : Number.NaN;
+const toNumber = (value: unknown): number | null => {
+  if (value == null || value === '') return null;
+  const n = typeof value === 'number' ? value : Number(value);
+  return Number.isFinite(n) ? n : null;
 };
 
-const formatDateTime = (locale: string, value: unknown): string => {
-  if (value == null) return '';
-  const ms = toDateMs(value);
-  if (Number.isNaN(ms)) return String(value);
-  return new Intl.DateTimeFormat(locale, {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-  }).format(new Date(ms));
-};
-
-const formatDuration = (value: unknown): string => {
-  const seconds = toDurationSeconds(value);
-  if (Number.isNaN(seconds)) return value == null || value === '' ? '' : String(value);
-  const total = Math.max(0, Math.floor(seconds));
-  const minutes = Math.floor(total / 60);
-  const secs = total % 60;
-  return `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-};
-
-const formatCellValue = (locale: string, key: string, value: unknown): string => {
-  if (value == null) return '';
-  if (isDateTimeKey(key)) return formatDateTime(locale, value);
-  if (isDurationKey(key)) return formatDuration(value);
-  if (typeof value === 'object') {
-    try {
-      return JSON.stringify(value);
-    } catch {
-      return String(value);
-    }
-  }
-  return String(value);
-};
+const toText = (value: unknown): string => (typeof value === 'string' ? value.trim() : '');
 
 /**
- * Compares two numeric values placing NaN entries last regardless of sort
- * direction. TanStack inverts the result for descending order, so returning a
- * direction-aware fallback keeps unparsable rows pinned to the bottom.
+ * Places NaN entries last regardless of sort direction. TanStack inverts the
+ * result for descending order, so the fallback keeps unparsable rows at the bottom.
  */
 const compareNumeric = (a: number, b: number): number => {
   const aMissing = Number.isNaN(a);
@@ -138,94 +99,265 @@ const compareNumeric = (a: number, b: number): number => {
   return a - b;
 };
 
-const orderColumns = (keys: string[]): string[] => {
-  const seen = new Set(keys);
-  const ordered: string[] = [];
-  PREFERRED_COLUMN_ORDER.forEach((key) => {
-    if (seen.has(key)) {
-      ordered.push(key);
-      seen.delete(key);
-    }
-  });
-  Array.from(seen).forEach((key) => ordered.push(key));
-  return ordered;
-};
+/** One Attendance Record as shown in the dialog. */
+interface RecordRow {
+  id: number;
+  name: string;
+  email: string;
+  locationOption: string | null;
+  location: string;
+  joinMs: number;
+  time: string;
+  timeTitle: string;
+  durationSeconds: number;
+  duration: string;
+  durationTitle: string;
+  belowMinimum: boolean;
+  assignedTo: string | null;
+}
+
+const isLocationOption = (value: string | null): value is LocationOption_enum =>
+  value != null && (Object.values(LocationOption_enum) as string[]).includes(value);
 
 interface AttendanceDataDialogProps {
   open: boolean;
   onClose: () => void;
   attendanceData: string | null;
+  attendances: readonly SessionAttendances_Attendance[];
+  sessionStart: string | null;
+  sessionEnd: string | null;
   sessionTitle?: string;
 }
+
+const ASSIGNED = 'assigned';
+const UNASSIGNED = 'unassigned';
 
 const AttendanceDataDialog: FC<AttendanceDataDialogProps> = ({
   open,
   onClose,
   attendanceData,
+  attendances,
+  sessionStart,
+  sessionEnd,
   sessionTitle,
 }) => {
   const t = useTranslations('manageCourse.SessionsTab.attendance_data');
+  const tCommon = useTranslations('common');
   const locale = useLocale();
 
-  const rows = useMemo(() => parseAttendanceData(attendanceData), [attendanceData]);
+  const rawRows = useMemo(() => parseAttendanceData(attendanceData), [attendanceData]);
+
+  const rows = useMemo<RecordRow[]>(() => {
+    const assignments = assignRecordsToParticipants(rawRows, attendances);
+    const timeFormat = new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit' });
+    const dateTimeFormat = new Intl.DateTimeFormat(locale, {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+
+    return rawRows.map((raw) => {
+      const source = toText(raw.source);
+      const place = toText(raw.location);
+      const locationOption = attendanceLocationOption(source, place);
+      const locationLabel = isLocationOption(locationOption) ? tCommon(`location.${locationOption}`) : locationOption ?? '';
+      // Show the raw check-in place next to the mapped location (e.g. "Kiel · SK").
+      const location =
+        source !== 'ZOOM' && place && place !== locationLabel ? [locationLabel, place].filter(Boolean).join(' · ') : locationLabel;
+
+      const joinMs = toDateMs(raw.joinDateTime);
+      const leaveMs = toDateMs(raw.leaveDateTime);
+      const time = [joinMs, leaveMs]
+        .filter((ms) => !Number.isNaN(ms))
+        .map((ms) => timeFormat.format(new Date(ms)))
+        .join('–');
+      const timeTitle = Number.isNaN(joinMs) ? '' : dateTimeFormat.format(new Date(joinMs));
+
+      const seconds = toNumber(raw.duration);
+      const share = attendanceShare(seconds, sessionStart, sessionEnd);
+      const interruptions = toNumber(raw.interruptionCount);
+      const duration = [formatMinutes(seconds), share != null ? `(${formatPercent(share)})` : null]
+        .filter(Boolean)
+        .join(' ');
+
+      return {
+        id: raw.id,
+        name: toText(raw.name),
+        email: toText(raw.email),
+        locationOption,
+        location,
+        joinMs,
+        time,
+        timeTitle,
+        durationSeconds: seconds ?? Number.NaN,
+        duration,
+        durationTitle: interruptions != null ? t('interruptions', { count: interruptions }) : '',
+        belowMinimum: share != null && share < MIN_ATTENDANCE_SHARE,
+        assignedTo: assignments[raw._idx] ?? null,
+      };
+    });
+  }, [rawRows, attendances, locale, sessionStart, sessionEnd, t, tCommon]);
 
   const [pageIndex, setPageIndex] = useState(0);
   const [pageSize, setPageSize] = usePersistedPageSize('manageCourse.attendanceData', 15);
   const [searchFilter, setSearchFilter] = useState('');
+  const [locationFilter, setLocationFilter] = useState<string[]>([]);
+  const [assignmentFilter, setAssignmentFilter] = useState<string[]>([]);
 
-  const handlePageSizeChange = useCallback((size: number) => {
-    setPageSize(size);
-    setPageIndex(0);
-  }, [setPageSize]);
+  const handlePageSizeChange = useCallback(
+    (size: number) => {
+      setPageSize(size);
+      setPageIndex(0);
+    },
+    [setPageSize]
+  );
 
   const handleSearchFilterChange = useCallback((value: string) => {
     setSearchFilter(value);
     setPageIndex(0);
   }, []);
 
-  const columns = useMemo<ColumnDef<AttendanceRow>[]>(() => {
-    if (rows.length === 0) return [];
-    const keySet = new Set<string>();
+  const locationOptions = useMemo(() => {
+    const counts = new Map<string, number>();
     rows.forEach((row) => {
-      Object.keys(row).forEach((key) => {
-        if (key !== 'id' && key !== '_idx') keySet.add(key);
-      });
+      if (row.locationOption) counts.set(row.locationOption, (counts.get(row.locationOption) ?? 0) + 1);
     });
-    return orderColumns(Array.from(keySet)).map<ColumnDef<AttendanceRow>>((key) => {
-      // Sort by the underlying raw value (chronological for dates, numeric for
-      // durations) instead of the localized display string, which would
-      // otherwise yield lexicographic ordering.
-      let sortingFn: ColumnDef<AttendanceRow>['sortingFn'];
-      if (isDateTimeKey(key)) {
-        sortingFn = (rowA: Row<AttendanceRow>, rowB: Row<AttendanceRow>) =>
-          compareNumeric(toDateMs(rowA.original[key]), toDateMs(rowB.original[key]));
-      } else if (isDurationKey(key)) {
-        sortingFn = (rowA: Row<AttendanceRow>, rowB: Row<AttendanceRow>) =>
-          compareNumeric(toDurationSeconds(rowA.original[key]), toDurationSeconds(rowB.original[key]));
-      }
+    return Array.from(counts.entries()).map(([value, count]) => ({
+      value,
+      label: `${isLocationOption(value) ? tCommon(`location.${value}`) : value} (${count})`,
+    }));
+  }, [rows, tCommon]);
 
-      return {
-        id: key,
-        header: key,
-        accessorFn: (row) => formatCellValue(locale, key, row[key]),
-        enableSorting: true,
-        size: isDateTimeKey(key) ? 170 : 140,
-        cell: ({ getValue }) => <span>{String(getValue() ?? '')}</span>,
-        ...(sortingFn ? { sortingFn } : {}),
-      };
+  const filters = useMemo<TableGridFilter[]>(() => {
+    const result: TableGridFilter[] = [];
+    if (locationOptions.length > 1) {
+      result.push({
+        id: 'location',
+        label: t('filter_location'),
+        options: locationOptions,
+        selected: locationFilter,
+        onChange: (selected) => {
+          setLocationFilter(selected);
+          setPageIndex(0);
+        },
+      });
+    }
+    result.push({
+      id: 'assignment',
+      label: t('filter_assignment'),
+      options: [
+        { value: ASSIGNED, label: t('assigned') },
+        { value: UNASSIGNED, label: t('unassigned') },
+      ],
+      selected: assignmentFilter,
+      onChange: (selected) => {
+        setAssignmentFilter(selected);
+        setPageIndex(0);
+      },
     });
-  }, [rows, locale]);
+    return result;
+  }, [assignmentFilter, locationFilter, locationOptions, t]);
 
   const filteredRows = useMemo(() => {
-    if (!searchFilter.trim()) return rows;
-    const needle = searchFilter.toLowerCase();
-    return rows.filter((row) =>
-      Object.entries(row).some(([key, val]) => {
-        if (key === 'id' || key === '_idx') return false;
-        return formatCellValue(locale, key, val).toLowerCase().includes(needle);
-      })
-    );
-  }, [rows, searchFilter, locale]);
+    const needle = searchFilter.trim().toLowerCase();
+    return rows.filter((row) => {
+      if (locationFilter.length > 0 && !locationFilter.includes(row.locationOption ?? '')) return false;
+      if (assignmentFilter.length > 0 && !assignmentFilter.includes(row.assignedTo ? ASSIGNED : UNASSIGNED)) {
+        return false;
+      }
+      if (!needle) return true;
+      return [row.name, row.email, row.location, row.assignedTo ?? ''].some((value) =>
+        value.toLowerCase().includes(needle)
+      );
+    });
+  }, [rows, searchFilter, locationFilter, assignmentFilter]);
+
+  const columns = useMemo<ColumnDef<RecordRow>[]>(() => {
+    const wrap = 'whitespace-normal break-words';
+    return [
+      {
+        id: 'name',
+        header: t('col_name'),
+        accessorKey: 'name',
+        size: 150,
+        cell: ({ row }) => <span className={wrap}>{row.original.name}</span>,
+      },
+      {
+        id: 'email',
+        header: t('col_email'),
+        accessorKey: 'email',
+        size: 150,
+        cell: ({ row }) => <span className={`${wrap} text-label-secondary`}>{row.original.email || '–'}</span>,
+      },
+      {
+        id: 'location',
+        header: t('col_location'),
+        accessorKey: 'location',
+        size: 110,
+        cell: ({ row }) => <span className={wrap}>{row.original.location}</span>,
+      },
+      {
+        id: 'time',
+        header: t('col_time'),
+        accessorFn: (row) => row.time,
+        size: 110,
+        sortingFn: (a: Row<RecordRow>, b: Row<RecordRow>) => compareNumeric(a.original.joinMs, b.original.joinMs),
+        cell: ({ row }) => (
+          <span className="tabular-nums" title={row.original.timeTitle}>
+            {row.original.time}
+          </span>
+        ),
+      },
+      {
+        id: 'duration',
+        header: t('col_duration'),
+        accessorFn: (row) => row.duration,
+        size: 110,
+        sortingFn: (a: Row<RecordRow>, b: Row<RecordRow>) =>
+          compareNumeric(a.original.durationSeconds, b.original.durationSeconds),
+        cell: ({ row }) =>
+          row.original.duration ? (
+            <span className={`${wrap} tabular-nums`} title={row.original.durationTitle || undefined}>
+              {row.original.duration}
+              {row.original.belowMinimum && (
+                <span className="block text-xs text-label-secondary">{t('below_minimum')}</span>
+              )}
+            </span>
+          ) : (
+            <span className="text-label-secondary">–</span>
+          ),
+      },
+      {
+        id: 'assignedTo',
+        header: t('col_assigned'),
+        accessorFn: (row) => row.assignedTo ?? '',
+        size: 150,
+        cell: ({ row }) =>
+          row.original.assignedTo ? (
+            <span className={`${wrap} font-semibold`}>{row.original.assignedTo}</span>
+          ) : (
+            <span className="italic text-label-secondary">{t('not_assigned')}</span>
+          ),
+      },
+    ];
+  }, [t]);
+
+  const renderMobileRow = useCallback(
+    (row: RecordRow) => (
+      <div className="flex flex-col gap-0.5 text-sm">
+        <span className="font-semibold text-label-primary">{row.name || row.email}</span>
+        <span className="text-label-secondary">
+          {[row.location, row.time, row.duration].filter(Boolean).join(' · ')}
+        </span>
+        <span className={row.assignedTo ? 'text-label-primary' : 'italic text-label-secondary'}>
+          {row.assignedTo ? `${t('col_assigned')}: ${row.assignedTo}` : t('not_assigned')}
+        </span>
+      </div>
+    ),
+    [t]
+  );
 
   const title = sessionTitle ? `${t('dialog_title')} – ${sessionTitle}` : t('dialog_title');
 
@@ -241,7 +373,7 @@ const AttendanceDataDialog: FC<AttendanceDataDialogProps> = ({
       {rows.length === 0 ? (
         <div className="py-6 text-center text-label-secondary">{t('no_data')}</div>
       ) : (
-        <TableGrid<AttendanceRow>
+        <TableGrid<RecordRow>
           data={filteredRows}
           columns={columns}
           loading={false}
@@ -255,6 +387,8 @@ const AttendanceDataDialog: FC<AttendanceDataDialogProps> = ({
           searchFilter={searchFilter}
           onSearchFilterChange={handleSearchFilterChange}
           showGlobalSearchField
+          filters={filters}
+          renderMobileRow={renderMobileRow}
           refetchQueries={[]}
           compactRows
         />

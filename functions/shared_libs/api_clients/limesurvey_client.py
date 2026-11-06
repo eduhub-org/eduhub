@@ -35,10 +35,13 @@ class LimeSurveyClient:
         self.s_key = s_key
 
     def to_datetime(self, date_time):
+        # LimeSurvey stores local Berlin time without an offset (check-ins for
+        # a 16:00 session arrive from 15:50), not UTC.
         limesurvey_format = '%Y-%m-%d %H:%M:%S'
-        limesurvey_timezone = 'UTC'
-        reference_timezone = 'Europe/Berlin'
-        return pd.to_datetime(date_time, format=limesurvey_format).dt.tz_localize(limesurvey_timezone).dt.tz_convert(reference_timezone)
+        limesurvey_timezone = 'Europe/Berlin'
+        return pd.to_datetime(date_time, format=limesurvey_format).dt.tz_localize(
+            limesurvey_timezone, ambiguous='NaT', nonexistent='shift_forward'
+        )
 
     def create_lms_request(self, payload):
         req = urllib.request.Request(
@@ -72,22 +75,17 @@ class LimeSurveyClient:
                    'params': [self.s_key, self.sID, 'json'],
                    'id': 1}
         req = self.create_lms_request(payload)
-        try:
-            f = urllib.request.urlopen(req)
-            request_json = json.loads(f.read())
-            result_base64 = request_json['result']
-            # check whether result is a valid base64 string
-            # if result_base64['status'] == "No permission":
-            #     logging.error(
-            #         f"############# No permission to access the survey. Please check your credentials.")
-            #     return f"############# No permission to access the survey. Please check your credentials."
-            result_json = json.loads(base64.b64decode(result_base64))
-            response_df = self.format_responses(result_json['responses'])
-            return(response_df)
-
-        except:
-            e = sys.exc_info()[0]
-            print("<p>Error: %s</p>" % e)
+        f = urllib.request.urlopen(req)
+        request_json = json.loads(f.read())
+        result_base64 = request_json['result']
+        # An empty survey or a missing permission comes back as a status dict
+        # instead of base64 data.
+        if isinstance(result_base64, dict):
+            if result_base64.get('status') == 'No Response found.':
+                return pd.DataFrame()
+            raise RuntimeError(f"LimeSurvey export_responses failed: {result_base64}")
+        result_json = json.loads(base64.b64decode(result_base64))
+        return self.format_responses(result_json['responses'])
 
     def get_summary(self):
         func_name = "get_summary"
@@ -107,6 +105,8 @@ class LimeSurveyClient:
             print("<p>Error: %s</p>" % e)
 
     def format_responses(self, response_list):
+        if not response_list:
+            return pd.DataFrame()
         unnested_responses = []
         for i, resp in enumerate(response_list):
             for d_key in resp.keys():

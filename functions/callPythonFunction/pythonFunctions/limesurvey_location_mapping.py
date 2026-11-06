@@ -4,6 +4,8 @@ from typing import List
 
 
 LIMESURVEY_LOCATION_MAPPING = {
+    # Keep in sync with frontend-nx/apps/edu-hub/helpers/attendanceDetails.ts.
+    "SK": "KIEL",  # answer code of Starterkitchen
     "Starterkitchen": "KIEL",
     "Legienstraße 40": "KIEL",
     "Waterkant": "KIEL",
