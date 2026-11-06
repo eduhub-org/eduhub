@@ -106,8 +106,9 @@ For a material change:
 
 1. Set `PRIVACY_NOTICE_VERSION` (same file as the policy version) to the new
    `PRIVACY_POLICY_VERSION`, and add the notice text for that version at the
-   top of `PRIVACY_NOTICES`: Markdown with a short intro, one `-` bullet per
-   topic and a closing sentence, in German and English. The notice adds the
+   top of `PRIVACY_NOTICES`: Markdown with a short intro paragraph and one `-`
+   bullet per topic, each opening with a short bold lead-in (`**...:**`), in
+   German and English. The notice adds the
    title, "you do not need to do anything" and the link to the policy itself.
    Word it as described under "Wording the notice" below. Never edit an entry
    whose version is already in production.
@@ -144,34 +145,36 @@ the wording must keep two kinds of change apart:
   in the past or present tense - "Wir verzichten auf ...", "Wir nutzen jetzt
   ...".
 - **More transparency** (an existing practice is now described, named or
-  explained in more detail): use verbs that point at the text, not at the
-  processing - "Wir machen transparenter, welche ...", "Wir erläutern genauer,
-  wie ...". Avoid "neu", "jetzt", "ab sofort" or "neu beschrieben" for these.
-- When both kinds appear, add one sentence that says so, e.g. "Einige
-  Änderungen betreffen unsere tatsächlichen Praktiken, andere machen bereits
-  bestehende Abläufe transparenter und nachvollziehbarer."
+  explained in more detail): let the verb point at the text, not at the
+  processing - "Wir nennen jetzt konkret, welche ...", "Wir erklären genauer,
+  wie ...". Never "neu" or "ab sofort" next to the practice itself, and no
+  "neu beschrieben".
+- Format each item as a list entry with a short bold lead-in (`**Kein Meta
+  Pixel mehr:**`) followed by one sentence; open with one short paragraph that
+  says why and introduces the list. Avoid stacked near-synonyms
+  ("transparenter und nachvollziehbarer").
 - Lead with the benefit to users where there is one (data we no longer
   collect), keep a calm, informative tone, and say that nothing has to be done
-  when that is true. Informal "Du" in German, as everywhere.
+  when that is true (the notice adds that line and the link to the policy
+  itself). Informal "Du" in German, as everywhere.
 - Name examples (e-mails, online sessions, course chat) rather than vendors;
   the policy itself names the vendors.
 
-Example (version 2026-11-05):
+Example (version 2026-11-05, under the title "Unsere Datenschutzerklärung hat
+sich geändert"):
 
-> Der Schutz deiner Daten und ein transparenter Umgang damit sind uns wichtig.
-> Deshalb haben wir unsere Datenschutzerklärung überarbeitet:
+> Du sollst jederzeit nachvollziehen können, was mit deinen Daten passiert.
+> Deshalb haben wir unsere Datenschutzerklärung überarbeitet. Das sind die
+> wichtigsten Änderungen:
 >
-> - Wir verzichten auf das Meta Pixel und messen die Nutzung unserer Plattform
->   nur noch anonym und ohne Cookies.
-> - Wir machen transparenter, welche Anmeldedienste und technischen
->   Dienstleister wir für unsere Plattform nutzen, beispielsweise für E-Mails,
->   Online-Sitzungen und den Kurs-Chat.
-> - Wir erläutern genauer, wie wir mit Aufzeichnungen von Online-Sitzungen
->   umgehen und welche Informationen wir im Rahmen unserer Förderprojekte an
->   Fördermittelgeber weitergeben.
->
-> Einige Änderungen betreffen unsere tatsächlichen Praktiken, andere machen
-> bereits bestehende Abläufe transparenter und nachvollziehbarer.
+> - **Kein Meta Pixel mehr:** Wir messen die Nutzung unserer Plattform nur
+>   noch anonym und ohne Cookies.
+> - **Mehr Transparenz bei Dienstleistern:** Wir nennen jetzt konkret, welche
+>   Anmeldedienste und technischen Dienstleister wir nutzen, zum Beispiel für
+>   E-Mails, Online-Sitzungen und den Kurs-Chat.
+> - **Aufzeichnungen und Förderprojekte:** Wir erklären genauer, wie wir mit
+>   Aufzeichnungen von Online-Sitzungen umgehen und welche Daten wir im Rahmen
+>   unserer Förderprojekte an Fördermittelgeber weitergeben.
 
 ## How to Find Which Version a User Accepted
 

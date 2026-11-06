@@ -88,9 +88,6 @@ module.exports = {
     fontFamily: {
       body: ['"Plus Jakarta Sans"', '"sans-serif"'],
     },
-    listStyleType: {
-      check: '{ list-style-image: url(img/iphone.png); }',
-    },
     screens: {
       xs: '375px',
       ...defaultTheme.screens,

@@ -17,7 +17,7 @@ import { AuthRoles } from '../../types/enums';
 // Every account holds the `user` role; org admins do not inherit user_access.
 const USER_ROLE_CONTEXT = { role: AuthRoles.user };
 
-// The notice body is our own text, but keep it to paragraphs and lists anyway.
+// The notice body is our own text, but keep it to paragraphs, lists and bold lead-ins anyway.
 const NOTICE_ELEMENTS = ['p', 'ul', 'li', 'strong', 'em'];
 
 /**
@@ -65,14 +65,15 @@ export const PrivacyUpdateNotice: FC = () => {
     <div role="status" className="w-full bg-fill-primary text-label-primary border-b border-border-primary">
       <div className="max-w-screen-xl mx-auto flex items-start gap-4 px-3 md:px-16 py-4">
         <div className="flex-1 text-sm leading-relaxed">
-          <p className="font-semibold">{t('title')}</p>
+          <p className="text-base font-bold">{t('title')}</p>
           {notice && (
             <ReactMarkdown
               allowedElements={NOTICE_ELEMENTS}
               unwrapDisallowed
               components={{
-                p: ({ children }) => <p className="mt-1">{children}</p>,
-                ul: ({ children }) => <ul className="mt-1 list-disc pl-5">{children}</ul>,
+                p: ({ children }) => <p className="mt-2">{children}</p>,
+                ul: ({ children }) => <ul className="mt-2 list-disc pl-5 space-y-1">{children}</ul>,
+                strong: ({ children }) => <strong className="font-bold">{children}</strong>,
               }}
             >
               {locale === 'en' ? notice.en : notice.de}
