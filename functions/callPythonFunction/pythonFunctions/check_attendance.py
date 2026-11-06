@@ -232,7 +232,8 @@ def session_locations(session):
     ]
 
 
-ON_SITE_OPTIONS = ("KIEL", "HEIDE")
+# Every LocationOption except ONLINE; all use the same check-in survey.
+ON_SITE_OPTIONS = ("KIEL", "HEIDE", "HAMBURG")
 
 
 def check_in_window_closed(session, now=None):

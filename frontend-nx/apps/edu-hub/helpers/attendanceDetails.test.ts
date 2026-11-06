@@ -53,6 +53,17 @@ describe('assignRecordsToParticipants', () => {
     expect(result).toEqual({ '0': 'Christine Avery' });
   });
 
+  it('combines stored indexes with the identifier fallback in one session', () => {
+    const result = assignRecordsToParticipants(
+      [{ _idx: '0', name: 'Christine' }, { _idx: '1', name: 'Bob Builder' }],
+      [
+        { source: 'ZOOM', attendanceRecordIndex: 0, recordedIdentifier: 'Christine', matchType: 'PARTIAL_NAME', User: user('Christine', 'Avery') },
+        { source: 'ZOOM', attendanceRecordIndex: null, recordedIdentifier: 'Bob Builder', matchType: 'NAME', User: user('Bob', 'Builder') },
+      ]
+    );
+    expect(result).toEqual({ '0': 'Christine Avery', '1': 'Bob Builder' });
+  });
+
   it('falls back to the recorded identifier for sessions checked before record indexes existed', () => {
     const result = assignRecordsToParticipants(
       [{ _idx: '0', name: 'Work Laptop', email: 'jane@example.com' }, { _idx: '1', name: 'Bob Builder' }],

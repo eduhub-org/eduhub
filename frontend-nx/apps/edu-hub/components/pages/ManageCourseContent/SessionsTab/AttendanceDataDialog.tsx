@@ -131,6 +131,8 @@ interface AttendanceDataDialogProps {
 
 const ASSIGNED = 'assigned';
 const UNASSIGNED = 'unassigned';
+// Filter value for records without a location (e.g. a check-in without a place).
+const UNKNOWN_LOCATION = '__unknown';
 
 const AttendanceDataDialog: FC<AttendanceDataDialogProps> = ({
   open,
@@ -222,13 +224,15 @@ const AttendanceDataDialog: FC<AttendanceDataDialogProps> = ({
   const locationOptions = useMemo(() => {
     const counts = new Map<string, number>();
     rows.forEach((row) => {
-      if (row.locationOption) counts.set(row.locationOption, (counts.get(row.locationOption) ?? 0) + 1);
+      const key = row.locationOption ?? UNKNOWN_LOCATION;
+      counts.set(key, (counts.get(key) ?? 0) + 1);
     });
-    return Array.from(counts.entries()).map(([value, count]) => ({
-      value,
-      label: `${isLocationOption(value) ? tCommon(`location.${value}`) : value} (${count})`,
-    }));
-  }, [rows, tCommon]);
+    return Array.from(counts.entries()).map(([value, count]) => {
+      const name =
+        value === UNKNOWN_LOCATION ? t('unknown_location') : isLocationOption(value) ? tCommon(`location.${value}`) : value;
+      return { value, label: `${name} (${count})` };
+    });
+  }, [rows, t, tCommon]);
 
   const filters = useMemo<TableGridFilter[]>(() => {
     const result: TableGridFilter[] = [];
@@ -263,7 +267,7 @@ const AttendanceDataDialog: FC<AttendanceDataDialogProps> = ({
   const filteredRows = useMemo(() => {
     const needle = searchFilter.trim().toLowerCase();
     return rows.filter((row) => {
-      if (locationFilter.length > 0 && !locationFilter.includes(row.locationOption ?? '')) return false;
+      if (locationFilter.length > 0 && !locationFilter.includes(row.locationOption ?? UNKNOWN_LOCATION)) return false;
       if (assignmentFilter.length > 0 && !assignmentFilter.includes(row.assignedTo ? ASSIGNED : UNASSIGNED)) {
         return false;
       }

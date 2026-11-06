@@ -155,10 +155,14 @@ describe('course participation attendance', () => {
     });
 
     it('reverts when the flip lands on the automatic result', () => {
-      expect(getNextAttendanceOverride(ATTENDED, ATTENDED)).toBe(REVERT_TO_AUTOMATIC);
-      expect(getNextAttendanceOverride(MISSED, MISSED)).toBe(REVERT_TO_AUTOMATIC);
       expect(getNextAttendanceOverride(ATTENDED, MISSED)).toBe(REVERT_TO_AUTOMATIC);
       expect(getNextAttendanceOverride(MISSED, ATTENDED)).toBe(REVERT_TO_AUTOMATIC);
+    });
+
+    it('flips a Manual Attendance that repeats the automatic result', () => {
+      // Every click flips what is shown; reverting here would change nothing visibly.
+      expect(getNextAttendanceOverride(ATTENDED, ATTENDED)).toBe(MISSED);
+      expect(getNextAttendanceOverride(MISSED, MISSED)).toBe(ATTENDED);
     });
 
     it('cycles unknown → attended → missed → unknown without an automatic result', () => {

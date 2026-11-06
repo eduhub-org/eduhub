@@ -632,11 +632,12 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
                 <span className="relative inline-flex">
                   {d.attendances.manual && (
                     // The dot is a 12px circle in the middle of its 24px icon box; whole-pixel
-                    // offsets put the badge on its upper right edge without sub-pixel blur.
+                    // offsets put the badge on its upper right edge without sub-pixel blur. No ring:
+                    // the row surface changes when selected, the label colour stands out on both.
                     <span
                       aria-hidden
                       data-testid="manual-attendance-badge"
-                      className="pointer-events-none absolute right-[4px] top-[4px] h-[7px] w-[7px] rounded-full bg-label-secondary ring-[1.5px] ring-white"
+                      className="pointer-events-none absolute right-[4px] top-[4px] h-[7px] w-[7px] rounded-full bg-label-primary"
                     />
                   )}
                   <Dot

@@ -772,3 +772,27 @@ class TestCheckInLocations:
         times = client.to_datetime(pd.Series(["2026-10-25 02:30:00", "2026-10-25 12:00:00"]))
         assert not times.isna().any()
         assert times.iloc[0] == pd.Timestamp("2026-10-25T02:30:00+02:00")
+
+
+def test_hamburg_sessions_collect_check_ins(monkeypatch):
+    from pythonFunctions import check_attendance as mod
+
+    session = {
+        "id": 40,
+        "title": "Hamburg",
+        "startDateTime": pd.Timestamp("2026-01-01T10:00:00Z"),
+        "endDateTime": pd.Timestamp("2026-01-01T11:30:00Z"),
+        "Course": {"CourseLocations": [{"locationOption": "HAMBURG", "defaultSessionAddress": None}]},
+        "SessionAddresses": [],
+    }
+    fetched = []
+
+    def _fetch(s, options=None):
+        fetched.append(options)
+        return pd.DataFrame([{"name": "Bob Builder", "location": "HH"}])
+
+    monkeypatch.setattr(mod, "get_offline_session_attendance", _fetch)
+    records, reason = mod.collect_attendance_records(session, None)
+    assert reason is None
+    assert fetched == [["HAMBURG"]]
+    assert list(records["name"]) == ["Bob Builder"]

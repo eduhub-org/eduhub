@@ -132,8 +132,9 @@ interface AssignableRecord {
 
 /**
  * Who each Attendance Record was matched to, keyed by the record's index in
- * Session.attendanceData. Sessions checked before Attendances stored their
- * record index fall back to the recorded name or email.
+ * Session.attendanceData. Attendances that stored their record index are
+ * placed first; the rest (checked before record indexes existed) fall back to
+ * the recorded name or email among the records still unassigned.
  */
 export const assignRecordsToParticipants = (
   records: readonly AssignableRecord[],
@@ -143,16 +144,13 @@ export const assignRecordsToParticipants = (
   const fullName = (a: AssignableAttendance) => `${a.User?.firstName ?? ''} ${a.User?.lastName ?? ''}`.trim();
   const result: Record<string, string> = {};
 
-  if (automatic.some((a) => a.attendanceRecordIndex != null)) {
-    automatic.forEach((a) => {
-      if (a.attendanceRecordIndex != null) result[String(a.attendanceRecordIndex)] = fullName(a);
-    });
-    return result;
-  }
+  automatic.forEach((a) => {
+    if (a.attendanceRecordIndex != null) result[String(a.attendanceRecordIndex)] = fullName(a);
+  });
 
   const normalise = (value: unknown) => (typeof value === 'string' ? value.trim().toLowerCase() : '');
   automatic
-    .filter((a) => a.matchType && a.matchType !== 'NONE' && a.recordedIdentifier)
+    .filter((a) => a.attendanceRecordIndex == null && a.matchType && a.matchType !== 'NONE' && a.recordedIdentifier)
     .forEach((a) => {
       const identifier = normalise(a.recordedIdentifier);
       const record = records.find(

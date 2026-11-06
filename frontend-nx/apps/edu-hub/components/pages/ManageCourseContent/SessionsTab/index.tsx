@@ -677,7 +677,11 @@ const ExpandableSessionRowContent: FC<ExpandableSessionRowContentProps> = ({
 
   const locations = useMemo(() => sessionLocationEntries(session, courseLocations), [session, courseLocations]);
 
-  const { data: attendanceRows } = useRoleQuery<SessionAttendances, SessionAttendancesVariables>(SESSION_ATTENDANCES, {
+  const {
+    data: attendanceRows,
+    loading: attendanceLoading,
+    error: attendanceError,
+  } = useRoleQuery<SessionAttendances, SessionAttendancesVariables>(SESSION_ATTENDANCES, {
     variables: { sessionId: session.id },
     skip: !hasAttendanceData,
     fetchPolicy: 'cache-and-network',
@@ -898,8 +902,17 @@ const ExpandableSessionRowContent: FC<ExpandableSessionRowContentProps> = ({
           <section className="border-t border-table-divider pt-4">
             <SectionLabel>{t('SessionsTab.attendance_data.label')}</SectionLabel>
             <div className="flex flex-wrap items-center justify-between gap-3">
-              {hasAttendanceData ? (
+              {hasAttendanceData && attendanceRows ? (
                 <SessionAttendanceSummary summary={attendanceSummary} locationOptions={locationOptions} />
+              ) : hasAttendanceData ? (
+                // Without data yet (loading) or after a failed query, a summary would read "0 / 0".
+                <output className="text-sm text-label-secondary">
+                  {attendanceError
+                    ? t('SessionsTab.attendance_data.unavailable')
+                    : attendanceLoading
+                      ? t('SessionsTab.attendance_data.loading')
+                      : t('SessionsTab.attendance_data.unavailable')}
+                </output>
               ) : (
                 <output className="text-sm text-label-secondary">{t('SessionsTab.attendance_data.not_checked')}</output>
               )}
