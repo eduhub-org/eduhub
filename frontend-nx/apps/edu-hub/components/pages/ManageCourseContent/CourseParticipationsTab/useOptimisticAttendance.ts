@@ -1,17 +1,22 @@
 import { MutationFunction } from '@apollo/client';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { AttendanceStatus_enum } from '../../../../__generated__/globalTypes';
 import { CourseParticipations_Course_by_pk_Sessions } from '../../../../queries/__generated__/CourseParticipations';
 import {
   InsertSingleAttendance,
   InsertSingleAttendanceVariables,
 } from '../../../../queries/__generated__/InsertSingleAttendance';
 import {
+  DeleteManualAttendances,
+  DeleteManualAttendancesVariables,
+} from '../../../../queries/__generated__/DeleteManualAttendances';
+import {
+  AttendanceOverride,
   CourseEnrollmentWithAttendances,
+  REVERT_TO_AUTOMATIC,
   applyAttendanceOverrides,
   attendanceOverrideKey,
-  collapseAttendancesBySession,
-  getNextAttendanceStatus,
+  getNextAttendanceOverride,
+  splitAttendancesBySession,
 } from '../../../../helpers/courseParticipationAttendance';
 import { ATTENDANCE_SOURCE_INSTRUCTOR } from '../../../../helpers/attendance';
 
@@ -21,6 +26,7 @@ interface UseOptimisticAttendanceOptions {
   enrollments: readonly CourseEnrollmentWithAttendances[];
   sessions: readonly CourseParticipations_Course_by_pk_Sessions[];
   insertAttendance: MutationFunction<InsertSingleAttendance, InsertSingleAttendanceVariables>;
+  deleteManualAttendances: MutationFunction<DeleteManualAttendances, DeleteManualAttendancesVariables>;
   refetchAttendances: () => Promise<unknown>;
   onError: (message: string) => void;
 }
@@ -29,10 +35,11 @@ export function useOptimisticAttendance({
   enrollments,
   sessions,
   insertAttendance,
+  deleteManualAttendances,
   refetchAttendances,
   onError,
 }: UseOptimisticAttendanceOptions) {
-  const [overrides, setOverrides] = useState<Record<string, AttendanceStatus_enum>>({});
+  const [overrides, setOverrides] = useState<Record<string, AttendanceOverride>>({});
   const overridesRef = useRef(overrides);
   const overrideVersionsRef = useRef<Record<string, number>>({});
   const nextVersionRef = useRef(0);
@@ -41,7 +48,7 @@ export function useOptimisticAttendance({
   const refetchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const mountedRef = useRef(true);
 
-  const replaceOverrides = useCallback((next: Record<string, AttendanceStatus_enum>) => {
+  const replaceOverrides = useCallback((next: Record<string, AttendanceOverride>) => {
     overridesRef.current = next;
     if (mountedRef.current) setOverrides(next);
   }, []);
@@ -58,7 +65,7 @@ export function useOptimisticAttendance({
       void refetchAttendances()
         .then(() => {
           if (!mountedRef.current) return;
-          const nextOverrides: Record<string, AttendanceStatus_enum> = {};
+          const nextOverrides: Record<string, AttendanceOverride> = {};
           const nextVersions: Record<string, number> = {};
 
           for (const [key, status] of Object.entries(overridesRef.current)) {
@@ -97,29 +104,32 @@ export function useOptimisticAttendance({
       if (!enrollment) return;
 
       const key = attendanceOverrideKey(userId, session.id);
-      const attendanceBySession = collapseAttendancesBySession(enrollment.User.Attendances);
-      const currentStatus = overridesRef.current[key] ?? attendanceBySession[session.id]?.status;
-      const nextStatus = getNextAttendanceStatus(currentStatus);
+      const { manual, automatic } = splitAttendancesBySession(enrollment.User.Attendances)[session.id] ?? {};
+      const pending = overridesRef.current[key];
+      const manualStatus = pending === undefined ? manual?.status : pending === REVERT_TO_AUTOMATIC ? undefined : pending;
+      const nextOverride = getNextAttendanceOverride(manualStatus, automatic?.status);
       const version = ++nextVersionRef.current;
 
       overrideVersionsRef.current = { ...overrideVersionsRef.current, [key]: version };
-      replaceOverrides({ ...overridesRef.current, [key]: nextStatus });
+      replaceOverrides({ ...overridesRef.current, [key]: nextOverride });
       pendingMutationsRef.current += 1;
 
       const previousMutation = mutationQueuesRef.current[key] ?? Promise.resolve();
       const mutation = previousMutation
         .catch(() => undefined)
-        .then(() =>
-          insertAttendance({
-            variables: {
-              input: {
-                status: nextStatus,
-                sessionId: session.id,
-                source: ATTENDANCE_SOURCE_INSTRUCTOR,
-                userId,
-              },
-            },
-          })
+        .then((): Promise<unknown> =>
+          nextOverride === REVERT_TO_AUTOMATIC
+            ? deleteManualAttendances({ variables: { userId, sessionId: session.id } })
+            : insertAttendance({
+                variables: {
+                  input: {
+                    status: nextOverride,
+                    sessionId: session.id,
+                    source: ATTENDANCE_SOURCE_INSTRUCTOR,
+                    userId,
+                  },
+                },
+              })
         );
       mutationQueuesRef.current[key] = mutation;
 
@@ -146,6 +156,7 @@ export function useOptimisticAttendance({
           scheduleBackgroundSync();
         });
     }, [
+      deleteManualAttendances,
       enrollments,
       insertAttendance,
       onError,

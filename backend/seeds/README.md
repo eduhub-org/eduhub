@@ -36,16 +36,17 @@ There are two ways to manage seed data:
 The default seed reuses the footer's checked-in SVGs so course funding sections
 work without uploading images to the storage emulator:
 
-- `Present Course 1` (4) and `Current Course A` (301): one wide EU/SH logo band.
-- `Current Course B` (302): DLC, EU/SH, and Kiel logos to exercise wrapping.
-- `This is a Degree` (7): DLC and EU/SH logos.
+- `Applied Machine Learning` (7009) and `Introduction to Data Science & Machine
+  Learning` (7005): one wide EU/SH logo band.
+- `From LLMs to AI Agents` (7004): DLC, EU/SH, and Kiel logos to exercise wrapping.
+- `Machine Learning Degree` (7000): EU/SH logo band, like production.
 - Other courses retain the empty funding-logo state.
 
 These fixtures load automatically with a fresh database. To add just these
 fixtures to an existing local Docker database, run from the repository root:
 
 ```bash
-sed -n '/^-- Course funding-logo fixtures/,$p' backend/seeds/default/initial_seeds.sql |
+sed -n '/^-- Course funding-logo fixtures/,/^-- BEGIN GENERATED COURSE_ATTENDANCE_SEED/{/^-- BEGIN GENERATED/!p}' backend/seeds/default/initial_seeds.sql |
   docker compose exec -T db_hasura psql -U postgres -d postgres \
     -v ON_ERROR_STOP=1 --single-transaction
 ```
@@ -68,6 +69,77 @@ python3 backend/seeds/utils/generate_ml_degree_seed.py --users 300
 
 This dataset is still part of the default seed. Larger performance datasets
 should be kept in a separate opt-in seed profile.
+
+The same command also regenerates the `COURSE_ATTENDANCE_SEED` block at the end
+of the file (`utils/course_attendance_seed.py`): course locations, weekly
+sessions and attendances for the realistic courses.
+
+- Past courses (7001–7008, 7012) have fixed dates in 2024 and every session is
+  checked.
+- `Applied Machine Learning` (7009) and `Introduction to Deep Reinforcement
+  Learning` (7010) are running and `Causal Inference and ML` (7011) is
+  upcoming. Their sessions are scheduled relative to the week the database is
+  seeded, so they stay running/upcoming on every fresh database.
+- Checked sessions carry Attendance Records (`Session.attendanceData`) and one
+  automatic Attendance per participant like `check_attendance` writes them:
+  email, name and partial-name matches, too-short Zoom stays, unmatched
+  participants with closest candidates, and a few Manual Attendances.
+- The block covers the generated participants and the dev accounts'
+  enrollments written further up in the file, so add hand-written enrollments
+  above it and rerun the generator.
+
+### Machine Learning Degree and Events
+
+`Machine Learning Degree` (7000) mirrors the production degree page: English
+texts, Kiel + online, organized by "Team Coding.Waterkant" (a `CourseInstructor`
+whose user links to the community homepage), EU/SH funding logo, and its
+"current offers" list. That list shows every linked course whose course and
+program are published, so past semesters and past events sit in unpublished
+programs (`Sommersemester 2024`, `Wintersemester 2024/25`,
+`Events 2025 (Archiv)`), and only `Laufendes Semester` and `Events` are
+published.
+
+The events (7201–7214, `utils/event_seed.py`) cover every registration option;
+the bracket in each title names the test case:
+
+| Event | Case |
+|---|---|
+| 7201 KI-Stammtisch Kiel | direct, free, available places shown |
+| 7202 Data Science Meetup Kiel | direct, guests (sign-up without account) |
+| 7203 Prototyping-Workshop | direct with input, guests |
+| 7204 Prompt Engineering Masterclass | paid direct: paid, SEPA pending, payment pending |
+| 7205 Waterkant Festival Tagesticket | paid with input |
+| 7206 Coding Camp 2026 | application: applied, invited, confirmed, rejected |
+| 7207 Waterkant Festival 2026 | external registration |
+| 7208 AI Founders Breakfast | full, waitlist |
+| 7209 Prototyping Week | running now (daily sessions), application closed |
+| 7210 Coding.Waterkant Meetup-Reihe | running series, hybrid, guests |
+| 7211–7214 | past: application, direct with guests, paid with refund, online |
+| 7215 Gastvortrag: ML in der Industrie | a course session published as an event (`sourceSessionId`) |
+
+Upcoming and running events are dated relative to the seeding day; finished
+event sessions have attendances like the courses. Paid tickets carry invoices
+(`PAID`, `ISSUED`, `REFUNDED`); checkout itself needs Stripe keys.
+
+### Locations
+
+Three venues (`LocationAddress`) cover the on-site locations: Starterkitchen and
+Legienstraße 40 in Kiel, Westküstenhochschule in Heide. Every on-site course
+location points to one of them as its default address and every on-site
+session address references it; online locations keep a Zoom link. The event
+created from a course session (7215) gets its locations, address and speaker
+copied from that session by the database triggers.
+
+### Dev Accounts
+
+- `admin@example.com` and `instructor@example.com` teach a past course (with an
+  instructor certificate), a running course and the upcoming course 7011.
+- `user@example.com` registered for several events (7201, a paid ticket for
+  7204, an application for 7206, the running meetup series 7210, past 7211).
+- `user@example.com` took four past courses (7001 with achievement and
+  attendance certificates, 7003 with an attendance certificate) and takes the
+  running course 7009.
+- The certificate PDFs live in `backend/init.d/file_storage/<userId>/<courseId>/`.
 
 ### Loading the Performance Test Degree Seed
 

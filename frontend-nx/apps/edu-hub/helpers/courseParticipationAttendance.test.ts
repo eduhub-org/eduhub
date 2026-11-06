@@ -5,8 +5,11 @@ import {
   collapseAttendancesBySession,
   countMandatorySessions,
   getAttendanceStatusFromMap,
+  getNextAttendanceOverride,
   getNextAttendanceStatus,
   groupAttendancesByUser,
+  REVERT_TO_AUTOMATIC,
+  splitAttendancesBySession,
 } from './courseParticipationAttendance';
 
 type AttendanceRow = {
@@ -141,5 +144,56 @@ describe('course participation attendance', () => {
   it('treats sessions without an explicit flag as mandatory', () => {
     const unflagged = [{ id: 1 }, { id: 2, isMandatory: null }];
     expect(countMandatorySessions(unflagged)).toBe(2);
+  });
+
+  describe('reverting a Manual Attendance', () => {
+    const { ATTENDED, MISSED, NO_INFO } = AttendanceStatus_enum;
+
+    it('flips the automatic result into a Manual Attendance', () => {
+      expect(getNextAttendanceOverride(undefined, ATTENDED)).toBe(MISSED);
+      expect(getNextAttendanceOverride(undefined, MISSED)).toBe(ATTENDED);
+    });
+
+    it('reverts when the flip lands on the automatic result', () => {
+      expect(getNextAttendanceOverride(ATTENDED, MISSED)).toBe(REVERT_TO_AUTOMATIC);
+      expect(getNextAttendanceOverride(MISSED, ATTENDED)).toBe(REVERT_TO_AUTOMATIC);
+    });
+
+    it('flips a Manual Attendance that repeats the automatic result', () => {
+      // Every click flips what is shown; reverting here would change nothing visibly.
+      expect(getNextAttendanceOverride(ATTENDED, ATTENDED)).toBe(MISSED);
+      expect(getNextAttendanceOverride(MISSED, MISSED)).toBe(ATTENDED);
+    });
+
+    it('cycles unknown → attended → missed → unknown without an automatic result', () => {
+      expect(getNextAttendanceOverride(undefined, undefined)).toBe(ATTENDED);
+      expect(getNextAttendanceOverride(ATTENDED, undefined)).toBe(MISSED);
+      expect(getNextAttendanceOverride(MISSED, undefined)).toBe(REVERT_TO_AUTOMATIC);
+      expect(getNextAttendanceOverride(MISSED, NO_INFO)).toBe(REVERT_TO_AUTOMATIC);
+    });
+
+    it('drops every Manual Attendance of the session on revert', () => {
+      const enrollments = [
+        {
+          userId: 'user-1',
+          User: {
+            Attendances: [
+              attendance(1, 1, MISSED, 'ZOOM'),
+              attendance(2, 1, ATTENDED, 'INSTRUCTOR'),
+              attendance(3, 1, MISSED, 'INSTRUCTOR'),
+              attendance(4, 2, ATTENDED, 'INSTRUCTOR'),
+            ],
+          },
+        },
+      ];
+      const overrides = { [attendanceOverrideKey('user-1', 1)]: REVERT_TO_AUTOMATIC };
+
+      const result = applyAttendanceOverrides(enrollments, overrides, sessions);
+      const split = splitAttendancesBySession(result[0].User.Attendances);
+
+      expect(split[1]).toEqual({ automatic: expect.objectContaining({ id: 1 }) });
+      expect(split[2]?.manual?.id).toBe(4);
+      expect(collapseAttendancesBySession(result[0].User.Attendances)[1]?.status).toBe(MISSED);
+    });
   });
 });

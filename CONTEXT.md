@@ -49,6 +49,27 @@ Someone whose Registration is confirmed or registered and is not a test enrollme
 **Overbooking**:
 More places held than the course has. Only organizers can overbook, and are warned before they do; people registering themselves never can.
 
+### Attendance
+
+**Attendance Record**:
+One entry from an attendance source for a Session: a Zoom participant or a submitted check-in (LimeSurvey) response. Records are kept as they came in; many match nobody (other courses, unsubmitted, unknown names).
+_Avoid_: attendance (for a raw entry)
+
+**Attendance**:
+A Participant's result for one Session: attended or missed. It is set automatically from the Attendance Records, or by an Organizer as a Manual Attendance. Until a Session has been checked there is no Attendance: it is unknown, never missed. A checked Session with no Attendance Records at all makes everyone missed.
+
+**Minimum Attendance Time**:
+The share of a Session (50 %) someone must spend in the online meeting for it to count as attended. A check-in on site counts as attended regardless of time. When someone has both, the one that counts wins.
+
+**Check-in Window**:
+From 30 minutes before a Session starts to 30 minutes after it ends. Only check-ins inside it belong to the Session.
+
+**Manual Attendance**:
+An Attendance an Organizer set by hand. It always takes precedence over the automatic one, which is kept underneath and comes back when the Organizer reverts their setting.
+
+**Attendance Location**:
+Where an attended Attendance took place: on site (a Course location such as Kiel or Heide) or online. A Manual Attendance has none and is counted as "manual".
+
 ### Paying
 
 **Invoice**:
@@ -84,6 +105,8 @@ The email organizers send by hand when Sessions are rescheduled. Separate from t
 - An **Invitation** holds one **Place** until it is accepted, declined or expires
 - A **Course** has zero or more **Sessions**; when it has any, exactly one of them is its **First Session**
 - A **Participant** receives at most one **Session Reminder** per **Course**
+- A **Session** has many **Attendance Records** and at most one **Attendance** per **Participant** (or person who completed the Course); a **Manual Attendance** overrides the automatic one
+- An **Attendance Record** belongs to at most one **Attendance**
 
 ## Example dialogue
 
@@ -93,4 +116,5 @@ The email organizers send by hand when Sessions are rescheduled. Separate from t
 ## Flagged ambiguities
 
 - "Invite" meant both the application decision (green rating) and moving someone up from the waitlist. Both are an **Invitation**: the same held place with a deadline; how it is accepted depends on the course (confirm or pay).
+- "Attendance" meant both a raw Zoom/LimeSurvey entry and a Participant's result for a Session. Resolved: the entry is an **Attendance Record**, the result an **Attendance**.
 - "Session reminder" meant three emails (24h, 1h, 15min) before sessions. Resolved: one email, before the First Session only, at the Course's Reminder Lead Time.

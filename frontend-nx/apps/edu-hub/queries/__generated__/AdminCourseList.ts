@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { Course_bool_exp, Course_order_by, Weekday_enum, CourseRegistrationType_enum, LocationOption_enum, OrganizationType_enum, CourseStatus_enum } from "./../../__generated__/globalTypes";
+import { Course_bool_exp, Course_order_by, Weekday_enum, CourseRegistrationType_enum, LocationOption_enum, OrganizationType_enum, CourseStatus_enum, AttendanceStatus_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: AdminCourseList
@@ -428,6 +428,44 @@ export interface AdminCourseList_Course_CourseDegrees {
   DegreeCourse: AdminCourseList_Course_CourseDegrees_DegreeCourse;
 }
 
+export interface AdminCourseList_Course_LastCheckedSession_Attendances {
+  __typename: "Attendance";
+  id: number;
+  /**
+   * The ID of the user for which the attendance was recorded (only provided if the recorded name was in accordance with the name of a user registered for the session)
+   */
+  userId: any | null;
+  /**
+   * The attendance status: MISSED for a user registered for the session but not recorded (or recognized), otherwise ATTENDED
+   */
+  status: AttendanceStatus_enum;
+  /**
+   * The source that provided the recorded names of the attendees.
+   */
+  source: string;
+  /**
+   * Location for this attendance. For LimeSurvey attendances, this stores the raw Place value from the QR code (e.g., "Starterkitchen", "Legienstraße 40", "Waterkant", "Kosmos", "KIEL", "HEIDE"). For Zoom attendances, this stores "ZOOM". These values are mapped to LocationOption values (KIEL, HEIDE, ONLINE) when updating CourseEnrollment.location. NULL means location is not yet determined.
+   */
+  location: string | null;
+}
+
+export interface AdminCourseList_Course_LastCheckedSession {
+  __typename: "Session";
+  id: number;
+  /**
+   * The title of the session
+   */
+  title: string;
+  /**
+   * The day and time of the start of the session
+   */
+  startDateTime: any;
+  /**
+   * An array relationship
+   */
+  Attendances: AdminCourseList_Course_LastCheckedSession_Attendances[];
+}
+
 export interface AdminCourseList_Course_AppliedAndUnratedCount_aggregate {
   __typename: "CourseEnrollment_aggregate_fields";
   count: number;
@@ -523,7 +561,7 @@ export interface AdminCourseList_Course {
    */
   publicParticipantCount: any | null;
   /**
-   * A computed field, executes function "course_waitlist_count"
+   * People on the waitlist of a course (preview enrollments excluded). Free places are reserved for them: new registrations need maxParticipants > active participants + this count.
    */
   waitlistCount: any | null;
   /**
@@ -575,10 +613,6 @@ export interface AdminCourseList_Course {
    * Full URL to the Formbricks survey for course enrollment/application (for iframe embedding). Overrides program default if set.
    */
   formbricksEnrollmentSurveyUrl: string | null;
-  /**
-   * How many hours before the first session participants get the session reminder email. Null sends none.
-   */
-  sessionReminderLeadHours: number | null;
   /**
    * The time the course starts each week.
    */
@@ -637,6 +671,10 @@ export interface AdminCourseList_Course {
   requiredEventCount: number | null;
   matrixRoomId: string | null;
   /**
+   * How many hours before the first session participants get the session reminder email. Null sends none.
+   */
+  sessionReminderLeadHours: number | null;
+  /**
    * Stripe Product ID for the base course price
    */
   stripeProductId: string | null;
@@ -664,6 +702,10 @@ export interface AdminCourseList_Course {
    * An array relationship
    */
   CourseDegrees: AdminCourseList_Course_CourseDegrees[];
+  /**
+   * An array relationship
+   */
+  LastCheckedSession: AdminCourseList_Course_LastCheckedSession[];
   /**
    * An aggregate relationship
    */

@@ -10,6 +10,7 @@ import { CertificateDownload } from '../../../common/CertificateDownload';
 import { Card } from '../../../common/Card';
 import { useRoleQuery } from '../../../../hooks/authedQuery';
 import {
+  DELETE_MANUAL_ATTENDANCES,
   INSERT_SINGLE_ATTENDANCE,
   REMOVE_ACHIEVEMENT_CERTIFICATES,
   REMOVE_ATTENDANCE_CERTIFICATES,
@@ -23,6 +24,10 @@ import {
   CourseParticipationAttendances,
   CourseParticipationAttendancesVariables,
 } from '../../../../queries/__generated__/CourseParticipationAttendances';
+import {
+  DeleteManualAttendances,
+  DeleteManualAttendancesVariables,
+} from '../../../../queries/__generated__/DeleteManualAttendances';
 import {
   CourseParticipations_Course_by_pk,
   CourseParticipations_Course_by_pk_ProjectCourses,
@@ -72,8 +77,11 @@ import {
   getAttendanceStatusFromMap,
   groupAttendancesByUser,
   isMandatorySession,
+  SessionAttendances,
+  splitAttendancesBySession,
 } from '../../../../helpers/courseParticipationAttendance';
 import { useOptimisticAttendance } from './useOptimisticAttendance';
+import { AttendanceDotTooltip } from './AttendanceDotTooltip';
 import { isProgramSession, mergeSessions } from '../../../../helpers/programSessions';
 import { useDisplayDate } from '../../../../helpers/dateTimeHelpers';
 import { EduhubSwitch } from '../../../inputs/CheckboxSelector/components/EduhubSwitch';
@@ -93,6 +101,8 @@ const EMPTY_SESSIONS: CourseParticipations_Course_by_pk_Sessions[] = [];
 interface IDotData {
   color: DotColor;
   session: CourseParticipations_Course_by_pk_Sessions;
+  /** Manual and automatic Attendance of the session, for the hover. */
+  attendances: SessionAttendances;
 }
 
 function findUserProject(
@@ -245,6 +255,9 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
   const [insertAttendance] = useRoleMutation<InsertSingleAttendance, InsertSingleAttendanceVariables>(
     INSERT_SINGLE_ATTENDANCE
   );
+  const [deleteManualAttendances] = useRoleMutation<DeleteManualAttendances, DeleteManualAttendancesVariables>(
+    DELETE_MANUAL_ATTENDANCES
+  );
 
   const handleAttendanceError = useCallback(
     (message: string) => setBulkActionError(message),
@@ -255,6 +268,7 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
     enrollments,
     sessions,
     insertAttendance,
+    deleteManualAttendances,
     refetchAttendances,
     onError: handleAttendanceError,
   });
@@ -544,6 +558,7 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
   const summarizeAttendance = useCallback(
     (enrollment: ExtendedEnrollment) => {
       const attendanceBySession = collapseAttendancesBySession(enrollment.User.Attendances);
+      const splitBySession = splitAttendancesBySession(enrollment.User.Attendances);
 
       const dotColor = (sn: CourseParticipations_Course_by_pk_Sessions): DotColor => {
         const att = attendanceBySession[sn.id];
@@ -553,7 +568,11 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
         return 'grey';
       };
 
-      const dotsData: IDotData[] = sessions.map((s: CourseParticipations_Course_by_pk_Sessions) => ({ session: s, color: dotColor(s) }));
+      const dotsData: IDotData[] = sessions.map((s: CourseParticipations_Course_by_pk_Sessions) => ({
+        session: s,
+        color: dotColor(s),
+        attendances: splitBySession[s.id] ?? {},
+      }));
       // Optional sessions are shown (and editable) but not counted.
       const mandatoryDots = dotsData.filter((d) => isMandatorySession(d.session));
       const missed = mandatoryDots.filter((d) => d.color === 'red').length;
@@ -591,28 +610,52 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
             style={{ gridTemplateColumns: 'repeat(8, 1.5em)' }}
           >
             {dotsData.map((d) => (
-              <Dot
+              <Tooltip
                 key={d.session.id}
-                color={d.color}
-                hollow={!isMandatorySession(d.session)}
-                className={
-                  attendanceLoading
-                    ? 'cursor-wait opacity-60'
-                    : 'cursor-pointer hover:border-2 hover:border-indigo-200 hover:rounded-full'
+                title={
+                  <AttendanceDotTooltip
+                    heading={[
+                      new Date(d.session.startDateTime).toLocaleString(),
+                      isProgramSession(d.session) ? `${programSessionLabel} (${programTitle})` : null,
+                      isMandatorySession(d.session) ? null : t('attendance_optional_session'),
+                    ]
+                      .filter(Boolean)
+                      .join(' · ')}
+                    attendances={d.attendances}
+                    sessionStart={d.session.startDateTime}
+                    sessionEnd={d.session.endDateTime}
+                    showMatchQuality={isAdmin}
+                  />
                 }
-                title={[
-                  new Date(d.session.startDateTime).toLocaleString(),
-                  isProgramSession(d.session) ? `${programSessionLabel} (${programTitle})` : null,
-                  isMandatorySession(d.session) ? null : t('attendance_optional_session'),
-                ]
-                  .filter(Boolean)
-                  .join(' · ')}
-                onClick={
-                  attendanceLoading
-                    ? undefined
-                    : () => onDotClick(d.session, enrollment.userId)
-                }
-              />
+              >
+                {/* A badge marks a Manual Attendance; clicking back to the automatic result removes it. */}
+                <span className="relative inline-flex">
+                  {d.attendances.manual && (
+                    // The dot is a 12px circle in the middle of its 24px icon box; whole-pixel
+                    // offsets put the badge on its upper right edge without sub-pixel blur. No ring:
+                    // the row surface changes when selected, the label colour stands out on both.
+                    <span
+                      aria-hidden
+                      data-testid="manual-attendance-badge"
+                      className="pointer-events-none absolute right-[4px] top-[4px] h-[7px] w-[7px] rounded-full bg-label-primary"
+                    />
+                  )}
+                  <Dot
+                    color={d.color}
+                    hollow={!isMandatorySession(d.session)}
+                    className={
+                      attendanceLoading
+                        ? 'cursor-wait opacity-60'
+                        : 'cursor-pointer hover:border-2 hover:border-indigo-200 hover:rounded-full'
+                    }
+                    onClick={
+                      attendanceLoading
+                        ? undefined
+                        : () => onDotClick(d.session, enrollment.userId)
+                    }
+                  />
+                </span>
+              </Tooltip>
             ))}
           </div>
           <div className="flex items-center gap-1 flex-shrink-0 w-16">
@@ -626,7 +669,7 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
         </div>
       );
     };
-  }, [attendanceLoading, summarizeAttendance, programTitle, programSessionLabel, t]);
+  }, [attendanceLoading, summarizeAttendance, programTitle, programSessionLabel, t, isAdmin]);
 
   const columns = useMemo<ColumnDef<ExtendedEnrollment>[]>(() => {
     const allColumns: ColumnDef<ExtendedEnrollment>[] = [
