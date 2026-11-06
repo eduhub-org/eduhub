@@ -3825,7 +3825,8 @@
   },
   "privacy_update": {
     "title": "We have updated our privacy policy",
-    "more": "You do not need to do anything. All changes are listed in the <privacy>privacy policy</privacy>.",
+    "nothing_to_do": "You do not need to do anything. We simply want to let you know how we handle your data.",
+    "more": "All changes are listed in our <privacy>privacy policy</privacy>.",
     "dismiss": "Close notice"
   }
 }

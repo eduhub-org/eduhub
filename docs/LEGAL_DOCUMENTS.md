@@ -63,7 +63,7 @@ consent to, so it is never phrased as "I accept the privacy policy".
 | Guest registration | Same checkbox, required by the server |
 | StuJo: publishing a posting, Job-Letter | Notice linking `/datenschutz` |
 | Admin-created accounts and speakers | `USER_CREATED` / `SESSION_SPEAKER_ADDED` mails link the policy |
-| Policy changes | One-time in-app notice for material changes, and the change history at the end of the policy (below) |
+| Policy changes | One-time in-app notice for material changes (below); the policy itself only shows its "Stand" date |
 
 Guest registrations use the same column: `confirmGuestRegistration` sets
 `termsAcceptedAt` when the double opt-in link is redeemed, so the timestamp
@@ -104,33 +104,74 @@ material.
 
 For a material change:
 
-1. Add an entry for the new version at the top of `PRIVACY_POLICY_CHANGES`
-   (same file as the policy version): one or two sentences per language,
-   written for users, and `sites` - EduHub, StuJo or both, depending on whose
-   users the change concerns. It appears in the change history at the end of
-   that site's policy (`#aenderungen`) and is the summary in the EduHub notice.
-   Add one for every version, material or not; never edit an entry whose
-   version is already in production.
+1. Set `PRIVACY_NOTICE_VERSION` (same file as the policy version) to the new
+   `PRIVACY_POLICY_VERSION`, and add the notice text for that version at the
+   top of `PRIVACY_NOTICES`: Markdown with a short intro, one `-` bullet per
+   topic and a closing sentence, in German and English. The notice adds the
+   title, "you do not need to do anything" and the link to the policy itself.
+   Word it as described under "Wording the notice" below. Never edit an entry
+   whose version is already in production.
 
    **Not yet in production?** Then do not start a new version: change the text
-   under the existing `PRIVACY_POLICY_VERSION`, extend its
-   `PRIVACY_POLICY_CHANGES` entry, and leave both version constants alone.
-   Only one version per production deploy, so users never see a change history
-   with versions they could not read. If the deploy happens on a later day, the
-   date may be moved to the deploy day (version constants and entry together).
-   StuJo's history starts with its first entry (none yet; the 2026-11-05
-   changes only documented existing processing there).
-2. Set `PRIVACY_NOTICE_VERSION` (same file) to the new
-   `PRIVACY_POLICY_VERSION`. Every account created up to that date then sees a
+   under the existing `PRIVACY_POLICY_VERSION`, extend its `PRIVACY_NOTICES`
+   entry, and leave both version constants alone. One notice per production
+   deploy. If the deploy happens on a later day, the date may be moved to the
+   deploy day (version constants and entry together).
+2. Every account created up to `PRIVACY_NOTICE_VERSION` then sees a
    dismissible notice on its next visit; the dismissal is stored in
    `User.privacyNoticeSeenVersion`. Accounts created later saw the new policy
    when they registered and are not shown it.
+
 There is no mail for policy changes yet; the in-app notice reaches people who
 log in. If one is needed (a change that matters to people who rarely visit),
 add a mail template and a send script in the same PR as the policy change.
 
-For a change that is not material, add the `PRIVACY_POLICY_CHANGES` entry but
-leave `PRIVACY_NOTICE_VERSION` alone.
+For a change that is not material, only bump `PRIVACY_POLICY_VERSION`; leave
+`PRIVACY_NOTICE_VERSION` and `PRIVACY_NOTICES` alone.
+
+The policy has no public change history: GDPR asks for the current policy and
+for telling users about material changes, not for a changelog. What applied
+when is recovered from git (below), and what users were told from
+`PRIVACY_NOTICES`.
+
+### Wording the notice
+
+The notice reaches every existing user, and they read each item as "this is
+new". Many items in a policy update only document what already happened, so
+the wording must keep two kinds of change apart:
+
+- **Changed practice** (we started or stopped doing something): say so plainly
+  in the past or present tense - "Wir verzichten auf ...", "Wir nutzen jetzt
+  ...".
+- **More transparency** (an existing practice is now described, named or
+  explained in more detail): use verbs that point at the text, not at the
+  processing - "Wir machen transparenter, welche ...", "Wir erläutern genauer,
+  wie ...". Avoid "neu", "jetzt", "ab sofort" or "neu beschrieben" for these.
+- When both kinds appear, add one sentence that says so, e.g. "Einige
+  Änderungen betreffen unsere tatsächlichen Praktiken, andere machen bereits
+  bestehende Abläufe transparenter und nachvollziehbarer."
+- Lead with the benefit to users where there is one (data we no longer
+  collect), keep a calm, informative tone, and say that nothing has to be done
+  when that is true. Informal "Du" in German, as everywhere.
+- Name examples (e-mails, online sessions, course chat) rather than vendors;
+  the policy itself names the vendors.
+
+Example (version 2026-11-05):
+
+> Der Schutz deiner Daten und ein transparenter Umgang damit sind uns wichtig.
+> Deshalb haben wir unsere Datenschutzerklärung überarbeitet:
+>
+> - Wir verzichten auf das Meta Pixel und messen die Nutzung unserer Plattform
+>   nur noch anonym und ohne Cookies.
+> - Wir machen transparenter, welche Anmeldedienste und technischen
+>   Dienstleister wir für unsere Plattform nutzen, beispielsweise für E-Mails,
+>   Online-Sitzungen und den Kurs-Chat.
+> - Wir erläutern genauer, wie wir mit Aufzeichnungen von Online-Sitzungen
+>   umgehen und welche Informationen wir im Rahmen unserer Förderprojekte an
+>   Fördermittelgeber weitergeben.
+>
+> Einige Änderungen betreffen unsere tatsächlichen Praktiken, andere machen
+> bereits bestehende Abläufe transparenter und nachvollziehbarer.
 
 ## How to Find Which Version a User Accepted
 

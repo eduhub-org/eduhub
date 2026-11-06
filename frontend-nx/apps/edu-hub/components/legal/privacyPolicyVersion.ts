@@ -1,10 +1,10 @@
 /**
  * The version of the privacy policy, as the ISO date of its "Stand".
  *
- * Bump it together with the text in PrivacySections.tsx and add an entry to
- * PRIVACY_POLICY_CHANGES below. For a material change also set
- * PRIVACY_NOTICE_VERSION: every account created before that date then sees
- * the one-time "policy updated" notice (components/layout/PrivacyUpdateNotice.tsx).
+ * Bump it together with the text in PrivacySections.tsx. For a material
+ * change also set PRIVACY_NOTICE_VERSION and add its text to PRIVACY_NOTICES
+ * below: every account created before that date then sees the one-time
+ * "policy updated" notice (components/layout/PrivacyUpdateNotice.tsx).
  * For changes that are not material (wording, removed processing) leave
  * PRIVACY_NOTICE_VERSION at its old value. Process: docs/LEGAL_DOCUMENTS.md.
  */
@@ -17,40 +17,45 @@ export const PRIVACY_POLICY_VERSION = '2026-11-05';
  */
 export const PRIVACY_NOTICE_VERSION = '2026-11-05';
 
-export type PrivacyPolicySite = 'eduhub' | 'stujo';
-
-/** `sites`: whose policy the change is about - the two sites share most of the text but not all of it. */
-export type PrivacyPolicyChange = { version: string; sites: PrivacyPolicySite[]; de: string; en: string };
+/** A notice body as Markdown (paragraphs and `-` lists); the notice adds the title and the closing lines itself. */
+export type PrivacyNotice = { version: string; de: string; en: string };
 
 /**
- * What changed in each version, in words for users: shown as the change
- * history at the end of each site's privacy policy (entries filtered by
- * `sites`), and the entry for PRIVACY_NOTICE_VERSION is the summary in the
- * EduHub "policy updated" notice. A version that changed nothing a site's
- * users would notice simply leaves that site out.
- * Newest first; never edit or drop an entry once its version is in production
- * (until then, extend it instead of adding a version). Kept in code rather than in
- * the locale files so the history is recoverable from git like the policy
- * itself, and because StuJo renders the policy sections with its own locales.
- * Tracked from 2026-11-05 on (StuJo from its first entry); older versions are
- * listed (for the team) in docs/LEGAL_DOCUMENTS.md.
+ * The body of the EduHub "policy updated" notice for each notice version.
+ * The text must keep apart what we actually do differently from what we only
+ * describe more openly, so nobody reads newly documented practice as newly
+ * introduced practice (docs/LEGAL_DOCUMENTS.md, "Wording the notice").
+ * Newest first; never edit or drop an entry once its version is in production.
+ * Kept in code rather than in the locale files so what users were told is
+ * recoverable from git like the policy itself.
  */
-export const PRIVACY_POLICY_CHANGES: PrivacyPolicyChange[] = [
+export const PRIVACY_NOTICES: PrivacyNotice[] = [
   {
     version: '2026-11-05',
-    sites: ['eduhub'],
-    de: 'Wir verzichten auf das Meta Pixel und auf das Cookie-Banner, messen Besuche nur noch anonym und ohne Cookies und nennen jetzt alle Dienste, über die du dich anmelden kannst, sowie alle Dienstleister, die wir einsetzen (u. a. für E-Mails, Online-Sitzungen und den Kurs-Chat). Neu beschrieben sind außerdem Aufzeichnungen von Online-Sitzungen und die Berichte an Fördermittelgeber.',
-    en: 'We no longer use the Meta Pixel or a cookie banner, measure visits only anonymously and without cookies, and now name every service you can sign in with as well as every service provider we use (including for emails, online sessions and the course chat). We also newly describe recordings of online sessions and the reports to funding organizations.',
+    de: [
+      'Der Schutz deiner Daten und ein transparenter Umgang damit sind uns wichtig. Deshalb haben wir unsere Datenschutzerklärung überarbeitet:',
+      '',
+      '- Wir verzichten auf das Meta Pixel und messen die Nutzung unserer Plattform nur noch anonym und ohne Cookies.',
+      '- Wir machen transparenter, welche Anmeldedienste und technischen Dienstleister wir für unsere Plattform nutzen, beispielsweise für E-Mails, Online-Sitzungen und den Kurs-Chat.',
+      '- Wir erläutern genauer, wie wir mit Aufzeichnungen von Online-Sitzungen umgehen und welche Informationen wir im Rahmen unserer Förderprojekte an Fördermittelgeber weitergeben.',
+      '',
+      'Einige Änderungen betreffen unsere tatsächlichen Praktiken, andere machen bereits bestehende Abläufe transparenter und nachvollziehbarer.',
+    ].join('\n'),
+    en: [
+      'Protecting your data and handling it transparently matter to us. That is why we have revised our privacy policy:',
+      '',
+      '- We have dropped the Meta Pixel and now measure the use of our platform only anonymously and without cookies.',
+      '- We are more transparent about which sign-in services and technical service providers we use for our platform, for example for emails, online sessions and the course chat.',
+      '- We explain in more detail how we handle recordings of online sessions and what information we pass on to funding organizations as part of our funded projects.',
+      '',
+      'Some of these changes concern our actual practices; others make existing processes more transparent and easier to follow.',
+    ].join('\n'),
   },
 ];
 
-/** The changes one site's history lists, newest first. */
-export const getPrivacyPolicyChanges = (site: PrivacyPolicySite): PrivacyPolicyChange[] =>
-  PRIVACY_POLICY_CHANGES.filter((change) => change.sites.includes(site));
-
-/** The change summary for a version, or null if none was recorded. */
-export const getPrivacyPolicyChange = (version: string): PrivacyPolicyChange | null =>
-  PRIVACY_POLICY_CHANGES.find((change) => change.version === version) ?? null;
+/** The notice text for a version, or null if none was recorded. */
+export const getPrivacyNotice = (version: string): PrivacyNotice | null =>
+  PRIVACY_NOTICES.find((notice) => notice.version === version) ?? null;
 
 /**
  * Whether a user still has to be told about the current notice version: their

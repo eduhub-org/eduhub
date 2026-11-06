@@ -5,7 +5,6 @@ import { GetServerSideProps } from 'next';
 
 import {
   PrivacyAsOfDate,
-  PrivacyChangeHistory,
   PrivacyDataCollection,
   PrivacyEmail,
   PrivacyGeneralInfo,
@@ -59,8 +58,6 @@ const Datenschutz: FC<Props> = ({ portal }) => {
         <PrivacyJobLetter n={6} />
         <PrivacyEmail n={7} />
         <PrivacyPayments n={8} />
-        {/* Empty until the first StuJo entry in PRIVACY_POLICY_CHANGES. */}
-        <PrivacyChangeHistory n={9} site="stujo" />
         <PrivacyAsOfDate />
       </div>
     </Layout>
