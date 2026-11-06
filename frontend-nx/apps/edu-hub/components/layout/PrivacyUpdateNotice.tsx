@@ -65,7 +65,7 @@ export const PrivacyUpdateNotice: FC = () => {
     <div role="status" className="w-full bg-fill-primary text-label-primary border-b border-border-primary">
       <div className="max-w-screen-xl mx-auto flex items-start gap-4 px-3 md:px-16 py-4">
         <div className="flex-1 text-sm leading-relaxed">
-          <p className="font-semibold">{t('title')}</p>
+          <p className="text-base font-bold">{t('title')}</p>
           {notice && (
             <ReactMarkdown
               allowedElements={NOTICE_ELEMENTS}
@@ -73,7 +73,7 @@ export const PrivacyUpdateNotice: FC = () => {
               components={{
                 p: ({ children }) => <p className="mt-2">{children}</p>,
                 ul: ({ children }) => <ul className="mt-2 list-disc pl-5 space-y-1">{children}</ul>,
-                strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
+                strong: ({ children }) => <strong className="font-bold">{children}</strong>,
               }}
             >
               {locale === 'en' ? notice.en : notice.de}
