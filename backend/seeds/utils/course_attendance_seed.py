@@ -30,11 +30,62 @@ SESSION_SECONDS = 2 * 60 * 60
 MIN_ATTENDANCE_SHARE = 0.5
 PARTICIPANT_STATUSES = {"CONFIRMED", "REGISTERED", "COMPLETED"}
 KIEL_PLACE = "SK"  # LimeSurvey answer code of the Starterkitchen
-ADDRESSES = {
-    "ONLINE": "https://zoom.us/j/{course_id}000",
-    "KIEL": "Starterkitchen, Wall 47-51, 24103 Kiel",
-    "HEIDE": "Westküstenhochschule, Fritz-Thiedemann-Ring 20, 25746 Heide",
+ONLINE_ADDRESS = "https://zoom.us/j/{course_id}000"
+
+
+@dataclass(frozen=True)
+class Venue:
+    """A LocationAddress: a place on-site sessions can be held at."""
+
+    id: int
+    option: str
+    short_label: str
+    street: str
+    zip_code: str
+    city: str
+    category: str
+    description: str
+    aliases: tuple[str, ...] = ()
+
+    @property
+    def address(self) -> str:
+        return f"{self.street}, {self.zip_code} {self.city}"
+
+
+VENUES = {
+    "starterkitchen": Venue(1, "KIEL", "Starterkitchen", "Wall 47-51", "24103", "Kiel", "WORKSPACE",
+                            "Gründungszentrum am Kieler Hafen; Kurse und Meetups im Eventraum im Erdgeschoss.",
+                            ("SK", "Starterkitchen")),
+    "legienstrasse": Venue(2, "KIEL", "Legienstraße 40", "Legienstraße 40", "24103", "Kiel", "WORKSPACE",
+                           "Seminarräume von opencampus.sh in der Kieler Innenstadt.", ("Legienstraße 40",)),
+    "westkueste": Venue(3, "HEIDE", "Westküstenhochschule", "Fritz-Thiedemann-Ring 20", "25746", "Heide", "MISC",
+                        "Campus der Fachhochschule Westküste.", ("H04", "FH Westküste")),
 }
+DEFAULT_VENUE = {"KIEL": "starterkitchen", "HEIDE": "westkueste"}
+# Courses and events held somewhere other than their option's default venue.
+VENUE_OVERRIDES = {7003: "legienstrasse", 7007: "legienstrasse", 7206: "legienstrasse", 7211: "legienstrasse",
+                   7101: "legienstrasse", 7102: "legienstrasse", 7103: "legienstrasse"}
+# Sessions written elsewhere in the seed that still need locations: course -> (options, session ids).
+EXTRA_SESSION_LOCATIONS = {
+    101: (("KIEL", "ONLINE"), tuple(range(41, 49))),
+    **{7100 + i: (("KIEL",), (71000 + i,)) for i in range(1, 6)},
+}
+
+
+def venue_for(course_id: int, option: str) -> Venue | None:
+    if option == "ONLINE":
+        return None
+    return VENUES[VENUE_OVERRIDES.get(course_id, DEFAULT_VENUE[option])]
+
+
+def address_for(course_id: int, option: str) -> str:
+    venue = venue_for(course_id, option)
+    return venue.address if venue else ONLINE_ADDRESS.format(course_id=course_id)
+
+
+def course_location_id(course_id: int, k: int) -> int:
+    # Courses below 7000 (hand-written ones) get 60000 + id * 10, clear of 70000 + (id - 7000) * 10.
+    return 70000 + (course_id - 7000) * 10 + k if course_id >= 7000 else 60000 + course_id * 10 + k
 # Records that belong to nobody: shared devices, the room account, strangers.
 NOISE_ZOOM_NAMES = ["iPhone", "Samsung SM-A175F", "Starterkitchen Eventraum", "Guest", "Zoom user"]
 NOISE_CHECK_IN_NAMES = ["Jan Winkel", "Vivien Friesorger", "Hendrik Danner", "Jeanne Laude"]
@@ -51,10 +102,23 @@ class CourseSchedule:
     # session relative to the seeding week (-6 = six weeks before).
     weekday: int = 0
     first_week: int = 0
+    # Events: one session per entry as (day, start hour, end hour); day is a
+    # Berlin date or an offset in days from the seeding day.
+    days: tuple[tuple[object, int, int], ...] = ()
+    attend_rate: float | None = None
 
     @property
     def relative(self) -> bool:
-        return self.first_date is None
+        return self.first_date is None and not any(isinstance(day, str) for day, _, _ in self.days)
+
+
+@dataclass(frozen=True)
+class SessionSpec:
+    number: int
+    start: str
+    end: str
+    seconds: int
+    checked: bool
 
 
 COURSE_SCHEDULES = [
@@ -132,6 +196,7 @@ class SessionPlan:
     session_id: int
     number: int
     checked: bool
+    seconds: int
     records: list[SeedRecord] = field(default_factory=list)
 
 
@@ -159,6 +224,52 @@ def _is_checked(schedule: CourseSchedule, number: int) -> bool:
     return schedule.first_week + number - 1 < 0
 
 
+def _day_time(day: object, hour: int) -> SqlRaw:
+    if isinstance(day, str):
+        local = f"'{day} {hour:02d}:00:00'::timestamp"
+    else:
+        local = f"date_trunc('day', now() AT TIME ZONE 'Europe/Berlin') + interval '{day} days {hour} hours'"
+    return SqlRaw(f"(({local}) AT TIME ZONE 'Europe/Berlin')")
+
+
+# Sessions with their own title and description: (course, number) -> (title, description).
+SESSION_DETAILS = {
+    (7009, 9): (
+        "Gastvortrag: Machine Learning in der Industrie",
+        "Dr. Lena Brandt zeigt, wie ML-Modelle in der Produktion eines Kieler Maschinenbauers laufen. "
+        "Diese Session ist auch als öffentliche Veranstaltung veröffentlicht.",
+    ),
+}
+
+
+def _session_title(schedule: CourseSchedule, number: int) -> str:
+    """Courses: "Session n". Events: one "Event", consecutive days "Tag n", a series "Termin n"."""
+    if (schedule.course_id, number) in SESSION_DETAILS:
+        return SESSION_DETAILS[(schedule.course_id, number)][0]
+    if not schedule.days:
+        return f"Session {number}"
+    if len(schedule.days) == 1:
+        return "Event"
+    offsets = [day for day, _, _ in schedule.days]
+    consecutive = all(isinstance(d, int) for d in offsets) and offsets == list(range(offsets[0], offsets[0] + len(offsets)))
+    consecutive = consecutive or all(isinstance(d, str) for d in offsets) and len(offsets) <= 5
+    return f"Tag {number}" if consecutive else f"Termin {number}"
+
+
+def session_specs(schedule: CourseSchedule) -> list[SessionSpec]:
+    if schedule.days:
+        return [
+            SessionSpec(n, _day_time(day, h1), _day_time(day, h2), (h2 - h1) * 3600,
+                        isinstance(day, str) or day < 0)
+            for n, (day, h1, h2) in enumerate(schedule.days, start=1)
+        ]
+    return [
+        SessionSpec(n, _local_start(schedule, n, 16), _local_start(schedule, n, 18), SESSION_SECONDS,
+                    _is_checked(schedule, n))
+        for n in range(1, schedule.session_count + 1)
+    ]
+
+
 def _sorted_tokens(name: str) -> str:
     return " ".join(sorted(re.sub(r"[,.@_:]", " ", name.lower()).split()))
 
@@ -174,6 +285,7 @@ def _location_option(record: SeedRecord) -> str:
 
 
 def _plan_course(schedule: CourseSchedule, participants: list[CourseParticipant]) -> list[SessionPlan]:
+    specs = session_specs(schedule)
     first_name_counts: dict[str, int] = {}
     for p in participants:
         key = p.first_name.lower()
@@ -185,8 +297,8 @@ def _plan_course(schedule: CourseSchedule, participants: list[CourseParticipant]
         rng = _rng(schedule.course_id, p.user_id)
         place = rng.choices(schedule.locations, weights=[3 if loc == "ONLINE" else 2 for loc in schedule.locations])[0]
         style = rng.choices(["full", "email", "last_first", "first"], weights=[75, 10, 7, 8])[0]
-        attend_rate = {"COMPLETED": 0.93}.get(p.status, 0.6 if not schedule.relative else 0.85)
-        attends = [rng.random() < attend_rate for _ in range(schedule.session_count)]
+        attend_rate = schedule.attend_rate or {"COMPLETED": 0.93}.get(p.status, 0.6 if not schedule.relative else 0.85)
+        attends = [rng.random() < attend_rate for _ in specs]
         if p.status == "COMPLETED":
             # Completed means at most two missed sessions (maxMissedSessions).
             missed = [i for i, a in enumerate(attends) if not a]
@@ -195,9 +307,10 @@ def _plan_course(schedule: CourseSchedule, participants: list[CourseParticipant]
         profiles[p.user_id] = (place, style, attends)
 
     plans = []
-    for number in range(1, schedule.session_count + 1):
+    for spec in specs:
+        number = spec.number
         session_id = 72000 + (schedule.course_id - 7000) * 100 + number
-        plan = SessionPlan(session_id, number, _is_checked(schedule, number))
+        plan = SessionPlan(session_id, number, spec.checked, spec.seconds)
         plans.append(plan)
         if not plan.checked:
             continue
@@ -223,7 +336,7 @@ def _plan_course(schedule: CourseSchedule, participants: list[CourseParticipant]
             if not attended and not short_stay:
                 continue
             share = rng.uniform(0.82, 1.0) if attended else rng.uniform(0.08, 0.4)
-            duration = int(share * SESSION_SECONDS)
+            duration = int(share * plan.seconds)
             interruptions = rng.choice([0, 0, 0, 1, 1, 2, 3])
             join = rng.randint(-5 * 60, 10 * 60) if attended else rng.randint(0, 60 * 60)
             record = SeedRecord(
@@ -231,7 +344,7 @@ def _plan_course(schedule: CourseSchedule, participants: list[CourseParticipant]
                 source="ZOOM",
                 location="ZOOM",
                 join=join,
-                leave=min(join + duration + interruptions * 90, SESSION_SECONDS + 15 * 60),
+                leave=min(join + duration + interruptions * 90, plan.seconds + 15 * 60),
                 duration=duration,
                 interruptions=interruptions,
                 owner=p.user_id,
@@ -276,7 +389,7 @@ def _attendance_rows(
             next_id[0] += 1
             if p.user_id in by_owner:
                 index, record = by_owner[p.user_id]
-                counts = record.source != "ZOOM" or record.duration >= MIN_ATTENDANCE_SHARE * SESSION_SECONDS
+                counts = record.source != "ZOOM" or record.duration >= MIN_ATTENDANCE_SHARE * plan.seconds
                 status = "ATTENDED" if counts else "MISSED"
                 rows.append(
                     (next_id[0], plan.session_id, p.user_id, status, "AUTO", record.email or record.name,
@@ -344,41 +457,80 @@ def _attendance_data_sql(plan: SessionPlan) -> str:
     )
 
 
-def build_attendance_sql(participants_by_course: dict[int, list[CourseParticipant]]) -> str:
+def build_attendance_sql(
+    participants_by_course: dict[int, list[CourseParticipant]],
+    extra_sql: str = "",
+    extra_schedules: list[CourseSchedule] | None = None,
+    post_sql: str = "",
+) -> str:
+    """``extra_sql`` (event courses and their enrollments) is emitted first, so the
+    sessions and attendances of ``extra_schedules`` can refer to it. ``post_sql``
+    follows the sessions and addresses (events created from a course session)."""
     location_rows, session_rows, address_rows, attendance_rows, data_sql = [], [], [], [], []
     next_attendance_id = [800000]
     seeded_at = "2026-04-20 05:00:00+00"
 
-    for schedule in COURSE_SCHEDULES:
+    for schedule in COURSE_SCHEDULES + list(extra_schedules or []):
         participants = sorted(
             participants_by_course.get(schedule.course_id, []), key=lambda p: (p.last_name, p.first_name, p.user_id)
         )
         location_ids = {}
         for k, option in enumerate(schedule.locations, start=1):
-            location_ids[option] = 70000 + (schedule.course_id - 7000) * 10 + k
+            location_ids[option] = course_location_id(schedule.course_id, k)
+            venue = venue_for(schedule.course_id, option)
             location_rows.append(
                 (location_ids[option], schedule.course_id, seeded_at, seeded_at, option,
-                 ADDRESSES[option].format(course_id=schedule.course_id))
+                 address_for(schedule.course_id, option), venue.id if venue else None)
             )
 
         plans = _plan_course(schedule, participants)
-        for plan in plans:
+        for plan, spec in zip(plans, session_specs(schedule)):
+            title = _session_title(schedule, plan.number)
             session_rows.append(
-                (plan.session_id, f"Session {plan.number}", "", _local_start(schedule, plan.number, 16),
-                 _local_start(schedule, plan.number, 18), schedule.course_id, seeded_at, seeded_at, plan.checked)
+                (plan.session_id, title, SESSION_DETAILS.get((schedule.course_id, plan.number), ("", ""))[1],
+                 spec.start, spec.end, schedule.course_id, seeded_at, seeded_at, plan.checked)
             )
             for k, option in enumerate(schedule.locations, start=1):
+                venue = venue_for(schedule.course_id, option)
                 address_rows.append(
                     (plan.session_id * 10 + k, seeded_at, seeded_at, plan.session_id,
-                     ADDRESSES[option].format(course_id=schedule.course_id), location_ids[option])
+                     address_for(schedule.course_id, option), location_ids[option], venue.id if venue else None)
                 )
             if plan.checked:
                 data_sql.append(_attendance_data_sql(plan))
         attendance_rows += _attendance_rows(schedule, plans, participants, next_attendance_id)
 
-    sql = [BEGIN_MARKER, "-- Generated by backend/seeds/utils/generate_ml_degree_seed.py (course_attendance_seed.py)"]
+    for course_id, (options, session_ids) in EXTRA_SESSION_LOCATIONS.items():
+        for k, option in enumerate(options, start=1):
+            venue = venue_for(course_id, option)
+            location_rows.append(
+                (course_location_id(course_id, k), course_id, seeded_at, seeded_at, option,
+                 address_for(course_id, option), venue.id if venue else None)
+            )
+            for session_id in session_ids:
+                address_rows.append(
+                    (session_id * 10 + k, seeded_at, seeded_at, session_id, address_for(course_id, option),
+                     course_location_id(course_id, k), venue.id if venue else None)
+                )
+
+    venue_rows = [
+        (v.id, v.option, v.short_label, v.address, v.description, json.dumps(list(v.aliases)), seeded_at, seeded_at,
+         v.street, v.zip_code, v.city, v.category)
+        for v in VENUES.values()
+    ]
+    sql = [BEGIN_MARKER, "-- Generated by backend/seeds/utils/generate_ml_degree_seed.py (course_attendance_seed.py, event_seed.py)"]
     sql.append(
-        'INSERT INTO public."CourseLocation" (id, "courseId", created_at, updated_at, "locationOption", "defaultSessionAddress") VALUES\n  '
+        "-- Venues on-site course locations and sessions point to; online locations keep a meeting link.\n"
+        'INSERT INTO public."LocationAddress" (id, "locationOption", "shortLabel", address, description, aliases, '
+        'created_at, updated_at, street, "zipCode", city, category) VALUES\n  '
+        + values_sql(venue_rows) + "\nON CONFLICT (id) DO NOTHING;\n"
+        'SELECT pg_catalog.setval(\'public."LocationAddress_id_seq"\', '
+        '(SELECT max(id) FROM public."LocationAddress"), true);\n'
+    )
+    if extra_sql:
+        sql.append(extra_sql)
+    sql.append(
+        'INSERT INTO public."CourseLocation" (id, "courseId", created_at, updated_at, "locationOption", "defaultSessionAddress", "defaultSessionAddressId") VALUES\n  '
         + values_sql(location_rows) + "\nON CONFLICT (id) DO NOTHING;\n"
     )
     sql.append(
@@ -386,9 +538,11 @@ def build_attendance_sql(participants_by_course: dict[int, list[CourseParticipan
         + values_sql(session_rows) + "\nON CONFLICT (id) DO NOTHING;\n"
     )
     sql.append(
-        'INSERT INTO public."SessionAddress" (id, created_at, updated_at, "sessionId", address, "courseLocationId") VALUES\n  '
+        'INSERT INTO public."SessionAddress" (id, created_at, updated_at, "sessionId", address, "courseLocationId", "locationAddressId") VALUES\n  '
         + values_sql(address_rows) + "\nON CONFLICT (id) DO NOTHING;\n"
     )
+    if post_sql:
+        sql.append(post_sql)
     sql.extend(data_sql)
     # Times are offsets from the session start; MANUAL rows are instructor corrections made after the session.
     for start in range(0, len(attendance_rows), 2000):
