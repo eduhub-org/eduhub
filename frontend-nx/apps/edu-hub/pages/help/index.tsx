@@ -1,21 +1,21 @@
-import Head from 'next/head';
-import { FC } from 'react';
-import { Page } from '../../components/layout/Page';
+import { GetServerSideProps } from 'next';
 
-const help: FC = () => {
-  const helpDocUrl = process.env.HELP_DOCS_URL;
+/**
+ * The help docs live on GitBook. Send visitors there as a top-level page
+ * instead of embedding GitBook in an iframe, so no third-party content (and
+ * whatever it stores) runs inside EduHub.
+ */
+export const getServerSideProps: GetServerSideProps = async () => {
+  // The build-time variable the Docker image and docker-compose actually set.
+  const helpDocUrl = process.env.NEXT_PUBLIC_HELP_DOCS_URL;
 
-  return (
-    <div className="max-w-screen-xl mx-auto mt-14">
-      <Head>
-        <title>EduHub | opencampus.sh</title>
-        <link rel="icon" href="/favicon.png" />
-      </Head>
-      <Page className="text-white">
-        <iframe className="responsive-iframe" src={helpDocUrl}></iframe>
-      </Page>
-    </div>
-  );
+  if (!helpDocUrl) {
+    return { notFound: true };
+  }
+
+  return { redirect: { destination: helpDocUrl, permanent: false } };
 };
 
-export default help;
+const Help = () => null;
+
+export default Help;

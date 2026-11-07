@@ -335,11 +335,14 @@ export enum Attendance_constraint {
  * select columns of table "Attendance"
  */
 export enum Attendance_select_column {
+  attendanceRecordIndex = "attendanceRecordIndex",
+  closestCandidates = "closestCandidates",
   created_at = "created_at",
   endDateTime = "endDateTime",
   id = "id",
   interruptionCount = "interruptionCount",
   location = "location",
+  matchScore = "matchScore",
   matchType = "matchType",
   recordedIdentifier = "recordedIdentifier",
   sessionId = "sessionId",
@@ -355,11 +358,14 @@ export enum Attendance_select_column {
  * update columns of table "Attendance"
  */
 export enum Attendance_update_column {
+  attendanceRecordIndex = "attendanceRecordIndex",
+  closestCandidates = "closestCandidates",
   created_at = "created_at",
   endDateTime = "endDateTime",
   id = "id",
   interruptionCount = "interruptionCount",
   location = "location",
+  matchScore = "matchScore",
   matchType = "matchType",
   recordedIdentifier = "recordedIdentifier",
   sessionId = "sessionId",
@@ -2079,6 +2085,7 @@ export enum Organization_select_column {
   name = "name",
   newsletterDescription = "newsletterDescription",
   newsletterProvider = "newsletterProvider",
+  participantIdSalt = "participantIdSalt",
   phone = "phone",
   postalCode = "postalCode",
   rausgegangenApiKeyConfigured = "rausgegangenApiKeyConfigured",
@@ -2156,6 +2163,7 @@ export enum Organization_update_column {
   name = "name",
   newsletterDescription = "newsletterDescription",
   newsletterProvider = "newsletterProvider",
+  participantIdSalt = "participantIdSalt",
   phone = "phone",
   postalCode = "postalCode",
   rausgegangenApiKeyConfigured = "rausgegangenApiKeyConfigured",
@@ -3116,6 +3124,7 @@ export enum User_select_column {
   organizationId = "organizationId",
   organizationName = "organizationName",
   picture = "picture",
+  privacyNoticeSeenVersion = "privacyNoticeSeenVersion",
   status = "status",
   updated_at = "updated_at",
   zipCode = "zipCode",
@@ -3158,6 +3167,7 @@ export enum User_update_column {
   organizationId = "organizationId",
   organizationName = "organizationName",
   picture = "picture",
+  privacyNoticeSeenVersion = "privacyNoticeSeenVersion",
   status = "status",
   updated_at = "updated_at",
   zipCode = "zipCode",
@@ -4234,8 +4244,10 @@ export interface Attendance_arr_rel_insert_input {
  * order by avg() on columns of table "Attendance"
  */
 export interface Attendance_avg_order_by {
+  attendanceRecordIndex?: order_by | null;
   id?: order_by | null;
   interruptionCount?: order_by | null;
+  matchScore?: order_by | null;
   sessionId?: order_by | null;
   totalAttendanceTime?: order_by | null;
 }
@@ -4251,11 +4263,14 @@ export interface Attendance_bool_exp {
   _and?: Attendance_bool_exp[] | null;
   _not?: Attendance_bool_exp | null;
   _or?: Attendance_bool_exp[] | null;
+  attendanceRecordIndex?: Int_comparison_exp | null;
+  closestCandidates?: jsonb_comparison_exp | null;
   created_at?: timestamptz_comparison_exp | null;
   endDateTime?: timestamptz_comparison_exp | null;
   id?: Int_comparison_exp | null;
   interruptionCount?: Int_comparison_exp | null;
   location?: String_comparison_exp | null;
+  matchScore?: Int_comparison_exp | null;
   matchType?: String_comparison_exp | null;
   recordedIdentifier?: String_comparison_exp | null;
   sessionId?: Int_comparison_exp | null;
@@ -4275,11 +4290,14 @@ export interface Attendance_insert_input {
   AttendanceStatus?: AttendanceStatus_obj_rel_insert_input | null;
   Session?: Session_obj_rel_insert_input | null;
   User?: User_obj_rel_insert_input | null;
+  attendanceRecordIndex?: number | null;
+  closestCandidates?: any | null;
   created_at?: any | null;
   endDateTime?: any | null;
   id?: number | null;
   interruptionCount?: number | null;
   location?: string | null;
+  matchScore?: number | null;
   matchType?: string | null;
   recordedIdentifier?: string | null;
   sessionId?: number | null;
@@ -4295,11 +4313,13 @@ export interface Attendance_insert_input {
  * order by max() on columns of table "Attendance"
  */
 export interface Attendance_max_order_by {
+  attendanceRecordIndex?: order_by | null;
   created_at?: order_by | null;
   endDateTime?: order_by | null;
   id?: order_by | null;
   interruptionCount?: order_by | null;
   location?: order_by | null;
+  matchScore?: order_by | null;
   matchType?: order_by | null;
   recordedIdentifier?: order_by | null;
   sessionId?: order_by | null;
@@ -4314,11 +4334,13 @@ export interface Attendance_max_order_by {
  * order by min() on columns of table "Attendance"
  */
 export interface Attendance_min_order_by {
+  attendanceRecordIndex?: order_by | null;
   created_at?: order_by | null;
   endDateTime?: order_by | null;
   id?: order_by | null;
   interruptionCount?: order_by | null;
   location?: order_by | null;
+  matchScore?: order_by | null;
   matchType?: order_by | null;
   recordedIdentifier?: order_by | null;
   sessionId?: order_by | null;
@@ -4342,11 +4364,14 @@ export interface Attendance_on_conflict {
  * input type for updating data in table "Attendance"
  */
 export interface Attendance_set_input {
+  attendanceRecordIndex?: number | null;
+  closestCandidates?: any | null;
   created_at?: any | null;
   endDateTime?: any | null;
   id?: number | null;
   interruptionCount?: number | null;
   location?: string | null;
+  matchScore?: number | null;
   matchType?: string | null;
   recordedIdentifier?: string | null;
   sessionId?: number | null;
@@ -4362,8 +4387,10 @@ export interface Attendance_set_input {
  * order by stddev() on columns of table "Attendance"
  */
 export interface Attendance_stddev_order_by {
+  attendanceRecordIndex?: order_by | null;
   id?: order_by | null;
   interruptionCount?: order_by | null;
+  matchScore?: order_by | null;
   sessionId?: order_by | null;
   totalAttendanceTime?: order_by | null;
 }
@@ -4372,8 +4399,10 @@ export interface Attendance_stddev_order_by {
  * order by stddev_pop() on columns of table "Attendance"
  */
 export interface Attendance_stddev_pop_order_by {
+  attendanceRecordIndex?: order_by | null;
   id?: order_by | null;
   interruptionCount?: order_by | null;
+  matchScore?: order_by | null;
   sessionId?: order_by | null;
   totalAttendanceTime?: order_by | null;
 }
@@ -4382,8 +4411,10 @@ export interface Attendance_stddev_pop_order_by {
  * order by stddev_samp() on columns of table "Attendance"
  */
 export interface Attendance_stddev_samp_order_by {
+  attendanceRecordIndex?: order_by | null;
   id?: order_by | null;
   interruptionCount?: order_by | null;
+  matchScore?: order_by | null;
   sessionId?: order_by | null;
   totalAttendanceTime?: order_by | null;
 }
@@ -4392,8 +4423,10 @@ export interface Attendance_stddev_samp_order_by {
  * order by sum() on columns of table "Attendance"
  */
 export interface Attendance_sum_order_by {
+  attendanceRecordIndex?: order_by | null;
   id?: order_by | null;
   interruptionCount?: order_by | null;
+  matchScore?: order_by | null;
   sessionId?: order_by | null;
   totalAttendanceTime?: order_by | null;
 }
@@ -4402,8 +4435,10 @@ export interface Attendance_sum_order_by {
  * order by var_pop() on columns of table "Attendance"
  */
 export interface Attendance_var_pop_order_by {
+  attendanceRecordIndex?: order_by | null;
   id?: order_by | null;
   interruptionCount?: order_by | null;
+  matchScore?: order_by | null;
   sessionId?: order_by | null;
   totalAttendanceTime?: order_by | null;
 }
@@ -4412,8 +4447,10 @@ export interface Attendance_var_pop_order_by {
  * order by var_samp() on columns of table "Attendance"
  */
 export interface Attendance_var_samp_order_by {
+  attendanceRecordIndex?: order_by | null;
   id?: order_by | null;
   interruptionCount?: order_by | null;
+  matchScore?: order_by | null;
   sessionId?: order_by | null;
   totalAttendanceTime?: order_by | null;
 }
@@ -4422,8 +4459,10 @@ export interface Attendance_var_samp_order_by {
  * order by variance() on columns of table "Attendance"
  */
 export interface Attendance_variance_order_by {
+  attendanceRecordIndex?: order_by | null;
   id?: order_by | null;
   interruptionCount?: order_by | null;
+  matchScore?: order_by | null;
   sessionId?: order_by | null;
   totalAttendanceTime?: order_by | null;
 }
@@ -10525,6 +10564,7 @@ export interface Organization_bool_exp {
   name?: String_comparison_exp | null;
   newsletterDescription?: String_comparison_exp | null;
   newsletterProvider?: String_comparison_exp | null;
+  participantIdSalt?: String_comparison_exp | null;
   phone?: String_comparison_exp | null;
   postalCode?: String_comparison_exp | null;
   rausgegangenApiKeyConfigured?: Boolean_comparison_exp | null;
@@ -10593,6 +10633,7 @@ export interface Organization_insert_input {
   name?: string | null;
   newsletterDescription?: string | null;
   newsletterProvider?: string | null;
+  participantIdSalt?: string | null;
   phone?: string | null;
   postalCode?: string | null;
   rausgegangenApiKeyConfigured?: boolean | null;
@@ -10644,6 +10685,7 @@ export interface Organization_max_order_by {
   name?: order_by | null;
   newsletterDescription?: order_by | null;
   newsletterProvider?: order_by | null;
+  participantIdSalt?: order_by | null;
   phone?: order_by | null;
   postalCode?: order_by | null;
   rausgegangenApiKeyEncrypted?: order_by | null;
@@ -10692,6 +10734,7 @@ export interface Organization_min_order_by {
   name?: order_by | null;
   newsletterDescription?: order_by | null;
   newsletterProvider?: order_by | null;
+  participantIdSalt?: order_by | null;
   phone?: order_by | null;
   postalCode?: order_by | null;
   rausgegangenApiKeyEncrypted?: order_by | null;
@@ -10775,6 +10818,7 @@ export interface Organization_order_by {
   name?: order_by | null;
   newsletterDescription?: order_by | null;
   newsletterProvider?: order_by | null;
+  participantIdSalt?: order_by | null;
   phone?: order_by | null;
   postalCode?: order_by | null;
   rausgegangenApiKeyConfigured?: order_by | null;
@@ -14439,6 +14483,7 @@ export interface User_bool_exp {
   organizationId?: Int_comparison_exp | null;
   organizationName?: String_comparison_exp | null;
   picture?: String_comparison_exp | null;
+  privacyNoticeSeenVersion?: String_comparison_exp | null;
   status?: UserStatus_enum_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
   zipCode?: String_comparison_exp | null;
@@ -14482,6 +14527,7 @@ export interface User_insert_input {
   organizationId?: number | null;
   organizationName?: string | null;
   picture?: string | null;
+  privacyNoticeSeenVersion?: string | null;
   status?: UserStatus_enum | null;
   updated_at?: any | null;
   zipCode?: string | null;
@@ -14508,6 +14554,7 @@ export interface User_max_order_by {
   organizationId?: order_by | null;
   organizationName?: order_by | null;
   picture?: order_by | null;
+  privacyNoticeSeenVersion?: order_by | null;
   updated_at?: order_by | null;
   zipCode?: order_by | null;
 }
@@ -14533,6 +14580,7 @@ export interface User_min_order_by {
   organizationId?: order_by | null;
   organizationName?: order_by | null;
   picture?: order_by | null;
+  privacyNoticeSeenVersion?: order_by | null;
   updated_at?: order_by | null;
   zipCode?: order_by | null;
 }
@@ -14592,6 +14640,7 @@ export interface User_order_by {
   organizationId?: order_by | null;
   organizationName?: order_by | null;
   picture?: order_by | null;
+  privacyNoticeSeenVersion?: order_by | null;
   status?: order_by | null;
   updated_at?: order_by | null;
   zipCode?: order_by | null;

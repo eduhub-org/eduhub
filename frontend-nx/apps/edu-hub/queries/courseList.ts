@@ -87,6 +87,23 @@ export const ADMIN_COURSE_LIST = gql`
           title
         }
       }
+      # Latest session whose attendance has been checked, for the attendance column.
+      LastCheckedSession: Sessions(
+        where: { attendanceData: { _is_null: false } }
+        order_by: { startDateTime: desc }
+        limit: 1
+      ) {
+        id
+        title
+        startDateTime
+        Attendances {
+          id
+          userId
+          status
+          source
+          location
+        }
+      }
       AppliedAndUnratedCount: CourseEnrollments_aggregate(
         where: {
           _and: [

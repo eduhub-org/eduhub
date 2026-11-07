@@ -11,6 +11,7 @@ import { Footer } from './Footer';
 import { Header } from './Header';
 import { ImpersonationBanner } from './ImpersonationBanner';
 import { ParticipantPreviewNotice } from './ParticipantPreviewNotice';
+import { PrivacyUpdateNotice } from './PrivacyUpdateNotice';
 import { useAppSettings } from '../../contexts/AppSettingsContext';
 
 type PageProps = {
@@ -71,6 +72,7 @@ export const Page: FC<PageProps> = ({ children, className }) => {
       {/* Also page chrome, and above the wrapper for the same reason: the header
           inside it is absolutely positioned and would cover this bar. */}
       <ParticipantPreviewNotice />
+      <PrivacyUpdateNotice />
       <Transition
         as="div"
         show={bannerState.isVisible && !appSettingsLoading && !appSettingsError}

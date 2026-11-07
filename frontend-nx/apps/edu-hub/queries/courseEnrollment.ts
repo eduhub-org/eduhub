@@ -10,6 +10,17 @@ export const INSERT_SINGLE_ATTENDANCE = gql`
   }
 `;
 
+// Reverting to the automatic result removes the session's Manual Attendances.
+export const DELETE_MANUAL_ATTENDANCES = gql`
+  mutation DeleteManualAttendances($userId: uuid!, $sessionId: Int!) {
+    delete_Attendance(
+      where: { userId: { _eq: $userId }, sessionId: { _eq: $sessionId }, source: { _eq: "INSTRUCTOR" } }
+    ) {
+      affected_rows
+    }
+  }
+`;
+
 export const UPDATE_ATTENDANCE = gql`
   mutation UpdateSingleAttendanceByPk(
     $pkId: Int!

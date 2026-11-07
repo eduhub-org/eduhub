@@ -192,6 +192,7 @@ select_permissions:
         - addressLine2
         - city
         - country
+        - created_at
         - email
         - externalProfile
         - firstName
@@ -204,6 +205,7 @@ select_permissions:
         - organizationId
         - organizationName
         - picture
+        - privacyNoticeSeenVersion
         - status
         - updated_at
         - zipCode
@@ -597,6 +599,7 @@ update_permissions:
         - occupation
         - organizationId
         - picture
+        - privacyNoticeSeenVersion
         - zipCode
       filter:
         id:

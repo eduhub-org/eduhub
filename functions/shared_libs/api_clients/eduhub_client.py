@@ -90,9 +90,16 @@ class EduHubClient:
         return result_list
 
     def get_course_participants_from_session_id(self, session_id):
+        """Participants (confirmed or registered) and people who completed the
+        course; cancelled, expired, aborted or rejected enrollments get no
+        Attendance."""
         variables = {"session_id": f"{session_id}"}
         query = """query($session_id: Int) {
-            CourseEnrollment(where: {isTest: {_eq: false}, Course: {Sessions: {id: {_eq: $session_id}}}}) {
+            CourseEnrollment(where: {
+                isTest: {_eq: false},
+                status: {_in: [CONFIRMED, REGISTERED, COMPLETED]},
+                Course: {Sessions: {id: {_eq: $session_id}}}
+            }) {
                 User {
                     id
                     firstName
@@ -489,82 +496,62 @@ class EduHubClient:
         return enrollments
         
 
-    def _safe_iloc(self, series, cast=None):
-        """Safely extract the first value from a DataFrame column (Series).
-        Returns None when the column is missing or empty."""
-        if series is None:
-            return None
-        if hasattr(series, "empty") and series.empty:
-            return None
-        val = series.iloc[0]
-        if pd.isnull(val):
-            return None
-        return cast(val) if cast else val
+    @staticmethod
+    def _attendance_object(row):
+        """Attendance insert object from a row built by check_attendance.match_participants."""
 
-    def insert_attendance(self, course_participant_attendance):
-        col = course_participant_attendance.get
-        variables = {
-            "leaveDateTime": self._safe_iloc(col("leaveDateTime")),
-            "interruptionCount": self._safe_iloc(col("interruptionCount"), cast=int),
-            "recordedIdentifier": self._safe_iloc(col("recordedIdentifier")),
-            "matchType": self._safe_iloc(col("matchType")),
-            "sessionId": self._safe_iloc(col("sessionId"), cast=int),
-            "source": self._safe_iloc(col("source")),
-            "joinDateTime": self._safe_iloc(col("joinDateTime")),
-            "status": self._safe_iloc(col("status")),
-            "totalAttendanceTime": self._safe_iloc(col("duration"), cast=int),
-            "userId": self._safe_iloc(col("userId")),
-            "location": self._safe_iloc(col("location"), cast=str),
+        def value(key, cast=None):
+            val = row.get(key)
+            if isinstance(val, (list, dict)):
+                return val
+            if val is None or pd.isnull(val):
+                return None
+            return cast(val) if cast else val
+
+        return {
+            "sessionId": value("sessionId", int),
+            "userId": value("userId"),
+            "status": value("status"),
+            "source": value("source"),
+            "location": value("location", str),
+            "startDateTime": value("joinDateTime"),
+            "endDateTime": value("leaveDateTime"),
+            "totalAttendanceTime": value("duration", int),
+            "interruptionCount": value("interruptionCount", int),
+            "recordedIdentifier": value("recordedIdentifier"),
+            "matchType": value("matchType"),
+            "matchScore": value("matchScore", int),
+            "attendanceRecordIndex": value("attendanceRecordIndex", int),
+            "closestCandidates": value("closestCandidates"),
         }
-        mutation = """mutation($leaveDateTime: timestamptz, $interruptionCount: Int, $recordedIdentifier: String,
-                               $matchType: String, $sessionId: Int, $source: String, $joinDateTime: timestamptz,
-                               $status: AttendanceStatus_enum, $totalAttendanceTime: Int, $userId: uuid, $location: String) {
-            insert_Attendance(objects: {endDateTime: $leaveDateTime, interruptionCount: $interruptionCount,
-            recordedIdentifier: $recordedIdentifier, matchType: $matchType, sessionId: $sessionId, source: $source,
-            startDateTime: $joinDateTime, status: $status, totalAttendanceTime: $totalAttendanceTime, userId: $userId,
-            location: $location}) {
-                returning {
-                    id
-                    created_at
-                    endDateTime
-                    interruptionCount
-                    recordedIdentifier
-                    matchType
-                    sessionId
-                    source
-                    startDateTime
-                    status
-                    totalAttendanceTime
-                    updated_at
-                    userId
-                    location
-                }
-            }
-        }"""
-        return self.send_query(mutation, variables)
 
-    def update_session_attendanceData(self, attendance_data, session_id):
+    def replace_session_attendances(self, session_id, attendance_rows, attendance_data):
+        """Store a checked Session in one request, which Hasura runs as one
+        transaction: replace its automatic Attendances (Manual Attendances,
+        source INSTRUCTOR, stay) and set Session.attendanceData. If anything
+        fails, nothing is written and the Session stays eligible for a retry."""
         variables = {
             "sessionId": int(session_id),
+            "objects": [self._attendance_object(row) for row in attendance_rows],
             "attendanceData": attendance_data.to_json(),
         }
-        mutation = """mutation($sessionId: Int, $attendanceData: String) {
+        mutation = """mutation($sessionId: Int!, $objects: [Attendance_insert_input!]!, $attendanceData: String!) {
+            delete_Attendance(where: {
+                sessionId: {_eq: $sessionId},
+                _or: [{source: {_neq: "INSTRUCTOR"}}, {source: {_is_null: true}}]
+            }) {
+                affected_rows
+            }
+            insert_Attendance(objects: $objects) {
+                affected_rows
+            }
             update_Session(where: {id: {_eq: $sessionId}}, _set: {attendanceData: $attendanceData}) {
                 affected_rows
-                returning {
-                    attendanceData
-                    courseId
-                    created_at
-                    description
-                    endDateTime
-                    id
-                    startDateTime
-                    title
-                    updated_at
-                }
             }
         }"""
-        return self.send_query(mutation, variables)
+        result = self.send_query(mutation, variables)
+        self._raise_on_graphql_errors(result, "replace_session_attendances")
+        return result
 
     def get_user_details_from_id(self, user_id):
         variables = {"userId": f"{user_id}"}

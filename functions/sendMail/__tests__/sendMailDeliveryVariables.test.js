@@ -80,6 +80,14 @@ describe('sendMail delivery-status variables', () => {
     expect(loggedMail().maillogId).toBe('4711');
   });
 
+  it('turns off open and click tracking for every mail', async () => {
+    const res = makeResponse();
+    await sendMail(makeRequest(baseRow), res);
+
+    // Per message, so a domain-wide tracking default (marketing) cannot apply.
+    expect(loggedMail().tracking).toEqual({ all: 'no', opens: 'no', clicks: 'no' });
+  });
+
   it('omits the variable when the row carries no usable id', async () => {
     // Without an id there is nothing to join an event back onto, and a literal
     // 'undefined' in the variable would produce events that look keyed but

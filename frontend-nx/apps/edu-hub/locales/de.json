@@ -392,7 +392,7 @@
     "funded_by": "Gefördert durch:",
     "learning": {
       "you_will_learn": "Du wirst lernen",
-      "general_achievement_certificate_conditions": "**Online-Teilnahme:**\nWenn eine Online-Teilnahme möglich ist, wird die Teilnahme nur dann als anwesend gewertet, wenn die Kamera eingeschaltet ist."
+      "general_achievement_certificate_conditions": "**Online-Teilnahme:**\nWenn eine Online-Teilnahme möglich ist, wird die Teilnahme nur dann als anwesend gewertet, wenn die Kamera eingeschaltet ist und du mit derselben E-Mail-Adresse bzw. demselben Namen wie in EduHub teilnimmst. Während einer angekündigten Aufzeichnung darfst du die Kamera ausschalten, ohne dass das als Fehlzeit zählt. Mehr dazu in der [Datenschutzerklärung](/privacy)."
     },
     "sessions": {
       "show_all_dates": "Alle Termine anzeigen",
@@ -704,7 +704,7 @@
       "addons": "Zusatzoptionen",
       "no_addons": "Keine Zusatzoptionen",
       "total": "Gesamtpreis",
-      "accept_terms": "Ich habe die <terms>Allgemeinen Geschäftsbedingungen (AGB)</terms> sowie die <privacy>Datenschutzerklärung</privacy> gelesen und akzeptiere sie.",
+      "accept_terms": "Ich akzeptiere die <terms>Allgemeinen Geschäftsbedingungen (AGB)</terms>. Die <privacy>Datenschutzerklärung</privacy> habe ich zur Kenntnis genommen.",
       "cancel": "Abbrechen",
       "payment": {
         "verifying": "Zahlung wird überprüft...",
@@ -826,7 +826,8 @@
       "cancel_success_message": "Deine Anmeldung wurde storniert.",
       "abort_success_message": "Deine Teilnahme wurde abgebrochen.",
       "cancellation_request_success_message": "Deine Anfrage wurde an die Veranstalter gesendet."
-    }
+    },
+    "privacy_notice": "Wie wir deine Daten bei der Anmeldung verarbeiten, erfährst du in unserer <privacy>Datenschutzerklärung</privacy>."
   },
   "coursePage": {
     "courseCosts": "Der Kurs kostet {price}",
@@ -1185,6 +1186,9 @@
       "instructor": "Dozent",
       "applications": "Bewerbungen",
       "confirmed": "Bestätigt",
+      "applications_confirmed": "Bewerbungen\u00a0/ Bestätigt",
+      "last_session_attendance": "Anwesenheit letzter erfasster Termin",
+      "last_session_attendance_hint": "{title} am {date}",
       "unrated_rated_not_informed": "Unbewertet / Bewertet aber nicht informiert",
       "application_end": "Anmelde- schluss",
       "program": "Programm",
@@ -1898,6 +1902,25 @@
     "attendance_program_session": "Kursübergreifend",
     "attendance_program_session_event": "Eventübergreifend",
     "attendance_optional_session": "optional",
+    "attendance_hover": {
+      "not_checked": "Noch nicht erfasst",
+      "manual": "Manuell gesetzt: {status}",
+      "automatic": "Automatisch {status}",
+      "automatic_not_checked": "Automatisch noch nicht erfasst",
+      "attended": "anwesend",
+      "missed": "verpasst",
+      "unknown": "unbekannt",
+      "checked_in": "erfasst {time}",
+      "interruptions": "{count, plural, one {# Unterbrechung} other {# Unterbrechungen}}",
+      "below_minimum": "unter Mindestzeit",
+      "not_recognised": "Nicht erkannt",
+      "no_records": "Keine Anwesenheitsdaten",
+      "closest": "Nächster Treffer {location}: {identifier} ({score} %)",
+      "closest_legacy": "Nächster Treffer: {identifier}",
+      "match_email": "Zuordnung per E-Mail",
+      "match_name": "Zuordnung per Name ({score} %)",
+      "match_partial_name": "Zuordnung per Namensteil ({score} %)"
+    },
     "attendance_status_passed": "Anwesenheitsanforderung erfüllt",
     "attendance_status_failed": "Anwesenheitsanforderung nicht erfüllt",
     "attendance_status_uncertain": "Anwesenheitsstatus noch offen",
@@ -2091,11 +2114,30 @@
         "placeholder": "Beschreibe den Inhalt der Session, z.B. Ablauf, Themen oder Hinweise für Teilnehmende. Möglich sind **fett**, *kursiv* und Links: [Text](https://...)"
       },
       "attendance_data": {
-        "label": "Anwesenheitsdaten",
-        "review_button": "Anwesenheitsdaten ansehen",
-        "review_short": "Ansehen",
+        "label": "Anwesenheit",
+        "review_button": "Rohdaten der Anwesenheit ansehen",
+        "review_short": "Rohdaten",
         "no_data": "Keine Anwesenheitsdaten vorhanden",
-        "dialog_title": "Anwesenheitsdaten"
+        "not_checked": "Wird nach dem Termin erfasst",
+        "attended_of_total": "{attended} / {total} anwesend",
+        "manual": "manuell",
+        "loading": "Anwesenheit wird geladen …",
+        "unavailable": "Anwesenheit konnte nicht geladen werden",
+        "unknown_location": "Ort unbekannt",
+        "dialog_title": "Rohdaten",
+        "col_name": "Name",
+        "col_email": "E-Mail",
+        "col_location": "Ort",
+        "col_time": "Zeit",
+        "col_duration": "Dauer",
+        "col_assigned": "Zugeordnet zu",
+        "not_assigned": "nicht zugeordnet",
+        "below_minimum": "unter Mindestzeit",
+        "interruptions": "{count, plural, one {# Unterbrechung} other {# Unterbrechungen}}",
+        "filter_location": "Ort",
+        "filter_assignment": "Zuordnung",
+        "assigned": "Zugeordnet",
+        "unassigned": "Nicht zugeordnet"
       },
       "notify_participants": {
         "title": "Teilnehmende informieren?",
@@ -3708,7 +3750,7 @@
       "last_name": "Nachname",
       "email": "E-Mail-Adresse",
       "organization": "Organisation (optional)",
-      "accept_terms": "Ich habe die <terms>Allgemeinen Geschäftsbedingungen (AGB)</terms> sowie die <privacy>Datenschutzerklärung</privacy> gelesen und akzeptiere sie.",
+      "accept_terms": "Ich akzeptiere die <terms>Allgemeinen Geschäftsbedingungen (AGB)</terms>. Die <privacy>Datenschutzerklärung</privacy> habe ich zur Kenntnis genommen.",
       "newsletter_opt_in": "Informiert mich per E-Mail über weitere Veranstaltungen dieses Veranstalters. Das ist freiwillig und du kannst es jederzeit widerrufen.",
       "data_notice": "Wir speichern deinen Namen, deine E-Mail-Adresse und ggf. deine Organisation, um die Veranstaltung durchzuführen und dich über Änderungen zu informieren. Danach löschen wir sie automatisch. Über den Link in jeder E-Mail kannst du deine Daten jederzeit einsehen oder löschen lassen.",
       "submit": "Anmeldung abschicken",
@@ -3750,12 +3792,12 @@
     "errors": {
       "name_required": "Bitte gib deinen Vor- und Nachnamen an.",
       "email_required": "Bitte gib deine E-Mail-Adresse an.",
-      "terms_required": "Bitte akzeptiere die AGB und die Datenschutzerklärung.",
+      "terms_required": "Bitte akzeptiere die AGB.",
       "invalid_name": "Bitte prüfe deinen Namen.",
       "invalid_organization": "Der Name der Organisation darf höchstens 200 Zeichen lang sein.",
       "invalid_email": "Bitte prüfe deine E-Mail-Adresse.",
       "invalid_course": "Diese Veranstaltung wurde nicht gefunden.",
-      "terms_not_accepted": "Bitte akzeptiere die AGB und die Datenschutzerklärung.",
+      "terms_not_accepted": "Bitte akzeptiere die AGB.",
       "course_not_available": "Diese Veranstaltung ist derzeit nicht verfügbar.",
       "guest_registration_not_enabled": "Für diese Veranstaltung ist eine Anmeldung ohne Konto nicht möglich.",
       "course_full": "Diese Veranstaltung ist bereits ausgebucht.",
@@ -3806,5 +3848,11 @@
       "REJECTED": "abgelehnt",
       "ABORTED": "abgebrochen"
     }
+  },
+  "privacy_update": {
+    "title": "Unsere Datenschutzerklärung hat sich geändert",
+    "nothing_to_do": "Du musst nichts unternehmen. Wir möchten dich lediglich darüber informieren, wie wir mit deinen Daten umgehen.",
+    "more": "Alle Änderungen findest du in unserer <privacy>Datenschutzerklärung</privacy>.",
+    "dismiss": "Hinweis schließen"
   }
 }

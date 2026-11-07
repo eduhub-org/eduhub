@@ -2,10 +2,9 @@ import { ApolloProvider } from '@apollo/client';
 import { SessionProvider } from 'next-auth/react';
 import type { AppContext, AppProps } from 'next/app';
 import Head from 'next/head';
-import { FC, useEffect, useState } from 'react';
+import { FC, useEffect } from 'react';
 import Script from 'next/script';
 import { useRouter } from 'next/router';
-import * as fbq from '../lib/fpixel';
 import { AppCacheProvider } from '@mui/material-nextjs/v15-pagesRouter';
 import { ThemeProvider } from '@mui/material/styles';
 import { NextIntlClientProvider } from 'next-intl';
@@ -75,8 +74,6 @@ const PlausibleAnalytics: FC = () => {
       data-domain="edu.opencampus.sh"
       src="https://plausible.io/js/script.js"
       strategy="afterInteractive"
-      data-cookieconsent="statistics"
-      type="text/plain"
     />
   );
 };
@@ -92,25 +89,6 @@ const MyApp: FC<AppProps & InitialProps> & {
     setDefaultLocale(locale);
   }, [locale]);
 
-  const [isFBPixelLoaded, setFBPixelLoaded] = useState(false);
-
-  useEffect(() => {
-    if (isFBPixelLoaded && typeof window.fbq === 'function') {
-      // This pageview only triggers the first time
-      fbq.pageview();
-
-      const handleRouteChange = () => {
-        fbq.pageview();
-      };
-
-      router.events.on('routeChangeComplete', handleRouteChange);
-      return () => {
-        router.events.off('routeChangeComplete', handleRouteChange);
-      };
-    }
-    return undefined;
-  }, [router.events, isFBPixelLoaded]);
-
   return (
     <NextIntlClientProvider locale={locale} messages={messages[locale]} timeZone="Europe/Berlin">
       <SessionProvider session={pageProps.session}>
@@ -125,29 +103,6 @@ const MyApp: FC<AppProps & InitialProps> & {
               <AuthErrorProvider>
                 <AppSettingsProvider>
                 <ParticipantPreviewProvider>
-                  {/* Global Site Code Pixel - Facebook Pixel */}
-                  <Script
-                    id="fb-pixel"
-                    data-cookieconsent="marketing"
-                    strategy="afterInteractive"
-                    type="text/plain"
-                    onLoad={() => setFBPixelLoaded(true)}
-                    dangerouslySetInnerHTML={{
-                      __html: `
-              !function(f,b,e,v,n,t,s)
-              {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-              n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-              if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-              n.queue=[];t=b.createElement(e);t.async=!0;
-              t.src=v;s=b.getElementsByTagName(e)[0];
-              s.parentNode.insertBefore(t,s)}(window, document,'script',
-              'https://connect.facebook.net/en_US/fbevents.js');
-              fbq('init', '1775867059535400');
-              fbq('track', 'PageView');
-            `,
-                    }}
-                  />
-
                   {/* Skip loading Plausible entirely for admins/org admins so their own usage never counts as traffic */}
                   <PlausibleAnalytics />
                   <Head>
