@@ -66,6 +66,7 @@ export const ADMIN_COURSE_LIST = gql`
       courseSeriesId
       CourseEnrollments(where: { isTest: { _eq: false } }) {
         id
+        userId
         CourseEnrollmentStatus {
           value
         }

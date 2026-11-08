@@ -109,6 +109,14 @@ const CONFIRMED_STATUSES = [
   CourseEnrollmentStatus_enum.REGISTERED,
 ];
 
+/** Participants the attendance check covers; their count is the attendance denominator. */
+const getParticipantIds = (course: AdminCourseList_Course) =>
+  new Set(
+    course.CourseEnrollments.filter((enrollment) =>
+      CONFIRMED_STATUSES.includes(enrollment.CourseEnrollmentStatus.value as CourseEnrollmentStatus_enum)
+    ).map((enrollment) => enrollment.userId)
+  );
+
 // Courses without an application process only report confirmed participants.
 const hasApplicationProcess = (course: AdminCourseList_Course) =>
   getRegistrationFeatures(course.registrationType).hasApplicationProcess;
@@ -923,7 +931,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
             <Tooltip title={t('table_header.last_session_attendance_hint', { title: session.title ?? '', date })}>
               <div className="w-full">
                 <SessionAttendanceSummary
-                  summary={summarizeSessionAttendances(session.Attendances)}
+                  summary={summarizeSessionAttendances(session.Attendances, getParticipantIds(row.original))}
                   locationOptions={locationOptions}
                   compact
                 />
@@ -1045,7 +1053,10 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
               <span>
                 {t('table_header.last_session_attendance')}:{' '}
                 {(() => {
-                  const summary = summarizeSessionAttendances(course.LastCheckedSession[0].Attendances);
+                  const summary = summarizeSessionAttendances(
+                    course.LastCheckedSession[0].Attendances,
+                    getParticipantIds(course)
+                  );
                   return `${summary.attended} / ${summary.total}`;
                 })()}
               </span>

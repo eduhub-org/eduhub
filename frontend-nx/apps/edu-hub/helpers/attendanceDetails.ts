@@ -79,20 +79,25 @@ interface SessionAttendanceRow {
 }
 
 export interface SessionAttendanceSummary {
-  /** People with an Attendance for the session (the automatic check creates one per Participant). */
+  /** Participants of the session (confirmed, registered or completed enrollments). */
   total: number;
   attended: number;
   /** Attended per Attendance Location; Manual Attendances under MANUAL_ATTENDANCE_LOCATION. */
   byLocation: Record<string, number>;
 }
 
-/** Counts effective Attendances: a Manual Attendance always wins over the automatic one. */
+/**
+ * Counts effective Attendances: a Manual Attendance always wins over the automatic one. Only the
+ * current Participants count, so applicants checked before the status filter existed, or people
+ * who cancelled after the check, do not inflate the total.
+ */
 export const summarizeSessionAttendances = (
-  rows: readonly SessionAttendanceRow[]
+  rows: readonly SessionAttendanceRow[],
+  participantIds: ReadonlySet<string>
 ): SessionAttendanceSummary => {
   const effectiveByUser = new Map<string, SessionAttendanceRow>();
   for (const row of rows) {
-    if (!row.userId) continue;
+    if (!row.userId || !participantIds.has(row.userId)) continue;
     const current = effectiveByUser.get(row.userId);
     const rowIsManual = row.source === ATTENDANCE_SOURCE_INSTRUCTOR;
     const currentIsManual = current?.source === ATTENDANCE_SOURCE_INSTRUCTOR;
@@ -113,7 +118,7 @@ export const summarizeSessionAttendances = (
     byLocation[location] = (byLocation[location] ?? 0) + 1;
   });
 
-  return { total: effectiveByUser.size, attended, byLocation };
+  return { total: participantIds.size, attended, byLocation };
 };
 
 interface AssignableAttendance {
