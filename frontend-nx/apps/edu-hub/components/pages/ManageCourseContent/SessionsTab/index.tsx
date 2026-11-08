@@ -687,7 +687,20 @@ const ExpandableSessionRowContent: FC<ExpandableSessionRowContentProps> = ({
     fetchPolicy: 'cache-and-network',
   });
   const sessionAttendances = useMemo(() => attendanceRows?.Attendance ?? [], [attendanceRows]);
-  const attendanceSummary = useMemo(() => summarizeSessionAttendances(sessionAttendances), [sessionAttendances]);
+  const participantIds = useMemo(
+    () => new Set((attendanceRows?.Participants ?? []).map((enrollment) => enrollment.userId)),
+    [attendanceRows]
+  );
+  // Applicants checked before the status filter existed, or people who cancelled after the check,
+  // still have Attendances; the summary and the record assignments only show current Participants.
+  const participantAttendances = useMemo(
+    () => sessionAttendances.filter((attendance) => attendance.userId && participantIds.has(attendance.userId)),
+    [sessionAttendances, participantIds]
+  );
+  const attendanceSummary = useMemo(
+    () => summarizeSessionAttendances(participantAttendances, participantIds),
+    [participantAttendances, participantIds]
+  );
   const locationOptions = useMemo(
     () => Array.from(new Set(locations.map((location) => location.option))),
     [locations]
@@ -941,7 +954,7 @@ const ExpandableSessionRowContent: FC<ExpandableSessionRowContentProps> = ({
         open={attendanceOpen}
         onClose={() => setAttendanceOpen(false)}
         attendanceData={session.attendanceData}
-        attendances={sessionAttendances}
+        attendances={participantAttendances}
         sessionStart={session.startDateTime}
         sessionEnd={session.endDateTime}
         sessionTitle={session.title ?? undefined}

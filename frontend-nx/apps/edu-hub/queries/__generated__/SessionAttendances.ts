@@ -59,11 +59,24 @@ export interface SessionAttendances_Attendance {
   User: SessionAttendances_Attendance_User | null;
 }
 
+export interface SessionAttendances_Participants {
+  __typename: "CourseEnrollment";
+  id: number;
+  /**
+   * The ID of the user that enrolled for the given course
+   */
+  userId: any;
+}
+
 export interface SessionAttendances {
   /**
    * fetch data from the table: "Attendance"
    */
   Attendance: SessionAttendances_Attendance[];
+  /**
+   * fetch data from the table: "CourseEnrollment"
+   */
+  Participants: SessionAttendances_Participants[];
 }
 
 export interface SessionAttendancesVariables {
