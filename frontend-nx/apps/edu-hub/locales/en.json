@@ -2138,6 +2138,7 @@
         "no_data": "No attendance data available",
         "not_checked": "Recorded after the session",
         "attended_of_total": "{attended} / {total} attended",
+        "attended_percent": "{percent}% ({attended})",
         "manual": "manual",
         "loading": "Loading attendance …",
         "unavailable": "Attendance could not be loaded",

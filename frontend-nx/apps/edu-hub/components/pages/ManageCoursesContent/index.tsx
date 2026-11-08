@@ -37,7 +37,7 @@ import { DELETE_A_COURSE } from '../../../queries/mutateCourse';
 import TableGrid from '../../common/TableGrid';
 import Loading from '../../common/Loading';
 import { useDeferredBulkAction, usePersistedPageSize, useTableGrid } from '../../common/TableGrid/hooks';
-import { createMultiWordSearchCondition } from '../../common/TableGrid/utils';
+import { createMultiWordSearchCondition, NULLS_LAST } from '../../common/TableGrid/utils';
 import { useManageQuery } from '../../../hooks/authedQuery';
 import { useManageRole } from '../../../hooks/authentication';
 import { useManageCourseWhere } from '../../../hooks/manageScope';
@@ -70,7 +70,10 @@ import { ProgramsMenubar } from '../../layout/ProgramsMenubar';
 import type { StaticComponentProperty } from '../../../types/UIComponents';
 import { ProgramType } from '../../../types/enums';
 import { useRausgegangenUnpublishPrompt } from '../ManageCourseContent/useRausgegangenUnpublishPrompt';
-import { SessionAttendanceSummary } from '../ManageCourseContent/SessionsTab/SessionAttendanceSummary';
+import {
+  formatAttendedPercent,
+  SessionAttendanceSummary,
+} from '../ManageCourseContent/SessionsTab/SessionAttendanceSummary';
 import { summarizeSessionAttendances } from '../../../helpers/attendanceDetails';
 import {
   programTabStorageKey,
@@ -134,6 +137,7 @@ interface IProps {
 const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationId, organizationSelector }) => {
   const t = useTranslations('manageCourses');
   const tCommon = useTranslations('common');
+  const tAttendance = useTranslations('manageCourse.SessionsTab.attendance_data');
   const locale = useLocale();
 
   // Management role (admin for super-admins, org_admin otherwise) and the organization scope that
@@ -262,6 +266,9 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
           return { CourseEnrollments_aggregate: { count: null } };
         case 'applicationEnd':
           return 'applicationEnd';
+        case 'lastSessionAttendance':
+          // Courses without a checked session sort last in both directions.
+          return { lastSessionAttendanceRate: NULLS_LAST };
         default:
           return null;
       }
@@ -912,7 +919,10 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
       {
         header: t('table_header.last_session_attendance'),
         id: 'lastSessionAttendance',
+        // Sorted on the server by the same rate (see sortColumnMapper).
+        accessorFn: (course) => course.lastSessionAttendanceRate,
         size: 150,
+        enableSorting: true,
         meta: { align: 'center' },
         cell: ({ row }) => {
           const session = row.original.LastCheckedSession[0];
@@ -1057,7 +1067,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
                     course.LastCheckedSession[0].Attendances,
                     getParticipantIds(course)
                   );
-                  return `${summary.attended} / ${summary.total}`;
+                  return formatAttendedPercent(summary, tAttendance);
                 })()}
               </span>
             )}
@@ -1065,7 +1075,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
         </div>
       );
     },
-    [t, messageKey, getApplicationsCount, getConfirmedCount]
+    [t, tAttendance, messageKey, getApplicationsCount, getConfirmedCount]
   );
 
   const handlePageSizeChange = useCallback(
