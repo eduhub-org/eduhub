@@ -14,7 +14,7 @@ AS $function$
     FROM "public"."Session"
     WHERE "courseId" = course_row.id
       AND "attendanceData" IS NOT NULL
-    ORDER BY "startDateTime" DESC
+    ORDER BY "startDateTime" DESC, id DESC
     LIMIT 1
   ),
   participant AS (
@@ -36,3 +36,8 @@ AS $function$
       / NULLIF((SELECT COUNT(*) FROM participant), 0)
   WHERE EXISTS (SELECT 1 FROM last_session);
 $function$;
+
+-- The latest checked session per course, looked up for every course when the list is sorted.
+CREATE INDEX IF NOT EXISTS "Session_courseId_startDateTime_checked_idx"
+  ON "public"."Session" ("courseId", "startDateTime" DESC, id DESC)
+  WHERE "attendanceData" IS NOT NULL;

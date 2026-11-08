@@ -92,7 +92,8 @@ export const ADMIN_COURSE_LIST = gql`
       lastSessionAttendanceRate
       LastCheckedSession: Sessions(
         where: { attendanceData: { _is_null: false } }
-        order_by: { startDateTime: desc }
+        # Same order as course_last_session_attendance_rate, which sorts this column.
+        order_by: [{ startDateTime: desc }, { id: desc }]
         limit: 1
       ) {
         id

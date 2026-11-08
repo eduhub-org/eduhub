@@ -1,1 +1,1 @@
-DROP FUNCTION IF EXISTS "public"."course_last_session_attendance_rate"("public"."Course");
+DROP INDEX IF EXISTS "public"."Session_courseId_startDateTime_checked_idx";
