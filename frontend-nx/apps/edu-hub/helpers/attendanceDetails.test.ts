@@ -22,20 +22,36 @@ describe('attendanceLocationOption', () => {
 
 describe('summarizeSessionAttendances', () => {
   it('counts effective Attendances with Manual Attendances taking precedence', () => {
-    const summary = summarizeSessionAttendances([
-      { id: 1, userId: 'a', status: ATTENDED, source: 'ZOOM', location: 'ZOOM' },
-      { id: 2, userId: 'b', status: ATTENDED, source: 'LIMESURVEY', location: 'SK' },
-      { id: 3, userId: 'c', status: MISSED, source: 'ZOOM', location: null },
-      { id: 4, userId: 'c', status: ATTENDED, source: 'INSTRUCTOR', location: null },
-      { id: 5, userId: 'd', status: ATTENDED, source: 'ZOOM', location: 'ZOOM' },
-      { id: 6, userId: 'd', status: MISSED, source: 'INSTRUCTOR', location: null },
-    ]);
+    const summary = summarizeSessionAttendances(
+      [
+        { id: 1, userId: 'a', status: ATTENDED, source: 'ZOOM', location: 'ZOOM' },
+        { id: 2, userId: 'b', status: ATTENDED, source: 'LIMESURVEY', location: 'SK' },
+        { id: 3, userId: 'c', status: MISSED, source: 'ZOOM', location: null },
+        { id: 4, userId: 'c', status: ATTENDED, source: 'INSTRUCTOR', location: null },
+        { id: 5, userId: 'd', status: ATTENDED, source: 'ZOOM', location: 'ZOOM' },
+        { id: 6, userId: 'd', status: MISSED, source: 'INSTRUCTOR', location: null },
+      ],
+      new Set(['a', 'b', 'c', 'd'])
+    );
 
     expect(summary).toEqual({
       total: 4,
       attended: 3,
       byLocation: { ONLINE: 1, KIEL: 1, [MANUAL_ATTENDANCE_LOCATION]: 1 },
     });
+  });
+
+  it('counts only Participants and all of them, with or without an Attendance', () => {
+    const summary = summarizeSessionAttendances(
+      [
+        { id: 1, userId: 'a', status: ATTENDED, source: 'ZOOM', location: 'ZOOM' },
+        { id: 2, userId: 'applicant', status: MISSED, source: 'ZOOM', location: null },
+        { id: 3, userId: 'cancelled', status: ATTENDED, source: 'ZOOM', location: 'ZOOM' },
+      ],
+      new Set(['a', 'enrolled-after-check'])
+    );
+
+    expect(summary).toEqual({ total: 2, attended: 1, byLocation: { ONLINE: 1 } });
   });
 });
 

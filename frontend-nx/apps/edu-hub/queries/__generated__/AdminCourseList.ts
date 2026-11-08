@@ -390,6 +390,10 @@ export interface AdminCourseList_Course_CourseEnrollments {
   __typename: "CourseEnrollment";
   id: number;
   /**
+   * The ID of the user that enrolled for the given course
+   */
+  userId: any;
+  /**
    * An object relationship
    */
   CourseEnrollmentStatus: AdminCourseList_Course_CourseEnrollments_CourseEnrollmentStatus;
