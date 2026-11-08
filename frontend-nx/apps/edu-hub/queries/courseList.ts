@@ -89,6 +89,7 @@ export const ADMIN_COURSE_LIST = gql`
         }
       }
       # Latest session whose attendance has been checked, for the attendance column.
+      lastSessionAttendanceRate
       LastCheckedSession: Sessions(
         where: { attendanceData: { _is_null: false } }
         order_by: { startDateTime: desc }

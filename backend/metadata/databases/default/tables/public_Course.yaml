@@ -135,6 +135,13 @@ computed_fields:
         name: course_active_participant_count
         schema: public
       table_argument: course_row
+  - name: lastSessionAttendanceRate
+    comment: Share of participants who attended the latest checked session; NULL without one.
+    definition:
+      function:
+        name: course_last_session_attendance_rate
+        schema: public
+      table_argument: course_row
   - name: publicParticipantCount
     definition:
       function:
@@ -259,6 +266,7 @@ select_permissions:
       computed_fields:
         - activeParticipantCount
         - publicParticipantCount
+        - lastSessionAttendanceRate
         - waitlistCount
       filter: {}
   - role: user_access
@@ -373,6 +381,7 @@ select_permissions:
       computed_fields:
         - activeParticipantCount
         - publicParticipantCount
+        - lastSessionAttendanceRate
         - waitlistCount
       filter:
         Program:

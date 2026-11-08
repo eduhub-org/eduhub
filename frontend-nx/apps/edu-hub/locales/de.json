@@ -2120,6 +2120,7 @@
         "no_data": "Keine Anwesenheitsdaten vorhanden",
         "not_checked": "Wird nach dem Termin erfasst",
         "attended_of_total": "{attended} / {total} anwesend",
+        "attended_percent": "{percent} % ({attended})",
         "manual": "manuell",
         "loading": "Anwesenheit wird geladen …",
         "unavailable": "Anwesenheit konnte nicht geladen werden",
