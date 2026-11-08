@@ -16,7 +16,16 @@ interface Props {
 const isLocationOption = (value: string): value is LocationOption_enum =>
   (Object.values(LocationOption_enum) as string[]).includes(value);
 
-/** "41 / 60 anwesend" and, for hybrid sessions, "Online 23 · Kiel 16 · manuell 2". */
+/** "68 % (41)" — the column header already says "attended"; "–" without participants. */
+export const formatAttendedPercent = (
+  summary: Summary,
+  t: (key: 'attended_percent', values: { percent: number; attended: number }) => string
+) =>
+  summary.total > 0
+    ? t('attended_percent', { percent: Math.round((summary.attended / summary.total) * 100), attended: summary.attended })
+    : '–';
+
+/** Compact "68 % (41)" or full "41 / 60 anwesend"; for hybrid sessions also "Online 23 · Kiel 16 · manuell 2". */
 export const SessionAttendanceSummary: FC<Props> = ({ summary, locationOptions, compact = false }) => {
   const t = useTranslations('manageCourse.SessionsTab.attendance_data');
   const tCommon = useTranslations('common');
@@ -37,7 +46,7 @@ export const SessionAttendanceSummary: FC<Props> = ({ summary, locationOptions, 
     return (
       <div className="flex flex-col items-center gap-0.5 text-center">
         <span className="text-sm font-semibold tabular-nums text-label-primary">
-          {t('attended_of_total', { attended: summary.attended, total: summary.total })}
+          {formatAttendedPercent(summary, t)}
         </span>
         {showBreakdown && (
           <span className="text-xs text-label-secondary">

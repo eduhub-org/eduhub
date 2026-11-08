@@ -707,6 +707,10 @@ export interface AdminCourseList_Course {
    */
   CourseDegrees: AdminCourseList_Course_CourseDegrees[];
   /**
+   * Share of participants who attended the latest checked session; NULL without one.
+   */
+  lastSessionAttendanceRate: any | null;
+  /**
    * An array relationship
    */
   LastCheckedSession: AdminCourseList_Course_LastCheckedSession[];
