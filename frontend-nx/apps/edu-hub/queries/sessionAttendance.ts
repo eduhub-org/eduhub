@@ -18,5 +18,22 @@ export const SESSION_ATTENDANCES = gql`
         lastName
       }
     }
+    # Participants (guests and direct sign-ups are REGISTERED) of the session's course, or of
+    # every course of the program for a program-wide session: the attendance denominator.
+    Participants: CourseEnrollment(
+      where: {
+        isTest: { _eq: false }
+        status: { _in: [CONFIRMED, REGISTERED, COMPLETED] }
+        Course: {
+          _or: [
+            { Sessions: { id: { _eq: $sessionId } } }
+            { Program: { Sessions: { id: { _eq: $sessionId } } } }
+          ]
+        }
+      }
+    ) {
+      id
+      userId
+    }
   }
 `;

@@ -6987,6 +6987,7 @@ export interface Course_bool_exp {
   headingDescriptionField2?: String_comparison_exp | null;
   id?: Int_comparison_exp | null;
   language?: String_comparison_exp | null;
+  lastSessionAttendanceRate?: numeric_comparison_exp | null;
   learningGoals?: String_comparison_exp | null;
   matrixRoomId?: String_comparison_exp | null;
   maxMissedSessions?: Int_comparison_exp | null;
@@ -7244,6 +7245,7 @@ export interface Course_order_by {
   headingDescriptionField2?: order_by | null;
   id?: order_by | null;
   language?: order_by | null;
+  lastSessionAttendanceRate?: order_by | null;
   learningGoals?: order_by | null;
   matrixRoomId?: order_by | null;
   maxMissedSessions?: order_by | null;
