@@ -1275,7 +1275,8 @@
     },
     "funding_organizations": {
       "label": "Förderorganisationen",
-      "add": "Förderorganisation hinzufügen"
+      "add": "Förderorganisation hinzufügen",
+      "synced_from_course": "Übernommen aus dem Kurs \"{course}\", aus dem diese Veranstaltung erstellt wurde. Ändere sie dort."
     },
     "certificates": {
       "enable": "Bescheinigungen vergeben",

@@ -979,35 +979,55 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
               </div>
             </Card>
 
-            {/* Funding organizations - last, rarely needed */}
+            {/* Funding organizations - last, rarely needed. An event created
+                from a course session shows the course's, synced by the
+                database, and they can only be changed on the course. */}
             <Card>
-              <EntityListManager
-                variant="material"
-                label={t('manageCourses.funding_organizations.label')}
-                addButtonText={t('manageCourses.funding_organizations.add')}
-                itemId={course.id}
-                entities={course.CourseFundingOrganizations || []}
-                renderEntity={renderFundingOrganization}
-                selectionDialog={
-                  <SelectOrganizationDialog
-                    onClose={addFundingOrgHandler}
-                    open={fundingOrgDialogOpen}
-                    title={t('manageCourses.funding_organizations.add')}
-                  />
-                }
-                dialogOpen={fundingOrgDialogOpen}
-                onOpenDialog={openFundingOrgDialog}
-                onCloseDialog={closeFundingOrgDialog}
-                onEntitySelected={addFundingOrgHandler}
-                insertEntityMutation={INSERT_COURSE_FUNDING_ORGANIZATION}
-                deleteEntityMutation={DELETE_COURSE_FUNDING_ORGANIZATION}
-                buildInsertVariables={(courseId, organization) => ({
-                  courseId,
-                  organizationId: organization.id,
-                })}
-                buildDeleteVariables={(courseId, organizationId) => ({ courseId, organizationId })}
-                refetchQueries={['AdminCourseList']}
-              />
+              {course.sourceSessionId != null ? (
+                <div className="flex flex-col gap-2">
+                  <span className="font-medium text-label-primary">
+                    {t('manageCourses.funding_organizations.label')}
+                  </span>
+                  {(course.CourseFundingOrganizations ?? []).map((cfo) => (
+                    <div key={cfo.id} className="bg-bg-secondary p-2 rounded font-medium text-label-primary">
+                      {cfo.Organization.name}
+                    </div>
+                  ))}
+                  <FieldHint>
+                    {t('manageCourses.funding_organizations.synced_from_course', {
+                      course: course.SourceSession?.Course?.title ?? '',
+                    })}
+                  </FieldHint>
+                </div>
+              ) : (
+                <EntityListManager
+                  variant="material"
+                  label={t('manageCourses.funding_organizations.label')}
+                  addButtonText={t('manageCourses.funding_organizations.add')}
+                  itemId={course.id}
+                  entities={course.CourseFundingOrganizations || []}
+                  renderEntity={renderFundingOrganization}
+                  selectionDialog={
+                    <SelectOrganizationDialog
+                      onClose={addFundingOrgHandler}
+                      open={fundingOrgDialogOpen}
+                      title={t('manageCourses.funding_organizations.add')}
+                    />
+                  }
+                  dialogOpen={fundingOrgDialogOpen}
+                  onOpenDialog={openFundingOrgDialog}
+                  onCloseDialog={closeFundingOrgDialog}
+                  onEntitySelected={addFundingOrgHandler}
+                  insertEntityMutation={INSERT_COURSE_FUNDING_ORGANIZATION}
+                  deleteEntityMutation={DELETE_COURSE_FUNDING_ORGANIZATION}
+                  buildInsertVariables={(courseId, organization) => ({
+                    courseId,
+                    organizationId: organization.id,
+                  })}
+                  buildDeleteVariables={(courseId, organizationId) => ({ courseId, organizationId })}
+                  refetchQueries={['AdminCourseList']}
+                />
+              )}
             </Card>
           </div>
         </div>
