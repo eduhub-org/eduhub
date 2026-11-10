@@ -103,6 +103,32 @@ describe('resolveAttachments', () => {
     expect(files[0].data.length).toBe(3);
   });
 
+  it('attaches an inline calendar without fetching anything', async () => {
+    global.fetch = jest.fn();
+    const files = await resolveAttachments(
+      [{ content: 'BEGIN:VCALENDAR\r\nEND:VCALENDAR\r\n', filename: 'kurs-1.ics', contentType: 'text/calendar' }],
+      7
+    );
+    expect(global.fetch).not.toHaveBeenCalled();
+    expect(files).toEqual([
+      {
+        data: Buffer.from('BEGIN:VCALENDAR\r\nEND:VCALENDAR\r\n'),
+        filename: 'kurs-1.ics',
+        contentType: 'text/calendar; charset=utf-8',
+      },
+    ]);
+  });
+
+  it('rejects inline content of any other type, or too large', async () => {
+    await expect(
+      resolveAttachments([{ content: '<script>', filename: 'x.html', contentType: 'text/html' }], 7)
+    ).resolves.toEqual([]);
+    await expect(
+      resolveAttachments([{ content: 'x'.repeat(300 * 1024), contentType: 'text/calendar' }], 7)
+    ).resolves.toEqual([]);
+    expect(errorSpy).toHaveBeenCalledTimes(2);
+  });
+
   it('skips a disallowed host without fetching it', async () => {
     global.fetch = jest.fn();
     await expect(resolveAttachments([{ url: 'https://evil.com/a.pdf' }], 7)).resolves.toEqual([]);
