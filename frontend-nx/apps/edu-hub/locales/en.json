@@ -1291,7 +1291,8 @@
     },
     "funding_organizations": {
       "label": "Funding Organizations",
-      "add": "Add Funding Organization"
+      "add": "Add Funding Organization",
+      "synced_from_course": "Taken from the course \"{course}\" this event was created from. Change them there."
     },
     "certificates": {
       "enable": "Award certificates",
