@@ -3,7 +3,10 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import {
   adminClient,
   isSameOrigin,
+  TARGET_INSTRUCTOR_FIELD,
+  TargetUserRow,
   noStore,
+  publicTarget,
   resolveAdminCaller,
   setImpersonationCookie,
 } from '../../../helpers/impersonation';
@@ -15,6 +18,7 @@ const GET_TARGET = `
       firstName
       lastName
       email
+      ${TARGET_INSTRUCTOR_FIELD}
     }
   }
 `;
@@ -51,7 +55,7 @@ const OPEN_SESSION = `
   }
 `;
 
-type Target = { id: string; firstName: string | null; lastName: string | null; email: string | null };
+type Target = TargetUserRow & { firstName: string | null; lastName: string | null; email: string | null };
 
 /**
  * Begins an impersonation: records it, then hands the browser an httpOnly cookie
@@ -119,7 +123,7 @@ export default async function impersonationStart(req: NextApiRequest, res: NextA
       sessionId: opened.insert_ImpersonationSession_one.id,
     });
 
-    return res.status(200).json({ active: true, target });
+    return res.status(200).json({ active: true, target: publicTarget(target) });
   } catch (error) {
     console.error('Failed to start impersonation', error);
     return res.status(500).json({ error: 'Could not start impersonation.' });
