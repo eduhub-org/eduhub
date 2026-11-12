@@ -2,8 +2,13 @@ import { gql, GraphQLClient } from 'graphql-request';
 import { createEnrollmentVariableReplacer } from '../emailTemplateVariables.js';
 import { appendGuestMailFooter, guestSafeCopyRecipients } from '../guestRegistration.js';
 import { isDeclinedByParticipant, notifyOrganizersOfDecline } from './invitationDeclined.js';
+import { buildCourseCalendar } from '../lib/courseCalendar.js';
 
 const PAID_REGISTRATION_TYPES = ['DIRECT_CONFIRMATION_AND_PAYMENT', 'DIRECT_WITH_INPUT_AND_PAYMENT'];
+
+// Mails that tell someone they have a place: these carry the course's sessions
+// as an .ics file, so the dates can go straight into their calendar.
+const CALENDAR_TEMPLATE_TYPES = ['REGISTRATION_CONFIRMED', 'APPLICATION_CONFIRMED', 'WAITLIST_CONFIRMED'];
 
 /**
  * Sends enrollment status emails when CourseEnrollment status or invitationExpirationDate changes
@@ -82,6 +87,22 @@ export default async function sendEnrollmentEmail(req, logger) {
             endTime
             basePrice
             currency
+            Sessions(order_by: [{ startDateTime: asc }, { id: asc }]) {
+              id
+              title
+              startDateTime
+              endDateTime
+              SessionAddresses(order_by: { id: asc }) {
+                address
+                CourseLocation {
+                  locationOption
+                }
+                LocationAddress {
+                  shortLabel
+                  address
+                }
+              }
+            }
           }
           CourseEnrollmentAddons {
             id
@@ -352,6 +373,20 @@ export default async function sendEnrollmentEmail(req, logger) {
       logger
     );
 
+    // The calendar is optional: a failure here must not cost the participant
+    // their confirmation, so the mail then goes out without it.
+    let calendar = null;
+    if (CALENDAR_TEMPLATE_TYPES.includes(baseTemplateType)) {
+      try {
+        calendar = buildCourseCalendar(enrollmentDetails.Course);
+      } catch (error) {
+        logger.error(`Calendar generation failed for enrollment ${enrollment.id}: ${error.message}`);
+      }
+    }
+    const attachments = calendar
+      ? [{ content: calendar, filename: `kurs-${courseId}.ics`, contentType: 'text/calendar' }]
+      : null;
+
     // Insert email into MailLog for sending
     const INSERT_MAIL_LOG = gql`
       mutation InsertMailLog(
@@ -362,6 +397,7 @@ export default async function sendEnrollmentEmail(req, logger) {
         $cc: String
         $bcc: String
         $status: String!
+        $attachments: jsonb
       ) {
         insert_MailLog_one(
           object: {
@@ -372,6 +408,7 @@ export default async function sendEnrollmentEmail(req, logger) {
             cc: $cc
             bcc: $bcc
             status: $status
+            attachments: $attachments
           }
         ) {
           id
@@ -388,7 +425,8 @@ export default async function sendEnrollmentEmail(req, logger) {
         cc: template.cc,
         bcc: template.bcc,
       }),
-      status: 'READY_TO_SEND'
+      status: 'READY_TO_SEND',
+      attachments
     });
 
     logger.info(`Email queued for enrollment ${enrollment.id}, status: ${enrollment.status}, operation: ${op}, mailId: ${mailResult.insert_MailLog_one.id}`);
