@@ -2,6 +2,8 @@ import { gql } from 'graphql-request';
 import { queueEmail } from './queueEmail.js';
 import { withRetry } from './withRetry.js';
 import { createVariableReplacer } from '../emailTemplateVariables.js';
+import { applyConditionalBlocks } from './conditionalBlocks.js';
+import { formatReminderDateTimeRange } from '../sendSessionReminders/index.js';
 
 const GET_ENROLLEES = gql`
   query GetActiveEnrollees($courseId: Int!) {
@@ -23,8 +25,10 @@ const formatTime = (dateString) =>
   dateString ? new Date(dateString).toLocaleTimeString('de-DE', { timeStyle: 'short' }) : '';
 
 /**
- * Queues the SESSION_RESCHEDULED mail for every active participant of the
- * session's course.
+ * Queues the mail about a session change for every active participant of the
+ * session's course: SESSION_RESCHEDULED for a new time, or the template the
+ * `change` names (see lib/sessionChange.js), with its [#if:...] flags and the
+ * before/after values the template shows.
  *
  * The caller decides *whether* to notify — the automatic event trigger this
  * logic used to live behind is gone, so the Sessions tab asks the editor first
@@ -34,9 +38,11 @@ const formatTime = (dateString) =>
  * @param {Object} params.session - { id, title, courseId, startDateTime, endDateTime }
  * @param {import('graphql-request').GraphQLClient} params.client
  * @param {Object} params.logger - Winston logger instance
+ * @param {Object} [params.change] - { templateType, flags, previousDateTimeRange, locationList, previousLocationList }
  * @returns {Promise<Object>} { success, messageKey, queued, total } or an error result
  */
-export async function sendSessionRescheduledEmails({ session, client, logger }) {
+export async function sendSessionRescheduledEmails({ session, client, logger, change = {} }) {
+  const templateType = change.templateType || 'SESSION_RESCHEDULED';
   const courseId = session.courseId;
 
   const courseData = await withRetry(() => client.request(GET_ENROLLEES, { courseId }), {
@@ -75,14 +81,22 @@ export async function sendSessionRescheduledEmails({ session, client, logger }) 
       {
         user,
         course: { id: course.id, title: course.title },
-        session: { title: session.title, startDateTime: formattedStart, endDateTime: formattedEnd },
+        session: {
+          title: session.title,
+          startDateTime: formattedStart,
+          endDateTime: formattedEnd,
+          dateTimeRange: formatReminderDateTimeRange(session.startDateTime, session.endDateTime),
+          previousDateTimeRange: change.previousDateTimeRange,
+          locationList: change.locationList,
+          previousLocationList: change.previousLocationList,
+        },
         courseLink: `${process.env.FRONTEND_URL || 'https://edu.opencampus.sh'}/course/${course.id}`,
       },
       formatDate
     );
     const result = await queueEmail({
-      templateType: 'SESSION_RESCHEDULED',
-      variableReplacer: replacer,
+      templateType,
+      variableReplacer: (text, options) => replacer(applyConditionalBlocks(text, change.flags), options),
       recipientEmail: user.email,
       courseId: course.id,
       // A guest has no account page to check the new date on, so this mail
@@ -94,7 +108,7 @@ export async function sendSessionRescheduledEmails({ session, client, logger }) 
     if (result?.success) queued += 1;
   }
 
-  logger.info(`SESSION_RESCHEDULED for course ${course.id}: queued ${queued}/${uniqueRecipients.length}`);
+  logger.info(`${templateType} for course ${course.id}: queued ${queued}/${uniqueRecipients.length}`);
   // queueEmail fails per recipient (bad address, missing template, insert
   // error) without stopping the loop. A partial batch is not a success: the
   // caller shows the editor "participants informed", so it has to hear that

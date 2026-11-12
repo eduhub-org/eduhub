@@ -10,6 +10,7 @@ import {
 } from '../../../../hooks/authedMutation';
 import {
   DELETE_SESSION,
+  DELETE_SESSION_ADDRESS,
   DELETE_SESSION_SPEAKER,
   INSERT_NEW_SESSION_SPEAKER,
   INSERT_SESSION_ADDRESS,
@@ -37,6 +38,10 @@ import {
   InsertSessionAddressVariables,
 } from '../../../../queries/__generated__/InsertSessionAddress';
 import {
+  DeleteSessionAddress,
+  DeleteSessionAddressVariables,
+} from '../../../../queries/__generated__/DeleteSessionAddress';
+import {
   DeleteSessionSpeaker,
   DeleteSessionSpeakerVariables,
 } from '../../../../queries/__generated__/DeleteSessionSpeaker';
@@ -63,7 +68,7 @@ import InputField from '../../../inputs/InputField';
 import InlineMarkdown from '../../../common/InlineMarkdown';
 import CheckboxSelector from '../../../inputs/CheckboxSelector';
 import { Tooltip } from '@mui/material';
-import { MdLock, MdSync, MdVisibility } from 'react-icons/md';
+import { MdClose, MdLock, MdSync, MdVisibility } from 'react-icons/md';
 import { isProgramSession, mergeSessions } from '../../../../helpers/programSessions';
 import { isMandatorySession } from '../../../../helpers/courseParticipationAttendance';
 import SessionAddresses from './SessionAddresses';
@@ -77,7 +82,7 @@ import { SessionAttendanceSummary } from './SessionAttendanceSummary';
 import { SESSION_ATTENDANCES } from '../../../../queries/sessionAttendance';
 import { SessionAttendances, SessionAttendancesVariables } from '../../../../queries/__generated__/SessionAttendances';
 import { summarizeSessionAttendances } from '../../../../helpers/attendanceDetails';
-import useNotifyParticipantsPrompt from './useNotifyParticipantsPrompt';
+import useNotifyParticipantsPrompt, { SessionSnapshot } from './useNotifyParticipantsPrompt';
 import PublicEventSection from './PublicEventSection';
 import { QuestionConfirmationDialog } from '../../../common/dialogs/QuestionConfirmationDialog';
 import { ErrorMessageDialog } from '../../../common/dialogs/ErrorMessageDialog';
@@ -122,6 +127,19 @@ const Eyebrow: FC<{ children: ReactNode; icon?: ReactNode }> = ({ children, icon
   </span>
 );
 
+/** What the participant mail compares against: each session's time and locations. */
+const toSessionSnapshots = (sessions: ManagedCourse_Course_by_pk_Sessions[]): SessionSnapshot[] =>
+  sessions.map((session) => ({
+    sessionId: session.id,
+    startDateTime: new Date(session.startDateTime).toISOString(),
+    endDateTime: new Date(session.endDateTime).toISOString(),
+    locations: session.SessionAddresses.flatMap((address) =>
+      address.CourseLocation?.id != null
+        ? [{ courseLocationId: address.CourseLocation.id, locationAddressId: address.locationAddressId ?? null }]
+        : []
+    ),
+  }));
+
 /** Section heading inside the expanded row. */
 const SectionLabel: FC<{ children: ReactNode }> = ({ children }) => (
   <h4 className="mb-3 text-[11px] font-bold uppercase tracking-wider text-label-secondary">{children}</h4>
@@ -150,6 +168,22 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
       Number(course.Sessions.find((session) => session.id === sessionId)?.PublicEvent?.publicParticipantCount ?? 0),
     [course.Sessions]
   );
+  const courseSessions = useMemo(() => {
+    const result = [...course.Sessions];
+    result.sort((a, b) => {
+      const aValue = a.startDateTime.getTime();
+      const bValue = b.startDateTime.getTime();
+      return aValue - bValue;
+    });
+    return result;
+  }, [course]);
+
+  const sessionSnapshots = useMemo(() => toSessionSnapshots(courseSessions), [courseSessions]);
+  const refreshSessionSnapshots = useCallback(async () => {
+    const { data } = await qResult.refetch();
+    return toSessionSnapshots(data?.Course_by_pk?.Sessions ?? []);
+  }, [qResult]);
+
   const {
     registerChange,
     promptOpen,
@@ -162,17 +196,20 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
     clearError: clearNotificationError,
     savedMessage: notificationSaved,
     clearSaved: clearNotificationSaved,
-  } = useNotifyParticipantsPrompt(participantCount, eventRegistrantCount);
+  } = useNotifyParticipantsPrompt(
+    participantCount,
+    eventRegistrantCount,
+    sessionSnapshots,
+    refreshSessionSnapshots
+  );
 
-  const courseSessions = useMemo(() => {
-    const result = [...course.Sessions];
-    result.sort((a, b) => {
-      const aValue = a.startDateTime.getTime();
-      const bValue = b.startDateTime.getTime();
-      return aValue - bValue;
-    });
-    return result;
-  }, [course]);
+  // A session that is over needs no announcement when its locations are corrected.
+  const registerLocationChange = useCallback(
+    (session: SessionRow) => {
+      if (session.endDateTime >= new Date()) registerChange(session.id);
+    },
+    [registerChange]
+  );
 
   const courseLocationIds = useMemo(() => {
     return course.CourseLocations.map((location) => location.id);
@@ -509,6 +546,7 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
               qResult={qResult}
               onSetDate={(event) => handleSetDate(props.row, event)}
               onTimeChanged={() => registerChange(props.row.id)}
+              onLocationChanged={() => registerLocationChange(props.row)}
               minDate={lectureStart}
               maxDate={lectureEnd}
             />
@@ -570,15 +608,91 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
 };
 
 /**
- * A course location the session has no address row for. The row is normally created with the
- * session (or with the location), so this only shows up for older or imported data - and without
- * it the address could not be set at all.
+ * Takes a course location out of this one session, e.g. when a session is exceptionally online
+ * only. Deleting the address row is what removes it: a course session takes place wherever it has
+ * a row, so the course page, calendar files and public event follow.
  */
-const MissingSessionAddress: FC<{
+const RemoveSessionLocation: FC<{
+  entry: SessionLocationEntry;
+  qResult: QueryResult<ManagedCourse, ManagedCourseVariables>;
+  onRemoved: () => void;
+  /** Set while another location of the session is being removed. */
+  disabled: boolean;
+  onBusyChange: (busy: boolean) => void;
+}> = ({ entry, qResult, onRemoved, disabled, onBusyChange }) => {
+  const t = useTranslations('manageCourse.SessionsTab');
+  const tCommon = useTranslations('common');
+  const [deleteSessionAddress, { loading, error }] = useRoleMutation<DeleteSessionAddress, DeleteSessionAddressVariables>(
+    DELETE_SESSION_ADDRESS
+  );
+  const [showError, setShowError] = useState(true);
+  const [refreshError, setRefreshError] = useState('');
+  const label = t('remove_location', { location: tCommon(`location.${entry.option}`) });
+
+  const removeLocation = async () => {
+    if (!entry.address) return;
+    setShowError(true);
+    setRefreshError('');
+    // Until the refetch shows the removal, the other locations still count
+    // this one, so removing them too could leave the session with none.
+    onBusyChange(true);
+    try {
+      try {
+        await deleteSessionAddress({ variables: { id: entry.address.id } });
+      } catch {
+        // The mutation's error state drives the dialog below.
+        return;
+      }
+      onRemoved();
+      try {
+        await qResult.refetch();
+      } catch (refetchError) {
+        setRefreshError(refetchError instanceof Error ? refetchError.message : String(refetchError));
+      }
+    } finally {
+      onBusyChange(false);
+    }
+  };
+
+  return (
+    <>
+      {/* The span keeps the tooltip working while the button is disabled. */}
+      <Tooltip title={label}>
+        <span>
+          <button
+            type="button"
+            onClick={removeLocation}
+            disabled={loading || disabled}
+            aria-label={label}
+            className="p-1 text-label-secondary hover:text-error transition-colors disabled:opacity-50"
+          >
+            <MdClose aria-hidden />
+          </button>
+        </span>
+      </Tooltip>
+      <ErrorMessageDialog
+        errorMessage={error?.message || refreshError}
+        open={(!!error || !!refreshError) && showError}
+        onClose={() => {
+          setShowError(false);
+          setRefreshError('');
+        }}
+      />
+    </>
+  );
+};
+
+/**
+ * A course location the session has no address row for: it was removed for this session (or,
+ * for older or imported data, never created). Adding it back creates the row with the course's
+ * default address.
+ */
+const RemovedSessionLocation: FC<{
   entry: SessionLocationEntry;
   sessionId: number;
   qResult: QueryResult<ManagedCourse, ManagedCourseVariables>;
-}> = ({ entry, sessionId, qResult }) => {
+  onAdded: () => void;
+}> = ({ entry, sessionId, qResult, onAdded }) => {
   const t = useTranslations('manageCourse.SessionsTab');
   const tCommon = useTranslations('common');
   const [insertSessionAddress, { loading, error }] = useRoleMutation<InsertSessionAddress, InsertSessionAddressVariables>(
@@ -599,6 +713,7 @@ const MissingSessionAddress: FC<{
       // The mutation's error state drives the dialog below.
       return;
     }
+    onAdded();
     try {
       await qResult.refetch();
     } catch (refetchError) {
@@ -608,21 +723,22 @@ const MissingSessionAddress: FC<{
 
   return (
     <>
-      <span className="flex items-center gap-2 font-semibold text-label-primary">
-        <LocationIcon option={entry.option} className="text-label-secondary" />
-        {tCommon(`location.${entry.option}`)}
+      <span className="flex items-center gap-2 font-semibold text-label-disabled">
+        <LocationIcon option={entry.option} />
+        <span className="line-through">{tCommon(`location.${entry.option}`)}</span>
       </span>
       <div className="flex flex-wrap items-center gap-3">
-        <span className="text-sm text-amber-700">{t('no_address')}</span>
+        <span className="text-sm text-label-secondary">{t('location_removed')}</span>
         <button
           type="button"
           onClick={createAddress}
           disabled={loading}
           className="inline-flex items-center rounded-full border-[1.5px] border-label-primary px-3 py-1 text-sm font-semibold text-label-primary hover:bg-bg-secondary disabled:opacity-50"
         >
-          {t('create_address')}
+          {t('add_location_back')}
         </button>
       </div>
+      <span />
       <ErrorMessageDialog
         errorMessage={error?.message || refreshError}
         open={(!!error || !!refreshError) && showError}
@@ -644,6 +760,8 @@ interface ExpandableSessionRowContentProps {
   qResult: QueryResult<ManagedCourse, ManagedCourseVariables>;
   onSetDate: (event: Date | null) => void;
   onTimeChanged: () => void;
+  /** Called after a location was removed from or added back to the session, or its address changed. */
+  onLocationChanged: () => void;
   minDate?: Date;
   maxDate?: Date;
 }
@@ -656,6 +774,7 @@ const ExpandableSessionRowContent: FC<ExpandableSessionRowContentProps> = ({
   qResult,
   onSetDate,
   onTimeChanged,
+  onLocationChanged,
   minDate,
   maxDate,
 }) => {
@@ -676,6 +795,9 @@ const ExpandableSessionRowContent: FC<ExpandableSessionRowContentProps> = ({
     Boolean(session.attendanceData) && session.attendanceData !== 'true';
 
   const locations = useMemo(() => sessionLocationEntries(session, courseLocations), [session, courseLocations]);
+  // A session keeps at least one location: the last one cannot be removed.
+  const canRemoveLocation = locations.filter((entry) => entry.address).length > 1;
+  const [removingLocation, setRemovingLocation] = useState(false);
 
   const {
     data: attendanceRows,
@@ -820,9 +942,9 @@ const ExpandableSessionRowContent: FC<ExpandableSessionRowContentProps> = ({
 
         <section className="order-1 min-w-0">
           <SectionLabel>{t('SessionsTab.location')}</SectionLabel>
-          <div className="grid grid-cols-[minmax(5rem,auto)_1fr] gap-x-4 gap-y-3 items-center">
+          <div className="grid grid-cols-[minmax(5rem,auto)_1fr_auto] gap-x-4 gap-y-3 items-center">
             {locked && locations.length === 0 ? (
-              <span className="text-sm text-label-secondary">–</span>
+              <span className="col-span-3 text-sm text-label-secondary">–</span>
             ) : locked ? (
               locations.map((entry) => (
                 <Fragment key={entry.key}>
@@ -833,13 +955,37 @@ const ExpandableSessionRowContent: FC<ExpandableSessionRowContentProps> = ({
                   <span className="min-w-0 break-words text-sm text-label-secondary">
                     {entry.address?.address || entry.address?.CourseLocation?.defaultSessionAddress || '–'}
                   </span>
+                  <span />
                 </Fragment>
               ))
             ) : locations.map((entry) =>
               entry.address ? (
-                <SessionAddresses key={entry.key} address={entry.address} refetchQueries={['ManagedCourse']} />
+                <Fragment key={entry.key}>
+                  <SessionAddresses
+                    address={entry.address}
+                    refetchQueries={['ManagedCourse']}
+                    onAddressChanged={onLocationChanged}
+                  />
+                  {canRemoveLocation ? (
+                    <RemoveSessionLocation
+                      entry={entry}
+                      qResult={qResult}
+                      onRemoved={onLocationChanged}
+                      disabled={removingLocation}
+                      onBusyChange={setRemovingLocation}
+                    />
+                  ) : (
+                    <span />
+                  )}
+                </Fragment>
               ) : (
-                <MissingSessionAddress key={entry.key} entry={entry} sessionId={session.id} qResult={qResult} />
+                <RemovedSessionLocation
+                  key={entry.key}
+                  entry={entry}
+                  sessionId={session.id}
+                  qResult={qResult}
+                  onAdded={onLocationChanged}
+                />
               )
             )}
           </div>
