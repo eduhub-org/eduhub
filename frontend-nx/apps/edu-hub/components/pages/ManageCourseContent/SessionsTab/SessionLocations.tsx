@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import { useTranslations } from 'next-intl';
 import { Tooltip } from '@mui/material';
-import { MdErrorOutline, MdPlace, MdVideocam } from 'react-icons/md';
+import { MdPlace, MdVideocam } from 'react-icons/md';
 
 import { LocationOption_enum } from '../../../../__generated__/globalTypes';
 import {
@@ -61,23 +61,23 @@ export const LocationIcon: FC<{ option: LocationOption_enum; className?: string 
   );
 
 /**
- * Compact location summary for a session row: a grey chip per location. With `iconsOnly` the
- * label moves into the tooltip; a missing address row is flagged in amber.
+ * Compact location summary for a session row: a grey chip per location the session takes place
+ * at. A location removed for this session has no address row and is left out. With `iconsOnly`
+ * the label moves into the tooltip.
  */
 export const SessionLocationChips: FC<{ entries: SessionLocationEntry[]; iconsOnly?: boolean }> = ({
   entries,
   iconsOnly = false,
 }) => {
   const tCommon = useTranslations('common');
-  const t = useTranslations('manageCourse.SessionsTab');
 
   return (
     <div className="flex flex-wrap items-center gap-1.5 min-w-0">
-      {entries.map((entry) => {
+      {entries.filter((entry) => entry.address).map((entry) => {
         const label = tCommon(`location.${entry.option}`);
         const address = entry.address?.address || entry.address?.CourseLocation?.defaultSessionAddress || '';
         return (
-          <Tooltip key={entry.key} title={entry.address ? [label, address].filter(Boolean).join(' · ') : label}>
+          <Tooltip key={entry.key} title={[label, address].filter(Boolean).join(' · ')}>
             <span
               className={`inline-flex items-center gap-1 rounded-full bg-bg-secondary text-label-secondary text-xs ${
                 iconsOnly ? 'p-1.5' : 'px-2 py-0.5'
@@ -85,9 +85,6 @@ export const SessionLocationChips: FC<{ entries: SessionLocationEntry[]; iconsOn
             >
               <LocationIcon option={entry.option} />
               {!iconsOnly && <span>{label}</span>}
-              {!entry.address && (
-                <MdErrorOutline className="text-amber-700" aria-label={t('no_address')} />
-              )}
             </span>
           </Tooltip>
         );

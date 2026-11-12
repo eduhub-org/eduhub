@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 import { useTranslations } from 'next-intl';
 
@@ -14,8 +14,16 @@ import {
 // once instead of once per saved field.
 const PROMPT_DELAY_MS = 2000;
 
+/** What the mail compares against: a session's time and locations as they were before an edit. */
+export interface SessionSnapshot {
+  sessionId: number;
+  startDateTime: string;
+  endDateTime: string;
+  locations: { courseLocationId: number; locationAddressId: number | null }[];
+}
+
 interface NotifyParticipantsPrompt {
-  /** Call after a session's timing was saved. No-op when nobody would be mailed. */
+  /** Call after a session's timing or locations were saved. No-op when nobody would be mailed. */
   registerChange: (sessionId: number) => void;
   promptOpen: boolean;
   pendingCount: number;
@@ -31,17 +39,24 @@ interface NotifyParticipantsPrompt {
 }
 
 /**
- * Collects the sessions whose timing changed and asks once, after a short
- * pause, whether the course's participants should be informed. A session that
+ * Collects the sessions whose timing or locations changed and asks once, after
+ * a short pause, whether the course's participants should be informed. A session that
  * was opened as a public event also has the event's registrants to inform
  * (`eventRegistrantCount`), since its event follows the new time.
  *
  * Informing used to happen automatically via a Hasura event trigger on
  * Session; it now only happens when the editor confirms here.
+ *
+ * The mail says what the session was before, so each session's state is kept
+ * from before its first edit (`snapshots` are the current states). It is only
+ * taken over once the session was mailed or the prompt dismissed: an edit's
+ * own refetch may land before `registerChange` is called, so a snapshot taken
+ * then could already show the new state.
  */
 const useNotifyParticipantsPrompt = (
   participantCount: number,
-  eventRegistrantCount: (sessionId: number) => number = () => 0
+  eventRegistrantCount: (sessionId: number) => number = () => 0,
+  snapshots: SessionSnapshot[] = []
 ): NotifyParticipantsPrompt => {
   const t = useTranslations('manageCourse');
 
@@ -51,6 +66,21 @@ const useNotifyParticipantsPrompt = (
   // Sessions whose course participants were mailed while their public event's
   // registrants were not: a retry mails only the event.
   const courseSentSessionIds = useRef<Set<number>>(new Set());
+  const baselines = useRef<Map<number, SessionSnapshot>>(new Map());
+  const latestSnapshots = useRef(snapshots);
+
+  useEffect(() => {
+    latestSnapshots.current = snapshots;
+    snapshots.forEach((snapshot) => {
+      if (!baselines.current.has(snapshot.sessionId)) baselines.current.set(snapshot.sessionId, snapshot);
+    });
+  }, [snapshots]);
+
+  const resetBaseline = useCallback((sessionId: number) => {
+    const current = latestSnapshots.current.find((snapshot) => snapshot.sessionId === sessionId);
+    if (current) baselines.current.set(sessionId, current);
+    else baselines.current.delete(sessionId);
+  }, []);
 
   const [promptOpen, setPromptOpen] = useState(false);
   const [pendingCount, setPendingCount] = useState(0);
@@ -85,11 +115,12 @@ const useNotifyParticipantsPrompt = (
   );
 
   const cancel = useCallback(() => {
+    pendingSessionIds.current.forEach(resetBaseline);
     pendingSessionIds.current.clear();
     courseSentSessionIds.current.clear();
     setPendingCount(0);
     setPromptOpen(false);
-  }, []);
+  }, [resetBaseline]);
 
   const confirm = useCallback(async () => {
     const sessionIds = [...pendingSessionIds.current];
@@ -101,13 +132,22 @@ const useNotifyParticipantsPrompt = (
       for (const sessionId of sessionIds) {
         try {
           const skipCourse = courseSentSessionIds.current.has(sessionId);
-          const { data } = await notifySessionParticipants({ variables: { sessionId, skipCourse } });
+          const baseline = baselines.current.get(sessionId);
+          const previous = baseline
+            ? {
+                startDateTime: baseline.startDateTime,
+                endDateTime: baseline.endDateTime,
+                locations: baseline.locations,
+              }
+            : null;
+          const { data } = await notifySessionParticipants({ variables: { sessionId, skipCourse, previous } });
           const result = data?.notifySessionParticipants;
           if (result?.success) {
             // Drop only what demonstrably went out, so retrying the rest
             // cannot mail an already-notified session a second time.
             pendingSessionIds.current.delete(sessionId);
             courseSentSessionIds.current.delete(sessionId);
+            resetBaseline(sessionId);
             notified += 1;
           } else {
             if (result?.courseSent) courseSentSessionIds.current.add(sessionId);
@@ -131,7 +171,7 @@ const useNotifyParticipantsPrompt = (
     } else if (notified > 0) {
       setSavedMessage(t('SessionsTab.notify_participants.sent'));
     }
-  }, [notifySessionParticipants, t]);
+  }, [notifySessionParticipants, t, resetBaseline]);
 
   return {
     registerChange,

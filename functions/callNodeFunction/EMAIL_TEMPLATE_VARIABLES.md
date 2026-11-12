@@ -95,6 +95,29 @@ The email template variable system is centralized in `emailTemplateVariables.js`
   - Example: `16:00`
   - Available in: `SESSION_RESCHEDULED` emails
 
+- **`[Session:DateTimeRange]`**: Session date with start and end time (Berlin
+  time); both full timestamps when it ends on another day
+  - Example: `27.10.2026, 17:00–19:00`
+
+- **`[Session:PreviousDateTimeRange]`**: The date and time before the change, in
+  the same form
+  - Example: `20.10.2026, 17:00–19:00`
+  - Available in: `SESSION_RESCHEDULED`, `SESSION_LOCATION_CHANGED` emails
+
+- **`[Session:LocationList]`**: Bulleted list of where the session now takes
+  place: the location with its venue, or just `Online` (never the meeting link)
+  - Example: `<ul><li>Kiel – ZBW (Düsternbrooker Weg 120)</li><li>Online</li></ul>`
+  - Available in: `SESSION_LOCATION_CHANGED` emails
+
+- **`[Session:PreviousLocationList]`**: The same list for where the session
+  took place before the change
+  - Available in: `SESSION_LOCATION_CHANGED` emails
+
+- **Conditional blocks** in the session change emails: `[#if:TimeChanged]…[/if:TimeChanged]`
+  and `[#if:TimeUnchanged]…[/if:TimeUnchanged]` (`SESSION_LOCATION_CHANGED`),
+  `[#if:PreviousTime]…[/if:PreviousTime]` (`SESSION_RESCHEDULED`, set when the
+  previous time is known)
+
 - **`[Session:Duration]`**: Session duration (calculated from start/end times)
   - Example: `2 hours` or `90 minutes`
 

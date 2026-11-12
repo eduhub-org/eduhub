@@ -262,8 +262,8 @@ export const UPDATE_USER_ADMIN_STATUS = gql`
 `;
 
 export const NOTIFY_SESSION_PARTICIPANTS = gql`
-  mutation NotifySessionParticipants($sessionId: Int!, $skipCourse: Boolean) {
-    notifySessionParticipants(sessionId: $sessionId, skipCourse: $skipCourse) {
+  mutation NotifySessionParticipants($sessionId: Int!, $skipCourse: Boolean, $previous: PreviousSessionState) {
+    notifySessionParticipants(sessionId: $sessionId, skipCourse: $skipCourse, previous: $previous) {
       success
       courseSent
       queued

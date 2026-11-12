@@ -132,4 +132,32 @@ describe('sendSessionRescheduledEmails', () => {
 
     expect(result).toMatchObject({ success: false, messageKey: 'COURSE_NOT_FOUND' });
   });
+
+  it('renders the change: its template, flagged blocks and the places before and after', async () => {
+    mockGraphqlRequest.mockResolvedValueOnce(enrollees([user(1)]));
+    mockQueueEmail.mockResolvedValue({ success: true });
+
+    await sendSessionRescheduledEmails({
+      session: SESSION,
+      client,
+      logger: mockLogger,
+      change: {
+        templateType: 'SESSION_LOCATION_CHANGED',
+        flags: { TimeUnchanged: true },
+        previousDateTimeRange: '01.10.2026, 11:00–13:00',
+        locationList: ['Online'],
+        previousLocationList: ['Kiel – <ZBW>', 'Online'],
+      },
+    });
+
+    const { templateType, variableReplacer } = mockQueueEmail.mock.calls[0][0];
+    expect(templateType).toBe('SESSION_LOCATION_CHANGED');
+    const template =
+      '[#if:TimeChanged]moved [Session:PreviousDateTimeRange][/if:TimeChanged]' +
+      '[#if:TimeUnchanged]at [Session:DateTimeRange][/if:TimeUnchanged]: ' +
+      '[Session:LocationList] was [Session:PreviousLocationList]';
+    expect(variableReplacer(template)).toBe(
+      'at 01.10.2026, 12:00–14:00: <ul><li>Online</li></ul> was <ul><li>Kiel – &lt;ZBW&gt;</li><li>Online</li></ul>'
+    );
+  });
 });

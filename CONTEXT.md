@@ -40,6 +40,9 @@ _Avoid_: treating externally synced listings (e.g. Rausgegangen) as Events
 **Session**:
 One scheduled meeting of a Course, with a start and an end.
 
+**Session Location**:
+A place a Session takes place at. A Course's Session takes place at all of the Course's locations unless one was removed for that Session (e.g. a Session that is exceptionally online only); it always keeps at least one.
+
 **First Session**:
 The Course's Session with the earliest start time.
 
@@ -96,7 +99,7 @@ _Avoid_: reminders for later Sessions, multiple reminders per Course
 How long before the First Session the Session Reminder goes out, set per Course in hours, or off to send none.
 
 **Session Change Notification**:
-The email organizers send by hand when Sessions are rescheduled. Separate from the Session Reminder.
+The email organizers send by hand when Sessions are rescheduled or their Session Locations change. It says what the Session was before. Separate from the Session Reminder.
 
 ## Relationships
 

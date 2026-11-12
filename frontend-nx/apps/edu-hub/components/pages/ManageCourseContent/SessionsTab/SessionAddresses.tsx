@@ -20,9 +20,11 @@ import { LocationIcon } from './SessionLocations';
 interface SessionAddressesIProps {
   address: ManagedCourse_Course_by_pk_Sessions_SessionAddresses | null;
   refetchQueries: [string];
+  /** Called once a different address was saved: the session now takes place elsewhere. */
+  onAddressChanged?: () => void;
 }
 
-export const SessionAddresses: FC<SessionAddressesIProps> = ({ address, refetchQueries }) => {
+export const SessionAddresses: FC<SessionAddressesIProps> = ({ address, refetchQueries, onAddressChanged }) => {
   const t = useTranslations('manageCourse.SessionsTab.sessionAddresses');
   const tCommon = useTranslations('common');
   const [showAddressLookupError, setShowAddressLookupError] = useState(true);
@@ -138,6 +140,7 @@ export const SessionAddresses: FC<SessionAddressesIProps> = ({ address, refetchQ
           value={currentLocationAddressId?.toString() || ''}
           options={addressOptions}
           updateValueMutation={UPDATE_SESSION_ADDRESS}
+          onValueUpdated={() => onAddressChanged?.()}
           identifierVariables={{ 
             itemId: address?.id,
             locationOption: address?.CourseLocation?.locationOption 

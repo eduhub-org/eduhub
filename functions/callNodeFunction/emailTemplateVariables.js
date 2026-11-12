@@ -157,6 +157,21 @@ export const EMAIL_VARIABLES = {
       example: 'ZBW Kiel (Düsternbrooker Weg 120, 24105 Kiel)',
       categories: ['session']
     },
+    '[Session:PreviousDateTimeRange]': {
+      description: 'The session date and time before it was changed, in the same form as [Session:DateTimeRange]',
+      example: '20.10.2026, 17:00–19:00',
+      categories: ['session']
+    },
+    '[Session:LocationList]': {
+      description: 'Bulleted list of where the session now takes place: the location with its venue, or just "Online" (never the meeting link)',
+      example: '<ul><li>Kiel – ZBW (Düsternbrooker Weg 120, 24105 Kiel)</li><li>Online</li></ul>',
+      categories: ['session']
+    },
+    '[Session:PreviousLocationList]': {
+      description: 'Bulleted list of where the session took place before it was changed, in the same form as [Session:LocationList]',
+      example: '<ul><li>Kiel – ZBW (Düsternbrooker Weg 120, 24105 Kiel)</li></ul>',
+      categories: ['session']
+    },
     '[Session:Duration]': {
       description: 'Session duration (calculated)',
       example: '2 hours',
@@ -365,6 +380,16 @@ function formatSessionLocation(locations, isHtml) {
     .join(' / ');
 }
 
+/**
+ * A bulleted list of places, one item each even for a single place, so the
+ * mail reads the same whatever changed. Escaped, since venues are user input.
+ */
+function formatLocationList(locations, isHtml) {
+  if (!Array.isArray(locations) || locations.length === 0) return '';
+  if (!isHtml) return locations.join(', ');
+  return `<ul>${locations.map((location) => `<li>${escapeHtml(location)}</li>`).join('')}</ul>`;
+}
+
 export function createVariableReplacer(data, formatDate) {
   return function replaceVariables(text, options = {}) {
     if (!text) return text;
@@ -492,7 +517,10 @@ export function createVariableReplacer(data, formatDate) {
       .replaceAll('[Session:Title]', escape(data.session?.title || ''))
       .replaceAll('[Session:StartDateTime]', data.session?.startDateTime || '')
       .replaceAll('[Session:EndDateTime]', data.session?.endDateTime || '')
+      .replaceAll('[Session:PreviousDateTimeRange]', data.session?.previousDateTimeRange || '')
       .replaceAll('[Session:DateTimeRange]', data.session?.dateTimeRange || '')
+      .replaceAll('[Session:PreviousLocationList]', formatLocationList(data.session?.previousLocationList, isHtml))
+      .replaceAll('[Session:LocationList]', formatLocationList(data.session?.locationList, isHtml))
       .replaceAll('[Session:Location]', formatSessionLocation(data.session?.location, isHtml))
       .replaceAll('[Session:Duration]', data.session?.duration || '')
       .replaceAll('[Session:ReminderText]', data.session?.reminderText || 'is starting soon')

@@ -18,7 +18,7 @@ const address = (id: number, courseLocationId: number, option: LocationOption_en
 });
 
 describe('sessionLocationEntries', () => {
-  it('lists every course location and flags the ones the session has no address for', () => {
+  it('lists every course location, with no address for the ones removed from the session', () => {
     const session = { id: 1, programId: null, SessionAddresses: [address(10, 4, LocationOption_enum.KIEL)] } as never;
     const entries = sessionLocationEntries(session, courseLocations);
 

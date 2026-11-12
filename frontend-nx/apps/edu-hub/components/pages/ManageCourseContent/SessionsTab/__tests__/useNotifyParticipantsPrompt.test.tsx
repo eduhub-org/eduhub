@@ -64,7 +64,7 @@ describe('useNotifyParticipantsPrompt', () => {
     expect(result.current.promptOpen).toBe(true);
 
     await act(async () => { await result.current.confirm(); });
-    expect(notifyMutation).toHaveBeenLastCalledWith({ variables: { sessionId: 1, skipCourse: true } });
+    expect(notifyMutation).toHaveBeenLastCalledWith({ variables: { sessionId: 1, skipCourse: true, previous: null } });
     await waitFor(() => expect(result.current.promptOpen).toBe(false));
   });
 
@@ -102,8 +102,8 @@ describe('useNotifyParticipantsPrompt', () => {
     await act(async () => { await result.current.confirm(); });
 
     expect(notifyMutation).toHaveBeenCalledTimes(2);
-    expect(notifyMutation).toHaveBeenCalledWith({ variables: { sessionId: 1, skipCourse: false } });
-    expect(notifyMutation).toHaveBeenCalledWith({ variables: { sessionId: 2, skipCourse: false } });
+    expect(notifyMutation).toHaveBeenCalledWith({ variables: { sessionId: 1, skipCourse: false, previous: null } });
+    expect(notifyMutation).toHaveBeenCalledWith({ variables: { sessionId: 2, skipCourse: false, previous: null } });
     await waitFor(() => expect(result.current.promptOpen).toBe(false));
     expect(result.current.savedMessage).toBe('SessionsTab.notify_participants.sent');
   });
@@ -167,7 +167,7 @@ describe('useNotifyParticipantsPrompt', () => {
     await act(async () => { await result.current.confirm(); });
 
     expect(notifyMutation).toHaveBeenCalledTimes(1);
-    expect(notifyMutation).toHaveBeenCalledWith({ variables: { sessionId: 2, skipCourse: false } });
+    expect(notifyMutation).toHaveBeenCalledWith({ variables: { sessionId: 2, skipCourse: false, previous: null } });
     await waitFor(() => expect(result.current.promptOpen).toBe(false));
   });
 
@@ -180,5 +180,72 @@ describe('useNotifyParticipantsPrompt', () => {
 
     await waitFor(() => expect(result.current.promptOpen).toBe(false));
     expect(result.current.pendingCount).toBe(0);
+  });
+
+  describe('the state the mail compares against', () => {
+    const snapshot = (sessionId: number, startDateTime: string, courseLocationIds: number[]) => ({
+      sessionId,
+      startDateTime,
+      endDateTime: '2026-11-18T18:30:00.000Z',
+      locations: courseLocationIds.map((courseLocationId) => ({ courseLocationId, locationAddressId: null })),
+    });
+    const hybrid = [snapshot(1, '2026-11-18T17:00:00.000Z', [1, 2])];
+    const onlineOnly = [snapshot(1, '2026-11-18T17:00:00.000Z', [2])];
+    const onlineLater = [snapshot(1, '2026-11-18T17:30:00.000Z', [2])];
+    const previousOf = (call: number) => notifyMutation.mock.calls[call][0].variables.previous;
+
+    it('sends the state from before the edit, even when its refetch landed first', async () => {
+      const { result, rerender } = renderHook(({ snapshots }) => useNotifyParticipantsPrompt(5, () => 0, snapshots), {
+        initialProps: { snapshots: hybrid },
+      });
+
+      rerender({ snapshots: onlineOnly });
+      act(() => result.current.registerChange(1));
+      settle();
+      await act(async () => { await result.current.confirm(); });
+
+      expect(previousOf(0)).toEqual({
+        startDateTime: hybrid[0].startDateTime,
+        endDateTime: hybrid[0].endDateTime,
+        locations: hybrid[0].locations,
+      });
+    });
+
+    it('compares the next edit with what was announced last', async () => {
+      const { result, rerender } = renderHook(({ snapshots }) => useNotifyParticipantsPrompt(5, () => 0, snapshots), {
+        initialProps: { snapshots: hybrid },
+      });
+
+      rerender({ snapshots: onlineOnly });
+      act(() => result.current.registerChange(1));
+      settle();
+      await act(async () => { await result.current.confirm(); });
+
+      rerender({ snapshots: onlineLater });
+      act(() => result.current.registerChange(1));
+      settle();
+      await act(async () => { await result.current.confirm(); });
+
+      expect(previousOf(1).locations).toEqual(onlineOnly[0].locations);
+      expect(previousOf(1).startDateTime).toBe(onlineOnly[0].startDateTime);
+    });
+
+    it('starts over from the current state after a dismissed prompt', async () => {
+      const { result, rerender } = renderHook(({ snapshots }) => useNotifyParticipantsPrompt(5, () => 0, snapshots), {
+        initialProps: { snapshots: hybrid },
+      });
+
+      rerender({ snapshots: onlineOnly });
+      act(() => result.current.registerChange(1));
+      settle();
+      act(() => result.current.cancel());
+
+      rerender({ snapshots: onlineLater });
+      act(() => result.current.registerChange(1));
+      settle();
+      await act(async () => { await result.current.confirm(); });
+
+      expect(previousOf(0).startDateTime).toBe(onlineOnly[0].startDateTime);
+    });
   });
 });
