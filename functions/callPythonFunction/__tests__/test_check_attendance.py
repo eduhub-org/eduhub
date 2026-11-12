@@ -203,6 +203,28 @@ class TestMatchParticipants:
         assert row["status"] == "ATTENDED"
         assert row["matchType"] == MATCH_TYPE_NAME
 
+    def test_exact_name_wins_over_missing_middle_name(self):
+        participants = _participants(
+            ("Marlena Isabella", "Ruzicka", "m1@example.com"), ("Marlena", "Ruzicka", "m2@example.com")
+        )
+        result = _match(participants, _records([_check_in("Marlena Ruzicka")]))
+        assert result["u-1"]["status"] == "ATTENDED"
+        assert result["u-1"]["matchScore"] == 100
+        assert result["u-0"]["status"] == "MISSED"
+
+    def test_multiword_first_name_alone_is_ambiguous(self):
+        participants = _participants(
+            ("Mary Jane", "Watson", "w@example.com"), ("Mary Jane", "Williams", "x@example.com")
+        )
+        result = _match(participants, _records([_check_in("Mary Jane")]))
+        assert {row["status"] for row in result.values()} == {"MISSED"}
+
+    def test_multiword_first_name_alone_matches_when_unique(self):
+        participants = _participants(("Mary Jane", "Watson", "w@example.com"), JANE)
+        row = _match(participants, _records([_check_in("Mary Jane")]))["u-0"]
+        assert row["status"] == "ATTENDED"
+        assert row["matchType"] == MATCH_TYPE_PARTIAL_NAME
+
     def test_shared_first_name_alone_is_no_full_name_match(self):
         participants = _participants(("Anna", "Mühlenbeck", "a@example.com"))
         row = _match(participants, _records([_check_in("Anna-Lena Wentzel")]))["u-0"]

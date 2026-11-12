@@ -426,36 +426,49 @@ def _clean_text(value):
     return unicodedata.normalize("NFC", str(value)).strip()
 
 
+# Score of a record that leaves out a middle name ("Marlena Ruzicka" for
+# "Marlena Isabella Ruzicka"): above the threshold, below an exact name, so
+# a participant whose name matches exactly keeps priority.
+MISSING_MIDDLE_NAME_SCORE = 90
+
+
 def _pair_score(full_name, candidate):
     """Similarity of two lower-case names.
 
     ``ratio`` compares the names as written, so a typo in the first letter
     of a token (Sann/Dann) costs one character; ``token_sort_ratio`` alone
     would sort the tokens differently and fall below 50. ``token_sort_ratio``
-    covers swapped order ("Hase Christian"), ``token_set_ratio`` a missing
-    middle name ("Marlena Ruzicka" for "Marlena Isabella Ruzicka"); the
-    latter only with two or more tokens on both sides, as a lone first name
-    would otherwise score 100 (single names are handled as partial keys).
+    covers swapped order ("Hase Christian").
     """
     if not candidate:
         return 0
-    scores = [
-        fuzz.ratio(full_name, candidate),
-        fuzz.token_sort_ratio(full_name, candidate),
-    ]
-    if len(full_name.split()) >= 2 and len(candidate.split()) >= 2:
-        scores.append(fuzz.token_set_ratio(full_name, candidate))
-    return max(scores)
+    return max(fuzz.ratio(full_name, candidate), fuzz.token_sort_ratio(full_name, candidate))
 
 
-def _name_score(participant_full_name, record_name):
+def _leaves_out_middle_name(full_name, last_name, candidate):
+    """True if the candidate is the participant's name minus some middle
+    tokens: every token belongs to the participant, the surname is there
+    and at least one first-name token too. A multiword first name alone
+    ("Mary Jane") is no surname evidence; it is a partial key instead."""
+    tokens = candidate.split()
+    surname = last_name.split()
+    return (
+        len(tokens) > len(surname) > 0
+        and set(tokens) < set(full_name.split())
+        and all(t in tokens for t in surname)
+    )
+
+
+def _name_score(participant_full_name, record_name, participant_last_name=""):
     raw = _clean_text(record_name).lower()
     if not raw:
         return 0
-    return max(
-        _pair_score(participant_full_name, raw),
-        _pair_score(participant_full_name, clean_display_name(raw)),
-    )
+    score = 0
+    for candidate in (raw, clean_display_name(raw)):
+        score = max(score, _pair_score(participant_full_name, candidate))
+        if _leaves_out_middle_name(participant_full_name, participant_last_name, candidate):
+            score = max(score, MISSING_MIDDLE_NAME_SCORE)
+    return score
 
 
 def _partial_keys_of_participant(participant):
@@ -486,6 +499,9 @@ def _partial_keys_of_record(record_name):
         keys.add(tokens[0])
     elif len(tokens) == 2 and len(tokens[0]) == 1:
         keys.add(tokens[0] + tokens[1])
+    if len(tokens) >= 2:
+        # A multiword first name alone ("Mary Jane").
+        keys.add(" ".join(tokens))
     return {k for k in keys if len(k) >= MIN_PARTIAL_KEY_LENGTH}
 
 
@@ -551,7 +567,9 @@ def match_participants(participants, records, session):
         full_name = f"{_clean_text(participant.get('firstName'))} {_clean_text(participant.get('lastName'))}".strip().lower()
         email = _clean_text(participant.get("email")).lower()
         for r_idx, record in enumerate(record_rows):
-            score = _name_score(full_name, record.get("name"))
+            score = _name_score(
+                full_name, record.get("name"), _clean_text(participant.get("lastName")).lower()
+            )
             scores[p_idx][r_idx] = score
             if email and _clean_text(record.get("email")).lower() == email:
                 candidates.append((3, 100, p_idx, r_idx, MATCH_TYPE_EMAIL))
