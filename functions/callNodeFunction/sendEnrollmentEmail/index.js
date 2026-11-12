@@ -373,9 +373,16 @@ export default async function sendEnrollmentEmail(req, logger) {
       logger
     );
 
-    const calendar = CALENDAR_TEMPLATE_TYPES.includes(baseTemplateType)
-      ? buildCourseCalendar(enrollmentDetails.Course)
-      : null;
+    // The calendar is optional: a failure here must not cost the participant
+    // their confirmation, so the mail then goes out without it.
+    let calendar = null;
+    if (CALENDAR_TEMPLATE_TYPES.includes(baseTemplateType)) {
+      try {
+        calendar = buildCourseCalendar(enrollmentDetails.Course);
+      } catch (error) {
+        logger.error(`Calendar generation failed for enrollment ${enrollment.id}: ${error.message}`);
+      }
+    }
     const attachments = calendar
       ? [{ content: calendar, filename: `kurs-${courseId}.ics`, contentType: 'text/calendar' }]
       : null;

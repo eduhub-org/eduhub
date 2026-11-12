@@ -151,6 +151,15 @@ describe('registration confirmation templates', () => {
     ]);
   });
 
+  it('still sends the confirmation when the calendar cannot be built', async () => {
+    const mail = await checkMail({
+      status: 'CONFIRMED', userStatus: 'ACTIVE', registrationType: 'DIRECT_CONFIRMATION',
+      templateType: 'REGISTRATION_CONFIRMED', sessions: [{ ...SESSION, startDateTime: 'not a date' }],
+    });
+    expect(mail.attachments).toBeNull();
+    expect(mockLogger.error).toHaveBeenCalledWith(expect.stringContaining('Calendar generation failed'));
+  });
+
   it('attaches no calendar when the course has no sessions yet', async () => {
     const mail = await checkMail({
       status: 'CONFIRMED', userStatus: 'ACTIVE', registrationType: 'DIRECT_CONFIRMATION',

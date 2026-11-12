@@ -129,6 +129,12 @@ describe('resolveAttachments', () => {
     expect(errorSpy).toHaveBeenCalledTimes(2);
   });
 
+  it('skips a descriptor that is not an object instead of throwing', async () => {
+    global.fetch = jest.fn();
+    await expect(resolveAttachments(['kurs.ics', 42], 7)).resolves.toEqual([]);
+    expect(global.fetch).not.toHaveBeenCalled();
+  });
+
   it('skips a disallowed host without fetching it', async () => {
     global.fetch = jest.fn();
     await expect(resolveAttachments([{ url: 'https://evil.com/a.pdf' }], 7)).resolves.toEqual([]);

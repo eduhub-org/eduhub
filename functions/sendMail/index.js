@@ -189,7 +189,7 @@ async function resolveAttachments(descriptors, mailId) {
   let totalBytes = 0;
 
   for (const [index, descriptor] of descriptors.entries()) {
-    if (descriptor && 'content' in descriptor) {
+    if (descriptor && typeof descriptor === 'object' && 'content' in descriptor) {
       const file = inlineAttachment(descriptor, index);
       if (!file) {
         console.error('Inline attachment rejected', { mailId, index, contentType: descriptor.contentType });
