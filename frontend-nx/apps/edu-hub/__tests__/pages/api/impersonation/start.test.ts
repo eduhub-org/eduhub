@@ -117,4 +117,20 @@ describe('impersonation start', () => {
     expect(marker).toContain('=1;');
     expect(marker).not.toContain('HttpOnly');
   });
+  it('tells the browser whether the target is an instructor, without the raw rows', async () => {
+    mockRequest
+      .mockReset()
+      .mockResolvedValueOnce({
+        User_by_pk: { id: TARGET, firstName: 'Ada', lastName: 'L', email: 'a@e.test', CourseInstructors: [{ id: 3 }] },
+      })
+      .mockResolvedValueOnce({ update_ImpersonationSession: { affected_rows: 0 } })
+      .mockResolvedValueOnce({ insert_ImpersonationSession_one: { id: 42 } });
+    const res = response();
+    await handler(request({ userId: TARGET }), res);
+
+    expect(res.json).toHaveBeenCalledWith({
+      active: true,
+      target: { id: TARGET, firstName: 'Ada', lastName: 'L', email: 'a@e.test', isInstructor: true },
+    });
+  });
 });

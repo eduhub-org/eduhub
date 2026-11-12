@@ -6,12 +6,13 @@ import {
   OpenSessionResult,
   GRAPHQL_URI,
   adminClient,
+  impersonatedRole,
+  isInstructorTarget,
   isSameOrigin,
   noStore,
   readImpersonationCookie,
   resolveAdminCaller,
 } from '../../../helpers/impersonation';
-import { AuthRoles } from '../../../types/enums';
 
 /**
  * The impersonation GraphQL proxy.
@@ -25,11 +26,14 @@ import { AuthRoles } from '../../../types/enums';
  *   3. the impersonation cookie is one this server signed
  *   4. the recorded session is still open (so `stop` ends it everywhere)
  *   5. the document contains only queries -- see READ-ONLY below
- *   6. forward with the admin secret and a pinned role of `user`
+ *   6. forward with the admin secret and a role the target really holds --
+ *      `instructor` when the page asks for it and the target teaches a course,
+ *      `user` otherwise (see impersonatedRole)
  *
  * Nothing from the client is forwarded except the document, its variables and
- * its operation name. In particular the role and the user id are set here, so a
- * request cannot ask to be someone else or to be admin.
+ * its operation name, and the requested role is only a request: the role and the
+ * user id are decided here, so a request cannot ask to be someone else or to be
+ * admin.
  *
  * READ-ONLY. Impersonation ships read-only, and this is the single place that
  * enforces it: a document is rejected unless every operation in it is a `query`.
@@ -115,7 +119,7 @@ export default async function impersonationGraphQL(req: NextApiRequest, res: Nex
       headers: {
         'Content-Type': 'application/json',
         'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET as string,
-        'x-hasura-role': AuthRoles.user,
+        'x-hasura-role': impersonatedRole(req.headers?.['x-hasura-role'], isInstructorTarget(session.TargetUser)),
         'x-hasura-user-id': payload.targetUserId,
       },
       body: JSON.stringify({

@@ -13,11 +13,17 @@ export type ViewAs = {
   userId: string | null;
   /** True when the viewer must be treated as an ordinary `user`, whatever they really are. */
   asPlainUser: boolean;
+  /**
+   * Only meaningful while `asPlainUser` is true: the viewed user is an instructor,
+   * so the instructor surface opens (read-only -- the proxy refuses writes).
+   * Admin and org-admin access never carry over to a viewed user.
+   */
+  asInstructor: boolean;
 };
 
 export const useViewAs = (): ViewAs => {
   const { target, loading } = useImpersonation();
-  if (target) return { userId: target.id, asPlainUser: true };
+  if (target) return { userId: target.id, asPlainUser: true, asInstructor: target.isInstructor === true };
 
   // The transport switches identity before this does: the marker cookie routes
   // Apollo through the proxy on the first render of every page load, while the
@@ -28,7 +34,7 @@ export const useViewAs = (): ViewAs => {
   // So a pending impersonation counts as one. There is no id to view as yet,
   // which is exactly right: a component that needs one has nothing to ask for
   // until the answer arrives.
-  if (loading) return { userId: null, asPlainUser: true };
+  if (loading) return { userId: null, asPlainUser: true, asInstructor: false };
 
-  return { userId: null, asPlainUser: false };
+  return { userId: null, asPlainUser: false, asInstructor: false };
 };

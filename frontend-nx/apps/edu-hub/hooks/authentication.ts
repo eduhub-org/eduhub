@@ -17,20 +17,25 @@ export const useIsLoggedIn = (): boolean => {
   return (status === 'authenticated') && !!sessionData?.accessToken;
 };
 
-// The elevated-role hooks all report false while the app is acting as a plain
+// The admin and org-admin hooks report false while the app is acting as another
 // user. That is what closes the management surface during an impersonation: the
 // nav in Menu.tsx and the guard in ManageCourseContent both key on these, and
-// the requests themselves are pinned to `user` server-side either way.
+// the proxy never grants those roles server-side either way. Only the instructor
+// view carries over (see useIsInstructor).
 export const useIsAdmin = (): boolean => {
   const { asPlainUser } = useViewAs();
   const { data: sessionData } = useSession();
   return !asPlainUser && hasRole(sessionData, AuthRoles.admin);
 };
 
+// While viewing as someone, this answers for them: an instructor's view shows
+// their instructor surface (the impersonation proxy grants the role only if the
+// server agrees they teach a course).
 export const useIsInstructor = (): boolean => {
-  const { asPlainUser } = useViewAs();
+  const { asPlainUser, asInstructor } = useViewAs();
   const { data: sessionData } = useSession();
-  return !asPlainUser && hasRole(sessionData, AuthRoles.instructor);
+  if (asPlainUser) return asInstructor;
+  return hasRole(sessionData, AuthRoles.instructor);
 };
 
 // Whether the current user administers at least one organization. Used purely for UI gating/nav.

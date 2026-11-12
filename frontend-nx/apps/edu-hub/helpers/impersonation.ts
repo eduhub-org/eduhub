@@ -196,6 +196,37 @@ export const isSameOrigin = (req: NextApiRequest): boolean => {
 
 export const noStore = (res: NextApiResponse) => res.setHeader('Cache-Control', 'no-store');
 
+/**
+ * Whether the impersonated user is an instructor, asked of the database on every
+ * request rather than stored in the cookie, so it follows course assignments as
+ * they change. Being listed on a course is also what grants the Keycloak
+ * `instructor` role in the first place (CourseInstructor's
+ * add_keycloak_instructor_role trigger), so this is the same rule, minus people
+ * who were once instructors and no longer teach anything.
+ */
+export const TARGET_INSTRUCTOR_FIELD = 'CourseInstructors(limit: 1) { id }';
+
+export type TargetUserRow = { id: string; CourseInstructors?: { id: number }[] | null };
+
+export const isInstructorTarget = (user: TargetUserRow | null | undefined): boolean =>
+  (user?.CourseInstructors?.length ?? 0) > 0;
+
+/**
+ * The Hasura role an impersonated request runs as. The page asks for one (the
+ * `x-hasura-role` header the Apollo link sends), and it is granted only when the
+ * impersonated user really holds it: `instructor` for instructors, and `user`
+ * for everything else -- including `admin` and `org_admin`, which impersonation
+ * never takes on. `user` inherits `anonymous`, so public queries still work.
+ */
+export const impersonatedRole = (requested: unknown, targetIsInstructor: boolean): AuthRoles =>
+  requested === AuthRoles.instructor && targetIsInstructor ? AuthRoles.instructor : AuthRoles.user;
+
+/** The target as the browser sees it: profile fields plus the roles it may view as. */
+export const publicTarget = <T extends TargetUserRow>({ CourseInstructors, ...user }: T) => ({
+  ...user,
+  isInstructor: (CourseInstructors?.length ?? 0) > 0,
+});
+
 export const OPEN_SESSION_QUERY = `
   query OpenImpersonationSession($id: Int!, $adminUserId: uuid!) {
     ImpersonationSession(
@@ -209,6 +240,7 @@ export const OPEN_SESSION_QUERY = `
         firstName
         lastName
         email
+        ${TARGET_INSTRUCTOR_FIELD}
       }
     }
   }
@@ -218,7 +250,7 @@ export type OpenSessionResult = {
   ImpersonationSession: {
     id: number;
     targetUserId: string;
-    TargetUser: { id: string; firstName: string | null; lastName: string | null; email: string | null } | null;
+    TargetUser: (TargetUserRow & { firstName: string | null; lastName: string | null; email: string | null }) | null;
   }[];
 };
 
