@@ -513,6 +513,14 @@ export const UPDATE_SESSION_ADDRESS_LOCATION = gql`
   }
 `;
 
+export const DELETE_SESSION_ADDRESS = gql`
+  mutation DeleteSessionAddress($id: Int!) {
+    delete_SessionAddress_by_pk(id: $id) {
+      id
+    }
+  }
+`;
+
 export const DELETE_SESSION_ADDRESSES_BY_COURSE_AND_LOCATION = gql`
   mutation DeleteSessionAddressesByCourseAndLocation(
     $courseId: Int!,

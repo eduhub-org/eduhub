@@ -263,4 +263,61 @@ describe('notifySessionParticipants', () => {
       expect(result.success).toBe(false);
     });
   });
+
+  describe('with the state before the edits', () => {
+    const withLocations = () => {
+      const data = session([]);
+      data.Session_by_pk.SessionAddresses = [{ courseLocationId: 1, locationAddressId: null, address: '' }];
+      data.Session_by_pk.Course.CourseLocations = [
+        { id: 1, locationOption: 'ONLINE', defaultSessionAddress: null, defaultSessionAddressId: null },
+        { id: 2, locationOption: 'KIEL', defaultSessionAddress: null, defaultSessionAddressId: 5 },
+      ];
+      return data;
+    };
+    const requestWith = (previous) => {
+      const request = buildRequest({ role: 'admin', userId: STRANGER_ID });
+      request.body.input.previous = previous;
+      return request;
+    };
+    const before = {
+      startDateTime: '2026-10-01T10:00:00.000Z',
+      endDateTime: '2026-10-01T12:00:00.000Z',
+      locations: [
+        { courseLocationId: 1, locationAddressId: null },
+        { courseLocationId: 2, locationAddressId: null },
+      ],
+    };
+
+    it('announces a removed location with the places before and after', async () => {
+      mockGraphqlRequest
+        .mockResolvedValueOnce(withLocations())
+        .mockResolvedValueOnce({ LocationAddress: [{ id: 5, shortLabel: 'ZBW', address: 'Düsternbrooker Weg 120' }] });
+
+      const result = await notifySessionParticipants(requestWith(before), mockLogger);
+
+      expect(result.success).toBe(true);
+      expect(mockGraphqlRequest.mock.calls[1][1]).toEqual({ ids: [5] });
+      const { change } = mockSendSessionRescheduledEmails.mock.calls[0][0];
+      expect(change).toMatchObject({
+        templateType: 'SESSION_LOCATION_CHANGED',
+        flags: { TimeChanged: false, TimeUnchanged: true },
+        locationList: ['Online'],
+        previousLocationList: ['Online', 'Kiel – ZBW (Düsternbrooker Weg 120)'],
+      });
+    });
+
+    it('sends nothing when the session ended up as it was', async () => {
+      mockGraphqlRequest
+        .mockResolvedValueOnce(withLocations())
+        .mockResolvedValueOnce({ LocationAddress: [] });
+
+      const result = await notifySessionParticipants(
+        requestWith({ ...before, locations: [{ courseLocationId: 1, locationAddressId: null }] }),
+        mockLogger
+      );
+
+      expect(mockSendSessionRescheduledEmails).not.toHaveBeenCalled();
+      expect(result).toEqual({ success: true, messageKey: 'NO_CHANGES', queued: 0, total: 0, courseSent: true });
+    });
+  });
 });

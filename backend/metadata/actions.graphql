@@ -308,7 +308,22 @@ type Mutation {
 }
 
 type Mutation {
-  notifySessionParticipants(sessionId: Int!, skipCourse: Boolean): NotifySessionParticipantsResult!
+  notifySessionParticipants(sessionId: Int!, skipCourse: Boolean, previous: PreviousSessionState): NotifySessionParticipantsResult!
+}
+
+"""
+A session's time and locations before the edits being announced, so the mail
+can say what changed. Without it only a time change is announced.
+"""
+input PreviousSessionState {
+  startDateTime: String!
+  endDateTime: String!
+  locations: [PreviousSessionLocation!]!
+}
+
+input PreviousSessionLocation {
+  courseLocationId: Int!
+  locationAddressId: Int
 }
 
 type NotifySessionParticipantsResult {

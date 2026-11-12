@@ -63,6 +63,7 @@ const CATEGORY_BY_TYPE: Record<string, EmailTemplateCategory> = {
   // Session reminders and changes
   SESSION_REMINDER: 'sessions',
   SESSION_RESCHEDULED: 'sessions',
+  SESSION_LOCATION_CHANGED: 'sessions',
   COURSE_CONTINUATION_INQUIRY: 'sessions',
   // System / account
   USER_CREATED: 'system',
