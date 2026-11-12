@@ -238,7 +238,7 @@ describe('useNotifyParticipantsPrompt', () => {
       rerender({ snapshots: onlineOnly });
       act(() => result.current.registerChange(1));
       settle();
-      act(() => result.current.cancel());
+      await act(async () => { result.current.cancel(); });
 
       rerender({ snapshots: onlineLater });
       act(() => result.current.registerChange(1));
@@ -246,6 +246,40 @@ describe('useNotifyParticipantsPrompt', () => {
       await act(async () => { await result.current.confirm(); });
 
       expect(previousOf(0).startDateTime).toBe(onlineOnly[0].startDateTime);
+    });
+
+    it('moves on to the freshly fetched state, not a stale rendered one', async () => {
+      // The edit's own refetch failed, so the rendered state still shows the session as it was.
+      const refresh = jest.fn().mockResolvedValue(onlineOnly);
+      const { result } = renderHook(() => useNotifyParticipantsPrompt(5, () => 0, hybrid, refresh));
+
+      act(() => result.current.registerChange(1));
+      settle();
+      await act(async () => { await result.current.confirm(); });
+      act(() => result.current.registerChange(1));
+      settle();
+      await act(async () => { await result.current.confirm(); });
+
+      expect(previousOf(1).locations).toEqual(onlineOnly[0].locations);
+    });
+
+    it('moves on past an edit nobody was there to hear about', async () => {
+      const refresh = jest.fn().mockResolvedValue(onlineOnly);
+      let participants = 0;
+      const { result, rerender } = renderHook(() =>
+        useNotifyParticipantsPrompt(participants, () => 0, hybrid, refresh)
+      );
+
+      await act(async () => { result.current.registerChange(1); });
+      expect(refresh).toHaveBeenCalled();
+
+      participants = 5;
+      rerender();
+      act(() => result.current.registerChange(1));
+      settle();
+      await act(async () => { await result.current.confirm(); });
+
+      expect(previousOf(0).locations).toEqual(onlineOnly[0].locations);
     });
   });
 });

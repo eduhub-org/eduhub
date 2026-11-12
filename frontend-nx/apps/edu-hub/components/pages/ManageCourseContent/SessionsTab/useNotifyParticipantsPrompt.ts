@@ -49,14 +49,16 @@ interface NotifyParticipantsPrompt {
  *
  * The mail says what the session was before, so each session's state is kept
  * from before its first edit (`snapshots` are the current states). It is only
- * taken over once the session was mailed or the prompt dismissed: an edit's
- * own refetch may land before `registerChange` is called, so a snapshot taken
- * then could already show the new state.
+ * moved on once the change was mailed, the prompt dismissed, or nobody was
+ * there to mail: an edit's own refetch may land before or after
+ * `registerChange`, so the state to move on to is fetched afresh
+ * (`refreshSnapshots`) rather than taken from whatever was rendered last.
  */
 const useNotifyParticipantsPrompt = (
   participantCount: number,
   eventRegistrantCount: (sessionId: number) => number = () => 0,
-  snapshots: SessionSnapshot[] = []
+  snapshots: SessionSnapshot[] = [],
+  refreshSnapshots?: () => Promise<SessionSnapshot[]>
 ): NotifyParticipantsPrompt => {
   const t = useTranslations('manageCourse');
 
@@ -76,10 +78,25 @@ const useNotifyParticipantsPrompt = (
     });
   }, [snapshots]);
 
-  const resetBaseline = useCallback((sessionId: number) => {
-    const current = latestSnapshots.current.find((snapshot) => snapshot.sessionId === sessionId);
-    if (current) baselines.current.set(sessionId, current);
-    else baselines.current.delete(sessionId);
+  const refreshRef = useRef(refreshSnapshots);
+  refreshRef.current = refreshSnapshots;
+
+  // Called once the given edits are settled. Every edit is saved before it is
+  // registered, so a fresh fetch shows its result. A session edited again in
+  // the meantime is pending and keeps its state from before that edit.
+  const resetBaselines = useCallback(async (sessionIds: number[]) => {
+    let current = latestSnapshots.current;
+    try {
+      if (refreshRef.current) current = await refreshRef.current();
+    } catch {
+      // Fall back to the last rendered state.
+    }
+    sessionIds.forEach((sessionId) => {
+      if (pendingSessionIds.current.has(sessionId)) return;
+      const snapshot = current.find((candidate) => candidate.sessionId === sessionId);
+      if (snapshot) baselines.current.set(sessionId, snapshot);
+      else baselines.current.delete(sessionId);
+    });
   }, []);
 
   const [promptOpen, setPromptOpen] = useState(false);
@@ -105,27 +122,33 @@ const useNotifyParticipantsPrompt = (
 
   const registerChange = useCallback(
     (sessionId: number) => {
-      if (participantCount + eventRegistrantCount(sessionId) <= 0) return;
+      if (participantCount + eventRegistrantCount(sessionId) <= 0) {
+        // Nobody to tell now, but whoever registers later must hear about the
+        // next change compared with this state.
+        void resetBaselines([sessionId]);
+        return;
+      }
       pendingSessionIds.current.add(sessionId);
       // A new change is news to the course participants as well.
       courseSentSessionIds.current.delete(sessionId);
       openPrompt();
     },
-    [participantCount, eventRegistrantCount, openPrompt]
+    [participantCount, eventRegistrantCount, openPrompt, resetBaselines]
   );
 
   const cancel = useCallback(() => {
-    pendingSessionIds.current.forEach(resetBaseline);
+    const dismissed = [...pendingSessionIds.current];
     pendingSessionIds.current.clear();
+    void resetBaselines(dismissed);
     courseSentSessionIds.current.clear();
     setPendingCount(0);
     setPromptOpen(false);
-  }, [resetBaseline]);
+  }, [resetBaselines]);
 
   const confirm = useCallback(async () => {
     const sessionIds = [...pendingSessionIds.current];
     setSending(true);
-    let notified = 0;
+    const notified: number[] = [];
     let failure: string | null = null;
 
     try {
@@ -147,8 +170,7 @@ const useNotifyParticipantsPrompt = (
             // cannot mail an already-notified session a second time.
             pendingSessionIds.current.delete(sessionId);
             courseSentSessionIds.current.delete(sessionId);
-            resetBaseline(sessionId);
-            notified += 1;
+            notified.push(sessionId);
           } else {
             if (result?.courseSent) courseSentSessionIds.current.add(sessionId);
             failure = result?.error || t('SessionsTab.notify_participants.failed');
@@ -166,12 +188,13 @@ const useNotifyParticipantsPrompt = (
       setPromptOpen(remaining > 0);
     }
 
+    await resetBaselines(notified);
     if (failure) {
       setErrorMessage(failure);
-    } else if (notified > 0) {
+    } else if (notified.length > 0) {
       setSavedMessage(t('SessionsTab.notify_participants.sent'));
     }
-  }, [notifySessionParticipants, t, resetBaseline]);
+  }, [notifySessionParticipants, t, resetBaselines]);
 
   return {
     registerChange,

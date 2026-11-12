@@ -85,6 +85,24 @@ describe('describeSessionChange', () => {
     ).toBeNull();
   });
 
+  it('treats the course default picked explicitly as the same place', () => {
+    expect(
+      describeSessionChange({
+        session: sessionWith([
+          { courseLocationId: 1, locationAddressId: null },
+          { courseLocationId: 2, locationAddressId: null },
+        ]),
+        courseLocations,
+        previous: {
+          startDateTime: start,
+          endDateTime: end,
+          locations: [{ courseLocationId: 1, locationAddressId: 10 }, { courseLocationId: 2, locationAddressId: null }],
+        },
+        addressMap,
+      })
+    ).toBeNull();
+  });
+
   it("ignores previous locations of another course", () => {
     expect(
       describeSessionChange({

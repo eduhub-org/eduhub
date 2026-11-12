@@ -40,9 +40,16 @@ const placesOf = (entries, courseLocations, addressMap) => {
   return [...new Set(places.filter(Boolean))];
 };
 
-const locationKey = (entries) =>
+/**
+ * The identity of a set of places. A location without its own venue falls back
+ * to the course default, so picking the default explicitly is the same place.
+ */
+const locationKey = (entries, courseLocations) =>
   entries
-    .map((entry) => `${entry.courseLocationId}:${entry.locationAddressId ?? ''}`)
+    .map((entry) => {
+      const courseLocation = courseLocations.find((location) => location.id === entry.courseLocationId);
+      return `${entry.courseLocationId}:${entry.locationAddressId || courseLocation?.defaultSessionAddressId || ''}`;
+    })
     .sort()
     .join('|');
 
@@ -84,7 +91,7 @@ export function describeSessionChange({ session, courseLocations, previous, addr
   const previousEntries = (previous.locations || []).filter((entry) => known.has(entry.courseLocationId));
   const currentEntries = (session.SessionAddresses || []).filter((entry) => known.has(entry.courseLocationId));
 
-  if (locationKey(previousEntries) !== locationKey(currentEntries)) {
+  if (locationKey(previousEntries, courseLocations) !== locationKey(currentEntries, courseLocations)) {
     return {
       templateType: 'SESSION_LOCATION_CHANGED',
       flags: { TimeChanged: timeChanged, TimeUnchanged: !timeChanged },

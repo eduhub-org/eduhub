@@ -127,6 +127,19 @@ const Eyebrow: FC<{ children: ReactNode; icon?: ReactNode }> = ({ children, icon
   </span>
 );
 
+/** What the participant mail compares against: each session's time and locations. */
+const toSessionSnapshots = (sessions: ManagedCourse_Course_by_pk_Sessions[]): SessionSnapshot[] =>
+  sessions.map((session) => ({
+    sessionId: session.id,
+    startDateTime: new Date(session.startDateTime).toISOString(),
+    endDateTime: new Date(session.endDateTime).toISOString(),
+    locations: session.SessionAddresses.flatMap((address) =>
+      address.CourseLocation?.id != null
+        ? [{ courseLocationId: address.CourseLocation.id, locationAddressId: address.locationAddressId ?? null }]
+        : []
+    ),
+  }));
+
 /** Section heading inside the expanded row. */
 const SectionLabel: FC<{ children: ReactNode }> = ({ children }) => (
   <h4 className="mb-3 text-[11px] font-bold uppercase tracking-wider text-label-secondary">{children}</h4>
@@ -165,21 +178,11 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
     return result;
   }, [course]);
 
-  // What the participant mail compares against: each session's time and locations.
-  const sessionSnapshots = useMemo<SessionSnapshot[]>(
-    () =>
-      courseSessions.map((session) => ({
-        sessionId: session.id,
-        startDateTime: new Date(session.startDateTime).toISOString(),
-        endDateTime: new Date(session.endDateTime).toISOString(),
-        locations: session.SessionAddresses.flatMap((address) =>
-          address.CourseLocation?.id != null
-            ? [{ courseLocationId: address.CourseLocation.id, locationAddressId: address.locationAddressId ?? null }]
-            : []
-        ),
-      })),
-    [courseSessions]
-  );
+  const sessionSnapshots = useMemo(() => toSessionSnapshots(courseSessions), [courseSessions]);
+  const refreshSessionSnapshots = useCallback(async () => {
+    const { data } = await qResult.refetch();
+    return toSessionSnapshots(data?.Course_by_pk?.Sessions ?? []);
+  }, [qResult]);
 
   const {
     registerChange,
@@ -193,7 +196,12 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
     clearError: clearNotificationError,
     savedMessage: notificationSaved,
     clearSaved: clearNotificationSaved,
-  } = useNotifyParticipantsPrompt(participantCount, eventRegistrantCount, sessionSnapshots);
+  } = useNotifyParticipantsPrompt(
+    participantCount,
+    eventRegistrantCount,
+    sessionSnapshots,
+    refreshSessionSnapshots
+  );
 
   // A session that is over needs no announcement when its locations are corrected.
   const registerLocationChange = useCallback(
@@ -608,7 +616,10 @@ const RemoveSessionLocation: FC<{
   entry: SessionLocationEntry;
   qResult: QueryResult<ManagedCourse, ManagedCourseVariables>;
   onRemoved: () => void;
-}> = ({ entry, qResult, onRemoved }) => {
+  /** Set while another location of the session is being removed. */
+  disabled: boolean;
+  onBusyChange: (busy: boolean) => void;
+}> = ({ entry, qResult, onRemoved, disabled, onBusyChange }) => {
   const t = useTranslations('manageCourse.SessionsTab');
   const tCommon = useTranslations('common');
   const [deleteSessionAddress, { loading, error }] = useRoleMutation<DeleteSessionAddress, DeleteSessionAddressVariables>(
@@ -622,32 +633,42 @@ const RemoveSessionLocation: FC<{
     if (!entry.address) return;
     setShowError(true);
     setRefreshError('');
+    // Until the refetch shows the removal, the other locations still count
+    // this one, so removing them too could leave the session with none.
+    onBusyChange(true);
     try {
-      await deleteSessionAddress({ variables: { id: entry.address.id } });
-    } catch {
-      // The mutation's error state drives the dialog below.
-      return;
-    }
-    onRemoved();
-    try {
-      await qResult.refetch();
-    } catch (refetchError) {
-      setRefreshError(refetchError instanceof Error ? refetchError.message : String(refetchError));
+      try {
+        await deleteSessionAddress({ variables: { id: entry.address.id } });
+      } catch {
+        // The mutation's error state drives the dialog below.
+        return;
+      }
+      onRemoved();
+      try {
+        await qResult.refetch();
+      } catch (refetchError) {
+        setRefreshError(refetchError instanceof Error ? refetchError.message : String(refetchError));
+      }
+    } finally {
+      onBusyChange(false);
     }
   };
 
   return (
     <>
+      {/* The span keeps the tooltip working while the button is disabled. */}
       <Tooltip title={label}>
-        <button
-          type="button"
-          onClick={removeLocation}
-          disabled={loading}
-          aria-label={label}
-          className="p-1 text-label-secondary hover:text-error transition-colors disabled:opacity-50"
-        >
-          <MdClose aria-hidden />
-        </button>
+        <span>
+          <button
+            type="button"
+            onClick={removeLocation}
+            disabled={loading || disabled}
+            aria-label={label}
+            className="p-1 text-label-secondary hover:text-error transition-colors disabled:opacity-50"
+          >
+            <MdClose aria-hidden />
+          </button>
+        </span>
       </Tooltip>
       <ErrorMessageDialog
         errorMessage={error?.message || refreshError}
@@ -776,6 +797,7 @@ const ExpandableSessionRowContent: FC<ExpandableSessionRowContentProps> = ({
   const locations = useMemo(() => sessionLocationEntries(session, courseLocations), [session, courseLocations]);
   // A session keeps at least one location: the last one cannot be removed.
   const canRemoveLocation = locations.filter((entry) => entry.address).length > 1;
+  const [removingLocation, setRemovingLocation] = useState(false);
 
   const {
     data: attendanceRows,
@@ -945,7 +967,13 @@ const ExpandableSessionRowContent: FC<ExpandableSessionRowContentProps> = ({
                     onAddressChanged={onLocationChanged}
                   />
                   {canRemoveLocation ? (
-                    <RemoveSessionLocation entry={entry} qResult={qResult} onRemoved={onLocationChanged} />
+                    <RemoveSessionLocation
+                      entry={entry}
+                      qResult={qResult}
+                      onRemoved={onLocationChanged}
+                      disabled={removingLocation}
+                      onBusyChange={setRemovingLocation}
+                    />
                   ) : (
                     <span />
                   )}
