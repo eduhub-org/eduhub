@@ -1,6 +1,7 @@
 import os
 import re
 import logging
+import unicodedata
 import pandas as pd
 from thefuzz import fuzz
 from api_clients import EduHubClient, ZoomClient, LimeSurveyClient
@@ -420,7 +421,31 @@ def _clean_text(value):
             return ""
     except (TypeError, ValueError):
         pass
-    return str(value).strip()
+    # NFC: a decomposed "é" (e + combining accent) would otherwise be split
+    # into two tokens by the fuzzy matcher.
+    return unicodedata.normalize("NFC", str(value)).strip()
+
+
+def _pair_score(full_name, candidate):
+    """Similarity of two lower-case names.
+
+    ``ratio`` compares the names as written, so a typo in the first letter
+    of a token (Sann/Dann) costs one character; ``token_sort_ratio`` alone
+    would sort the tokens differently and fall below 50. ``token_sort_ratio``
+    covers swapped order ("Hase Christian"), ``token_set_ratio`` a missing
+    middle name ("Marlena Ruzicka" for "Marlena Isabella Ruzicka"); the
+    latter only with two or more tokens on both sides, as a lone first name
+    would otherwise score 100 (single names are handled as partial keys).
+    """
+    if not candidate:
+        return 0
+    scores = [
+        fuzz.ratio(full_name, candidate),
+        fuzz.token_sort_ratio(full_name, candidate),
+    ]
+    if len(full_name.split()) >= 2 and len(candidate.split()) >= 2:
+        scores.append(fuzz.token_set_ratio(full_name, candidate))
+    return max(scores)
 
 
 def _name_score(participant_full_name, record_name):
@@ -428,8 +453,8 @@ def _name_score(participant_full_name, record_name):
     if not raw:
         return 0
     return max(
-        fuzz.token_sort_ratio(participant_full_name, raw),
-        fuzz.token_sort_ratio(participant_full_name, clean_display_name(raw)),
+        _pair_score(participant_full_name, raw),
+        _pair_score(participant_full_name, clean_display_name(raw)),
     )
 
 
