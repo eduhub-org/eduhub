@@ -716,7 +716,7 @@ actions:
       # Org admins on the course management page. Listed as org_admin itself: the
       # inherited role does not pick up an org_admin_access action permission.
       - role: org_admin
-    comment: Mails active participants that a session was rescheduled. Called from
+    comment: Mails active participants that a session was rescheduled or moved to other locations. Called from
       the Sessions tab after the editor confirms the prompt; there is no automatic
       trigger any more. Authorization is in the handler, because the action queries
       with the admin secret and Session row permissions do not apply to it.
@@ -861,6 +861,8 @@ custom_types:
     - name: AddonMappingInput
     - name: CourseInput
     - name: JobPostingBillingInput
+    - name: PreviousSessionLocation
+    - name: PreviousSessionState
     - name: SelectedAddonInput
   objects:
     - name: NotifySessionParticipantsResult

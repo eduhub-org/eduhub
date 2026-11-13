@@ -25,11 +25,19 @@ const authLink = new ApolloLink((operation, forward) => {
   const { accessToken, role } = getAuthState();
   const roleOverride = operation.getContext().role as AuthRoles | undefined;
   const effectiveRole = roleOverride ?? role;
-  // While impersonating, the proxy decides the role and the identity. Sending
-  // the admin's own bearer token and role along would be, at best, ignored -- and
-  // at worst an invitation to honour it.
-  const willAddAuth =
-    !!(accessToken && effectiveRole !== AuthRoles.anonymous) && !getImpersonationState().active;
+  const impersonating = getImpersonationState().active;
+  // While impersonating, the proxy decides the identity and grants a role only
+  // if the viewed user holds it, so the role goes along as a request and the
+  // admin's own bearer token does not go at all.
+  if (impersonating) {
+    operation.setContext((prev: Record<string, unknown>) => ({
+      ...prev,
+      headers: { ...((prev.headers as Record<string, string>) ?? {}), 'x-hasura-role': effectiveRole },
+    }));
+    return forward(operation);
+  }
+
+  const willAddAuth = !!(accessToken && effectiveRole !== AuthRoles.anonymous);
 
   if (willAddAuth) {
     operation.setContext((prev: Record<string, unknown>) => {

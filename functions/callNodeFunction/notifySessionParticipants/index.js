@@ -1,5 +1,6 @@
 import { GraphQLClient } from 'graphql-request';
 import { sendSessionRescheduledEmails } from '../lib/sessionRescheduledEmail.js';
+import { describeSessionChange, referencedLocationAddressIds } from '../lib/sessionChange.js';
 import { ORG_ADMIN_ROLES, isOrgAdminOfCourse } from '../lib/orgAdminScope.js';
 
 // Request roles from session_variables, not the inherited-role names used in
@@ -16,10 +17,21 @@ const GET_SESSION_FOR_NOTIFICATION = `
       courseId
       startDateTime
       endDateTime
+      SessionAddresses {
+        courseLocationId
+        locationAddressId
+        address
+      }
       Course {
         id
         CourseInstructors(where: { userId: { _eq: $userId } }) {
           courseId
+        }
+        CourseLocations(order_by: { id: asc }) {
+          id
+          locationOption
+          defaultSessionAddress
+          defaultSessionAddressId
         }
       }
       PublicEvent {
@@ -32,6 +44,16 @@ const GET_SESSION_FOR_NOTIFICATION = `
           endDateTime
         }
       }
+    }
+  }
+`;
+
+const GET_LOCATION_ADDRESSES = `
+  query GetLocationAddressesForNotification($ids: [Int!]!) {
+    LocationAddress(where: { id: { _in: $ids } }) {
+      id
+      shortLabel
+      address
     }
   }
 `;
@@ -60,7 +82,9 @@ const combineResults = (courseResult, eventResult) => {
 
 /**
  * Mails the active (CONFIRMED/REGISTERED) participants of a session's course
- * that the session was rescheduled. When the session was opened to the public
+ * that the session was rescheduled or now takes place at other locations. The
+ * Sessions tab sends the session's state from before the edits (`previous`),
+ * and the mail says what changed (see lib/sessionChange.js). When the session was opened to the public
  * as an event, the event's registrants are mailed too: the event's session
  * already carries the new time (a database trigger mirrors it), and their mail
  * links to the event page. A retry passes `skipCourse` when the course mailing
@@ -137,11 +161,30 @@ export default async function notifySessionParticipants(req, logger) {
       };
     }
 
+    const previous = req.body?.input?.previous ?? null;
+    const courseLocations = session.Course?.CourseLocations || [];
+    const addressIds = previous ? referencedLocationAddressIds(session, courseLocations, previous) : [];
+    const addresses =
+      addressIds.length > 0 ? (await client.request(GET_LOCATION_ADDRESSES, { ids: addressIds }))?.LocationAddress : [];
+    const change = describeSessionChange({
+      session,
+      courseLocations,
+      previous,
+      addressMap: new Map((addresses || []).map((address) => [address.id, address])),
+    });
+    if (!change) {
+      return { success: true, messageKey: 'NO_CHANGES', queued: 0, total: 0, courseSent: true };
+    }
+
+    // The event's session mirrors the course session, so the same places are
+    // announced to its registrants; only its title, time and course differ.
     const skipCourse = req.body?.input?.skipCourse === true;
-    const courseResult = skipCourse ? SKIPPED : await sendSessionRescheduledEmails({ session, client, logger });
+    const courseResult = skipCourse
+      ? SKIPPED
+      : await sendSessionRescheduledEmails({ session, client, logger, change });
     const eventSession = session.PublicEvent?.Sessions?.[0];
     const eventResult = eventSession
-      ? await sendSessionRescheduledEmails({ session: eventSession, client, logger })
+      ? await sendSessionRescheduledEmails({ session: eventSession, client, logger, change })
       : SKIPPED;
     return combineResults(courseResult, eventResult);
   } catch (error) {

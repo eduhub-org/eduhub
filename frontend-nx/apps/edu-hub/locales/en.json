@@ -1291,7 +1291,8 @@
     },
     "funding_organizations": {
       "label": "Funding Organizations",
-      "add": "Add Funding Organization"
+      "add": "Add Funding Organization",
+      "synced_from_course": "Taken from the course \"{course}\" this event was created from. Change them there."
     },
     "certificates": {
       "enable": "Award certificates",
@@ -2094,8 +2095,9 @@
       "edit_date_time": "Change date and time",
       "location": "Location",
       "optional": "Optional",
-      "no_address": "No address",
-      "create_address": "Create address",
+      "location_removed": "Not taking place here this session",
+      "add_location_back": "Add back",
+      "remove_location": "Remove {location} for this session",
       "schedule": "Session",
       "program_session_locked": "Managed by the program admin",
       "sessionAddresses": {
@@ -2160,7 +2162,7 @@
       },
       "notify_participants": {
         "title": "Inform participants?",
-        "question": "{sessions, plural, one {This session's date or time has changed.} other {The dates or times of # sessions have changed.}} {participants, plural, one {Should the registered participant be informed by email?} other {Should the # registered participants be informed by email?}}",
+        "question": "{sessions, plural, one {This session's time or location has changed.} other {The times or locations of # sessions have changed.}} {participants, plural, one {Should the registered participant be informed by email?} other {Should the # registered participants be informed by email?}}",
         "confirm": "Inform",
         "cancel": "Don't inform",
         "sent": "The participants have been informed.",
@@ -3368,6 +3370,7 @@
       "PROJECT_REJECTED": "Project Not Passed",
       "PROJECT_DEADLINE_REMINDER": "Project Deadline Reminder",
       "SESSION_RESCHEDULED": "Session Rescheduled",
+      "SESSION_LOCATION_CHANGED": "Session Location Changed",
       "PAYMENT_RECEIPT": "Payment Receipt",
       "COURSE_CONTINUATION_INQUIRY": "Course Continuation Inquiry",
       "JOB_POSTING_PUBLISHED": "Job posting published",
@@ -3431,6 +3434,7 @@
       "PROJECT_REJECTED": "Sent when a project is rated as not passed",
       "PROJECT_DEADLINE_REMINDER": "Sent 48 hours before a project's submission deadline",
       "SESSION_RESCHEDULED": "Sent to participants when a session's date or time changes",
+      "SESSION_LOCATION_CHANGED": "Sent to participants when a session takes place at other locations, e.g. online only; also names a changed time",
       "PAYMENT_RECEIPT": "Sent when an invoice for a course or event enrollment is paid",
       "COURSE_CONTINUATION_INQUIRY": "Sent when a participant reaches the course's limit of missed sessions, asking them not to miss further sessions or to let the team know if they want to stop",
       "JOB_POSTING_PUBLISHED": "Sent to the employer once the posting is live. Carries the payment receipt, the invoice number and the invoice PDF as an attachment. The block between [#if:Invoice] and [/if:Invoice] is dropped for free and credit-funded postings; [#if:InvoicePdf] only renders when the PDF is actually attached.",

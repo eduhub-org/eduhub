@@ -18,6 +18,8 @@ export type ImpersonationTarget = {
   firstName?: string | null;
   lastName?: string | null;
   email?: string | null;
+  /** Set by the server: the target teaches at least one course, so the app may show their instructor view. */
+  isInstructor?: boolean;
 };
 
 type ImpersonationContextValue = {

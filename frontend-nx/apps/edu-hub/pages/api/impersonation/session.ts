@@ -6,6 +6,7 @@ import {
   adminClient,
   clearImpersonationCookie,
   noStore,
+  publicTarget,
   readImpersonationCookie,
   resolveAdminCaller,
 } from '../../../helpers/impersonation';
@@ -48,7 +49,7 @@ export default async function impersonationSession(req: NextApiRequest, res: Nex
 
     return res.status(200).json({
       active: true,
-      target: session.TargetUser ?? { id: session.targetUserId },
+      target: session.TargetUser ? publicTarget(session.TargetUser) : { id: session.targetUserId, isInstructor: false },
     });
   } catch (error) {
     console.error('Failed to read impersonation session', error);

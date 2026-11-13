@@ -1275,7 +1275,8 @@
     },
     "funding_organizations": {
       "label": "Förderorganisationen",
-      "add": "Förderorganisation hinzufügen"
+      "add": "Förderorganisation hinzufügen",
+      "synced_from_course": "Übernommen aus dem Kurs \"{course}\", aus dem diese Veranstaltung erstellt wurde. Ändere sie dort."
     },
     "certificates": {
       "enable": "Bescheinigungen vergeben",
@@ -2076,8 +2077,9 @@
       "edit_date_time": "Datum und Uhrzeit ändern",
       "location": "Ort",
       "optional": "Optional",
-      "no_address": "Keine Adresse",
-      "create_address": "Adresse anlegen",
+      "location_removed": "Findet bei diesem Termin nicht hier statt",
+      "add_location_back": "Wieder hinzufügen",
+      "remove_location": "{location} für diesen Termin entfernen",
       "schedule": "Termin",
       "program_session_locked": "Wird vom Programm-Admin verwaltet",
       "sessionAddresses": {
@@ -2142,7 +2144,7 @@
       },
       "notify_participants": {
         "title": "Teilnehmende informieren?",
-        "question": "{sessions, plural, one {Der Termin dieser Session wurde geändert.} other {Die Termine von # Sessions wurden geändert.}} {participants, plural, one {Soll die angemeldete Person per E-Mail darüber informiert werden?} other {Sollen die # angemeldeten Personen per E-Mail darüber informiert werden?}}",
+        "question": "{sessions, plural, one {Zeit oder Ort dieser Session wurden geändert.} other {Zeit oder Ort von # Sessions wurden geändert.}} {participants, plural, one {Soll die angemeldete Person per E-Mail darüber informiert werden?} other {Sollen die # angemeldeten Personen per E-Mail darüber informiert werden?}}",
         "confirm": "Informieren",
         "cancel": "Nicht informieren",
         "sent": "Die Teilnehmenden wurden informiert.",
@@ -3353,6 +3355,7 @@
       "PROJECT_REJECTED": "Projekt nicht bestanden",
       "PROJECT_DEADLINE_REMINDER": "Erinnerung Projektabgabe",
       "SESSION_RESCHEDULED": "Termin verschoben",
+      "SESSION_LOCATION_CHANGED": "Ort geändert",
       "PAYMENT_RECEIPT": "Zahlungsbestätigung",
       "COURSE_CONTINUATION_INQUIRY": "Nachfrage zur Kursfortsetzung",
       "JOB_POSTING_PUBLISHED": "Stellenanzeige veröffentlicht",
@@ -3416,6 +3419,7 @@
       "PROJECT_REJECTED": "Gesendet, wenn ein Projekt als nicht bestanden bewertet wird",
       "PROJECT_DEADLINE_REMINDER": "Gesendet 48 Stunden vor dem Abgabetermin eines Projekts",
       "SESSION_RESCHEDULED": "Gesendet an Teilnehmende, wenn sich Datum oder Zeit eines Termins ändert",
+      "SESSION_LOCATION_CHANGED": "Gesendet an Teilnehmende, wenn ein Termin an anderen Orten stattfindet, z. B. nur online; nennt auch eine geänderte Zeit",
       "PAYMENT_RECEIPT": "Gesendet, wenn eine Rechnung für eine Kurs- oder Event-Anmeldung bezahlt wurde",
       "COURSE_CONTINUATION_INQUIRY": "Gesendet, wenn Teilnehmende so viele Termine versäumt haben, wie für den Kurs maximal erlaubt sind – mit der Bitte, keine weiteren Termine zu verpassen oder kurz Bescheid zu geben, falls sie nicht mehr teilnehmen möchten",
       "JOB_POSTING_PUBLISHED": "Geht an den Arbeitgeber, sobald die Anzeige online ist. Enthält den Zahlungsbeleg, die Rechnungsnummer und die Rechnung als PDF-Anhang. Der Abschnitt zwischen [#if:Invoice] und [/if:Invoice] entfällt bei kostenlosen und über Kontingent bezahlten Anzeigen; [#if:InvoicePdf] nur, wenn das PDF wirklich anhängt.",

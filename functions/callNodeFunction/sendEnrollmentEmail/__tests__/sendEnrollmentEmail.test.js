@@ -141,6 +141,41 @@ describe('registration confirmation templates', () => {
     });
   });
 
+  it('attaches the course sessions as a calendar file to a confirmation', async () => {
+    const mail = await checkMail({
+      status: 'CONFIRMED', userStatus: 'ACTIVE', registrationType: 'DIRECT_CONFIRMATION',
+      templateType: 'REGISTRATION_CONFIRMED', sessions: [SESSION],
+    });
+    expect(mail.attachments).toEqual([
+      { content: expect.stringContaining('UID:session-5@'), filename: 'kurs-101.ics', contentType: 'text/calendar' },
+    ]);
+  });
+
+  it('still sends the confirmation when the calendar cannot be built', async () => {
+    const mail = await checkMail({
+      status: 'CONFIRMED', userStatus: 'ACTIVE', registrationType: 'DIRECT_CONFIRMATION',
+      templateType: 'REGISTRATION_CONFIRMED', sessions: [{ ...SESSION, startDateTime: 'not a date' }],
+    });
+    expect(mail.attachments).toBeNull();
+    expect(mockLogger.error).toHaveBeenCalledWith(expect.stringContaining('Calendar generation failed'));
+  });
+
+  it('attaches no calendar when the course has no sessions yet', async () => {
+    const mail = await checkMail({
+      status: 'CONFIRMED', userStatus: 'ACTIVE', registrationType: 'DIRECT_CONFIRMATION',
+      templateType: 'REGISTRATION_CONFIRMED',
+    });
+    expect(mail.attachments).toBeNull();
+  });
+
+  it('attaches no calendar to an invitation', async () => {
+    const mail = await checkMail({
+      status: 'INVITED', userStatus: 'ACTIVE', registrationType: 'APPROVAL_WITH_INPUT',
+      templateType: 'WAITLIST_PROMOTED', oldStatus: 'WAITLIST', sessions: [SESSION],
+    });
+    expect(mail.attachments).toBeNull();
+  });
+
   it('asks for payment when inviting on a paid course', async () => {
     await checkMail({
       status: 'INVITED', userStatus: 'ACTIVE', registrationType: 'DIRECT_CONFIRMATION_AND_PAYMENT',
@@ -156,7 +191,12 @@ describe('registration confirmation templates', () => {
   });
 });
 
-async function checkMail({ status, userStatus, registrationType, templateType, paid, fallback, oldStatus }) {
+const SESSION = {
+  id: 5, title: 'Kickoff', startDateTime: '2026-12-01T17:00:00+00:00', endDateTime: '2026-12-01T19:00:00+00:00',
+  SessionAddresses: [],
+};
+
+async function checkMail({ status, userStatus, registrationType, templateType, paid, fallback, oldStatus, sessions = [] }) {
   process.env.GUEST_TOKEN_SECRET = 'test-guest-token-secret';
   const request = jest.spyOn(GraphQLClient.prototype, 'request');
   const template = {
@@ -168,7 +208,7 @@ async function checkMail({ status, userStatus, registrationType, templateType, p
     CourseEnrollment_by_pk: {
       id: 1, status,
       User: { id: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', firstName: 'Test', email: 'test@example.com', status: userStatus },
-      Course: { id: 101, title: 'Test event', registrationType },
+      Course: { id: 101, title: 'Test event', registrationType, Sessions: sessions },
       Invoices: paid ? [{ status: 'PAID' }] : [],
       CourseEnrollmentAddons: [],
     },
@@ -193,4 +233,5 @@ async function checkMail({ status, userStatus, registrationType, templateType, p
   expect(mail).toMatchObject({ subject: 'Confirmed: Test event', to: 'test@example.com', status: 'READY_TO_SEND' });
   expect(mail.content).toContain('Hello Test');
   expect(mail.content.includes('/guest/manage?token=')).toBe(userStatus === 'GUEST');
+  return mail;
 }

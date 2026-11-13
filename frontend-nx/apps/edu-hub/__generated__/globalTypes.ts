@@ -10894,6 +10894,17 @@ export interface Organization_variance_order_by {
   id?: order_by | null;
 }
 
+export interface PreviousSessionLocation {
+  courseLocationId: number;
+  locationAddressId?: number | null;
+}
+
+export interface PreviousSessionState {
+  endDateTime: string;
+  locations: PreviousSessionLocation[];
+  startDateTime: string;
+}
+
 /**
  * Boolean expression to filter rows from the table "ProgramType". All fields are combined with a logical 'AND'.
  */

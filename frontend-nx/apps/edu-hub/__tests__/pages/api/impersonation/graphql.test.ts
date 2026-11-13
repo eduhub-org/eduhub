@@ -212,4 +212,47 @@ describe('impersonation GraphQL proxy', () => {
     });
     expect(res.status).toHaveBeenCalledWith(200);
   });
+  describe('role', () => {
+    const forwardedRole = () => (global.fetch as jest.Mock).mock.calls[0][1].headers['x-hasura-role'];
+    const asking = (role: string) =>
+      request({ headers: { host: 'edu.test', cookie: validCookie(), 'x-hasura-role': role } } as never);
+    const targetTeaches = (teaches: boolean) =>
+      mockRequest.mockResolvedValue({
+        ImpersonationSession: [
+          { id: 7, targetUserId: TARGET, TargetUser: { id: TARGET, CourseInstructors: teaches ? [{ id: 1 }] : [] } },
+        ],
+      });
+
+    it('forwards as instructor when asked and the target teaches a course', async () => {
+      targetTeaches(true);
+      await handler(asking('instructor'), response());
+      expect(forwardedRole()).toBe('instructor');
+    });
+
+    it('falls back to user when the target teaches nothing', async () => {
+      targetTeaches(false);
+      await handler(asking('instructor'), response());
+      expect(forwardedRole()).toBe('user');
+    });
+
+    it.each(['admin', 'org_admin', 'anything'])('never grants %s, even to an instructor target', async (role) => {
+      targetTeaches(true);
+      await handler(asking(role), response());
+      expect(forwardedRole()).toBe('user');
+    });
+
+    it('stays read-only for an instructor target', async () => {
+      targetTeaches(true);
+      const res = response();
+      await handler(
+        request({
+          headers: { host: 'edu.test', cookie: validCookie(), 'x-hasura-role': 'instructor' },
+          body: { query: 'mutation { delete_Course(where: {}) { affected_rows } }' },
+        } as never),
+        res
+      );
+      expect(res.status).toHaveBeenCalledWith(403);
+      expect(global.fetch).not.toHaveBeenCalled();
+    });
+  });
 });
