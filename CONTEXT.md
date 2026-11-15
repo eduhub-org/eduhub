@@ -86,6 +86,32 @@ _Avoid_: SEPA (on its own, in copy)
 Someone who runs a course: its instructors and the admins of its organization who manage that kind of program.
 _Avoid_: Kursleitung (as a role name in code)
 
+**Admin**:
+Someone with full access to everything on the platform, across all organizations. Not tied to any one organization.
+_Avoid_: Super admin
+
+**Org Admin**:
+Someone who manages the programs of one organization, limited to the kinds of program (courses, events, degrees) they are allowed to manage.
+
+### Projects
+
+**Project**:
+Work done by a team of participants within a course: proposed, carried out, submitted and reviewed. It can be listed in more than one course.
+
+**Project Template**:
+A project offered in a course for teams to take on. It is not worked on directly: each team gets its own **Project Copy**.
+_Avoid_: Vorlage (in code)
+
+**Project Copy**:
+A team's own project, created from a **Project Template**. Its title comes from the template and can't be changed while it is still linked to that template.
+
+**Passed Project**:
+A project whose review rated it as passed, whether it has been published or not. A project rated as not passed is not a passed project.
+
+**Removing a project from a course**:
+Taking a project out of one course. The project stays in every other course it is listed in, and is only deleted once no course is left.
+_Avoid_: Deleting (when the project is still listed in other courses)
+
 ### Communication
 
 **Session Reminder**:
