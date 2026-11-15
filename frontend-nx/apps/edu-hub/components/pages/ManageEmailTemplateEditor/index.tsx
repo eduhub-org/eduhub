@@ -59,6 +59,7 @@ const ManageEmailTemplateEditor: FC<ManageEmailTemplateEditorProps> = ({ templat
       let previewSubject = template.subject;
       const sampleReplacements: Record<string, string> = {
         '\\[User:FirstName\\]': 'John',
+        '\\[User:Firstname\\]': 'John',
         '\\[User:LastName\\]': 'Doe',
         '\\[Enrollment:CourseId--Course:Name\\]': 'Sample Course Title',
         '\\[Course:StartTime\\]': '15. Januar 2024',
