@@ -63,6 +63,8 @@ const ManageEmailTemplateEditor: FC<ManageEmailTemplateEditorProps> = ({ templat
         '\\[Enrollment:CourseId--Course:Name\\]': 'Sample Course Title',
         '\\[Course:StartTime\\]': '15. Januar 2024',
         '\\[Course:EndTime\\]': '20. März 2024',
+        '\\[Course:DateTime\\]': '26.11.2026, 18:00–20:00',
+        '\\[Course:LocationList\\]': '<ul><li>Kiel – ZBW (Düsternbrooker Weg 120, 24105 Kiel)</li><li>Online</li></ul>',
         '\\[Enrollment:CreatedAt\\]': '10. Januar 2024',
         '\\[Enrollment:ExpirationDate\\]': '25. Januar 2024',
         '\\[Enrollment:CourseLink\\]': 'https://edu.opencampus.sh/course/123',

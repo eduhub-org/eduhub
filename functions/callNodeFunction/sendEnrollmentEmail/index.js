@@ -350,7 +350,24 @@ export default async function sendEnrollmentEmail(req, logger) {
     // Expose the certificate link (when a certificate was just issued) to the replacer
     enrollmentDetails.certificateLink = certificateLink;
 
-    const replaceVariables = createEnrollmentVariableReplacer(enrollmentDetails, formatDate);
+    // Built before the text, so [#if:Calendar] only mentions a file that is
+    // really attached. The calendar is optional: a failure here must not cost
+    // the participant their confirmation, so the mail then goes out without it.
+    let calendar = null;
+    if (CALENDAR_TEMPLATE_TYPES.includes(baseTemplateType)) {
+      try {
+        calendar = buildCourseCalendar(enrollmentDetails.Course);
+      } catch (error) {
+        logger.error(`Calendar generation failed for enrollment ${enrollment.id}: ${error.message}`);
+      }
+    }
+    const attachments = calendar
+      ? [{ content: calendar, filename: `kurs-${courseId}.ics`, contentType: 'text/calendar' }]
+      : null;
+
+    const replaceVariables = createEnrollmentVariableReplacer(enrollmentDetails, formatDate, {
+      calendarAttached: !!calendar
+    });
 
     // The subject is plain text, so variables must not be HTML-escaped there
     const emailSubject = replaceVariables(template.subject, { html: false });
@@ -372,20 +389,6 @@ export default async function sendEnrollmentEmail(req, logger) {
       enrollmentDetails.User,
       logger
     );
-
-    // The calendar is optional: a failure here must not cost the participant
-    // their confirmation, so the mail then goes out without it.
-    let calendar = null;
-    if (CALENDAR_TEMPLATE_TYPES.includes(baseTemplateType)) {
-      try {
-        calendar = buildCourseCalendar(enrollmentDetails.Course);
-      } catch (error) {
-        logger.error(`Calendar generation failed for enrollment ${enrollment.id}: ${error.message}`);
-      }
-    }
-    const attachments = calendar
-      ? [{ content: calendar, filename: `kurs-${courseId}.ics`, contentType: 'text/calendar' }]
-      : null;
 
     // Insert email into MailLog for sending
     const INSERT_MAIL_LOG = gql`
