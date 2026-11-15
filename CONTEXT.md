@@ -127,6 +127,10 @@ How long before the First Session the Session Reminder goes out, set per Course 
 **Session Change Notification**:
 The email organizers send by hand when Sessions are rescheduled or their Session Locations change. It says what the Session was before. Separate from the Session Reminder.
 
+**Registration Confirmation**:
+The email a person gets once their Registration is confirmed. It is the same for Events and other Courses: when and where it names follow the Course's Sessions and Session Locations, not its Program type.
+_Avoid_: event confirmation vs. course confirmation as separate emails
+
 ## Relationships
 
 - A **Course** has a number of **Places** and at most one **Registration** per person
@@ -150,3 +154,4 @@ The email organizers send by hand when Sessions are rescheduled or their Session
 - "Invite" meant both the application decision (green rating) and moving someone up from the waitlist. Both are an **Invitation**: the same held place with a deadline; how it is accepted depends on the course (confirm or pay).
 - "Attendance" meant both a raw Zoom/LimeSurvey entry and a Participant's result for a Session. Resolved: the entry is an **Attendance Record**, the result an **Attendance**.
 - "Session reminder" meant three emails (24h, 1h, 15min) before sessions. Resolved: one email, before the First Session only, at the Course's Reminder Lead Time.
+- "Event confirmation mail" was asked for as a separate template from the course one. Resolved: there is one **Registration Confirmation**; a Course with a single Session simply reads like an event invitation because it has one date.
