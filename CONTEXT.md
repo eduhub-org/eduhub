@@ -109,7 +109,7 @@ A team's own project, created from a **Project Template**. Its title comes from 
 A project whose review rated it as passed, whether it has been published or not. A project rated as not passed is not a passed project.
 
 **Removing a project from a course**:
-Taking a project out of one course. The project stays in every other course it is listed in, and is only deleted once no course is left.
+Taking a project out of one course. The project stays in every other course it is listed in, and is only deleted once no course is left. A **Passed Project** can't be taken out of its last course, since that would delete it.
 _Avoid_: Deleting (when the project is still listed in other courses)
 
 ### Communication
@@ -133,7 +133,7 @@ The email organizers send by hand when Sessions are rescheduled. Separate from t
 - A **Participant** receives at most one **Session Reminder** per **Course**
 - A **Session** has many **Attendance Records** and at most one **Attendance** per **Participant** (or person who completed the Course); a **Manual Attendance** overrides the automatic one
 - An **Attendance Record** belongs to at most one **Attendance**
-- A **Project** is listed in one or more **Courses**; removing it from its last course deletes it
+- A **Project** is listed in one or more **Courses**; removing it from its last course deletes it, so a **Passed Project** can't be removed from its last course
 - A **Project Template** has zero or more **Project Copies**; deleting the template keeps the copies as projects of their own
 - A **Passed Project** can't be deleted by anyone, **Admins** included
 
