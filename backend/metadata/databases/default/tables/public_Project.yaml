@@ -76,6 +76,14 @@ array_relationships:
         table:
           name: ProjectMentor
           schema: public
+computed_fields:
+  - name: courses
+    comment: Every course the project is listed in, including courses whose listings the caller cannot see.
+    definition:
+      function:
+        name: project_courses
+        schema: public
+      table_argument: project_row
 insert_permissions:
   - role: user_access
     permission:
@@ -577,70 +585,10 @@ update_permissions:
           - status:
               _in:
                 - COMPLETED
-delete_permissions:
-  - role: instructor_access
-    permission:
-      filter:
-        _or:
-          - ProjectCourses:
-              Course:
-                CourseInstructors:
-                  User:
-                    id:
-                      _eq: X-Hasura-User-Id
-          - ProjectMentors:
-              User:
-                id:
-                  _eq: X-Hasura-User-Id
-  - role: org_admin_access
-    permission:
-      filter:
-        _or:
-          - ProjectCourses:
-              Course:
-                Program:
-                  _or:
-                    - _and:
-                        - type:
-                            _eq: EVENTS
-                        - Organization:
-                            OrganizationAdmins:
-                              _and:
-                                - userId:
-                                    _eq: X-Hasura-User-Id
-                                - canManageEvents:
-                                    _eq: true
-                    - _and:
-                        - type:
-                            _eq: COURSES
-                        - Organization:
-                            OrganizationAdmins:
-                              _and:
-                                - userId:
-                                    _eq: X-Hasura-User-Id
-                                - canManageCourses:
-                                    _eq: true
-                    - _and:
-                        - type:
-                            _eq: DEGREES
-                        - Organization:
-                            OrganizationAdmins:
-                              _and:
-                                - userId:
-                                    _eq: X-Hasura-User-Id
-                                - canManageDegrees:
-                                    _eq: true
-                    - Organization:
-                        OrganizationAdmins:
-                          _and:
-                            - userId:
-                                _eq: X-Hasura-User-Id
-                            - canManageSettings:
-                                _eq: true
-          - ProjectMentors:
-              User:
-                id:
-                  _eq: X-Hasura-User-Id
+# Organizers never delete a project row directly: they remove it from their
+# course (ProjectCourse delete), and the delete_project_when_no_course_remains
+# trigger deletes the project once no course lists it. A direct delete would
+# take the project out of other organizers' courses too. Admins keep full access.
 event_triggers:
   - name: send_project_status_email
     definition:

@@ -169,3 +169,18 @@ export function canManagePublicationSuggestion(
 ): boolean {
   return status === ProjectStatus_enum.COMPLETED;
 }
+
+/**
+ * A project rated as passed, published or not. Nobody may delete it: it holds the work an
+ * achievement certificate rests on. Mirrors the database guard `prevent_deleting_passed_project`.
+ */
+export function isPassedProject(project: {
+  status: ProjectStatus_enum;
+  published: boolean;
+}): boolean {
+  return (
+    project.status === ProjectStatus_enum.COMPLETED ||
+    project.status === ProjectStatus_enum.PUBLISHED ||
+    project.published
+  );
+}
