@@ -1,7 +1,7 @@
 import { FC, ReactElement, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { ApolloError } from '@apollo/client';
-import { IconButton } from '@mui/material';
+import { IconButton, Tooltip } from '@mui/material';
 import { MdDelete } from 'react-icons/md';
 
 import { TableGridDeleteButtonProps } from '../types';
@@ -22,7 +22,8 @@ const DeleteButtonShell: FC<{
   onConfirm: () => Promise<string | null>;
   onDeleted?: () => void;
   label?: string;
-}> = ({ deletionConfirmationQuestion, disabled, onConfirm, onDeleted, label }) => {
+  tooltip?: string | null;
+}> = ({ deletionConfirmationQuestion, disabled, onConfirm, onDeleted, label, tooltip }) => {
   const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const t = useTranslations('common');
@@ -43,33 +44,40 @@ const DeleteButtonShell: FC<{
   return (
     <>
       {label ? (
-        <button
-          type="button"
-          onClick={() => !disabled && setIsConfirmationOpen(true)}
-          disabled={disabled}
-          className="delete-button inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold text-label-secondary hover:text-error disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:text-label-secondary"
-        >
-          <MdDelete size="1.1em" aria-hidden />
-          {label}
-        </button>
+        <div className="flex flex-col items-center">
+          <button
+            type="button"
+            onClick={() => !disabled && setIsConfirmationOpen(true)}
+            disabled={disabled}
+            className="delete-button inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold text-label-secondary hover:text-error disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:text-label-secondary"
+          >
+            <MdDelete size="1.1em" aria-hidden />
+            {label}
+          </button>
+          {/* Touch screens have no hover, so a disabled button explains itself in text. */}
+          {disabled && tooltip && <p className="px-3 pb-2 text-xs text-label-secondary">{tooltip}</p>}
+        </div>
       ) : (
         // Grey at rest so a column of bins does not shout; red once it is aimed at.
-        <IconButton
-          size="small"
-          onClick={() => {
-            if (!disabled) {
-              setIsConfirmationOpen(true);
-            }
-          }}
-          disabled={disabled}
-          aria-label={t('table_grid_delete_button.delete')}
-          className={`delete-button !p-1 !bg-transparent ${
-            disabled ? '!text-label-disabled opacity-40 !cursor-not-allowed' : '!text-label-disabled hover:!text-error'
-          }`}
-          sx={{ '&.Mui-disabled': { pointerEvents: 'auto' } }}
-        >
-          <MdDelete size="1.25em" />
-        </IconButton>
+        // An empty title renders no tooltip, so tables without a hover label are unchanged.
+        <Tooltip title={tooltip ?? ''}>
+          <IconButton
+            size="small"
+            onClick={() => {
+              if (!disabled) {
+                setIsConfirmationOpen(true);
+              }
+            }}
+            disabled={disabled}
+            aria-label={t('table_grid_delete_button.delete')}
+            className={`delete-button !p-1 !bg-transparent ${
+              disabled ? '!text-label-disabled opacity-40 !cursor-not-allowed' : '!text-label-disabled hover:!text-error'
+            }`}
+            sx={{ '&.Mui-disabled': { pointerEvents: 'auto' } }}
+          >
+            <MdDelete size="1.25em" />
+          </IconButton>
+        </Tooltip>
       )}
       <QuestionConfirmationDialog
         question={confirmationQuestion}
@@ -98,6 +106,7 @@ const MutationDeleteButton = ({
   validateDeleteResult,
   onDeleted,
   label,
+  tooltip,
 }: TableGridDeleteButtonProps & { deleteMutation: NonNullable<TableGridDeleteButtonProps['deleteMutation']> }) => {
   const t = useTranslations('common');
   const [deleteItem] = useRoleMutation(deleteMutation, {
@@ -155,6 +164,7 @@ const MutationDeleteButton = ({
       onConfirm={performDelete}
       onDeleted={onDeleted}
       label={label}
+      tooltip={tooltip}
     />
   );
 };
@@ -166,6 +176,7 @@ const CallbackDeleteButton = ({
   onDelete,
   onDeleted,
   label,
+  tooltip,
 }: TableGridDeleteButtonProps & { onDelete: NonNullable<TableGridDeleteButtonProps['onDelete']> }) => {
   const t = useTranslations('common');
 
@@ -188,6 +199,7 @@ const CallbackDeleteButton = ({
       onConfirm={performDelete}
       onDeleted={onDeleted}
       label={label}
+      tooltip={tooltip}
     />
   );
 };

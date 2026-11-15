@@ -43,7 +43,8 @@ import {
   INSTRUCTOR_INSERT_PROJECT_AUTHOR,
   INSERT_PROJECT_MENTOR,
   DELETE_PROJECT_MENTOR,
-  DELETE_PROJECT,
+  REMOVE_PROJECT_FROM_COURSE,
+  PROJECT_COURSES_BY_COURSE,
   UPDATE_PROJECT_SUGGESTED_FOR_PUBLICATION,
   UPDATE_PROJECT_TYPE,
 } from '../../../../../queries/projectInstructor';
@@ -51,6 +52,14 @@ import {
   ProjectsByCourse,
   ProjectsByCourseVariables,
 } from '../../../../../queries/__generated__/ProjectsByCourse';
+import {
+  ProjectCoursesByCourse,
+  ProjectCoursesByCourseVariables,
+} from '../../../../../queries/__generated__/ProjectCoursesByCourse';
+import {
+  RemoveProjectFromCourse,
+  RemoveProjectFromCourseVariables,
+} from '../../../../../queries/__generated__/RemoveProjectFromCourse';
 import { ProjectTypes } from '../../../../../queries/__generated__/ProjectTypes';
 import { ProjectDocumentationInstructions } from '../../../../../queries/__generated__/ProjectDocumentationInstructions';
 import {
@@ -72,6 +81,7 @@ import {
   isProjectTypeEditable,
   canManagePublicationSuggestion,
   getPublicationDecision,
+  isPassedProject,
 } from '../../../CourseContent/Projects/projectStatusDisplay';
 import { IoIosCheckmarkCircle, IoIosCloseCircle } from 'react-icons/io';
 import ProjectPreviewLayout from '../../../CourseContent/Projects/ProjectPreviewLayout';
@@ -93,6 +103,7 @@ interface ProjectsManagementGridProps {
 }
 
 const REFETCH_QUERIES = ['ProjectsByCourse'];
+const REMOVE_REFETCH_QUERIES = ['ProjectsByCourse', 'ProjectCoursesByCourse'];
 
 const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
   courseId,
@@ -118,12 +129,15 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
     id: number;
     name: string;
   } | null>(null);
-  const [deleteTemplateTarget, setDeleteTemplateTarget] = useState<ProjectRow | null>(null);
 
   const projectsQuery = useRoleQuery<ProjectsByCourse, ProjectsByCourseVariables>(
     PROJECTS_BY_COURSE,
     { variables: { courseId } }
   );
+  const projectCoursesQuery = useRoleQuery<
+    ProjectCoursesByCourse,
+    ProjectCoursesByCourseVariables
+  >(PROJECT_COURSES_BY_COURSE, { variables: { courseId } });
   const projectTypesQuery = useRoleQuery<ProjectTypes>(PROJECT_TYPES);
   const documentationInstructionsQuery = useRoleQuery<ProjectDocumentationInstructions>(
     PROJECT_DOCUMENTATION_INSTRUCTIONS
@@ -147,9 +161,10 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
       refetchQueries: REFETCH_QUERIES,
     }
   );
-  const [deleteProject, { loading: deleteProjectLoading }] = useRoleMutation(DELETE_PROJECT, {
-    refetchQueries: REFETCH_QUERIES,
-  });
+  const [removeProjectFromCourse] = useRoleMutation<
+    RemoveProjectFromCourse,
+    RemoveProjectFromCourseVariables
+  >(REMOVE_PROJECT_FROM_COURSE);
   const [updateProjectType] = useRoleMutation(UPDATE_PROJECT_TYPE, {
     refetchQueries: REFETCH_QUERIES,
   });
@@ -205,6 +220,18 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
     }
     return counts;
   }, [projectsQuery.data?.Project]);
+
+  /** Titles of the other courses each project is listed in; removing it here keeps it there. */
+  const otherCourseTitlesByProjectId = useMemo(() => {
+    const titles = new Map<number, string[]>();
+    for (const p of projectCoursesQuery.data?.Project ?? []) {
+      titles.set(
+        p.id,
+        (p.courses ?? []).filter((c) => c.id !== courseId).map((c) => c.title)
+      );
+    }
+    return titles;
+  }, [courseId, projectCoursesQuery.data?.Project]);
 
   const projectTypesList = useMemo(
     () => projectTypesQuery.data?.ProjectType ?? [],
@@ -284,16 +311,45 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
     }
   }, [deleteAuthor, removeAuthorContext, tCommon]);
 
-  const handleConfirmDeleteTemplate = useCallback(async () => {
-    const target = deleteTemplateTarget;
-    setDeleteTemplateTarget(null);
-    if (!target) return;
-    try {
-      await deleteProject({ variables: { id: target.id } });
-    } catch (err) {
-      setErrorMessage(err instanceof Error ? err.message : tCommon('error'));
-    }
-  }, [deleteProject, deleteTemplateTarget, tCommon]);
+  // Removing from the last course deletes the project; the database decides, since an organizer
+  // may not see every course the project is listed in.
+  const handleRemoveProject = useCallback(
+    async (project: ProjectRow) => {
+      await removeProjectFromCourse({
+        variables: { projectId: project.id, courseId },
+        refetchQueries: REMOVE_REFETCH_QUERIES,
+        awaitRefetchQueries: true,
+      });
+    },
+    [courseId, removeProjectFromCourse]
+  );
+
+  const removeProjectQuestion = useCallback(
+    (project: ProjectRow) => {
+      const otherCourses = otherCourseTitlesByProjectId.get(project.id) ?? [];
+      if (otherCourses.length > 0) {
+        return t('projects.remove_from_course_confirmation', {
+          title: project.title,
+          courses: otherCourses.join(', '),
+        });
+      }
+      const parts = [t('projects.delete_confirmation', { title: project.title })];
+      const authorNames = getDisplayAuthors(project.ProjectAuthors).map((a) =>
+        makeFullName(a.User?.firstName ?? '', a.User?.lastName ?? '').trim()
+      );
+      if (authorNames.length > 0) {
+        parts.push(
+          t('projects.delete_confirmation_authors', { names: authorNames.join(', ') })
+        );
+      }
+      const copyCount = templateCopyCountByParentId.get(project.id) ?? 0;
+      if (copyCount > 0) {
+        parts.push(t('projects.delete_confirmation_copies', { count: copyCount }));
+      }
+      return parts.join(' ');
+    },
+    [otherCourseTitlesByProjectId, t, templateCopyCountByParentId]
+  );
 
   const handleRemoveMentor = useCallback(
     async (id: number) => {
@@ -479,26 +535,8 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
           (a) =>
             a.participationStatus === ProjectParticipationStatus_enum.ACCEPTED
         );
-        if (!hasAcceptedAuthor) {
-          const copyCount = templateCopyCountByParentId.get(project.id) ?? 0;
-          const deleteDisabled = copyCount > 0 || deleteProjectLoading;
-          const deleteButton = (
-            <Button
-              className="w-full"
-              onClick={() => setDeleteTemplateTarget(project)}
-              disabled={deleteDisabled}
-            >
-              {t('projects.actions.delete_template')}
-            </Button>
-          );
-          return copyCount > 0 ? (
-            <Tooltip title={t('projects.delete_template_disabled_tooltip')}>
-              <span className="block w-full">{deleteButton}</span>
-            </Tooltip>
-          ) : (
-            deleteButton
-          );
-        }
+        // A template waits for teams to take it on: there is no next step for the organizer.
+        if (!hasAcceptedAuthor) return null;
         return (
           <Button onClick={() => setConfirmProject(project)} className="w-full">
             {t('projects.actions.confirm_project')}
@@ -550,7 +588,7 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
       }
       return null;
     },
-    [deleteProjectLoading, handleTogglePublicationSuggestion, t, templateCopyCountByParentId]
+    [handleTogglePublicationSuggestion, t]
   );
 
   const columns = useMemo<ColumnDef<ProjectRow>[]>(
@@ -1091,6 +1129,20 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
         onAddButtonClick={() => setAddDialogOpen(true)}
         expandableRowComponent={expandableRowComponent}
         renderMobileRow={renderMobileRow}
+        onRowDelete={handleRemoveProject}
+        // Until the project's courses are known, the confirmation can't say whether this removes
+        // or deletes it, so the button waits (and explains itself if the query failed).
+        canDeleteRow={(project) =>
+          !isPassedProject(project) && otherCourseTitlesByProjectId.has(project.id)
+        }
+        deleteButtonTooltip={(project) => {
+          if (isPassedProject(project)) return t('projects.delete_passed_disabled_tooltip');
+          if (!otherCourseTitlesByProjectId.has(project.id)) {
+            return t('projects.delete_courses_unavailable_tooltip');
+          }
+          return null;
+        }}
+        generateDeletionConfirmationQuestion={removeProjectQuestion}
       />
 
       <ConfirmProjectDialog
@@ -1163,16 +1215,6 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
         })}
         onClose={() => setRemoveAuthorContext(null)}
         onConfirm={handleConfirmRemoveAuthor}
-      />
-
-      <QuestionConfirmationDialog
-        open={Boolean(deleteTemplateTarget)}
-        question={t('projects.delete_template_confirmation', {
-          title: deleteTemplateTarget?.title ?? '',
-        })}
-        onClose={() => setDeleteTemplateTarget(null)}
-        onConfirm={handleConfirmDeleteTemplate}
-        confirmDisabled={deleteProjectLoading}
       />
 
       <NotificationSnackbar

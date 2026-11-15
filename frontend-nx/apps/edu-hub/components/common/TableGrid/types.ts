@@ -102,6 +102,11 @@ export interface TableGridProps<T extends BaseRow> {
   onRowNavigate?: (row: T) => void;
   /** When false, the row delete control is disabled (TableGrid delete column). */
   canDeleteRow?: (row: T) => boolean;
+  /**
+   * Hover label of the row delete control, e.g. why it is disabled (none by default). On phones a
+   * disabled control shows it as text below the button instead.
+   */
+  deleteButtonTooltip?: (row: T) => string | null | undefined;
   /** When false, the row delete control is not rendered at all (e.g. rows owned elsewhere). */
   showDeleteForRow?: (row: T) => boolean;
   /** When false, the row has no expand chevron (expandableRowComponent mode). */
@@ -159,4 +164,6 @@ export interface TableGridDeleteButtonProps {
   onDeleted?: () => void;
   /** Renders a text button with this label instead of the bare bin icon (e.g. in mobile cards). */
   label?: string;
+  /** Hover label of the bin icon; below a disabled text button it is shown as a hint. */
+  tooltip?: string | null;
 }

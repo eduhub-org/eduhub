@@ -260,6 +260,9 @@ update_permissions:
                     OrganizationAdmins:
                       userId:
                         _eq: X-Hasura-User-Id
+# Removing a project from a course. The last removal deletes the project
+# (trigger delete_project_when_no_course_remains); passed projects are refused
+# by prevent_deleting_passed_project.
 delete_permissions:
   - role: instructor_access
     permission:
@@ -269,3 +272,46 @@ delete_permissions:
             User:
               id:
                 _eq: X-Hasura-User-Id
+  - role: org_admin_access
+    permission:
+      filter:
+        Course:
+          Program:
+            _or:
+              - _and:
+                  - type:
+                      _eq: EVENTS
+                  - Organization:
+                      OrganizationAdmins:
+                        _and:
+                          - userId:
+                              _eq: X-Hasura-User-Id
+                          - canManageEvents:
+                              _eq: true
+              - _and:
+                  - type:
+                      _eq: COURSES
+                  - Organization:
+                      OrganizationAdmins:
+                        _and:
+                          - userId:
+                              _eq: X-Hasura-User-Id
+                          - canManageCourses:
+                              _eq: true
+              - _and:
+                  - type:
+                      _eq: DEGREES
+                  - Organization:
+                      OrganizationAdmins:
+                        _and:
+                          - userId:
+                              _eq: X-Hasura-User-Id
+                          - canManageDegrees:
+                              _eq: true
+              - Organization:
+                  OrganizationAdmins:
+                    _and:
+                      - userId:
+                          _eq: X-Hasura-User-Id
+                      - canManageSettings:
+                          _eq: true

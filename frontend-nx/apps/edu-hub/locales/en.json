@@ -1202,7 +1202,7 @@
       "instructor": "Instructor",
       "applications": "Applications",
       "confirmed": "Confirmed",
-      "applications_confirmed": "Applications\u00a0/ Confirmed",
+      "applications_confirmed": "Applications / Confirmed",
       "last_session_attendance": "Attendance latest checked session",
       "last_session_attendance_hint": "{title} on {date}",
       "unrated_rated_not_informed": "Unrated / Rated but not informed",
@@ -1734,15 +1734,12 @@
       },
       "actions": {
         "confirm_project": "Confirm project",
-        "delete_template": "Delete template",
         "review": "Review",
         "evaluate_project": "Evaluate project",
         "evaluate_disabled_tooltip": "You can evaluate the project here once it has been submitted.",
         "suggest_for_publication": "Suggest for publication",
         "withdraw_publication_suggestion": "Withdraw suggestion"
       },
-      "delete_template_confirmation": "Delete the project template \"{title}\"? This cannot be undone.",
-      "delete_template_disabled_tooltip": "You cannot delete this template while at least one copy created from it still exists in this course.",
       "expanded": {
         "tagline": "Tagline",
         "documentation_link": "Open documentation",
@@ -1912,7 +1909,13 @@
             "CLASSIC_PROJECT": "Classic project – participants form a team that you confirm before work starts."
           }
         }
-      }
+      },
+      "delete_confirmation": "Delete the project \"{title}\"? This cannot be undone.",
+      "delete_confirmation_authors": "The work of {names} will be lost.",
+      "delete_confirmation_copies": "{count, plural, one {The # copy created from it stays as a project of its own, and its title is no longer locked.} other {The # copies created from it stay as projects of their own, and their titles are no longer locked.}}",
+      "remove_from_course_confirmation": "Remove the project \"{title}\" from this course? It stays listed in: {courses}.",
+      "delete_passed_disabled_tooltip": "Passed projects cannot be deleted.",
+      "delete_courses_unavailable_tooltip": "This project's courses haven't loaded yet. Reload the page if this persists."
     },
     "attendance_cert_issued": "Attendance certificate issued",
     "attendance_cert_not_issued": "No attendance certificate issued",

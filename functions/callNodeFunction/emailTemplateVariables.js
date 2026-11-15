@@ -1,3 +1,6 @@
+import { applyConditionalBlocks } from './lib/conditionalBlocks.js';
+import { describeCourseSchedule } from './lib/courseSchedule.js';
+
 /**
  * Centralized Email Template Variables System
  * 
@@ -87,6 +90,16 @@ export const EMAIL_VARIABLES = {
     '[Course:EndTime]': {
       description: 'Course end date (formatted)',
       example: '20. März 2024',
+      categories: ['enrollment']
+    },
+    '[Course:DateTime]': {
+      description: 'When the course takes place, from its Sessions: date and time for one Session, first to last date for several, the start date when it has none',
+      example: '26.11.2026, 18:00–20:00',
+      categories: ['enrollment']
+    },
+    '[Course:LocationList]': {
+      description: 'Bulleted list of every place the course\'s Sessions take place at, or just "Online" (never the meeting link)',
+      example: '<ul><li>Kiel – ZBW (Düsternbrooker Weg 120, 24105 Kiel)</li><li>Online</li></ul>',
       categories: ['enrollment']
     },
     '[Course:BasePrice]': {
@@ -399,13 +412,31 @@ export function createVariableReplacer(data, formatDate) {
     const escape = isHtml ? escapeHtml : (value) => (value == null ? '' : String(value));
     
     let result = text;
+
+    // When and where (enrollment mails). Their [#if:...] blocks are resolved
+    // first, and only these: other blocks belong to other steps.
+    if (data.courseSchedule) {
+      const schedule = data.courseSchedule;
+      result = applyConditionalBlocks(result, {
+        CourseDateTime: !!schedule.dateTime,
+        CourseLocation: schedule.locationList?.length > 0,
+        Online: !!schedule.online,
+        Calendar: !!schedule.calendarAttached,
+      }, { onlyFlags: true });
+    }
+    result = result
+      .replaceAll('[Course:DateTime]', data.courseSchedule?.dateTime || '')
+      .replaceAll('[Course:LocationList]', formatLocationList(data.courseSchedule?.locationList, isHtml));
     
     // User variables - always attempt replacement
     // Escape user-supplied personal data to prevent XSS
     const firstName = escape(data.user?.firstName || '');
     const lastName = escape(data.user?.lastName || '');
+    // [User:Firstname] is a typo several seeded templates carried for years;
+    // course-specific copies of them still do, so it is honoured as an alias.
     result = result
       .replaceAll('[User:FirstName]', firstName)
+      .replaceAll('[User:Firstname]', firstName)
       .replaceAll('[User:LastName]', lastName);
     
     // Course variables - always attempt replacement  
@@ -551,9 +582,12 @@ export function createVariableReplacer(data, formatDate) {
  * Convenience function for enrollment emails
  * @param {Object} enrollmentDetails - Enrollment data from GraphQL (should include CourseEnrollmentAddons with CourseAddonMapping)
  * @param {Function} formatDate - Date formatting function  
+ * @param {Object} [options]
+ * @param {boolean} [options.calendarAttached] - Whether the mail carries the
+ *   course's .ics file; sets the [#if:Calendar] block
  * @returns {Function} Variable replacement function
  */
-export function createEnrollmentVariableReplacer(enrollmentDetails, formatDate) {
+export function createEnrollmentVariableReplacer(enrollmentDetails, formatDate, { calendarAttached = false } = {}) {
   const courseLink = `${process.env.FRONTEND_URL || 'https://edu.opencampus.sh'}/course/${enrollmentDetails.Course.id}`;
   // An invitation can only be accepted when logged in; logged out, the course page offers to apply
   // instead. force_login sends a logged-out recipient through the login first (withAuthRedirect).
@@ -565,7 +599,8 @@ export function createEnrollmentVariableReplacer(enrollmentDetails, formatDate) 
     enrollment: enrollmentDetails,
     enrollmentAddons: enrollmentDetails.CourseEnrollmentAddons || [],
     courseLink: forceLogin ? `${courseLink}?force_login=true` : courseLink,
-    certificateLink: enrollmentDetails.certificateLink || null
+    certificateLink: enrollmentDetails.certificateLink || null,
+    courseSchedule: { ...describeCourseSchedule(enrollmentDetails.Course), calendarAttached }
   }, formatDate);
 }
 

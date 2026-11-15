@@ -64,7 +64,19 @@ export default async function sendCourseUpdateEmail(req, logger) {
             created_at
             invitationExpirationDate
             User { id email firstName lastName }
-            Course { id title startTime endTime basePrice currency }
+            Course {
+              id title startTime endTime basePrice currency
+              # For [Course:DateTime] / [Course:LocationList], same as sendEnrollmentEmail
+              Sessions(order_by: [{ startDateTime: asc }, { id: asc }]) {
+                startDateTime
+                endDateTime
+                SessionAddresses(order_by: { id: asc }) {
+                  address
+                  CourseLocation { locationOption }
+                  LocationAddress { shortLabel address }
+                }
+              }
+            }
             CourseEnrollmentAddons {
               id
               priceAtPurchase
