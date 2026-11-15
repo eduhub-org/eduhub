@@ -40,7 +40,7 @@ WHERE "type" = 'REGISTRATION_CONFIRMED' AND "courseId" IS NULL
   [#if:CourseDateTime]<p><strong>Wann:</strong> [Course:DateTime]</p>[/if:CourseDateTime]
   [#if:CourseLocation]<p style="margin-bottom:0;"><strong>Wo:</strong></p>[Course:LocationList][/if:CourseLocation]
   [#if:Calendar]<p>Im Anhang findest Du eine Kalenderdatei, mit der Du die Termine in Deinen Kalender übernehmen kannst.</p>[/if:Calendar]
-  [#if:Online]<p>Den Zugangslink für online bekommst Du mit der Erinnerungsmail vor dem Start; er steht auch auf der Seite unten.</p>[/if:Online]
+  [#if:Online]<p>Den Zugangslink für die Online-Teilnahme findest Du vor dem Start auf der Seite unten.</p>[/if:Online]
   <p>Alle Infos und mögliche Änderungen findest Du hier: <a href="[Enrollment:CourseLink]">[Enrollment:CourseLink]</a></p>
   <p>Falls Du doch nicht teilnehmen kannst, melde Dich bitte dort ab, damit jemand anderes Deinen Platz bekommt.</p>
   <p>Viele Grüße<br>Dein EduHub Team</p>
@@ -51,7 +51,7 @@ WHERE "type" = 'REGISTRATION_CONFIRMED' AND "courseId" IS NULL
   [#if:CourseDateTime]<p><strong>When:</strong> [Course:DateTime]</p>[/if:CourseDateTime]
   [#if:CourseLocation]<p style="margin-bottom:0;"><strong>Where:</strong></p>[Course:LocationList][/if:CourseLocation]
   [#if:Calendar]<p>The attached calendar file lets you add the dates to your calendar.</p>[/if:Calendar]
-  [#if:Online]<p>You will get the access link for online participation with the reminder email before the start; it is also on the page linked below.</p>[/if:Online]
+  [#if:Online]<p>You will find the access link for online participation on the page linked below before the start.</p>[/if:Online]
   <p>All details and any changes are here: <a href="[Enrollment:CourseLink]">[Enrollment:CourseLink]</a></p>
   <p>If you can no longer attend, please cancel your registration there so someone else can have your place.</p>
   <p>Best regards<br>The EduHub Team</p>
@@ -95,7 +95,7 @@ WHERE "type" = 'APPLICATION_CONFIRMED' AND "courseId" IS NULL
   [#if:CourseDateTime]<p><strong>Wann:</strong> [Course:DateTime]</p>[/if:CourseDateTime]
   [#if:CourseLocation]<p style="margin-bottom:0;"><strong>Wo:</strong></p>[Course:LocationList][/if:CourseLocation]
   [#if:Calendar]<p>Im Anhang findest Du eine Kalenderdatei, mit der Du die Termine in Deinen Kalender übernehmen kannst.</p>[/if:Calendar]
-  [#if:Online]<p>Den Zugangslink für online bekommst Du mit der Erinnerungsmail vor dem Start; er steht auch auf der Seite unten.</p>[/if:Online]
+  [#if:Online]<p>Den Zugangslink für die Online-Teilnahme findest Du vor dem Start auf der Seite unten.</p>[/if:Online]
   <p>Alle Infos und mögliche Änderungen findest Du hier: <a href="[Enrollment:CourseLink]">[Enrollment:CourseLink]</a></p>
   <p>Falls Du doch nicht teilnehmen kannst, melde Dich bitte dort ab, damit jemand anderes Deinen Platz bekommt.</p>
   <p>Viele Grüße<br>Dein EduHub Team</p>
@@ -106,7 +106,7 @@ WHERE "type" = 'APPLICATION_CONFIRMED' AND "courseId" IS NULL
   [#if:CourseDateTime]<p><strong>When:</strong> [Course:DateTime]</p>[/if:CourseDateTime]
   [#if:CourseLocation]<p style="margin-bottom:0;"><strong>Where:</strong></p>[Course:LocationList][/if:CourseLocation]
   [#if:Calendar]<p>The attached calendar file lets you add the dates to your calendar.</p>[/if:Calendar]
-  [#if:Online]<p>You will get the access link for online participation with the reminder email before the start; it is also on the page linked below.</p>[/if:Online]
+  [#if:Online]<p>You will find the access link for online participation on the page linked below before the start.</p>[/if:Online]
   <p>All details and any changes are here: <a href="[Enrollment:CourseLink]">[Enrollment:CourseLink]</a></p>
   <p>If you can no longer attend, please cancel your registration there so someone else can have your place.</p>
   <p>Best regards<br>The EduHub Team</p>
@@ -145,7 +145,7 @@ WHERE "type" = 'WAITLIST_CONFIRMED' AND "courseId" IS NULL
   [#if:CourseDateTime]<p><strong>Wann:</strong> [Course:DateTime]</p>[/if:CourseDateTime]
   [#if:CourseLocation]<p style="margin-bottom:0;"><strong>Wo:</strong></p>[Course:LocationList][/if:CourseLocation]
   [#if:Calendar]<p>Im Anhang findest Du eine Kalenderdatei, mit der Du die Termine in Deinen Kalender übernehmen kannst.</p>[/if:Calendar]
-  [#if:Online]<p>Den Zugangslink für online bekommst Du mit der Erinnerungsmail vor dem Start; er steht auch auf der Seite unten.</p>[/if:Online]
+  [#if:Online]<p>Den Zugangslink für die Online-Teilnahme findest Du vor dem Start auf der Seite unten.</p>[/if:Online]
   <p>Alle Infos und mögliche Änderungen findest Du hier: <a href="[Enrollment:CourseLink]">[Enrollment:CourseLink]</a></p>
   <p>Falls Du doch nicht teilnehmen kannst, melde Dich bitte dort ab, damit jemand anderes Deinen Platz bekommt.</p>
   <p>Viele Grüße<br>Dein EduHub Team</p>
@@ -156,7 +156,7 @@ WHERE "type" = 'WAITLIST_CONFIRMED' AND "courseId" IS NULL
   [#if:CourseDateTime]<p><strong>When:</strong> [Course:DateTime]</p>[/if:CourseDateTime]
   [#if:CourseLocation]<p style="margin-bottom:0;"><strong>Where:</strong></p>[Course:LocationList][/if:CourseLocation]
   [#if:Calendar]<p>The attached calendar file lets you add the dates to your calendar.</p>[/if:Calendar]
-  [#if:Online]<p>You will get the access link for online participation with the reminder email before the start; it is also on the page linked below.</p>[/if:Online]
+  [#if:Online]<p>You will find the access link for online participation on the page linked below before the start.</p>[/if:Online]
   <p>All details and any changes are here: <a href="[Enrollment:CourseLink]">[Enrollment:CourseLink]</a></p>
   <p>If you can no longer attend, please cancel your registration there so someone else can have your place.</p>
   <p>Best regards<br>The EduHub Team</p>
@@ -164,6 +164,6 @@ WHERE "type" = 'WAITLIST_CONFIRMED' AND "courseId" IS NULL
 </html>');
 
 UPDATE "public"."MailTemplate"
-SET "content" = replace("content", '[#if:CourseDateTime]<p><strong>Wann:</strong> [Course:DateTime]</p>[/if:CourseDateTime][#if:CourseLocation]<p style="margin-bottom:0;"><strong>Wo:</strong></p>[Course:LocationList][/if:CourseLocation][#if:Calendar]<p>Im Anhang findest du eine Kalenderdatei, mit der du die Termine in deinen Kalender übernehmen kannst.</p>[/if:Calendar][#if:Online]<p>Den Zugangslink für online bekommst du mit der Erinnerungsmail vor dem Start; er steht auch auf der Seite der Veranstaltung.</p>[/if:Online]<p>', '<p>Datum: [Course:StartTime] - [Course:EndTime]<br />'),
+SET "content" = replace("content", '[#if:CourseDateTime]<p><strong>Wann:</strong> [Course:DateTime]</p>[/if:CourseDateTime][#if:CourseLocation]<p style="margin-bottom:0;"><strong>Wo:</strong></p>[Course:LocationList][/if:CourseLocation][#if:Calendar]<p>Im Anhang findest du eine Kalenderdatei, mit der du die Termine in deinen Kalender übernehmen kannst.</p>[/if:Calendar][#if:Online]<p>Den Zugangslink für die Online-Teilnahme findest du vor dem Start auf der Seite der Veranstaltung.</p>[/if:Online]<p>', '<p>Datum: [Course:StartTime] - [Course:EndTime]<br />'),
     "updated_at" = NOW()
 WHERE "type" = 'REGISTRATION_CONFIRMED_PAID' AND "courseId" IS NULL;
