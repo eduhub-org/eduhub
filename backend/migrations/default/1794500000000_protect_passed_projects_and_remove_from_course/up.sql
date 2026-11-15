@@ -21,23 +21,30 @@ FOR EACH ROW EXECUTE FUNCTION public.prevent_deleting_passed_project();
 -- project itself is deleted once no course lists it any more. This lives in
 -- the database because an organizer only sees the listings of their own
 -- courses and so cannot tell whether the listing they remove is the last one.
+-- Moving a listing to another project (an update of "projectId") takes it away
+-- from the old project just the same, so it runs the same check.
 -- When the project row itself is being deleted, its listings cascade after
--- it is already gone, so the EXISTS check skips them.
+-- it is already gone, so the lookup finds nothing and the check is skipped.
+-- The project row is locked first: two removals of different listings of the
+-- same project then run one after the other, and the second sees the first.
 CREATE OR REPLACE FUNCTION public.delete_project_when_no_course_remains()
 RETURNS TRIGGER AS $$
 BEGIN
-  IF EXISTS (SELECT 1 FROM public."Project" WHERE id = OLD."projectId")
-     AND NOT EXISTS (
-       SELECT 1 FROM public."ProjectCourse" WHERE "projectId" = OLD."projectId"
-     ) THEN
+  IF TG_OP = 'UPDATE' AND NEW."projectId" = OLD."projectId" THEN
+    RETURN NULL;
+  END IF;
+  PERFORM 1 FROM public."Project" WHERE id = OLD."projectId" FOR UPDATE;
+  IF FOUND AND NOT EXISTS (
+    SELECT 1 FROM public."ProjectCourse" WHERE "projectId" = OLD."projectId"
+  ) THEN
     DELETE FROM public."Project" WHERE id = OLD."projectId";
   END IF;
-  RETURN OLD;
+  RETURN NULL;
 END;
 $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER delete_project_when_no_course_remains
-AFTER DELETE ON public."ProjectCourse"
+AFTER DELETE OR UPDATE OF "projectId" ON public."ProjectCourse"
 FOR EACH ROW EXECUTE FUNCTION public.delete_project_when_no_course_remains();
 
 -- Every course a project is listed in, regardless of who may see the

@@ -106,7 +106,7 @@ _Avoid_: Vorlage (in code)
 A team's own project, created from a **Project Template**. Its title comes from the template and can't be changed while it is still linked to that template.
 
 **Passed Project**:
-A project whose review rated it as passed, whether it has been published or not. A project rated as not passed is not a passed project.
+A project whose review rated it as passed, whether it has been published or not, and any project shown in the public showcase. A project rated as not passed and not shown in the showcase is not a passed project.
 
 **Removing a project from a course**:
 Taking a project out of one course. The project stays in every other course it is listed in, and is only deleted once no course is left. A **Passed Project** can't be taken out of its last course, since that would delete it.

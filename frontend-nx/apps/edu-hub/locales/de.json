@@ -1896,7 +1896,8 @@
       "delete_confirmation_authors": "Die Arbeit von {names} geht dabei verloren.",
       "delete_confirmation_copies": "{count, plural, one {Die # daraus erstellte Kopie bleibt als eigenständiges Projekt bestehen, ihr Titel ist dann nicht mehr gesperrt.} other {Die # daraus erstellten Kopien bleiben als eigenständige Projekte bestehen, ihre Titel sind dann nicht mehr gesperrt.}}",
       "remove_from_course_confirmation": "Das Projekt \"{title}\" aus diesem Kurs entfernen? Es bleibt weiterhin in: {courses}.",
-      "delete_passed_disabled_tooltip": "Bestandene Projekte können nicht gelöscht werden."
+      "delete_passed_disabled_tooltip": "Bestandene Projekte können nicht gelöscht werden.",
+      "delete_courses_unavailable_tooltip": "Die Kurse dieses Projekts sind noch nicht geladen. Lade die Seite neu, falls das so bleibt."
     },
     "attendance_cert_issued": "Teilnahmebescheinigung ausgestellt",
     "attendance_cert_not_issued": "Keine Teilnahmebescheinigung ausgestellt",

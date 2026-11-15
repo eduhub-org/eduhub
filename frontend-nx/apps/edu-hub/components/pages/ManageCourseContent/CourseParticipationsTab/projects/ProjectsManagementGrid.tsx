@@ -1130,10 +1130,18 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
         expandableRowComponent={expandableRowComponent}
         renderMobileRow={renderMobileRow}
         onRowDelete={handleRemoveProject}
-        canDeleteRow={(project) => !isPassedProject(project)}
-        deleteButtonTooltip={(project) =>
-          isPassedProject(project) ? t('projects.delete_passed_disabled_tooltip') : null
+        // Until the project's courses are known, the confirmation can't say whether this removes
+        // or deletes it, so the button waits (and explains itself if the query failed).
+        canDeleteRow={(project) =>
+          !isPassedProject(project) && otherCourseTitlesByProjectId.has(project.id)
         }
+        deleteButtonTooltip={(project) => {
+          if (isPassedProject(project)) return t('projects.delete_passed_disabled_tooltip');
+          if (!otherCourseTitlesByProjectId.has(project.id)) {
+            return t('projects.delete_courses_unavailable_tooltip');
+          }
+          return null;
+        }}
         generateDeletionConfirmationQuestion={removeProjectQuestion}
       />
 
