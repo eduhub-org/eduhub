@@ -133,6 +133,9 @@ The email organizers send by hand when Sessions are rescheduled. Separate from t
 - A **Participant** receives at most one **Session Reminder** per **Course**
 - A **Session** has many **Attendance Records** and at most one **Attendance** per **Participant** (or person who completed the Course); a **Manual Attendance** overrides the automatic one
 - An **Attendance Record** belongs to at most one **Attendance**
+- A **Project** is listed in one or more **Courses**; removing it from its last course deletes it
+- A **Project Template** has zero or more **Project Copies**; deleting the template keeps the copies as projects of their own
+- A **Passed Project** can't be deleted by anyone, **Admins** included
 
 ## Example dialogue
 
