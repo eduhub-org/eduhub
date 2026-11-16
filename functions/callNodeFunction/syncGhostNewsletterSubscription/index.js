@@ -1,6 +1,6 @@
 import axios from 'axios';
-import { gql, GraphQLClient } from 'graphql-request';
-import { requireEnv } from '../lib/config.js';
+import { gql } from 'graphql-request';
+import { createHasuraClient } from '../lib/hasura.js';
 import { decryptOrganizationCredential } from '../lib/organizationCredential.js';
 
 const USER_DRIVEN_SOURCES = new Set(['CHECKBOX', 'PROFILE', 'ADMIN']);
@@ -105,13 +105,6 @@ const normalizeRemoteSubscriptionStatus = (remoteStatus, fallbackStatus) => {
   return fallbackStatus;
 };
 
-const getGraphqlClient = () =>
-  new GraphQLClient(requireEnv('HASURA_ENDPOINT'), {
-    headers: {
-      'x-hasura-admin-secret': requireEnv('HASURA_ADMIN_SECRET'),
-    },
-  });
-
 const GET_SUBSCRIPTION_DETAILS = gql`
   query GetOrganizationNewsletterSubscriptionDetails($userId: uuid!, $organizationId: Int!) {
     OrganizationNewsletterSubscription_by_pk(userId: $userId, organizationId: $organizationId) {
@@ -204,7 +197,7 @@ export default async function syncGhostNewsletterSubscription(req, logger) {
       };
     }
 
-    const client = getGraphqlClient();
+    const client = createHasuraClient();
     const detailsResult = await client.request(GET_SUBSCRIPTION_DETAILS, {
       userId: newRow.userId,
       organizationId: newRow.organizationId,
@@ -348,7 +341,7 @@ export default async function syncGhostNewsletterSubscription(req, logger) {
 
     if (userId && organizationId != null) {
       try {
-        const client = getGraphqlClient();
+        const client = createHasuraClient();
         await updateSubscriptionState(client, {
           userId,
           organizationId,
