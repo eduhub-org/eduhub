@@ -1,4 +1,4 @@
-import { GraphQLClient, gql } from 'graphql-request';
+import { gql } from 'graphql-request';
 
 import {
   formattedResponsesForEnrollment,
@@ -6,6 +6,7 @@ import {
   storeQuestionnaireResponse,
   toStoredQuestionnaireResponse,
 } from '../lib/formbricksResponses.js';
+import { createHasuraClient } from '../lib/hasura.js';
 
 /**
  * Nightly copy of Formbricks application questionnaire responses into
@@ -103,9 +104,7 @@ const isNewer = (stored, response) =>
 export default async function syncFormbricksResponses(req, logger) {
   logger.info('########## Sync Formbricks Responses ##########');
 
-  const client = new GraphQLClient(process.env.HASURA_ENDPOINT, {
-    headers: { 'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET },
-  });
+  const client = createHasuraClient();
 
   const after = new Date(Date.now() - MAX_AGE_DAYS * 24 * 60 * 60 * 1000).toISOString();
   // Paged by (created_at, id), not by offset: rows that get a response meanwhile (here or from
