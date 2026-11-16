@@ -1,3 +1,4 @@
+// @ts-check
 /**
  * Small JSON HTTP client on native fetch, with the parts of axios' contract
  * the handlers relied on:

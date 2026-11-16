@@ -1,3 +1,4 @@
+// @ts-check
 /**
  * The one place callNodeFunction reads its environment.
  *

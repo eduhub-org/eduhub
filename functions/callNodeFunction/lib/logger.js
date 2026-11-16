@@ -1,3 +1,4 @@
+// @ts-check
 import winston from 'winston';
 import { isProduction } from './config.js';
 

@@ -1,3 +1,4 @@
+// @ts-check
 import { http } from './http.js';
 import { keycloakConfig } from './config.js';
 import { logger } from './logger.js';

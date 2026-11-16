@@ -1,3 +1,4 @@
+// @ts-check
 const HTML_ESCAPES = {
   '&': '&amp;',
   '<': '&lt;',

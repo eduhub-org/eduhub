@@ -1,3 +1,4 @@
+// @ts-check
 import { GraphQLClient } from 'graphql-request';
 import { hasuraConfig } from './config.js';
 

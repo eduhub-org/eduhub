@@ -1,3 +1,4 @@
+// @ts-check
 import getSignedUrl from "./getSignedUrl/index.js";
 import saveFile from "./saveFile/index.js";
 import saveImage from "./saveImage/index.js";
@@ -54,6 +55,13 @@ import { constantTimeSecretsEqual } from "./shared/security.js";
 import { cloudFunctionSecret } from "./lib/config.js";
 import { logger } from "./lib/logger.js";
 
+/**
+ * Handlers by the `name` header Hasura sends. Static imports on purpose: the
+ * Cloud Functions entry point must be resolvable without scanning folders.
+ * __tests__/registry.test.js checks this map against the handler folders and
+ * the Hasura metadata.
+ * @type {Record<string, import('./lib/types.js').Handler>}
+ */
 export const functionMap = {
   getSignedUrl,
   saveFile,
@@ -116,7 +124,7 @@ const constantTimeEquals = (providedSecret, expectedSecret) => {
 
 /**
  * Validates the Hasura secret from the request headers.
- * @param {string} hasuraSecret - The secret from request headers
+ * @param {string | string[] | undefined} hasuraSecret - The secret from request headers
  * @returns {Object} Validation result
  */
 const validateSecret = (hasuraSecret) => {
@@ -198,11 +206,12 @@ const formatResponse = (result) => {
 
 /**
  * Responds to any HTTP request from Hasura.
- * @param {express.Request} req - HTTP request context
- * @param {express.Response} res - HTTP response context
+ * @param {import('express').Request} req - HTTP request context
+ * @param {import('express').Response} res - HTTP response context
  */
 export const callNodeFunction = async (req, res) => {
-  const functionName = req.headers.name;
+  // Node joins repeated custom headers into one string.
+  const functionName = String(req.headers.name);
 
   // Validate secret
   const secretValidation = validateSecret(req.headers.secret);
