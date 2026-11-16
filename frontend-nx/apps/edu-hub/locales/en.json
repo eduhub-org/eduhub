@@ -4100,5 +4100,15 @@
     "org_rules_link": "Go to the rules and FAQ",
     "version_release": "Manual as of release <release></release>, commit <commit></commit>",
     "version_commit": "Manual as of commit <commit></commit> (not released yet)"
+  },
+  "matrixChat": {
+    "login_redirecting": "Taking you to the course chat login …",
+    "login_completing": "Finishing your course chat login …",
+    "not_configured": "The course chat is not set up here.",
+    "login_failed": "Logging in to the course chat did not work. Please try again.",
+    "login_denied": "You cancelled the course chat login.",
+    "session_missing": "Please log in to EduHub first, then try again.",
+    "try_again": "Try again",
+    "back_home": "Back to the start page"
   }
 }

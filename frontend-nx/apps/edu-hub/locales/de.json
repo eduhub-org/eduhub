@@ -4085,5 +4085,15 @@
     "org_rules_link": "Zu den Regeln und FAQ",
     "version_release": "Stand des Handbuchs: Release <release></release>, Commit <commit></commit>",
     "version_commit": "Stand des Handbuchs: Commit <commit></commit> (noch kein Release)"
+  },
+  "matrixChat": {
+    "login_redirecting": "Du wirst zur Anmeldung für den Kurs-Chat weitergeleitet …",
+    "login_completing": "Deine Anmeldung für den Kurs-Chat wird abgeschlossen …",
+    "not_configured": "Der Kurs-Chat ist hier nicht eingerichtet.",
+    "login_failed": "Die Anmeldung beim Kurs-Chat hat nicht geklappt. Versuch es bitte noch einmal.",
+    "login_denied": "Du hast die Anmeldung beim Kurs-Chat abgebrochen.",
+    "session_missing": "Bitte melde dich zuerst bei EduHub an und versuch es dann noch einmal.",
+    "try_again": "Erneut versuchen",
+    "back_home": "Zur Startseite"
   }
 }

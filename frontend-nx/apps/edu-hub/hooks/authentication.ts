@@ -65,6 +65,18 @@ export const useCurrentUserId = (): string | null => {
 };
 
 /**
+ * The id of the person who is actually signed in, ignoring any "view as".
+ *
+ * For state that belongs to the login itself rather than to the identity being
+ * viewed, such as the embedded chat's Matrix session: that session comes from
+ * the signed-in person's own Keycloak login, so it must stay keyed to them.
+ */
+export const useSignedInUserId = (): string | null => {
+  const { data: sessionData } = useSession();
+  return sessionData?.profile?.['https://hasura.io/jwt/claims']?.['x-hasura-user-id'] ?? null;
+};
+
+/**
  * Whether the signed-in person holds an elevated role, read straight from the
  * session and past the view-as masking above.
  *
