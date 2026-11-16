@@ -2,11 +2,11 @@ import { gql } from 'graphql-request';
 import {
   GUEST_ALLOWED_REGISTRATION_TYPES,
   buildManageToken,
-  createHasuraClient,
   findUsersByEmail,
   markConfirmTokenUsed,
   resolveConfirmToken,
 } from '../guestRegistration.js';
+import { createHasuraClient } from '../lib/hasura.js';
 
 /**
  * Redeems a guest double opt-in link.

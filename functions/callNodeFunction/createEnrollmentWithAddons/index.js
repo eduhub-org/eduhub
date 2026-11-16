@@ -1,6 +1,7 @@
-import { GraphQLClient } from 'graphql-request';
 import { isCourseRegistrationClosed } from '../guestRegistration.js';
 import { validateAndExtractFormbricksSurvey, buildLabelToChoiceIdMap, matchAddonsFromResponse, fetchAllFormbricksResponses } from '../lib/formbricks.js';
+import * as config from '../lib/config.js';
+import { createHasuraClient } from '../lib/hasura.js';
 
 const normalizeUserId = (value) => String(value ?? '').trim().toLowerCase();
 
@@ -413,11 +414,7 @@ export default async function createEnrollmentWithAddons(req, logger) {
     const effectiveUserId = normalizedSessionUserId;
 
     // Create Hasura GraphQL client
-    const client = new GraphQLClient(process.env.HASURA_ENDPOINT, {
-      headers: {
-        'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET,
-      },
-    });
+    const client = createHasuraClient();
 
     // Step 1: Create CourseEnrollment with status APPLIED (an existing row keeps its status).
     // termsAcceptedAt is set later, by a separate mutation, when the user
@@ -489,7 +486,7 @@ export default async function createEnrollmentWithAddons(req, logger) {
     }
 
     const { baseUrl: formbricksApiUrl, surveyId: formbricksSurveyId } = urlParts;
-    const formbricksApiKey = process.env.FORMBRICKS_API_KEY;
+    const formbricksApiKey = config.formbricksApiKey();
 
     if (!formbricksApiKey) {
       logger.error('Formbricks API key missing');

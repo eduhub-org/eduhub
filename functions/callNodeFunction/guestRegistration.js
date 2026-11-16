@@ -1,5 +1,6 @@
 import crypto from 'node:crypto';
-import { gql, GraphQLClient } from 'graphql-request';
+import { gql } from 'graphql-request';
+import * as config from './lib/config.js';
 import { escapeHtml } from './emailTemplateVariables.js';
 
 /**
@@ -43,8 +44,6 @@ export function confirmTokenExpiresAt(now = new Date(), nextSessionStart = null)
   return sessionStart && sessionStart > now && sessionStart < ttlEnd ? sessionStart : ttlEnd;
 }
 
-const DEFAULT_FRONTEND_URL = 'https://edu.opencampus.sh';
-
 /** Registration types a guest may use. Approval workflows and paid courses are
  *  deliberately excluded: the former needs an admin decision the guest cannot
  *  see, the latter drags in Stripe, invoices and statutory retention periods
@@ -82,16 +81,7 @@ export function isCourseRegistrationClosed(applicationEnd, now = new Date()) {
 }
 
 export function getFrontendUrl() {
-  return (process.env.FRONTEND_URL || DEFAULT_FRONTEND_URL).replace(/\/+$/, '');
-}
-
-export function createHasuraClient() {
-  if (!process.env.HASURA_ENDPOINT || !process.env.HASURA_ADMIN_SECRET) {
-    throw new Error('HASURA_ENDPOINT or HASURA_ADMIN_SECRET not configured');
-  }
-  return new GraphQLClient(process.env.HASURA_ENDPOINT, {
-    headers: { 'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET },
-  });
+  return config.frontendUrl().replace(/\/+$/, '');
 }
 
 /* ------------------------------------------------ confirmation tokens */
@@ -221,13 +211,9 @@ export async function markConfirmTokenUsed(client, tokenId) {
 /* -------------------------------------------------------- manage tokens */
 
 function getManageTokenSecret() {
-  const secret = process.env.GUEST_TOKEN_SECRET;
-  if (!secret || secret.trim() === '') {
-    // Failing loudly beats deriving links from a default secret: a predictable
-    // secret would let anyone mint a manage link for any guest.
-    throw new Error('GUEST_TOKEN_SECRET is not configured');
-  }
-  return secret;
+  // Failing loudly beats deriving links from a default secret: a predictable
+  // secret would let anyone mint a manage link for any guest.
+  return config.requireEnv('GUEST_TOKEN_SECRET');
 }
 
 function signUserId(userId) {
