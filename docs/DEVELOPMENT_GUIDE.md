@@ -70,6 +70,44 @@ Stop the preview when it is finished.
 - `5000` - Edu frontend
 - `28080` - Keycloak admin interface, login as **admin** with password **admin**
 - `42000` to `42025` - serverless functions (currently most functions have their own port)
+- `8008`, `8088`, `8090` - Matrix homeserver, Element Web and the Matrix Authentication Service (only with `--profile matrix`, see below)
+
+On macOS, the AirPlay Receiver also listens on port `5000` (IPv6 included), so
+`http://localhost:5000` may answer with `403` from `AirTunes` instead of EduHub.
+Turn it off under System Settings → General → AirDrop & Handoff → AirPlay Receiver.
+
+## 💬 Local Matrix chat (optional)
+
+The course chat runs on Matrix. Locally, the `matrix` Compose profile starts a
+stack that mirrors production, where Synapse delegates every login to the
+Matrix Authentication Service (MAS) and MAS logs people in through Keycloak:
+
+| Service | URL | Purpose |
+| --- | --- | --- |
+| `matrix_proxy` | http://localhost:8008 | Homeserver address for browsers; sends `/login`, `/logout` and `/refresh` to MAS, everything else to Synapse |
+| `synapse` | `http://synapse:8008` (Docker network only) | Matrix homeserver, `server_name` `localhost` |
+| `mas` | http://localhost:8090 | Matrix Authentication Service (OAuth 2.0 issuer) |
+| `element` | http://localhost:8088 | Element Web, fixed to the local homeserver |
+
+Configuration lives in `matrix/`. All secrets there are public dev-only
+placeholders; MAS's signing key is generated into a Docker volume on first start.
+
+```bash
+docker compose --profile matrix up -d
+scripts/matrix-dev-setup.sh
+```
+
+The setup script is safe to run again. It gives the local Keycloak users their
+`matrix_user_handle` (via `functions/callNodeFunction/scripts/backfill-matrix-handles.js`),
+registers the EduHub bot and a Synapse admin in MAS, issues their tokens, creates
+the main space and writes the `MATRIX_*` variables into `.env`.
+
+Run it again after every Keycloak recreate (for example
+`docker compose up -d --force-recreate keycloak`): the development realm is
+re-imported without any handles, and Matrix logins fail until they are back.
+
+Then "Create Matrix room" in Manage Courses creates real rooms, and any local
+EduHub user (e.g. `admin@example.com` / `dev`) can log in to Element.
 
 ## 🌱 Seeds
 

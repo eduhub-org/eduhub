@@ -1,0 +1,92 @@
+# DEV ONLY: local Matrix Authentication Service (MAS) for EduHub development
+# (docker compose --profile matrix). Mirrors production, where Synapse delegates
+# all logins to MAS at auth.opencampus.sh. Every secret here is a public
+# placeholder. The RSA signing key is generated on first start (service mas_keys).
+# Reference: https://element-hq.github.io/matrix-authentication-service/reference/configuration.html
+
+http:
+  # Browsers reach MAS here; this is also the OAuth 2.0 issuer.
+  public_base: "http://localhost:8090/"
+  listeners:
+    - name: web
+      resources:
+        - name: discovery # /.well-known/openid-configuration
+        - name: human # login, consent and account pages
+        - name: oauth # /oauth2/* (authorize, token, revoke, registration)
+        - name: compat # legacy /_matrix/client/*/login (m.login.sso, m.login.token)
+        - name: graphql
+        - name: assets
+      binds:
+        - address: "[::]:8080"
+    - name: internal
+      resources:
+        - name: health
+      binds:
+        - host: localhost
+          port: 8081
+
+database:
+  uri: "postgresql://mas:dev-only-mas-db-password@mas_db/mas"
+
+# How MAS reaches Synapse (Docker network) to create and update Matrix users.
+# Must match matrix_authentication_service in matrix/synapse/homeserver.yaml.
+matrix:
+  kind: synapse
+  homeserver: "localhost"
+  endpoint: "http://synapse:8008/"
+  secret: "dev-only-mas-synapse-shared-secret"
+
+secrets:
+  # 32 bytes, hex. Encrypts cookies and some database fields.
+  encryption: "0000000000000000000000000000000000000000000000000000000000de7001"
+  keys:
+    - key_file: /keys/rsa.pem
+
+# Like production: no MAS passwords, everybody logs in through Keycloak.
+# The EduHub bot has no password either; it gets a token via mas-cli.
+passwords:
+  enabled: false
+
+email:
+  transport: blackhole
+
+policy:
+  data:
+    client_registration:
+      # Local clients (Element on :8088, EduHub on :5000) use plain http.
+      allow_insecure_uris: true
+
+upstream_oauth2:
+  providers:
+    - id: 01M7J8Q3MF1QK40ZC1MW3K49SH
+      human_name: "EduHub"
+      client_id: "matrix-authentication-service"
+      client_secret: "dev-only-mas-client-secret"
+      token_endpoint_auth_method: client_secret_basic
+      scope: "openid profile email"
+      # Browser and container see Keycloak at different addresses
+      # (localhost:28080 vs keycloak:8080), so endpoints are set by hand.
+      discovery_mode: disabled
+      # Must equal the "iss" claim in Keycloak's tokens (KC_HOSTNAME).
+      issuer: "http://localhost:28080/realms/edu-hub"
+      authorization_endpoint: "http://localhost:28080/realms/edu-hub/protocol/openid-connect/auth"
+      token_endpoint: "http://keycloak:8080/realms/edu-hub/protocol/openid-connect/token"
+      jwks_uri: "http://keycloak:8080/realms/edu-hub/protocol/openid-connect/certs"
+      userinfo_endpoint: "http://keycloak:8080/realms/edu-hub/protocol/openid-connect/userinfo"
+      # Discovery is off, so PKCE can't be detected; Keycloak supports S256.
+      pkce_method: always
+      claims_imports:
+        # No "confirm your new account" page; needs localpart=require and the
+        # other attributes force/require/ignore.
+        skip_confirmation: true
+        localpart:
+          action: require
+          # Matrix localpart = EduHub handle (Keycloak mapper "matrix_user_handle"),
+          # so @<handle>:localhost matches User.matrixUserHandle.
+          template: "{{ user.matrix_user_handle }}"
+        displayname:
+          action: force
+          template: "{{ user.given_name }} {{ user.family_name }}"
+        email:
+          action: force
+          template: "{{ user.email }}"

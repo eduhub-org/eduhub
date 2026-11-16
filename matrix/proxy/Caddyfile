@@ -1,0 +1,15 @@
+# DEV ONLY: stands in for the production reverse proxy in front of the
+# homeserver (http://localhost:8008). Like production, the legacy login
+# endpoints are answered by MAS (its "compat" layer); everything else goes to
+# Synapse. See https://element-hq.github.io/matrix-authentication-service/setup/reverse-proxy.html
+{
+	auto_https off
+	admin off
+}
+
+:8008 {
+	@compat path_regexp ^/_matrix/client/[^/]+/(login|logout|refresh)
+	reverse_proxy @compat mas:8080
+
+	reverse_proxy synapse:8008
+}
