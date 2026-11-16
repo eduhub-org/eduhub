@@ -39,13 +39,18 @@ class EduHubClient:
 
     def send_query(self, query, variables):
         self.set_headers()
+        # Never log the headers (they carry the admin secret) or variable
+        # values (they carry personal data); the keys are enough to debug.
         logging.debug(
-            f"URL: {self.url}\nHeader: {self.headers}\nQuery: {query}\nVariables: {variables}"
+            "GraphQL request to %s, variables: %s",
+            self.url,
+            sorted((variables or {}).keys()),
         )
         r = requests.post(
             self.url,
             json={"query": query, "variables": variables},
             headers=self.headers,
+            timeout=GRAPHQL_REQUEST_TIMEOUT_SECONDS,
         )
         if r.status_code == 200:
             return r.json()
