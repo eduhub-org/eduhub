@@ -51,7 +51,6 @@ The system automatically keeps versions synchronized across:
 
 ### Serverless Functions
 All function packages in [functions/](mdc:functions/) directory:
-- `functions/echo/package.json`
 - `functions/addKeycloakRole/package.json`
 - `functions/callPythonFunction/package.json`
 - `functions/sendMail/package.json`

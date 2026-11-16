@@ -25,7 +25,7 @@ function watchChildProc(cproc, name) {
 }
 
 // dirs which do not contain the standard setup with one js function and package.json for it
-const EXCLUDE_DIRS = ["lib", "callPythonFunction", "node_modules"];
+const EXCLUDE_DIRS = ["callPythonFunction", "node_modules"];
 
 const getDirectories = (source) =>
   fs
