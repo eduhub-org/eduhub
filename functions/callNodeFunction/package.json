@@ -19,6 +19,7 @@
     "@google-cloud/functions-framework": "^3.1.2",
     "@jest/globals": "^29.7.0",
     "jest": "^29.7.0",
+    "js-yaml": "^4.1.0",
     "npm-watch": "^0.13.0"
   },
   "watch": {

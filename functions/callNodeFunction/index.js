@@ -54,7 +54,7 @@ import { constantTimeSecretsEqual } from "./shared/security.js";
 import { cloudFunctionSecret } from "./lib/config.js";
 import { logger } from "./lib/logger.js";
 
-const functionMap = {
+export const functionMap = {
   getSignedUrl,
   saveFile,
   saveImage,
