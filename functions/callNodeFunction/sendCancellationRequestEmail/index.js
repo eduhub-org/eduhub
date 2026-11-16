@@ -1,6 +1,8 @@
-import { gql, GraphQLClient } from 'graphql-request';
+import { gql } from 'graphql-request';
 import { createCancellationRequestVariableReplacer } from '../emailTemplateVariables.js';
 import { queueEmail } from '../lib/queueEmail.js';
+import { createHasuraClient } from '../lib/hasura.js';
+import * as config from '../lib/config.js';
 
 /**
  * Mails a cancellation request of a paid enrollment: to every organizer of the
@@ -115,9 +117,7 @@ export default async function sendCancellationRequestEmail(req, logger) {
       return { success: true, messageKey: 'NO_ACTION_NEEDED', message: 'Not a new cancellation request' };
     }
 
-    const client = new GraphQLClient(process.env.HASURA_ENDPOINT, {
-      headers: { 'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET },
-    });
+    const client = createHasuraClient();
 
     const result = await client.request(GET_REQUEST_DETAILS, { enrollmentId: data.new.id });
     const enrollment = result?.CourseEnrollment_by_pk;
@@ -127,7 +127,7 @@ export default async function sendCancellationRequestEmail(req, logger) {
     }
 
     const { User: participant, Course: course } = enrollment;
-    const frontendUrl = process.env.FRONTEND_URL || 'https://edu.opencampus.sh';
+    const frontendUrl = config.frontendUrl();
     const cancellation = {
       participantName: [participant?.firstName, participant?.lastName].filter(Boolean).join(' '),
       participantEmail: participant?.email || '',

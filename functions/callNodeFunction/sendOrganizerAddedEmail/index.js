@@ -1,6 +1,8 @@
-import { gql, GraphQLClient } from 'graphql-request';
+import { gql } from 'graphql-request';
 import { createVariableReplacer } from '../emailTemplateVariables.js';
 import { queueEmail } from '../lib/queueEmail.js';
+import { createHasuraClient } from '../lib/hasura.js';
+import * as config from '../lib/config.js';
 
 /**
  * Sends an email when a user is added as an organizer (instructor) to a course or event.
@@ -43,11 +45,7 @@ export default async function sendOrganizerAddedEmail(req, logger) {
 
     const courseInstructor = data.new;
 
-    const client = new GraphQLClient(process.env.HASURA_ENDPOINT, {
-      headers: {
-        'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET,
-      },
-    });
+    const client = createHasuraClient();
 
     const GET_ORGANIZER_DETAILS = gql`
       query GetOrganizerDetails($courseInstructorId: Int!) {
@@ -107,7 +105,7 @@ export default async function sendOrganizerAddedEmail(req, logger) {
       };
     }
 
-    const courseLink = `${process.env.FRONTEND_URL || 'https://edu.opencampus.sh'}/manage/course/${Course.id}`;
+    const courseLink = `${config.frontendUrl()}/manage/course/${Course.id}`;
 
     // ORGANIZER_ADDED template uses only Course-level placeholders ([Enrollment:CourseId--Course:Name],
     // [Enrollment:CourseLink]). enrollment is empty and formatDate is a no-op by design.

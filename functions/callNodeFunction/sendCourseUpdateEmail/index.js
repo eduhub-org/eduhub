@@ -1,7 +1,8 @@
-import { gql, GraphQLClient } from 'graphql-request';
+import { gql } from 'graphql-request';
 import { queueEmail } from '../lib/queueEmail.js';
 import { withRetry } from '../lib/withRetry.js';
 import { createEnrollmentVariableReplacer } from '../emailTemplateVariables.js';
+import { createHasuraClient } from '../lib/hasura.js';
 
 /**
  * Sends emails for course-side changes:
@@ -37,9 +38,7 @@ export default async function sendCourseUpdateEmail(req, logger) {
       return { success: true, messageKey: 'NO_ACTION_NEEDED', message: 'Only UPDATE is handled' };
     }
 
-    const client = new GraphQLClient(process.env.HASURA_ENDPOINT, {
-      headers: { 'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET },
-    });
+    const client = createHasuraClient();
 
     const formatDate = (dateString) =>
       dateString ? new Date(dateString).toLocaleDateString('de-DE', { year: 'numeric', month: 'long', day: 'numeric' }) : '';

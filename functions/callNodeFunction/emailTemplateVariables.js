@@ -1,5 +1,6 @@
 import { applyConditionalBlocks } from './lib/conditionalBlocks.js';
 import { describeCourseSchedule } from './lib/courseSchedule.js';
+import * as config from './lib/config.js';
 
 /**
  * Centralized Email Template Variables System
@@ -458,10 +459,10 @@ export function createVariableReplacer(data, formatDate) {
           formatDate(data.enrollment.invitationExpirationDate) : 'TBD'
       )
       .replaceAll('[Enrollment:CourseLink]',
-        data.courseLink || `${process.env.FRONTEND_URL || 'https://edu.opencampus.sh'}/course/${data.course?.id || ''}`
+        data.courseLink || `${config.frontendUrl()}/course/${data.course?.id || ''}`
       )
       .replaceAll('[Enrollment:CertificateLink]',
-        data.certificateLink || data.courseLink || `${process.env.FRONTEND_URL || 'https://edu.opencampus.sh'}/course/${data.course?.id || ''}`
+        data.certificateLink || data.courseLink || `${config.frontendUrl()}/course/${data.course?.id || ''}`
       );
     
     // Build addons HTML list (escape user-controlled strings to prevent XSS)
@@ -517,7 +518,7 @@ export function createVariableReplacer(data, formatDate) {
     result = result
       .replaceAll('[Project:Title]', escape(data.project?.title || ''))
       .replaceAll('[Project:Link]',
-        data.projectLink || `${process.env.FRONTEND_URL || 'https://edu.opencampus.sh'}/project/${data.project?.id || ''}`
+        data.projectLink || `${config.frontendUrl()}/project/${data.project?.id || ''}`
       )
       .replaceAll('[Project:ApplicantName]', escape(data.applicantName || ''))
       .replaceAll('[Project:SubmissionDeadline]', submissionDeadlineBlock)
@@ -538,7 +539,7 @@ export function createVariableReplacer(data, formatDate) {
       .replaceAll('[OrganizationClaim:ContactEmail]', escape(data.organizationClaim?.contactEmail || ''));
 
     // System links - always attempt replacement
-    const portalUrl = data.portalUrl || process.env.FRONTEND_URL || 'https://edu.opencampus.sh';
+    const portalUrl = data.portalUrl || config.frontendUrl();
     result = result
       .replaceAll('[System:PortalUrl]', portalUrl)
       .replaceAll('[System:PrivacyPolicyLink]', `${portalUrl}/privacy`);
@@ -588,7 +589,7 @@ export function createVariableReplacer(data, formatDate) {
  * @returns {Function} Variable replacement function
  */
 export function createEnrollmentVariableReplacer(enrollmentDetails, formatDate, { calendarAttached = false } = {}) {
-  const courseLink = `${process.env.FRONTEND_URL || 'https://edu.opencampus.sh'}/course/${enrollmentDetails.Course.id}`;
+  const courseLink = `${config.frontendUrl()}/course/${enrollmentDetails.Course.id}`;
   // An invitation can only be accepted when logged in; logged out, the course page offers to apply
   // instead. force_login sends a logged-out recipient through the login first (withAuthRedirect).
   // Guests have no account to log in with.
@@ -651,7 +652,7 @@ export function createSessionVariableReplacer(session, enrollment, sessionData =
       reminderText: sessionData.reminderText,
       reminderTime: sessionData.reminderTime
     },
-    courseLink: `${process.env.FRONTEND_URL || 'https://edu.opencampus.sh'}/course/${session.Course.id}`
+    courseLink: `${config.frontendUrl()}/course/${session.Course.id}`
   });
 }
 
@@ -666,7 +667,7 @@ export function createProjectVariableReplacer(project, recipientUser, extra = {}
   return createVariableReplacer({
     user: recipientUser,
     project,
-    projectLink: `${process.env.FRONTEND_URL || 'https://edu.opencampus.sh'}/project/${project?.id || ''}`,
+    projectLink: `${config.frontendUrl()}/project/${project?.id || ''}`,
     applicantName: extra.applicantName || ''
   });
 }
