@@ -1,4 +1,4 @@
-name: Build and Store a Docker Image in the Artifact Registry
+name: Zip and Store Cloud Functions
 
 on:
   workflow_call:
@@ -7,7 +7,7 @@ on:
       PROJECT_ID:
         required: true
         type: string
-      # Name of the cloud function (and of the folder in which it is defined)
+      # Folder that holds the cloud functions (one sub-folder per unit)
       CLOUD_FUNCTION_FOLDER:
         required: true
         type: string
@@ -22,14 +22,25 @@ on:
       GCP_REGION:
         required: true
 
+permissions:
+  contents: read
+
 jobs:
   zip-and-store:
     name: Zip and Store Cloud Function in Google Storage Bucket
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
 
     steps:
+      - name: Harden the runner
+        uses: step-security/harden-runner@1d88384fd173af6ecb012dfd0264a306b711241a # v2.22.4
+        with:
+          egress-policy: audit
+
       - name: Check Out the Repository Branch
-        uses: actions/checkout@v5
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
 
       - name: Replace symlinks with actual files
         env:
@@ -57,78 +68,54 @@ jobs:
             cp -r ./${CF_FOLDER}/shared_libs/node ./${CF_FOLDER}/$fn/shared_libs/
           done
 
-      - name: Zip Archive for callPythonFunction
-        uses: thedoctor0/zip-release@main
-        with:
-          type: "zip"
-          directory: "./${{ inputs.CLOUD_FUNCTION_FOLDER }}/callPythonFunction"
-          filename: "../callPythonFunction.zip"
-
-      - name: Zip Archive for sendMail
-        uses: thedoctor0/zip-release@main
-        with:
-          type: "zip"
-          directory: "./${{ inputs.CLOUD_FUNCTION_FOLDER }}/sendMail"
-          filename: "../sendMail.zip"
-
-      - name: Zip Archive for updateFromKeycloak
-        uses: thedoctor0/zip-release@main
-        with:
-          type: "zip"
-          directory: "./${{ inputs.CLOUD_FUNCTION_FOLDER }}/updateFromKeycloak"
-          filename: "../updateFromKeycloak.zip"
-
-      - name: Zip Archive for addKeycloakRole
-        uses: thedoctor0/zip-release@main
-        with:
-          type: "zip"
-          directory: "./${{ inputs.CLOUD_FUNCTION_FOLDER }}/addKeycloakRole"
-          filename: "../addKeycloakRole.zip"
-
-      - name: Zip Archive for removeKeycloakRole
-        uses: thedoctor0/zip-release@main
-        with:
-          type: "zip"
-          directory: "./${{ inputs.CLOUD_FUNCTION_FOLDER }}/removeKeycloakRole"
-          filename: "../removeKeycloakRole.zip"
-
-      - name: Zip Archive for callNodeFunction
-        uses: thedoctor0/zip-release@main
-        with:
-          type: "zip"
-          directory: "./${{ inputs.CLOUD_FUNCTION_FOLDER }}/callNodeFunction"
-          filename: "../callNodeFunction.zip"
-
-      - name: Zip Archive for sendQuestionaires
-        uses: thedoctor0/zip-release@main
-        with:
-          type: "zip"
-          directory: "./${{ inputs.CLOUD_FUNCTION_FOLDER }}/sendQuestionaires"
-          filename: "../sendQuestionaires.zip"
-
-      - name: Zip Archive for apiProxy
-        uses: thedoctor0/zip-release@main
-        with:
-          type: "zip"
-          directory: "./${{ inputs.CLOUD_FUNCTION_FOLDER }}/apiProxy"
-          filename: "../apiProxy.zip"
+      # Same eight archives as before, built with plain `zip -r` per unit
+      # (previously one thedoctor0/zip-release step each, no exclusions).
+      - name: Zip one archive per cloud function
+        env:
+          CF_FOLDER: ${{ inputs.CLOUD_FUNCTION_FOLDER }}
+        run: |
+          set -euo pipefail
+          out="${GITHUB_WORKSPACE}/cloud-function-zips"
+          mkdir -p "${out}"
+          for unit in callPythonFunction sendMail updateFromKeycloak \
+            addKeycloakRole removeKeycloakRole callNodeFunction \
+            sendQuestionaires apiProxy; do
+            (
+              cd "./${CF_FOLDER}/${unit}"
+              zip -q -r "${out}/${unit}.zip" . \
+                -x 'node_modules/*' '*/node_modules/*' \
+                '__pycache__/*' '*/__pycache__/*' '.venv/*'
+            )
+          done
+          ls -l "${out}"
 
       - name: Authenticate to Google Cloud
         id: "auth"
-        uses: "google-github-actions/auth@v3"
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
         with:
           credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
           project_id: ${{ inputs.PROJECT_ID }}
 
+      # Terraform reads the fixed names cloud-functions/<Unit>.zip.
       - name: Upload Archives to Google Cloud
         id: "upload-archives"
-        uses: "google-github-actions/upload-cloud-storage@v3"
+        uses: google-github-actions/upload-cloud-storage@6397bd7208e18d13ba2619ee21b9873edc94427a # v3.0.0
         with:
-          path: "./${{ inputs.CLOUD_FUNCTION_FOLDER }}"
+          path: "./cloud-function-zips"
           destination: "${{ inputs.BUCKET_NAME }}/cloud-functions"
           glob: "*.zip"
           parent: false
           process_gcloudignore: false
 
-      - name: Show Output
-        run: echo ${{ steps.deploy.outputs.url }}
+      # Rollback copies, one folder per commit. Bucket object versioning stays
+      # off on purpose: the bucket also holds user files, and versioning would
+      # keep files that users deleted.
+      - name: Upload Rollback Copies to Google Cloud
+        id: "upload-archive-copies"
+        uses: google-github-actions/upload-cloud-storage@6397bd7208e18d13ba2619ee21b9873edc94427a # v3.0.0
+        with:
+          path: "./cloud-function-zips"
+          destination: "${{ inputs.BUCKET_NAME }}/cloud-functions/archive/${{ github.sha }}"
+          glob: "*.zip"
+          parent: false
+          process_gcloudignore: false
