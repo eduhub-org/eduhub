@@ -1,3 +1,4 @@
+import hmac
 import logging
 import os
 from flask import request, jsonify
@@ -50,10 +51,21 @@ def call_python_function(request):
     Returns:
         dict: A standardized response containing success status and result/error
     """
+    # Bound before the try so the except block can always log it.
+    function_name = None
     try:
         arguments = request.get_json()
         logging.info("########## Calling Python Function ##########")
         logging.debug(f"Request: {arguments}")
+
+        expected_secret = os.environ.get("HASURA_CLOUD_FUNCTION_SECRET")
+        if not expected_secret or not expected_secret.strip():
+            logging.error("HASURA_CLOUD_FUNCTION_SECRET is not configured")
+            return jsonify({
+                "success": False,
+                "error": "Server secret is not configured.",
+                "messageKey": "SERVER_MISCONFIGURED"
+            }), 500
 
         hasura_secret = request.headers.get("Hasura-Secret")
 
@@ -63,15 +75,16 @@ def call_python_function(request):
                 "success": False,
                 "error": "Missing Hasura secret",
                 "messageKey": "MISSING_SECRET"
-            }), 200
+            }), 401
 
-        if not hasura_secret == os.environ.get("HASURA_CLOUD_FUNCTION_SECRET"):
+        # Bytes, so a non-ASCII header cannot make compare_digest raise.
+        if not hmac.compare_digest(hasura_secret.encode("utf-8"), expected_secret.encode("utf-8")):
             logging.error("Invalid Hasura secret provided")
             return jsonify({
                 "success": False,
                 "error": "Invalid secret",
                 "messageKey": "INVALID_SECRET"
-            }), 200
+            }), 401
 
         function_name = request.headers.get("Function-Name")
         if function_name is None and arguments.get('action', {}).get('name'):
