@@ -223,7 +223,7 @@ async function fetchFormbricksResponseWithRetry(
         logger.warn('No responses returned from Formbricks API', {
           attempt,
           surveyId: formbricksSurveyId,
-          apiUrl: responsesUrl.toString()
+          apiUrl: formbricksApiUrl
         });
       }
 
