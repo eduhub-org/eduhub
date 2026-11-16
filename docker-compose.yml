@@ -226,7 +226,6 @@ services:
       CLOUD_FUNCTION_LINK_SEND_MAIL: "http://node_functions:42019"
       CLOUD_FUNCTION_LINK_ADD_KEYCLOAK_ROLE: "http://node_functions:42000"
       CLOUD_FUNCTION_LINK_REMOVE_KEYCLOAK_ROLE: "http://node_functions:42002"
-      CLOUD_FUNCTION_LINK_CREATE_PARTICIPATION_CERTIFICATE: "http://node_functions:42023"
       CLOUD_FUNCTION_LINK_SEND_QUESTIONAIRES: "http://node_functions:42024"
       CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION: "http://node_functions:42022"
       CLOUD_FUNCTION_LINK_CALL_PYTHON_FUNCTION: "http://python_functions:42025"
