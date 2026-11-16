@@ -20,7 +20,7 @@ functions/
 ├── callNodeFunction/           # Email template processing
 │   ├── sendEnrollmentEmail/    # Course enrollment emails
 │   ├── sendSessionReminders/   # Session reminder emails
-│   ├── emailTemplateVariables.js  # Template variable definitions
+│   ├── lib/emailTemplateVariables.js  # Template variable definitions
 │   └── EMAIL_TEMPLATE_VARIABLES.md # Documentation
 └── callPythonFunction/         # Python email functions
 ```

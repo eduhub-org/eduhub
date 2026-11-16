@@ -25,7 +25,7 @@ Sends automated session reminder emails for the **first session only** of each c
 
 ## Email Template Variables
 
-Both email functions use a **centralized variable system** (`emailTemplateVariables.js`) that provides:
+Both email functions use a **centralized variable system** (`lib/emailTemplateVariables.js`) that provides:
 
 ✅ **Centralized Management**: Single source of truth for all email variables  
 ✅ **Automatic Date Formatting**: Dates formatted based on app timezone settings  
@@ -35,7 +35,7 @@ Both email functions use a **centralized variable system** (`emailTemplateVariab
 
 ### Quick Usage
 ```javascript
-import { createEnrollmentVariableReplacer } from '../emailTemplateVariables.js';
+import { createEnrollmentVariableReplacer } from '../lib/emailTemplateVariables.js';
 
 const replaceVariables = createEnrollmentVariableReplacer(enrollmentDetails, formatDate);
 const emailContent = replaceVariables(template.content);

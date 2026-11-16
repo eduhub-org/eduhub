@@ -1,6 +1,6 @@
 import { gql } from 'graphql-request';
-import { createEnrollmentVariableReplacer } from '../emailTemplateVariables.js';
-import { appendGuestMailFooter, guestSafeCopyRecipients } from '../guestRegistration.js';
+import { createEnrollmentVariableReplacer } from '../lib/emailTemplateVariables.js';
+import { appendGuestMailFooter, guestSafeCopyRecipients } from '../lib/guestRegistration.js';
 import { isDeclinedByParticipant, notifyOrganizersOfDecline } from './invitationDeclined.js';
 import { buildCourseCalendar } from '../lib/courseCalendar.js';
 import { createHasuraClient } from '../lib/hasura.js';

@@ -1,5 +1,5 @@
 import { gql } from 'graphql-request';
-import { createVariableReplacer } from '../emailTemplateVariables.js';
+import { createVariableReplacer } from '../lib/emailTemplateVariables.js';
 import { queueEmail } from '../lib/queueEmail.js';
 import { createHasuraClient } from '../lib/hasura.js';
 import * as config from '../lib/config.js';

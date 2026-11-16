@@ -1,6 +1,6 @@
 import crypto from 'node:crypto';
 import { gql } from 'graphql-request';
-import * as config from './lib/config.js';
+import * as config from './config.js';
 import { escapeHtml } from './emailTemplateVariables.js';
 
 /**

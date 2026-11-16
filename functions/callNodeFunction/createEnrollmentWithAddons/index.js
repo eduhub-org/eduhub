@@ -1,4 +1,4 @@
-import { isCourseRegistrationClosed } from '../guestRegistration.js';
+import { isCourseRegistrationClosed } from '../lib/guestRegistration.js';
 import { validateAndExtractFormbricksSurvey, buildLabelToChoiceIdMap, matchAddonsFromResponse, fetchAllFormbricksResponses } from '../lib/formbricks.js';
 import * as config from '../lib/config.js';
 import { createHasuraClient } from '../lib/hasura.js';

@@ -12,7 +12,7 @@ describe('Email Template Variables System', () => {
       generateVariableDocumentation;
 
   beforeAll(async () => {
-    const module = await import('../emailTemplateVariables.js');
+    const module = await import('../lib/emailTemplateVariables.js');
     EMAIL_VARIABLES = module.EMAIL_VARIABLES;
     getVariablesByCategory = module.getVariablesByCategory;
     getAllVariableKeys = module.getAllVariableKeys;

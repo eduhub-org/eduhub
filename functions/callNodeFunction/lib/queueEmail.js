@@ -1,5 +1,5 @@
 import { gql } from 'graphql-request';
-import { appendGuestMailFooter, guestSafeCopyRecipients } from '../guestRegistration.js';
+import { appendGuestMailFooter, guestSafeCopyRecipients } from './guestRegistration.js';
 
 /**
  * Generic function to queue emails

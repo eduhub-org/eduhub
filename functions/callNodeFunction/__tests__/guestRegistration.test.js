@@ -26,7 +26,7 @@ const {
   GUEST_ALLOWED_REGISTRATION_TYPES,
   isCourseRegistrationClosed,
   confirmTokenExpiresAt,
-} = await import('../guestRegistration.js');
+} = await import('../lib/guestRegistration.js');
 
 const USER_ID = '7c9e6679-7425-40de-944b-e07fc1f90ae7';
 

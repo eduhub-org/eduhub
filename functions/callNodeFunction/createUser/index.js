@@ -1,7 +1,7 @@
 import KcAdminClient from "@keycloak/keycloak-admin-client";
 import { gql } from 'graphql-request';
 import { queueEmail } from '../lib/queueEmail.js';
-import { createVariableReplacer } from '../emailTemplateVariables.js';
+import { createVariableReplacer } from '../lib/emailTemplateVariables.js';
 import { computeMatrixHandle } from '../lib/matrixHandle.js';
 import { mergeUserPutPayload } from '../shared/keycloakUserMerge.js';
 import { createHasuraClient } from '../lib/hasura.js';

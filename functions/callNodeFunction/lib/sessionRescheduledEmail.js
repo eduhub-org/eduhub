@@ -1,7 +1,7 @@
 import { gql } from 'graphql-request';
 import { queueEmail } from './queueEmail.js';
 import { withRetry } from './withRetry.js';
-import { createVariableReplacer } from '../emailTemplateVariables.js';
+import { createVariableReplacer } from './emailTemplateVariables.js';
 import { applyConditionalBlocks } from './conditionalBlocks.js';
 import { formatReminderDateTimeRange } from '../sendSessionReminders/index.js';
 import * as config from './config.js';

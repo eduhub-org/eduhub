@@ -1,7 +1,7 @@
 import { gql } from 'graphql-request';
 import { queueEmail } from '../lib/queueEmail.js';
 import { withRetry } from '../lib/withRetry.js';
-import { createProjectVariableReplacer } from '../emailTemplateVariables.js';
+import { createProjectVariableReplacer } from '../lib/emailTemplateVariables.js';
 import { createHasuraClient } from '../lib/hasura.js';
 
 /**

@@ -1,7 +1,7 @@
 import { gql } from 'graphql-request';
 
 import { queueEmail } from '../lib/queueEmail.js';
-import { createOrganizationClaimVariableReplacer } from '../emailTemplateVariables.js';
+import { createOrganizationClaimVariableReplacer } from '../lib/emailTemplateVariables.js';
 import { adminAccessUrl, displayName, resolveContactEmail } from '../lib/jobOrganizationClaim.js';
 import { createHasuraClient } from '../lib/hasura.js';
 

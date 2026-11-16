@@ -1,6 +1,6 @@
-import { applyConditionalBlocks } from './lib/conditionalBlocks.js';
-import { describeCourseSchedule } from './lib/courseSchedule.js';
-import * as config from './lib/config.js';
+import { applyConditionalBlocks } from './conditionalBlocks.js';
+import { describeCourseSchedule } from './courseSchedule.js';
+import * as config from './config.js';
 
 /**
  * Centralized Email Template Variables System

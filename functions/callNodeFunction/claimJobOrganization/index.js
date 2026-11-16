@@ -2,7 +2,7 @@ import { gql } from 'graphql-request';
 
 import { addKeycloakClientRole } from '../lib/keycloakClientRole.js';
 import { queueEmail } from '../lib/queueEmail.js';
-import { createOrganizationClaimVariableReplacer } from '../emailTemplateVariables.js';
+import { createOrganizationClaimVariableReplacer } from '../lib/emailTemplateVariables.js';
 import {
   CLAIM_NEW_ORGANIZATION,
   FIND_ORGANIZATION_CANDIDATES,

@@ -5,7 +5,7 @@ import {
   findUsersByEmail,
   markConfirmTokenUsed,
   resolveConfirmToken,
-} from '../guestRegistration.js';
+} from '../lib/guestRegistration.js';
 import { createHasuraClient } from '../lib/hasura.js';
 
 /**

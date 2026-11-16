@@ -1,5 +1,5 @@
 import { gql } from 'graphql-request';
-import { createCancellationRequestVariableReplacer } from '../emailTemplateVariables.js';
+import { createCancellationRequestVariableReplacer } from '../lib/emailTemplateVariables.js';
 import { queueEmail } from '../lib/queueEmail.js';
 import { collectOrganizerRecipients } from '../sendCancellationRequestEmail/index.js';
 import * as config from '../lib/config.js';
