@@ -84,3 +84,26 @@ moved {
   from = google_cloud_run_service_iam_binding.api_proxy_noauth
   to   = module.cloud_function["api_proxy"].google_cloud_run_service_iam_binding.noauth_invoker[0]
 }
+
+# sendMail now runs as its own account (cf-send-mail, granted in the module).
+# Its three grants on the shared account were never used by sendMail itself:
+# - the Mailgun one is what callPythonFunction reads, so it stays, renamed;
+moved {
+  from = google_secret_manager_secret_iam_member.send_mail_mailgun_api_key
+  to   = google_secret_manager_secret_iam_member.call_python_function_mailgun_api_key
+}
+
+# - the HASURA_CLOUD_FUNCTION_SECRET one duplicates
+#   call_python_function_cloud_secret_access and
+#   call_node_function_cloud_function_secret; destroying it would revoke the
+#   binding they manage, so it is only dropped from state;
+removed {
+  from = google_secret_manager_secret_iam_member.send_mail_cloud_function_secret
+
+  lifecycle {
+    destroy = false
+  }
+}
+
+# - send_mail_hasura_mail_pw (HASURA_MAIL_PW on the shared account) has no
+#   reader and is destroyed.

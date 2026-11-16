@@ -251,6 +251,7 @@ locals {
         local.secret_env.HASURA_MAIL_PW,
         local.secret_env.MAILGUN_API_KEY,
       ]
+      service_account_id = "cf-send-mail"
     }
 
     ###########################################################################
@@ -271,6 +272,7 @@ locals {
         local.secret_env.HASURA_CLOUD_FUNCTION_SECRET,
         local.secret_env.KEYCLOAK_PW,
       ]
+      service_account_id = "cf-add-keycloak-role"
     }
 
     remove_keycloak_role = {
@@ -292,6 +294,7 @@ locals {
         local.secret_env.KEYCLOAK_PW,
         local.secret_env.HASURA_ADMIN_SECRET,
       ]
+      service_account_id = "cf-remove-keycloak-role"
     }
 
     update_from_keycloak = {
@@ -313,6 +316,7 @@ locals {
         local.secret_env.KEYCLOAK_PW,
         local.secret_env.HASURA_ADMIN_SECRET,
       ]
+      service_account_id = "cf-update-from-keycloak"
     }
 
     send_questionaires = {
@@ -331,6 +335,7 @@ locals {
         local.secret_env.HASURA_CLOUD_FUNCTION_SECRET,
         local.secret_env.HASURA_ADMIN_SECRET,
       ]
+      service_account_id = "cf-send-questionaires"
     }
   }
 }
@@ -411,21 +416,8 @@ resource "google_secret_manager_secret_iam_member" "call_python_function_mm_toke
   depends_on = [google_secret_manager_secret.mm_token]
 }
 
-# Granted on the shared account although sendMail runs as the default
-# compute account; callPythonFunction relies on the Mailgun one.
-resource "google_secret_manager_secret_iam_member" "send_mail_cloud_function_secret" {
-  secret_id = google_secret_manager_secret.cloud_function.id
-  role      = "roles/secretmanager.secretAccessor"
-  member    = "serviceAccount:${google_service_account.custom_cloud_function_account.email}"
-}
-
-resource "google_secret_manager_secret_iam_member" "send_mail_hasura_mail_pw" {
-  secret_id = google_secret_manager_secret.hasura_mail_pw.id
-  role      = "roles/secretmanager.secretAccessor"
-  member    = "serviceAccount:${google_service_account.custom_cloud_function_account.email}"
-}
-
-resource "google_secret_manager_secret_iam_member" "send_mail_mailgun_api_key" {
+# sync_mail_delivery_status reads the Mailgun events API.
+resource "google_secret_manager_secret_iam_member" "call_python_function_mailgun_api_key" {
   secret_id = google_secret_manager_secret.mailgun_api_key.id
   role      = "roles/secretmanager.secretAccessor"
   member    = "serviceAccount:${google_service_account.custom_cloud_function_account.email}"
