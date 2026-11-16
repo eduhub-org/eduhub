@@ -91,6 +91,7 @@ locals {
   # itself secret, and must not be: it decides a for_each in the module.
   matrix_synapse_admin_token = nonsensitive(var.matrix_synapse_admin_token != "") ? [local.secret_env.MATRIX_SYNAPSE_ADMIN_TOKEN] : []
 
+  # Plain environment of the units built from callNodeFunction's code.
   matrix_env = {
     MATRIX_HOMESERVER_URL     = var.matrix_homeserver_url
     MATRIX_SERVER_NAME        = var.matrix_server_name
@@ -106,6 +107,8 @@ locals {
   # account whose grants are managed below.
   cloud_function_units = {
     ###########################################################################
+    # Dispatchers built from functions/callNodeFunction (one zip, three
+    # entry points). See functions/callNodeFunction/index.js.
     call_node_function = {
       name          = "call-node-function"
       description   = "Calls a node function specificed via the function header."
@@ -115,6 +118,9 @@ locals {
       memory        = "512M"
       timeout       = 180
       max_instances = 20
+      # Until docs/plans/functions-topology-cleanup.md, callNodeFunction also
+      # routes the handlers that moved to identity and media, so it keeps
+      # their Keycloak and Matrix environment and secrets for one release.
       env = merge(local.matrix_env, {
         ENVIRONMENT               = var.environment
         KEYCLOAK_USER             = var.keycloak_user
@@ -146,6 +152,60 @@ locals {
         ],
       )
       service_account_email = google_service_account.custom_cloud_function_account.email
+    }
+
+    # Keycloak and Matrix accounts. 180 s: anonymizeUser, deleteMyAccount and
+    # syncProgramInstructorMatrixRoom are 180 s actions.
+    identity = {
+      name          = "identity"
+      description   = "Keycloak and Matrix account handlers (callNodeFunction code, identity entry point)."
+      runtime       = "nodejs22"
+      entry_point   = "identity"
+      source_object = "cloud-functions/callNodeFunction.zip"
+      memory        = "256M"
+      timeout       = 180
+      max_instances = 5
+      env = merge(local.matrix_env, {
+        ENVIRONMENT               = var.environment
+        KEYCLOAK_USER             = var.keycloak_user
+        KEYCLOAK_URL              = local.keycloak_url
+        HASURA_ENDPOINT           = local.hasura_endpoint
+        FRONTEND_URL              = "https://${local.eduhub_service_name}.opencampus.sh"
+        STORAGE_BUCKET_PUBLIC_URL = "https://storage.googleapis.com/${var.project_id}"
+        STUJO_FRONTEND_URL        = "https://${local.stujo_public_host}"
+        STUJO_ADMIN_EMAIL         = var.stujo_admin_email
+      })
+      secrets = concat(
+        [
+          local.secret_env.HASURA_CLOUD_FUNCTION_SECRET,
+          local.secret_env.HASURA_ADMIN_SECRET,
+          local.secret_env.KEYCLOAK_PW,
+          local.secret_env.MATRIX_ADMIN_ACCESS_TOKEN,
+        ],
+        local.matrix_synapse_admin_token,
+      )
+      service_account_id = "cf-identity"
+    }
+
+    # Files in the storage bucket; more memory for sharp.
+    media = {
+      name          = "media"
+      description   = "Storage file handlers (callNodeFunction code, media entry point)."
+      runtime       = "nodejs22"
+      entry_point   = "media"
+      source_object = "cloud-functions/callNodeFunction.zip"
+      memory        = "1024M"
+      timeout       = 120
+      max_instances = 20
+      env = {
+        ENVIRONMENT     = var.environment
+        HASURA_ENDPOINT = local.hasura_endpoint
+      }
+      secrets = [
+        local.secret_env.HASURA_CLOUD_FUNCTION_SECRET,
+        local.secret_env.HASURA_ADMIN_SECRET,
+      ]
+      service_account_id = "cf-media"
     }
 
     ###########################################################################
@@ -255,6 +315,9 @@ locals {
     }
 
     ###########################################################################
+    # Folded into identity / callNodeFunction; no Hasura entry calls them any
+    # more. Kept for one release for event retries queued against their
+    # URLs; remove with docs/plans/functions-topology-cleanup.md.
     add_keycloak_role = {
       name          = "add-keycloak-role"
       description   = "Adds role mapping for given role for keycloak hasura client"
@@ -365,6 +428,32 @@ module "cloud_function" {
   service_account_email = try(each.value.service_account_email, null)
   service_account_id    = try(each.value.service_account_id, null)
   public_invoker        = try(each.value.public_invoker, "policy")
+}
+
+###############################################################################
+# Extra IAM of the dedicated accounts (secret access is in the module)
+#####
+
+# anonymizeUser / deleteMyAccount list and delete a user's files.
+resource "google_storage_bucket_iam_member" "identity_storage" {
+  bucket = var.project_id
+  role   = "roles/storage.objectUser"
+  member = "serviceAccount:${module.cloud_function["identity"].service_account_email}"
+}
+
+# Uploads, image variants, makePublic (object ACLs need objectAdmin).
+resource "google_storage_bucket_iam_member" "media_storage" {
+  bucket = var.project_id
+  role   = "roles/storage.objectAdmin"
+  member = "serviceAccount:${module.cloud_function["media"].service_account_email}"
+}
+
+# getSignedUrl signs with the runtime account through the IAM signBlob API
+# (there is no key file), which needs Token Creator on the account itself.
+resource "google_service_account_iam_member" "media_sign_urls" {
+  service_account_id = module.cloud_function["media"].service_account_name
+  role               = "roles/iam.serviceAccountTokenCreator"
+  member             = "serviceAccount:${module.cloud_function["media"].service_account_email}"
 }
 
 ###############################################################################

@@ -106,6 +106,14 @@ module "hasura_service" {
       value = module.cloud_function["call_node_function"].uri
     },
     {
+      name  = "CLOUD_FUNCTION_LINK_IDENTITY"
+      value = module.cloud_function["identity"].uri
+    },
+    {
+      name  = "CLOUD_FUNCTION_LINK_MEDIA"
+      value = module.cloud_function["media"].uri
+    },
+    {
       name  = "CLOUD_FUNCTION_LINK_SEND_QUESTIONAIRES"
       value = module.cloud_function["send_questionaires"].uri
     },
