@@ -2,7 +2,7 @@ import logging
 import secrets
 from datetime import datetime, timedelta, timezone
 
-from api_clients import EduHubClient
+from api_clients import EduHubClient, HasuraQueryError
 
 # Kept in step with the Node-side erasure in
 # functions/callNodeFunction/manageGuestRegistration/index.js and with the
@@ -23,13 +23,16 @@ def _anonymized_email():
     return f"anon_{secrets.token_hex(6)}@example.com"
 
 
-def _check(result, context):
-    """Returns the data payload, or None after logging a GraphQL/transport error."""
-    if not isinstance(result, dict):
-        logging.error(f"{context}: unexpected response from Hasura: {result}")
-        return None
-    if result.get("errors"):
-        logging.error(f"{context}: GraphQL errors: {result['errors']}")
+def _run(client, query, variables, context):
+    """Returns the data payload, or None after logging a GraphQL/transport error.
+
+    Never raises for a failed query, so one failing guest does not stop the
+    sweep over the others.
+    """
+    try:
+        result = client.send_query(query, variables)
+    except HasuraQueryError as error:
+        logging.error(f"{context}: {error}")
         return None
     return result.get("data")
 
@@ -42,7 +45,7 @@ def _get_retention_months(client):
         }
     }
     """
-    data = _check(client.send_query(query, {}), "load retention setting")
+    data = _run(client, query, {}, "load retention setting")
     if not data:
         return DEFAULT_RETENTION_MONTHS
     settings = data.get("AppSettings") or []
@@ -184,8 +187,10 @@ def _erase_guest(client, user_id, newsletter_subscriptions):
     leave the real one on the list.
     """
     if newsletter_subscriptions:
-        if _check(
-            client.send_query(UNSUBSCRIBE_NEWSLETTER, {"userId": user_id}),
+        if _run(
+            client,
+            UNSUBSCRIBE_NEWSLETTER,
+            {"userId": user_id},
             f"unsubscribe guest {user_id}",
         ) is None:
             # Anonymizing now would strand the address inside Ghost with no way
@@ -193,16 +198,15 @@ def _erase_guest(client, user_id, newsletter_subscriptions):
             logging.error(f"Skipping erasure of guest {user_id}: newsletter unsubscribe failed")
             return False
 
-    if _check(
-        client.send_query(
-            ANONYMIZE_GUEST,
-            {"userId": user_id, "email": _anonymized_email(), "anonName": ANON_NAME},
-        ),
+    if _run(
+        client,
+        ANONYMIZE_GUEST,
+        {"userId": user_id, "email": _anonymized_email(), "anonName": ANON_NAME},
         f"anonymize guest {user_id}",
     ) is None:
         return False
 
-    _check(client.send_query(DELETE_TOKENS, {"userId": user_id}), f"delete tokens of {user_id}")
+    _run(client, DELETE_TOKENS, {"userId": user_id}, f"delete tokens of {user_id}")
     return True
 
 
@@ -253,14 +257,13 @@ def anonymize_guest_data(arguments):
         anonymized = 0
         failed = 0
 
-        data = _check(
-            client.send_query(
-                GUESTS_PAST_RETENTION,
-                # Separate variables on purpose: Session.endDateTime is a
-                # timestamptz and Course.applicationEnd a date, and Hasura types
-                # each comparison from its column.
-                {"cutoff": retention_cutoff, "cutoffDate": retention_cutoff_date},
-            ),
+        data = _run(
+            client,
+            GUESTS_PAST_RETENTION,
+            # Separate variables on purpose: Session.endDateTime is a
+            # timestamptz and Course.applicationEnd a date, and Hasura types
+            # each comparison from its column.
+            {"cutoff": retention_cutoff, "cutoffDate": retention_cutoff_date},
             "select guests past retention",
         )
         if data is None:
@@ -278,8 +281,10 @@ def anonymize_guest_data(arguments):
         ).isoformat()
 
         deleted = 0
-        data = _check(
-            client.send_query(ABANDONED_GUESTS, {"cutoff": unconfirmed_cutoff}),
+        data = _run(
+            client,
+            ABANDONED_GUESTS,
+            {"cutoff": unconfirmed_cutoff},
             "select abandoned guest signups",
         )
         if data is None:
@@ -287,8 +292,10 @@ def anonymize_guest_data(arguments):
 
         for guest in data.get("User", []):
             # The GuestRegistrationToken FK cascades, so the tokens go with the row.
-            if _check(
-                client.send_query(DELETE_GUEST_USER, {"userId": guest["id"]}),
+            if _run(
+                client,
+                DELETE_GUEST_USER,
+                {"userId": guest["id"]},
                 f"delete abandoned guest {guest['id']}",
             ) is not None:
                 deleted += 1

@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 
 from dateutil import tz
 
-from api_clients import EduHubClient
+from api_clients import EduHubClient, HasuraQueryError
 
 from pythonFunctions.mail_helpers import (
     already_sent_keys,
@@ -87,10 +87,11 @@ def expire_invitations(arguments):
             }
         }
         """
-        reminder_result = client.send_query(reminder_query, {"today": today_iso})
-        if not isinstance(reminder_result, dict) or reminder_result.get("errors"):
-            logging.error(f"Failed to query expiring invitations: {reminder_result}")
-            return {"success": False, "error": str(reminder_result)}
+        try:
+            reminder_result = client.send_query(reminder_query, {"today": today_iso})
+        except HasuraQueryError as error:
+            logging.error(f"Failed to query expiring invitations: {error}")
+            return {"success": False, "error": str(error)}
 
         expiring_soon = reminder_result["data"]["CourseEnrollment"]
         reminded = 0
@@ -120,12 +121,13 @@ def expire_invitations(arguments):
             }
         }
         """
-        expire_result = client.send_query(
-            expire_mutation, {"today": today_iso, "graceStart": grace_start_iso}
-        )
-        if not isinstance(expire_result, dict) or expire_result.get("errors"):
-            logging.error(f"Failed to expire invitations: {expire_result}")
-            return {"success": False, "error": str(expire_result)}
+        try:
+            expire_result = client.send_query(
+                expire_mutation, {"today": today_iso, "graceStart": grace_start_iso}
+            )
+        except HasuraQueryError as error:
+            logging.error(f"Failed to expire invitations: {error}")
+            return {"success": False, "error": str(error)}
 
         expired_count = expire_result["data"]["update_CourseEnrollment"]["affected_rows"]
         logging.info(f"Reminded {reminded} invitation(s); expired {expired_count} invitation(s)")

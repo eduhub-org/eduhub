@@ -2,7 +2,7 @@ import logging
 import os
 from datetime import datetime, timedelta, timezone
 
-from api_clients import EduHubClient
+from api_clients import EduHubClient, HasuraQueryError
 
 from pythonFunctions.mail_helpers import (
     already_sent_keys,
@@ -52,10 +52,11 @@ def send_project_deadline_reminders(arguments):
             }
         }
         """
-        result = client.send_query(query, {"now": now_iso, "cutoff": cutoff_iso})
-        if not isinstance(result, dict) or result.get("errors"):
-            logging.error(f"Failed to query projects with approaching deadline: {result}")
-            return {"success": False, "error": str(result)}
+        try:
+            result = client.send_query(query, {"now": now_iso, "cutoff": cutoff_iso})
+        except HasuraQueryError as error:
+            logging.error(f"Failed to query projects with approaching deadline: {error}")
+            return {"success": False, "error": str(error)}
 
         projects = result["data"]["Project"]
         template = get_default_mail_template(client, MAIL_TYPE)

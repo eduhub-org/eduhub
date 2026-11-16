@@ -10,6 +10,22 @@ import pandas as pd
 GRAPHQL_REQUEST_TIMEOUT_SECONDS = 60
 
 
+class HasuraQueryError(Exception):
+    """`EduHubClient.send_query` got no usable result from Hasura.
+
+    Attributes:
+        graphql_errors (list|None): The response's GraphQL `errors`, when that
+            is what failed.
+        status_code (int|None): The HTTP status, or None on a transport error
+            (no response at all).
+    """
+
+    def __init__(self, message, graphql_errors=None, status_code=None):
+        super().__init__(message)
+        self.graphql_errors = graphql_errors
+        self.status_code = status_code
+
+
 class EduHubClient:
     def __init__(self):
         self.url = os.getenv("HASURA_ENDPOINT")
@@ -38,6 +54,16 @@ class EduHubClient:
         return date_time.tz_convert(reference_timezone)
 
     def send_query(self, query, variables):
+        """POSTs a GraphQL document with the admin secret.
+
+        Returns:
+            dict: The full response body ({"data": ...}).
+
+        Raises:
+            HasuraQueryError: On a transport error (timeout, connection
+                refused, ...), a non-200 response, a body that is not JSON or
+                a populated GraphQL `errors` key.
+        """
         self.set_headers()
         # Never log the headers (they carry the admin secret) or variable
         # values (they carry personal data); the keys are enough to debug.
@@ -46,17 +72,34 @@ class EduHubClient:
             self.url,
             sorted((variables or {}).keys()),
         )
-        r = requests.post(
-            self.url,
-            json={"query": query, "variables": variables},
-            headers=self.headers,
-            timeout=GRAPHQL_REQUEST_TIMEOUT_SECONDS,
-        )
-        if r.status_code == 200:
-            return r.json()
-        else:
-            print(f"Response text: {r.text}")
-            return f"Something went wrong. HTTP Code: {r.status_code}"
+        try:
+            r = requests.post(
+                self.url,
+                json={"query": query, "variables": variables},
+                headers=self.headers,
+                timeout=GRAPHQL_REQUEST_TIMEOUT_SECONDS,
+            )
+        except requests.exceptions.RequestException as error:
+            raise HasuraQueryError(f"GraphQL request failed: {error}") from error
+        if r.status_code != 200:
+            logging.error("Response text: %s", r.text)
+            raise HasuraQueryError(
+                f"Something went wrong. HTTP Code: {r.status_code}",
+                status_code=r.status_code,
+            )
+        try:
+            result = r.json()
+        except ValueError as error:
+            raise HasuraQueryError(
+                "GraphQL response is not JSON", status_code=r.status_code
+            ) from error
+        if isinstance(result, dict) and result.get("errors"):
+            raise HasuraQueryError(
+                f"GraphQL errors: {result['errors']}",
+                graphql_errors=result["errors"],
+                status_code=r.status_code,
+            )
+        return result
 
     def get_finished_sessions_without_attendance_check(self):
         variables = {}
@@ -405,10 +448,11 @@ class EduHubClient:
     def _post_graphql(self, query, variables, operation_name):
         """POSTs a GraphQL document with the admin secret and fails loudly.
 
-        Unlike `send_query`, this raises on a non-200 response and on a populated
-        `errors` key instead of returning a string / a half-empty payload. Use it
-        wherever silently returning no data would produce a wrong result rather
-        than a visible failure.
+        Like `send_query` it raises on a failed request and on a populated
+        `errors` key, but it also raises on a missing `data` object and returns
+        `data` itself. Its callers (and their tests) rely on the exception
+        types: `requests.HTTPError` for a non-2xx response, `ValueError` for a
+        bad payload.
 
         Returns:
             dict: The `data` object of the response.
@@ -579,11 +623,14 @@ class EduHubClient:
                 }
             }
         """
-        result = self.send_query(query, variables)
-
-        # Check for errors in the GraphQL response
-        if "errors" in result:
-            return None  # or handle error as appropriate for your use case
+        try:
+            result = self.send_query(query, variables)
+        except HasuraQueryError as error:
+            # GraphQL errors have always meant "no chat link"; an HTTP or
+            # transport failure propagates.
+            if error.graphql_errors:
+                return None
+            raise
         try:
             chat_link = result["data"]["Course"][0]["chatLink"]
             return chat_link

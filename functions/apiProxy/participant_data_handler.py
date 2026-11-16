@@ -12,7 +12,7 @@ from datetime import datetime, UTC
 import jwt
 from jwt import InvalidTokenError, PyJWKClient
 try:
-    from api_clients.eduhub_client import EduHubClient
+    from api_clients.eduhub_client import EduHubClient, HasuraQueryError
     from api_clients.numeric_utils import safe_float_convert
     from security_handler import security_handler, get_security_level_for_organization, validate_and_sanitize_input
     from course_id_utils import generate_course_hash_id
@@ -22,7 +22,7 @@ except ImportError:
     import os
     current_dir = os.path.dirname(os.path.abspath(__file__))
     sys.path.insert(0, current_dir)
-    from api_clients.eduhub_client import EduHubClient
+    from api_clients.eduhub_client import EduHubClient, HasuraQueryError
     from api_clients.numeric_utils import safe_float_convert
     from security_handler import security_handler, get_security_level_for_organization, validate_and_sanitize_input
     from course_id_utils import generate_course_hash_id
@@ -271,16 +271,18 @@ def authenticate_api_key(api_key):
             "apiKeyHash": api_key_hash
         }
         
-        result = eduhub_client.send_query(query, variables)
-        
-        # Check for GraphQL errors
-        if not isinstance(result, dict):
-            logging.error(f"GraphQL query failed: {result}")
-            raise ValueError("Database connection error")
-        
-        if "errors" in result:
-            logging.error(f"GraphQL errors: {result['errors']}")
-            raise ValueError("Database query error")
+        try:
+            result = eduhub_client.send_query(query, variables)
+        except HasuraQueryError as error:
+            if error.graphql_errors:
+                logging.error(f"GraphQL errors: {error.graphql_errors}")
+                raise ValueError("Database query error") from error
+            if error.status_code is None:
+                # Transport failure: the generic handler below reports it as
+                # "Authentication failed", as before.
+                raise
+            logging.error(f"GraphQL query failed: {error}")
+            raise ValueError("Database connection error") from error
         
         if "data" not in result:
             logging.error(f"GraphQL response missing data: {result}")
@@ -363,9 +365,10 @@ def authenticate_jwt(token):
             }
         }
         """
-        result = eduhub_client.send_query(query, {"orgId": organization_id})
-        if not isinstance(result, dict) or "errors" in result:
-            raise ValueError("Database query error during JWT validation")
+        try:
+            result = eduhub_client.send_query(query, {"orgId": organization_id})
+        except HasuraQueryError as error:
+            raise ValueError("Database query error during JWT validation") from error
 
         organizations = result.get("data", {}).get("Organization", [])
         if not organizations:
@@ -467,12 +470,26 @@ def get_organization_funded_courses(organization_id, eduhub_client):
     }
     """
     
-    result = eduhub_client.send_query(primary_query, variables)
     courses: list = []
-    
-    def _valid_result(res: dict) -> bool:
+
+    def _send(query):
+        """The response, or the HasuraQueryError on an HTTP/GraphQL error.
+
+        Transport failures (no response at all) propagate, so the request ends
+        in a 500 instead of an empty course list.
+        """
+        try:
+            return eduhub_client.send_query(query, variables)
+        except HasuraQueryError as error:
+            if error.status_code is None:
+                raise
+            return error
+
+    def _valid_result(res) -> bool:
         return isinstance(res, dict) and ("data" in res) and ("errors" not in res)
-    
+
+    result = _send(primary_query)
+
     if _valid_result(result):
         try:
             for funding_relation in result["data"].get("CourseFundingOrganization", []):
@@ -543,7 +560,7 @@ def get_organization_funded_courses(organization_id, eduhub_client):
             }
         }
         """
-        fb_result = eduhub_client.send_query(fallback_query, variables)
+        fb_result = _send(fallback_query)
         if _valid_result(fb_result):
             try:
                 raw_courses = fb_result["data"].get("Course", [])
@@ -688,16 +705,21 @@ def get_course_participants(course_id, auth_info, eduhub_client, location_id=Non
     """
     
     variables = {"courseId": course_id}
-    result = eduhub_client.send_query(query, variables)
-    
-    # Check for GraphQL errors
-    if "errors" in result:
-        error_messages = [err.get("message", str(err)) for err in result["errors"]]
+    try:
+        result = eduhub_client.send_query(query, variables)
+    except HasuraQueryError as error:
+        if error.status_code is None:
+            raise
+        if not error.graphql_errors:
+            logging.error(f"GraphQL response missing data: {error}")
+            raise ValueError("GraphQL response missing data") from error
+        errors = error.graphql_errors
+        error_messages = [err.get("message", str(err)) for err in errors]
         logging.error(f"GraphQL query error in get_course_participants: {error_messages}")
         # Check if error is about missing 'location' field (migration not run)
-        if any("location" in str(err).lower() or "field" in str(err).lower() for err in result["errors"]):
+        if any("location" in str(err).lower() or "field" in str(err).lower() for err in errors):
             logging.error("The 'location' field may not exist in the database schema. Please run the migration to add the location column to CourseEnrollment.")
-        raise ValueError(f"GraphQL query failed: {', '.join(error_messages)}")
+        raise ValueError(f"GraphQL query failed: {', '.join(error_messages)}") from error
     
     if "data" not in result:
         logging.error(f"GraphQL response missing data: {result}")
