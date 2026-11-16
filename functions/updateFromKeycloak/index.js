@@ -185,6 +185,10 @@ export const updateFromKeycloak = async (req, res) => {
       return res.status(403).json({ error: 'Account deleted' });
     }
 
+    if (user == null) {
+      return res.status(404).json({ error: 'User not found in Keycloak' });
+    }
+
     if (user != null) {
       // Ensure matrix_user_handle is set in Keycloak (backfill for pre-SPI users)
       let matrixHandle = user.attributes?.matrix_user_handle?.[0] || null;
