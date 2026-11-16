@@ -125,3 +125,86 @@ resource "google_billing_budget" "monthly_increase" {
 
   depends_on = [google_project_service.billing_budgets]
 }
+
+###############################################################################
+# Cloud function dashboard
+#####
+# Request latency (p95), instances and request rate per cloud function unit,
+# so a split of a unit (e.g. interactive vs background handlers of
+# callNodeFunction, docs/adr/0002-function-units-by-secret-scope.md) is
+# decided on data. Gen2 functions run on Cloud Run, hence the run.googleapis.com
+# metrics on cloud_run_revision.
+
+locals {
+  cloud_function_service_filter = format(
+    "resource.type=\"cloud_run_revision\" AND resource.label.\"service_name\"=one_of(%s)",
+    join(",", [for unit in module.cloud_function : format("\"%s\"", unit.name)])
+  )
+
+  cloud_function_dashboard_charts = [
+    {
+      title     = "Request latency p95 (ms)"
+      metric    = "run.googleapis.com/request_latencies"
+      aligner   = "ALIGN_PERCENTILE_95"
+      reducer   = "REDUCE_MAX"
+      plot_type = "LINE"
+      y_label   = "ms"
+    },
+    {
+      title     = "Instances"
+      metric    = "run.googleapis.com/container/instance_count"
+      aligner   = "ALIGN_MAX"
+      reducer   = "REDUCE_SUM"
+      plot_type = "STACKED_AREA"
+      y_label   = "instances"
+    },
+    {
+      title     = "Requests per second"
+      metric    = "run.googleapis.com/request_count"
+      aligner   = "ALIGN_RATE"
+      reducer   = "REDUCE_SUM"
+      plot_type = "LINE"
+      y_label   = "req/s"
+    },
+  ]
+}
+
+resource "google_monitoring_dashboard" "cloud_functions" {
+  dashboard_json = jsonencode({
+    displayName = "EduHub cloud functions (${var.project_id})"
+    mosaicLayout = {
+      columns = 12
+      tiles = [
+        for index, chart in local.cloud_function_dashboard_charts : {
+          xPos   = 0
+          yPos   = index * 4
+          width  = 12
+          height = 4
+          widget = {
+            title = chart.title
+            xyChart = {
+              dataSets = [{
+                plotType = chart.plot_type
+                timeSeriesQuery = {
+                  timeSeriesFilter = {
+                    filter = "metric.type=\"${chart.metric}\" AND ${local.cloud_function_service_filter}"
+                    aggregation = {
+                      alignmentPeriod    = "60s"
+                      perSeriesAligner   = chart.aligner
+                      crossSeriesReducer = chart.reducer
+                      groupByFields      = ["resource.label.\"service_name\""]
+                    }
+                  }
+                }
+              }]
+              yAxis = {
+                label = chart.y_label
+                scale = "LINEAR"
+              }
+            }
+          }
+        }
+      ]
+    }
+  })
+}
