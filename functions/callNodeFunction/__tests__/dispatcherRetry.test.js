@@ -23,15 +23,6 @@ describe('callNodeFunction event retries', () => {
     handlerMock = jest.fn();
     jest.unstable_mockModule('../sendSpeakerAddedEmail/index.js', () => ({ default: handlerMock }));
 
-    // Keep the logger from writing error.log/combined.log into the package.
-    const winston = (await import('winston')).default;
-    jest.unstable_mockModule('winston', () => ({
-      default: {
-        ...winston,
-        transports: { Console: winston.transports.Console, File: winston.transports.Console },
-      },
-    }));
-
     ({ callNodeFunction } = await import('../index.js'));
   });
 

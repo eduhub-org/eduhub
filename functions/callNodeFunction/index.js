@@ -73,11 +73,9 @@ export const logger = winston.createLogger({
     winston.format.splat(),
     winston.format.json()  // Changed to JSON format for better structured logging
   ),
-  transports: [
-    new winston.transports.Console(),
-    new winston.transports.File({ filename: "error.log", level: "error" }),
-    new winston.transports.File({ filename: "combined.log" }),
-  ],
+  // Console only: Cloud Logging parses the JSON lines (jsonPayload.level),
+  // and a file transport would just fill the instance's in-memory disk.
+  transports: [new winston.transports.Console()],
 });
 
 const functionMap = {
