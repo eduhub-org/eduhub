@@ -9,6 +9,8 @@ on:
   push:
     paths:
       - functions/**
+      # callNodeFunction's registry test checks the function names here.
+      - backend/metadata/**
       - .github/workflows/functions-code-checks.yml
     branches:
       - develop
@@ -17,6 +19,8 @@ on:
   pull_request:
     paths:
       - functions/**
+      # callNodeFunction's registry test checks the function names here.
+      - backend/metadata/**
       - .github/workflows/functions-code-checks.yml
     branches:
       - develop
