@@ -63,13 +63,15 @@
       value_from_env: HASURA_CLOUD_FUNCTION_SECRET
   comment: Reminds accepted project authors before their project submission deadline
 - name: send_questionaires
-  webhook: '{{CLOUD_FUNCTION_LINK_SEND_QUESTIONAIRES}}'
+  webhook: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
   schedule: 0 */2 * * *
   include_in_metadata: true
   payload: {}
   headers:
-    - name: secret
+    - name: Hasura-Secret
       value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+    - name: Function-Name
+      value: sendQuestionaires
   comment: Sends out questionaires if necessary
 - name: update_enrollment_locations
   webhook: '{{CLOUD_FUNCTION_LINK_CALL_PYTHON_FUNCTION}}'

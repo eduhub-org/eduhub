@@ -55,23 +55,26 @@ Do not start until the release with step 1 is deployed to production.
       `getSignedUrl` from the Hasura console, once as is and once with the
       headers renamed by hand.
 
-### What changes (count: 79 + 73 + 20 header entries)
+### What changes (count: 48 + 47 + 1 header entries)
+
+Phase 6 (identity/media split and the folded units) already moved every
+entry it touched to the standard names, so only the callNodeFunction and
+sendMail entries below remain.
 
 `- name: <header>` entries in `backend/metadata/`:
 
 | File | `secret` → `Hasura-Secret` | `name` → `Function-Name` | `bucket` → `Bucket` |
 |------|---:|---:|---:|
-| `actions.yaml` (52 callNodeFunction actions + `updateFromKeycloak`) | 53 | 52 | 20 |
-| `cron_triggers.yaml` (4 callNodeFunction crons + `send_questionaires`) | 5 | 4 | 0 |
-| `databases/default/tables/public_*.yaml` (21 event triggers, 16 files) | 21 | 17 | 0 |
-| **Total** | **79** | **73** | **20** |
+| `actions.yaml` (28 callNodeFunction actions) | 28 | 28 | 1 |
+| `cron_triggers.yaml` (4 callNodeFunction crons) | 4 | 4 | 0 |
+| `databases/default/tables/public_*.yaml` (16 event triggers, 14 files) | 16 | 15 | 0 |
+| **Total** | **48** | **47** | **1** |
 
 Event triggers per file: `Course` 1, `CourseEnrollment` 2, `CourseInstructor`
-4 (3 with a name), `Invoice` 1, `LocationAddress` 1, `MailLog` 1 (secret only),
-`OrganizationAdmin` 2 (secret only, keep `role`), `OrganizationFeature` 1,
-`OrganizationNewsletterSubscription` 1, `Project` 1, `ProjectAuthor` 1,
-`RausgegangenListing` 1, `Session` 1, `SessionAddress` 1, `SessionSpeaker` 1,
-`User` 1.
+2, `Invoice` 1, `LocationAddress` 1, `MailLog` 1 (secret only),
+`OrganizationFeature` 1, `OrganizationNewsletterSubscription` 1, `Project` 1,
+`ProjectAuthor` 1, `RausgegangenListing` 1, `Session` 1, `SessionAddress` 1,
+`SessionSpeaker` 1.
 
 Every `- name: name` / `- name: secret` / `- name: bucket` line in these files
 is a header (the counts match the header inventory exactly), so a line-anchored
@@ -86,7 +89,7 @@ case-insensitive) but makes the metadata uniform. Other headers (`role`,
 cd backend/metadata
 files=(actions.yaml cron_triggers.yaml databases/default/tables/*.yaml)
 count() { grep -hEc "^\s*- name: $1\s*$" "${files[@]}" | paste -sd+ | bc; }
-[ "$(count secret)" = 79 ] && [ "$(count name)" = 73 ] && [ "$(count bucket)" = 20 ] \
+[ "$(count secret)" = 48 ] && [ "$(count name)" = 47 ] && [ "$(count bucket)" = 1 ] \
   || { echo "counts changed, re-check the inventory"; exit 1; }
 sed -i -E \
   -e 's/^(\s*)- name: secret\s*$/\1- name: Hasura-Secret/' \
@@ -94,8 +97,8 @@ sed -i -E \
   -e 's/^(\s*)- name: bucket\s*$/\1- name: Bucket/' \
   "${files[@]}"
 [ "$(count secret)$(count name)$(count bucket)" = 000 ]
-[ "$(count Hasura-Secret)" = 93 ] && [ "$(count Function-Name)" = 87 ] \
-  && [ "$(count Bucket)" = 23 ]   # 79+14, 73+14, 20+3 already standard
+[ "$(count Hasura-Secret)" = 93 ] && [ "$(count Function-Name)" = 92 ] \
+  && [ "$(count Bucket)" = 23 ]   # 48+45, 47+45, 1+22 already standard
 ```
 
 If a handler was added since, the count check fails: update the table above
@@ -182,9 +185,9 @@ Event triggers (`retry_conf`: `num_retries` × `interval_sec`, `timeout_sec`):
 | `update_keycloak_user` (User) | updateKeycloakUser | 5 × 10 s | 60 | sync |
 | `update_matrix_instructor_power_level` (CourseInstructor) | updateMatrixInstructorPowerLevel | 3 × 10 s | 60 | sync |
 | `add_confirmed_user_to_mm` (CourseEnrollment) | Python add_confirmed_user_to_mm | 0 × 10 s | 60 | sync |
-| `add_keycloak_instructor_role` (CourseInstructor) | addKeycloakRole unit | 0 × 10 s | 60 | role |
-| `add_keycloak_org_admin_role` (OrganizationAdmin) | addKeycloakRole unit | 3 × 10 s | 60 | role |
-| `remove_keycloak_org_admin_role` (OrganizationAdmin) | removeKeycloakRole unit | 3 × 10 s | 60 | role |
+| `add_keycloak_instructor_role` (CourseInstructor) | addKeycloakRole (identity) | 0 × 10 s | 60 | role |
+| `add_keycloak_org_admin_role` (OrganizationAdmin) | addKeycloakRole (identity) | 3 × 10 s | 60 | role |
+| `remove_keycloak_org_admin_role` (OrganizationAdmin) | removeKeycloakRole (identity) | 3 × 10 s | 60 | role |
 
 Cron triggers (`num_retries` × `retry_interval_seconds`, `timeout_seconds`;
 all `tolerance_seconds: 21600`): `sync_mail_delivery_status` 3 × 60 s / 3699,

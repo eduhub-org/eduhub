@@ -41,8 +41,7 @@ const NON_HANDLER_DIRS = new Set(['lib', 'scripts', 'shared', 'node_modules', 'c
 // Handlers registered under another name than their folder.
 const EXTRA_KEYS = { deleteMyAccount: 'anonymizeUser' };
 // Handler keys that no metadata entry is expected to reference.
-// Folded in from their own units; the metadata still calls those units.
-const UNREFERENCED_ALLOWED = new Set(['updateFromKeycloak', 'addKeycloakRole', 'removeKeycloakRole', 'sendQuestionaires']);
+const UNREFERENCED_ALLOWED = new Set([]);
 
 const readYaml = (file) => yaml.load(fs.readFileSync(file, 'utf8')) ?? [];
 

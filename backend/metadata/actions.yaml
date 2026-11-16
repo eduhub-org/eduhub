@@ -709,11 +709,13 @@ actions:
   - name: updateFromKeycloak
     definition:
       kind: synchronous
-      handler: '{{CLOUD_FUNCTION_LINK_UPDATE_FROM_KEYCLOAK}}'
+      handler: '{{CLOUD_FUNCTION_LINK_IDENTITY}}'
       forward_client_headers: true
       headers:
-        - name: secret
+        - name: Hasura-Secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: Function-Name
+          value: updateFromKeycloak
     permissions:
       - role: instructor_access
       - role: user_access
