@@ -282,7 +282,8 @@ exports.sendMail = async (req, res) => {
   const { id, subject, content, to, from, replyTo, cc, bcc, attachments } = req.body.event.data.new;
 
   // Get mail tag from headers or use default
-  const mailTag = req.headers.mailTag || 'eduhub'; // default if not provided
+  // Express lowercases header names, so the header must be read as `mailtag`.
+  const mailTag = req.headers.mailtag || 'eduhub'; // default if not provided
 
   // The mail's own sender, and the Mailgun domain that can legitimately sign
   // for it. A sender that no configured domain covers is replaced rather than
