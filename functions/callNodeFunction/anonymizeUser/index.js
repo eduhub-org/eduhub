@@ -7,6 +7,7 @@ import { deactivateMatrixUser, getMatrixDeactivationConfig, toMatrixUserId } fro
 import axios from 'axios';
 import path from 'node:path';
 import { GET_DELETION_DATA, ERASE_PERSONAL_DATA, getErasureVariables } from './personalData.js';
+import * as appConfig from '../lib/config.js';
 
 // Stay below the 180 s action/function limit, so the caller gets the retryable
 // partial result instead of a generic timeout.
@@ -50,7 +51,7 @@ async function removeMatrixAccount(matrixUserHandle, logger, userId, timeoutMs) 
   const config = getMatrixDeactivationConfig();
   if (!config) {
     // A partial configuration must not clear the handle while the account stays active.
-    if (process.env.MATRIX_HOMESERVER_URL?.trim()) throw new Error('Matrix deactivation config incomplete');
+    if (appConfig.trimmedEnv('MATRIX_HOMESERVER_URL')) throw new Error('Matrix deactivation config incomplete');
     // No homeserver at all (e.g. local development): there is no Matrix integration to clean up.
     logger.warn?.('Matrix not configured; skipping Matrix account deactivation', { userId });
     return;
@@ -84,10 +85,10 @@ async function eraseAccount(req, logger, userId) {
   const checkpoint = () => {
     if (timeLeft() <= 0) throw new Error('DEADLINE_EXCEEDED');
   };
-  const query = (document, variables) => request(
-    process.env.HASURA_ENDPOINT, document, variables,
-    { 'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET }
-  );
+  const query = (document, variables) => {
+    const { endpoint, adminSecret } = appConfig.hasuraConfig();
+    return request(endpoint, document, variables, { 'x-hasura-admin-secret': adminSecret });
+  };
 
   try {
     if (!UUID.test(userId || '')) throw new Error('ERROR_INVALID_UUID');
@@ -133,7 +134,7 @@ async function eraseAccount(req, logger, userId) {
     // Last: preserve a working session for retries until all cleanup has landed.
     const token = await getKeycloakToken();
     try {
-      await axios.delete(`${process.env.KEYCLOAK_URL}/admin/realms/edu-hub/users/${userId}`, {
+      await axios.delete(`${appConfig.keycloakConfig().url}/admin/realms/edu-hub/users/${userId}`, {
         headers: { Authorization: `Bearer ${token}` },
         timeout: KEYCLOAK_TIMEOUT_MS,
       });

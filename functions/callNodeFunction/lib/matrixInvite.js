@@ -1,4 +1,5 @@
 import { trimAndNull } from "./matrixRoomUtils.js";
+import * as appConfig from "./config.js";
 
 const normalizeBaseUrl = (url) => url.replace(/\/+$/, "");
 
@@ -98,11 +99,11 @@ const fetchMatrixWithRateLimitRetry = async (url, init, signal) => {
 };
 
 export const getMatrixInviteConfig = ({ requireToken = true } = {}) => {
-  const homeserverUrl = trimAndNull(process.env.MATRIX_HOMESERVER_URL);
-  const token = trimAndNull(process.env.MATRIX_ADMIN_ACCESS_TOKEN);
-  const mainSpaceId = trimAndNull(process.env.MATRIX_MAIN_SPACE_ID);
-  const adminUserId = trimAndNull(process.env.MATRIX_ADMIN_USER_ID);
-  const explicitServerName = trimAndNull(process.env.MATRIX_SERVER_NAME);
+  const homeserverUrl = appConfig.trimmedEnv('MATRIX_HOMESERVER_URL');
+  const token = appConfig.trimmedEnv('MATRIX_ADMIN_ACCESS_TOKEN');
+  const mainSpaceId = appConfig.trimmedEnv('MATRIX_MAIN_SPACE_ID');
+  const adminUserId = appConfig.trimmedEnv('MATRIX_ADMIN_USER_ID');
+  const explicitServerName = appConfig.trimmedEnv('MATRIX_SERVER_NAME');
   const serverName = deriveServerName({ explicitServerName, mainSpaceId, adminUserId });
 
   if (!homeserverUrl || (requireToken && !token) || !serverName) return null;
@@ -122,7 +123,7 @@ export const getMatrixInviteConfig = ({ requireToken = true } = {}) => {
 export const getMatrixDeactivationConfig = () => {
   const config = getMatrixInviteConfig({ requireToken: false });
   if (!config) return null;
-  return { ...config, token: trimAndNull(process.env.MATRIX_SYNAPSE_ADMIN_TOKEN) };
+  return { ...config, token: appConfig.trimmedEnv('MATRIX_SYNAPSE_ADMIN_TOKEN') };
 };
 
 /**

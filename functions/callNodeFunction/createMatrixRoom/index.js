@@ -1,4 +1,5 @@
-import { GraphQLClient } from "graphql-request";
+import { createHasuraClient } from "../lib/hasura.js";
+import * as config from "../lib/config.js";
 
 const GET_COURSE_CONTEXT = `
   query GetCourseContext($courseId: Int!) {
@@ -220,24 +221,13 @@ const sanitizeAliasLocalPart = (value) =>
     .replace(/-+/g, "-")
     .replace(/^-|-$/g, "");
 
-const ensureHasuraClient = () => {
-  if (!process.env.HASURA_ENDPOINT || !process.env.HASURA_ADMIN_SECRET) {
-    throw new Error("HASURA_ENDPOINT or HASURA_ADMIN_SECRET not configured");
-  }
-  return new GraphQLClient(process.env.HASURA_ENDPOINT, {
-    headers: {
-      "x-hasura-admin-secret": process.env.HASURA_ADMIN_SECRET,
-    },
-  });
-};
-
 const getMatrixConfig = () => {
-  const homeserverUrl = trimAndNull(process.env.MATRIX_HOMESERVER_URL);
-  const token = trimAndNull(process.env.MATRIX_ADMIN_ACCESS_TOKEN);
-  const elementClientUrl = trimAndNull(process.env.MATRIX_ELEMENT_CLIENT_URL);
-  const mainSpaceId = trimAndNull(process.env.MATRIX_MAIN_SPACE_ID);
-  const adminUserId = trimAndNull(process.env.MATRIX_ADMIN_USER_ID);
-  const explicitServerName = trimAndNull(process.env.MATRIX_SERVER_NAME);
+  const homeserverUrl = config.trimmedEnv('MATRIX_HOMESERVER_URL');
+  const token = config.trimmedEnv('MATRIX_ADMIN_ACCESS_TOKEN');
+  const elementClientUrl = config.trimmedEnv('MATRIX_ELEMENT_CLIENT_URL');
+  const mainSpaceId = config.trimmedEnv('MATRIX_MAIN_SPACE_ID');
+  const adminUserId = config.trimmedEnv('MATRIX_ADMIN_USER_ID');
+  const explicitServerName = config.trimmedEnv('MATRIX_SERVER_NAME');
   const serverName = deriveServerName({ explicitServerName, mainSpaceId, adminUserId });
 
   if (!homeserverUrl || !token || !elementClientUrl || !mainSpaceId || !serverName) {
@@ -379,7 +369,7 @@ export default async function createMatrixRoom(req, logger) {
   let partialRoomId = null;
 
   try {
-    const hasuraClient = ensureHasuraClient();
+    const hasuraClient = createHasuraClient();
 
     if (!ADMIN_ROLES.has(role)) {
       const userId = req.body?.session_variables?.["x-hasura-user-id"];

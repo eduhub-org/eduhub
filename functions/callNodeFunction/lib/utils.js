@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { logger } from '../index.js';
+import * as config from './config.js';
 
 export function replacePlaceholders(str, values) {
   return Object.keys(values).reduce((currentStr, key) => {
@@ -11,12 +12,12 @@ export function replacePlaceholders(str, values) {
 export const getKeycloakToken = async () => {
   try {
     const response = await axios.post(
-      `${process.env.KEYCLOAK_URL}/realms/master/protocol/openid-connect/token`,
+      `${config.keycloakConfig().url}/realms/master/protocol/openid-connect/token`,
       new URLSearchParams({
         grant_type: 'password',
         client_id: 'admin-cli',
-        username: process.env.KEYCLOAK_USER || 'keycloak',
-        password: process.env.KEYCLOAK_PW,
+        username: config.keycloakConfig().username,
+        password: config.keycloakConfig().password,
       }),
       {
         headers: {

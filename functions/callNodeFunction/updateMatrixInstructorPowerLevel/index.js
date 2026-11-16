@@ -1,4 +1,3 @@
-import { GraphQLClient } from "graphql-request";
 import { trimAndNull, normalizeMatrixRoomId, isValidMatrixRoomId } from "../lib/matrixRoomUtils.js";
 import {
   ensureBotJoinedMatrixRoom,
@@ -6,6 +5,7 @@ import {
   inviteUserToMatrixRoom,
   toMatrixUserId,
 } from "../lib/matrixInvite.js";
+import { createHasuraClient } from "../lib/hasura.js";
 
 const GRAPHQL_TIMEOUT_MS = 30_000;
 const MATRIX_TIMEOUT_MS = 30_000;
@@ -68,17 +68,6 @@ const parseMatrixResponse = async (response) => {
   throw error;
 };
 
-const ensureHasuraClient = () => {
-  if (!process.env.HASURA_ENDPOINT || !process.env.HASURA_ADMIN_SECRET) {
-    throw new Error("HASURA_ENDPOINT or HASURA_ADMIN_SECRET not configured");
-  }
-  return new GraphQLClient(process.env.HASURA_ENDPOINT, {
-    headers: {
-      "x-hasura-admin-secret": process.env.HASURA_ADMIN_SECRET,
-    },
-  });
-};
-
 const getCurrentPowerLevels = async ({ roomId, matrixConfig, signal }) => {
   const stateUrl = `${matrixConfig.homeserverUrl}/_matrix/client/v3/rooms/${encodeURIComponent(
     roomId
@@ -135,7 +124,7 @@ export default async function updateMatrixInstructorPowerLevel(req, logger) {
     };
   }
 
-  const hasuraClient = ensureHasuraClient();
+  const hasuraClient = createHasuraClient();
   const gqlController = new AbortController();
   const gqlTimeout = setTimeout(() => gqlController.abort(), GRAPHQL_TIMEOUT_MS);
 

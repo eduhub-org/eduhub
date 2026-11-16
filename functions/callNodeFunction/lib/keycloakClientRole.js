@@ -1,4 +1,5 @@
 import KcAdminClient from '@keycloak/keycloak-admin-client';
+import * as config from './config.js';
 
 /**
  * Hand out a Keycloak `hasura` client role (admin, instructor, org_admin, ...)
@@ -39,7 +40,7 @@ export const addKeycloakClientRole = async (
   if (!userId || !role) {
     return { granted: false, reason: 'MISSING_ARGUMENTS' };
   }
-  if (!process.env.KEYCLOAK_URL || !process.env.KEYCLOAK_PW) {
+  if (!config.keycloakConfig().url || !config.keycloakConfig().password) {
     logger?.warn('Keycloak admin credentials not configured, cannot grant role', { role });
     return { granted: false, reason: 'KEYCLOAK_NOT_CONFIGURED' };
   }
@@ -62,14 +63,14 @@ export const addKeycloakClientRole = async (
 
 const grant = async (userId, role, clientId, realmName, timeoutMs) => {
   const kcAdminClient = new KcAdminClient({
-    baseUrl: process.env.KEYCLOAK_URL,
+    baseUrl: config.keycloakConfig().url,
     realmName: 'master',
     timeout: timeoutMs,
   });
 
   await kcAdminClient.auth({
-    username: process.env.KEYCLOAK_USER || 'keycloak',
-    password: process.env.KEYCLOAK_PW,
+    username: config.keycloakConfig().username,
+    password: config.keycloakConfig().password,
     grantType: 'password',
     clientId: 'admin-cli',
   });

@@ -1,12 +1,13 @@
 import axios from 'axios';
 import { getKeycloakToken } from '../lib/utils.js';
 import { logger } from '../index.js';
+import * as config from '../lib/config.js';
 
 const getAdminUsers = async (req) => {
   try {
     const keycloakToken = await getKeycloakToken();
     const authHeaders = { headers: { Authorization: `Bearer ${keycloakToken}` } };
-    const realmUrl = `${process.env.KEYCLOAK_URL}/admin/realms/edu-hub`;
+    const realmUrl = `${config.keycloakConfig().url}/admin/realms/edu-hub`;
 
     // Super-admin is modeled as the "admin" role on the "hasura" client (not a realm role),
     // matching addKeycloakRole and the Hasura JWT role mapping. Resolve the client by clientId so we

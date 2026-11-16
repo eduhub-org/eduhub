@@ -2,16 +2,17 @@ import { logger } from "../index.js";
 import axios from "axios";
 import { computeMatrixHandle } from "../lib/matrixHandle.js";
 import { mergeUserPutPayload } from "../shared/keycloakUserMerge.js";
+import * as config from "../lib/config.js";
 
 const getKeycloakToken = async () => {
   try {
     const response = await axios.post(
-      `${process.env.KEYCLOAK_URL}/realms/master/protocol/openid-connect/token`,
+      `${config.keycloakConfig().url}/realms/master/protocol/openid-connect/token`,
       new URLSearchParams({
         grant_type: 'password',
         client_id: 'admin-cli',
-        username: process.env.KEYCLOAK_USER || 'keycloak',
-        password: process.env.KEYCLOAK_PW,
+        username: config.keycloakConfig().username,
+        password: config.keycloakConfig().password,
       }),
       {
         headers: {
@@ -29,7 +30,7 @@ const getKeycloakToken = async () => {
 const updateKeycloakUser = async (userId, updatedFields, token) => {
   try {
     await axios.put(
-      `${process.env.KEYCLOAK_URL}/admin/realms/edu-hub/users/${userId}`,
+      `${config.keycloakConfig().url}/admin/realms/edu-hub/users/${userId}`,
       updatedFields,
       {
         headers: {
@@ -74,7 +75,7 @@ const resolvePictureUrl = (picturePath) => {
     return picturePath;
   }
   if (picturePath.startsWith('public/') || picturePath.includes('/public/')) {
-    const bucketUrl = process.env.STORAGE_BUCKET_PUBLIC_URL;
+    const bucketUrl = config.storageBucketPublicUrl();
     if (!bucketUrl) {
       logger.warn('STORAGE_BUCKET_PUBLIC_URL not set, cannot resolve picture URL');
       return null;
@@ -139,7 +140,7 @@ const updateKeycloakUserHandler = async (req) => {
     let userResponse;
     try {
       userResponse = await axios.get(
-        `${process.env.KEYCLOAK_URL}/admin/realms/edu-hub/users/${userId}`,
+        `${config.keycloakConfig().url}/admin/realms/edu-hub/users/${userId}`,
         { headers: { Authorization: `Bearer ${keycloakToken}` } }
       );
     } catch (err) {
