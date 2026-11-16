@@ -98,7 +98,7 @@ const formatResponse = (result) => {
  * missing or wrong secret, 500 when the server secret is unset, 400 when
  * `Function-Name` and `name` disagree, 404 for a handler not in `handlers`,
  * 503 for a failure the handler marks `retryable` in an event or cron
- * trigger, and 200 otherwise, including `success: false` results and thrown
+ * trigger, the handler's `httpStatus` when it sets one, and 200 otherwise, including `success: false` results and thrown
  * errors.
  *
  * @param {{ name: string, handlers: Record<string, import('./types.js').Handler> }} options
@@ -145,6 +145,20 @@ export const createDispatcher = ({ name: unitName, handlers }) => async (req, re
   try {
     logger.info(`Executing function: ${functionName}`, { unit: unitName });
     const result = await handlers[functionName](req, logger);
+
+    // A handler that must answer with a given status sets `httpStatus`, e.g.
+    // an action whose caller relies on Hasura turning a 4xx into a GraphQL
+    // error (updateFromKeycloak), or an event trigger that must fail with a
+    // non-2xx so Hasura retries it. Hasura reads `message` from an action's
+    // error body. The field itself is not sent.
+    if (Number.isInteger(result?.httpStatus)) {
+      const { httpStatus, ...body } = result;
+      logger.info(`Function ${functionName} answered ${httpStatus}`, {
+        unit: unitName,
+        response: redactForLogging(body)
+      });
+      return res.status(httpStatus).json(body);
+    }
 
     // Event and cron triggers retry only on a non-2xx answer. Handlers opt in
     // per failure with `retryable`, since most failures (a deleted row, a

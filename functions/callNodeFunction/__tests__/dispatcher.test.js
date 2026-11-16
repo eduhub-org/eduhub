@@ -104,6 +104,30 @@ describe('callNodeFunction', () => {
     });
   });
 
+  describe('httpStatus', () => {
+    it('answers with the status a handler sets and drops the field', async () => {
+      handlerMock.mockResolvedValue({ httpStatus: 403, message: 'Account deleted', error: 'Account deleted' });
+      const { status, body } = await call({ ...eventRequest(), body: { input: {}, request_query: 'mutation { a }' } });
+
+      expect(status).toBe(403);
+      expect(body).toEqual({ message: 'Account deleted', error: 'Account deleted' });
+    });
+
+    it('takes httpStatus over retryable', async () => {
+      handlerMock.mockResolvedValue({ httpStatus: 400, retryable: true });
+      const { status } = await call(eventRequest());
+
+      expect(status).toBe(400);
+    });
+
+    it('ignores a httpStatus that is not an integer', async () => {
+      handlerMock.mockResolvedValue({ success: true, httpStatus: '500' });
+      const { status } = await call(eventRequest());
+
+      expect(status).toBe(200);
+    });
+  });
+
   describe('response body', () => {
     it('wraps a result without success/error for a query', async () => {
       handlerMock.mockResolvedValue({ link: 'x' });
