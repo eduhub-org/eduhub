@@ -14,8 +14,8 @@ describe('Email System Integration', () => {
 
   describe('Module loading', () => {
     it('should load both email functions successfully', async () => {
-      const { default: sendEnrollmentEmail } = await import('../sendEnrollmentEmail/index.js');
-      const { default: sendSessionReminders } = await import('../sendSessionReminders/index.js');
+      const { default: sendEnrollmentEmail } = await import('../index.js');
+      const { default: sendSessionReminders } = await import('../../sendSessionReminders/index.js');
       
       expect(typeof sendEnrollmentEmail).toBe('function');
       expect(typeof sendSessionReminders).toBe('function');
@@ -24,7 +24,7 @@ describe('Email System Integration', () => {
 
   describe('sendProjectEmail routing (no GraphQL needed)', () => {
     it('should skip DELETE operations', async () => {
-      const { default: sendProjectEmail } = await import('../sendProjectEmail/index.js');
+      const { default: sendProjectEmail } = await import('../../sendProjectEmail/index.js');
       const res = await sendProjectEmail(
         { body: { table: { name: 'Project' }, event: { op: 'DELETE', data: { new: null, old: { id: 1 } } } } },
         mockLogger
@@ -34,7 +34,7 @@ describe('Email System Integration', () => {
     });
 
     it('should skip Project updates with unchanged status', async () => {
-      const { default: sendProjectEmail } = await import('../sendProjectEmail/index.js');
+      const { default: sendProjectEmail } = await import('../../sendProjectEmail/index.js');
       const res = await sendProjectEmail(
         {
           body: {
@@ -49,7 +49,7 @@ describe('Email System Integration', () => {
     });
 
     it('should not email on ProjectAuthor insert that is not REQUESTED', async () => {
-      const { default: sendProjectEmail } = await import('../sendProjectEmail/index.js');
+      const { default: sendProjectEmail } = await import('../../sendProjectEmail/index.js');
       const res = await sendProjectEmail(
         {
           body: {
@@ -67,7 +67,7 @@ describe('Email System Integration', () => {
 
   describe('sendCourseUpdateEmail routing (no GraphQL needed)', () => {
     it('should skip non-UPDATE operations', async () => {
-      const { default: sendCourseUpdateEmail } = await import('../sendCourseUpdateEmail/index.js');
+      const { default: sendCourseUpdateEmail } = await import('../../sendCourseUpdateEmail/index.js');
       const res = await sendCourseUpdateEmail(
         { body: { table: { name: 'Session' }, event: { op: 'INSERT', data: { new: { Id: 1 }, old: null } } } },
         mockLogger
@@ -77,7 +77,7 @@ describe('Email System Integration', () => {
     });
 
     it('should skip Session updates that do not change timing', async () => {
-      const { default: sendCourseUpdateEmail } = await import('../sendCourseUpdateEmail/index.js');
+      const { default: sendCourseUpdateEmail } = await import('../../sendCourseUpdateEmail/index.js');
       const res = await sendCourseUpdateEmail(
         {
           body: {
@@ -98,7 +98,7 @@ describe('Email System Integration', () => {
     });
 
     it('should skip Invoice updates that are not a fresh transition to PAID', async () => {
-      const { default: sendCourseUpdateEmail } = await import('../sendCourseUpdateEmail/index.js');
+      const { default: sendCourseUpdateEmail } = await import('../../sendCourseUpdateEmail/index.js');
       const res = await sendCourseUpdateEmail(
         {
           body: {
@@ -113,7 +113,7 @@ describe('Email System Integration', () => {
     });
 
     it('should skip PAID invoices with no linked course enrollment', async () => {
-      const { default: sendCourseUpdateEmail } = await import('../sendCourseUpdateEmail/index.js');
+      const { default: sendCourseUpdateEmail } = await import('../../sendCourseUpdateEmail/index.js');
       const res = await sendCourseUpdateEmail(
         {
           body: {
@@ -130,7 +130,7 @@ describe('Email System Integration', () => {
 
   describe('Function behavior without GraphQL', () => {
     it('should handle enrollment email edge cases', async () => {
-      const { default: sendEnrollmentEmail } = await import('../sendEnrollmentEmail/index.js');
+      const { default: sendEnrollmentEmail } = await import('../index.js');
       
       // Test DELETE operation (should be skipped)
       const deleteReq = {
@@ -166,7 +166,7 @@ describe('Email System Integration', () => {
     });
 
     it('should handle session reminders error cases', async () => {
-      const { default: sendSessionReminders } = await import('../sendSessionReminders/index.js');
+      const { default: sendSessionReminders } = await import('../../sendSessionReminders/index.js');
       
       const req = { body: {} };
       const result = await sendSessionReminders(req, mockLogger);
@@ -180,8 +180,8 @@ describe('Email System Integration', () => {
 
   describe('Error resilience', () => {
     it('should demonstrate independent error handling', async () => {
-      const { default: sendEnrollmentEmail } = await import('../sendEnrollmentEmail/index.js');
-      const { default: sendSessionReminders } = await import('../sendSessionReminders/index.js');
+      const { default: sendEnrollmentEmail } = await import('../index.js');
+      const { default: sendSessionReminders } = await import('../../sendSessionReminders/index.js');
       
       // Even if one function encounters an error, the other should still work for valid inputs
       const validEnrollmentReq = {
@@ -208,8 +208,8 @@ describe('Email System Integration', () => {
 
   describe('Logging consistency', () => {
     it('should demonstrate consistent logging patterns', async () => {
-      const { default: sendEnrollmentEmail } = await import('../sendEnrollmentEmail/index.js');
-      const { default: sendSessionReminders } = await import('../sendSessionReminders/index.js');
+      const { default: sendEnrollmentEmail } = await import('../index.js');
+      const { default: sendSessionReminders } = await import('../../sendSessionReminders/index.js');
       
       const enrollmentReq = {
         body: {

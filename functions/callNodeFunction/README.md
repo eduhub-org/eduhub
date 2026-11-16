@@ -70,20 +70,18 @@ VERBOSE=1 npm test
 
 ### Test Structure
 
+Tests live next to the code they test:
+
 ```
 functions/callNodeFunction/
-├── __tests__/
-│   └── helpers/
-│       └── mockData.js           # Shared mock data and utilities
-├── sendEnrollmentEmail/
-│   ├── __tests__/
-│   │   └── sendEnrollmentEmail.test.js
+├── __tests__/                    # dispatcher (index.js) tests only
+├── <handler>/
+│   ├── __tests__/<name>.test.js  # handler tests
 │   └── index.js
-├── sendSessionReminders/
-│   ├── __tests__/
-│   │   └── sendSessionReminders.test.js
-│   └── index.js
-├── jest.config.js                # Jest configuration
+├── lib/
+│   ├── __tests__/<name>.test.js  # shared helper tests
+│   └── <name>.js
+├── jest.config.js                # Jest configuration (also runs ../sendMail/__tests__)
 ├── jest.setup.js                 # Global test setup
 └── package.json
 ```
@@ -112,11 +110,8 @@ The tests cover:
 
 ### Mock Data
 
-The test suite uses comprehensive mock data including:
-- Sample users, courses, sessions, and enrollments
-- All email templates with variable placeholders
-- Hasura event trigger payloads
-- GraphQL response structures
+Each suite builds its own fixtures and mocks `graphql-request` (or the `lib/`
+module it depends on) with `jest.unstable_mockModule`.
 
 ### Environment Variables
 

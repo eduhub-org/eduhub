@@ -9,7 +9,7 @@ import {
   hasQueuedPublishedMail,
   issueBankTransferInvoice,
   normalizeBillingInput,
-} from '../publishJobPosting/invoicePayment.js';
+} from '../invoicePayment.js';
 
 const logger = { info: jest.fn(), warn: jest.fn(), error: jest.fn() };
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from '@jest/globals';
-import { maxBase64LengthForBytes, validateFileUpload } from './fileValidation.js';
+import { maxBase64LengthForBytes, validateFileUpload } from '../fileValidation.js';
 
 const PDF = Buffer.from('%PDF-1.7\n1 0 obj<</Type/Catalog>>endobj\n%%EOF\n');
 const EMPTY_ZIP = Buffer.from([

@@ -7,8 +7,8 @@ jest.unstable_mockModule('graphql-request', () => ({
 }));
 
 const loadFormbricksSurveyResponses = jest.fn();
-const actual = await import('../lib/formbricksResponses.js');
-jest.unstable_mockModule('../lib/formbricksResponses.js', () => ({
+const actual = await import('../../lib/formbricksResponses.js');
+jest.unstable_mockModule('../../lib/formbricksResponses.js', () => ({
   ...actual,
   loadFormbricksSurveyResponses,
 }));
@@ -16,7 +16,7 @@ jest.unstable_mockModule('../lib/formbricksResponses.js', () => ({
 process.env.HASURA_ENDPOINT = 'http://hasura.test/v1/graphql';
 process.env.HASURA_ADMIN_SECRET = 'test-secret';
 
-const { default: syncFormbricksResponses } = await import('../syncFormbricksResponses/index.js');
+const { default: syncFormbricksResponses } = await import('../index.js');
 
 const logger = { info: jest.fn(), error: jest.fn(), warn: jest.fn(), debug: jest.fn() };
 const URL_A = 'https://forms.example/s/a';

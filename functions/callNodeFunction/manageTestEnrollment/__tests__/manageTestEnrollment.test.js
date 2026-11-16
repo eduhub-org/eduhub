@@ -10,7 +10,7 @@ jest.unstable_mockModule('graphql-request', () => ({
 process.env.HASURA_ENDPOINT = 'http://hasura.test/v1/graphql';
 process.env.HASURA_ADMIN_SECRET = 'test-secret';
 
-const { default: manageTestEnrollment } = await import('../manageTestEnrollment/index.js');
+const { default: manageTestEnrollment } = await import('../index.js');
 
 const USER_ID = '7c9e6679-7425-40de-944b-e07fc1f90ae7';
 const COURSE_ID = 42;

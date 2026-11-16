@@ -9,7 +9,7 @@ import {
   buildServicePeriodField,
   formatInvoiceDate,
   getOrCreateCustomer,
-} from '../lib/stripeTax.js';
+} from '../stripeTax.js';
 
 describe('buildPaymentMethodConfig', () => {
   it('offers card and SEPA debit, and lets Stripe create the customer when there is no email', () => {

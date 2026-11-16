@@ -1,4 +1,4 @@
-import { checkoutAccess, endOfBerlinDay, placesOpenForRegistration } from '../lib/checkoutAccess.js';
+import { checkoutAccess, endOfBerlinDay, placesOpenForRegistration } from '../checkoutAccess.js';
 
 describe('endOfBerlinDay', () => {
   it('ends a summer day at 22:00 UTC and a winter day at 23:00 UTC', () => {

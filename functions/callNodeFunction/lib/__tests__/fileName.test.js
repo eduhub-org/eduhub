@@ -1,4 +1,4 @@
-import { sanitizeStoredFileName } from './fileName.js';
+import { sanitizeStoredFileName } from '../fileName.js';
 
 const NUL = String.fromCharCode(0);
 const BACKSLASH = String.fromCharCode(92);

@@ -7,7 +7,7 @@ import {
   safeAttachmentFilename,
   resolveAttachments,
   resolveSender,
-} from '../../sendMail/index.js';
+} from '../index.js';
 
 describe('isAllowedAttachmentUrl', () => {
   it('accepts Stripe invoice documents over https', () => {

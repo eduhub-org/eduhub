@@ -1,9 +1,9 @@
 import { afterEach, expect, it, jest } from '@jest/globals';
 
 const post = jest.fn();
-jest.unstable_mockModule('../lib/http.js', () => ({ http: { post }, isNetworkError: () => false }));
-const { unsubscribeForAccountDeletion } = await import('../syncGhostNewsletterSubscription/index.js');
-const { deactivateMatrixUser, getMatrixDeactivationConfig } = await import('../lib/matrixInvite.js');
+jest.unstable_mockModule('../../lib/http.js', () => ({ http: { post }, isNetworkError: () => false }));
+const { unsubscribeForAccountDeletion } = await import('../../syncGhostNewsletterSubscription/index.js');
+const { deactivateMatrixUser, getMatrixDeactivationConfig } = await import('../../lib/matrixInvite.js');
 
 const realFetch = global.fetch;
 const realEnv = { ...process.env };

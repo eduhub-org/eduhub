@@ -1,5 +1,5 @@
 import { jest } from '@jest/globals';
-import { withRetry } from '../lib/withRetry.js';
+import { withRetry } from '../withRetry.js';
 
 const graphqlError = (message = 'field not found') => {
   const error = new Error(message);

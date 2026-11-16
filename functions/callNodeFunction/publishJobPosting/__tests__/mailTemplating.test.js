@@ -2,7 +2,7 @@ import {
   applyConditionalBlocks,
   escapeHtml,
   replaceJobPostingVariables,
-} from '../publishJobPosting/index.js';
+} from '../index.js';
 
 describe('applyConditionalBlocks', () => {
   it('keeps the body and strips the markers when the flag is set', () => {

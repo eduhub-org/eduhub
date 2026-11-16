@@ -1,5 +1,5 @@
 import { jest } from '@jest/globals';
-import { createRausgegangenClient, mappingId } from '../lib/rausgegangen.js';
+import { createRausgegangenClient, mappingId } from '../../lib/rausgegangen.js';
 import {
   buildEventDescription,
   buildEventPayload,
@@ -14,8 +14,8 @@ import {
   pickShowSession,
   registrationUrlOf,
   toApiSlug,
-} from '../lib/rausgegangenMapping.js';
-import { syncCourse } from '../syncRausgegangenEvent/index.js';
+} from '../../lib/rausgegangenMapping.js';
+import { syncCourse } from '../index.js';
 
 const kiel = {
   id: 3,

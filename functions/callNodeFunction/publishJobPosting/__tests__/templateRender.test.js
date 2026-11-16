@@ -6,7 +6,7 @@ import {
   applyConditionalBlocks,
   buildJobPostingMailVars,
   replaceJobPostingVariables,
-} from '../publishJobPosting/index.js';
+} from '../index.js';
 
 /**
  * Renders the shipped JOB_POSTING_PUBLISHED template out of its migration.
@@ -17,7 +17,7 @@ import {
  */
 const MIGRATION = path.join(
   path.dirname(fileURLToPath(import.meta.url)),
-  '../../../backend/migrations/default',
+  '../../../../backend/migrations/default',
   '1788200000001_update_job_posting_published_mail_template/up.sql'
 );
 

@@ -18,11 +18,16 @@ component/
 ├── MyComponent.tsx
 └── MyComponent.test.tsx    # Co-located tests
 
-functions/
-└── myFunction/
-    ├── index.js
+functions/callNodeFunction/
+├── __tests__/                 # dispatcher (index.js) tests only
+├── myHandler/
+│   ├── index.js
+│   └── __tests__/
+│       └── myHandler.test.js
+└── lib/
+    ├── myHelper.js
     └── __tests__/
-        └── myFunction.test.js
+        └── myHelper.test.js
 ```
 
 ## Basic Test Pattern

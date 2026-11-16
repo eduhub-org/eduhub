@@ -10,21 +10,21 @@ const deactivateMatrixUser = jest.fn();
 const getMatrixDeactivationConfig = jest.fn();
 jest.unstable_mockModule('graphql-request', () => ({ request, gql: (parts) => parts[0] }));
 jest.unstable_mockModule('@google-cloud/storage', () => ({ Storage: jest.fn() }));
-jest.unstable_mockModule('../lib/cloud-storage.js', () => ({
+jest.unstable_mockModule('../../lib/cloud-storage.js', () => ({
   buildCloudStorage: () => ({ deleteFile, listFiles }),
 }));
-jest.unstable_mockModule('../lib/keycloak.js', () => ({ getKeycloakToken }));
-jest.unstable_mockModule('../lib/http.js', () => ({ http: { delete: deleteIdentity } }));
-jest.unstable_mockModule('../syncGhostNewsletterSubscription/index.js', () => ({
+jest.unstable_mockModule('../../lib/keycloak.js', () => ({ getKeycloakToken }));
+jest.unstable_mockModule('../../lib/http.js', () => ({ http: { delete: deleteIdentity } }));
+jest.unstable_mockModule('../../syncGhostNewsletterSubscription/index.js', () => ({
   unsubscribeForAccountDeletion: unsubscribe,
 }));
-jest.unstable_mockModule('../lib/matrixInvite.js', () => ({
+jest.unstable_mockModule('../../lib/matrixInvite.js', () => ({
   deactivateMatrixUser,
   getMatrixDeactivationConfig,
   toMatrixUserId: (handle, server) => `@${handle}:${server}`,
 }));
-const { default: anonymizeUser, deleteMyAccount } = await import('../anonymizeUser/index.js');
-const { eraseRawAttendance } = await import('../anonymizeUser/personalData.js');
+const { default: anonymizeUser, deleteMyAccount } = await import('../index.js');
+const { eraseRawAttendance } = await import('../personalData.js');
 const USER = '7c9e6679-7425-40de-944b-e07fc1f90ae7';
 const OTHER = '7c9e6679-7425-40de-944b-e07fc1f90ae8';
 const logger = { error: jest.fn(), warn: jest.fn() };

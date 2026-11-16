@@ -1,4 +1,4 @@
-import { buildJobPostingMailVars, formatJobPostingAmount } from '../publishJobPosting/index.js';
+import { buildJobPostingMailVars, formatJobPostingAmount } from '../index.js';
 
 const posting = {
   id: 42,

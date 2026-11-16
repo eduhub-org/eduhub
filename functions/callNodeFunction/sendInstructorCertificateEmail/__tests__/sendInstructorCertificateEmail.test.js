@@ -1,4 +1,4 @@
-import { isNewlyIssued } from './index.js';
+import { isNewlyIssued } from '../index.js';
 
 const update = (oldUrl, newUrl) => ({
   op: 'UPDATE',

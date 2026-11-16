@@ -1,6 +1,6 @@
 import { describe, expect, it, test } from "@jest/globals";
 import assert from "node:assert/strict";
-import { normalizeMatrixRoomId, isValidMatrixRoomId, parseMatrixResponse } from "../lib/matrixRoomUtils.js";
+import { normalizeMatrixRoomId, isValidMatrixRoomId, parseMatrixResponse } from "../matrixRoomUtils.js";
 
 test("normalizeMatrixRoomId from Element hash URL", () => {
   assert.equal(

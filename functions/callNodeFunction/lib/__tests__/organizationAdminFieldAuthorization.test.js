@@ -1,6 +1,6 @@
 import { jest } from '@jest/globals';
 
-import { authorizeOrganizationAdminFieldChange } from './organizationAdminFieldAuthorization.js';
+import { authorizeOrganizationAdminFieldChange } from '../organizationAdminFieldAuthorization.js';
 
 const grantResponse = (ownGrant, settingsAdminCount) => ({
   ownGrant,
