@@ -75,6 +75,12 @@ upstream_oauth2:
       userinfo_endpoint: "http://keycloak:8080/realms/edu-hub/protocol/openid-connect/userinfo"
       # Discovery is off, so PKCE can't be detected; Keycloak supports S256.
       pkce_method: always
+      # Keycloak calls back (client "matrix-authentication-service", backchannel
+      # logout URL) when its session ends, e.g. on EduHub logout. MAS then ends
+      # its own browser session and every Matrix session started from that
+      # Keycloak login, so the next person on a shared computer can't continue
+      # as the previous one.
+      on_backchannel_logout: logout_all
       claims_imports:
         # No "confirm your new account" page; needs localpart=require and the
         # other attributes force/require/ignore.

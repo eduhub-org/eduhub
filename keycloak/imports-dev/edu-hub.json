@@ -1352,7 +1352,9 @@
       "frontchannelLogout": false,
       "protocol": "openid-connect",
       "attributes": {
-        "login_theme": "edu-hub"
+        "login_theme": "edu-hub",
+        "backchannel.logout.url": "http://mas:8080/upstream/backchannel-logout/01M7J8Q3MF1QK40ZC1MW3K49SH",
+        "backchannel.logout.session.required": "true"
       },
       "fullScopeAllowed": false,
       "defaultClientScopes": [
