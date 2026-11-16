@@ -1,0 +1,20 @@
+# Ruff config for the Python serverless functions (errors only, no style).
+# Run from functions/: ruff check .
+# The ruff version is pinned in .github/workflows/functions-code-checks.yml.
+target-version = "py311"
+extend-exclude = ["**/node_modules"]
+
+[lint]
+select = [
+  "E9",    # syntax / IO errors
+  "F63",   # invalid comparisons (e.g. `is` with a literal)
+  "F7",    # misplaced break/continue/return/yield/await
+  "F82",   # undefined names
+  "F401",  # unused imports
+  "F811",  # redefinition of unused name
+  "F841",  # local variable assigned but never used
+]
+
+[lint.per-file-ignores]
+# Re-exports for `from api_clients import ...`.
+"shared_libs/api_clients/__init__.py" = ["F401"]
