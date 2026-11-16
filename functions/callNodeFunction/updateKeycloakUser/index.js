@@ -1,15 +1,7 @@
-import { createRequire } from "module";
 import { logger } from "../index.js";
 import axios from "axios";
 import { computeMatrixHandle } from "../lib/matrixHandle.js";
-
-const require = createRequire(import.meta.url);
-let mergeUserPutPayload;
-try {
-  ({ mergeUserPutPayload } = require("../shared_libs/node/keycloakUserMerge.cjs"));
-} catch {
-  ({ mergeUserPutPayload } = require("../../shared_libs/node/keycloakUserMerge.cjs"));
-}
+import { mergeUserPutPayload } from "../shared/keycloakUserMerge.js";
 
 const getKeycloakToken = async () => {
   try {

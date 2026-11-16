@@ -2,16 +2,8 @@ import KcAdminClient from "@keycloak/keycloak-admin-client";
 import { GraphQLClient, gql } from 'graphql-request';
 import { queueEmail } from '../lib/queueEmail.js';
 import { createVariableReplacer } from '../emailTemplateVariables.js';
-import { createRequire } from 'module';
 import { computeMatrixHandle } from '../lib/matrixHandle.js';
-
-const require = createRequire(import.meta.url);
-let mergeUserPutPayload;
-try {
-  ({ mergeUserPutPayload } = require('../shared_libs/node/keycloakUserMerge.cjs'));
-} catch {
-  ({ mergeUserPutPayload } = require('../../shared_libs/node/keycloakUserMerge.cjs'));
-}
+import { mergeUserPutPayload } from '../shared/keycloakUserMerge.js';
 
 /**
  * Creates a new user in both Keycloak and Hasura
@@ -319,5 +311,4 @@ export default async function createUser(req, logger) {
     };
   }
 }
-
 

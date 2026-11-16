@@ -1,5 +1,4 @@
 import winston from "winston";
-import { createRequire } from "node:module";
 import getSignedUrl from "./getSignedUrl/index.js";
 import saveFile from "./saveFile/index.js";
 import saveImage from "./saveImage/index.js";
@@ -52,14 +51,7 @@ import manageTestEnrollment from "./manageTestEnrollment/index.js";
 import syncRausgegangenEvent from "./syncRausgegangenEvent/index.js";
 import searchRausgegangenLocations from "./searchRausgegangenLocations/index.js";
 import geocodeLocationAddress from "./geocodeLocationAddress/index.js";
-
-const require = createRequire(import.meta.url);
-let constantTimeSecretsEqual;
-try {
-  ({ constantTimeSecretsEqual } = require("./shared_libs/node/security.cjs"));
-} catch {
-  ({ constantTimeSecretsEqual } = require("../shared_libs/node/security.cjs"));
-}
+import { constantTimeSecretsEqual } from "./shared/security.js";
 
 /**
  * Creates a logger instance with structured logging.

@@ -1,4 +1,5 @@
-const { sendMail } = require('../index.js');
+import { jest } from '@jest/globals';
+import { sendMail } from '../index.js';
 
 const SECRET = 'test-cloud-function-secret';
 

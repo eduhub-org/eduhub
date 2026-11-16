@@ -61,12 +61,8 @@ jobs:
           rm -f ./${CF_FOLDER}/callPythonFunction/api_clients
           cp -r ./${CF_FOLDER}/shared_libs/api_clients ./${CF_FOLDER}/callPythonFunction/
 
-          # Copy shared Node security helpers into each Node function package
-          for fn in callNodeFunction sendMail updateFromKeycloak addKeycloakRole removeKeycloakRole sendQuestionaires; do
-            rm -rf ./${CF_FOLDER}/$fn/shared_libs
-            mkdir -p ./${CF_FOLDER}/$fn/shared_libs
-            cp -r ./${CF_FOLDER}/shared_libs/node ./${CF_FOLDER}/$fn/shared_libs/
-          done
+          # Node units link functions/shared as ./shared; `zip -r` below
+          # follows that symlink and stores real files.
 
       # Same eight archives as before, built with plain `zip -r` per unit
       # (previously one thedoctor0/zip-release step each, no exclusions).

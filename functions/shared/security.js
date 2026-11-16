@@ -1,10 +1,10 @@
-const crypto = require("crypto");
+import crypto from "node:crypto";
 
 /**
  * Constant-time secret comparison that avoids early length-based exits.
  * Inputs are normalized via SHA-256 first, then compared with timingSafeEqual.
  */
-function constantTimeSecretsEqual(providedSecret, expectedSecret) {
+export function constantTimeSecretsEqual(providedSecret, expectedSecret) {
   const provided = String(providedSecret ?? "");
   const expected = String(expectedSecret ?? "");
 
@@ -20,14 +20,9 @@ function constantTimeSecretsEqual(providedSecret, expectedSecret) {
   return crypto.timingSafeEqual(providedDigest, expectedDigest);
 }
 
-function secretsMatch(providedSecret, expectedSecret) {
+export function secretsMatch(providedSecret, expectedSecret) {
   if (!providedSecret || !expectedSecret) {
     return false;
   }
   return constantTimeSecretsEqual(providedSecret, expectedSecret);
 }
-
-module.exports = {
-  secretsMatch,
-  constantTimeSecretsEqual,
-};

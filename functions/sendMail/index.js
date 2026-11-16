@@ -1,11 +1,6 @@
-const formData = require('form-data');
-const Mailgun = require('mailgun.js');
-let secretsMatch;
-try {
-  ({ secretsMatch } = require('./shared_libs/node/security.cjs'));
-} catch {
-  ({ secretsMatch } = require('../shared_libs/node/security.cjs'));
-}
+import formData from 'form-data';
+import Mailgun from 'mailgun.js';
+import { secretsMatch } from './shared/security.js';
 
 // Mailgun accepts up to 25 MB, but this function runs with 256M of memory and
 // form-data buffers a second multipart copy of every attachment. A Stripe
@@ -267,7 +262,7 @@ async function resolveAttachments(descriptors, mailId) {
  * @param {!express:Request} req HTTP request context.
  * @param {!express:Response} res HTTP response context.
  */
-exports.sendMail = async (req, res) => {
+export const sendMail = async (req, res) => {
   const expectedSecret = process.env.HASURA_CLOUD_FUNCTION_SECRET;
   if (!expectedSecret) {
     return res.status(500).json({ error: 'Server secret not configured' });
@@ -385,7 +380,9 @@ exports.sendMail = async (req, res) => {
 };
 
 // Exported for unit tests; not part of the cloud function contract.
-exports.resolveAttachments = resolveAttachments;
-exports.resolveSender = resolveSender;
-exports.isAllowedAttachmentUrl = isAllowedAttachmentUrl;
-exports.safeAttachmentFilename = safeAttachmentFilename;
+export {
+  resolveAttachments,
+  resolveSender,
+  isAllowedAttachmentUrl,
+  safeAttachmentFilename,
+};

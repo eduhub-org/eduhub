@@ -12,7 +12,7 @@
  * Keep in sync with MatrixHandleEventListenerProvider.computeHandle in
  * keycloak/spi/matrix-handle-listener: both must produce the same handle.
  *
- * Run tests: node --test matrixHandle.test.cjs
+ * Run tests: node --test matrixHandle.test.js
  */
 
 // Greek digraphs (ELOT 743), applied before the per-letter map. αυ/ευ/ηυ
@@ -62,11 +62,9 @@ function sanitize(input) {
  * @param {string} userId - Keycloak UUID (with or without hyphens)
  * @returns {string} sanitized handle
  */
-function computeMatrixHandle(firstName, lastName, userId) {
+export function computeMatrixHandle(firstName, lastName, userId) {
   const first = sanitize(firstName) || "user";
   const last = sanitize(lastName) || "user";
   const uuidPrefix = (userId || "").replace(/-/g, "").substring(0, 6);
   return `${first}.${last}.${uuidPrefix}`;
 }
-
-module.exports = { computeMatrixHandle };

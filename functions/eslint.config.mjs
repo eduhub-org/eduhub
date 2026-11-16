@@ -71,21 +71,17 @@ const errorRules = {
   ],
 };
 
-// Units whose package.json has "type": "module": their .js files are ESM.
-const esmUnits = [
-  'addKeycloakRole',
-  'callNodeFunction',
-  'removeKeycloakRole',
-  'updateFromKeycloak',
-];
+// Every Node unit and functions/shared has "type": "module", so all .js
+// files are ESM. Only .cjs files and the dev server (dev.js, run by
+// start-node.sh with no package.json of its own) are CommonJS.
+const commonjsFiles = ['**/*.cjs', 'dev.js'];
 
 export default [
   {
     ignores: ['**/node_modules/**', '**/coverage/**'],
   },
   {
-    files: ['**/*.js', '**/*.cjs'],
-    ignores: esmUnits.map((unit) => `${unit}/**/*.js`),
+    files: commonjsFiles,
     languageOptions: {
       ecmaVersion: 'latest',
       sourceType: 'commonjs',
@@ -94,7 +90,8 @@ export default [
     rules: errorRules,
   },
   {
-    files: [...esmUnits.map((unit) => `${unit}/**/*.js`), '**/*.mjs'],
+    files: ['**/*.js', '**/*.mjs'],
+    ignores: commonjsFiles,
     languageOptions: {
       ecmaVersion: 'latest',
       sourceType: 'module',
@@ -103,7 +100,7 @@ export default [
     rules: errorRules,
   },
   {
-    files: ['**/__tests__/**', '**/*.test.js', '**/*.test.cjs', '**/jest.setup.js'],
+    files: ['**/__tests__/**', '**/*.test.js', '**/jest.setup.js'],
     languageOptions: {
       globals: { ...nodeGlobals, ...jestGlobals },
     },

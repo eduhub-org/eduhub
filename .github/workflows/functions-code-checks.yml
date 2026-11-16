@@ -66,8 +66,8 @@ jobs:
         working-directory: functions/callNodeFunction
         run: npm test
 
-      - name: node --test (shared_libs/node)
-        run: node --test 'shared_libs/node/*.test.cjs'
+      - name: node --test (functions/shared)
+        run: node --test 'shared/*.test.js'
 
   python:
     name: Python tests (${{ matrix.unit }})

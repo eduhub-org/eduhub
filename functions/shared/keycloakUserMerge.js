@@ -19,7 +19,7 @@ const READ_ONLY_OR_DERIVED_FIELDS = [
   "self",
 ];
 
-function mergeUserPutPayload(existingUser, patch) {
+export function mergeUserPutPayload(existingUser, patch) {
   if (!existingUser?.username) {
     throw new Error(
       "mergeUserPutPayload: existing user must include username (GET user before PUT)"
@@ -39,5 +39,3 @@ function mergeUserPutPayload(existingUser, patch) {
   }
   return merged;
 }
-
-module.exports = { mergeUserPutPayload };

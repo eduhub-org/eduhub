@@ -1,13 +1,5 @@
 import KcAdminClient from '@keycloak/keycloak-admin-client';
-import { createRequire } from 'module';
-
-const require = createRequire(import.meta.url);
-let secretsMatch;
-try {
-  ({ secretsMatch } = require('./shared_libs/node/security.cjs'));
-} catch {
-  ({ secretsMatch } = require('../shared_libs/node/security.cjs'));
-}
+import { secretsMatch } from './shared/security.js';
 
 export const addKeycloakRole = async (req, res) => {
   const expectedSecret = process.env.HASURA_CLOUD_FUNCTION_SECRET;

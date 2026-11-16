@@ -1,12 +1,12 @@
 /**
- * Run: node --test matrixHandle.test.cjs
+ * Run: node --test matrixHandle.test.js
  *
  * The same cases live in MatrixHandleEventListenerProviderTest (Keycloak SPI);
  * update both when the expected handles change.
  */
-const { test } = require("node:test");
-const assert = require("node:assert/strict");
-const { computeMatrixHandle } = require("./matrixHandle.cjs");
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import { computeMatrixHandle } from "./matrixHandle.js";
 
 const UUID = "4f42bd12-3456-7890-abcd-ef0123456789";
 

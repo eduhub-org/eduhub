@@ -1,15 +1,13 @@
 import { jest } from '@jest/globals';
-import { createRequire } from 'node:module';
 
-// sendMail is CommonJS and lives in a sibling function package; callNodeFunction
-// is the only place in functions/ with a test runner.
-const require = createRequire(import.meta.url);
-const {
+// sendMail lives in a sibling function package; callNodeFunction is the only
+// place in functions/ with a test runner.
+import {
   isAllowedAttachmentUrl,
   safeAttachmentFilename,
   resolveAttachments,
   resolveSender,
-} = require('../../sendMail/index.js');
+} from '../../sendMail/index.js';
 
 describe('isAllowedAttachmentUrl', () => {
   it('accepts Stripe invoice documents over https', () => {

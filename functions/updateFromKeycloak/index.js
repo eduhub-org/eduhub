@@ -1,29 +1,8 @@
 import KcAdminClient from "@keycloak/keycloak-admin-client";
 import { GraphQLClient, gql } from "graphql-request";
-import { createRequire } from "module";
-
-const require = createRequire(import.meta.url);
-
-let mergeUserPutPayload;
-try {
-  ({ mergeUserPutPayload } = require("./shared_libs/node/keycloakUserMerge.cjs"));
-} catch {
-  ({ mergeUserPutPayload } = require("../shared_libs/node/keycloakUserMerge.cjs"));
-}
-
-let computeMatrixHandle;
-try {
-  ({ computeMatrixHandle } = require("./shared_libs/node/matrixHandle.cjs"));
-} catch {
-  ({ computeMatrixHandle } = require("../shared_libs/node/matrixHandle.cjs"));
-}
-
-let secretsMatch;
-try {
-  ({ secretsMatch } = require("./shared_libs/node/security.cjs"));
-} catch {
-  ({ secretsMatch } = require("../shared_libs/node/security.cjs"));
-}
+import { mergeUserPutPayload } from "./shared/keycloakUserMerge.js";
+import { computeMatrixHandle } from "./shared/matrixHandle.js";
+import { secretsMatch } from "./shared/security.js";
 
 const FIND_USER = gql`
   query ($id: uuid!) {

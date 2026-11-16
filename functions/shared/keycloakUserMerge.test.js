@@ -1,9 +1,9 @@
 /**
- * Run: node --test keycloakUserMerge.test.cjs
+ * Run: node --test keycloakUserMerge.test.js
  */
-const { test } = require("node:test");
-const assert = require("node:assert/strict");
-const { mergeUserPutPayload } = require("./keycloakUserMerge.cjs");
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import { mergeUserPutPayload } from "./keycloakUserMerge.js";
 
 test("merges partial attributes without dropping existing custom attributes", () => {
   const existing = {

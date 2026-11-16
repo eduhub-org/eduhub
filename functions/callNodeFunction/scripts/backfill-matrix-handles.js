@@ -33,12 +33,9 @@
  *   node scripts/backfill-matrix-handles.js [--dry-run]
  */
 
-import { createRequire } from 'module';
 import KcAdminClient from '@keycloak/keycloak-admin-client';
-
-const require = createRequire(import.meta.url);
-const { mergeUserPutPayload } = require('../../shared_libs/node/keycloakUserMerge.cjs');
-const { computeMatrixHandle } = require('../../shared_libs/node/matrixHandle.cjs');
+import { mergeUserPutPayload } from '../shared/keycloakUserMerge.js';
+import { computeMatrixHandle } from '../shared/matrixHandle.js';
 
 const DRY_RUN = process.argv.includes('--dry-run');
 const DELAY_BETWEEN_USERS_MS = 100;
