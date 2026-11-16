@@ -51,16 +51,17 @@ jobs:
         with:
           node-version: 22.x
 
-      # No lockfiles yet (functions/.gitignore); they arrive with the npm
-      # workspace. sendMail's suites run under callNodeFunction's Jest config
-      # (roots include ../sendMail) and need sendMail's own dependencies.
+      # Every Node unit commits its own package-lock.json (Cloud Functions
+      # builds each zip on its own, so there is no shared root lockfile).
+      # sendMail's suites run under callNodeFunction's Jest config (roots
+      # include ../sendMail) and need sendMail's own dependencies.
       - name: Install sendMail dependencies
         working-directory: functions/sendMail
-        run: npm install --no-audit --no-fund
+        run: npm ci --no-audit --no-fund
 
       - name: Install callNodeFunction dependencies
         working-directory: functions/callNodeFunction
-        run: npm install --no-audit --no-fund
+        run: npm ci --no-audit --no-fund
 
       - name: Jest (callNodeFunction + sendMail)
         working-directory: functions/callNodeFunction

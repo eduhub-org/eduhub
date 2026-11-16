@@ -2,7 +2,9 @@
 // node_functions container by start-node.sh.
 //
 // It starts exactly the Node units listed in units.json (the same list the
-// zip workflow packages): installs each unit's dependencies, then runs its
+// zip workflow packages): installs each unit's dependencies from its
+// committed package-lock.json (`npm ci`, as the Cloud Functions build does,
+// so a host-built node_modules for another OS never leaks in), then runs its
 // `npm run watch` with PORT set to the unit's port from units.json. A unit
 // that fails to install stops the whole server, so a broken unit is visible
 // instead of silently missing.
@@ -39,9 +41,9 @@ console.log(
 
 for (const unit of units) {
   const cwd = path.join(__dirname, unit.name);
-  console.log("npm install " + cwd);
+  console.log("npm ci " + cwd);
   try {
-    child_process.execSync("npm install --silent --no-audit --no-fund", {
+    child_process.execSync("npm ci --silent --no-audit --no-fund", {
       cwd,
       stdio: "inherit",
     });
