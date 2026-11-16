@@ -6,9 +6,9 @@ A handler is **not done** until all steps below are complete. Full reference:
 ## Vocabulary
 
 - **Unit**: one deployed Cloud Function, listed in `functions/units.json`.
-- **Dispatcher**: a unit that routes by the `Function-Name` header:
-  `functions/callNodeFunction` (Node) and `functions/callPythonFunction`
-  (Python).
+- **Dispatcher**: a unit that routes by the `Function-Name` header. Node:
+  `callNodeFunction`, `identity` and `media`, three entry points of the code
+  in `functions/callNodeFunction`. Python: `functions/callPythonFunction`.
 - **Handler**: one routed function in a dispatcher. New work is a handler,
   not a new unit.
 
@@ -18,6 +18,20 @@ Node (`callNodeFunction`) for anything that talks to Hasura, Keycloak,
 Stripe, Matrix, storage or mail. Python (`callPythonFunction`) for PDF
 generation, pandas-style reports, or code that reuses
 `functions/shared_py/api_clients`.
+
+For Node, pick the dispatcher by the credentials the handler needs, since
+each unit only holds its own secrets
+(`docs/adr/0002-function-units-by-secret-scope.md`):
+
+| Needs | Dispatcher | URL variable |
+|-------|------------|--------------|
+| Keycloak admin or Matrix tokens | `identity` | `CLOUD_FUNCTION_LINK_IDENTITY` |
+| Only Hasura and the storage bucket (uploads, images, signed URLs) | `media` | `CLOUD_FUNCTION_LINK_MEDIA` |
+| Anything else: Hasura, mail, Stripe, Formbricks, guest token, Ghost | `callNodeFunction` | `CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION` |
+
+A handler needing credentials of two dispatchers is a design question: raise
+it before adding a secret to a unit. A new secret goes into
+`infrastructure/application/06_cloud-functions.tf` for exactly that unit.
 
 ## 1. Write the handler
 
@@ -52,7 +66,10 @@ def handler_name(arguments: Dict[str, Any]) -> Dict[str, Any]:
 
 ## 2. Register it
 
-- Node: import in `functions/callNodeFunction/index.js`, add to `functionMap`.
+- Node: import in `functions/callNodeFunction/index.js`, add to the chosen
+  dispatcher's map: `callNodeFunctionHandlers`, `identityHandlers` or
+  `mediaHandlers`. An action with `forward_client_headers: true` also goes
+  into that dispatcher's `pinnedActions` (only `identity` has one today).
 - Python: import in `functions/callPythonFunction/main.py`, add to
   `PYTHON_FUNCTIONS`.
 
@@ -62,8 +79,12 @@ def handler_name(arguments: Dict[str, Any]) -> Dict[str, Any]:
 - Failures the user should see: return `success: false` (status stays 200).
 - Event/cron failures worth retrying: add `retryable: true` (dispatcher
   answers 503, Hasura retries) and make the side effect idempotent.
-- The dispatcher answers 401 (secret), 404 (unknown name), 500 (server secret
-  unset), 400 (Node: `Function-Name` and legacy `name` differ).
+- The dispatcher answers 401 (secret), 404 (name not in this unit), 500
+  (server secret unset), 400 (Node: `Function-Name` and legacy `name` differ,
+  or a pinned action named another handler).
+- Node only: an integer `httpStatus` in the result is sent as the status
+  (e.g. an action error Hasura must turn into a GraphQL error). Rarely
+  needed.
 
 ## 4. Hasura metadata
 
@@ -80,7 +101,8 @@ headers:
 ```
 
 - **Action**: entry in `backend/metadata/actions.yaml` with
-  `handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'` (or
+  `handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'` (or the chosen
+  dispatcher's variable, `..._IDENTITY`, `..._MEDIA`,
   `..._CALL_PYTHON_FUNCTION`), `kind: synchronous`, `timeout:` in seconds if
   it may exceed Hasura's 30 s default, `permissions:` for the non-admin roles
   (never add `admin`). Add the signature and result type to
@@ -88,7 +110,8 @@ headers:
   `custom_types.objects` in `actions.yaml`.
 - **Event trigger**: under `event_triggers:` in
   `backend/metadata/databases/default/tables/public_<Table>.yaml` with
-  `webhook_from_env: CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION` and a
+  `webhook_from_env: CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION` (or the chosen
+  dispatcher's variable) and a
   `retry_conf` (`interval_sec`, `num_retries`, `timeout_sec`).
 - **Cron trigger**: `backend/metadata/cron_triggers.yaml` with
   `webhook: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'`.
@@ -110,7 +133,8 @@ Apply: `docker compose exec hasura hasura-cli metadata apply`.
   (Jest ESM, `jest.unstable_mockModule`). Run `npm test` in
   `functions/callNodeFunction` (`npm ci` there and in `functions/sendMail`
   first). `__tests__/registry.test.js` fails until the handler is in
-  `functionMap` and named by some metadata entry.
+  exactly one dispatcher's map and named by a metadata entry with that
+  dispatcher's URL.
 - Python: `functions/callPythonFunction/__tests__/test_<handler_name>.py`.
   Run `python -m pytest __tests__` in `functions/callPythonFunction`.
 - Lint from `functions/`: `npx --yes eslint@10.14.0 .` and
@@ -125,6 +149,7 @@ Apply: `docker compose exec hasura hasura-cli metadata apply`.
 
 ## Output reporting
 
-When invoked, report: runtime and handler name, metadata entries added,
+When invoked, report: runtime, dispatcher (and why, by secrets) and handler
+name, metadata entries added,
 frontend document and regenerated types (if an action), and the test commands
 run with their results.

@@ -7,29 +7,39 @@ Playbook version: `.claude/commands/create-function.md`.
 
 - **Unit**: one deployed Cloud Function (one zip, one URL, one entry point).
 - **Dispatcher**: a unit that routes each request to one of many handlers by
-  the `Function-Name` header: `callNodeFunction` and `callPythonFunction`.
+  the `Function-Name` header: `callNodeFunction`, `identity`, `media` (one
+  Node codebase, three entry points) and `callPythonFunction`.
 - **Handler**: one routed function inside a dispatcher, e.g.
   `callNodeFunction/saveImage/` or `callPythonFunction/pythonFunctions/create_certificates.py`.
 
 ## Units
 
 `functions/units.json` is the list of units. The zip workflow
-(`.github/workflows/zip-and-store-cloud-functions.yml`) packages exactly these,
-and `functions/dev.js` / `functions/dev.py` serve them locally on these ports.
+(`.github/workflows/zip-and-store-cloud-functions.yml`) packages one zip per
+unit without a `source`, and `functions/dev.js` / `functions/dev.py` serve
+them locally on these ports. A unit with `"source": "callNodeFunction"` has no
+folder or zip of its own: it is callNodeFunction's code with another entry
+point (Terraform deploys `callNodeFunction.zip` with that `entry_point`).
 
-| Unit | Runtime | Kind | Local port | Hasura URL variable |
-|------|---------|------|-----------|---------------------|
-| `callNodeFunction` | Node 22 | dispatcher | 42022 | `CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION` |
-| `callPythonFunction` | Python 3.11 | dispatcher | 42025 | `CLOUD_FUNCTION_LINK_CALL_PYTHON_FUNCTION` |
-| `sendMail` | Node | MailLog insert trigger, sends via Mailgun | 42019 | `CLOUD_FUNCTION_LINK_SEND_MAIL` |
-| `updateFromKeycloak` | Node | action, syncs a user from Keycloak | 42020 | `CLOUD_FUNCTION_LINK_UPDATE_FROM_KEYCLOAK` |
-| `addKeycloakRole` | Node | event trigger, `role` header | 42000 | `CLOUD_FUNCTION_LINK_ADD_KEYCLOAK_ROLE` |
-| `removeKeycloakRole` | Node | event trigger, `role` header | 42002 | `CLOUD_FUNCTION_LINK_REMOVE_KEYCLOAK_ROLE` |
-| `sendQuestionaires` | Node | cron | 42024 | `CLOUD_FUNCTION_LINK_SEND_QUESTIONAIRES` |
-| `apiProxy` | Python | external API (Participants, MOOCHub), not called by Hasura | 42026 | — |
+Units are split by the secrets their handlers need, not by domain
+(`docs/adr/0002-function-units-by-secret-scope.md`).
+
+| Unit | Runtime | Kind | Holds | Local port | Hasura URL variable |
+|------|---------|------|-------|-----------|---------------------|
+| `callNodeFunction` | Node 22 | dispatcher: enrollment, guests, Formbricks, Stripe, job postings, mails, syncs | Hasura, Stripe, Formbricks, guest token, Ghost key | 42022 | `CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION` |
+| `identity` | Node 22 (callNodeFunction code) | dispatcher: Keycloak and Matrix accounts | Hasura, Keycloak, Matrix; deletes bucket objects | 42021 | `CLOUD_FUNCTION_LINK_IDENTITY` |
+| `media` | Node 22 (callNodeFunction code) | dispatcher: storage files | Hasura; bucket objects, signed URLs | 42023 | `CLOUD_FUNCTION_LINK_MEDIA` |
+| `callPythonFunction` | Python 3.11 | dispatcher | Hasura, Zoom, LMS, Mattermost, Mailgun | 42025 | `CLOUD_FUNCTION_LINK_CALL_PYTHON_FUNCTION` |
+| `sendMail` | Node | MailLog insert trigger, sends via Mailgun | Mailgun, Hasura mail user | 42019 | `CLOUD_FUNCTION_LINK_SEND_MAIL` |
+| `apiProxy` | Python | external API (Participants, MOOCHub), not called by Hasura | Hasura | 42026 | — |
+
+`addKeycloakRole`, `removeKeycloakRole`, `updateFromKeycloak` (now identity
+handlers) and `sendQuestionaires` (now a callNodeFunction handler) are still
+listed in `units.json` and deployed for one release, but no Hasura entry calls
+them; they go with `docs/plans/functions-topology-cleanup.md`.
 
 New work goes into a dispatcher as a handler. A new unit is only worth it for
-a different runtime or secret scope.
+a different runtime, secret scope or resource profile.
 
 ## Request contract
 
@@ -43,20 +53,34 @@ The standard names are `Function-Name`, `Hasura-Secret` and `Bucket`. Most
 Node metadata still sends the legacy `name` and `secret`; the switch is
 tracked in `docs/plans/functions-header-switch.md`.
 
-| Header | Value | callNodeFunction | callPythonFunction | Other Node units |
-|--------|-------|------------------|--------------------|------------------|
-| `Hasura-Secret` | env `HASURA_CLOUD_FUNCTION_SECRET` | also accepts legacy `secret` | required | also accept legacy `secret` |
-| `Function-Name` | handler name | also accepts legacy `name` | falls back to `action.name` | — |
+| Header | Value | Node dispatchers | callPythonFunction | sendMail |
+|--------|-------|------------------|--------------------|----------|
+| `Hasura-Secret` | env `HASURA_CLOUD_FUNCTION_SECRET` | also accept legacy `secret` | required | also accepts legacy `secret` |
+| `Function-Name` | handler name | also accept legacy `name` | falls back to `action.name` | — |
 | `Bucket` | env `HASURA_BUCKET` | read by file handlers via `getBucket(req)` | not read | — |
+
+The Node dispatchers (`callNodeFunction`, `identity`, `media`) are all built by
+`createDispatcher` in `functions/callNodeFunction/lib/dispatcher.js` and share
+this contract; each routes only the handlers in its own map and answers 404
+for the others.
 
 Header names are case-insensitive: Node lowercases them (`req.headers.bucket`
 is `Bucket`), Flask looks them up case-insensitively. Handler-specific headers
 (`file-path`, `is-public`, `sizes`, `role`, `operation`, `mailtag`, ...) keep
 their names.
 
-During the transition callNodeFunction prefers `Function-Name` and
+During the transition the Node dispatchers prefer `Function-Name` and
 `Hasura-Secret` when both spellings are sent; two *different* function names
-answer 400. It logs the spelling used at debug level ("Request header names").
+answer 400. They log the spelling used at debug level ("Request header
+names").
+
+**Actions that forward client headers.** With `forward_client_headers: true`
+Hasura passes the caller's own HTTP headers on to the unit, so a caller could
+add a `Function-Name` or `name` header. Such an action must be listed in its
+dispatcher's `pinnedActions` (`identityPinnedActions` in `index.js`): the
+handler then follows `action.name` in the body, which Hasura sets, and a
+routing header naming another handler answers 400. The registry test fails for
+an unpinned one. Today only `updateFromKeycloak` forwards client headers.
 
 ### Status codes (both dispatchers)
 
@@ -65,9 +89,10 @@ answer 400. It logs the spelling used at debug level ("Request header names").
 | 200 | handler ran, including `success: false` results and thrown errors | handler's own, or `INTERNAL_SERVER_ERROR` |
 | 400 | Node only: `Function-Name` and `name` differ | `CONFLICTING_FUNCTION_NAME` |
 | 401 | secret header missing or wrong | `MISSING_SECRET` / `INVALID_SECRET` |
-| 404 | no handler by that name | `FUNCTION_NOT_FOUND` |
+| 404 | no handler by that name in this unit | `FUNCTION_NOT_FOUND` |
 | 500 | `HASURA_CLOUD_FUNCTION_SECRET` unset on the server | `SERVER_MISCONFIGURED` |
 | 503 | event or cron delivery and the result has `retryable: true` | handler's own |
+| any | Node only: the result has an integer `httpStatus` (removed from the body) | handler's own |
 
 Hasura retries an event or cron delivery on any non-2xx status, up to the
 trigger's `retry_conf`. Actions never retry: they read the body, so a failed
@@ -86,6 +111,11 @@ therefore needs a handler whose side effect is idempotent across deliveries.
 - Return result fields at the top level (they map onto the action's output
   type), not under a nested object.
 - `messageKey` is the translation key the frontend shows.
+- Node: `httpStatus` is for the few handlers whose callers need a non-2xx:
+  `updateFromKeycloak` (Hasura turns a 4xx/5xx action answer into a GraphQL
+  error and shows its `message`) and the Keycloak role triggers (500 so
+  Hasura retries a configuration error). Prefer `success: false` or
+  `retryable` otherwise.
 - Node: a result without `success`/`error` is wrapped as
   `{ success: true, data }`, except for mutation actions, which get it as is.
   A thrown error becomes `{ success: false, error, messageKey }` with
@@ -96,6 +126,14 @@ therefore needs a handler whose side effect is idempotent across deliveries.
 
 ## Add a Node handler
 
+0. **Pick the unit by the credentials the handler needs** (the Holds column
+   above): Keycloak or Matrix → `identity`; storage files only (with Hasura)
+   → `media`; anything else, including Stripe, Formbricks, the guest token
+   or the Ghost key → `callNodeFunction`. A handler that needs credentials of
+   two units goes to the one that holds both, or is raised before adding a
+   secret to a unit. Terraform gives each unit only its own secrets
+   (`infrastructure/application/06_cloud-functions.tf`); add a new secret
+   there for exactly the unit that needs it.
 1. **Folder**: `functions/callNodeFunction/<handlerName>/index.js` (camelCase):
 
    ```js
@@ -110,13 +148,16 @@ therefore needs a handler whose side effect is idempotent across deliveries.
    ```
 
 2. **Register**: import it in `functions/callNodeFunction/index.js` and add
-   it to `functionMap` (static imports only).
+   it to the unit's map: `callNodeFunctionHandlers`, `identityHandlers` or
+   `mediaHandlers` (static imports only).
 3. **Hasura metadata** (see [Hasura metadata](#hasura-metadata)), with
-   `Function-Name: <handlerName>` and the `CALL_NODE_FUNCTION` URL.
+   `Function-Name: <handlerName>` and the unit's URL variable
+   (`CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION`, `_IDENTITY` or `_MEDIA`).
 4. **Tests**: `functions/callNodeFunction/<handlerName>/__tests__/*.test.js`
    (Jest, ESM; mock modules with `jest.unstable_mockModule`). Run `npm test`
    in `functions/callNodeFunction`. `__tests__/registry.test.js` fails until
-   the folder is in `functionMap` *and* some metadata entry names it.
+   the folder is in exactly one unit's map *and* a metadata entry with that
+   unit's URL names it.
 5. **Frontend**, if it is an action (see [Frontend](#frontend)).
 
 ## Add a Python handler
@@ -148,7 +189,10 @@ therefore needs a handler whose side effect is idempotent across deliveries.
 
 ## Hasura metadata
 
-Every entry sends `Hasura-Secret` from env and `Function-Name` as a value.
+Every entry sends `Hasura-Secret` from env and `Function-Name` as a value,
+to the URL of the unit whose map holds the handler. The examples use
+callNodeFunction; for an identity or media handler use
+`CLOUD_FUNCTION_LINK_IDENTITY` / `CLOUD_FUNCTION_LINK_MEDIA` instead.
 Admin needs no permission entry.
 
 **Action** (`backend/metadata/actions.yaml`, plus the type in
@@ -247,6 +291,8 @@ clients):
   modules that are not passed one; never import it from `../index.js`.
 - `lib/http.js`: fetch-based JSON client with timeouts.
 - `lib/requestHeaders.js`: `getFunctionName`, `getBucket`.
+- `lib/dispatcher.js`: `createDispatcher({ name, handlers, pinnedActions })`,
+  the request contract of all three Node entry points.
 - `lib/queueEmail.js`: renders a MailTemplate into MailLog, which `sendMail`
   delivers.
 - `lib/types.js`: JSDoc types (`Handler`, `HasuraRequestBody`).
@@ -254,11 +300,29 @@ clients):
 ## Local development
 
 `docker compose up` starts `node_functions` (all Node units via `dev.js`,
-ports from `units.json`, plus a fake storage bucket on 4001) and
+ports from `units.json`, plus a fake storage bucket on 4001; `identity` and
+`media` run from `functions/callNodeFunction` with `FUNCTION_TARGET` set to
+their entry point) and
 `python_functions` (`dev.py`, ports 42025/42026). Hasura reaches them through
 the `CLOUD_FUNCTION_LINK_*` variables in `docker-compose.yml`. After a
 dependency change, rebuild or restart as `.cursor/rules/docker-rebuild.mdc`
 describes.
+
+To run one Node dispatcher by hand: `PORT=42021 FUNCTION_TARGET=identity npm
+start` in `functions/callNodeFunction`.
+
+## Deployment
+
+`infrastructure/application/06_cloud-functions.tf` has one entry per unit in
+`local.cloud_function_units` (zip, entry point, memory, timeout, max
+instances, env, secrets, service account) and deploys each through
+`modules/cloud_function`. Every unit runs as a dedicated service account that
+may read exactly its secrets, except `callNodeFunction`, `callPythonFunction`
+and `apiProxy`, which share `custom_cloud_function_account` (its grants are
+listed in the same file). Keep a unit's `timeout` at or above the longest
+Hasura `timeout` / `timeout_sec` of its handlers. The dashboard "EduHub cloud
+functions" (`10_monitoring.tf`) shows p95 latency, instances and request rate
+per unit.
 
 ## CI
 

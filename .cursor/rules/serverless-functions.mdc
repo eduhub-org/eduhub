@@ -10,10 +10,14 @@ alwaysApply: false
 > `.claude/commands/create-function.md`.
 
 - **Unit** = deployed Cloud Function (`functions/units.json`). **Dispatcher**
-  = `callNodeFunction` / `callPythonFunction`, routing by `Function-Name`.
-  **Handler** = one routed function. Add handlers, not units.
-- Headers: `Hasura-Secret`, `Function-Name`, `Bucket`. callNodeFunction and
-  the other Node units still accept the legacy `secret` / `name` until
+  = `callNodeFunction`, `identity`, `media` (one Node codebase in
+  `functions/callNodeFunction`, three entry points) and `callPythonFunction`,
+  routing by `Function-Name`. **Handler** = one routed function. Add
+  handlers, not units; pick the Node dispatcher by the secrets the handler
+  needs (Keycloak/Matrix → identity, storage only → media, else
+  callNodeFunction; `docs/adr/0002-function-units-by-secret-scope.md`).
+- Headers: `Hasura-Secret`, `Function-Name`, `Bucket`. The Node dispatchers
+  and sendMail still accept the legacy `secret` / `name` until
   `docs/plans/functions-header-switch.md` is done; new metadata uses the
   standard names.
 - Status codes: 401 secret, 404 unknown function, 500 server secret unset,
@@ -21,6 +25,7 @@ alwaysApply: false
   else 200 with `{ success, messageKey, error? }`.
 - Node handlers read env via `lib/config.js`, Hasura via `lib/hasura.js`,
   HTTP via `lib/http.js`, the bucket via `lib/requestHeaders.js`.
-- Register in `functionMap` / `PYTHON_FUNCTIONS`; the registry test
-  (`callNodeFunction/__tests__/registry.test.js`) checks it against the
-  Hasura metadata.
+- Register in `callNodeFunctionHandlers` / `identityHandlers` /
+  `mediaHandlers` / `PYTHON_FUNCTIONS`; the registry test
+  (`callNodeFunction/__tests__/registry.test.js`) checks each metadata entry
+  calls the unit whose map holds the handler.
