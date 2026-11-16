@@ -36,6 +36,7 @@
 import KcAdminClient from '@keycloak/keycloak-admin-client';
 import { mergeUserPutPayload } from '../shared/keycloakUserMerge.js';
 import { computeMatrixHandle } from '../shared/matrixHandle.js';
+import * as config from '../lib/config.js';
 
 const DRY_RUN = process.argv.includes('--dry-run');
 const DELAY_BETWEEN_USERS_MS = 100;
@@ -52,8 +53,8 @@ async function keycloakAuth(kcAdminClient) {
   for (let attempt = 1; attempt <= AUTH_RETRY_ATTEMPTS; attempt++) {
     try {
       await kcAdminClient.auth({
-        username: process.env.KEYCLOAK_USER || 'keycloak',
-        password: process.env.KEYCLOAK_PW,
+        username: config.keycloakConfig().username,
+        password: config.keycloakConfig().password,
         grantType: 'password',
         clientId: 'admin-cli',
       });
@@ -77,7 +78,7 @@ function resolvePictureUrl(picturePath) {
     return picturePath;
   }
   if (picturePath.startsWith('public/') || picturePath.includes('/public/')) {
-    const bucketUrl = process.env.STORAGE_BUCKET_PUBLIC_URL;
+    const bucketUrl = config.storageBucketPublicUrl();
     if (!bucketUrl) return null;
     return `${bucketUrl}/${picturePath}`;
   }
@@ -89,11 +90,11 @@ function resolvePictureUrl(picturePath) {
 // ---------------------------------------------------------------------------
 
 async function hasuraQuery(query, variables = {}) {
-  const response = await fetch(process.env.HASURA_ENDPOINT, {
+  const response = await fetch(config.env('HASURA_ENDPOINT'), {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET,
+      'x-hasura-admin-secret': config.env('HASURA_ADMIN_SECRET'),
     },
     body: JSON.stringify({ query, variables }),
   });
@@ -157,7 +158,7 @@ async function main() {
 
   // 2. Authenticate with Keycloak
   const kcAdminClient = new KcAdminClient({
-    baseUrl: process.env.KEYCLOAK_URL,
+    baseUrl: config.keycloakConfig().url,
     realmName: 'master',
   });
 
