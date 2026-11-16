@@ -4,7 +4,7 @@ import { useSession } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
 
 import MatrixAuthStatus from '../../components/pages/MatrixAuth/MatrixAuthStatus';
-import { useSignedInUserId } from '../../hooks/authentication';
+import { useSignedInMatrixHandle, useSignedInUserId } from '../../hooks/authentication';
 import { completeMatrixLogin, MatrixLoginError, parseMatrixCallback } from '../../lib/matrix/oauth';
 
 /**
@@ -16,6 +16,7 @@ const MatrixCallbackPage = () => {
   const t = useTranslations('matrixChat');
   const { status } = useSession();
   const eduHubUserId = useSignedInUserId();
+  const expectedMatrixHandle = useSignedInMatrixHandle();
   const [error, setError] = useState<string | null>(null);
   const started = useRef(false);
 
@@ -40,17 +41,19 @@ const MatrixCallbackPage = () => {
       return;
     }
 
-    completeMatrixLogin({ code, state, eduHubUserId, origin: window.location.origin })
+    completeMatrixLogin({ code, state, eduHubUserId, expectedMatrixHandle, origin: window.location.origin })
       .then(({ returnTo }) => router.replace(returnTo))
       .catch((loginError) => {
         console.error('Could not complete the Matrix login', loginError);
-        setError(
-          loginError instanceof MatrixLoginError && loginError.reason === 'WRONG_USER'
-            ? t('session_missing')
-            : t('login_failed')
-        );
+        if (loginError instanceof MatrixLoginError && loginError.reason === 'WRONG_MATRIX_ACCOUNT') {
+          setError(t('wrong_account', { matrixId: loginError.message }));
+        } else if (loginError instanceof MatrixLoginError && loginError.reason === 'WRONG_USER') {
+          setError(t('session_missing'));
+        } else {
+          setError(t('login_failed'));
+        }
       });
-  }, [status, eduHubUserId, router, t]);
+  }, [status, eduHubUserId, expectedMatrixHandle, router, t]);
 
   return <MatrixAuthStatus message={t('login_completing')} error={error} retryHref="/matrix/login" />;
 };

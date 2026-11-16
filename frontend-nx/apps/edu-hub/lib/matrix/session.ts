@@ -78,6 +78,17 @@ export const saveMatrixSession = (eduHubUserId: string, matrixSession: MatrixSes
 
 export const clearMatrixSession = (eduHubUserId: string): void => remove(local, SESSION_PREFIX + eduHubUserId);
 
+/** EduHub user ids that have a Matrix session stored in this browser. */
+export const listMatrixSessionOwners = (): string[] => {
+  try {
+    return Object.keys(window.localStorage)
+      .filter((key) => key.startsWith(SESSION_PREFIX))
+      .map((key) => key.slice(SESSION_PREFIX.length));
+  } catch {
+    return [];
+  }
+};
+
 const clientKey = (issuer: string, origin: string) => `${CLIENT_PREFIX}${issuer}|${origin}`;
 
 export const loadRegisteredClientId = (issuer: string, origin: string): string | null =>

@@ -4109,6 +4109,7 @@
     "login_denied": "You cancelled the course chat login.",
     "session_missing": "Please log in to EduHub first, then try again.",
     "try_again": "Try again",
-    "back_home": "Back to the start page"
+    "back_home": "Back to the start page",
+    "wrong_account": "The chat login in this browser still belonged to {matrixId}, not to your own account. We discarded it. Please try again and choose “Use another account” there."
   }
 }

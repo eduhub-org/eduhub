@@ -77,6 +77,17 @@ export const useSignedInUserId = (): string | null => {
 };
 
 /**
+ * The Matrix handle of the person who is actually signed in, from the
+ * `matrix_user_handle` claim Keycloak puts into the login profile. The chat
+ * login checks the Matrix account it gets back against it.
+ */
+export const useSignedInMatrixHandle = (): string | null => {
+  const { data: sessionData } = useSession();
+  const handle = (sessionData?.profile as { matrix_user_handle?: unknown } | undefined)?.matrix_user_handle;
+  return typeof handle === 'string' && handle.trim() ? handle.trim() : null;
+};
+
+/**
  * Whether the signed-in person holds an elevated role, read straight from the
  * session and past the view-as masking above.
  *

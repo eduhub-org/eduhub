@@ -19,6 +19,7 @@ import { getMatrixHomeserverUrl, matrixCallbackUrl, safeReturnTo } from './confi
 import {
   clearMatrixSession,
   forgetRegisteredClientId,
+  listMatrixSessionOwners,
   loadMatrixSession,
   loadRegisteredClientId,
   MatrixSession,
@@ -36,6 +37,7 @@ export class MatrixLoginError extends Error {
       | 'NOT_CONFIGURED'
       | 'UNKNOWN_STATE'
       | 'WRONG_USER'
+      | 'WRONG_MATRIX_ACCOUNT'
       | 'DENIED'
       | 'EXCHANGE_FAILED',
     message?: string
@@ -118,6 +120,9 @@ export const startMatrixLogin = async ({
   return oauth.generateAuthorizationCodeGrantUrl(state, matrixCallbackUrl(origin), 'fragment');
 };
 
+/** The localpart of a Matrix user id or handle: "@ina.lehr.abc123:server" → "ina.lehr.abc123". */
+const localpartOf = (userIdOrHandle: string): string => userIdOrHandle.trim().replace(/^@/, '').split(':')[0];
+
 /** Reads code/state (or error) from the callback URL fragment. */
 export const parseMatrixCallback = (
   hash: string
@@ -138,11 +143,14 @@ export const completeMatrixLogin = async ({
   code,
   state,
   eduHubUserId,
+  expectedMatrixHandle,
   origin,
 }: {
   code: string;
   state: string;
   eduHubUserId: string;
+  /** The signed-in EduHub user's matrix_user_handle; the Matrix account must match it. */
+  expectedMatrixHandle: string | null;
   origin: string;
 }): Promise<{ session: MatrixSession; returnTo: string }> => {
   const pending = takePendingMatrixLogin(state);
@@ -173,6 +181,19 @@ export const completeMatrixLogin = async ({
     baseUrl: pending.homeserverUrl,
     accessToken: tokens.access_token,
   }).whoami();
+
+  // The auth server keeps its own browser session, so on a shared computer it
+  // can still be logged in as the previous person. Never keep a Matrix session
+  // that is not the signed-in EduHub user's own account.
+  if (!expectedMatrixHandle || localpartOf(whoami.user_id) !== localpartOf(expectedMatrixHandle)) {
+    await Promise.all(
+      [
+        tokens.refresh_token && oauth.revokeToken(tokens.refresh_token, 'refresh_token'),
+        oauth.revokeToken(tokens.access_token, 'access_token'),
+      ].map((revocation) => Promise.resolve(revocation).catch(() => undefined))
+    );
+    throw new MatrixLoginError('WRONG_MATRIX_ACCOUNT', whoami.user_id);
+  }
 
   // A login while an earlier session is still stored (e.g. a second tab) would
   // leave that session alive at the auth server, and with it the device, even
@@ -257,4 +278,13 @@ export const logoutMatrix = async (eduHubUserId: string): Promise<void> => {
   } catch (error) {
     console.warn('Could not revoke the Matrix session', error);
   }
+};
+
+/**
+ * Ends every Matrix session stored in this browser. For when nobody is signed
+ * in to EduHub any more, however that happened (logout, expired session, auth
+ * error): no chat tokens should outlive the EduHub login they came from.
+ */
+export const logoutAllMatrixSessions = async (): Promise<void> => {
+  await Promise.all(listMatrixSessionOwners().map((eduHubUserId) => logoutMatrix(eduHubUserId)));
 };

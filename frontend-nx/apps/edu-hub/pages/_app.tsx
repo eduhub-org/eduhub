@@ -16,6 +16,7 @@ import { enUS } from 'date-fns/locale/en-US';
 import { AppSettingsProvider } from '../contexts/AppSettingsContext';
 import { AuthErrorProvider } from '../contexts/AuthErrorContext';
 import { AuthStoreUpdater } from '../components/AuthStoreUpdater';
+import { MatrixSessionGuard } from '../components/MatrixSessionGuard';
 import { ImpersonationProvider } from '../contexts/ImpersonationContext';
 import { ParticipantPreviewProvider } from '../contexts/ParticipantPreviewContext';
 import { useHasElevatedSessionRole, useIsSessionLoading } from '../hooks/authentication';
@@ -97,6 +98,7 @@ const MyApp: FC<AppProps & InitialProps> & {
             of those answers come from. */}
         <ImpersonationProvider>
         <AuthStoreUpdater />
+        <MatrixSessionGuard />
         <ApolloProvider client={client}>
           <AppCacheProvider {...pageProps}>
             <ThemeProvider theme={theme}>

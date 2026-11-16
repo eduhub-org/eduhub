@@ -1,6 +1,7 @@
 import { safeReturnTo } from './config';
 import {
   completeMatrixLogin,
+  logoutAllMatrixSessions,
   logoutMatrix,
   MatrixLoginError,
   parseMatrixCallback,
@@ -138,7 +139,7 @@ describe('completeMatrixLogin', () => {
   it('exchanges the code with the PKCE verifier and stores the session', async () => {
     const url = await startMatrixLogin({ eduHubUserId: 'u1', returnTo: '/course/12', origin });
 
-    const result = await completeMatrixLogin({ code: 'code-1', state: stateOf(url), eduHubUserId: 'u1', origin });
+    const result = await completeMatrixLogin({ code: 'code-1', state: stateOf(url), eduHubUserId: 'u1', expectedMatrixHandle: 'ina.lehr.abc123', origin });
 
     expect(oauthContexts[1]).toEqual({ clientId: 'client-1', deviceId: 'NEWDEVICE', codeVerifier: 'verifier-1' });
     expect(completeAuthorizationCodeGrant).toHaveBeenCalledWith('code-1', 'https://edu.test/matrix/callback');
@@ -164,7 +165,7 @@ describe('completeMatrixLogin', () => {
     });
     const url = await startMatrixLogin({ eduHubUserId: 'u1', returnTo: '/', origin });
 
-    await completeMatrixLogin({ code: 'code-1', state: stateOf(url), eduHubUserId: 'u1', origin });
+    await completeMatrixLogin({ code: 'code-1', state: stateOf(url), eduHubUserId: 'u1', expectedMatrixHandle: 'ina.lehr.abc123', origin });
 
     expect(revokeToken).toHaveBeenCalledWith('old-refresh', 'refresh_token');
     expect(revokeToken).toHaveBeenCalledWith('old-access', 'access_token');
@@ -183,18 +184,40 @@ describe('completeMatrixLogin', () => {
     revokeToken.mockRejectedValue(new Error('already gone'));
     const url = await startMatrixLogin({ eduHubUserId: 'u1', returnTo: '/', origin });
 
-    await completeMatrixLogin({ code: 'code-1', state: stateOf(url), eduHubUserId: 'u1', origin });
+    await completeMatrixLogin({ code: 'code-1', state: stateOf(url), eduHubUserId: 'u1', expectedMatrixHandle: 'ina.lehr.abc123', origin });
 
     expect(loadMatrixSession('u1')?.accessToken).toBe('access-1');
     revokeToken.mockResolvedValue(undefined);
   });
 
-  it('accepts a state only once', async () => {
+  it('discards a Matrix account that is not the signed-in user\'s own', async () => {
+    // The auth server's browser session still belongs to the previous person.
+    whoami.mockResolvedValueOnce({ user_id: '@admin.admin.8914be:test', device_id: 'DEVICE1' });
     const url = await startMatrixLogin({ eduHubUserId: 'u1', returnTo: '/', origin });
-    await completeMatrixLogin({ code: 'code-1', state: stateOf(url), eduHubUserId: 'u1', origin });
 
     await expect(
-      completeMatrixLogin({ code: 'code-1', state: stateOf(url), eduHubUserId: 'u1', origin })
+      completeMatrixLogin({ code: 'code-1', state: stateOf(url), eduHubUserId: 'u1', expectedMatrixHandle: 'ina.lehr.abc123', origin })
+    ).rejects.toMatchObject({ reason: 'WRONG_MATRIX_ACCOUNT', message: '@admin.admin.8914be:test' });
+    expect(revokeToken).toHaveBeenCalledWith('refresh-1', 'refresh_token');
+    expect(revokeToken).toHaveBeenCalledWith('access-1', 'access_token');
+    expect(loadMatrixSession('u1')).toBeNull();
+  });
+
+  it('refuses the login when the expected Matrix account is unknown', async () => {
+    const url = await startMatrixLogin({ eduHubUserId: 'u1', returnTo: '/', origin });
+
+    await expect(
+      completeMatrixLogin({ code: 'code-1', state: stateOf(url), eduHubUserId: 'u1', expectedMatrixHandle: null, origin })
+    ).rejects.toMatchObject({ reason: 'WRONG_MATRIX_ACCOUNT' });
+    expect(loadMatrixSession('u1')).toBeNull();
+  });
+
+  it('accepts a state only once', async () => {
+    const url = await startMatrixLogin({ eduHubUserId: 'u1', returnTo: '/', origin });
+    await completeMatrixLogin({ code: 'code-1', state: stateOf(url), eduHubUserId: 'u1', expectedMatrixHandle: 'ina.lehr.abc123', origin });
+
+    await expect(
+      completeMatrixLogin({ code: 'code-1', state: stateOf(url), eduHubUserId: 'u1', expectedMatrixHandle: 'ina.lehr.abc123', origin })
     ).rejects.toMatchObject({ reason: 'UNKNOWN_STATE' });
   });
 
@@ -202,7 +225,7 @@ describe('completeMatrixLogin', () => {
     const url = await startMatrixLogin({ eduHubUserId: 'u1', returnTo: '/', origin });
 
     await expect(
-      completeMatrixLogin({ code: 'code-1', state: stateOf(url), eduHubUserId: 'u2', origin })
+      completeMatrixLogin({ code: 'code-1', state: stateOf(url), eduHubUserId: 'u2', expectedMatrixHandle: 'someone.else.def456', origin })
     ).rejects.toBeInstanceOf(MatrixLoginError);
     expect(loadMatrixSession('u2')).toBeNull();
   });
@@ -225,5 +248,24 @@ describe('logoutMatrix', () => {
 
     expect(logout).toHaveBeenCalled();
     expect(loadMatrixSession('u1')).toBeNull();
+  });
+
+  it('ends every stored session once nobody is signed in', async () => {
+    for (const id of ['u1', 'u2']) {
+      saveMatrixSession(id, {
+        homeserverUrl: 'https://matrix.test',
+        userId: `@${id}:test`,
+        deviceId: 'DEVICE1',
+        accessToken: `access-${id}`,
+        oauthClientId: 'client-1',
+        issuer: metadata.issuer,
+      });
+    }
+
+    await logoutAllMatrixSessions();
+
+    expect(logout).toHaveBeenCalledTimes(2);
+    expect(loadMatrixSession('u1')).toBeNull();
+    expect(loadMatrixSession('u2')).toBeNull();
   });
 });

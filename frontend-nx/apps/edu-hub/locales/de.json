@@ -4094,6 +4094,7 @@
     "login_denied": "Du hast die Anmeldung beim Kurs-Chat abgebrochen.",
     "session_missing": "Bitte melde dich zuerst bei EduHub an und versuch es dann noch einmal.",
     "try_again": "Erneut versuchen",
-    "back_home": "Zur Startseite"
+    "back_home": "Zur Startseite",
+    "wrong_account": "Für den Chat warst du in diesem Browser noch als {matrixId} angemeldet, nicht mit deinem eigenen Konto. Wir haben diese Anmeldung verworfen. Versuch es noch einmal und wähle dort „Anderes Konto verwenden“."
   }
 }
