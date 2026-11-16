@@ -3,49 +3,64 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from '@jest/globals';
 import yaml from 'js-yaml';
-import { functionMap } from '../index.js';
+import {
+  callNodeFunctionHandlers,
+  identityHandlers,
+  mediaHandlers,
+  movedHandlers,
+} from '../index.js';
 
-// Keeps the dispatcher's functionMap, the handler folders and the Hasura
+// Keeps the dispatchers' handler maps, the handler folders and the Hasura
 // metadata (actions, cron triggers, event triggers) in step, so a handler
-// that is not registered, or a metadata entry naming a function that does not
-// exist, fails here instead of in production.
+// that is not registered, or a metadata entry naming a function that its
+// unit does not route, fails here instead of in production.
 
 const UNIT_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const METADATA_DIR = path.resolve(UNIT_DIR, '../../backend/metadata');
-const URL_TEMPLATE = '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}';
-const URL_ENV = 'CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION';
-// Header the dispatcher routes on (Function-Name is the planned new name).
+
+// The units built from this code: the Hasura URL variable each one is reached
+// through, and the handlers it serves.
+const DISPATCHERS = [
+  { unit: 'callNodeFunction', urlEnv: 'CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION', handlers: callNodeFunctionHandlers },
+  { unit: 'identity', urlEnv: 'CLOUD_FUNCTION_LINK_IDENTITY', handlers: identityHandlers },
+  { unit: 'media', urlEnv: 'CLOUD_FUNCTION_LINK_MEDIA', handlers: mediaHandlers },
+];
+const DISPATCHER_BY_ENV = new Map(DISPATCHERS.map((dispatcher) => [dispatcher.urlEnv, dispatcher]));
+
+// Header the dispatcher routes on (`name` is the legacy spelling).
 const NAME_HEADERS = new Set(['name', 'function-name']);
 
 // Folders with an index.js that are not handlers.
 const NON_HANDLER_DIRS = new Set(['lib', 'scripts', 'shared', 'node_modules', 'coverage', 'jest']);
 // Handlers registered under another name than their folder.
 const EXTRA_KEYS = { deleteMyAccount: 'anonymizeUser' };
-// functionMap keys that no metadata entry is expected to reference.
+// Handler keys that no metadata entry is expected to reference.
 const UNREFERENCED_ALLOWED = new Set([]);
 
 const readYaml = (file) => yaml.load(fs.readFileSync(file, 'utf8')) ?? [];
 
-const isCallNodeFunction = (url, urlFromEnv) => url === URL_TEMPLATE || urlFromEnv === URL_ENV;
+/** URL variable of a `{{VAR}}` template or a `webhook_from_env` entry. */
+const urlEnvOf = (url, urlFromEnv) => urlFromEnv ?? /^\{\{(\w+)\}\}$/.exec(url ?? '')?.[1];
 
 const functionNameOf = (headers = []) =>
   headers.find((header) => NAME_HEADERS.has(String(header.name).toLowerCase()))?.value;
 
-/** Every metadata entry that calls this unit, as { source, functionName }. */
+/** Every metadata entry that calls one of these units, as { source, urlEnv, functionName }. */
 const collectMetadataReferences = () => {
   const references = [];
+  const add = (source, urlEnv, headers) => {
+    if (DISPATCHER_BY_ENV.has(urlEnv)) {
+      references.push({ source, urlEnv, functionName: functionNameOf(headers) });
+    }
+  };
 
   for (const action of readYaml(path.join(METADATA_DIR, 'actions.yaml')).actions ?? []) {
     const { handler, headers } = action.definition ?? {};
-    if (isCallNodeFunction(handler)) {
-      references.push({ source: `action ${action.name}`, functionName: functionNameOf(headers) });
-    }
+    add(`action ${action.name}`, urlEnvOf(handler), headers);
   }
 
   for (const cron of readYaml(path.join(METADATA_DIR, 'cron_triggers.yaml'))) {
-    if (isCallNodeFunction(cron.webhook, cron.webhook_from_env)) {
-      references.push({ source: `cron ${cron.name}`, functionName: functionNameOf(cron.headers) });
-    }
+    add(`cron ${cron.name}`, urlEnvOf(cron.webhook, cron.webhook_from_env), cron.headers);
   }
 
   const databasesDir = path.join(METADATA_DIR, 'databases');
@@ -56,12 +71,11 @@ const collectMetadataReferences = () => {
     for (const file of fs.readdirSync(tablesDir).filter((name) => name.endsWith('.yaml'))) {
       const table = readYaml(path.join(tablesDir, file));
       for (const trigger of table?.event_triggers ?? []) {
-        if (isCallNodeFunction(trigger.webhook, trigger.webhook_from_env)) {
-          references.push({
-            source: `event trigger ${trigger.name} (${file})`,
-            functionName: functionNameOf(trigger.headers),
-          });
-        }
+        add(
+          `event trigger ${trigger.name} (${file})`,
+          urlEnvOf(trigger.webhook, trigger.webhook_from_env),
+          trigger.headers
+        );
       }
     }
   }
@@ -77,38 +91,61 @@ const handlerDirs = () =>
     .filter((entry) => fs.existsSync(path.join(UNIT_DIR, entry.name, 'index.js')))
     .map((entry) => entry.name);
 
+const allKeys = () => DISPATCHERS.flatMap(({ handlers }) => Object.keys(handlers));
+
 describe('handler registry', () => {
   const references = collectMetadataReferences();
 
-  it('finds the metadata entries that call callNodeFunction', () => {
+  it('finds the metadata entries that call the dispatchers', () => {
     expect(references.length).toBeGreaterThan(20);
   });
 
-  it('registers every handler folder in functionMap', () => {
-    const missing = handlerDirs().filter((dir) => !Object.hasOwn(functionMap, dir));
-    expect(missing).toEqual([]);
+  it('registers every handler folder in exactly one dispatcher', () => {
+    const keys = allKeys();
+    const counts = handlerDirs().map((dir) => [dir, keys.filter((key) => key === dir).length]);
+    expect(counts.filter(([, count]) => count !== 1)).toEqual([]);
   });
 
-  it('maps every functionMap key to a handler folder', () => {
+  it('registers every handler name in exactly one dispatcher', () => {
+    const keys = allKeys();
+    expect(keys.filter((key, index) => keys.indexOf(key) !== index)).toEqual([]);
+  });
+
+  it('maps every handler key to a handler folder', () => {
     const dirs = new Set(handlerDirs());
-    const orphaned = Object.keys(functionMap).filter(
-      (key) => !dirs.has(key) && !dirs.has(EXTRA_KEYS[key])
-    );
+    const orphaned = allKeys().filter((key) => !dirs.has(key) && !dirs.has(EXTRA_KEYS[key]));
     expect(orphaned).toEqual([]);
   });
 
-  it('resolves every function name in Hasura metadata', () => {
+  it("resolves every function name in Hasura metadata in its URL's dispatcher", () => {
     const unresolved = references
-      .filter(({ functionName }) => !functionName || !Object.hasOwn(functionMap, functionName))
-      .map(({ source, functionName }) => `${source} -> ${functionName ?? '(no name header)'}`);
+      .filter(({ urlEnv, functionName }) => {
+        const { unit, handlers: own } = DISPATCHER_BY_ENV.get(urlEnv);
+        // Until the metadata switch, callNodeFunction entries still name the moved handlers.
+        const handlers = unit === 'callNodeFunction' ? { ...own, ...movedHandlers } : own;
+        return !functionName || !Object.hasOwn(handlers, functionName);
+      })
+      .map(({ source, urlEnv, functionName }) => `${source} -> ${urlEnv} ${functionName ?? '(no name header)'}`);
     expect(unresolved).toEqual([]);
   });
 
-  it('references every registered function from Hasura metadata', () => {
-    const referenced = new Set(references.map(({ functionName }) => functionName));
-    const unreferenced = Object.keys(functionMap).filter(
+  it.each(DISPATCHERS)('references every $unit handler through $urlEnv', ({ urlEnv, handlers }) => {
+    const referenced = new Set(
+      references
+        // Until the metadata switch, moved handlers are referenced through callNodeFunction.
+        .filter((reference) => reference.urlEnv === urlEnv || reference.urlEnv === DISPATCHERS[0].urlEnv)
+        .map(({ functionName }) => functionName)
+    );
+    const unreferenced = Object.keys(handlers).filter(
       (key) => !referenced.has(key) && !UNREFERENCED_ALLOWED.has(key)
     );
     expect(unreferenced).toEqual([]);
+  });
+
+  it('keeps routing in callNodeFunction only handlers that moved to identity or media', () => {
+    const moved = Object.keys(movedHandlers).filter(
+      (key) => movedHandlers[key] !== (identityHandlers[key] ?? mediaHandlers[key])
+    );
+    expect(moved).toEqual([]);
   });
 });

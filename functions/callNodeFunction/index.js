@@ -53,30 +53,60 @@ import searchRausgegangenLocations from "./searchRausgegangenLocations/index.js"
 import geocodeLocationAddress from "./geocodeLocationAddress/index.js";
 import { createDispatcher } from "./lib/dispatcher.js";
 
+// Handlers by the `Function-Name` (legacy: `name`) header Hasura sends, one map
+// per unit. Static imports on purpose: a Cloud Functions entry point must be
+// resolvable without scanning folders. __tests__/registry.test.js checks the
+// maps against the handler folders and the Hasura metadata.
+//
+// All three units deploy this same code (callNodeFunction.zip) with a
+// different entry point; what separates them is the secrets Terraform gives
+// each one (docs/adr/0002-function-units-by-secret-scope.md). Put a handler in
+// the unit that holds the credentials it needs.
+
 /**
- * Handlers by the `Function-Name` (legacy: `name`) header Hasura sends. Static imports on purpose: the
- * Cloud Functions entry point must be resolvable without scanning folders.
- * __tests__/registry.test.js checks this map against the handler folders and
- * the Hasura metadata.
+ * Keycloak and Matrix accounts: everything that needs the Keycloak admin
+ * login or a Matrix token.
  * @type {Record<string, import('./lib/types.js').Handler>}
  */
-export const functionMap = {
-  getSignedUrl,
-  saveFile,
-  saveImage,
-  anonymizeUser,
-  deleteMyAccount,
+export const identityHandlers = {
+  createUser,
   updateKeycloakUser,
   updateAdminUser,
   getAdminUsers,
+  claimJobOrganization,
+  anonymizeUser,
+  deleteMyAccount,
+  createMatrixRoom,
+  syncProgramInstructorMatrixRoom,
+  updateMatrixInstructorPowerLevel,
+};
+
+/**
+ * Files in the storage bucket: uploads, image resizing, signed URLs. Hasura
+ * and storage only, with more memory for sharp.
+ * @type {Record<string, import('./lib/types.js').Handler>}
+ */
+export const mediaHandlers = {
+  saveFile,
+  saveImage,
+  saveOrganizationLogo,
+  removeOrganizationLogo,
+  getSignedUrl,
+  makeCertificatePublic,
+};
+
+/**
+ * Everything else: enrollment, guest registration, Formbricks, Stripe, job
+ * postings, mails and syncs.
+ * @type {Record<string, import('./lib/types.js').Handler>}
+ */
+export const callNodeFunctionHandlers = {
   sendEnrollmentEmail,
   sendOrganizerAddedEmail,
   sendInstructorCertificateEmail,
   sendSpeakerAddedEmail,
   sendCancellationRequestEmail,
   sendSessionReminders,
-  makeCertificatePublic,
-  createUser,
   getFormbricksResponses,
   syncFormbricksResponses,
   getFormbricksAddonSelections,
@@ -90,15 +120,9 @@ export const functionMap = {
   sendPendingJobPostingMails,
   archiveJobPosting,
   setJobPostingActive,
-  claimJobOrganization,
   requestJobOrganizationAccess,
-  saveOrganizationLogo,
-  removeOrganizationLogo,
   updateOrganizationWebsite,
   createEnrollmentWithAddons,
-  createMatrixRoom,
-  updateMatrixInstructorPowerLevel,
-  syncProgramInstructorMatrixRoom,
   syncGhostNewsletterSubscription,
   copyProjectFromTemplate,
   setProjectDocumentationInstructionDefault,
@@ -117,7 +141,40 @@ export const functionMap = {
 };
 
 /**
- * Responds to any HTTP request from Hasura; see lib/dispatcher.js for the
- * request contract.
+ * Handlers that moved from callNodeFunction to identity or media and that
+ * callNodeFunction still routes for one release, so a Hasura revision or an
+ * event retry that still targets callNodeFunction's URL during the rollout
+ * does not get a 404. Remove with
+ * docs/plans/functions-topology-cleanup.md.
+ * @type {Record<string, import('./lib/types.js').Handler>}
  */
-export const callNodeFunction = createDispatcher({ name: "callNodeFunction", handlers: functionMap });
+export const movedHandlers = {
+  createUser,
+  updateKeycloakUser,
+  updateAdminUser,
+  getAdminUsers,
+  claimJobOrganization,
+  anonymizeUser,
+  deleteMyAccount,
+  createMatrixRoom,
+  syncProgramInstructorMatrixRoom,
+  updateMatrixInstructorPowerLevel,
+  saveFile,
+  saveImage,
+  saveOrganizationLogo,
+  removeOrganizationLogo,
+  getSignedUrl,
+  makeCertificatePublic,
+};
+
+/** Entry point of the callNodeFunction unit. */
+export const callNodeFunction = createDispatcher({
+  name: "callNodeFunction",
+  handlers: { ...callNodeFunctionHandlers, ...movedHandlers },
+});
+
+/** Entry point of the identity unit (same zip as callNodeFunction). */
+export const identity = createDispatcher({ name: "identity", handlers: identityHandlers });
+
+/** Entry point of the media unit (same zip as callNodeFunction). */
+export const media = createDispatcher({ name: "media", handlers: mediaHandlers });
