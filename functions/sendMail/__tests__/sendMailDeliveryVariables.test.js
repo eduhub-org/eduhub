@@ -110,4 +110,21 @@ describe('sendMail delivery-status variables', () => {
     expect(res.statusCode).toBe(401);
     expect(logSpy.mock.calls.some(([label]) => label === 'Development email:')).toBe(false);
   });
+
+  it('accepts the secret in the Hasura-Secret header', async () => {
+    const res = makeResponse();
+    const request = { ...makeRequest(baseRow), headers: { 'hasura-secret': SECRET } };
+    await sendMail(request, res);
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toEqual({ success: true });
+  });
+
+  it('rejects a wrong Hasura-Secret header', async () => {
+    const res = makeResponse();
+    const request = { ...makeRequest(baseRow), headers: { 'hasura-secret': 'wrong' } };
+    await sendMail(request, res);
+
+    expect(res.statusCode).toBe(401);
+  });
 });

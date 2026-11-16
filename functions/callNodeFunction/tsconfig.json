@@ -23,6 +23,7 @@
     "lib/http.js",
     "lib/keycloak.js",
     "lib/logger.js",
+    "lib/requestHeaders.js",
     "lib/types.js"
   ]
 }

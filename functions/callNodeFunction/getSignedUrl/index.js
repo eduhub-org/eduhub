@@ -1,5 +1,6 @@
 import { Storage } from "@google-cloud/storage";
 import { buildCloudStorage } from "../lib/cloud-storage.js";
+import { getBucket } from "../lib/requestHeaders.js";
 import { logger } from "../lib/logger.js";
 import { canAccessPath } from "./access.js";
 
@@ -32,7 +33,7 @@ const getSignedUrl = async (req) => {
   try {
     // Admins, instructors, or users accessing their own data (see access.js)
     if (canAccessPath(path, userRole, userUUID)) {
-      const link = await storage.loadFromBucket(path, req.headers.bucket);
+      const link = await storage.loadFromBucket(path, getBucket(req));
       logger.info("File access granted", { path, userRole, userUUID });
       return {
         success: true,

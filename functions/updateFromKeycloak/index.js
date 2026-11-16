@@ -2,7 +2,7 @@ import KcAdminClient from "@keycloak/keycloak-admin-client";
 import { GraphQLClient, gql } from "graphql-request";
 import { mergeUserPutPayload } from "./shared/keycloakUserMerge.js";
 import { computeMatrixHandle } from "./shared/matrixHandle.js";
-import { secretsMatch } from "./shared/security.js";
+import { getProvidedSecret, secretsMatch } from "./shared/security.js";
 
 const FIND_USER = gql`
   query ($id: uuid!) {
@@ -123,7 +123,7 @@ export const updateFromKeycloak = async (req, res) => {
     return res.status(500).json({ error: "Server secret not configured" });
   }
 
-  if (secretsMatch(req.headers.secret, expectedSecret)) {
+  if (secretsMatch(getProvidedSecret(req.headers), expectedSecret)) {
     const kcAdminClient = new KcAdminClient({
       baseUrl: process.env.KEYCLOAK_URL,
       realmName: "master",

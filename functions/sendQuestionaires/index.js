@@ -1,5 +1,5 @@
 import { GraphQLClient, gql } from "graphql-request";
-import { secretsMatch } from "./shared/security.js";
+import { getProvidedSecret, secretsMatch } from "./shared/security.js";
 
 const COURSES_WITH_SESSIONS = gql`query { 
             Course(where: {Program: {published: {_eq: true}}, published: {_eq: true}}) {
@@ -58,7 +58,7 @@ export const sendQuestionaires = async (req, res) => {
     return res.status(500).json({ error: "Server secret not configured" });
   }
 
-  if (secretsMatch(req.headers.secret, expectedSecret)) {
+  if (secretsMatch(getProvidedSecret(req.headers), expectedSecret)) {
 
     const client = new GraphQLClient(process.env.HASURA_ENDPOINT, {
       headers: {

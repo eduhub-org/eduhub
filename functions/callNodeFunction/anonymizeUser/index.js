@@ -1,6 +1,7 @@
 import { request } from 'graphql-request';
 import { Storage } from '@google-cloud/storage';
 import { buildCloudStorage } from '../lib/cloud-storage.js';
+import { getBucket } from '../lib/requestHeaders.js';
 import { getKeycloakToken } from '../lib/keycloak.js';
 import { unsubscribeForAccountDeletion } from '../syncGhostNewsletterSubscription/index.js';
 import { deactivateMatrixUser, getMatrixDeactivationConfig, toMatrixUserId } from '../lib/matrixInvite.js';
@@ -109,7 +110,7 @@ async function eraseAccount(req, logger, userId) {
 
     checkpoint();
     const storage = buildCloudStorage(Storage);
-    await removeProfileImage(storage, user.picture, req.headers.bucket);
+    await removeProfileImage(storage, user.picture, getBucket(req));
     result.steps.profile_picture_removal = true;
 
     const certificates = new Set([
@@ -120,7 +121,7 @@ async function eraseAccount(req, logger, userId) {
     ].filter(Boolean));
     for (const certificate of certificates) {
       checkpoint();
-      await deleteFile(storage, certificate, req.headers.bucket);
+      await deleteFile(storage, certificate, getBucket(req));
     }
     result.steps.certificate_anonymization = true;
 

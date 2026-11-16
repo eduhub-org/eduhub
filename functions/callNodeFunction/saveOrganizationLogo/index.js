@@ -3,6 +3,7 @@ import { Storage } from '@google-cloud/storage';
 
 import { saveImageUnchecked } from '../saveImage/index.js';
 import { buildCloudStorage } from '../lib/cloud-storage.js';
+import { getBucket } from '../lib/requestHeaders.js';
 import { authorizeOrganizationAdminFieldChange } from '../lib/organizationAdminFieldAuthorization.js';
 import { createHasuraClient } from '../lib/hasura.js';
 
@@ -47,7 +48,7 @@ const SET_ORGANIZATION_LOGO = gql`
 const cleanUpOrphanedUpload = async (req, logger, uploadResult) => {
   try {
     const storage = buildCloudStorage(Storage);
-    const bucketName = req.headers.bucket;
+    const bucketName = getBucket(req);
     await storage.deleteFile(uploadResult.filePath, bucketName);
     await Promise.all(
       (uploadResult.resizedPaths ?? []).map((resized) => storage.deleteFile(resized.filePath, bucketName))

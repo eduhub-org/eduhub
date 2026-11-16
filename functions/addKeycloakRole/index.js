@@ -1,5 +1,5 @@
 import KcAdminClient from '@keycloak/keycloak-admin-client';
-import { secretsMatch } from './shared/security.js';
+import { getProvidedSecret, secretsMatch } from './shared/security.js';
 
 export const addKeycloakRole = async (req, res) => {
   const expectedSecret = process.env.HASURA_CLOUD_FUNCTION_SECRET;
@@ -7,7 +7,7 @@ export const addKeycloakRole = async (req, res) => {
     return res.status(500).json({ error: 'Server secret not configured' });
   }
 
-  if (secretsMatch(req.headers.secret, expectedSecret)) {
+  if (secretsMatch(getProvidedSecret(req.headers), expectedSecret)) {
     const kcAdminClient = new KcAdminClient({
       baseUrl: process.env.KEYCLOAK_URL,
       realmName: 'master',

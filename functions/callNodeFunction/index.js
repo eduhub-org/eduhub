@@ -51,12 +51,13 @@ import manageTestEnrollment from "./manageTestEnrollment/index.js";
 import syncRausgegangenEvent from "./syncRausgegangenEvent/index.js";
 import searchRausgegangenLocations from "./searchRausgegangenLocations/index.js";
 import geocodeLocationAddress from "./geocodeLocationAddress/index.js";
-import { constantTimeSecretsEqual } from "./shared/security.js";
+import { constantTimeSecretsEqual, getProvidedSecret, SECRET_HEADER } from "./shared/security.js";
 import { cloudFunctionSecret } from "./lib/config.js";
 import { logger } from "./lib/logger.js";
+import { getFunctionName } from "./lib/requestHeaders.js";
 
 /**
- * Handlers by the `name` header Hasura sends. Static imports on purpose: the
+ * Handlers by the `Function-Name` (legacy: `name`) header Hasura sends. Static imports on purpose: the
  * Cloud Functions entry point must be resolvable without scanning folders.
  * __tests__/registry.test.js checks this map against the handler folders and
  * the Hasura metadata.
@@ -206,22 +207,40 @@ const formatResponse = (result) => {
 
 /**
  * Responds to any HTTP request from Hasura.
+ *
+ * Status codes (docs/SERVERLESS_FUNCTIONS.md, "Request contract"): 401 for a
+ * missing or wrong secret, 500 when the server secret is unset, 400 when
+ * `Function-Name` and `name` disagree, 404 for an unknown handler, 503 for a
+ * failure the handler marks `retryable` in an event or cron trigger, and 200
+ * otherwise, including `success: false` results and thrown errors.
  * @param {import('express').Request} req - HTTP request context
  * @param {import('express').Response} res - HTTP response context
  */
 export const callNodeFunction = async (req, res) => {
-  // Node joins repeated custom headers into one string.
-  const functionName = String(req.headers.name);
-
-  // Validate secret
-  const secretValidation = validateSecret(req.headers.secret);
+  const secretValidation = validateSecret(getProvidedSecret(req.headers));
   if (!secretValidation.isValid) {
     return res.status(secretValidation.statusCode).json(secretValidation.error);
   }
 
+  const { name, header, conflict } = getFunctionName(req.headers);
+  if (conflict) {
+    return res.status(400).json({
+      success: false,
+      error: "Function-Name and name headers name different functions.",
+      messageKey: "CONFLICTING_FUNCTION_NAME"
+    });
+  }
+  const functionName = String(name);
+
+  // Shows how far the switch to the standard header names has got
+  // (docs/plans/functions-header-switch.md).
+  logger.debug("Request header names", {
+    functionNameHeader: header,
+    secretHeader: req.headers[SECRET_HEADER] !== undefined ? SECRET_HEADER : "secret",
+  });
   logger.info(`Received request for function: ${functionName}`);
 
-  // Own properties only: `in` walks the prototype chain, so a `name` header of
+  // Own properties only: `in` walks the prototype chain, so a name header of
   // `constructor` would resolve to `Object` and `__proto__` to `Object.prototype`.
   // Neither is reachable without the shared secret, checked above - this is
   // defence in depth, not a fix for a live hole.
@@ -236,11 +255,6 @@ export const callNodeFunction = async (req, res) => {
   try {
     logger.info(`Executing function: ${functionName}`);
     const result = await functionMap[functionName](req, logger);
-    
-
-    if (req.body.request_query?.includes('mutation')) {
-      return res.status(200).json(result);
-    }
 
     // Event and cron triggers retry only on a non-2xx answer. Handlers opt in
     // per failure with `retryable`, since most failures (a deleted row, a
@@ -249,39 +263,30 @@ export const callNodeFunction = async (req, res) => {
     // carries `scheduled_time` instead of `event`.
     if ((req.body.event || req.body.scheduled_time) && result?.retryable) {
       logger.warn(`Retryable failure in ${functionName}`, { response: redactForLogging(result) });
-      return res.status(500).json(result);
+      return res.status(503).json(result);
     }
-    
-    // Define formattedResponse with the output from formatResponse.
-    const formattedResponse = formatResponse(result);
-    
+
+    // Mutation actions get the handler's result as is; everything else gets
+    // `{ success: true, data }` when the result has no success/error field.
+    const body = req.body.request_query?.includes('mutation') ? result : formatResponse(result);
+
     logger.info(`Successfully executed function: ${functionName}`, {
-      response: redactForLogging(formattedResponse)
+      response: redactForLogging(body)
     });
-    
-    return res.status(200).json(formattedResponse);
-    
+
+    return res.status(200).json(body);
   } catch (error) {
     logger.error(`Error in ${functionName}`, {
       error: error.message,
       stack: error.stack
     });
-    
 
-    if (req.body.request_query?.includes('mutation')) {
-      return res.status(200).json({
-        success: false,
-        error: error.message || "Internal Server Error",
-        messageKey: error.messageKey || "INTERNAL_SERVER_ERROR",
-      });
-    }
-    
-  
+    // A thrown error is not retried: actions read the body, and an event
+    // that throws would usually throw again.
     return res.status(200).json({
       success: false,
       error: error.message || "Internal Server Error",
       messageKey: error.messageKey || "INTERNAL_SERVER_ERROR",
-      details: error.details || "An unexpected error occurred"
     });
   }
 };

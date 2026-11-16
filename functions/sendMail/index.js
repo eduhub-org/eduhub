@@ -1,6 +1,6 @@
 import formData from 'form-data';
 import Mailgun from 'mailgun.js';
-import { secretsMatch } from './shared/security.js';
+import { getProvidedSecret, secretsMatch } from './shared/security.js';
 
 // Mailgun accepts up to 25 MB, but this function runs with 256M of memory and
 // form-data buffers a second multipart copy of every attachment. A Stripe
@@ -269,7 +269,7 @@ export const sendMail = async (req, res) => {
   }
 
   // Verify the request contains the correct secret header
-  if (!secretsMatch(req.headers.secret, expectedSecret)) {
+  if (!secretsMatch(getProvidedSecret(req.headers), expectedSecret)) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 

@@ -19,8 +19,9 @@
 /**
  * One routed function. Receives the raw request and the shared logger and
  * returns the response body; a value without `success`/`error` is wrapped as
- * `{ success: true, data }`, and `retryable: true` makes event and cron
- * deliveries answer 500 so Hasura retries.
+ * `{ success: true, data }` (except for mutation actions, which get it as
+ * is), and `retryable: true` makes event and cron deliveries answer 503 so
+ * Hasura retries.
  * @typedef {(req: import('express').Request, logger: import('winston').Logger) => Promise<any>} Handler
  */
 

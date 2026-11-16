@@ -1,6 +1,6 @@
 import KcAdminClient from '@keycloak/keycloak-admin-client';
 import { GraphQLClient } from 'graphql-request';
-import { secretsMatch } from './shared/security.js';
+import { getProvidedSecret, secretsMatch } from './shared/security.js';
 
 // Roles that are backed by a "source of truth" table: the Keycloak role should only be removed once
 // the user has no remaining rows in that table (e.g. an org admin who still administers another
@@ -26,7 +26,7 @@ export const removeKeycloakRole = async (req, res) => {
     return res.status(500).json({ error: 'Server secret not configured' });
   }
 
-  if (!secretsMatch(req.headers.secret, expectedSecret)) {
+  if (!secretsMatch(getProvidedSecret(req.headers), expectedSecret)) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 

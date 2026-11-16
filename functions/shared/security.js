@@ -26,3 +26,22 @@ export function secretsMatch(providedSecret, expectedSecret) {
   }
   return constantTimeSecretsEqual(providedSecret, expectedSecret);
 }
+
+/**
+ * Header that carries HASURA_CLOUD_FUNCTION_SECRET (`Hasura-Secret`), and the
+ * legacy name still sent by most Hasura metadata until the switch in
+ * docs/plans/functions-header-switch.md. Node lowercases incoming header
+ * names, so these are the keys of `req.headers`.
+ */
+export const SECRET_HEADER = "hasura-secret";
+export const LEGACY_SECRET_HEADER = "secret";
+
+/**
+ * The secret a request carries: `Hasura-Secret`, else the legacy `secret`.
+ * @param {Record<string, string | string[] | undefined> | undefined} headers
+ *   `req.headers` (lowercase keys)
+ * @returns {string | string[] | undefined}
+ */
+export function getProvidedSecret(headers) {
+  return headers?.[SECRET_HEADER] ?? headers?.[LEGACY_SECRET_HEADER];
+}
