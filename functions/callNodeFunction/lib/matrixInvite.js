@@ -1,4 +1,4 @@
-import { trimAndNull } from "./matrixRoomUtils.js";
+import { readMatrixPayload, trimAndNull } from "./matrixRoomUtils.js";
 import * as appConfig from "./config.js";
 
 const normalizeBaseUrl = (url) => url.replace(/\/+$/, "");
@@ -145,12 +145,7 @@ export const ensureBotJoinedMatrixRoom = async ({ homeserverUrl, token, roomId, 
 
   if (response.ok) return { joined: true };
 
-  let payload = null;
-  try {
-    payload = await response.json();
-  } catch (_e) {
-    payload = null;
-  }
+  const payload = await readMatrixPayload(response);
 
   const errcode = payload?.errcode;
   const errMsg = (payload?.error || "").toString();
@@ -189,12 +184,7 @@ export const inviteUserToMatrixRoom = async ({ homeserverUrl, token, roomId, mat
 
   if (response.ok) return { invited: true };
 
-  let payload = null;
-  try {
-    payload = await response.json();
-  } catch (_e) {
-    payload = null;
-  }
+  const payload = await readMatrixPayload(response);
   const errcode = payload?.errcode;
   const errMsg = (payload?.error || "").toString();
 
@@ -234,12 +224,7 @@ export const deactivateMatrixUser = async ({ homeserverUrl, token, matrixUserId,
 
   if (response.ok) return { deactivated: true };
 
-  let payload = null;
-  try {
-    payload = await response.json();
-  } catch (_e) {
-    payload = null;
-  }
+  const payload = await readMatrixPayload(response);
   // Only Synapse's own "unknown user" counts as done; any other 404 (wrong URL, proxy) must fail.
   if (response.status === 404 && payload?.errcode === "M_NOT_FOUND") {
     return { deactivated: false, skipped: true };

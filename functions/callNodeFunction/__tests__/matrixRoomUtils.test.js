@@ -1,6 +1,6 @@
-import { test } from "@jest/globals";
+import { describe, expect, it, test } from "@jest/globals";
 import assert from "node:assert/strict";
-import { normalizeMatrixRoomId, isValidMatrixRoomId } from "../lib/matrixRoomUtils.js";
+import { normalizeMatrixRoomId, isValidMatrixRoomId, parseMatrixResponse } from "../lib/matrixRoomUtils.js";
 
 test("normalizeMatrixRoomId from Element hash URL", () => {
   assert.equal(
@@ -52,4 +52,32 @@ test("isValidMatrixRoomId", () => {
   assert.equal(isValidMatrixRoomId("!abc:[2001:db8::1]:8448"), true);
   assert.equal(isValidMatrixRoomId("!abc:192.168.0.1"), true);
   assert.equal(isValidMatrixRoomId("not-a-room"), false);
+});
+
+describe('parseMatrixResponse', () => {
+  const response = (status, body) => ({
+    ok: status >= 200 && status < 300,
+    status,
+    json: async () => (body === undefined ? JSON.parse('not json') : body),
+  });
+
+  it('returns the JSON body of a successful response', async () => {
+    await expect(parseMatrixResponse(response(200, { room_id: '!a:b' }))).resolves.toEqual({
+      room_id: '!a:b',
+    });
+  });
+
+  it('returns null for a successful response without JSON', async () => {
+    await expect(parseMatrixResponse(response(200))).resolves.toBeNull();
+  });
+
+  it('throws with Matrix error details otherwise', async () => {
+    await expect(
+      parseMatrixResponse(response(403, { errcode: 'M_FORBIDDEN', error: 'nope' }))
+    ).rejects.toMatchObject({ message: 'nope', status: 403, errcode: 'M_FORBIDDEN' });
+    await expect(parseMatrixResponse(response(502))).rejects.toMatchObject({
+      message: 'Matrix request failed with HTTP 502',
+      status: 502,
+    });
+  });
 });

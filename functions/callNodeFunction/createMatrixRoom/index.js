@@ -1,5 +1,6 @@
 import { createHasuraClient } from "../lib/hasura.js";
 import * as config from "../lib/config.js";
+import { parseMatrixResponse } from "../lib/matrixRoomUtils.js";
 
 const GET_COURSE_CONTEXT = `
   query GetCourseContext($courseId: Int!) {
@@ -104,25 +105,6 @@ const matrixHeaders = (token) => ({
   Authorization: `Bearer ${token}`,
   "Content-Type": "application/json",
 });
-
-const parseMatrixResponse = async (response) => {
-  let payload = null;
-  try {
-    payload = await response.json();
-  } catch (_error) {
-    payload = null;
-  }
-
-  if (response.ok) {
-    return payload;
-  }
-
-  const error = new Error(payload?.error || `Matrix request failed with HTTP ${response.status}`);
-  error.status = response.status;
-  error.errcode = payload?.errcode;
-  error.payload = payload;
-  throw error;
-};
 
 const createRoomWithAlias = async ({
   homeserverUrl,

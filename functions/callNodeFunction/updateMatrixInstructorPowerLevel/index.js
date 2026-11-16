@@ -1,4 +1,4 @@
-import { trimAndNull, normalizeMatrixRoomId, isValidMatrixRoomId } from "../lib/matrixRoomUtils.js";
+import { trimAndNull, normalizeMatrixRoomId, isValidMatrixRoomId, parseMatrixResponse } from "../lib/matrixRoomUtils.js";
 import {
   ensureBotJoinedMatrixRoom,
   getMatrixInviteConfig,
@@ -51,22 +51,6 @@ const matrixHeaders = (token) => ({
   Authorization: `Bearer ${token}`,
   "Content-Type": "application/json",
 });
-
-const parseMatrixResponse = async (response) => {
-  let payload = null;
-  try {
-    payload = await response.json();
-  } catch (_error) {
-    payload = null;
-  }
-
-  if (response.ok) return payload;
-
-  const error = new Error(payload?.error || `Matrix request failed with HTTP ${response.status}`);
-  error.status = response.status;
-  error.errcode = payload?.errcode;
-  throw error;
-};
 
 const getCurrentPowerLevels = async ({ roomId, matrixConfig, signal }) => {
   const stateUrl = `${matrixConfig.homeserverUrl}/_matrix/client/v3/rooms/${encodeURIComponent(
