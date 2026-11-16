@@ -104,6 +104,73 @@ describe('callNodeFunction', () => {
     });
   });
 
+  describe('pinned actions', () => {
+    let dispatch;
+    const pinnedHandler = jest.fn();
+    const otherHandler = jest.fn();
+
+    beforeAll(async () => {
+      const { createDispatcher } = await import('../lib/dispatcher.js');
+      dispatch = createDispatcher({
+        name: 'test',
+        handlers: { syncMe: pinnedHandler, other: otherHandler },
+        pinnedActions: { syncMeAction: 'syncMe' },
+      });
+    });
+
+    beforeEach(() => {
+      pinnedHandler.mockReset().mockResolvedValue({ result: 'synced' });
+      otherHandler.mockReset().mockResolvedValue({ success: true });
+    });
+
+    const callPinned = async (headers, actionName = 'syncMeAction') => {
+      const res = response();
+      await dispatch({ headers, body: { action: { name: actionName }, input: {}, request_query: 'mutation { a }' } }, res);
+      return { status: res.status.mock.calls[0][0], body: res.json.mock.calls[0][0] };
+    };
+
+    it('runs the pinned handler for its action', async () => {
+      const { status, body } = await callPinned({ 'function-name': 'syncMe', 'hasura-secret': 'test-secret' });
+
+      expect(status).toBe(200);
+      expect(body).toEqual({ result: 'synced' });
+    });
+
+    it('runs the pinned handler without a routing header', async () => {
+      const { status } = await callPinned({ 'hasura-secret': 'test-secret' });
+
+      expect(status).toBe(200);
+      expect(pinnedHandler).toHaveBeenCalledTimes(1);
+    });
+
+    // A forwarded client header naming another handler must not reroute the
+    // action (Hasura still attaches the real secret).
+    it.each([
+      ['Function-Name', { 'function-name': 'other', 'hasura-secret': 'test-secret' }],
+      ['legacy name', { name: 'other', 'hasura-secret': 'test-secret' }],
+    ])('answers 400 when %s names another handler', async (_label, headers) => {
+      const { status, body } = await callPinned(headers);
+
+      expect(status).toBe(400);
+      expect(body.messageKey).toBe('CONFLICTING_FUNCTION_NAME');
+      expect(otherHandler).not.toHaveBeenCalled();
+      expect(pinnedHandler).not.toHaveBeenCalled();
+    });
+
+    it('still requires the secret', async () => {
+      const { status } = await callPinned({ 'function-name': 'syncMe' });
+
+      expect(status).toBe(401);
+    });
+
+    it('routes other actions by header', async () => {
+      const { status } = await callPinned({ 'function-name': 'other', 'hasura-secret': 'test-secret' }, 'otherAction');
+
+      expect(status).toBe(200);
+      expect(otherHandler).toHaveBeenCalledTimes(1);
+    });
+  });
+
   describe('httpStatus', () => {
     it('answers with the status a handler sets and drops the field', async () => {
       handlerMock.mockResolvedValue({ httpStatus: 403, message: 'Account deleted', error: 'Account deleted' });

@@ -101,25 +101,40 @@ const formatResponse = (result) => {
  * trigger, the handler's `httpStatus` when it sets one, and 200 otherwise, including `success: false` results and thrown
  * errors.
  *
- * @param {{ name: string, handlers: Record<string, import('./types.js').Handler> }} options
- *   `name` is the unit name used in logs.
+ * `pinnedActions` maps an action name to the handler it must run. An action
+ * with `forward_client_headers: true` passes the caller's own HTTP headers on
+ * to the unit, so a caller could send a `Function-Name` or `name` header of
+ * their choice next to the one in the metadata. For a pinned action the
+ * handler follows `action.name` in the body, which Hasura sets, and a routing
+ * header naming any other handler answers 400. The registry test requires
+ * every action that forwards client headers to be pinned.
+ *
+ * @param {{
+ *   name: string,
+ *   handlers: Record<string, import('./types.js').Handler>,
+ *   pinnedActions?: Record<string, string>,
+ * }} options `name` is the unit name used in logs.
  * @returns {(req: import('express').Request, res: import('express').Response) => Promise<any>}
  */
-export const createDispatcher = ({ name: unitName, handlers }) => async (req, res) => {
+export const createDispatcher = ({ name: unitName, handlers, pinnedActions = {} }) => async (req, res) => {
   const secretValidation = validateSecret(getProvidedSecret(req.headers));
   if (!secretValidation.isValid) {
     return res.status(secretValidation.statusCode).json(secretValidation.error);
   }
 
   const { name, header, conflict } = getFunctionName(req.headers);
-  if (conflict) {
+  const actionName = req.body?.action?.name;
+  const pinned = typeof actionName === "string" && Object.hasOwn(pinnedActions, actionName)
+    ? pinnedActions[actionName]
+    : undefined;
+  if (conflict || (pinned !== undefined && name !== undefined && name !== pinned)) {
     return res.status(400).json({
       success: false,
       error: "Function-Name and name headers name different functions.",
       messageKey: "CONFLICTING_FUNCTION_NAME"
     });
   }
-  const functionName = String(name);
+  const functionName = String(pinned ?? name);
 
   // Shows how far the switch to the standard header names has got
   // (docs/plans/functions-header-switch.md).
