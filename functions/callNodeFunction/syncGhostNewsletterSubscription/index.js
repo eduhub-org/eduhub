@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { gql, GraphQLClient } from 'graphql-request';
+import { requireEnv } from '../lib/config.js';
 import { decryptOrganizationCredential } from '../lib/organizationCredential.js';
 
 const USER_DRIVEN_SOURCES = new Set(['CHECKBOX', 'PROFILE', 'ADMIN']);
@@ -104,18 +105,10 @@ const normalizeRemoteSubscriptionStatus = (remoteStatus, fallbackStatus) => {
   return fallbackStatus;
 };
 
-const getRequiredEnv = (name) => {
-  const value = normalize(process.env[name]);
-  if (!value) {
-    throw new Error(`Missing ${name}`);
-  }
-  return value;
-};
-
 const getGraphqlClient = () =>
-  new GraphQLClient(getRequiredEnv('HASURA_ENDPOINT'), {
+  new GraphQLClient(requireEnv('HASURA_ENDPOINT'), {
     headers: {
-      'x-hasura-admin-secret': getRequiredEnv('HASURA_ADMIN_SECRET'),
+      'x-hasura-admin-secret': requireEnv('HASURA_ADMIN_SECRET'),
     },
   });
 

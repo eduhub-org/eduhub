@@ -37,6 +37,7 @@
 
 import Stripe from 'stripe';
 import { GraphQLClient, gql } from 'graphql-request';
+import { requireEnv } from '../lib/config.js';
 
 import { buildJobPostingMailVars, sendJobPostingMail } from '../publishJobPosting/index.js';
 
@@ -120,15 +121,6 @@ const logger = {
   warn: (...args) => console.warn(...args),
   error: (...args) => console.error(...args),
 };
-
-function requireEnv(name) {
-  const value = process.env[name];
-  if (!value) {
-    console.error(`${name} is required`);
-    process.exit(1);
-  }
-  return value;
-}
 
 /** Why the employer of this posting should (not) get the invoice mail now. */
 async function invoiceMailDecision(client, jobPostingId) {
