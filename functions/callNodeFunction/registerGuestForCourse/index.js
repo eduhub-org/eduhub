@@ -17,8 +17,8 @@ import {
   normalizeEmail,
   normalizeName,
   normalizeOrganizationName,
-  queueGuestMail,
 } from '../lib/guestRegistration.js';
+import { queueGuestMail } from '../lib/queueEmail.js';
 import { createHasuraClient } from '../lib/hasura.js';
 
 /**

@@ -1,7 +1,6 @@
 import crypto from 'node:crypto';
 import { gql } from 'graphql-request';
 import * as config from './config.js';
-import { escapeHtml } from './emailTemplateVariables.js';
 
 /**
  * Shared helpers for account-less ("guest") event registration.
@@ -271,93 +270,6 @@ export function buildCourseLink(courseId) {
 
 export function buildPrivacyPolicyLink() {
   return `${getFrontendUrl()}/privacy`;
-}
-
-/* ------------------------------------------------------------------- emails */
-
-const GET_TEMPLATE = gql`
-  query GetGuestMailTemplate($type: MailTemplateType_enum!) {
-    MailTemplate(
-      where: { _and: [{ type: { _eq: $type } }, { courseId: { _is_null: true } }] }
-      limit: 1
-    ) {
-      subject
-      content
-      from
-      cc
-      bcc
-    }
-  }
-`;
-
-const INSERT_MAIL_LOG = gql`
-  mutation InsertGuestMailLog(
-    $subject: String!
-    $content: String!
-    $from: String!
-    $to: String!
-    $cc: String
-    $bcc: String
-    $status: String!
-    $metadata: jsonb
-  ) {
-    insert_MailLog_one(
-      object: {
-        subject: $subject
-        content: $content
-        from: $from
-        to: $to
-        cc: $cc
-        bcc: $bcc
-        status: $status
-        metadata: $metadata
-      }
-    ) {
-      id
-    }
-  }
-`;
-
-/**
- * Substitutes `[Guest:*]` and `[User:*]` placeholders. Values are HTML-escaped
- * in the body but not in the subject, mirroring `createVariableReplacer`.
- */
-function replaceGuestVariables(text, values, { html = true } = {}) {
-  if (!text) return '';
-  const escape = html ? escapeHtml : (v) => (v == null ? '' : String(v));
-  return Object.entries(values).reduce(
-    (acc, [placeholder, value]) => acc.replaceAll(placeholder, escape(value)),
-    text
-  );
-}
-
-/**
- * Renders a guest template and queues it. `metadata` follows the same jsonb
- * convention the cron mailers use, so guest mail is greppable in MailLog
- * alongside everything else.
- */
-export async function queueGuestMail(client, logger, { templateType, to, values, metadata }) {
-  const templateData = await client.request(GET_TEMPLATE, { type: templateType });
-  const template = templateData?.MailTemplate?.[0];
-
-  if (!template) {
-    logger.error(`Guest email template not found: ${templateType}`);
-    return { success: false, messageKey: 'TEMPLATE_NOT_FOUND' };
-  }
-
-  const result = await client.request(INSERT_MAIL_LOG, {
-    subject: replaceGuestVariables(template.subject, values, { html: false }),
-    content: replaceGuestVariables(template.content, values),
-    from: template.from || 'noreply@opencampus.sh',
-    to,
-    cc: template.cc,
-    bcc: template.bcc,
-    status: 'READY_TO_SEND',
-    metadata: metadata ?? null,
-  });
-
-  logger.info(`Queued guest email ${templateType}, mailId: ${result.insert_MailLog_one.id}`);
-  return { success: true, mailId: result.insert_MailLog_one.id };
 }
 
 /**

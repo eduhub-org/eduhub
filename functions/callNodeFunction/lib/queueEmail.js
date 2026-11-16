@@ -1,5 +1,6 @@
 import { gql } from 'graphql-request';
 import { appendGuestMailFooter, guestSafeCopyRecipients } from './guestRegistration.js';
+import { escapeHtml } from './emailTemplateVariables.js';
 
 /**
  * Generic function to queue emails
@@ -250,5 +251,42 @@ async function queueEmail({
   }
 }
 
-export { queueEmail };
+/**
+ * Substitutes `[Guest:*]` and `[User:*]` placeholders. Values are HTML-escaped
+ * in the body but not in the subject, mirroring `createVariableReplacer`.
+ */
+function replaceGuestVariables(text, values, { html = true } = {}) {
+  if (!text) return '';
+  const escape = html ? escapeHtml : (v) => (v == null ? '' : String(v));
+  return Object.entries(values).reduce(
+    (acc, [placeholder, value]) => acc.replaceAll(placeholder, escape(value)),
+    text
+  );
+}
+
+/**
+ * Queues a guest-registration mail from its default template. `metadata`
+ * follows the same jsonb convention the cron mailers use, so guest mail is
+ * greppable in MailLog alongside everything else.
+ *
+ * Template copies (cc/bcc) are kept: the recipient is an address, not yet a
+ * guest User. A failed insert throws, so the caller's request fails instead
+ * of reporting a registration whose confirmation mail never went out.
+ */
+async function queueGuestMail(client, logger, { templateType, to, values, metadata }) {
+  const result = await queueEmail({
+    templateType,
+    variableReplacer: (text, options) => replaceGuestVariables(text, values, options),
+    recipientEmail: to,
+    metadata: metadata ?? null,
+    client,
+    logger,
+  });
+  if (!result.success && result.messageKey === 'EMAIL_QUEUE_FAILED') {
+    throw new Error(result.error);
+  }
+  return result;
+}
+
+export { queueEmail, queueGuestMail };
 
