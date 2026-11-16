@@ -228,6 +228,8 @@ services:
       CLOUD_FUNCTION_LINK_REMOVE_KEYCLOAK_ROLE: "http://node_functions:42002"
       CLOUD_FUNCTION_LINK_SEND_QUESTIONAIRES: "http://node_functions:42024"
       CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION: "http://node_functions:42022"
+      CLOUD_FUNCTION_LINK_IDENTITY: "http://node_functions:42021"
+      CLOUD_FUNCTION_LINK_MEDIA: "http://node_functions:42023"
       CLOUD_FUNCTION_LINK_CALL_PYTHON_FUNCTION: "http://python_functions:42025"
     volumes:
       - ./backend:/hasura

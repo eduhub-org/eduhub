@@ -1,5 +1,7 @@
 [
   { "name": "callNodeFunction", "runtime": "node", "entryPoint": "callNodeFunction", "port": 42022 },
+  { "name": "identity", "runtime": "node", "source": "callNodeFunction", "entryPoint": "identity", "port": 42021 },
+  { "name": "media", "runtime": "node", "source": "callNodeFunction", "entryPoint": "media", "port": 42023 },
   { "name": "sendMail", "runtime": "node", "entryPoint": "sendMail", "port": 42019 },
   { "name": "updateFromKeycloak", "runtime": "node", "entryPoint": "updateFromKeycloak", "port": 42020 },
   { "name": "addKeycloakRole", "runtime": "node", "entryPoint": "addKeycloakRole", "port": 42000 },

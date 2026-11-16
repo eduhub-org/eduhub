@@ -9,6 +9,13 @@
 // that fails to install stops the whole server, so a broken unit is visible
 // instead of silently missing.
 //
+// A unit with a `source` (identity, media) has no folder of its own: it runs
+// another unit's code with its own entry point, as in production, where
+// Terraform deploys that unit's zip with a different `entry_point`. It is
+// started from the source folder with FUNCTION_TARGET set to its entryPoint
+// (the source unit's start script passes it as --target) and reuses the
+// source unit's install.
+//
 // It also serves the emulated "Google Cloud Storage" bucket on port 4001.
 
 const path = require("path");
@@ -39,7 +46,9 @@ console.log(
   units.map((unit) => `${unit.name}:${unit.port}`)
 );
 
-for (const unit of units) {
+// Install every folder once, before any unit starts, so a unit with a
+// `source` never starts against a half-installed node_modules.
+for (const unit of units.filter((unit) => !unit.source)) {
   const cwd = path.join(__dirname, unit.name);
   console.log("npm ci " + cwd);
   try {
@@ -51,10 +60,17 @@ for (const unit of units) {
     console.error(`Installing dependencies for ${unit.name} failed`, e.message);
     process.exit(1);
   }
+}
 
+for (const unit of units) {
+  const cwd = path.join(__dirname, unit.source || unit.name);
   const watchProc = child_process.spawn("npm", ["run", "watch"], {
     cwd,
-    env: { ...process.env, PORT: String(unit.port) },
+    env: {
+      ...process.env,
+      PORT: String(unit.port),
+      FUNCTION_TARGET: unit.entryPoint,
+    },
   });
   watchChildProc(watchProc, unit.name);
 }

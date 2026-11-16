@@ -43,7 +43,9 @@ jobs:
         uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
 
       # One archive per unit in <CLOUD_FUNCTION_FOLDER>/units.json, which
-      # functions/dev.js reads too. Shared code reaches a unit through a
+      # functions/dev.js reads too. A unit with a `source` (identity, media)
+      # gets no archive: Terraform deploys its source unit's zip with the
+      # unit's own entry point. Shared code reaches a unit through a
       # committed symlink (Node: ./shared -> ../shared, Python: ./api_clients
       # -> ../shared_py/api_clients). zip stores the files a symlink points
       # to unless given -y/--symlinks, so each archive holds real copies.
@@ -60,8 +62,13 @@ jobs:
 
           out="${GITHUB_WORKSPACE}/cloud-function-zips"
           mkdir -p "${out}"
-          mapfile -t units < <(jq -r '.[].name' "${resolved}/units.json")
+          mapfile -t units < <(jq -r '.[] | select(.source == null) | .name' "${resolved}/units.json")
           if [[ ${#units[@]} -eq 0 ]]; then echo "units.json lists no units"; exit 1; fi
+          # Every `source` must be a unit that gets its own archive.
+          missing=$(jq -r '[.[] | select(.source == null) | .name] as $own
+            | .[] | select(.source != null and (.source as $s | $own | index($s) | not))
+            | "\(.name) -> \(.source)"' "${resolved}/units.json")
+          if [[ -n "${missing}" ]]; then echo "unknown source unit: ${missing}"; exit 1; fi
           # Node units ship without tests, Jest config, the type-check config
           # and the one-off CLIs in scripts/ (zip's * also matches '/').
           node_excludes=('__tests__/*' '*/__tests__/*' '*.test.js' 'coverage/*' \

@@ -27,7 +27,7 @@
   },
   "scripts": {
     "watch": "npm-watch start",
-    "start": "npx @google-cloud/functions-framework --target=callNodeFunction",
+    "start": "npx @google-cloud/functions-framework --target=${FUNCTION_TARGET:-callNodeFunction}",
     "test": "node --experimental-vm-modules node_modules/.bin/jest",
     "test:watch": "node --experimental-vm-modules node_modules/.bin/jest --watch",
     "test:coverage": "node --experimental-vm-modules node_modules/.bin/jest --coverage"
