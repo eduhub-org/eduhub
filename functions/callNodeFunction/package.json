@@ -1,6 +1,9 @@
 {
   "name": "callNodeFunction",
   "version": "0.1.0",
+  "engines": {
+    "node": ">=22 <23"
+  },
   "type": "module",
   "dependencies": {
     "@google-cloud/storage": "^5.3.0",
