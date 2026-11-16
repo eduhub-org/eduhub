@@ -62,13 +62,20 @@ jobs:
           mkdir -p "${out}"
           mapfile -t units < <(jq -r '.[].name' "${resolved}/units.json")
           if [[ ${#units[@]} -eq 0 ]]; then echo "units.json lists no units"; exit 1; fi
+          # Node units ship without tests, Jest config, the type-check config
+          # and the one-off CLIs in scripts/ (zip's * also matches '/').
+          node_excludes=('__tests__/*' '*/__tests__/*' '*.test.js' 'coverage/*' \
+            'jest/*' 'jest.config.js' 'jest.setup.js' 'scripts/*' 'tsconfig.json')
           for unit in "${units[@]}"; do
             if [[ ! "${unit}" =~ ^[A-Za-z0-9_-]+$ ]]; then echo "bad unit name: ${unit}"; exit 1; fi
+            runtime=$(jq -r --arg u "${unit}" '.[] | select(.name == $u) | .runtime' "${resolved}/units.json")
+            excludes=()
+            if [[ "${runtime}" == "node" ]]; then excludes=("${node_excludes[@]}"); fi
             (
               cd "${resolved}/${unit}"
               zip -q -r "${out}/${unit}.zip" . \
                 -x 'node_modules/*' '*/node_modules/*' \
-                '__pycache__/*' '*/__pycache__/*' '.venv/*'
+                '__pycache__/*' '*/__pycache__/*' '.venv/*' "${excludes[@]}"
             )
             # A symlink left in an archive would deploy as a dangling link.
             links=$(zipinfo "${out}/${unit}.zip" | grep -c '^l' || true)
