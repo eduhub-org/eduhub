@@ -140,7 +140,7 @@ async function main() {
     'STORAGE_BUCKET_PUBLIC_URL',
   ];
   for (const envVar of requiredEnvVars) {
-    if (!process.env[envVar]) {
+    if (!config.env(envVar)) {
       console.error(`Missing required environment variable: ${envVar}`);
       process.exit(1);
     }
