@@ -1,5 +1,5 @@
 # Runtime dependencies of the apiProxy Cloud Function (python311).
-# Direct imports only (incl. shared_libs/api_clients), pinned with ==.
+# Direct imports only (incl. shared_py/api_clients), pinned with ==.
 # Test-only tools live in requirements-dev.txt.
 authlib==1.9.8
 cryptography==48.0.1  # backend for PyJWT RS256 verification

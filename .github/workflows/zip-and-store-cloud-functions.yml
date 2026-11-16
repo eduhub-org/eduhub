@@ -45,7 +45,7 @@ jobs:
       # One archive per unit in <CLOUD_FUNCTION_FOLDER>/units.json, which
       # functions/dev.js reads too. Shared code reaches a unit through a
       # committed symlink (Node: ./shared -> ../shared, Python: ./api_clients
-      # -> ../shared_libs/api_clients). zip stores the files a symlink points
+      # -> ../shared_py/api_clients). zip stores the files a symlink points
       # to unless given -y/--symlinks, so each archive holds real copies.
       - name: Zip one archive per cloud function
         env:

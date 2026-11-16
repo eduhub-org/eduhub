@@ -24,7 +24,7 @@ This guide covers the development of serverless functions in our system, ensurin
 - Shared Node code lives in `functions/shared/` (ESM, **no dependencies**).
   A unit that needs it has a committed symlink `shared -> ../shared` and
   imports `./shared/<file>.js` (or `../shared/...` from a handler folder).
-  Python units link `api_clients -> ../shared_libs/api_clients` the same way.
+  Python units link `api_clients -> ../shared_py/api_clients` the same way.
 - `zip -r` follows these symlinks, so each archive contains real copies; the
   workflow fails if an archive still holds a symlink. On Windows, enable
   `core.symlinks` (and Developer Mode) before cloning.

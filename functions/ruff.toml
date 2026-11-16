@@ -17,4 +17,4 @@ select = [
 
 [lint.per-file-ignores]
 # Re-exports for `from api_clients import ...`.
-"shared_libs/api_clients/__init__.py" = ["F401"]
+"shared_py/api_clients/__init__.py" = ["F401"]
