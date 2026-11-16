@@ -94,17 +94,26 @@ def call_python_function(request):
             logging.info(f"Function name: {function_name}")
 
         if function_name not in PYTHON_FUNCTIONS:
+            logging.error(f"Function not found: {function_name}")
             return jsonify({
                 "success": False,
                 "error": "Function not found",
                 "messageKey": "FUNCTION_NOT_FOUND"
-            }), 200
+            }), 404
 
         result = PYTHON_FUNCTIONS[function_name](arguments)
         
-        # If result is already a dict with success/error info, return it directly
+        # If result is already a dict with success/error info, return it directly.
+        # 503 makes Hasura retry an event or cron delivery; handlers set
+        # `retryable` only for failures worth retrying (see
+        # docs/SERVERLESS_FUNCTIONS.md, "Request contract").
         if isinstance(result, dict) and ("success" in result or "error" in result):
-            status_code = 503 if result.get("retryable") else 200
+            # A cron request carries `scheduled_time` instead of `event`;
+            # actions read the body, so they always get 200.
+            is_trigger = isinstance(arguments, dict) and (
+                "event" in arguments or "scheduled_time" in arguments
+            )
+            status_code = 503 if is_trigger and result.get("retryable") else 200
             return jsonify(result), status_code
             
         # Otherwise, wrap the result in a success response
