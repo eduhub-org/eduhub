@@ -3,13 +3,13 @@ actions:
     definition:
       kind: synchronous
       timeout: 180
-      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      handler: '{{CLOUD_FUNCTION_LINK_IDENTITY}}'
       headers:
-        - name: secret
+        - name: Hasura-Secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
-        - name: bucket
+        - name: Bucket
           value_from_env: HASURA_BUCKET
-        - name: name
+        - name: Function-Name
           value: deleteMyAccount
     permissions:
       - role: user
@@ -20,13 +20,13 @@ actions:
     definition:
       kind: synchronous
       timeout: 180
-      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      handler: '{{CLOUD_FUNCTION_LINK_IDENTITY}}'
       headers:
-        - name: secret
+        - name: Hasura-Secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
-        - name: bucket
+        - name: Bucket
           value_from_env: HASURA_BUCKET
-        - name: name
+        - name: Function-Name
           value: anonymizeUser
     comment: Deletes an admin-selected account and certificates and anonymizes personal data
   - name: createCertificates
@@ -91,11 +91,11 @@ actions:
   - name: createMatrixRoom
     definition:
       kind: synchronous
-      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      handler: '{{CLOUD_FUNCTION_LINK_IDENTITY}}'
       headers:
-        - name: secret
+        - name: Hasura-Secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
-        - name: name
+        - name: Function-Name
           value: createMatrixRoom
     permissions:
       - role: instructor_access
@@ -144,13 +144,13 @@ actions:
   - name: syncProgramInstructorMatrixRoom
     definition:
       kind: synchronous
-      # Must exceed call-node-function Matrix phase (120s) + 429 backoff; default Hasura timeout is 60s → 504.
-      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      # Must exceed the identity unit's Matrix phase (120s) + 429 backoff; default Hasura timeout is 60s → 504.
+      handler: '{{CLOUD_FUNCTION_LINK_IDENTITY}}'
       timeout: 180
       headers:
-        - name: secret
+        - name: Hasura-Secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
-        - name: name
+        - name: Function-Name
           value: syncProgramInstructorMatrixRoom
     comment: Invites all program course instructors to the configured Matrix instructor room
   - name: createEnrollmentWithAddons
@@ -207,11 +207,11 @@ actions:
   - name: claimJobOrganization
     definition:
       kind: synchronous
-      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      handler: '{{CLOUD_FUNCTION_LINK_IDENTITY}}'
       headers:
-        - name: secret
+        - name: Hasura-Secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
-        - name: name
+        - name: Function-Name
           value: claimJobOrganization
     permissions:
       - role: user_access
@@ -253,13 +253,13 @@ actions:
   - name: saveJobPostingPdf
     definition:
       kind: synchronous
-      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      handler: '{{CLOUD_FUNCTION_LINK_MEDIA}}'
       headers:
-        - name: secret
+        - name: Hasura-Secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
-        - name: bucket
+        - name: Bucket
           value_from_env: HASURA_BUCKET
-        - name: name
+        - name: Function-Name
           value: saveFile
         - name: file-path
           value: jobpostings/jobposting-${jobpostingid}/public/${filename}
@@ -273,11 +273,11 @@ actions:
   - name: createUser
     definition:
       kind: synchronous
-      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      handler: '{{CLOUD_FUNCTION_LINK_IDENTITY}}'
       headers:
-        - name: secret
+        - name: Hasura-Secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
-        - name: name
+        - name: Function-Name
           value: createUser
     permissions:
       - role: instructor_access
@@ -288,13 +288,13 @@ actions:
   - name: getAdminUsers
     definition:
       kind: ""
-      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      handler: '{{CLOUD_FUNCTION_LINK_IDENTITY}}'
       headers:
-        - name: secret
+        - name: Hasura-Secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
-        - name: bucket
+        - name: Bucket
           value_from_env: HASURA_BUCKET
-        - name: name
+        - name: Function-Name
           value: getAdminUsers
   - name: getFormbricksResponses
     definition:
@@ -326,13 +326,13 @@ actions:
   - name: getSignedUrl
     definition:
       kind: ""
-      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      handler: '{{CLOUD_FUNCTION_LINK_MEDIA}}'
       headers:
-        - name: secret
+        - name: Hasura-Secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
-        - name: bucket
+        - name: Bucket
           value_from_env: HASURA_BUCKET
-        - name: name
+        - name: Function-Name
           value: getSignedUrl
     permissions:
       - role: user_access
@@ -350,13 +350,13 @@ actions:
   - name: makeCertificatePublic
     definition:
       kind: synchronous
-      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      handler: '{{CLOUD_FUNCTION_LINK_MEDIA}}'
       headers:
-        - name: secret
+        - name: Hasura-Secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
-        - name: bucket
+        - name: Bucket
           value_from_env: HASURA_BUCKET
-        - name: name
+        - name: Function-Name
           value: makeCertificatePublic
     permissions:
       - role: user_access
@@ -364,26 +364,26 @@ actions:
   - name: saveAchievementCertificateTemplate
     definition:
       kind: synchronous
-      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      handler: '{{CLOUD_FUNCTION_LINK_MEDIA}}'
       headers:
-        - name: secret
+        - name: Hasura-Secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
-        - name: bucket
+        - name: Bucket
           value_from_env: HASURA_BUCKET
-        - name: name
+        - name: Function-Name
           value: saveFile
         - name: file-path
           value: programs/program-${programid}/private/achievement-certificate-template/${filename}
   - name: saveAchievementDocumentationTemplate
     definition:
       kind: synchronous
-      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      handler: '{{CLOUD_FUNCTION_LINK_MEDIA}}'
       headers:
-        - name: secret
+        - name: Hasura-Secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
-        - name: bucket
+        - name: Bucket
           value_from_env: HASURA_BUCKET
-        - name: name
+        - name: Function-Name
           value: saveFile
         - name: file-path
           value: achievement-docs-templates/public/template-${achievementDocumentationTemplateId}/${filename}
@@ -392,13 +392,13 @@ actions:
   - name: saveAchievementRecordCoverImage
     definition:
       kind: synchronous
-      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      handler: '{{CLOUD_FUNCTION_LINK_MEDIA}}'
       headers:
-        - name: secret
+        - name: Hasura-Secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
-        - name: bucket
+        - name: Bucket
           value_from_env: HASURA_BUCKET
-        - name: name
+        - name: Function-Name
           value: saveImage
         - name: file-path
           value: achievement-records/record-${achievementRecordId}/public/cover-image/${filename}
@@ -409,13 +409,13 @@ actions:
   - name: saveAchievementRecordDocumentation
     definition:
       kind: synchronous
-      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      handler: '{{CLOUD_FUNCTION_LINK_MEDIA}}'
       headers:
-        - name: secret
+        - name: Hasura-Secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
-        - name: bucket
+        - name: Bucket
           value_from_env: HASURA_BUCKET
-        - name: name
+        - name: Function-Name
           value: saveFile
         - name: file-path
           value: achievement-records/record-${achievementRecordId}/private/documentation/${filename}
@@ -436,26 +436,26 @@ actions:
   - name: saveAttendanceCertificateTemplate
     definition:
       kind: synchronous
-      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      handler: '{{CLOUD_FUNCTION_LINK_MEDIA}}'
       headers:
-        - name: secret
+        - name: Hasura-Secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
-        - name: bucket
+        - name: Bucket
           value_from_env: HASURA_BUCKET
-        - name: name
+        - name: Function-Name
           value: saveFile
         - name: file-path
           value: programs/program-${programid}/private/attendance-certificate-template/${filename}
   - name: saveCourseImage
     definition:
       kind: synchronous
-      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      handler: '{{CLOUD_FUNCTION_LINK_MEDIA}}'
       headers:
-        - name: secret
+        - name: Hasura-Secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
-        - name: bucket
+        - name: Bucket
           value_from_env: HASURA_BUCKET
-        - name: name
+        - name: Function-Name
           value: saveImage
         - name: file-path
           value: courses/course-${courseid}/public/cover-image/${filename}
@@ -527,13 +527,13 @@ actions:
   - name: saveProjectImage
     definition:
       kind: synchronous
-      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      handler: '{{CLOUD_FUNCTION_LINK_MEDIA}}'
       headers:
-        - name: secret
+        - name: Hasura-Secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
-        - name: bucket
+        - name: Bucket
           value_from_env: HASURA_BUCKET
-        - name: name
+        - name: Function-Name
           value: saveImage
         - name: file-path
           value: projects/project-${projectid}/public/cover-image/${filename}
@@ -550,13 +550,13 @@ actions:
   - name: saveProjectDocumentation
     definition:
       kind: synchronous
-      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      handler: '{{CLOUD_FUNCTION_LINK_MEDIA}}'
       headers:
-        - name: secret
+        - name: Hasura-Secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
-        - name: bucket
+        - name: Bucket
           value_from_env: HASURA_BUCKET
-        - name: name
+        - name: Function-Name
           value: saveFile
         - name: file-path
           value: projects/project-${projectid}/public/documentation/${filename}
@@ -572,13 +572,13 @@ actions:
   - name: saveProjectPresentation
     definition:
       kind: synchronous
-      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      handler: '{{CLOUD_FUNCTION_LINK_MEDIA}}'
       headers:
-        - name: secret
+        - name: Hasura-Secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
-        - name: bucket
+        - name: Bucket
           value_from_env: HASURA_BUCKET
-        - name: name
+        - name: Function-Name
           value: saveFile
         - name: file-path
           value: projects/project-${projectid}/public/presentation/${filename}
@@ -594,13 +594,13 @@ actions:
   - name: saveOrganizationLogo
     definition:
       kind: synchronous
-      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      handler: '{{CLOUD_FUNCTION_LINK_MEDIA}}'
       headers:
-        - name: secret
+        - name: Hasura-Secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
-        - name: bucket
+        - name: Bucket
           value_from_env: HASURA_BUCKET
-        - name: name
+        - name: Function-Name
           value: saveOrganizationLogo
         - name: file-path
           value: organizations/org-${organizationid}/public/logo/${filename}
@@ -628,11 +628,11 @@ actions:
   - name: removeOrganizationLogo
     definition:
       kind: synchronous
-      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      handler: '{{CLOUD_FUNCTION_LINK_MEDIA}}'
       headers:
-        - name: secret
+        - name: Hasura-Secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
-        - name: name
+        - name: Function-Name
           value: removeOrganizationLogo
     # Counterpart to saveOrganizationLogo, same authorization rule and same
     # reason the column write happens in the handler rather than a follow-up
@@ -661,13 +661,13 @@ actions:
   - name: saveUserProfileImage
     definition:
       kind: synchronous
-      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      handler: '{{CLOUD_FUNCTION_LINK_MEDIA}}'
       headers:
-        - name: secret
+        - name: Hasura-Secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
-        - name: bucket
+        - name: Bucket
           value_from_env: HASURA_BUCKET
-        - name: name
+        - name: Function-Name
           value: saveImage
         - name: file-path
           value: users/user-${userid}/public/profile_image/${filename}
@@ -720,13 +720,13 @@ actions:
   - name: updateUserAdminStatus
     definition:
       kind: synchronous
-      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      handler: '{{CLOUD_FUNCTION_LINK_IDENTITY}}'
       headers:
-        - name: secret
+        - name: Hasura-Secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
-        - name: bucket
+        - name: Bucket
           value_from_env: HASURA_BUCKET
-        - name: name
+        - name: Function-Name
           value: updateAdminUser
   - name: validateFormbricksSurvey
     definition:
@@ -791,13 +791,13 @@ actions:
   - name: saveLocationAddressImage
     definition:
       kind: synchronous
-      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      handler: '{{CLOUD_FUNCTION_LINK_MEDIA}}'
       headers:
-        - name: secret
+        - name: Hasura-Secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
-        - name: bucket
+        - name: Bucket
           value_from_env: HASURA_BUCKET
-        - name: name
+        - name: Function-Name
           value: saveImage
         - name: file-path
           value: locations/location-${locationaddressid}/public/picture/${filename}

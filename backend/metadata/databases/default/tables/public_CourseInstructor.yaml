@@ -193,11 +193,11 @@ event_triggers:
       interval_sec: 10
       num_retries: 3
       timeout_sec: 60
-    webhook_from_env: CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION
+    webhook_from_env: CLOUD_FUNCTION_LINK_IDENTITY
     headers:
-      - name: secret
+      - name: Hasura-Secret
         value_from_env: HASURA_CLOUD_FUNCTION_SECRET
-      - name: name
+      - name: Function-Name
         value: updateMatrixInstructorPowerLevel
     cleanup_config:
       batch_size: 10000

@@ -120,9 +120,7 @@ describe('handler registry', () => {
   it("resolves every function name in Hasura metadata in its URL's dispatcher", () => {
     const unresolved = references
       .filter(({ urlEnv, functionName }) => {
-        const { unit, handlers: own } = DISPATCHER_BY_ENV.get(urlEnv);
-        // Until the metadata switch, callNodeFunction entries still name the moved handlers.
-        const handlers = unit === 'callNodeFunction' ? { ...own, ...movedHandlers } : own;
+        const { handlers } = DISPATCHER_BY_ENV.get(urlEnv);
         return !functionName || !Object.hasOwn(handlers, functionName);
       })
       .map(({ source, urlEnv, functionName }) => `${source} -> ${urlEnv} ${functionName ?? '(no name header)'}`);
@@ -131,10 +129,7 @@ describe('handler registry', () => {
 
   it.each(DISPATCHERS)('references every $unit handler through $urlEnv', ({ urlEnv, handlers }) => {
     const referenced = new Set(
-      references
-        // Until the metadata switch, moved handlers are referenced through callNodeFunction.
-        .filter((reference) => reference.urlEnv === urlEnv || reference.urlEnv === DISPATCHERS[0].urlEnv)
-        .map(({ functionName }) => functionName)
+      references.filter((reference) => reference.urlEnv === urlEnv).map(({ functionName }) => functionName)
     );
     const unreferenced = Object.keys(handlers).filter(
       (key) => !referenced.has(key) && !UNREFERENCED_ALLOWED.has(key)
