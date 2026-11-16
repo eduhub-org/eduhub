@@ -51,6 +51,7 @@ import manageTestEnrollment from "./manageTestEnrollment/index.js";
 import syncRausgegangenEvent from "./syncRausgegangenEvent/index.js";
 import searchRausgegangenLocations from "./searchRausgegangenLocations/index.js";
 import geocodeLocationAddress from "./geocodeLocationAddress/index.js";
+import updateFromKeycloak from "./updateFromKeycloak/index.js";
 import { createDispatcher } from "./lib/dispatcher.js";
 
 // Handlers by the `Function-Name` (legacy: `name`) header Hasura sends, one map
@@ -79,6 +80,17 @@ export const identityHandlers = {
   createMatrixRoom,
   syncProgramInstructorMatrixRoom,
   updateMatrixInstructorPowerLevel,
+  updateFromKeycloak,
+};
+
+/**
+ * Identity actions whose handler follows the action name instead of the
+ * routing header, because the action forwards client headers (see
+ * pinnedActions in lib/dispatcher.js).
+ * @type {Record<string, string>}
+ */
+export const identityPinnedActions = {
+  updateFromKeycloak: "updateFromKeycloak",
 };
 
 /**
@@ -174,7 +186,11 @@ export const callNodeFunction = createDispatcher({
 });
 
 /** Entry point of the identity unit (same zip as callNodeFunction). */
-export const identity = createDispatcher({ name: "identity", handlers: identityHandlers });
+export const identity = createDispatcher({
+  name: "identity",
+  handlers: identityHandlers,
+  pinnedActions: identityPinnedActions,
+});
 
 /** Entry point of the media unit (same zip as callNodeFunction). */
 export const media = createDispatcher({ name: "media", handlers: mediaHandlers });

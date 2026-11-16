@@ -6,6 +6,7 @@ import yaml from 'js-yaml';
 import {
   callNodeFunctionHandlers,
   identityHandlers,
+  identityPinnedActions,
   mediaHandlers,
   movedHandlers,
 } from '../index.js';
@@ -22,7 +23,12 @@ const METADATA_DIR = path.resolve(UNIT_DIR, '../../backend/metadata');
 // through, and the handlers it serves.
 const DISPATCHERS = [
   { unit: 'callNodeFunction', urlEnv: 'CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION', handlers: callNodeFunctionHandlers },
-  { unit: 'identity', urlEnv: 'CLOUD_FUNCTION_LINK_IDENTITY', handlers: identityHandlers },
+  {
+    unit: 'identity',
+    urlEnv: 'CLOUD_FUNCTION_LINK_IDENTITY',
+    handlers: identityHandlers,
+    pinnedActions: identityPinnedActions,
+  },
   { unit: 'media', urlEnv: 'CLOUD_FUNCTION_LINK_MEDIA', handlers: mediaHandlers },
 ];
 const DISPATCHER_BY_ENV = new Map(DISPATCHERS.map((dispatcher) => [dispatcher.urlEnv, dispatcher]));
@@ -35,7 +41,8 @@ const NON_HANDLER_DIRS = new Set(['lib', 'scripts', 'shared', 'node_modules', 'c
 // Handlers registered under another name than their folder.
 const EXTRA_KEYS = { deleteMyAccount: 'anonymizeUser' };
 // Handler keys that no metadata entry is expected to reference.
-const UNREFERENCED_ALLOWED = new Set([]);
+// Folded in from their own units; the metadata still calls those units.
+const UNREFERENCED_ALLOWED = new Set(['updateFromKeycloak']);
 
 const readYaml = (file) => yaml.load(fs.readFileSync(file, 'utf8')) ?? [];
 
@@ -48,15 +55,18 @@ const functionNameOf = (headers = []) =>
 /** Every metadata entry that calls one of these units, as { source, urlEnv, functionName }. */
 const collectMetadataReferences = () => {
   const references = [];
-  const add = (source, urlEnv, headers) => {
+  const add = (source, urlEnv, headers, action = {}) => {
     if (DISPATCHER_BY_ENV.has(urlEnv)) {
-      references.push({ source, urlEnv, functionName: functionNameOf(headers) });
+      references.push({ source, urlEnv, functionName: functionNameOf(headers), ...action });
     }
   };
 
   for (const action of readYaml(path.join(METADATA_DIR, 'actions.yaml')).actions ?? []) {
-    const { handler, headers } = action.definition ?? {};
-    add(`action ${action.name}`, urlEnvOf(handler), headers);
+    const { handler, headers, forward_client_headers: forwardsClientHeaders } = action.definition ?? {};
+    add(`action ${action.name}`, urlEnvOf(handler), headers, {
+      actionName: action.name,
+      forwardsClientHeaders: forwardsClientHeaders === true,
+    });
   }
 
   for (const cron of readYaml(path.join(METADATA_DIR, 'cron_triggers.yaml'))) {
@@ -135,6 +145,28 @@ describe('handler registry', () => {
       (key) => !referenced.has(key) && !UNREFERENCED_ALLOWED.has(key)
     );
     expect(unreferenced).toEqual([]);
+  });
+
+  // A caller can add their own routing header to an action that forwards
+  // client headers; only a pinned action ignores it.
+  it('pins every action that forwards client headers to its handler', () => {
+    const unpinned = references
+      .filter(({ forwardsClientHeaders }) => forwardsClientHeaders)
+      .filter(({ urlEnv, actionName, functionName }) => {
+        const { pinnedActions = {} } = DISPATCHER_BY_ENV.get(urlEnv);
+        return pinnedActions[actionName] !== functionName;
+      })
+      .map(({ source }) => source);
+    expect(unpinned).toEqual([]);
+  });
+
+  it('pins actions only to handlers of their dispatcher', () => {
+    const invalid = DISPATCHERS.flatMap(({ unit, handlers, pinnedActions = {} }) =>
+      Object.entries(pinnedActions)
+        .filter(([, handler]) => !Object.hasOwn(handlers, handler))
+        .map(([action, handler]) => `${unit}: ${action} -> ${handler}`)
+    );
+    expect(invalid).toEqual([]);
   });
 
   it('keeps routing in callNodeFunction only handlers that moved to identity or media', () => {
