@@ -52,6 +52,8 @@ import syncRausgegangenEvent from "./syncRausgegangenEvent/index.js";
 import searchRausgegangenLocations from "./searchRausgegangenLocations/index.js";
 import geocodeLocationAddress from "./geocodeLocationAddress/index.js";
 import updateFromKeycloak from "./updateFromKeycloak/index.js";
+import addKeycloakRole from "./addKeycloakRole/index.js";
+import removeKeycloakRole from "./removeKeycloakRole/index.js";
 import { createDispatcher } from "./lib/dispatcher.js";
 
 // Handlers by the `Function-Name` (legacy: `name`) header Hasura sends, one map
@@ -81,6 +83,8 @@ export const identityHandlers = {
   syncProgramInstructorMatrixRoom,
   updateMatrixInstructorPowerLevel,
   updateFromKeycloak,
+  addKeycloakRole,
+  removeKeycloakRole,
 };
 
 /**
