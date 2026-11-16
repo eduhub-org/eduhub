@@ -1,6 +1,6 @@
 import { createHasuraClient } from "../lib/hasura.js";
 import * as config from "../lib/config.js";
-import { parseMatrixResponse } from "../lib/matrixRoomUtils.js";
+import { creatorsHaveImplicitPower, parseMatrixResponse } from "../lib/matrixRoomUtils.js";
 
 const GET_COURSE_CONTEXT = `
   query GetCourseContext($courseId: Int!) {
@@ -140,6 +140,17 @@ const createRoomWithAlias = async ({
     const aliasResult = await parseMatrixResponse(aliasResponse);
     return aliasResult.room_id;
   }
+};
+
+/** The room version the homeserver uses for new rooms, or null if it does not say. */
+const getDefaultRoomVersion = async ({ homeserverUrl, token, signal }) => {
+  const response = await fetch(`${homeserverUrl}/_matrix/client/v3/capabilities`, {
+    method: "GET",
+    headers: matrixHeaders(token),
+    signal,
+  });
+  const result = await parseMatrixResponse(response);
+  return result?.capabilities?.["m.room_versions"]?.default ?? null;
 };
 
 const putStateEvent = async ({
@@ -484,10 +495,20 @@ export default async function createMatrixRoom(req, logger) {
       logger,
       signal: controller.signal,
     });
+    // Pin the version we check against, so the room is created with the same one.
+    const roomVersion = await getDefaultRoomVersion({
+      homeserverUrl: matrixConfig.homeserverUrl,
+      token: matrixConfig.token,
+      signal: controller.signal,
+    });
     const powerLevelUsers = {
-      ...(matrixConfig.adminUserId && { [matrixConfig.adminUserId]: 100 }),
+      [matrixConfig.adminUserId]: 100,
       ...instructorUsers,
     };
+    // The bot creates the room, so from room version 12 on its power is implicit.
+    if (creatorsHaveImplicitPower(roomVersion)) {
+      delete powerLevelUsers[matrixConfig.adminUserId];
+    }
     const roomId = await createRoomWithAlias({
       homeserverUrl: matrixConfig.homeserverUrl,
       token: matrixConfig.token,
@@ -495,6 +516,7 @@ export default async function createMatrixRoom(req, logger) {
       serverName: matrixConfig.serverName,
       signal: controller.signal,
       payload: {
+        ...(roomVersion && { room_version: roomVersion }),
         name: roomName,
         topic: topic || "",
         visibility: "private",
