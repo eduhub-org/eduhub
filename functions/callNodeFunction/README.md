@@ -47,7 +47,7 @@ const emailContent = replaceVariables(template.content);
 
 ### Prerequisites
 ```bash
-npm install
+npm ci   # also run it in ../sendMail: its tests run from here
 ```
 
 ### Running Tests

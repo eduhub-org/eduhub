@@ -22,7 +22,7 @@ command to run (and why).
 | `keycloak/themes/**` | `keycloak` | **nothing** — themes are volume-mounted and theme caching is off, so they hot-reload |
 | `functions/Dockerfile` (Python base image / apt packages) | `python_functions` | **rebuild** |
 | `functions/**/requirements.txt` (pip deps) | `python_functions` | `docker compose restart python_functions` — pip installs at container start, no rebuild |
-| `functions/**` Node deps (`package.json`) | `node_functions` | `docker compose restart node_functions` — deps install at container start; this service has **no build context**, so `build` does nothing |
+| `functions/**` Node deps (`package.json` / `package-lock.json`), `functions/units.json`, `functions/dev.js` | `node_functions` | `docker compose restart node_functions` — `dev.js` runs `npm ci` for each Node unit in `units.json` at container start; this service has **no build context**, so `build` does nothing |
 | Pinned `image:` tag bump in `docker-compose.yml` (e.g. `node:22-bookworm`, `postgres:17`) | `node_functions`, `db_hasura` | `docker compose pull <svc>` then `docker compose up -d --force-recreate <svc>` — **not** `build` |
 | `backend/dockerfile-dev-entrypoint.sh`, `backend/wait-for-it.sh`, `backend/config.yaml` (COPY'd in `backend/Dockerfile-dev`) | `hasura` | **rebuild** |
 | `frontend-nx` deps (`package.json`) | `frontend-nx` | `docker compose restart frontend-nx` — `dev.sh` runs `yarn install` at start; only a base-image change needs a rebuild |

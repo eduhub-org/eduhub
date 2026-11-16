@@ -4,12 +4,32 @@
 This guide covers the development of serverless functions in our system, ensuring consistency and maintainability across all implementations.
 
 ## Table of Contents
+0. [Units and Shared Code](#units-and-shared-code)
 1. [Basic Python Function Template](#basic-python-function-template)
 2. [Implementation Steps](#implementation-steps)
 3. [Naming Conventions](#naming-conventions)
 4. [Response Format](#response-format)
 5. [Error Handling](#error-handling)
 6. [Documentation Requirements](#documentation-requirements)
+
+## Units and Shared Code
+
+- `functions/units.json` lists every deployed unit (name, runtime, entry
+  point, local port). The zip workflow
+  (`.github/workflows/zip-and-store-cloud-functions.yml`) packages exactly
+  these, and `functions/dev.js` / `functions/dev.py` start them locally.
+- Every Node unit is ESM (`"type": "module"`) and commits its own
+  `package-lock.json`; Cloud Functions builds each zip on its own with
+  `npm ci`. Change dependencies with `npm install <pkg>` inside the unit.
+- Shared Node code lives in `functions/shared/` (ESM, **no dependencies**).
+  A unit that needs it has a committed symlink `shared -> ../shared` and
+  imports `./shared/<file>.js` (or `../shared/...` from a handler folder).
+  Python units link `api_clients -> ../shared_libs/api_clients` the same way.
+- `zip -r` follows these symlinks, so each archive contains real copies; the
+  workflow fails if an archive still holds a symlink. On Windows, enable
+  `core.symlinks` (and Developer Mode) before cloning.
+- To add a Node unit that uses shared code:
+  `ln -s ../shared functions/<unit>/shared`, then add it to `units.json`.
 
 
 ## Basic Python Function Template
