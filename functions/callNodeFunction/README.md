@@ -1,8 +1,12 @@
-# EduHub Email System - Node Functions
+# callNodeFunction
 
-This directory contains the Node.js cloud functions for EduHub's automated email system.
+The Node dispatcher: one Cloud Function that routes each Hasura request to a
+handler folder by its `Function-Name` header. The request contract, how to add
+a handler and the Hasura metadata it needs are in
+[`docs/SERVERLESS_FUNCTIONS.md`](../../docs/SERVERLESS_FUNCTIONS.md). This file
+covers the email handlers and the test setup.
 
-## Functions
+## Email handlers
 
 ### sendEnrollmentEmail
 Automatically sends emails when course enrollment status changes. Triggered by Hasura event triggers.
@@ -33,11 +37,12 @@ Handlers use these instead of reading `process.env` or building clients:
 - `lib/logger.js`: the winston logger for modules that are not passed one
   (never import it from `../index.js`).
 - `lib/http.js`: fetch-based JSON client; `lib/keycloak.js`: admin login.
+- `lib/requestHeaders.js`: `getFunctionName`, `getBucket` (Hasura headers).
 - `lib/queueEmail.js`: renders a MailTemplate into MailLog.
 
 A new handler is a folder with an `index.js`, imported and added to
 `functionMap` in `index.js`; `__tests__/registry.test.js` fails until the
-Hasura metadata names it too.
+Hasura metadata names it too. Step by step: `docs/SERVERLESS_FUNCTIONS.md`.
 
 ## Email Template Variables
 

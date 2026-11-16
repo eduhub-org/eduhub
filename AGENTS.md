@@ -118,6 +118,7 @@ context from this file by design.
 | `/run-tests` | Running or scoping Jest tests |
 | `/regenerate-types` | After any GraphQL document or schema change |
 | `/create-migration` | Adding/altering tables, columns, constraints |
+| `/create-function` | Adding a serverless handler (Node or Python) and its Hasura action/trigger |
 | `/graphql-backend` | Coordinating GraphQL/Hasura schema and permission changes |
 | `/frontend-patterns` | Building or refactoring React components and pages |
 | `/security-auth` | Auth, role checks, Keycloak, NextAuth, Hasura permissions |

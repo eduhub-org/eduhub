@@ -1,0 +1,26 @@
+---
+description: "Apply when working on serverless functions in functions/ (callNodeFunction, callPythonFunction handlers) or the Hasura actions and triggers that call them"
+globs: ["functions/**", "backend/metadata/actions.yaml", "backend/metadata/cron_triggers.yaml"]
+alwaysApply: false
+---
+
+# Serverless Functions
+
+> **Full guide**: `docs/SERVERLESS_FUNCTIONS.md`. Step by step:
+> `.claude/commands/create-function.md`.
+
+- **Unit** = deployed Cloud Function (`functions/units.json`). **Dispatcher**
+  = `callNodeFunction` / `callPythonFunction`, routing by `Function-Name`.
+  **Handler** = one routed function. Add handlers, not units.
+- Headers: `Hasura-Secret`, `Function-Name`, `Bucket`. callNodeFunction and
+  the other Node units still accept the legacy `secret` / `name` until
+  `docs/plans/functions-header-switch.md` is done; new metadata uses the
+  standard names.
+- Status codes: 401 secret, 404 unknown function, 500 server secret unset,
+  400 (Node) conflicting names, 503 for a `retryable` event/cron failure,
+  else 200 with `{ success, messageKey, error? }`.
+- Node handlers read env via `lib/config.js`, Hasura via `lib/hasura.js`,
+  HTTP via `lib/http.js`, the bucket via `lib/requestHeaders.js`.
+- Register in `functionMap` / `PYTHON_FUNCTIONS`; the registry test
+  (`callNodeFunction/__tests__/registry.test.js`) checks it against the
+  Hasura metadata.

@@ -1,3 +1,7 @@
+> The request contract (headers, status codes, response body) and the
+> step-by-step for a new handler are in
+> [`docs/SERVERLESS_FUNCTIONS.md`](../../docs/SERVERLESS_FUNCTIONS.md).
+
 # Adding a New Python Backend Function
 
 Welcome to the guide on how to contribute by adding a new Python backend function to our project. We value your contributions, and this guide aims to ensure the process is smooth and clear.

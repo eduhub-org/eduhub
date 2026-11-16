@@ -29,6 +29,7 @@ This directory contains comprehensive development rules and guidelines for the E
 |------|-------------|-------------|
 | [GraphQL Integration Patterns](graphql-integration-patterns.mdc) | Query/mutation structure, error handling, and caching strategies | Working with GraphQL queries, mutations, or data fetching |
 | [Database Table Creation](database-table-creation.md) | Adding new tables, columns, and Hasura metadata configuration | Creating database tables, migrations, or Hasura metadata |
+| [Serverless Functions](serverless-functions.mdc) | Dispatchers, handlers, request contract, and the Hasura entries that call them | Working in `functions/` or on actions and triggers |
 
 ### 🌐 Internationalization
 | Rule | Description | Applied When |
