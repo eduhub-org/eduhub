@@ -4130,6 +4130,14 @@
     "deleted": "This message was deleted.",
     "encrypted": "Encrypted message, not readable here.",
     "unsupported": "This message cannot be shown here.",
-    "wrong_account": "The chat login in this browser still belonged to {matrixId}, not to your own account. We discarded it. Please try again and choose “Use another account” there."
+    "wrong_account": "The chat login in this browser still belonged to {matrixId}, not to your own account. We discarded it. Please try again and choose “Use another account” there.",
+    "pinned_title": "Pinned",
+    "pinned_badge": "pinned",
+    "pin": "Pin",
+    "unpin": "Unpin",
+    "delete": "Delete",
+    "delete_title": "Delete message?",
+    "delete_question": "The message is removed for everyone in the chat. This cannot be undone.",
+    "action_failed": "That did not work. You may not have the rights for it in this chat."
   }
 }

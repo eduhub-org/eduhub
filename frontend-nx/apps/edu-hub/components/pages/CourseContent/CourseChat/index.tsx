@@ -1,13 +1,17 @@
 import { FC, FormEvent, KeyboardEvent, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
 import { useTranslations } from 'next-intl';
-import type { MatrixClient } from 'matrix-js-sdk';
+import type { MatrixClient, MatrixEvent } from 'matrix-js-sdk';
 
 import Button from '../../../common/Button';
 import Loading from '../../../common/Loading';
 import { SectionTitle } from '../../../common/SectionTitle';
+import NotificationSnackbar from '../../../common/dialogs/NotificationSnackbar';
+import { QuestionConfirmationDialog } from '../../../common/dialogs/QuestionConfirmationDialog';
 import { useMatrixClient } from '../../../../hooks/useMatrixClient';
 import ChatMessage from './ChatMessage';
+import PinnedMessages from './PinnedMessages';
+import { useRoomModeration } from './useRoomModeration';
 import { useRoomTimeline } from './useRoomTimeline';
 
 /** How close to the bottom (px) still counts as "reading the newest messages". */
@@ -19,7 +23,10 @@ const ChatRoom: FC<{ client: MatrixClient; roomId: string; offline: boolean }> =
     client,
     roomId
   );
+  const { pinnedIds, canPin, canRedact, redact, togglePin } = useRoomModeration(client, room);
   const [draft, setDraft] = useState('');
+  const [toRedact, setToRedact] = useState<MatrixEvent | null>(null);
+  const [actionFailed, setActionFailed] = useState(false);
   const listRef = useRef<HTMLDivElement>(null);
   const stickToBottom = useRef(true);
   const heightBeforeOlder = useRef<number | null>(null);
@@ -61,12 +68,36 @@ const ChatRoom: FC<{ client: MatrixClient; roomId: string; offline: boolean }> =
     if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing) submit();
   };
 
+  // The server has the last word on permissions (M_FORBIDDEN); say so if it refuses.
+  const reportFailure = (error: unknown) => {
+    console.error('Chat moderation action failed', error);
+    setActionFailed(true);
+  };
+
+  const confirmRedact = () => {
+    const event = toRedact;
+    setToRedact(null);
+    if (event) redact(event).catch(reportFailure);
+  };
+
+  const handleTogglePin = (eventId: string) => {
+    togglePin(eventId).catch(reportFailure);
+  };
+
   if (joinFailed) return <p className="text-label-secondary">{t('join_failed')}</p>;
   if (!room) return <Loading />;
 
   return (
     <div className="rounded-2xl border border-border-primary bg-bg-primary overflow-hidden">
       {offline && <p className="px-4 py-2 text-xs bg-bg-secondary text-label-secondary">{t('offline')}</p>}
+      <PinnedMessages
+        client={client}
+        room={room}
+        pinnedIds={pinnedIds}
+        events={events}
+        canPin={canPin}
+        onUnpin={handleTogglePin}
+      />
       <div
         ref={listRef}
         onScroll={handleScroll}
@@ -99,6 +130,11 @@ const ChatRoom: FC<{ client: MatrixClient; roomId: string; offline: boolean }> =
                 senderName={room.getMember(sender)?.name ?? sender}
                 isOwn={sender === ownUserId}
                 onResend={resend}
+                canRedact={canRedact(event)}
+                onRedact={setToRedact}
+                canPin={canPin}
+                isPinned={pinnedIds.includes(event.getId() ?? '')}
+                onTogglePin={handleTogglePin}
               />
             );
           })}
@@ -121,6 +157,20 @@ const ChatRoom: FC<{ client: MatrixClient; roomId: string; offline: boolean }> =
           {t('send')}
         </Button>
       </form>
+      <QuestionConfirmationDialog
+        open={toRedact !== null}
+        title={t('delete_title')}
+        question={t('delete_question')}
+        confirmationText={t('delete')}
+        onClose={() => setToRedact(null)}
+        onConfirm={confirmRedact}
+      />
+      <NotificationSnackbar
+        open={actionFailed}
+        onClose={() => setActionFailed(false)}
+        message={t('action_failed')}
+        duration={5000}
+      />
     </div>
   );
 };

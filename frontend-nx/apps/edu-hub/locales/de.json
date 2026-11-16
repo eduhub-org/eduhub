@@ -4115,6 +4115,14 @@
     "deleted": "Diese Nachricht wurde gelöscht.",
     "encrypted": "Verschlüsselte Nachricht, hier nicht lesbar.",
     "unsupported": "Diese Nachricht kann hier nicht angezeigt werden.",
-    "wrong_account": "Für den Chat warst du in diesem Browser noch als {matrixId} angemeldet, nicht mit deinem eigenen Konto. Wir haben diese Anmeldung verworfen. Versuch es noch einmal und wähle dort „Anderes Konto verwenden“."
+    "wrong_account": "Für den Chat warst du in diesem Browser noch als {matrixId} angemeldet, nicht mit deinem eigenen Konto. Wir haben diese Anmeldung verworfen. Versuch es noch einmal und wähle dort „Anderes Konto verwenden“.",
+    "pinned_title": "Angeheftet",
+    "pinned_badge": "angeheftet",
+    "pin": "Anheften",
+    "unpin": "Lösen",
+    "delete": "Löschen",
+    "delete_title": "Nachricht löschen?",
+    "delete_question": "Die Nachricht wird für alle im Chat entfernt. Das lässt sich nicht rückgängig machen.",
+    "action_failed": "Das hat nicht geklappt. Vielleicht fehlen dir dafür die Rechte im Chat."
   }
 }
