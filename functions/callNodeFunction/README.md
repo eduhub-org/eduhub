@@ -23,6 +23,22 @@ Sends automated session reminder emails for the **first session only** of each c
 - 1 hour before (±15 minutes tolerance)  
 - 15 minutes before (±6 minutes tolerance)
 
+## Shared modules (`lib/`)
+
+Handlers use these instead of reading `process.env` or building clients:
+
+- `lib/config.js`: every environment variable, read at call time
+  (`requireEnv`, `hasuraConfig`, `frontendUrl`, `keycloakConfig`, ...).
+- `lib/hasura.js`: `createHasuraClient()`, the admin GraphQL client.
+- `lib/logger.js`: the winston logger for modules that are not passed one
+  (never import it from `../index.js`).
+- `lib/http.js`: fetch-based JSON client; `lib/keycloak.js`: admin login.
+- `lib/queueEmail.js`: renders a MailTemplate into MailLog.
+
+A new handler is a folder with an `index.js`, imported and added to
+`functionMap` in `index.js`; `__tests__/registry.test.js` fails until the
+Hasura metadata names it too.
+
 ## Email Template Variables
 
 Both email functions use a **centralized variable system** (`lib/emailTemplateVariables.js`) that provides:
