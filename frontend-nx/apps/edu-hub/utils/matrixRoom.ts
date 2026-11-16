@@ -18,8 +18,8 @@ export function normalizeMatrixRoomId(input: string | null | undefined): string 
           return elementRoom[1];
         }
       }
-      // matrix.to: https://matrix.to/#/!room:server?via=…
-      const matrixToRoom = hashNoQuery.match(/^#\/?(![^:#?]+:[^?#/]+)/);
+      // matrix.to: https://matrix.to/#/!room:server?via=… (room version 12 ids have no :server)
+      const matrixToRoom = hashNoQuery.match(/^#\/?(![^:#?]+(?::[^?#/]+)?)/);
       if (matrixToRoom) {
         try {
           return decodeURIComponent(matrixToRoom[1]);
@@ -59,7 +59,12 @@ export function normalizeMatrixRoomId(input: string | null | undefined): string 
   return withoutQuery;
 }
 
+/**
+ * Basic shape check, matching isValidMatrixRoomId in
+ * functions/callNodeFunction/lib/matrixRoomUtils.js: "!opaque:server" (server
+ * may carry a port or be an IP), or "!opaque" alone as in room version 12.
+ */
 export function isValidMatrixRoomId(roomId: string | null | undefined): boolean {
   if (!roomId?.trim()) return false;
-  return /^![^:]+:[^:]+$/.test(roomId.trim());
+  return /^![^\s:#/?]+(?::[^\s#/?]+)?$/.test(roomId.trim());
 }
