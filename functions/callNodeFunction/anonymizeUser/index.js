@@ -1,7 +1,7 @@
 import { request } from 'graphql-request';
 import { Storage } from '@google-cloud/storage';
 import { buildCloudStorage } from '../lib/cloud-storage.js';
-import { getKeycloakToken } from '../lib/utils.js';
+import { getKeycloakToken } from '../lib/keycloak.js';
 import { unsubscribeForAccountDeletion } from '../syncGhostNewsletterSubscription/index.js';
 import { deactivateMatrixUser, getMatrixDeactivationConfig, toMatrixUserId } from '../lib/matrixInvite.js';
 import axios from 'axios';

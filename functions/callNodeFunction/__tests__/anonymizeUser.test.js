@@ -13,7 +13,7 @@ jest.unstable_mockModule('@google-cloud/storage', () => ({ Storage: jest.fn() })
 jest.unstable_mockModule('../lib/cloud-storage.js', () => ({
   buildCloudStorage: () => ({ deleteFile, listFiles }),
 }));
-jest.unstable_mockModule('../lib/utils.js', () => ({ getKeycloakToken }));
+jest.unstable_mockModule('../lib/keycloak.js', () => ({ getKeycloakToken }));
 jest.unstable_mockModule('axios', () => ({ default: { delete: deleteIdentity } }));
 jest.unstable_mockModule('../syncGhostNewsletterSubscription/index.js', () => ({
   unsubscribeForAccountDeletion: unsubscribe,

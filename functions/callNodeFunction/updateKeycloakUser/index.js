@@ -3,29 +3,7 @@ import axios from "axios";
 import { computeMatrixHandle } from "../lib/matrixHandle.js";
 import { mergeUserPutPayload } from "../shared/keycloakUserMerge.js";
 import * as config from "../lib/config.js";
-
-const getKeycloakToken = async () => {
-  try {
-    const response = await axios.post(
-      `${config.keycloakConfig().url}/realms/master/protocol/openid-connect/token`,
-      new URLSearchParams({
-        grant_type: 'password',
-        client_id: 'admin-cli',
-        username: config.keycloakConfig().username,
-        password: config.keycloakConfig().password,
-      }),
-      {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-      }
-    );
-    return response.data.access_token;
-  } catch (error) {
-    logger.error('Error getting Keycloak token', error);
-    throw error;
-  }
-};
+import { getKeycloakToken } from "../lib/keycloak.js";
 
 const updateKeycloakUser = async (userId, updatedFields, token) => {
   try {

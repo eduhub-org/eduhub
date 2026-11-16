@@ -6,6 +6,7 @@ import { computeMatrixHandle } from '../lib/matrixHandle.js';
 import { mergeUserPutPayload } from '../shared/keycloakUserMerge.js';
 import { createHasuraClient } from '../lib/hasura.js';
 import * as config from '../lib/config.js';
+import { authenticateKeycloakAdmin } from '../lib/keycloak.js';
 
 /**
  * Creates a new user in both Keycloak and Hasura
@@ -54,12 +55,7 @@ export default async function createUser(req, logger) {
 
   try {
     // Authenticate with Keycloak
-    await kcAdminClient.auth({
-      username: config.keycloakConfig().username,
-      password: config.keycloakConfig().password,
-      grantType: "password",
-      clientId: "admin-cli",
-    });
+    await authenticateKeycloakAdmin(kcAdminClient);
     kcAdminClient.setConfig({
       realmName: "edu-hub",
     });

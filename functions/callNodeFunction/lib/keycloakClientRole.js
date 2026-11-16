@@ -1,5 +1,6 @@
 import KcAdminClient from '@keycloak/keycloak-admin-client';
 import * as config from './config.js';
+import { authenticateKeycloakAdmin } from './keycloak.js';
 
 /**
  * Hand out a Keycloak `hasura` client role (admin, instructor, org_admin, ...)
@@ -68,12 +69,7 @@ const grant = async (userId, role, clientId, realmName, timeoutMs) => {
     timeout: timeoutMs,
   });
 
-  await kcAdminClient.auth({
-    username: config.keycloakConfig().username,
-    password: config.keycloakConfig().password,
-    grantType: 'password',
-    clientId: 'admin-cli',
-  });
+  await authenticateKeycloakAdmin(kcAdminClient);
 
   kcAdminClient.setConfig({ realmName });
 

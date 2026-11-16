@@ -37,6 +37,7 @@ import KcAdminClient from '@keycloak/keycloak-admin-client';
 import { mergeUserPutPayload } from '../shared/keycloakUserMerge.js';
 import { computeMatrixHandle } from '../shared/matrixHandle.js';
 import * as config from '../lib/config.js';
+import { authenticateKeycloakAdmin } from '../lib/keycloak.js';
 
 const DRY_RUN = process.argv.includes('--dry-run');
 const DELAY_BETWEEN_USERS_MS = 100;
@@ -52,12 +53,7 @@ async function keycloakAuth(kcAdminClient) {
   kcAdminClient.setConfig({ realmName: 'master' });
   for (let attempt = 1; attempt <= AUTH_RETRY_ATTEMPTS; attempt++) {
     try {
-      await kcAdminClient.auth({
-        username: config.keycloakConfig().username,
-        password: config.keycloakConfig().password,
-        grantType: 'password',
-        clientId: 'admin-cli',
-      });
+      await authenticateKeycloakAdmin(kcAdminClient);
       kcAdminClient.setConfig({ realmName: 'edu-hub' });
       return;
     } catch (err) {

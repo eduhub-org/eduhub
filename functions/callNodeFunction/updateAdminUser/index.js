@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getKeycloakToken } from '../lib/utils.js';
+import { getKeycloakToken } from '../lib/keycloak.js';
 import { logger } from '../lib/logger.js';
 import * as config from '../lib/config.js';
 
