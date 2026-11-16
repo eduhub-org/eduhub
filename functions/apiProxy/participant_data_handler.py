@@ -14,7 +14,7 @@ from jwt import InvalidTokenError, PyJWKClient
 try:
     from api_clients.eduhub_client import EduHubClient
     from api_clients.numeric_utils import safe_float_convert
-    from security_handler import security_handler, get_security_level_for_organization, validate_and_sanitize_input, SecurityLevel
+    from security_handler import security_handler, get_security_level_for_organization, validate_and_sanitize_input
     from course_id_utils import generate_course_hash_id
 except ImportError:
     # Fallback for when module is loaded from different context
@@ -24,7 +24,7 @@ except ImportError:
     sys.path.insert(0, current_dir)
     from api_clients.eduhub_client import EduHubClient
     from api_clients.numeric_utils import safe_float_convert
-    from security_handler import security_handler, get_security_level_for_organization, validate_and_sanitize_input, SecurityLevel
+    from security_handler import security_handler, get_security_level_for_organization, validate_and_sanitize_input
     from course_id_utils import generate_course_hash_id
 
 logger = logging.getLogger(__name__)
@@ -1234,10 +1234,6 @@ def handle_participants_schema():
     """
     Return the JSON schema for participant data
     """
-    # Debug info about environment
-    hasura_endpoint = os.getenv("HASURA_ENDPOINT", "NOT_SET")
-    hasura_secret = "SET" if os.getenv("HASURA_ADMIN_SECRET") else "NOT_SET"
-    
     schema = {
         "$schema": "https://json-schema.org/draft/2019-09/schema",
         "$id": "https://api-edu.opencampus.sh/schemas/participant-data-v1.0.0.json",

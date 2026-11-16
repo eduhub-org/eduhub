@@ -5,7 +5,6 @@ import base64
 from datetime import datetime, timedelta
 import sys
 import os
-from requests.structures import CaseInsensitiveDict
 import numpy as np
 import pandas as pd
 

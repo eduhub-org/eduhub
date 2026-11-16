@@ -1,6 +1,6 @@
 """Unit tests for the secret check and error path of the Python dispatcher."""
 import pytest
-from flask import Flask
+from flask import Flask, request
 
 import main
 
@@ -13,7 +13,7 @@ def _call(headers=None, data='{"action": {"name": "unknown_function"}}'):
         "/", method="POST", data=data, headers=headers or {},
         content_type="application/json",
     ):
-        response, status = main.call_python_function(main.request)
+        response, status = main.call_python_function(request)
         return response.get_json(), status
 
 

@@ -587,7 +587,7 @@ class EduHubClient:
         try:
             chat_link = result["data"]["Course"][0]["chatLink"]
             return chat_link
-        except (KeyError, IndexError) as e:
+        except (KeyError, IndexError):
             return None  # or handle error as appropriate for your use case
 
     def update_course_enrollment_record(self, user_id, course_id, certificate_url, certificate_type):

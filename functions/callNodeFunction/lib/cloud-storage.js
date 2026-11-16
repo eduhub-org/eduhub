@@ -4,7 +4,6 @@ import path from "path";
 import url from "url";
 
 const isPublicLegacy = (filePath) => filePath.startsWith("https://") || filePath.startsWith("http://");
-const isPublic = (filePath) => filePath.includes("/public/");
 const isPdf = (filePath) => filePath.split("?")[0].toLowerCase().endsWith(".pdf");
 
 const getDownloadFileName = (filePath) => {
@@ -148,7 +147,7 @@ export const buildCloudStorage = (Storage) => {
         const saveOptions = isPdf(filename)
           ? { metadata: { contentType: "application/pdf" } }
           : undefined;
-        const sr = await file.save(fileBuffer, saveOptions);
+        await file.save(fileBuffer, saveOptions);
 
         let link = "";
         if (isPublic) {

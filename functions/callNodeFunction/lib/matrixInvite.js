@@ -97,22 +97,6 @@ const fetchMatrixWithRateLimitRetry = async (url, init, signal) => {
   return lastResponse;
 };
 
-const parseMatrixResponse = async (response) => {
-  let payload = null;
-  try {
-    payload = await response.json();
-  } catch (_error) {
-    payload = null;
-  }
-
-  if (response.ok) return payload;
-
-  const error = new Error(payload?.error || `Matrix request failed with HTTP ${response.status}`);
-  error.status = response.status;
-  error.errcode = payload?.errcode;
-  throw error;
-};
-
 export const getMatrixInviteConfig = ({ requireToken = true } = {}) => {
   const homeserverUrl = trimAndNull(process.env.MATRIX_HOMESERVER_URL);
   const token = trimAndNull(process.env.MATRIX_ADMIN_ACCESS_TOKEN);

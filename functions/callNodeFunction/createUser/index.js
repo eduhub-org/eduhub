@@ -2,7 +2,6 @@ import KcAdminClient from "@keycloak/keycloak-admin-client";
 import { GraphQLClient, gql } from 'graphql-request';
 import { queueEmail } from '../lib/queueEmail.js';
 import { createVariableReplacer } from '../emailTemplateVariables.js';
-import { logger } from '../index.js';
 import { createRequire } from 'module';
 import { computeMatrixHandle } from '../lib/matrixHandle.js';
 

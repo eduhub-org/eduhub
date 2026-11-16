@@ -54,11 +54,11 @@ exports.buildCloudStorage = (Storage) => {
         const file = bucket.file(filename);
         const fileBuffer = new Buffer(content, "base64");
 
-        const sr = await file.save(fileBuffer);
+        await file.save(fileBuffer);
 
         let link = "";
         if (isPublic == true) {
-          const mp = await file.makePublic();
+          await file.makePublic();
           link = await file.publicUrl();
         } else {
           link = await file.getSignedUrl({

@@ -8,9 +8,7 @@ This key is safe to commit since it's only test data.
 import pytest
 import requests
 import json
-import os
 from pathlib import Path
-from jsonschema import validate, ValidationError
 
 # Test API key from seed data (organization ID 160)
 TEST_API_KEY = "edh_live_org160_sk_056afe290cadf18e2b2d7482c5f4e5a5"

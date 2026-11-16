@@ -1,8 +1,8 @@
 import hmac
 import logging
 import os
-from flask import request, jsonify
-from typing import Dict, Any, Callable
+from flask import jsonify
+from typing import Dict, Callable
 
 # Import functions explicitly
 from pythonFunctions.add_confirmed_user_to_mm import add_confirmed_user_to_mm
