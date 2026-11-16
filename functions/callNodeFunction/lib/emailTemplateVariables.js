@@ -45,6 +45,13 @@ export function formatSubmissionDeadlineForEmail(value) {
   return `${day}.${month}.${year}`;
 }
 
+/**
+ * "3. März 2026" for template dates; empty for a missing value.
+ * @param {string | Date | null | undefined} dateString
+ */
+export const formatGermanLongDate = (dateString) =>
+  dateString ? new Date(dateString).toLocaleDateString('de-DE', { year: 'numeric', month: 'long', day: 'numeric' }) : '';
+
 export function escapeHtml(text) {
   // Empty values (null, undefined, '', 0) render as nothing in a template.
   if (!text) return '';

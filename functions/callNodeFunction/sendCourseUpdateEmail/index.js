@@ -1,7 +1,7 @@
 import { gql } from 'graphql-request';
 import { queueEmail } from '../lib/queueEmail.js';
 import { withRetry } from '../lib/withRetry.js';
-import { createEnrollmentVariableReplacer } from '../lib/emailTemplateVariables.js';
+import { createEnrollmentVariableReplacer, formatGermanLongDate } from '../lib/emailTemplateVariables.js';
 import { createHasuraClient } from '../lib/hasura.js';
 
 /**
@@ -40,8 +40,7 @@ export default async function sendCourseUpdateEmail(req, logger) {
 
     const client = createHasuraClient();
 
-    const formatDate = (dateString) =>
-      dateString ? new Date(dateString).toLocaleDateString('de-DE', { year: 'numeric', month: 'long', day: 'numeric' }) : '';
+    const formatDate = formatGermanLongDate;
 
     if (tableName === 'Invoice') {
       const invoiceNew = data.new;
