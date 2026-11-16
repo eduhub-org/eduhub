@@ -1,6 +1,5 @@
 import winston from "winston";
 import { createRequire } from "node:module";
-import createCertificate from "./createCertificate/index.js";
 import getSignedUrl from "./getSignedUrl/index.js";
 import saveFile from "./saveFile/index.js";
 import saveImage from "./saveImage/index.js";
@@ -79,7 +78,6 @@ export const logger = winston.createLogger({
 });
 
 const functionMap = {
-  createCertificate,
   getSignedUrl,
   saveFile,
   saveImage,
