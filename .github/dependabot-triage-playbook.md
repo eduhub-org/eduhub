@@ -39,8 +39,8 @@ Stopping here stops the **alert-driven** half of the job only. The watchlist pas
 | Path | Manager | Notes |
 | --- | --- | --- |
 | `frontend-nx/` | Yarn 3.4.1 (`nodeLinker: node-modules`) | Next.js app, `frontend-nx/yarn.lock`. The only deployed frontend. |
-| `functions/<name>/` | npm (`package-lock.json`) | Cloud Functions. |
-| `functions/apiProxy`, `functions/callPythonFunction` | pip (`requirements.txt`) | |
+| `functions/<name>/` (Node units) | npm, **no lockfile** | Cloud Functions. `package-lock.json` is gitignored (`functions/.gitignore`); Cloud Build resolves the `package.json` ranges at deploy time. |
+| `functions/apiProxy`, `functions/callPythonFunction` | pip (`requirements.txt`, `==` pins; tests use `requirements-dev.txt`) | |
 | `keycloak/spi/*` | Maven (`pom.xml`) | |
 
 ## 2. Collect
@@ -142,6 +142,9 @@ the range in `package.json`, and the image tag for a container — and compare i
 every published advisory's vulnerable range. Do not filter by publication date: an advisory
 from months ago whose range still covers the shipped version is still a finding, and a date
 filter would make this pass depend on when it last ran.
+
+`functions/` Node units have no lockfile: what ships is the newest version the
+`package.json` range admits at deploy time (`npm view '<pkg>@<range>' version | tail -1`).
 
 **Second check, for the fix that ships without an advisory.** Not every security fix gets
 one; some land in a release with a line in the changelog and nothing else. For each
@@ -285,8 +288,12 @@ Then apply the bump with the manager that owns the manifest:
   direct deps. For transitive-only, add or raise a `resolutions` entry in
   `frontend-nx/package.json`, then `cd frontend-nx && yarn install --mode=update-lockfile`.
   Never hand-edit `yarn.lock`.
-- **npm**: in the function directory, `npm install <pkg>@<version>`, or
-  `npm install <pkg>@<version> --package-lock-only` for transitive-only.
+- **npm** (`functions/<name>/`): there is no committed lockfile, so the shipped version is
+  whatever the `package.json` range resolves to on the day of the deploy. For a direct
+  dependency, raise the range in `package.json` so it excludes the vulnerable versions.
+  A transitive-only fix cannot be pinned there without a lockfile: add an `overrides`
+  entry to that unit's `package.json`, or move it to NEEDS-MANUAL-DECISION. Do not
+  commit a `package-lock.json` (it is gitignored).
 - **pip**: edit the pin in `requirements.txt`.
 - **Maven**: bump the `<version>` in the relevant `pom.xml`.
 - **Keycloak** (`keycloak/spi/matrix-handle-listener`): the pom alone remediates **nothing**.
@@ -343,7 +350,11 @@ If a check fails **because of** a bump, revert that one bump, move it to
 NEEDS-MANUAL-DECISION with the error quoted, and re-verify. Never open a PR with a red build
 you already know about.
 
-If a `functions/` directory changed, at minimum confirm `npm ci` resolves there.
+If a `functions/` directory changed, reproduce `.github/workflows/functions-code-checks.yml`
+for that unit: `npm install && npm test` in `functions/callNodeFunction` (run
+`npm install` in `functions/sendMail` first; its tests run from there), or
+`pip install -r requirements-dev.txt && pytest` for a Python unit. For another Node unit,
+at minimum confirm `npm install` resolves there.
 
 ## 6. One PR
 
