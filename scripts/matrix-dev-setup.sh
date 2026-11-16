@@ -192,6 +192,7 @@ set_env MATRIX_ADMIN_USER_ID "@$BOT_LOCALPART:$SERVER_NAME"
 set_env MATRIX_ELEMENT_CLIENT_URL "http://localhost:8088"
 set_env NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL "http://localhost:8088"
 set_env NEXT_PUBLIC_MATRIX_SERVER_NAME "$SERVER_NAME"
+set_env NEXT_PUBLIC_MATRIX_HOMESERVER_URL "$HOMESERVER_URL"
 compose up -d node_functions frontend-nx 2>&1 | grep -E 'Recreated|Started' | sed 's/^/  /' || true
 
 echo "Done. Log in to Element at http://localhost:8088 with a local EduHub user."
