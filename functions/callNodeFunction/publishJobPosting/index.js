@@ -1,5 +1,6 @@
 import Stripe from 'stripe';
 import { applyConditionalBlocks } from '../lib/conditionalBlocks.js';
+import { escapeHtml } from '../lib/html.js';
 import { gql } from 'graphql-request';
 
 import {
@@ -213,14 +214,8 @@ const JOB_POSTING_TYPE_LABELS = {
   PERMANENT: 'Festanstellung',
 };
 
-export function escapeHtml(value) {
-  return String(value)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
+// Re-exported for the existing tests.
+export { escapeHtml };
 
 // Shared with the session-change mails; re-exported for the existing tests.
 export { applyConditionalBlocks };

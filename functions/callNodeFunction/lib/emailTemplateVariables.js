@@ -1,6 +1,7 @@
 import { applyConditionalBlocks } from './conditionalBlocks.js';
 import { describeCourseSchedule } from './courseSchedule.js';
 import * as config from './config.js';
+import { escapeHtml as escapeHtmlString } from './html.js';
 
 /**
  * Centralized Email Template Variables System
@@ -45,16 +46,9 @@ export function formatSubmissionDeadlineForEmail(value) {
 }
 
 export function escapeHtml(text) {
-  if (!text || typeof text !== 'string') {
-    return text || '';
-  }
-  
-  return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
+  // Empty values (null, undefined, '', 0) render as nothing in a template.
+  if (!text) return '';
+  return escapeHtmlString(text);
 }
 
 /**
