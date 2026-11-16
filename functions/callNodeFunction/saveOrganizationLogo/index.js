@@ -1,9 +1,10 @@
-import { GraphQLClient, gql } from 'graphql-request';
+import { gql } from 'graphql-request';
 import { Storage } from '@google-cloud/storage';
 
 import { saveImageUnchecked } from '../saveImage/index.js';
 import { buildCloudStorage } from '../lib/cloud-storage.js';
 import { authorizeOrganizationAdminFieldChange } from '../lib/organizationAdminFieldAuthorization.js';
+import { createHasuraClient } from '../lib/hasura.js';
 
 /**
  * Uploads an organization's logo, for the people entitled to change it, and
@@ -75,9 +76,7 @@ export default async function saveOrganizationLogo(req, logger) {
       };
     }
 
-    const client = new GraphQLClient(process.env.HASURA_ENDPOINT, {
-      headers: { 'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET },
-    });
+    const client = createHasuraClient();
 
     const authorization = await authorizeOrganizationAdminFieldChange(client, {
       sessionUserId,
