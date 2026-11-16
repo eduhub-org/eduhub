@@ -177,9 +177,9 @@
     Normally sent at checkout.session.completed or on invoice.finalized; this
     sweep covers the case where neither fired (most plausibly because
     invoice.finalized is not enabled on the Stripe endpoint), so an employer
-    never pays without hearing anything. Note the headers differ from the Python
-    crons - callNodeFunction dispatches on name/secret, not
-    Function-Name/Hasura-Secret.
+    never pays without hearing anything. The legacy name/secret headers are
+    still accepted by callNodeFunction alongside Function-Name/Hasura-Secret
+    until docs/plans/functions-header-switch.md is done.
 - name: sync_formbricks_responses
   webhook: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
   schedule: 20 2 * * *
