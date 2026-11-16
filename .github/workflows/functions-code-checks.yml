@@ -71,6 +71,12 @@ jobs:
         working-directory: functions/callNodeFunction
         run: npm test
 
+      # JSDoc type check of the dispatcher and typed lib/ modules. TypeScript
+      # is pinned here, not added to the unit's dependencies.
+      - name: tsc (callNodeFunction, checkJs)
+        working-directory: functions/callNodeFunction
+        run: npx --yes -p typescript@5.9.3 tsc -p tsconfig.json
+
       - name: node --test (functions/shared)
         run: node --test 'shared/*.test.js'
 
