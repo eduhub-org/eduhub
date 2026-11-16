@@ -1,5 +1,5 @@
 import { logger } from "../lib/logger.js";
-import axios from "axios";
+import { http } from "../lib/http.js";
 import { computeMatrixHandle } from "../lib/matrixHandle.js";
 import { mergeUserPutPayload } from "../shared/keycloakUserMerge.js";
 import * as config from "../lib/config.js";
@@ -7,7 +7,7 @@ import { getKeycloakToken } from "../lib/keycloak.js";
 
 const updateKeycloakUser = async (userId, updatedFields, token) => {
   try {
-    await axios.put(
+    await http.put(
       `${config.keycloakConfig().url}/admin/realms/edu-hub/users/${userId}`,
       updatedFields,
       {
@@ -117,7 +117,7 @@ const updateKeycloakUserHandler = async (req) => {
 
     let userResponse;
     try {
-      userResponse = await axios.get(
+      userResponse = await http.get(
         `${config.keycloakConfig().url}/admin/realms/edu-hub/users/${userId}`,
         { headers: { Authorization: `Bearer ${keycloakToken}` } }
       );

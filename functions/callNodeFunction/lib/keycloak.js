@@ -1,4 +1,4 @@
-import axios from 'axios';
+import { http } from './http.js';
 import { keycloakConfig } from './config.js';
 import { logger } from './logger.js';
 
@@ -10,7 +10,7 @@ import { logger } from './logger.js';
 export const getKeycloakToken = async () => {
   const { url, username, password } = keycloakConfig();
   try {
-    const response = await axios.post(
+    const response = await http.post(
       `${url}/realms/master/protocol/openid-connect/token`,
       new URLSearchParams({
         grant_type: 'password',

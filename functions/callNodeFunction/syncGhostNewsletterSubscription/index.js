@@ -1,4 +1,4 @@
-import axios from 'axios';
+import { http, isNetworkError } from '../lib/http.js';
 import { gql } from 'graphql-request';
 import { createHasuraClient } from '../lib/hasura.js';
 import { decryptOrganizationCredential } from '../lib/organizationCredential.js';
@@ -47,7 +47,7 @@ const callGhostSyncEndpoint = async ({ subscription, userEmail, subscribe }) => 
   let lastError;
   for (let attempt = 0; attempt < MAX_GHOST_SYNC_RETRIES; attempt += 1) {
     try {
-      const response = await axios.post(endpoint, payload, {
+      const response = await http.post(endpoint, payload, {
         timeout: 15000,
         validateStatus: () => true,
         headers: {
@@ -78,13 +78,7 @@ const callGhostSyncEndpoint = async ({ subscription, userEmail, subscribe }) => 
         remoteStatus: response.data?.status || null,
       };
     } catch (err) {
-      const isNetwork =
-        !err.response &&
-        (err.code === 'ECONNABORTED' ||
-          err.code === 'ETIMEDOUT' ||
-          err.code === 'ECONNRESET' ||
-          err.message === 'Network Error');
-      if (isNetwork && attempt < MAX_GHOST_SYNC_RETRIES - 1) {
+      if (isNetworkError(err) && attempt < MAX_GHOST_SYNC_RETRIES - 1) {
         await new Promise((r) => setTimeout(r, 1000 * 2 ** attempt));
         lastError = err;
         continue;

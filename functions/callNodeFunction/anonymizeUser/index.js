@@ -4,7 +4,7 @@ import { buildCloudStorage } from '../lib/cloud-storage.js';
 import { getKeycloakToken } from '../lib/keycloak.js';
 import { unsubscribeForAccountDeletion } from '../syncGhostNewsletterSubscription/index.js';
 import { deactivateMatrixUser, getMatrixDeactivationConfig, toMatrixUserId } from '../lib/matrixInvite.js';
-import axios from 'axios';
+import { http } from '../lib/http.js';
 import path from 'node:path';
 import { GET_DELETION_DATA, ERASE_PERSONAL_DATA, getErasureVariables } from './personalData.js';
 import * as appConfig from '../lib/config.js';
@@ -134,7 +134,7 @@ async function eraseAccount(req, logger, userId) {
     // Last: preserve a working session for retries until all cleanup has landed.
     const token = await getKeycloakToken();
     try {
-      await axios.delete(`${appConfig.keycloakConfig().url}/admin/realms/edu-hub/users/${userId}`, {
+      await http.delete(`${appConfig.keycloakConfig().url}/admin/realms/edu-hub/users/${userId}`, {
         headers: { Authorization: `Bearer ${token}` },
         timeout: KEYCLOAK_TIMEOUT_MS,
       });
