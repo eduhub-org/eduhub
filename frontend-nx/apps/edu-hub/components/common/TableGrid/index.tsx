@@ -178,6 +178,7 @@ const TableGrid = <T extends BaseRow,>({
   rowHref,
   onRowNavigate,
   canDeleteRow,
+  deleteButtonTooltip,
   showDeleteForRow,
   canExpandRow,
   rowClassName,
@@ -883,6 +884,7 @@ const TableGrid = <T extends BaseRow,>({
       refetchQueries={refetchQueries}
       onDeleted={() => deselectRow(row.id)}
       label={label}
+      tooltip={deleteButtonTooltip?.(row)}
     />
   );
 

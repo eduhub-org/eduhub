@@ -128,10 +128,28 @@ export const DELETE_PROJECT_MENTOR = gql`
   }
 `;
 
-export const DELETE_PROJECT = gql`
-  mutation DeleteProject($id: Int!) {
-    delete_Project_by_pk(id: $id) {
+export const REMOVE_PROJECT_FROM_COURSE = gql`
+  # Removes the project from one course only. The database deletes the project
+  # once no course lists it any more, and refuses either for a passed project.
+  mutation RemoveProjectFromCourse($projectId: Int!, $courseId: Int!) {
+    delete_ProjectCourse(
+      where: { projectId: { _eq: $projectId }, courseId: { _eq: $courseId } }
+    ) {
+      affected_rows
+    }
+  }
+`;
+
+export const PROJECT_COURSES_BY_COURSE = gql`
+  # Every course each project of this course is listed in, via the computed
+  # field, since an organizer only sees the listings of their own courses.
+  query ProjectCoursesByCourse($courseId: Int!) {
+    Project(where: { ProjectCourses: { courseId: { _eq: $courseId } } }) {
       id
+      courses {
+        id
+        title
+      }
     }
   }
 `;

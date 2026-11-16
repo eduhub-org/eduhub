@@ -32,6 +32,25 @@ The email template variable system is centralized in `emailTemplateVariables.js`
   - Example: `20. März 2024` (German locale) or `March 20, 2024` (US locale)
   - Shows: `TBD` if not set
 
+- **`[Course:DateTime]`**: When the course takes place, from its Sessions, in
+  numeric Berlin time so it reads right in the German and the English half
+  - One Session: `26.11.2026, 18:00–20:00` (both full timestamps when it ends on another day)
+  - Several Sessions: first to last date, `14.01.2027 – 25.03.2027` (or one day
+    with first start and last end when they all fall on it)
+  - No Sessions: the course start date, `03.07.2027`; empty without one
+
+- **`[Course:LocationList]`**: Bulleted list of every place the course's
+  Sessions take place at, each once: the location with its venue, or just
+  `Online` (never the meeting link)
+  - Example: `<ul><li>Kiel – ZBW (Düsternbrooker Weg 120, 24105 Kiel)</li><li>Online</li></ul>`
+
+- **Conditional blocks** in all enrollment emails:
+  `[#if:CourseDateTime]…[/if:CourseDateTime]` (a date is known),
+  `[#if:CourseLocation]…[/if:CourseLocation]` (a place is known),
+  `[#if:Online]…[/if:Online]` (one of the places is online),
+  `[#if:Calendar]…[/if:Calendar]` (this mail carries the course's `.ics` file;
+  only the confirmation mails do, and only when the course has Sessions)
+
 ### Enrollment Variables
 *Available in: enrollment emails*
 
