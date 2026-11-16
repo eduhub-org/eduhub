@@ -1,4 +1,4 @@
-import { logger } from "../index.js";
+import { logger } from "../lib/logger.js";
 import axios from "axios";
 import { computeMatrixHandle } from "../lib/matrixHandle.js";
 import { mergeUserPutPayload } from "../shared/keycloakUserMerge.js";

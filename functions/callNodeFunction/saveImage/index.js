@@ -2,7 +2,7 @@ import { Storage } from "@google-cloud/storage";
 import { buildCloudStorage } from "../lib/cloud-storage.js";
 import { replacePlaceholders } from "../lib/utils.js";
 import { sanitizeStoredFileName } from "../lib/fileName.js";
-import { logger } from "../index.js";
+import { logger } from "../lib/logger.js";
 import { authorizeUpload } from "../lib/uploadAuthorization.js";
 import sharp from "sharp";
 import path from "path";

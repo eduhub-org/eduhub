@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { getKeycloakToken } from '../lib/utils.js';
-import { logger } from '../index.js';
+import { logger } from '../lib/logger.js';
 import * as config from '../lib/config.js';
 
 const updateAdminUser = async (req) => {

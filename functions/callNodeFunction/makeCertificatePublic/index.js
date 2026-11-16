@@ -1,6 +1,6 @@
 import { Storage } from "@google-cloud/storage";
 import { buildCloudStorage } from "../lib/cloud-storage.js";
-import { logger } from "../index.js";
+import { logger } from "../lib/logger.js";
 
 /**
  * Makes a certificate file public in cloud storage and returns the public URL.

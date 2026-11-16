@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { logger } from '../index.js';
+import { logger } from './logger.js';
 import * as config from './config.js';
 
 export function replacePlaceholders(str, values) {

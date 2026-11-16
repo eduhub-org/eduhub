@@ -1,4 +1,3 @@
-import winston from "winston";
 import getSignedUrl from "./getSignedUrl/index.js";
 import saveFile from "./saveFile/index.js";
 import saveImage from "./saveImage/index.js";
@@ -52,22 +51,8 @@ import syncRausgegangenEvent from "./syncRausgegangenEvent/index.js";
 import searchRausgegangenLocations from "./searchRausgegangenLocations/index.js";
 import geocodeLocationAddress from "./geocodeLocationAddress/index.js";
 import { constantTimeSecretsEqual } from "./shared/security.js";
-
-/**
- * Creates a logger instance with structured logging.
- */
-export const logger = winston.createLogger({
-  level: process.env.ENVIRONMENT === "production" ? "info" : "debug",
-  format: winston.format.combine(
-    winston.format.timestamp(),
-    winston.format.errors({ stack: true }),
-    winston.format.splat(),
-    winston.format.json()  // Changed to JSON format for better structured logging
-  ),
-  // Console only: Cloud Logging parses the JSON lines (jsonPayload.level),
-  // and a file transport would just fill the instance's in-memory disk.
-  transports: [new winston.transports.Console()],
-});
+import { cloudFunctionSecret } from "./lib/config.js";
+import { logger } from "./lib/logger.js";
 
 const functionMap = {
   getSignedUrl,
@@ -135,7 +120,7 @@ const constantTimeEquals = (providedSecret, expectedSecret) => {
  * @returns {Object} Validation result
  */
 const validateSecret = (hasuraSecret) => {
-  const hasuraCloudFunctionSecret = process.env.HASURA_CLOUD_FUNCTION_SECRET;
+  const hasuraCloudFunctionSecret = cloudFunctionSecret();
 
   if (!hasuraCloudFunctionSecret || typeof hasuraCloudFunctionSecret !== "string" || hasuraCloudFunctionSecret.trim() === "") {
     return {
