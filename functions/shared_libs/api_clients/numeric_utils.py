@@ -1,10 +1,10 @@
 """Numeric helpers shared by the python cloud functions.
 
-Lives inside ``api_clients`` because the release workflow
-(.github/workflows/zip-and-store-cloud-functions.yml) copies exactly
-``shared_libs/api_clients`` into each python function bundle - a module placed
-anywhere else in ``shared_libs`` works locally and raises ImportError in
-production.
+Lives inside ``api_clients`` because each python function links exactly
+``shared_libs/api_clients`` (a committed ``api_clients`` symlink, dereferenced
+by the zip step in .github/workflows/zip-and-store-cloud-functions.yml) - a
+module placed anywhere else in ``shared_libs`` works locally and raises
+ImportError in production.
 """
 
 

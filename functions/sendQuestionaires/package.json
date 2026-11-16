@@ -17,6 +17,6 @@
   },
   "scripts": {
     "watch": "npm-watch start",
-    "start": "npx @google-cloud/functions-framework --port 42024 --target=sendQuestionaires"
+    "start": "npx @google-cloud/functions-framework --target=sendQuestionaires"
   }
 }

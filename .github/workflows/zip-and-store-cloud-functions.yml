@@ -42,7 +42,12 @@ jobs:
       - name: Check Out the Repository Branch
         uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
 
-      - name: Replace symlinks with actual files
+      # One archive per unit in <CLOUD_FUNCTION_FOLDER>/units.json, which
+      # functions/dev.js reads too. Shared code reaches a unit through a
+      # committed symlink (Node: ./shared -> ../shared, Python: ./api_clients
+      # -> ../shared_libs/api_clients). zip stores the files a symlink points
+      # to unless given -y/--symlinks, so each archive holds real copies.
+      - name: Zip one archive per cloud function
         env:
           CF_FOLDER: ${{ inputs.CLOUD_FUNCTION_FOLDER }}
         run: |
@@ -53,35 +58,23 @@ jobs:
           resolved=$(cd "${GITHUB_WORKSPACE}/${CF_FOLDER}" 2>/dev/null && pwd)
           if [[ -z "${resolved}" || "${resolved}" != "${GITHUB_WORKSPACE}"/* ]]; then echo "CLOUD_FUNCTION_FOLDER resolves outside workspace"; exit 1; fi
 
-          # Remove symlinks and copy actual files for apiProxy
-          rm -f ./${CF_FOLDER}/apiProxy/api_clients
-          cp -r ./${CF_FOLDER}/shared_libs/api_clients ./${CF_FOLDER}/apiProxy/
-
-          # Remove symlinks and copy actual files for callPythonFunction
-          rm -f ./${CF_FOLDER}/callPythonFunction/api_clients
-          cp -r ./${CF_FOLDER}/shared_libs/api_clients ./${CF_FOLDER}/callPythonFunction/
-
-          # Node units link functions/shared as ./shared; `zip -r` below
-          # follows that symlink and stores real files.
-
-      # Same eight archives as before, built with plain `zip -r` per unit
-      # (previously one thedoctor0/zip-release step each, no exclusions).
-      - name: Zip one archive per cloud function
-        env:
-          CF_FOLDER: ${{ inputs.CLOUD_FUNCTION_FOLDER }}
-        run: |
-          set -euo pipefail
           out="${GITHUB_WORKSPACE}/cloud-function-zips"
           mkdir -p "${out}"
-          for unit in callPythonFunction sendMail updateFromKeycloak \
-            addKeycloakRole removeKeycloakRole callNodeFunction \
-            sendQuestionaires apiProxy; do
+          mapfile -t units < <(jq -r '.[].name' "${resolved}/units.json")
+          if [[ ${#units[@]} -eq 0 ]]; then echo "units.json lists no units"; exit 1; fi
+          for unit in "${units[@]}"; do
+            if [[ ! "${unit}" =~ ^[A-Za-z0-9_-]+$ ]]; then echo "bad unit name: ${unit}"; exit 1; fi
             (
-              cd "./${CF_FOLDER}/${unit}"
+              cd "${resolved}/${unit}"
               zip -q -r "${out}/${unit}.zip" . \
                 -x 'node_modules/*' '*/node_modules/*' \
                 '__pycache__/*' '*/__pycache__/*' '.venv/*'
             )
+            # A symlink left in an archive would deploy as a dangling link.
+            links=$(zipinfo "${out}/${unit}.zip" | grep -c '^l' || true)
+            if [[ "${links}" != 0 ]]; then
+              echo "${unit}.zip contains ${links} symlink(s)"; exit 1
+            fi
           done
           ls -l "${out}"
 

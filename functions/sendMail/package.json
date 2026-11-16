@@ -18,6 +18,6 @@
   },
   "scripts": {
     "watch": "npm-watch start",
-    "start": "npx @google-cloud/functions-framework --port 42019 --target=sendMail"
+    "start": "npx @google-cloud/functions-framework --target=sendMail"
   }
 }

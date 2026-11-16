@@ -1,4 +1,5 @@
 import ast
+import json
 import os
 import subprocess
 from flask import Flask, request
@@ -89,7 +90,16 @@ def handle_api_proxy(subpath):
     return api_proxy_module.handle_request(request)
 
 
+def unit_ports():
+    """Ports of the python units, from units.json (shared with dev.js and
+    the zip workflow)."""
+    units_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "units.json")
+    with open(units_path, encoding="utf-8") as f:
+        return {u["name"]: u["port"] for u in json.load(f) if u["runtime"] == "python"}
+
+
 def main():
+    ports = unit_ports()
     # Get the current PYTHONPATH
     python_path = os.environ.get('PYTHONPATH', '')
     current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -100,12 +110,12 @@ def main():
 
     # Start the main Flask server in a separate process
     main_process = subprocess.Popen([sys.executable, '-c',
-        'from dev import app; app.run(host="0.0.0.0", port=42025, debug=True)'],
+        f'from dev import app; app.run(host="0.0.0.0", port={ports["callPythonFunction"]}, debug=True)'],
         env=env)
     
     # Start the API proxy Flask server in a separate process
     api_process = subprocess.Popen([sys.executable, '-c',
-        'from dev import api_proxy_app; api_proxy_app.run(host="0.0.0.0", port=42026, debug=True)'],
+        f'from dev import api_proxy_app; api_proxy_app.run(host="0.0.0.0", port={ports["apiProxy"]}, debug=True)'],
         env=env)
     
     try:

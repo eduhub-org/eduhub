@@ -17,6 +17,6 @@
   },
   "scripts": {
     "watch": "npm-watch start",
-    "start": "npx @google-cloud/functions-framework --port 42000 --target=addKeycloakRole"
+    "start": "npx @google-cloud/functions-framework --target=addKeycloakRole"
   }
 }

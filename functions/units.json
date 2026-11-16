@@ -1,0 +1,10 @@
+[
+  { "name": "callNodeFunction", "runtime": "node", "entryPoint": "callNodeFunction", "port": 42022 },
+  { "name": "sendMail", "runtime": "node", "entryPoint": "sendMail", "port": 42019 },
+  { "name": "updateFromKeycloak", "runtime": "node", "entryPoint": "updateFromKeycloak", "port": 42020 },
+  { "name": "addKeycloakRole", "runtime": "node", "entryPoint": "addKeycloakRole", "port": 42000 },
+  { "name": "removeKeycloakRole", "runtime": "node", "entryPoint": "removeKeycloakRole", "port": 42002 },
+  { "name": "sendQuestionaires", "runtime": "node", "entryPoint": "sendQuestionaires", "port": 42024 },
+  { "name": "callPythonFunction", "runtime": "python", "entryPoint": "call_python_function", "port": 42025 },
+  { "name": "apiProxy", "runtime": "python", "entryPoint": "handle_request", "port": 42026 }
+]
