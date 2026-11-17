@@ -260,6 +260,11 @@ jobs:
         working-directory: ./infrastructure/application
 
     steps:
+      - name: Harden the runner
+        uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
+        with:
+          egress-policy: audit
+
       # `always()` above keeps this job running when a build job is skipped
       # (and on PRs, where the zip job is skipped by design). It must not
       # apply after failed function checks: the zips were not refreshed.
