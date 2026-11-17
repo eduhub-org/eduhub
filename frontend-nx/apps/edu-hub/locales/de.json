@@ -1186,7 +1186,7 @@
       "instructor": "Dozent",
       "applications": "Bewerbungen",
       "confirmed": "Bestätigt",
-      "applications_confirmed": "Bewerbungen\u00a0/ Bestätigt",
+      "applications_confirmed": "Bewerbungen / Bestätigt",
       "last_session_attendance": "Anwesenheit letzter erfasster Termin",
       "last_session_attendance_hint": "{title} am {date}",
       "unrated_rated_not_informed": "Unbewertet / Bewertet aber nicht informiert",
@@ -1716,15 +1716,12 @@
       },
       "actions": {
         "confirm_project": "Projekt bestätigen",
-        "delete_template": "Vorlage löschen",
         "review": "Bewerten",
         "evaluate_project": "Projekt beurteilen",
         "evaluate_disabled_tooltip": "Sobald das Projekt eingereicht wurde, kannst du es hier bewerten.",
         "suggest_for_publication": "Zur Veröffentlichung vorschlagen",
         "withdraw_publication_suggestion": "Vorschlag zurückziehen"
       },
-      "delete_template_confirmation": "Die Projektvorlage \"{title}\" wirklich löschen? Das kann nicht rückgängig gemacht werden.",
-      "delete_template_disabled_tooltip": "Du kannst diese Vorlage nicht löschen, solange mindestens eine daraus erstellte Kopie in diesem Kurs existiert.",
       "expanded": {
         "tagline": "Untertitel",
         "documentation_link": "Dokumentation öffnen",
@@ -1894,7 +1891,13 @@
             "CLASSIC_PROJECT": "Klassisches Projekt – Teilnehmende bilden ein Team, das Du vor Arbeitsbeginn bestätigst."
           }
         }
-      }
+      },
+      "delete_confirmation": "Das Projekt \"{title}\" wirklich löschen? Das kann nicht rückgängig gemacht werden.",
+      "delete_confirmation_authors": "Die Arbeit von {names} geht dabei verloren.",
+      "delete_confirmation_copies": "{count, plural, one {Die # daraus erstellte Kopie bleibt als eigenständiges Projekt bestehen, ihr Titel ist dann nicht mehr gesperrt.} other {Die # daraus erstellten Kopien bleiben als eigenständige Projekte bestehen, ihre Titel sind dann nicht mehr gesperrt.}}",
+      "remove_from_course_confirmation": "Das Projekt \"{title}\" aus diesem Kurs entfernen? Es bleibt weiterhin in: {courses}.",
+      "delete_passed_disabled_tooltip": "Bestandene Projekte können nicht gelöscht werden.",
+      "delete_courses_unavailable_tooltip": "Die Kurse dieses Projekts sind noch nicht geladen. Lade die Seite neu, falls das so bleibt."
     },
     "attendance_cert_issued": "Teilnahmebescheinigung ausgestellt",
     "attendance_cert_not_issued": "Keine Teilnahmebescheinigung ausgestellt",
