@@ -1,5 +1,25 @@
 import { DEFAULT_MATRIX_SERVER_NAME, elementDirectMessageUrl, toMatrixUserId } from './matrix';
 
+// elementDirectMessageUrl defaults its parameters to these variables, so an
+// explicit `undefined` reads them. Run every test without them, as in CI, so
+// a local .env with the Matrix stack configured does not change the results.
+const MATRIX_ENV = ['NEXT_PUBLIC_MATRIX_SERVER_NAME', 'NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL'] as const;
+const savedEnv: Partial<Record<(typeof MATRIX_ENV)[number], string>> = {};
+
+beforeEach(() => {
+  MATRIX_ENV.forEach((name) => {
+    savedEnv[name] = process.env[name];
+    delete process.env[name];
+  });
+});
+
+afterEach(() => {
+  MATRIX_ENV.forEach((name) => {
+    if (savedEnv[name] === undefined) delete process.env[name];
+    else process.env[name] = savedEnv[name];
+  });
+});
+
 describe('toMatrixUserId', () => {
   it('qualifies a bare localpart with the server name', () => {
     expect(toMatrixUserId('nina.petersen.ab12cd', 'matrix.opencampus.sh')).toBe(
