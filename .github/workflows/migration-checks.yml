@@ -1,0 +1,56 @@
+name: Migration Checks
+
+# Hasura's cli-migrations image refuses to start when two migration folders
+# share a version prefix ("found duplicate migrations for version ..."). Catch
+# that before it reaches a deploy.
+
+on:
+  push:
+    paths:
+      - backend/migrations/**
+    branches:
+      - develop
+      - staging
+      - production
+  pull_request:
+    paths:
+      - backend/migrations/**
+    types: [opened, synchronize, reopened]
+
+jobs:
+  unique-versions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+
+    steps:
+      - name: Harden the runner
+        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c # v2.21.0
+        with:
+          egress-policy: audit
+
+      - name: Checkout project
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+
+      - name: Check for duplicate migration versions
+        working-directory: backend/migrations/default
+        run: |
+          duplicates="$(find . -mindepth 1 -maxdepth 1 -type d -printf '%f\n' \
+            | cut -d_ -f1 | sort | uniq -d)"
+
+          if [ -z "${duplicates}" ]; then
+            echo "All migration versions are unique."
+            exit 0
+          fi
+
+          echo "Duplicate Hasura migration versions found:"
+          for version in ${duplicates}; do
+            echo "::error title=Duplicate migration version ${version}::Folders sharing version ${version}: $(ls -d "${version}"_* | tr '\n' ' ')"
+            ls -d "${version}"_* | sed 's/^/  /'
+          done
+          echo
+          echo "Hasura will refuse to start with duplicate versions. Rename the"
+          echo "new migration folder to a fresh timestamp (date +%s%3N) newer"
+          echo "than every existing migration on the target branch."
+          exit 1

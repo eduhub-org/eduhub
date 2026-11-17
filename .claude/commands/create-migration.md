@@ -27,6 +27,12 @@ backend/migrations/default/{timestamp}_{verb}_{description}/
   down.sql
 ```
 
+The version (timestamp prefix) must be unique **and** newer than every
+existing migration on the target branch — Hasura refuses to start if two
+folders share a version. Re-check after merging `develop` into your branch
+(`ls backend/migrations/default | cut -d_ -f1 | sort | uniq -d` must print
+nothing); the `Migration Checks` CI workflow enforces this.
+
 Verbs follow existing patterns: `create_table_public_{Name}`,
 `alter_table_public_{Name}_add_column_{column}`,
 `drop_table_public_{Name}`, `set_fk_public_{Name}_{column}`.

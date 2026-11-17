@@ -29,8 +29,13 @@ Examples:
 
 ```text
 backend/migrations/default/1753957404053_add_column_status_to_mail_log/
-backend/migrations/default/1753957404053_create_table_AttendanceAudit/
+backend/migrations/default/1753957404054_create_table_AttendanceAudit/
 ```
+
+Each timestamp must be unique and newer than every existing migration on the
+target branch; Hasura refuses to start on duplicate versions. Re-check after
+merging `develop` (`ls backend/migrations/default | cut -d_ -f1 | sort | uniq -d`
+must print nothing).
 
 ## SQL Expectations
 
