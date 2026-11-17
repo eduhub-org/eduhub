@@ -32,12 +32,20 @@ def test_missing_server_secret_is_a_server_error(monkeypatch):
     body, status = _call({"Hasura-Secret": SECRET})
     assert status == 500
     assert body["messageKey"] == "SERVER_MISCONFIGURED"
+    assert body["message"] == body["error"]
+    assert body["extensions"] == {"code": "SERVER_MISCONFIGURED"}
 
 
 def test_missing_secret_header_is_unauthorized():
     body, status = _call()
     assert status == 401
-    assert body == {"success": False, "error": "Missing Hasura secret", "messageKey": "MISSING_SECRET"}
+    assert body == {
+        "success": False,
+        "error": "Missing Hasura secret",
+        "messageKey": "MISSING_SECRET",
+        "message": "Missing Hasura secret",
+        "extensions": {"code": "MISSING_SECRET"},
+    }
 
 
 @pytest.mark.parametrize("provided", ["wrong", "", "ä" + SECRET])
@@ -45,12 +53,16 @@ def test_wrong_secret_is_unauthorized(provided):
     body, status = _call({"Hasura-Secret": provided})
     assert status == 401
     assert body["messageKey"] == "INVALID_SECRET"
+    assert body["message"] == "Invalid secret"
+    assert body["extensions"] == {"code": "INVALID_SECRET"}
 
 
 def test_unknown_function_is_not_found():
     body, status = _call({"Hasura-Secret": SECRET})
     assert status == 404
     assert body["messageKey"] == "FUNCTION_NOT_FOUND"
+    assert body["message"] == "Function not found"
+    assert body["extensions"] == {"code": "FUNCTION_NOT_FOUND"}
 
 
 def test_missing_function_name_is_not_found():
@@ -118,7 +130,15 @@ def test_retryable_trigger_failure_is_unavailable(handler, payload):
     handler.result = RETRYABLE
     body, status = _call(HEADERS, data=json.dumps(payload))
     assert status == 503
-    assert body == RETRYABLE
+    assert body == {**RETRYABLE, "message": "mailgun down"}
+
+
+def test_retryable_failure_keeps_its_message_key_as_extensions_code(handler):
+    handler.result = {**RETRYABLE, "messageKey": "MAIL_DOWN"}
+    body, status = _call(HEADERS, data=json.dumps({"event": {"op": "INSERT"}}))
+    assert status == 503
+    assert body["message"] == "mailgun down"
+    assert body["extensions"] == {"code": "MAIL_DOWN"}
 
 
 def test_retryable_failure_of_an_action_is_ok(handler):

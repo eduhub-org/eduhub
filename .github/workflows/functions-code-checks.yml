@@ -57,15 +57,19 @@ jobs:
 
       # Every Node unit commits its own package-lock.json (Cloud Functions
       # builds each zip on its own, so there is no shared root lockfile).
-      # sendMail's suites run under callNodeFunction's Jest config (roots
-      # include ../sendMail) and need sendMail's own dependencies.
-      - name: Install sendMail dependencies
-        working-directory: functions/sendMail
-        run: npm ci --no-audit --no-fund
-
-      - name: Install callNodeFunction dependencies
-        working-directory: functions/callNodeFunction
-        run: npm ci --no-audit --no-fund
+      # Install all of them, so a broken lockfile in any deployed unit fails
+      # here. sendMail's suites run under callNodeFunction's Jest config
+      # (roots include ../sendMail) and need sendMail's own dependencies.
+      # Units with a `source` field are built from another unit's directory.
+      - name: Install dependencies of every Node unit (functions/units.json)
+        run: |
+          set -euo pipefail
+          jq -r '.[] | select(.runtime == "node" and (has("source") | not)) | .name' units.json |
+            while read -r unit; do
+              echo "::group::npm ci (${unit})"
+              (cd "${unit}" && npm ci --no-audit --no-fund)
+              echo "::endgroup::"
+            done
 
       - name: Jest (callNodeFunction + sendMail)
         working-directory: functions/callNodeFunction

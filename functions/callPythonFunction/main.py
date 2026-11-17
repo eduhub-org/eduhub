@@ -44,6 +44,31 @@ PYTHON_FUNCTIONS: Dict[str, Callable] = {
     "update_enrollment_locations": update_enrollment_locations,
 }
 
+
+def _error_body(error, message_key):
+    """Body of a non-2xx response.
+
+    Hasura surfaces only `message` (and `extensions`) of an action handler's
+    non-2xx response; existing callers and tests read the other fields.
+    """
+    return {
+        "success": False,
+        "error": error,
+        "messageKey": message_key,
+        "message": error,
+        "extensions": {"code": message_key},
+    }
+
+
+def _with_hasura_error_fields(body):
+    """Add `message`/`extensions` to a handler's non-2xx body if missing."""
+    body = dict(body)
+    body.setdefault("message", str(body.get("error") or "Function failed"))
+    if "extensions" not in body and body.get("messageKey"):
+        body["extensions"] = {"code": body["messageKey"]}
+    return body
+
+
 def call_python_function(request):
     """Call the Python function indicated in the request and return the result.
     Args:
@@ -61,30 +86,20 @@ def call_python_function(request):
         expected_secret = os.environ.get("HASURA_CLOUD_FUNCTION_SECRET")
         if not expected_secret or not expected_secret.strip():
             logging.error("HASURA_CLOUD_FUNCTION_SECRET is not configured")
-            return jsonify({
-                "success": False,
-                "error": "Server secret is not configured.",
-                "messageKey": "SERVER_MISCONFIGURED"
-            }), 500
+            return jsonify(_error_body(
+                "Server secret is not configured.", "SERVER_MISCONFIGURED"
+            )), 500
 
         hasura_secret = request.headers.get("Hasura-Secret")
 
         if hasura_secret is None:
             logging.error("No Hasura secret provided")
-            return jsonify({
-                "success": False,
-                "error": "Missing Hasura secret",
-                "messageKey": "MISSING_SECRET"
-            }), 401
+            return jsonify(_error_body("Missing Hasura secret", "MISSING_SECRET")), 401
 
         # Bytes, so a non-ASCII header cannot make compare_digest raise.
         if not hmac.compare_digest(hasura_secret.encode("utf-8"), expected_secret.encode("utf-8")):
             logging.error("Invalid Hasura secret provided")
-            return jsonify({
-                "success": False,
-                "error": "Invalid secret",
-                "messageKey": "INVALID_SECRET"
-            }), 401
+            return jsonify(_error_body("Invalid secret", "INVALID_SECRET")), 401
 
         function_name = request.headers.get("Function-Name")
         if function_name is None and arguments.get('action', {}).get('name'):
@@ -95,11 +110,7 @@ def call_python_function(request):
 
         if function_name not in PYTHON_FUNCTIONS:
             logging.error(f"Function not found: {function_name}")
-            return jsonify({
-                "success": False,
-                "error": "Function not found",
-                "messageKey": "FUNCTION_NOT_FOUND"
-            }), 404
+            return jsonify(_error_body("Function not found", "FUNCTION_NOT_FOUND")), 404
 
         result = PYTHON_FUNCTIONS[function_name](arguments)
         
@@ -113,8 +124,9 @@ def call_python_function(request):
             is_trigger = isinstance(arguments, dict) and (
                 "event" in arguments or "scheduled_time" in arguments
             )
-            status_code = 503 if is_trigger and result.get("retryable") else 200
-            return jsonify(result), status_code
+            if is_trigger and result.get("retryable"):
+                return jsonify(_with_hasura_error_fields(result)), 503
+            return jsonify(result), 200
             
         # Otherwise, wrap the result in a success response
         return jsonify({
