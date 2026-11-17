@@ -270,7 +270,7 @@ export const sendMail = async (req, res) => {
 
   // Verify the request contains the correct secret header
   if (!secretsMatch(getProvidedSecret(req.headers), expectedSecret)) {
-    return res.status(401).json({ error: 'Unauthorized' });
+    return res.status(401).json({ error: 'Unauthorized', message: 'Unauthorized' });
   }
 
   // Extract email parameters from the Hasura event payload

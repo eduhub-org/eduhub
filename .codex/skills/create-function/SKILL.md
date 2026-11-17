@@ -46,3 +46,5 @@ A handler is not done until all steps are done:
   retries; the side effect must be idempotent.
 - Dispatchers answer 401 (secret), 404 (unknown function), 500 (server
   secret unset), and Node 400 when `Function-Name` and legacy `name` differ.
+- Every non-2xx body also gets `message` (= `error`) and
+  `extensions: { code: messageKey }`; Hasura shows only these for an action.

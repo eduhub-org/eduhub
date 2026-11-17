@@ -27,7 +27,7 @@ export const removeKeycloakRole = async (req, res) => {
   }
 
   if (!secretsMatch(getProvidedSecret(req.headers), expectedSecret)) {
-    return res.status(401).json({ error: 'Unauthorized' });
+    return res.status(401).json({ error: 'Unauthorized', message: 'Unauthorized' });
   }
 
   // DELETE events carry the removed row under `data.old`.
