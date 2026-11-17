@@ -1,15 +1,21 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Direction, EventType, KnownMembership, MatrixClient, MatrixEvent, Room, RoomEvent } from 'matrix-js-sdk';
 
-/** Events the chat shows: messages, and the placeholders left by deleted or encrypted ones. */
-const isShown = (event: MatrixEvent): boolean =>
+import { isEdit, latestEdits } from './messageContent';
+
+const isMessage = (event: MatrixEvent): boolean =>
   event.getType() === EventType.RoomMessage || event.getType() === EventType.RoomMessageEncrypted;
+
+/** Events the chat shows: messages (not their edits) and the placeholders of deleted or encrypted ones. */
+const isShown = (event: MatrixEvent): boolean => isMessage(event) && !isEdit(event);
 
 const OLDER_PAGE_SIZE = 30;
 
 export interface RoomTimeline {
   room: Room | null;
   events: MatrixEvent[];
+  /** Newest edit per original message id, from the loaded timeline. */
+  edits: Map<string, MatrixEvent>;
   joinFailed: boolean;
   /** False once the very first message of the room is loaded. */
   canLoadOlder: boolean;
@@ -27,6 +33,7 @@ export interface RoomTimeline {
 export const useRoomTimeline = (client: MatrixClient, roomId: string): RoomTimeline => {
   const [room, setRoom] = useState<Room | null>(null);
   const [events, setEvents] = useState<MatrixEvent[]>([]);
+  const [edits, setEdits] = useState<Map<string, MatrixEvent>>(new Map());
   const [joinFailed, setJoinFailed] = useState(false);
   const [canLoadOlder, setCanLoadOlder] = useState(true);
   const [loadingOlder, setLoadingOlder] = useState(false);
@@ -65,7 +72,9 @@ export const useRoomTimeline = (client: MatrixClient, roomId: string): RoomTimel
   const refresh = useCallback(() => {
     if (!room) return;
     const timeline = room.getLiveTimeline();
-    setEvents(timeline.getEvents().filter(isShown));
+    const all = timeline.getEvents();
+    setEvents(all.filter(isShown));
+    setEdits(latestEdits(all.filter(isMessage)) as Map<string, MatrixEvent>);
     setCanLoadOlder(timeline.getPaginationToken(Direction.Backward) !== null);
   }, [room]);
 
@@ -112,5 +121,5 @@ export const useRoomTimeline = (client: MatrixClient, roomId: string): RoomTimel
     [client, room]
   );
 
-  return { room, events, joinFailed, canLoadOlder, loadingOlder, loadOlder, send, resend };
+  return { room, events, edits, joinFailed, canLoadOlder, loadingOlder, loadOlder, send, resend };
 };

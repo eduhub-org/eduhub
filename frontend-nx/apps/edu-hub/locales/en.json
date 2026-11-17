@@ -4145,6 +4145,13 @@
     "delete": "Delete",
     "delete_title": "Delete message?",
     "delete_question": "The message is removed for everyone in the chat. This cannot be undone.",
-    "action_failed": "That did not work. You may not have the rights for it in this chat."
+    "action_failed": "That did not work. You may not have the rights for it in this chat.",
+    "edited": "edited",
+    "reply_unavailable": "Original message not available",
+    "image_loading": "Loading image",
+    "image_failed": "The image could not be loaded.",
+    "image_open": "Open full-size image",
+    "unread": "{count, plural, one {# new message} other {# new messages}}",
+    "connect_failed": "The chat could not connect. Check your internet connection and try again."
   }
 }

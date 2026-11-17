@@ -1,10 +1,18 @@
 import { FC } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { MdDeleteOutline, MdOutlinePushPin, MdPushPin } from 'react-icons/md';
-import { EventStatus, EventType, MatrixEvent } from 'matrix-js-sdk';
+import { EventStatus, EventType, MatrixClient, MatrixEvent, Room } from 'matrix-js-sdk';
+
+import MatrixImage from './MatrixImage';
+import ReplyQuote from './ReplyQuote';
+import { displayContent, replyToEventId, stripReplyFallback } from './messageContent';
 
 interface ChatMessageProps {
+  client: MatrixClient;
+  room: Room;
   event: MatrixEvent;
+  /** Newest edit per original message id (see useRoomTimeline). */
+  edits: Map<string, MatrixEvent>;
   senderName: string;
   isOwn: boolean;
   onResend: (event: MatrixEvent) => void;
@@ -21,7 +29,10 @@ const ACTION_BUTTON =
   'inline-flex items-center gap-1 rounded px-1 text-xs text-label-secondary hover:text-brand focus:outline-none focus-visible:ring-2 focus-visible:ring-brand';
 
 const ChatMessage: FC<ChatMessageProps> = ({
+  client,
+  room,
   event,
+  edits,
   senderName,
   isOwn,
   onResend,
@@ -38,8 +49,11 @@ const ChatMessage: FC<ChatMessageProps> = ({
   const fullDate = date ? date.toLocaleString(locale) : undefined;
   const eventId = event.getId();
 
+  const replyTo = replyToEventId(event);
   let body: string;
   let isPlaceholder = false;
+  let edited = false;
+  let imageUrl: string | null = null;
   if (event.isRedacted()) {
     body = t('deleted');
     isPlaceholder = true;
@@ -47,9 +61,16 @@ const ChatMessage: FC<ChatMessageProps> = ({
     body = t('encrypted');
     isPlaceholder = true;
   } else {
-    const content = event.getContent();
-    body = typeof content.body === 'string' ? content.body : t('unsupported');
-    isPlaceholder = typeof content.body !== 'string';
+    const shown = displayContent(event, edits);
+    edited = shown.edited;
+    const { content } = shown;
+    if (content.msgtype === 'm.image' && typeof content.url === 'string') imageUrl = content.url;
+    if (typeof content.body === 'string') {
+      body = replyTo ? stripReplyFallback(content.body) : content.body;
+    } else {
+      body = t('unsupported');
+      isPlaceholder = true;
+    }
   }
 
   const isSending = event.status === EventStatus.SENDING || event.status === EventStatus.QUEUED;
@@ -63,6 +84,7 @@ const ChatMessage: FC<ChatMessageProps> = ({
         <time dateTime={date?.toISOString()} title={fullDate}>
           {time}
         </time>
+        {edited && <span>({t('edited')})</span>}
         {isPinned && (
           <span className="inline-flex items-center gap-0.5 text-brand">
             <MdPushPin aria-hidden="true" />
@@ -70,13 +92,14 @@ const ChatMessage: FC<ChatMessageProps> = ({
           </span>
         )}
       </div>
-      <p
+      <div
         className={`mt-1 max-w-[85%] whitespace-pre-wrap break-words rounded-2xl px-4 py-2 text-sm ${
           isOwn ? 'bg-brand text-white' : 'bg-bg-secondary text-label-primary'
         } ${isPlaceholder ? 'italic opacity-80' : ''} ${isSending ? 'opacity-60' : ''}`}
       >
-        {body}
-      </p>
+        {replyTo && !event.isRedacted() && <ReplyQuote client={client} room={room} eventId={replyTo} />}
+        {imageUrl ? <MatrixImage client={client} mxcUrl={imageUrl} alt={body} /> : <p>{body}</p>}
+      </div>
       {(showPin || canRedact) && (
         <div className="mt-1 flex gap-2">
           {showPin && eventId && (

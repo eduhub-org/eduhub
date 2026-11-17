@@ -18,6 +18,8 @@ export type MatrixClientStatus =
   | { state: 'connecting' }
   | { state: 'needs-login' }
   | { state: 'other-tab' }
+  /** Starting the client failed (e.g. homeserver unreachable); the session is kept. */
+  | { state: 'error' }
   | { state: 'ready'; client: MatrixClient }
   /** The client is still running and retrying; the connection is just down. */
   | { state: 'offline'; client: MatrixClient };
@@ -87,7 +89,7 @@ const run = async (s: Shared) => {
 const start = (s: Shared) => {
   const lockName = `eduhub-matrix-client-${s.eduHubUserId}`;
   if (typeof navigator === 'undefined' || !navigator.locks) {
-    run(s).catch(() => setStatus(s, { state: 'needs-login' }));
+    run(s).catch(() => setStatus(s, { state: 'error' }));
     return;
   }
 
@@ -98,7 +100,7 @@ const start = (s: Shared) => {
         resolve();
         return;
       }
-      run(s).catch(() => setStatus(s, { state: 'needs-login' }));
+      run(s).catch(() => setStatus(s, { state: 'error' }));
     });
 
   navigator.locks.request(lockName, { ifAvailable: true }, (lock) => {

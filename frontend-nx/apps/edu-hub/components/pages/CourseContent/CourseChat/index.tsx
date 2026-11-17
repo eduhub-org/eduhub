@@ -1,6 +1,7 @@
-import { FC, FormEvent, KeyboardEvent, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { FC, FormEvent, KeyboardEvent, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
 import { useTranslations } from 'next-intl';
+import { NotificationCountType, RoomEvent } from 'matrix-js-sdk';
 import type { MatrixClient, MatrixEvent } from 'matrix-js-sdk';
 
 import Button from '../../../common/Button';
@@ -17,9 +18,14 @@ import { useRoomTimeline } from './useRoomTimeline';
 /** How close to the bottom (px) still counts as "reading the newest messages". */
 const STICK_TO_BOTTOM_PX = 80;
 
-const ChatRoom: FC<{ client: MatrixClient; roomId: string; offline: boolean }> = ({ client, roomId, offline }) => {
+const ChatRoom: FC<{
+  client: MatrixClient;
+  roomId: string;
+  offline: boolean;
+  onUnreadChange: (count: number) => void;
+}> = ({ client, roomId, offline, onUnreadChange }) => {
   const t = useTranslations('matrixChat');
-  const { room, events, joinFailed, canLoadOlder, loadingOlder, loadOlder, send, resend } = useRoomTimeline(
+  const { room, events, edits, joinFailed, canLoadOlder, loadingOlder, loadOlder, send, resend } = useRoomTimeline(
     client,
     roomId
   );
@@ -45,9 +51,41 @@ const ChatRoom: FC<{ client: MatrixClient; roomId: string; offline: boolean }> =
     }
   }, [events]);
 
+  // Unread count as the homeserver computes it from read receipts and push rules.
+  useEffect(() => {
+    if (!room) return undefined;
+    const update = () => onUnreadChange(room.getUnreadNotificationCount(NotificationCountType.Total));
+    update();
+    room.on(RoomEvent.UnreadNotifications, update);
+    return () => {
+      room.off(RoomEvent.UnreadNotifications, update);
+    };
+  }, [room, onUnreadChange]);
+
+  // Someone reading the newest messages in a visible tab has read them: send a
+  // read receipt (m.read) for the last message, which resets the unread count
+  // on the server and so on every device.
+  const markRead = useCallback(() => {
+    const last = events[events.length - 1];
+    const lastId = last?.getId();
+    if (!room || !last || !lastId || last.status || !ownUserId) return;
+    if (!stickToBottom.current || document.visibilityState !== 'visible') return;
+    if (last.getSender() === ownUserId || room.hasUserReadEvent(ownUserId, lastId)) return;
+    client.sendReadReceipt(last).catch((error) => console.warn('Could not send read receipt', error));
+  }, [client, room, events, ownUserId]);
+
+  useEffect(() => {
+    markRead();
+    document.addEventListener('visibilitychange', markRead);
+    return () => document.removeEventListener('visibilitychange', markRead);
+  }, [markRead]);
+
   const handleScroll = () => {
     const list = listRef.current;
-    if (list) stickToBottom.current = list.scrollHeight - list.scrollTop - list.clientHeight < STICK_TO_BOTTOM_PX;
+    if (!list) return;
+    const wasAtBottom = stickToBottom.current;
+    stickToBottom.current = list.scrollHeight - list.scrollTop - list.clientHeight < STICK_TO_BOTTOM_PX;
+    if (stickToBottom.current && !wasAtBottom) markRead();
   };
 
   const handleLoadOlder = () => {
@@ -126,7 +164,10 @@ const ChatRoom: FC<{ client: MatrixClient; roomId: string; offline: boolean }> =
             return (
               <ChatMessage
                 key={event.getId() ?? event.getTxnId()}
+                client={client}
+                room={room}
                 event={event}
+                edits={edits}
                 senderName={room.getMember(sender)?.name ?? sender}
                 isOwn={sender === ownUserId}
                 onResend={resend}
@@ -183,6 +224,7 @@ const CourseChat: FC<{ roomId: string }> = ({ roomId }) => {
   const t = useTranslations('matrixChat');
   const router = useRouter();
   const status = useMatrixClient();
+  const [unread, setUnread] = useState(0);
   const [loginHref, setLoginHref] = useState('/matrix/login');
 
   useEffect(() => {
@@ -193,7 +235,14 @@ const CourseChat: FC<{ roomId: string }> = ({ roomId }) => {
 
   let content;
   if (status.state === 'ready' || status.state === 'offline') {
-    content = <ChatRoom client={status.client} roomId={roomId} offline={status.state === 'offline'} />;
+    content = (
+      <ChatRoom
+        client={status.client}
+        roomId={roomId}
+        offline={status.state === 'offline'}
+        onUnreadChange={setUnread}
+      />
+    );
   } else if (status.state === 'needs-login') {
     content = (
       <div className="flex flex-col items-start gap-4 max-w-2xl">
@@ -201,6 +250,13 @@ const CourseChat: FC<{ roomId: string }> = ({ roomId }) => {
         <Button as="a" href={loginHref} filled>
           {t('connect_button')}
         </Button>
+      </div>
+    );
+  } else if (status.state === 'error') {
+    content = (
+      <div className="flex flex-col items-start gap-4 max-w-2xl">
+        <p className="text-label-primary">{t('connect_failed')}</p>
+        <Button onClick={() => window.location.reload()}>{t('try_again')}</Button>
       </div>
     );
   } else if (status.state === 'other-tab') {
@@ -216,7 +272,16 @@ const CourseChat: FC<{ roomId: string }> = ({ roomId }) => {
 
   return (
     <section className="max-w-3xl">
-      <SectionTitle className="mb-6">{t('title')}</SectionTitle>
+      <SectionTitle className="mb-6">
+        <span className="inline-flex items-center gap-3">
+          {t('title')}
+          {unread > 0 && (status.state === 'ready' || status.state === 'offline') && (
+            <span className="rounded-full bg-brand px-2.5 py-0.5 text-sm font-semibold text-white">
+              {t('unread', { count: unread })}
+            </span>
+          )}
+        </span>
+      </SectionTitle>
       {content}
     </section>
   );
