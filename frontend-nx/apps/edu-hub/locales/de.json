@@ -2727,6 +2727,9 @@
     }
   },
   "manageAppSettings": {
+    "matrixChatSettings": "Kurs-Chat",
+    "matrixChatEnabled": "Kurs-Chat auf Kursseiten anzeigen",
+    "matrixChatHint": "Teilnehmende und Kursleitungen sehen den Chat auf der Kursseite, sobald der Kurs einen Matrix-Raum hat (Kurse verwalten → Teilnehmenden-Chat). Ausgeschaltet bleiben Raumlinks nach Element unverändert.",
     "appSettings": "App Einstellungen",
     "backgroundImageURL": "Hintergrundbild URL",
     "previewImageURL": "Vorschaubild URL",
@@ -3620,6 +3623,10 @@
         "homepage": {
           "label": "Startseiten-Inhalte",
           "description": "FAQ-Bereich auf der Startseite"
+        },
+        "chat": {
+          "label": "Kurs-Chat",
+          "description": "Eingebetteten Matrix-Chat auf Kursseiten ein- oder ausschalten"
         },
         "emails": {
           "label": "E-Mail-Vorlagen",

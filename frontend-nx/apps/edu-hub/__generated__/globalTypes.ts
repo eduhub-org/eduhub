@@ -278,6 +278,7 @@ export enum AppSettings_update_column {
   heroHeadlineDe = "heroHeadlineDe",
   heroHeadlineEn = "heroHeadlineEn",
   logoUrl = "logoUrl",
+  matrixChatEnabled = "matrixChatEnabled",
   operatorName = "operatorName",
   previewImageURL = "previewImageURL",
   primaryColor = "primaryColor",
@@ -4125,6 +4126,7 @@ export interface AppSettings_bool_exp {
   heroHeadlineDe?: String_comparison_exp | null;
   heroHeadlineEn?: String_comparison_exp | null;
   logoUrl?: String_comparison_exp | null;
+  matrixChatEnabled?: Boolean_comparison_exp | null;
   operatorName?: String_comparison_exp | null;
   previewImageURL?: String_comparison_exp | null;
   primaryColor?: String_comparison_exp | null;
@@ -4154,6 +4156,7 @@ export interface AppSettings_insert_input {
   heroHeadlineDe?: string | null;
   heroHeadlineEn?: string | null;
   logoUrl?: string | null;
+  matrixChatEnabled?: boolean | null;
   operatorName?: string | null;
   previewImageURL?: string | null;
   primaryColor?: string | null;

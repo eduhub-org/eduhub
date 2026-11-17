@@ -13,6 +13,8 @@ interface AppSettingsContextType {
   previewImageURL: string | null;
   operatorName: string | null;
   privacyContactEmail: string | null;
+  /** Feature flag: show the embedded Matrix course chat. */
+  matrixChatEnabled: boolean;
   loading: boolean;
   error: any;
 }
@@ -27,6 +29,7 @@ const defaultSettings: AppSettingsContextType = {
   previewImageURL: null,
   operatorName: null,
   privacyContactEmail: null,
+  matrixChatEnabled: false,
   loading: true,
   error: null,
 };

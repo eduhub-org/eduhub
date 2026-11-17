@@ -2742,6 +2742,9 @@
     }
   },
   "manageAppSettings": {
+    "matrixChatSettings": "Course chat",
+    "matrixChatEnabled": "Show the course chat on course pages",
+    "matrixChatHint": "Participants and instructors see the chat on the course page once the course has a Matrix room (Manage courses → Participant chat). When off, links to the room in Element stay as they are.",
     "backgroundImageURL": "Background image URL",
     "bannerBackgroundColor": "News Banner background color",
     "bannerFontColor": "News Banner text color",
@@ -3635,6 +3638,10 @@
         "homepage": {
           "label": "Homepage content",
           "description": "FAQ section on the homepage"
+        },
+        "chat": {
+          "label": "Course chat",
+          "description": "Turn the embedded Matrix chat on course pages on or off"
         },
         "emails": {
           "label": "Email templates",

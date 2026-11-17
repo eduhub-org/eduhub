@@ -4,6 +4,7 @@ import { signIn, useSession } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
 
 import MatrixAuthStatus from '../../components/pages/MatrixAuth/MatrixAuthStatus';
+import { useAppSettings } from '../../contexts/AppSettingsContext';
 import { useSignedInUserId } from '../../hooks/authentication';
 import { safeReturnTo } from '../../lib/matrix/config';
 import { MatrixLoginError, startMatrixLogin } from '../../lib/matrix/oauth';
@@ -18,11 +19,19 @@ const MatrixLoginPage = () => {
   const t = useTranslations('matrixChat');
   const { status } = useSession();
   const eduHubUserId = useSignedInUserId();
+  const { matrixChatEnabled, loading: settingsLoading } = useAppSettings();
   const [error, setError] = useState<string | null>(null);
   const started = useRef(false);
 
   useEffect(() => {
-    if (!router.isReady || status === 'loading' || started.current) return;
+    if (!router.isReady || status === 'loading' || settingsLoading || started.current) return;
+
+    // Feature flag (Settings → Course chat): no chat, no chat login.
+    if (!matrixChatEnabled) {
+      started.current = true;
+      setError(t('not_configured'));
+      return;
+    }
 
     if (status === 'unauthenticated') {
       started.current = true;
@@ -46,7 +55,7 @@ const MatrixLoginPage = () => {
             : t('login_failed')
         );
       });
-  }, [router.isReady, router.query.returnTo, status, eduHubUserId, t]);
+  }, [router.isReady, router.query.returnTo, status, eduHubUserId, settingsLoading, matrixChatEnabled, t]);
 
   return <MatrixAuthStatus message={t('login_redirecting')} error={error} retryHref={router.asPath} />;
 };

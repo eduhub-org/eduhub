@@ -6,6 +6,7 @@ import {
   MdOutlineDescription,
   MdOutlineEmail,
   MdOutlineFolderOpen,
+  MdOutlineForum,
   MdOutlineEventNote,
   MdOutlineGroups,
   MdOutlineBallot,
@@ -32,6 +33,7 @@ export type SettingsNavItemId =
   | 'appearance'
   | 'jobboerse'
   | 'homepage'
+  | 'chat'
   | 'location-addresses'
   | 'emails'
   | 'programs'
@@ -84,6 +86,14 @@ export const SETTINGS_NAV_ITEMS: Record<SettingsNavItemId, SettingsNavItemDef> =
     id: 'homepage',
     icon: MdOutlineHome,
     href: '/manage/settings/homepage',
+    requiredCapability: 'admin',
+    status: 'live',
+    groupId: 'platform',
+  },
+  chat: {
+    id: 'chat',
+    icon: MdOutlineForum,
+    href: '/manage/settings/chat',
     requiredCapability: 'admin',
     status: 'live',
     groupId: 'platform',
@@ -206,7 +216,7 @@ export const SETTINGS_NAV_ITEMS: Record<SettingsNavItemId, SettingsNavItemDef> =
 export const SETTINGS_NAV_GROUPS: SettingsNavGroupDef[] = [
   {
     id: 'platform',
-    items: ['appearance', 'homepage', 'jobboerse', 'location-addresses'],
+    items: ['appearance', 'homepage', 'chat', 'jobboerse', 'location-addresses'],
   },
   {
     id: 'notifications',
