@@ -22,7 +22,8 @@ alwaysApply: false
   standard names.
 - Status codes: 401 secret, 404 unknown function, 500 server secret unset,
   400 (Node) conflicting names, 503 for a `retryable` event/cron failure,
-  else 200 with `{ success, messageKey, error? }`.
+  else 200 with `{ success, messageKey, error? }`. Non-2xx bodies also carry
+  Hasura's `message` (= `error`) and `extensions: { code: messageKey }`.
 - Node handlers read env via `lib/config.js`, Hasura via `lib/hasura.js`,
   HTTP via `lib/http.js`, the bucket via `lib/requestHeaders.js`.
 - Register in `callNodeFunctionHandlers` / `identityHandlers` /

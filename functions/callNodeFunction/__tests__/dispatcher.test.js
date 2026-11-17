@@ -18,6 +18,13 @@ describe('callNodeFunction', () => {
     return res;
   };
 
+  // Hasura reads only `message` and `extensions` of a non-2xx action body.
+  const expectHasuraError = (body, messageKey) => {
+    expect(body.message).toBe(body.error);
+    expect(body.extensions).toEqual({ code: messageKey });
+    expect(body.messageKey).toBe(messageKey);
+  };
+
   const call = async (request) => {
     const res = response();
     await callNodeFunction(request, res);
@@ -58,7 +65,7 @@ describe('callNodeFunction', () => {
       );
 
       expect(status).toBe(400);
-      expect(body.messageKey).toBe('CONFLICTING_FUNCTION_NAME');
+      expectHasuraError(body, 'CONFLICTING_FUNCTION_NAME');
       expect(handlerMock).not.toHaveBeenCalled();
     });
   });
@@ -72,7 +79,7 @@ describe('callNodeFunction', () => {
       const { status, body } = await call(eventRequest(headers));
 
       expect(status).toBe(401);
-      expect(body.messageKey).toBe(messageKey);
+      expectHasuraError(body, messageKey);
       expect(handlerMock).not.toHaveBeenCalled();
     });
 
@@ -81,7 +88,7 @@ describe('callNodeFunction', () => {
       const { status, body } = await call(eventRequest());
 
       expect(status).toBe(500);
-      expect(body.messageKey).toBe('SERVER_MISCONFIGURED');
+      expectHasuraError(body, 'SERVER_MISCONFIGURED');
     });
 
     it.each([
@@ -92,7 +99,7 @@ describe('callNodeFunction', () => {
       const { status, body } = await call(eventRequest(headers));
 
       expect(status).toBe(404);
-      expect(body.messageKey).toBe('FUNCTION_NOT_FOUND');
+      expectHasuraError(body, 'FUNCTION_NOT_FOUND');
     });
 
     it('answers 200 with success false for a thrown error', async () => {
@@ -180,6 +187,28 @@ describe('callNodeFunction', () => {
       expect(body).toEqual({ message: 'Account deleted', error: 'Account deleted' });
     });
 
+    it('adds message and extensions to a non-2xx handler body', async () => {
+      handlerMock.mockResolvedValue({ httpStatus: 500, success: false, error: 'No grant', messageKey: 'GRANT_FAILED' });
+      const { status, body } = await call(eventRequest());
+
+      expect(status).toBe(500);
+      expect(body).toEqual({
+        success: false,
+        error: 'No grant',
+        messageKey: 'GRANT_FAILED',
+        message: 'No grant',
+        extensions: { code: 'GRANT_FAILED' },
+      });
+    });
+
+    it('leaves a 2xx handler body as is', async () => {
+      handlerMock.mockResolvedValue({ httpStatus: 202, success: true, messageKey: 'QUEUED' });
+      const { status, body } = await call(eventRequest());
+
+      expect(status).toBe(202);
+      expect(body).toEqual({ success: true, messageKey: 'QUEUED' });
+    });
+
     it('takes httpStatus over retryable', async () => {
       handlerMock.mockResolvedValue({ httpStatus: 400, retryable: true });
       const { status } = await call(eventRequest());
@@ -215,10 +244,14 @@ describe('callNodeFunction', () => {
   // dispatcher answers 503 just for failures a handler marks retryable.
   describe('retries', () => {
     it('answers 503 for a retryable event failure', async () => {
-      handlerMock.mockResolvedValue({ success: false, retryable: true, messageKey: 'EMAIL_QUEUE_FAILED' });
-      const { status } = await call(eventRequest());
+      handlerMock.mockResolvedValue({
+        success: false, retryable: true, error: 'Queue down', messageKey: 'EMAIL_QUEUE_FAILED',
+      });
+      const { status, body } = await call(eventRequest());
 
       expect(status).toBe(503);
+      expect(body.retryable).toBe(true);
+      expectHasuraError(body, 'EMAIL_QUEUE_FAILED');
     });
 
     it('answers 503 for a retryable cron failure', async () => {

@@ -85,6 +85,9 @@ def handler_name(arguments: Dict[str, Any]) -> Dict[str, Any]:
 - Node only: an integer `httpStatus` in the result is sent as the status
   (e.g. an action error Hasura must turn into a GraphQL error). Rarely
   needed.
+- Every non-2xx body also gets `message` (= `error`) and
+  `extensions: { code: messageKey }` from the dispatcher; Hasura shows only
+  these in an action's GraphQL error.
 
 ## 4. Hasura metadata
 

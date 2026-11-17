@@ -5,6 +5,20 @@ import { logger } from './logger.js';
 import { getFunctionName } from './requestHeaders.js';
 
 /**
+ * Adds the fields Hasura reads from a non-2xx action response: `message`
+ * (the error text) and `extensions.code` (the `messageKey`). Fields already
+ * set and all other fields stay, since callers and logs read them.
+ * @param {Record<string, any>} body
+ * @returns {Record<string, any>}
+ */
+const withHasuraError = (body) => {
+  const out = { ...body };
+  if (out.message === undefined) out.message = String(out.error ?? "Function failed");
+  if (out.extensions === undefined && out.messageKey) out.extensions = { code: out.messageKey };
+  return out;
+};
+
+/**
  * Validates the Hasura secret from the request headers.
  * @param {string | string[] | undefined} hasuraSecret - The secret from request headers
  * @returns {{ isValid: boolean, statusCode?: number, error?: object }}
@@ -16,11 +30,11 @@ const validateSecret = (hasuraSecret) => {
     return {
       isValid: false,
       statusCode: 500,
-      error: {
+      error: withHasuraError({
         success: false,
         error: "Server secret is not configured.",
         messageKey: "SERVER_MISCONFIGURED"
-      }
+      })
     };
   }
 
@@ -28,11 +42,11 @@ const validateSecret = (hasuraSecret) => {
     return {
       isValid: false,
       statusCode: 401,
-      error: {
+      error: withHasuraError({
         success: false,
         error: "Missing secret header.",
         messageKey: "MISSING_SECRET"
-      }
+      })
     };
   }
 
@@ -40,11 +54,11 @@ const validateSecret = (hasuraSecret) => {
     return {
       isValid: false,
       statusCode: 401,
-      error: {
+      error: withHasuraError({
         success: false,
         error: "Invalid secret provided.",
         messageKey: "INVALID_SECRET"
-      }
+      })
     };
   }
 
@@ -98,8 +112,9 @@ const formatResponse = (result) => {
  * missing or wrong secret, 500 when the server secret is unset, 400 when
  * `Function-Name` and `name` disagree, 404 for a handler not in `handlers`,
  * 503 for a failure the handler marks `retryable` in an event or cron
- * trigger, the handler's `httpStatus` when it sets one, and 200 otherwise, including `success: false` results and thrown
- * errors.
+ * trigger, the handler's `httpStatus` when it sets one, and 200 otherwise,
+ * including `success: false` results and thrown errors. Every non-2xx body
+ * also carries Hasura's `message` and `extensions: { code: messageKey }`.
  *
  * `pinnedActions` maps an action name to the handler it must run. An action
  * with `forward_client_headers: true` passes the caller's own HTTP headers on
@@ -128,11 +143,11 @@ export const createDispatcher = ({ name: unitName, handlers, pinnedActions = {} 
     ? pinnedActions[actionName]
     : undefined;
   if (conflict || (pinned !== undefined && name !== undefined && name !== pinned)) {
-    return res.status(400).json({
+    return res.status(400).json(withHasuraError({
       success: false,
       error: "Function-Name and name headers name different functions.",
       messageKey: "CONFLICTING_FUNCTION_NAME"
-    });
+    }));
   }
   const functionName = String(pinned ?? name);
 
@@ -150,11 +165,11 @@ export const createDispatcher = ({ name: unitName, handlers, pinnedActions = {} 
   // Neither is reachable without the shared secret, checked above - this is
   // defence in depth, not a fix for a live hole.
   if (!Object.prototype.hasOwnProperty.call(handlers, functionName)) {
-    return res.status(404).json({
+    return res.status(404).json(withHasuraError({
       success: false,
       error: "Function Not Found",
       messageKey: "FUNCTION_NOT_FOUND"
-    });
+    }));
   }
 
   try {
@@ -164,10 +179,12 @@ export const createDispatcher = ({ name: unitName, handlers, pinnedActions = {} 
     // A handler that must answer with a given status sets `httpStatus`, e.g.
     // an action whose caller relies on Hasura turning a 4xx into a GraphQL
     // error (updateFromKeycloak), or an event trigger that must fail with a
-    // non-2xx so Hasura retries it. Hasura reads `message` from an action's
-    // error body. The field itself is not sent.
+    // non-2xx so Hasura retries it. Hasura reads `message` (and
+    // `extensions`) from an action's non-2xx body, so a non-2xx gets them.
+    // The field itself is not sent.
     if (Number.isInteger(result?.httpStatus)) {
-      const { httpStatus, ...body } = result;
+      const { httpStatus, ...rest } = result;
+      const body = httpStatus >= 200 && httpStatus < 300 ? rest : withHasuraError(rest);
       logger.info(`Function ${functionName} answered ${httpStatus}`, {
         unit: unitName,
         response: redactForLogging(body)
@@ -182,7 +199,7 @@ export const createDispatcher = ({ name: unitName, handlers, pinnedActions = {} 
     // carries `scheduled_time` instead of `event`.
     if ((req.body.event || req.body.scheduled_time) && result?.retryable) {
       logger.warn(`Retryable failure in ${functionName}`, { unit: unitName, response: redactForLogging(result) });
-      return res.status(503).json(result);
+      return res.status(503).json(withHasuraError(result));
     }
 
     // Mutation actions get the handler's result as is; everything else gets

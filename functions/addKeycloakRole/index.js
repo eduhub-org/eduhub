@@ -77,5 +77,5 @@ export const addKeycloakRole = async (req, res) => {
     });
   }
 
-  return res.status(401).json({ error: 'Unauthorized' });
+  return res.status(401).json({ error: 'Unauthorized', message: 'Unauthorized' });
 };

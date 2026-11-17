@@ -106,8 +106,17 @@ therefore needs a handler whose side effect is idempotent across deliveries.
 ```js
 { success: true | false, messageKey: 'UPPER_SNAKE_CASE', error?: string,
   retryable?: boolean, ...fields }
+// non-2xx only, added by the dispatcher:
+//   message: string, extensions: { code: messageKey }
 ```
 
+- Every non-2xx body (both dispatchers) also carries `message` (the `error`
+  text) and `extensions: { code: messageKey }`: for a non-2xx action answer
+  Hasura shows only these two fields in its GraphQL error. The dispatchers
+  add them to their own 400/401/404/500 bodies and to a handler's 503 or
+  non-2xx `httpStatus` body, keeping a `message` or `extensions` the handler
+  set. The single-purpose Node units still deployed send
+  `{ error, message }` with their 401.
 - Return result fields at the top level (they map onto the action's output
   type), not under a nested object.
 - `messageKey` is the translation key the frontend shows.
