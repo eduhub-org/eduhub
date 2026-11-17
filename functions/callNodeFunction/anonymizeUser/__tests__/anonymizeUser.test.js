@@ -1,4 +1,4 @@
-import { beforeEach, expect, it, jest } from '@jest/globals';
+import { afterEach, beforeEach, expect, it, jest } from '@jest/globals';
 
 const request = jest.fn();
 const deleteFile = jest.fn();
@@ -38,7 +38,17 @@ const user = () => ({
   CourseEnrollments: [{ id: 8, achievementCertificateURL: 'achievement.pdf', attendanceCertificateURL: 'attendance.pdf' }],
   OrganizationNewsletterSubscriptions: [{ status: 'SUBSCRIBED' }],
 });
+// deleteMyAccount treats a set MATRIX_HOMESERVER_URL as "Matrix is configured".
+// Run without it, as in CI, so a local .env with the Matrix stack does not
+// change the results; tests that need it set it themselves.
+const savedHomeserverUrl = process.env.MATRIX_HOMESERVER_URL;
+afterEach(() => {
+  if (savedHomeserverUrl === undefined) delete process.env.MATRIX_HOMESERVER_URL;
+  else process.env.MATRIX_HOMESERVER_URL = savedHomeserverUrl;
+});
+
 beforeEach(() => {
+  delete process.env.MATRIX_HOMESERVER_URL;
   jest.clearAllMocks();
   request.mockImplementation(async (_endpoint, document) => {
     if (document.includes('query AccountDeletionData')) return {
