@@ -16,7 +16,7 @@
     "winston": "^3.3.3"
   },
   "devDependencies": {
-    "@google-cloud/functions-framework": "^3.1.2",
+    "@google-cloud/functions-framework": "^5.0.5",
     "@jest/globals": "^29.7.0",
     "jest": "^29.7.0",
     "js-yaml": "^4.1.0",
