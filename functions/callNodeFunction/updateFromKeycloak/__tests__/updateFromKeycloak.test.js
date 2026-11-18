@@ -107,6 +107,24 @@ describe('updateFromKeycloak', () => {
     );
   });
 
+  // Hasura keeps its stored handle and account deletion deactivates that one,
+  // so Keycloak must be backfilled with it rather than a new one.
+  it('backfills Keycloak with the handle Hasura already stores', async () => {
+    kc.users.findOne.mockResolvedValue(keycloakUser({ attributes: {} }));
+    requestMock = database({ row: { id: USER_ID, status: 'ACTIVE', matrixUserHandle: 'kept.handle.6a1b2c' } });
+
+    await updateFromKeycloak(actionRequest(), logger);
+
+    expect(kc.users.update).toHaveBeenCalledWith(
+      { id: USER_ID },
+      expect.objectContaining({ attributes: { matrix_user_handle: ['kept.handle.6a1b2c'] } })
+    );
+    const update = requestMock.mock.calls.find(
+      ([document]) => String(document).includes('update_User') && String(document).includes('firstName')
+    );
+    expect(update[1].matrixUserHandle).toBe('kept.handle.6a1b2c');
+  });
+
   it.each([
     ['a deleted account', () => { requestMock = database({ row: { id: USER_ID, status: 'DELETED' } }); }, 403],
     ['an unknown Keycloak user', () => { kc.users.findOne.mockResolvedValue(undefined); }, 404],
