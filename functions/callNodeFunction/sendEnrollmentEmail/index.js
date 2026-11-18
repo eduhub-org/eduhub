@@ -1,8 +1,9 @@
-import { gql, GraphQLClient } from 'graphql-request';
-import { createEnrollmentVariableReplacer } from '../emailTemplateVariables.js';
-import { appendGuestMailFooter, guestSafeCopyRecipients } from '../guestRegistration.js';
+import { gql } from 'graphql-request';
+import { createEnrollmentVariableReplacer } from '../lib/emailTemplateVariables.js';
+import { appendGuestMailFooter, guestSafeCopyRecipients } from '../lib/guestRegistration.js';
 import { isDeclinedByParticipant, notifyOrganizersOfDecline } from './invitationDeclined.js';
 import { buildCourseCalendar } from '../lib/courseCalendar.js';
+import { createHasuraClient } from '../lib/hasura.js';
 
 const PAID_REGISTRATION_TYPES = ['DIRECT_CONFIRMATION_AND_PAYMENT', 'DIRECT_WITH_INPUT_AND_PAYMENT'];
 
@@ -49,11 +50,7 @@ export default async function sendEnrollmentEmail(req, logger) {
     }
 
     // Create GraphQL client
-    const client = new GraphQLClient(process.env.HASURA_ENDPOINT, {
-      headers: {
-        'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET,
-      },
-    });
+    const client = createHasuraClient();
 
     if (isDeclinedByParticipant(event)) {
       await notifyOrganizersOfDecline(enrollment.id, client, logger);

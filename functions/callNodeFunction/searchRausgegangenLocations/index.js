@@ -1,6 +1,6 @@
-import { GraphQLClient } from 'graphql-request';
 import { decryptOrganizationCredential } from '../lib/organizationCredential.js';
 import { createRausgegangenClient } from '../lib/rausgegangen.js';
+import { createHasuraClient } from '../lib/hasura.js';
 
 /**
  * Lists rausgegangen.de venues that may be the same place as a location
@@ -44,9 +44,7 @@ async function search(req, logger) {
     return { success: false, error: 'Only super admins can search Rausgegangen locations', locations: [] };
   }
 
-  const client = new GraphQLClient(process.env.HASURA_ENDPOINT, {
-    headers: { 'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET },
-  });
+  const client = createHasuraClient();
   const data = await client.request(GET_LOCATION_ADDRESS, { id: Number(req.body.input?.locationAddressId) });
   const locationAddress = data.LocationAddress_by_pk;
   const encryptedKey = data.Organization?.[0]?.rausgegangenApiKeyEncrypted;

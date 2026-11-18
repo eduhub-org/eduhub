@@ -1,0 +1,30 @@
+{
+  // Type-checks the dispatcher and the typed lib/ modules from their JSDoc;
+  // nothing is emitted. Handlers and the older lib/ files are not checked yet
+  // (imported files are only type-checked when they say // @ts-check).
+  // Run: npx --yes -p typescript@5.9.3 tsc -p tsconfig.json
+  // (pinned in .github/workflows/functions-code-checks.yml, not a dependency)
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": false,
+    "noEmit": true,
+    "target": "es2022",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "lib": ["es2023", "dom"],
+    "types": ["node"],
+    "skipLibCheck": true
+  },
+  "files": [
+    "index.js",
+    "lib/dispatcher.js",
+    "lib/config.js",
+    "lib/hasura.js",
+    "lib/html.js",
+    "lib/http.js",
+    "lib/keycloak.js",
+    "lib/logger.js",
+    "lib/requestHeaders.js",
+    "lib/types.js"
+  ]
+}

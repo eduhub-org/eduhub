@@ -1,0 +1,3 @@
+# Test-only dependencies; not deployed.
+-r requirements.txt
+pytest==9.2.0

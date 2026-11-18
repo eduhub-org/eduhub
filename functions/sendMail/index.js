@@ -1,11 +1,6 @@
-const formData = require('form-data');
-const Mailgun = require('mailgun.js');
-let secretsMatch;
-try {
-  ({ secretsMatch } = require('./shared_libs/node/security.cjs'));
-} catch {
-  ({ secretsMatch } = require('../shared_libs/node/security.cjs'));
-}
+import formData from 'form-data';
+import Mailgun from 'mailgun.js';
+import { getProvidedSecret, secretsMatch } from './shared/security.js';
 
 // Mailgun accepts up to 25 MB, but this function runs with 256M of memory and
 // form-data buffers a second multipart copy of every attachment. A Stripe
@@ -267,22 +262,23 @@ async function resolveAttachments(descriptors, mailId) {
  * @param {!express:Request} req HTTP request context.
  * @param {!express:Response} res HTTP response context.
  */
-exports.sendMail = async (req, res) => {
+export const sendMail = async (req, res) => {
   const expectedSecret = process.env.HASURA_CLOUD_FUNCTION_SECRET;
   if (!expectedSecret) {
     return res.status(500).json({ error: 'Server secret not configured' });
   }
 
   // Verify the request contains the correct secret header
-  if (!secretsMatch(req.headers.secret, expectedSecret)) {
-    return res.status(401).json({ error: 'Unauthorized' });
+  if (!secretsMatch(getProvidedSecret(req.headers), expectedSecret)) {
+    return res.status(401).json({ error: 'Unauthorized', message: 'Unauthorized' });
   }
 
   // Extract email parameters from the Hasura event payload
   const { id, subject, content, to, from, replyTo, cc, bcc, attachments } = req.body.event.data.new;
 
   // Get mail tag from headers or use default
-  const mailTag = req.headers.mailTag || 'eduhub'; // default if not provided
+  // Express lowercases header names, so the header must be read as `mailtag`.
+  const mailTag = req.headers.mailtag || 'eduhub'; // default if not provided
 
   // The mail's own sender, and the Mailgun domain that can legitimately sign
   // for it. A sender that no configured domain covers is replaced rather than
@@ -384,7 +380,9 @@ exports.sendMail = async (req, res) => {
 };
 
 // Exported for unit tests; not part of the cloud function contract.
-exports.resolveAttachments = resolveAttachments;
-exports.resolveSender = resolveSender;
-exports.isAllowedAttachmentUrl = isAllowedAttachmentUrl;
-exports.safeAttachmentFilename = safeAttachmentFilename;
+export {
+  resolveAttachments,
+  resolveSender,
+  isAllowedAttachmentUrl,
+  safeAttachmentFilename,
+};

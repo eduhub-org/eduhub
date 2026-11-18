@@ -1,5 +1,7 @@
 """Unit tests for the shared mail helpers used by the reminder cron jobs."""
 
+from api_clients import HasuraQueryError
+
 from pythonFunctions.mail_helpers import (
     DEDUP_CHUNK_SIZE,
     already_sent_keys,
@@ -19,8 +21,15 @@ class FakeClient:
     def send_query(self, query, variables):
         self.calls.append({"query": query, "variables": variables})
         if self.responses:
-            return self.responses.pop(0)
+            response = self.responses.pop(0)
+            if isinstance(response, Exception):
+                raise response
+            return response
         return {"data": {"MailLog": []}}
+
+
+def graphql_error():
+    return HasuraQueryError("GraphQL errors: boom", graphql_errors=[{"message": "boom"}])
 
 
 TEMPLATE = {
@@ -74,7 +83,7 @@ class TestAlreadySentKeys:
     def test_failed_lookup_suppresses_the_chunk(self):
         # A failed dedup lookup must not turn into duplicate mails; the next
         # cron run retries these candidates.
-        client = FakeClient([{"errors": [{"message": "boom"}]}])
+        client = FakeClient([graphql_error()])
 
         sent = already_sent_keys(client, "T", [{"enrollmentId": 3}], ["enrollmentId"])
 
@@ -115,7 +124,7 @@ class TestQueueMail:
         assert client.calls[0]["variables"]["subject"] == "Deadline - "
 
     def test_graphql_error_is_reported_as_failure(self):
-        client = FakeClient([{"errors": [{"message": "boom"}]}])
+        client = FakeClient([graphql_error()])
 
         assert queue_mail(client, TEMPLATE, "jane@example.com", {}) is False
 

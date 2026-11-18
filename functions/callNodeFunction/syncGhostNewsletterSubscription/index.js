@@ -1,5 +1,6 @@
-import axios from 'axios';
-import { gql, GraphQLClient } from 'graphql-request';
+import { http, isNetworkError } from '../lib/http.js';
+import { gql } from 'graphql-request';
+import { createHasuraClient } from '../lib/hasura.js';
 import { decryptOrganizationCredential } from '../lib/organizationCredential.js';
 
 const USER_DRIVEN_SOURCES = new Set(['CHECKBOX', 'PROFILE', 'ADMIN']);
@@ -46,7 +47,7 @@ const callGhostSyncEndpoint = async ({ subscription, userEmail, subscribe }) => 
   let lastError;
   for (let attempt = 0; attempt < MAX_GHOST_SYNC_RETRIES; attempt += 1) {
     try {
-      const response = await axios.post(endpoint, payload, {
+      const response = await http.post(endpoint, payload, {
         timeout: 15000,
         validateStatus: () => true,
         headers: {
@@ -77,13 +78,7 @@ const callGhostSyncEndpoint = async ({ subscription, userEmail, subscribe }) => 
         remoteStatus: response.data?.status || null,
       };
     } catch (err) {
-      const isNetwork =
-        !err.response &&
-        (err.code === 'ECONNABORTED' ||
-          err.code === 'ETIMEDOUT' ||
-          err.code === 'ECONNRESET' ||
-          err.message === 'Network Error');
-      if (isNetwork && attempt < MAX_GHOST_SYNC_RETRIES - 1) {
+      if (isNetworkError(err) && attempt < MAX_GHOST_SYNC_RETRIES - 1) {
         await new Promise((r) => setTimeout(r, 1000 * 2 ** attempt));
         lastError = err;
         continue;
@@ -103,21 +98,6 @@ const normalizeRemoteSubscriptionStatus = (remoteStatus, fallbackStatus) => {
   }
   return fallbackStatus;
 };
-
-const getRequiredEnv = (name) => {
-  const value = normalize(process.env[name]);
-  if (!value) {
-    throw new Error(`Missing ${name}`);
-  }
-  return value;
-};
-
-const getGraphqlClient = () =>
-  new GraphQLClient(getRequiredEnv('HASURA_ENDPOINT'), {
-    headers: {
-      'x-hasura-admin-secret': getRequiredEnv('HASURA_ADMIN_SECRET'),
-    },
-  });
 
 const GET_SUBSCRIPTION_DETAILS = gql`
   query GetOrganizationNewsletterSubscriptionDetails($userId: uuid!, $organizationId: Int!) {
@@ -211,7 +191,7 @@ export default async function syncGhostNewsletterSubscription(req, logger) {
       };
     }
 
-    const client = getGraphqlClient();
+    const client = createHasuraClient();
     const detailsResult = await client.request(GET_SUBSCRIPTION_DETAILS, {
       userId: newRow.userId,
       organizationId: newRow.organizationId,
@@ -355,7 +335,7 @@ export default async function syncGhostNewsletterSubscription(req, logger) {
 
     if (userId && organizationId != null) {
       try {
-        const client = getGraphqlClient();
+        const client = createHasuraClient();
         await updateSubscriptionState(client, {
           userId,
           organizationId,

@@ -1,4 +1,5 @@
-import { GraphQLClient } from 'graphql-request';
+import { createHasuraClient } from '../lib/hasura.js';
+import * as config from '../lib/config.js';
 import { decryptOrganizationCredential } from '../lib/organizationCredential.js';
 import { ORG_ADMIN_ROLES, isOrgAdminOfCourse } from '../lib/orgAdminScope.js';
 import { createRausgegangenClient, isProduction, mappingId, RausgegangenApiError } from '../lib/rausgegangen.js';
@@ -183,13 +184,6 @@ const LISTINGS_TO_RECONCILE = `
   }
 `;
 
-const getGraphqlClient = () => {
-  const endpoint = process.env.HASURA_ENDPOINT;
-  const secret = process.env.HASURA_ADMIN_SECRET;
-  if (!endpoint || !secret) throw new Error('Missing HASURA_ENDPOINT or HASURA_ADMIN_SECRET');
-  return new GraphQLClient(endpoint, { headers: { 'x-hasura-admin-secret': secret } });
-};
-
 /** Records the outcome on the listing; returns the result for the caller. */
 const recordResult = async (client, listingId, set) => {
   await client.request(UPDATE_LISTING, {
@@ -327,8 +321,8 @@ export const syncCourse = async ({ client, courseId, logger, createClient = crea
     return unlisted('SKIPPED', showSession.error);
   }
 
-  const bucketUrl = process.env.STORAGE_BUCKET_PUBLIC_URL;
-  const frontendUrl = process.env.FRONTEND_URL;
+  const bucketUrl = config.storageBucketPublicUrl();
+  const frontendUrl = config.env('FRONTEND_URL');
 
   const location = await ensureLocation({
     client,
@@ -469,7 +463,7 @@ const handleAction = async ({ client, req, logger }) => {
 };
 
 export default async function syncRausgegangenEvent(req, logger) {
-  const client = getGraphqlClient();
+  const client = createHasuraClient();
   const body = req.body ?? {};
 
   if (body.action) {

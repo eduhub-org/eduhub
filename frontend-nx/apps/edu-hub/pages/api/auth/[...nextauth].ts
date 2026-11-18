@@ -5,6 +5,7 @@ import axios from 'axios';
 
 import type { JWT } from 'next-auth/jwt';
 import type { IKeycloakRefreshTokenApiResponse } from './keycloakRefreshToken';
+import { withRefreshedHasuraClaims } from '../../../lib/sessionRoles';
 
 // Validate HASURA_ADMIN_SECRET at module load time
 // This ensures the secret is set and prevents hard-coded fallbacks
@@ -61,6 +62,7 @@ const refreshAccessToken = async (token: JWT) => {
 
     return {
       ...token,
+      profile: withRefreshedHasuraClaims(token.profile, refreshedTokens.data.access_token),
       accessToken: refreshedTokens.data.access_token,
       accessTokenExpired: Date.now() + refreshedTokens.data.expires_in * 1000,
       refreshToken: refreshedTokens.data.refresh_token ?? token.refreshToken,

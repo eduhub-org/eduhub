@@ -1,6 +1,5 @@
 """Unit tests for the attendance matching / row preparation logic."""
 import pandas as pd
-import pytest
 
 from pythonFunctions.check_attendance import (
     MATCH_TYPE_EMAIL,

@@ -1,4 +1,5 @@
-import { GraphQLClient, gql } from 'graphql-request';
+import { gql } from 'graphql-request';
+import { createHasuraClient } from '../lib/hasura.js';
 
 /**
  * Employer-facing archive action for StuJo job postings. JobPosting.status
@@ -47,9 +48,7 @@ export default async function archiveJobPosting(req, logger) {
       return { success: false, error: 'Missing authenticated session user', messageKey: 'UNAUTHORIZED' };
     }
 
-    const client = new GraphQLClient(process.env.HASURA_ENDPOINT, {
-      headers: { 'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET },
-    });
+    const client = createHasuraClient();
 
     const data = await client.request(GET_POSTING, { id: jobPostingId });
     const posting = data.JobPosting_by_pk;

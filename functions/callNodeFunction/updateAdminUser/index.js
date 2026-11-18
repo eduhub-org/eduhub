@@ -1,6 +1,7 @@
-import axios from 'axios';
-import { getKeycloakToken } from '../lib/utils.js';
-import { logger } from '../index.js';
+import { http } from '../lib/http.js';
+import { getKeycloakToken } from '../lib/keycloak.js';
+import { logger } from '../lib/logger.js';
+import * as config from '../lib/config.js';
 
 const updateAdminUser = async (req) => {
   try {
@@ -19,18 +20,18 @@ const updateAdminUser = async (req) => {
     const jsonHeaders = {
       headers: { Authorization: `Bearer ${keycloakToken}`, 'Content-Type': 'application/json' },
     };
-    const realmUrl = `${process.env.KEYCLOAK_URL}/admin/realms/edu-hub`;
+    const realmUrl = `${config.keycloakConfig().url}/admin/realms/edu-hub`;
 
     // Super-admin is the "admin" role on the "hasura" client (not a realm role), matching
     // addKeycloakRole and the Hasura JWT role mapping. Resolve the client by clientId so we do not
     // depend on a hardcoded client uuid that differs between environments.
-    const clientsResponse = await axios.get(`${realmUrl}/clients?clientId=hasura`, authHeaders);
+    const clientsResponse = await http.get(`${realmUrl}/clients?clientId=hasura`, authHeaders);
     const hasuraClient = clientsResponse.data[0];
     if (!hasuraClient) {
       throw new Error('Hasura client not found in Keycloak');
     }
 
-    const adminRoleResponse = await axios.get(
+    const adminRoleResponse = await http.get(
       `${realmUrl}/clients/${hasuraClient.id}/roles/admin`,
       authHeaders
     );
@@ -39,13 +40,13 @@ const updateAdminUser = async (req) => {
     const userClientRolesUrl = `${realmUrl}/users/${userId}/role-mappings/clients/${hasuraClient.id}`;
 
     // Only add/remove when needed so the operation is idempotent.
-    const currentRolesResponse = await axios.get(userClientRolesUrl, authHeaders);
+    const currentRolesResponse = await http.get(userClientRolesUrl, authHeaders);
     const hasAdminRole = currentRolesResponse.data.some((role) => role.name === 'admin');
 
     if (isAdmin && !hasAdminRole) {
-      await axios.post(userClientRolesUrl, [adminRole], jsonHeaders);
+      await http.post(userClientRolesUrl, [adminRole], jsonHeaders);
     } else if (!isAdmin && hasAdminRole) {
-      await axios.delete(userClientRolesUrl, { data: [adminRole], ...jsonHeaders });
+      await http.delete(userClientRolesUrl, { data: [adminRole], ...jsonHeaders });
     }
 
     logger.debug(`Successfully ${isAdmin ? 'added' : 'removed'} admin role for user ${userId}`);

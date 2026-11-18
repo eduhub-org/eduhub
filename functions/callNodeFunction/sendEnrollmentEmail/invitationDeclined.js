@@ -1,7 +1,8 @@
 import { gql } from 'graphql-request';
-import { createCancellationRequestVariableReplacer } from '../emailTemplateVariables.js';
+import { createCancellationRequestVariableReplacer } from '../lib/emailTemplateVariables.js';
 import { queueEmail } from '../lib/queueEmail.js';
 import { collectOrganizerRecipients } from '../sendCancellationRequestEmail/index.js';
+import * as config from '../lib/config.js';
 
 const GET_DECLINE_DETAILS = gql`
   query GetInvitationDeclineDetails($enrollmentId: Int!) {
@@ -67,7 +68,7 @@ export async function notifyOrganizersOfDecline(enrollmentId, client, logger) {
     const enrollment = result?.CourseEnrollment_by_pk;
     if (!enrollment) return;
     const { User: participant, Course: course } = enrollment;
-    const frontendUrl = process.env.FRONTEND_URL || 'https://edu.opencampus.sh';
+    const frontendUrl = config.frontendUrl();
     const decline = {
       participantName: [participant?.firstName, participant?.lastName].filter(Boolean).join(' '),
       participantEmail: participant?.email || '',

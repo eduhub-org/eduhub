@@ -1,6 +1,8 @@
-import { gql, GraphQLClient } from 'graphql-request';
-import { createVariableReplacer } from '../emailTemplateVariables.js';
+import { gql } from 'graphql-request';
+import { createVariableReplacer } from '../lib/emailTemplateVariables.js';
 import { queueEmail } from '../lib/queueEmail.js';
+import { createHasuraClient } from '../lib/hasura.js';
+import * as config from '../lib/config.js';
 
 const HOUR_MS = 60 * 60 * 1000;
 const TIME_ZONE = 'Europe/Berlin';
@@ -160,11 +162,7 @@ export default async function sendSessionReminders(req, logger) {
   logger.info('########## Send Session Reminders ##########');
 
   try {
-    const client = new GraphQLClient(process.env.HASURA_ENDPOINT, {
-      headers: {
-        'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET,
-      },
-    });
+    const client = createHasuraClient();
 
     const now = new Date();
     const horizon = new Date(now.getTime() + MAX_LEAD_HOURS * HOUR_MS);
@@ -211,7 +209,7 @@ export default async function sendSessionReminders(req, logger) {
             duration: formatDuration(session.startDateTime, session.endDateTime),
             location,
           },
-          courseLink: `${process.env.FRONTEND_URL || 'https://edu.opencampus.sh'}/course/${course.id}`,
+          courseLink: `${config.frontendUrl()}/course/${course.id}`,
         });
 
         const result = await queueEmail({

@@ -1,4 +1,3 @@
-import { GraphQLClient } from 'graphql-request';
 
 const GET_COURSE_ADDONS = `
   query GetCourseAddons($courseId: Int!) {
@@ -16,6 +15,8 @@ const GET_COURSE_ADDONS = `
 `;
 
 import { validateAndExtractFormbricksSurvey, buildLabelToChoiceIdMap, matchAddonsFromResponse, fetchAllFormbricksResponses } from '../lib/formbricks.js';
+import { createHasuraClient } from '../lib/hasura.js';
+import * as config from '../lib/config.js';
 
 /**
  * Fetches selected addons from the latest Formbricks response for a user/course.
@@ -64,7 +65,7 @@ export default async function getFormbricksAddonSelections(req, logger) {
     }
     
     const { baseUrl: formbricksApiUrl, surveyId: formbricksSurveyId } = urlParts;
-    const formbricksApiKey = process.env.FORMBRICKS_API_KEY;
+    const formbricksApiKey = config.formbricksApiKey();
     
     if (!formbricksApiKey) {
       logger.error('Formbricks API key missing');
@@ -77,11 +78,7 @@ export default async function getFormbricksAddonSelections(req, logger) {
     }
     
     // Fetch CourseAddonMappings from Hasura
-    const client = new GraphQLClient(process.env.HASURA_ENDPOINT, {
-      headers: {
-        'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET,
-      },
-    });
+    const client = createHasuraClient();
     
     const courseData = await client.request(GET_COURSE_ADDONS, { courseId });
     const addonMappings = courseData.Course_by_pk?.CourseAddonMappings || [];

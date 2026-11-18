@@ -39,8 +39,8 @@ Stopping here stops the **alert-driven** half of the job only. The watchlist pas
 | Path | Manager | Notes |
 | --- | --- | --- |
 | `frontend-nx/` | Yarn 3.4.1 (`nodeLinker: node-modules`) | Next.js app, `frontend-nx/yarn.lock`. The only deployed frontend. |
-| `functions/<name>/` | npm (`package-lock.json`) | Cloud Functions. |
-| `functions/apiProxy`, `functions/callPythonFunction` | pip (`requirements.txt`) | |
+| `functions/<name>/` (Node units, listed in `functions/units.json`) | npm, one committed `package-lock.json` per unit | Cloud Functions. Each unit is zipped and built on its own (`npm ci` from that unit's lockfile), so there is no shared root lockfile. `functions/shared/` has no dependencies. |
+| `functions/apiProxy`, `functions/callPythonFunction` | pip (`requirements.txt`, `==` pins; tests use `requirements-dev.txt`) | |
 | `keycloak/spi/*` | Maven (`pom.xml`) | |
 
 ## 2. Collect
@@ -142,6 +142,9 @@ the range in `package.json`, and the image tag for a container — and compare i
 every published advisory's vulnerable range. Do not filter by publication date: an advisory
 from months ago whose range still covers the shipped version is still a finding, and a date
 filter would make this pass depend on when it last ran.
+
+`functions/` Node units ship what their own `functions/<name>/package-lock.json` resolves
+(`npm ls <pkg>` in that unit after `npm ci`, or read the lockfile entry).
 
 **Second check, for the fix that ships without an advisory.** Not every security fix gets
 one; some land in a release with a line in the changelog and nothing else. For each
@@ -285,8 +288,13 @@ Then apply the bump with the manager that owns the manifest:
   direct deps. For transitive-only, add or raise a `resolutions` entry in
   `frontend-nx/package.json`, then `cd frontend-nx && yarn install --mode=update-lockfile`.
   Never hand-edit `yarn.lock`.
-- **npm**: in the function directory, `npm install <pkg>@<version>`, or
-  `npm install <pkg>@<version> --package-lock-only` for transitive-only.
+- **npm** (`functions/<name>/`): run npm inside the unit's own directory, with Node 22
+  and the npm it ships. For a direct dependency, `npm install <pkg>@<version>`, which
+  updates both `package.json` and that unit's `package-lock.json`. For transitive-only,
+  `npm update <pkg>` when the parent's range already admits the fix; otherwise add an
+  `overrides` entry to that unit's `package.json` and run `npm install`. Commit both
+  files. Never hand-edit `package-lock.json`. A package used by several units needs the
+  same change in each of them.
 - **pip**: edit the pin in `requirements.txt`.
 - **Maven**: bump the `<version>` in the relevant `pom.xml`.
 - **Keycloak** (`keycloak/spi/matrix-handle-listener`): the pom alone remediates **nothing**.
@@ -343,7 +351,11 @@ If a check fails **because of** a bump, revert that one bump, move it to
 NEEDS-MANUAL-DECISION with the error quoted, and re-verify. Never open a PR with a red build
 you already know about.
 
-If a `functions/` directory changed, at minimum confirm `npm ci` resolves there.
+If a `functions/` directory changed, reproduce `.github/workflows/functions-code-checks.yml`
+for that unit: `npm ci && npm test` in `functions/callNodeFunction` (run
+`npm ci` in `functions/sendMail` first; its tests run from there), or
+`pip install -r requirements-dev.txt && pytest` for a Python unit. For another Node unit,
+at minimum confirm `npm ci` succeeds there.
 
 ## 6. One PR
 

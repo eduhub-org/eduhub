@@ -9,7 +9,7 @@
 # Ignore the express installation that is created by start.sh
 node_modules
 /package.json
-package-lock.json
+/package-lock.json
 
 # Python cache files
 __pycache__/

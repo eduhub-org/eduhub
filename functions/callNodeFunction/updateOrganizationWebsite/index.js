@@ -1,6 +1,7 @@
-import { GraphQLClient, gql } from 'graphql-request';
+import { gql } from 'graphql-request';
 
 import { authorizeOrganizationAdminFieldChange } from '../lib/organizationAdminFieldAuthorization.js';
+import { createHasuraClient } from '../lib/hasura.js';
 
 /**
  * Updates (or clears) an organization's public website link, for the people
@@ -59,9 +60,7 @@ export default async function updateOrganizationWebsite(req, logger) {
       };
     }
 
-    const client = new GraphQLClient(process.env.HASURA_ENDPOINT, {
-      headers: { 'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET },
-    });
+    const client = createHasuraClient();
 
     const authorization = await authorizeOrganizationAdminFieldChange(client, {
       sessionUserId,

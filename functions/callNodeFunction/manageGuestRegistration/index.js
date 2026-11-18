@@ -1,6 +1,7 @@
 import crypto from 'node:crypto';
 import { gql } from 'graphql-request';
-import { createHasuraClient, verifyManageToken } from '../guestRegistration.js';
+import { verifyManageToken } from '../lib/guestRegistration.js';
+import { createHasuraClient } from '../lib/hasura.js';
 
 /**
  * Token-authenticated self-service for guests.

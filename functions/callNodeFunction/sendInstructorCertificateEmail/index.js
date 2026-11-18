@@ -1,6 +1,8 @@
-import { gql, GraphQLClient } from 'graphql-request';
-import { createVariableReplacer } from '../emailTemplateVariables.js';
+import { gql } from 'graphql-request';
+import { createVariableReplacer } from '../lib/emailTemplateVariables.js';
 import { queueEmail } from '../lib/queueEmail.js';
+import { createHasuraClient } from '../lib/hasura.js';
+import * as config from '../lib/config.js';
 
 /**
  * Mails an instructor when their instructor certificate for a course has been issued, i.e. when
@@ -32,9 +34,7 @@ export default async function sendInstructorCertificateEmail(req, logger) {
     }
 
     const courseInstructorId = event.data.new.id;
-    const client = new GraphQLClient(process.env.HASURA_ENDPOINT, {
-      headers: { 'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET },
-    });
+    const client = createHasuraClient();
 
     const GET_INSTRUCTOR_DETAILS = gql`
       query GetInstructorCertificateDetails($courseInstructorId: Int!) {
@@ -80,7 +80,7 @@ export default async function sendInstructorCertificateEmail(req, logger) {
 
     const { User, Course } = details;
     // The certificate is downloaded from the Course team card on the course management page.
-    const courseLink = `${process.env.FRONTEND_URL || 'https://edu.opencampus.sh'}/manage/course/${Course.id}`;
+    const courseLink = `${config.frontendUrl()}/manage/course/${Course.id}`;
     const variableReplacer = createVariableReplacer({ user: User, course: Course, enrollment: {}, courseLink }, () => '');
 
     const emailResult = await queueEmail({

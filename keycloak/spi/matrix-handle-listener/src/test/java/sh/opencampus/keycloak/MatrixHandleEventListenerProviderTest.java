@@ -6,7 +6,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 /**
- * Same cases as functions/shared_libs/node/matrixHandle.test.cjs; update both
+ * Same cases as functions/shared/matrixHandle.test.js; update both
  * when the expected handles change.
  */
 class MatrixHandleEventListenerProviderTest {

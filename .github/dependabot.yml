@@ -1,0 +1,86 @@
+# Dependabot version updates for the serverless functions and the workflow
+# actions. Security alerts are handled separately by the daily
+# .github/workflows/dependabot-triage.yml job, which may close a PR opened
+# here when its consolidated triage PR already carries the same bump.
+#
+# The frontend (Yarn) and Keycloak (Maven/Docker) are deliberately not listed:
+# their upgrades are coupled (see .github/security-watchlist.yml) and run
+# through the triage job.
+version: 2
+
+updates:
+  - package-ecosystem: npm
+    directories:
+      - /functions/callNodeFunction
+      - /functions/sendMail
+      - /functions/addKeycloakRole
+      - /functions/removeKeycloakRole
+      - /functions/updateFromKeycloak
+      - /functions/sendQuestionaires
+    target-branch: develop
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 3
+    commit-message:
+      prefix: build
+      include: scope
+    groups:
+      functions-npm-minor-patch:
+        update-types: [minor, patch]
+
+  - package-ecosystem: pip
+    directory: /functions/callPythonFunction
+    target-branch: develop
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 2
+    commit-message:
+      prefix: build
+      include: scope
+    groups:
+      call-python-function-minor-patch:
+        update-types: [minor, patch]
+    ignore:
+      # Flask stays <3.0 for Functions Framework compatibility.
+      - dependency-name: flask
+        update-types: [version-update:semver-major]
+
+  - package-ecosystem: pip
+    directory: /functions/apiProxy
+    target-branch: develop
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 2
+    commit-message:
+      prefix: build
+      include: scope
+    groups:
+      api-proxy-minor-patch:
+        update-types: [minor, patch]
+    ignore:
+      # These were constrained to their current major (==2.*) before pinning.
+      - dependency-name: flask
+        update-types: [version-update:semver-major]
+      - dependency-name: requests
+        update-types: [version-update:semver-major]
+      - dependency-name: google-auth
+        update-types: [version-update:semver-major]
+      - dependency-name: google-cloud-storage
+        update-types: [version-update:semver-major]
+
+  # Keeps the SHA-pinned actions (and their version comments) current.
+  - package-ecosystem: github-actions
+    directory: /
+    target-branch: develop
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 2
+    commit-message:
+      prefix: ci
+    groups:
+      github-actions:
+        patterns: ["*"]
