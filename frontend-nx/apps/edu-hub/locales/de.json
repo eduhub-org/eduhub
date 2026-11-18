@@ -3639,7 +3639,8 @@
     }
   },
   "project": {
-    "not_found": "Projekt nicht gefunden",
+    "not_found_or_no_access": "Projekt nicht gefunden – oder Du hast keinen Zugriff darauf.",
+    "not_found_logged_out": "Projekt nicht gefunden. Wenn Du zu diesem Projekt gehörst, melde Dich an, um es zu sehen.",
     "status": {
       "PUBLISHED": "Veröffentlicht"
     },

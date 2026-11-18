@@ -1,4 +1,4 @@
-import { FC, useCallback, useMemo, useState } from 'react';
+import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { CircularProgress } from '@mui/material';
 import { useRoleQuery } from '../../../../hooks/authedQuery';
@@ -139,6 +139,16 @@ const Projects: FC<ProjectsProps> = ({
   const initialLoading =
     projectsQuery.loading && !projectsQuery.data;
 
+  // Project emails link to `/course/<id>#projects`. The section renders only
+  // after its queries load, so the browser's own anchor jump misses it.
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const sectionReady = !initialLoading && !myProjectQuery.loading;
+  useEffect(() => {
+    if (sectionReady && window.location.hash === '#projects') {
+      sectionRef.current?.scrollIntoView({ block: 'start' });
+    }
+  }, [sectionReady]);
+
   if (initialLoading) {
     return (
       <div className="flex justify-center py-6">
@@ -169,7 +179,7 @@ const Projects: FC<ProjectsProps> = ({
   }
 
   return (
-    <div className="mt-24 mb-24 min-w-0 mx-6 xl:mx-0">
+    <div id="projects" ref={sectionRef} className="mt-24 mb-24 min-w-0 mx-6 xl:mx-0 scroll-mt-24">
       {showMyProjectPanel && userId ? (
         <>
           <SectionTitle>{t('projects.my_project.heading')}</SectionTitle>

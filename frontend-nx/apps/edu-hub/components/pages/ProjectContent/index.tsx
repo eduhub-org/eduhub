@@ -7,6 +7,9 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
 import { AuthRoles } from '../../../types/enums';
+import { useRoleQuery } from '../../../hooks/authedQuery';
+import { useCurrentRole, useIsLoggedIn, useIsSessionLoading } from '../../../hooks/authentication';
+import { LoginButton } from '../../layout/LoginButton';
 import { PROJECT_PAGE, SIMILAR_PROJECT_TILES } from '../../../queries/projectPage';
 import { ProjectPage, ProjectPageVariables } from '../../../queries/__generated__/ProjectPage';
 import {
@@ -36,11 +39,24 @@ const ProjectContent: FC<ProjectContentProps> = ({ id, context, courseId }) => {
   const t = useTranslations('project');
   const locale = useLocale();
   const anonymous = { role: AuthRoles.anonymous };
+  const role = useCurrentRole();
+  const isLoggedIn = useIsLoggedIn();
+  const sessionLoading = useIsSessionLoading();
 
-  const { data, loading, error } = useQuery<ProjectPage, ProjectPageVariables>(PROJECT_PAGE, {
+  // Read the project with the visitor's own role: logged-out visitors see
+  // published projects and open templates, logged-in ones also every project
+  // they can see in its course (team, proposer, mentors, instructors,
+  // participants). Wait for the session so the role is known.
+  const {
+    data,
+    loading: projectLoading,
+    error,
+  } = useRoleQuery<ProjectPage, ProjectPageVariables>(PROJECT_PAGE, {
     variables: { id },
-    context: anonymous,
+    context: { role },
+    skip: sessionLoading,
   });
+  const loading = sessionLoading || projectLoading;
 
   const project: ProjectPageFragment | undefined = data?.Project?.[0];
 
@@ -102,7 +118,10 @@ const ProjectContent: FC<ProjectContentProps> = ({ id, context, courseId }) => {
   if (!project) {
     return (
       <div className="flex justify-center max-w-screen-xl mx-auto w-full pt-32">
-        <div className="text-white">{t('not_found')}</div>
+        <div className="flex flex-col items-center gap-6 text-white">
+          <div>{isLoggedIn ? t('not_found_or_no_access') : t('not_found_logged_out')}</div>
+          {!isLoggedIn && <LoginButton />}
+        </div>
       </div>
     );
   }

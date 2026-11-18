@@ -3654,7 +3654,8 @@
     }
   },
   "project": {
-    "not_found": "Project not found",
+    "not_found_or_no_access": "Project not found – or you don't have access to it.",
+    "not_found_logged_out": "Project not found. If you belong to this project, log in to see it.",
     "status": {
       "PUBLISHED": "Published"
     },

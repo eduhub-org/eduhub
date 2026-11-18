@@ -213,8 +213,8 @@ export const EMAIL_VARIABLES = {
       categories: ['project']
     },
     '[Project:Link]': {
-      description: 'Link to the project page',
-      example: 'https://edu.opencampus.sh/project/123',
+      description: 'Link to where the team works on the project: the projects section of its course page, or the project page when it has no course',
+      example: 'https://edu.opencampus.sh/course/42#projects',
       categories: ['project']
     },
     '[Project:ReviewComment]': {
@@ -659,14 +659,20 @@ export function createSessionVariableReplacer(session, enrollment, sessionData =
  * Convenience function for project lifecycle emails
  * @param {Object} project - Project data ({ id, title })
  * @param {Object} recipientUser - Recipient user ({ firstName, lastName, email })
- * @param {Object} [extra] - Optional extra values ({ applicantName })
+ * @param {Object} [extra] - Optional extra values ({ applicantName, courseId })
  * @returns {Function} Variable replacement function
  */
 export function createProjectVariableReplacer(project, recipientUser, extra = {}) {
+  const baseUrl = process.env.FRONTEND_URL || 'https://edu.opencampus.sh';
+  // Lifecycle emails ask the team to act (answer a join request, revise a
+  // sent-back project), which happens in the course page's projects section.
+  const projectLink = extra.courseId
+    ? `${baseUrl}/course/${extra.courseId}#projects`
+    : `${baseUrl}/project/${project?.id || ''}`;
   return createVariableReplacer({
     user: recipientUser,
     project,
-    projectLink: `${process.env.FRONTEND_URL || 'https://edu.opencampus.sh'}/project/${project?.id || ''}`,
+    projectLink,
     applicantName: extra.applicantName || ''
   });
 }

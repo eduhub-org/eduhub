@@ -4,6 +4,32 @@ import { withRetry } from '../lib/withRetry.js';
 import { createProjectVariableReplacer } from '../emailTemplateVariables.js';
 
 /**
+ * Who is told about a Join Request (see CONTEXT.md): the Project Team, who
+ * decide on it. Only a project with no team yet falls back to its mentors,
+ * or, without mentors, to its course instructors, so the request still
+ * reaches someone. Instructors otherwise follow requests in the course's
+ * project overview rather than by email.
+ *
+ * @param {Object} project - Project with ProjectAuthors, ProjectMentors and
+ *   ProjectCourses.Course.CourseInstructors (each holding a User)
+ * @returns {Object[]} Recipient users (may contain duplicates)
+ */
+export function resolveJoinRequestRecipients(project) {
+  const team = (project.ProjectAuthors || [])
+    .filter((a) => a.participationStatus === 'ACCEPTED')
+    .map((a) => a.User)
+    .filter(Boolean);
+  if (team.length > 0) return team;
+
+  const mentors = (project.ProjectMentors || []).map((m) => m.User).filter(Boolean);
+  if (mentors.length > 0) return mentors;
+
+  return (project.ProjectCourses || [])
+    .flatMap((pc) => (pc.Course?.CourseInstructors || []).map((ci) => ci.User))
+    .filter(Boolean);
+}
+
+/**
  * Sends project lifecycle emails.
  *
  * Wired to two Hasura event triggers:
@@ -42,7 +68,7 @@ export default async function sendProjectEmail(req, logger) {
     // Decide the template, the affected project, and (for author events) the affected user.
     let projectId;
     let templateType;
-    let recipientSelector; // 'authors' | 'staff' | 'staff_and_authors' | 'affected_user'
+    let recipientSelector; // 'authors' | 'team' | 'staff_and_authors' | 'affected_user'
     let affectedUserId = null;
     let applicantUserId = null;
 
@@ -54,7 +80,7 @@ export default async function sendProjectEmail(req, logger) {
 
       if (op === 'INSERT' && status === 'REQUESTED') {
         templateType = 'PROJECT_JOIN_REQUESTED';
-        recipientSelector = 'staff_and_owner';
+        recipientSelector = 'team';
         applicantUserId = authorNew.userId;
       } else if (op === 'UPDATE' && authorOld?.participationStatus !== status) {
         affectedUserId = authorNew.userId;
@@ -115,8 +141,6 @@ export default async function sendProjectEmail(req, logger) {
           title
           ratingComment
           submissionDeadline
-          proposedByUserId
-          ProposedByUser { id email firstName lastName }
           ProjectAuthors {
             participationStatus
             User { id email firstName lastName }
@@ -165,11 +189,8 @@ export default async function sendProjectEmail(req, logger) {
       case 'staff_and_authors':
         recipients = [...staff, ...acceptedAuthors];
         break;
-      case 'staff_and_owner':
-        recipients = [...staff];
-        if (project.ProposedByUser) recipients.push(project.ProposedByUser);
-        // fall back to accepted authors if there is no explicit owner
-        if (!project.ProposedByUser) recipients.push(...acceptedAuthors);
+      case 'team':
+        recipients = resolveJoinRequestRecipients(project);
         break;
       case 'affected_user': {
         const affected = (project.ProjectAuthors || []).map((a) => a.User).find((u) => u && u.id === affectedUserId);
@@ -228,7 +249,7 @@ export default async function sendProjectEmail(req, logger) {
 
     const results = [];
     for (const recipient of uniqueRecipients) {
-      const replacer = createProjectVariableReplacer(projectForTemplate, recipient, { applicantName });
+      const replacer = createProjectVariableReplacer(projectForTemplate, recipient, { applicantName, courseId });
       const result = await queueEmail({
         templateType,
         variableReplacer: replacer,
