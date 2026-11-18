@@ -196,6 +196,12 @@ against the actual code rather than the advisory text alone.
   drops tests and Jest files, and the Cloud Functions build runs `npm ci` from the
   lockfile with `NODE_ENV=production` (no `build`/`gcp-build` script), so
   devDependencies are never installed in a deployed function.
+  **Exception: `@google-cloud/functions-framework`.** The units list it only in
+  devDependencies, but the Cloud Functions Node.js build adds the framework itself
+  when `dependencies` lacks it, so a version (and dependency tree) chosen by the
+  build, not the lockfile, runs in production. Never mark an alert on it or its
+  transitive deps NOT-RELEVANT from dev scope alone: check which framework version
+  the build installs and whether the vulnerable code is reachable, then classify.
 - For runtime deps, check **reachability**: grep for the import, and for the specific
   vulnerable function or option the advisory names. State whether user-controlled input can
   actually reach it.
