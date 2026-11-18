@@ -43,17 +43,20 @@ export default async function createUser(req, logger) {
     };
   }
 
-  const kcAdminClient = new KcAdminClient({
-    baseUrl: config.keycloakConfig().url,
-    realmName: "master",
-  });
-
-  const graphqlClient = createHasuraClient();
-
+  // Created inside the try, so missing configuration ends in the normal
+  // USER_CREATION_FAILED response instead of rejecting the handler.
+  let kcAdminClient;
+  let graphqlClient;
   let keycloakUserId = null;
   let hasuraUserId = null;
 
   try {
+    kcAdminClient = new KcAdminClient({
+      baseUrl: config.keycloakConfig().url,
+      realmName: "master",
+    });
+    graphqlClient = createHasuraClient();
+
     // Authenticate with Keycloak
     await authenticateKeycloakAdmin(kcAdminClient);
     kcAdminClient.setConfig({
@@ -266,8 +269,9 @@ export default async function createUser(req, logger) {
     // Log full error details server-side
     logger.error(`Error creating user: ${error.message}`, { error: error.stack });
 
-    // Rollback: Delete user from Keycloak if created
-    if (keycloakUserId) {
+    // Rollback: Delete user from Keycloak if created. The ids are only set
+    // after both clients exist, so a config failure skips the rollback.
+    if (keycloakUserId && kcAdminClient) {
       try {
         await kcAdminClient.users.del({ id: keycloakUserId });
         logger.info(`Rolled back Keycloak user: ${keycloakUserId}`);
@@ -277,7 +281,7 @@ export default async function createUser(req, logger) {
     }
 
     // Rollback: Delete user from Hasura if created
-    if (hasuraUserId) {
+    if (hasuraUserId && graphqlClient) {
       try {
         const DELETE_USER = gql`
           mutation DeleteUser($id: uuid!) {
