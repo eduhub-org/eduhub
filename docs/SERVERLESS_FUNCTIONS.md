@@ -126,10 +126,14 @@ therefore needs a handler whose side effect is idempotent across deliveries.
   type), not under a nested object.
 - `messageKey` is the translation key the frontend shows.
 - Node: `httpStatus` is for the few handlers whose callers need a non-2xx:
-  `updateFromKeycloak` (Hasura turns a 4xx/5xx action answer into a GraphQL
-  error and shows its `message`) and the Keycloak role triggers (500 so
-  Hasura retries a configuration error). Prefer `success: false` or
-  `retryable` otherwise.
+  `updateFromKeycloak` and `getSignedUrl` (Hasura turns a 4xx action answer
+  into a GraphQL error and passes on its `message` and `extensions`; a 5xx
+  reaches the client only as a generic error), and the Keycloak role
+  triggers (500 so Hasura retries a configuration error). `getSignedUrl`
+  needs it because its output type has only a required `link`: a 200
+  without one fails Hasura's output validation, so a denied path answers
+  403 (`FILE_ACCESS_DENIED`) and a failed load 400 (`FILE_LOAD_ERROR`).
+  Prefer `success: false` or `retryable` otherwise.
 - Node: a result without `success`/`error` is wrapped as
   `{ success: true, data }`, except for mutation actions, which get it as is.
   A thrown error becomes `{ success: false, error, messageKey }` with
