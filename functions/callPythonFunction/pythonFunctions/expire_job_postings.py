@@ -1,7 +1,7 @@
 import logging
 import os
 from datetime import datetime, timezone
-from api_clients import EduHubClient
+from api_clients import EduHubClient, HasuraQueryError
 
 
 def _get_mail_template(client, template_type):
@@ -16,9 +16,10 @@ def _get_mail_template(client, template_type):
         }
     }
     """
-    result = client.send_query(query, {"type": template_type})
-    if not isinstance(result, dict) or result.get("errors"):
-        logging.warning(f"Could not load mail template {template_type}: {result}")
+    try:
+        result = client.send_query(query, {"type": template_type})
+    except HasuraQueryError as error:
+        logging.warning(f"Could not load mail template {template_type}: {error}")
         return None
     templates = result.get("data", {}).get("MailTemplate", [])
     return templates[0] if templates else None
@@ -41,15 +42,16 @@ def _queue_mail(client, template, to, variables):
         }
     }
     """
-    result = client.send_query(mutation, {
-        "subject": subject,
-        "content": content,
-        "from": template.get("from") or "team@stujo.net",
-        "to": to,
-        "bcc": template.get("bcc"),
-    })
-    if not isinstance(result, dict) or result.get("errors"):
-        logging.error(f"Failed to queue expiry mail to {to}: {result}")
+    try:
+        client.send_query(mutation, {
+            "subject": subject,
+            "content": content,
+            "from": template.get("from") or "team@stujo.net",
+            "to": to,
+            "bcc": template.get("bcc"),
+        })
+    except HasuraQueryError as error:
+        logging.error(f"Failed to queue expiry mail to {to}: {error}")
         return False
     return True
 
@@ -107,14 +109,11 @@ def expire_job_postings(arguments):
         }
         """
 
-        result = eduhub_client.send_query(expire_mutation, {"now": now})
-
-        if not isinstance(result, dict):
-            logging.error(f"Unexpected response from Hasura: {result}")
-            return {"success": False, "error": str(result)}
-        if result.get("errors"):
-            logging.error(f"GraphQL errors: {result['errors']}")
-            return {"success": False, "error": str(result["errors"])}
+        try:
+            result = eduhub_client.send_query(expire_mutation, {"now": now})
+        except HasuraQueryError as error:
+            logging.error(f"Expiring job postings failed: {error}")
+            return {"success": False, "error": str(error)}
 
         expired = result["data"]["update_JobPosting"]["returning"]
         logging.info(f"Expired {len(expired)} job posting(s)")

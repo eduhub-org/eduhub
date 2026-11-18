@@ -15,6 +15,8 @@
  *   production cannot address live objects.
  */
 
+import * as config from './config.js';
+
 const DEFAULT_API_URL = 'https://api.zentrale.rausgegangen.de/v2';
 const MAX_ATTEMPTS = 3;
 const BASE_BACKOFF_MS = 1000;
@@ -22,7 +24,7 @@ const REQUEST_TIMEOUT_MS = 20000;
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-export const isProduction = () => process.env.ENVIRONMENT === 'production';
+export const isProduction = config.isProduction;
 
 /**
  * The mapping id of one of our objects: `eduhub-event-12`, `eduhub-event-12-show`,
@@ -30,7 +32,7 @@ export const isProduction = () => process.env.ENVIRONMENT === 'production';
  * (`eduhub-staging-event-12`).
  */
 export const mappingId = (kind, id) => {
-  const environment = (process.env.ENVIRONMENT || 'development').trim();
+  const environment = config.envOr('ENVIRONMENT', 'development').trim();
   return isProduction() ? `eduhub-${kind}-${id}` : `eduhub-${environment}-${kind}-${id}`;
 };
 
@@ -76,7 +78,7 @@ export const createRausgegangenClient = ({ apiKey, logger, fetchImpl = globalThi
   if (!apiKey) {
     throw new Error('Rausgegangen API key is missing');
   }
-  const baseUrl = (process.env.RAUSGEGANGEN_API_URL || DEFAULT_API_URL).replace(/\/+$/, '');
+  const baseUrl = config.envOr('RAUSGEGANGEN_API_URL', DEFAULT_API_URL).replace(/\/+$/, '');
 
   const request = async (method, path, { query = {}, body } = {}) => {
     const url = new URL(`${baseUrl}${path}`);

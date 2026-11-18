@@ -1,5 +1,5 @@
-import { GraphQLClient } from 'graphql-request';
 import { isOrgAdminOfCourse } from './orgAdminScope.js';
+import { createHasuraClient } from './hasura.js';
 
 /**
  * Who may upload a file for a record through the generic saveImage / saveFile
@@ -152,9 +152,7 @@ export async function authorizeUpload(req) {
     return { authorized: false, reason: 'No upload rule for this target' };
   }
 
-  const client = new GraphQLClient(process.env.HASURA_ENDPOINT, {
-    headers: { 'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET },
-  });
+  const client = createHasuraClient();
   const authorized = await RULES[keys[0]]({ client, id: targets[keys[0]], userId });
   return authorized ? { authorized: true } : { authorized: false, reason: `Not allowed to upload for ${keys[0]}` };
 }

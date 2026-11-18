@@ -1,10 +1,10 @@
 import fs from "fs";
-import { logger } from "../index.js";
+import { logger } from "./logger.js";
 import path from "path";
 import url from "url";
+import * as appConfig from "./config.js";
 
 const isPublicLegacy = (filePath) => filePath.startsWith("https://") || filePath.startsWith("http://");
-const isPublic = (filePath) => filePath.includes("/public/");
 const isPdf = (filePath) => filePath.split("?")[0].toLowerCase().endsWith(".pdf");
 
 const getDownloadFileName = (filePath) => {
@@ -54,7 +54,7 @@ const getRelativePath = (filePath) => {
 };
 
 export const buildCloudStorage = (Storage) => {
-  const emulated = process.env.ENVIRONMENT == "development";
+  const emulated = appConfig.isDevelopment();
 
   if (emulated) {
     const www = "/home/node/www/";
@@ -84,7 +84,7 @@ export const buildCloudStorage = (Storage) => {
         try {
             path = getRelativePath(path);
             const fullPath = `${bucketName}/${path}`;
-            const url = encodeURI(`http://localhost:${process.env.STORAGE_PORT}/${fullPath}`);
+            const url = encodeURI(`http://localhost:${appConfig.storagePort()}/${fullPath}`);
             logger.debug(`loadFromBucket: Generated URL for loading from bucket: ${url}`);
     
             return url;
@@ -127,7 +127,7 @@ export const buildCloudStorage = (Storage) => {
       setPublic: async (path, bucketName) => {
         path = getRelativePath(path);
         logger.debug(`[Emulated] Set public: ${bucketName}/${path}`);
-        const publicUrl = `http://localhost:${process.env.STORAGE_PORT}/${bucketName}/${path}`;
+        const publicUrl = `http://localhost:${appConfig.storagePort()}/${bucketName}/${path}`;
         return publicUrl;
       },
       setPrivate: async (path, bucketName) => {
@@ -148,7 +148,7 @@ export const buildCloudStorage = (Storage) => {
         const saveOptions = isPdf(filename)
           ? { metadata: { contentType: "application/pdf" } }
           : undefined;
-        const sr = await file.save(fileBuffer, saveOptions);
+        await file.save(fileBuffer, saveOptions);
 
         let link = "";
         if (isPublic) {

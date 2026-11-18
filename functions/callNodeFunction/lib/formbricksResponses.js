@@ -1,4 +1,5 @@
 import { validateAndExtractFormbricksSurvey, fetchAllFormbricksResponses } from './formbricks.js';
+import * as config from './config.js';
 
 /**
  * Loading, matching and formatting of Formbricks survey responses, shared by
@@ -77,7 +78,7 @@ export async function loadFormbricksSurveyResponses(surveyUrl, logger) {
   }
   const { baseUrl, surveyId } = urlParts;
 
-  const apiKey = process.env.FORMBRICKS_API_KEY;
+  const apiKey = config.formbricksApiKey();
   if (!apiKey) {
     throw new FormbricksResponsesError('Formbricks API key not configured', 'FORMBRICKS_NOT_CONFIGURED');
   }

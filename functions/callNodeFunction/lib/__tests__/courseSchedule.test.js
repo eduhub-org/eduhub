@@ -1,5 +1,5 @@
 import { formatCourseDateTime, describeCourseLocations } from '../courseSchedule.js';
-import { createEnrollmentVariableReplacer } from '../../emailTemplateVariables.js';
+import { createEnrollmentVariableReplacer } from '../emailTemplateVariables.js';
 
 // Times in UTC; Berlin is UTC+1 in winter.
 const session = (start, end, SessionAddresses = []) => ({ startDateTime: start, endDateTime: end, SessionAddresses });

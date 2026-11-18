@@ -1,5 +1,6 @@
 import Stripe from 'stripe';
-import { GraphQLClient } from 'graphql-request';
+import { createHasuraClient } from '../lib/hasura.js';
+import * as config from '../lib/config.js';
 
 /**
  * Creates Stripe Products and Prices programmatically for validated add-ons.
@@ -32,7 +33,7 @@ export default async function createStripeAddonPrices(req, logger) {
       };
     }
 
-    const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+    const stripeSecretKey = config.stripeSecretKey();
     if (!stripeSecretKey) {
       logger.error('Stripe secret key missing');
       return {
@@ -45,11 +46,7 @@ export default async function createStripeAddonPrices(req, logger) {
     const stripe = new Stripe(stripeSecretKey);
     
     // Setup Hasura client for database operations
-    const hasuraClient = new GraphQLClient(process.env.HASURA_ENDPOINT, {
-      headers: {
-        'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET,
-      },
-    });
+    const hasuraClient = createHasuraClient();
 
     const CHECK_EXISTING_MAPPING = `
       query CheckExistingMapping($courseId: Int!, $questionId: String!) {

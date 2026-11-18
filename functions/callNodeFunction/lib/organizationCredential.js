@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import { trimmedEnv } from './config.js';
 
 /**
  * Decrypts an organization's integration credential (Ghost newsletter key,
@@ -14,7 +15,7 @@ const KEY_ENV = 'GHOST_NEWSLETTER_CREDENTIALS_ENCRYPTION_KEY';
 const normalize = (value) => (typeof value === 'string' ? value.trim() : '');
 
 const decodeEncryptionKey = () => {
-  const raw = normalize(process.env[KEY_ENV]);
+  const raw = trimmedEnv(KEY_ENV);
   if (!raw) {
     throw new Error(`Missing ${KEY_ENV}`);
   }

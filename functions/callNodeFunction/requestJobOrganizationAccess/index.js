@@ -1,8 +1,9 @@
-import { GraphQLClient, gql } from 'graphql-request';
+import { gql } from 'graphql-request';
 
 import { queueEmail } from '../lib/queueEmail.js';
-import { createOrganizationClaimVariableReplacer } from '../emailTemplateVariables.js';
+import { createOrganizationClaimVariableReplacer } from '../lib/emailTemplateVariables.js';
 import { adminAccessUrl, displayName, resolveContactEmail } from '../lib/jobOrganizationClaim.js';
+import { createHasuraClient } from '../lib/hasura.js';
 
 /**
  * Asks the people who already manage an organization's job offers to let a
@@ -74,9 +75,7 @@ export default async function requestJobOrganizationAccess(req, logger) {
       return { success: false, error: 'organizationId is required', messageKey: 'MISSING_ORGANIZATION_ID' };
     }
 
-    const client = new GraphQLClient(process.env.HASURA_ENDPOINT, {
-      headers: { 'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET },
-    });
+    const client = createHasuraClient();
 
     const requester = (await client.request(GET_REQUESTER, { userId: sessionUserId }))?.User_by_pk;
     if (!requester) {

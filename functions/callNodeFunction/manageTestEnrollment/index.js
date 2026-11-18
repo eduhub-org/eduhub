@@ -1,4 +1,4 @@
-import { GraphQLClient } from "graphql-request";
+import { createHasuraClient } from "../lib/hasura.js";
 
 /**
  * Create or remove a preview enrollment.
@@ -31,17 +31,6 @@ const ROLES_ALLOWED = new Set(["admin", "instructor", "instructor_access"]);
 // while previewing must still be able to end it. The handler only ever removes
 // the caller's own `isTest` row, so this reaches nothing else.
 const ROLES_ALLOWED_TO_REMOVE = new Set([...ROLES_ALLOWED, "user", "user_access"]);
-
-const ensureHasuraClient = () => {
-  if (!process.env.HASURA_ENDPOINT || !process.env.HASURA_ADMIN_SECRET) {
-    throw new Error("HASURA_ENDPOINT or HASURA_ADMIN_SECRET not configured");
-  }
-  return new GraphQLClient(process.env.HASURA_ENDPOINT, {
-    headers: {
-      "x-hasura-admin-secret": process.env.HASURA_ADMIN_SECRET,
-    },
-  });
-};
 
 const GET_CONTEXT = `
   query TestEnrollmentContext($courseId: Int!, $userId: uuid!) {
@@ -195,7 +184,7 @@ export default async function manageTestEnrollment(req, logger) {
     };
   }
 
-  const client = ensureHasuraClient();
+  const client = createHasuraClient();
   const context = await client.request(GET_CONTEXT, { courseId, userId });
 
   if (!context.Course_by_pk) {

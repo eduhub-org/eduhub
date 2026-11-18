@@ -162,7 +162,7 @@ at their own link is usually the fastest complete answer.
   payload whether the address was unknown, already had an account, already had a
   pending confirmation, or was already enrolled. Only the address owner learns
   the difference, by email. Keep it that way when editing.
-- **Volume caps** (`GUEST_THROTTLE` in `guestRegistration.js`) apply per address
+- **Volume caps** (`GUEST_THROTTLE` in `lib/guestRegistration.js`) apply per address
   *and course* (3/h), per address (10/h), per course (30/h) and globally (100 new
   guests/h), all checked *before* anything is written and for unseen addresses as
   well as known ones. Every `MailLog` insert becomes a real Mailgun send, and this
@@ -220,9 +220,9 @@ at their own link is usually the fastest complete answer.
 | Migrations | `backend/migrations/default/1788100000000_*` … `1788100000009_*` |
 | Actions | `backend/metadata/actions.yaml`, `actions.graphql` |
 | Token table | `backend/metadata/databases/default/tables/public_GuestRegistrationToken.yaml` |
-| Shared helpers | `functions/callNodeFunction/guestRegistration.js` |
+| Shared helpers | `functions/callNodeFunction/lib/guestRegistration.js` |
 | Handlers | `functions/callNodeFunction/{registerGuestForCourse,confirmGuestRegistration,manageGuestRegistration}/` |
-| Guest mail footer | `appendGuestMailFooter` in `guestRegistration.js`, applied by `sendEnrollmentEmail`, `sendCourseUpdateEmail` and `sendSessionReminders` |
+| Guest mail footer | `appendGuestMailFooter` in `lib/guestRegistration.js`, applied by `sendEnrollmentEmail`, `sendCourseUpdateEmail` and `sendSessionReminders` |
 | Retention cron | `functions/callPythonFunction/pythonFunctions/anonymize_guest_data.py` |
 | Form | `frontend-nx/apps/edu-hub/components/pages/CourseContent/Registration/GuestRegistrationModal.tsx` |
 | Public pages | `frontend-nx/apps/edu-hub/pages/guest/{confirm,manage}.tsx` |

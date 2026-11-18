@@ -1,9 +1,10 @@
 import { gql } from 'graphql-request';
 import { queueEmail } from './queueEmail.js';
 import { withRetry } from './withRetry.js';
-import { createVariableReplacer } from '../emailTemplateVariables.js';
+import { createVariableReplacer, formatGermanLongDate } from './emailTemplateVariables.js';
 import { applyConditionalBlocks } from './conditionalBlocks.js';
 import { formatReminderDateTimeRange } from '../sendSessionReminders/index.js';
+import * as config from './config.js';
 
 const GET_ENROLLEES = gql`
   query GetActiveEnrollees($courseId: Int!) {
@@ -17,8 +18,6 @@ const GET_ENROLLEES = gql`
   }
 `;
 
-const formatDate = (dateString) =>
-  dateString ? new Date(dateString).toLocaleDateString('de-DE', { year: 'numeric', month: 'long', day: 'numeric' }) : '';
 const formatDateTime = (dateString) =>
   dateString ? new Date(dateString).toLocaleString('de-DE', { dateStyle: 'long', timeStyle: 'short' }) : '';
 const formatTime = (dateString) =>
@@ -90,9 +89,9 @@ export async function sendSessionRescheduledEmails({ session, client, logger, ch
           locationList: change.locationList,
           previousLocationList: change.previousLocationList,
         },
-        courseLink: `${process.env.FRONTEND_URL || 'https://edu.opencampus.sh'}/course/${course.id}`,
+        courseLink: `${config.frontendUrl()}/course/${course.id}`,
       },
-      formatDate
+      formatGermanLongDate
     );
     const result = await queueEmail({
       templateType,

@@ -1,5 +1,6 @@
 import { marked } from 'marked';
 import sanitizeHtml from 'sanitize-html';
+import { escapeHtml } from './html.js';
 
 /**
  * Maps an EduHub event (a Course in an EVENTS program) to Rausgegangen API
@@ -24,9 +25,6 @@ export { ACTIVE_ENROLLMENT_STATUSES };
 export const toApiSlug = (enumValue) => (enumValue ? String(enumValue).toLowerCase().replace(/_/g, '-') : null);
 
 const trimmed = (value) => (typeof value === 'string' ? value.trim() : '');
-
-const escapeHtml = (value) =>
-  String(value).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 
 /**
  * Markdown (our description fields) to the HTML subset Rausgegangen accepts.

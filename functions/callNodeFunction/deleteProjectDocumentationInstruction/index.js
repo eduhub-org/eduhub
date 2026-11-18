@@ -1,4 +1,4 @@
-import { GraphQLClient } from "graphql-request";
+import { createHasuraClient } from "../lib/hasura.js";
 
 // Request roles from session_variables, not the inherited-role names used in
 // actions.yaml permissions. Instructors are additionally limited to instructions
@@ -6,17 +6,6 @@ import { GraphQLClient } from "graphql-request";
 // Org admins manage courses from the course management page like instructors do;
 // the ownership check below applies to them the same way.
 const ALLOWED_ROLES = new Set(["admin", "instructor", "org_admin"]);
-
-const ensureHasuraClient = () => {
-  if (!process.env.HASURA_ENDPOINT || !process.env.HASURA_ADMIN_SECRET) {
-    throw new Error("HASURA_ENDPOINT or HASURA_ADMIN_SECRET not configured");
-  }
-  return new GraphQLClient(process.env.HASURA_ENDPOINT, {
-    headers: {
-      "x-hasura-admin-secret": process.env.HASURA_ADMIN_SECRET,
-    },
-  });
-};
 
 const GET_INSTRUCTION = `
   query GetProjectDocumentationInstructionForDelete($id: Int!) {
@@ -86,7 +75,7 @@ export default async function deleteProjectDocumentationInstruction(req, logger)
 
   let hasuraClient;
   try {
-    hasuraClient = ensureHasuraClient();
+    hasuraClient = createHasuraClient();
   } catch (error) {
     logger.error("Hasura client misconfigured", { error: error.message });
     return {

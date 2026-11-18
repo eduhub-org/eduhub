@@ -63,13 +63,15 @@
       value_from_env: HASURA_CLOUD_FUNCTION_SECRET
   comment: Reminds accepted project authors before their project submission deadline
 - name: send_questionaires
-  webhook: '{{CLOUD_FUNCTION_LINK_SEND_QUESTIONAIRES}}'
+  webhook: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
   schedule: 0 */2 * * *
   include_in_metadata: true
   payload: {}
   headers:
-    - name: secret
+    - name: Hasura-Secret
       value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+    - name: Function-Name
+      value: sendQuestionaires
   comment: Sends out questionaires if necessary
 - name: update_enrollment_locations
   webhook: '{{CLOUD_FUNCTION_LINK_CALL_PYTHON_FUNCTION}}'
@@ -177,9 +179,9 @@
     Normally sent at checkout.session.completed or on invoice.finalized; this
     sweep covers the case where neither fired (most plausibly because
     invoice.finalized is not enabled on the Stripe endpoint), so an employer
-    never pays without hearing anything. Note the headers differ from the Python
-    crons - callNodeFunction dispatches on name/secret, not
-    Function-Name/Hasura-Secret.
+    never pays without hearing anything. The legacy name/secret headers are
+    still accepted by callNodeFunction alongside Function-Name/Hasura-Secret
+    until docs/plans/functions-header-switch.md is done.
 - name: sync_formbricks_responses
   webhook: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
   schedule: 20 2 * * *
