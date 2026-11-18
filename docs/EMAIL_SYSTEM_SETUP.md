@@ -157,7 +157,7 @@ The email templates are automatically inserted via migration. You can customize 
 
 ## Email Template Variables
 
-The email system uses a **centralized variable system** located in `functions/callNodeFunction/emailTemplateVariables.js` to ensure consistency and maintainability across all email functions.
+The email system uses a **centralized variable system** located in `functions/callNodeFunction/lib/emailTemplateVariables.js` to ensure consistency and maintainability across all email functions.
 
 ### Key Features
 - **Centralized management**: Single source of truth for all email variables
@@ -200,7 +200,7 @@ All date variables are automatically formatted based on the app's timezone setti
 - **America/New_York** → `January 15, 2024` (US)
 
 ### Adding New Variables
-1. Update the registry in `emailTemplateVariables.js`
+1. Update the registry in `lib/emailTemplateVariables.js`
 2. Add replacement logic to `createVariableReplacer()`
 3. Update convenience functions as needed
 4. Add comprehensive tests

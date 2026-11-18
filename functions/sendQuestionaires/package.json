@@ -1,6 +1,10 @@
 {
   "name": "sendQuestionaires",
   "version": "0.1.0",
+  "engines": {
+    "node": ">=22 <23"
+  },
+  "type": "module",
   "dependencies": {
     "graphql-request": "6.1.0"
   },
@@ -13,6 +17,6 @@
   },
   "scripts": {
     "watch": "npm-watch start",
-    "start": "npx @google-cloud/functions-framework --port 42024 --target=sendQuestionaires"
+    "start": "npx @google-cloud/functions-framework --target=sendQuestionaires"
   }
 }

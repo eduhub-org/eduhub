@@ -1,4 +1,5 @@
 import { validateAndExtractFormbricksSurvey } from '../lib/formbricks.js';
+import * as config from '../lib/config.js';
 
 /**
  * Extracts price and currency from question text using regex patterns.
@@ -225,7 +226,7 @@ export default async function validateFormbricksSurvey(req, logger) {
     if (!urlParts) {
       // Error already logged by extractFormbricksBaseUrlAndSurveyId
       // Check if it's a configuration issue (no trusted origins) vs invalid URL
-      const hasTrustedOrigins = !!(process.env.FORMBRICKS_API_URL || process.env.FORMBRICKS_BASE_URL || process.env.FORMBRICKS_TRUSTED_ORIGINS);
+      const hasTrustedOrigins = !!(config.formbricksApiUrl() || config.formbricksTrustedOrigins());
       return {
         success: false,
         error: hasTrustedOrigins 
@@ -236,7 +237,7 @@ export default async function validateFormbricksSurvey(req, logger) {
     }
 
     const { baseUrl: formbricksApiUrl, surveyId: formbricksSurveyId } = urlParts;
-    const formbricksApiKey = process.env.FORMBRICKS_API_KEY;
+    const formbricksApiKey = config.formbricksApiKey();
 
     if (!formbricksApiKey) {
       logger.error('Formbricks API key missing');

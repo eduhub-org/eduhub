@@ -227,9 +227,16 @@ jobs:
       GCP_REGION: ${{ secrets.GCP_REGION }}
       GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_PRODUCTION_KEY }}
 
+  functions_code_checks:
+    name: Functions Code Checks
+    uses: ./.github/workflows/functions-code-checks.yml
+
   zip_and_store_cloud_functions:
     name: Zip and Store Cloud Functions
-    needs: [prepare_environment, check_folder_changes]
+    # Only pushes publish zips: a PR must not overwrite the deployed sources.
+    # Needs green function checks, so a failing test blocks packaging.
+    if: github.event_name == 'push'
+    needs: [prepare_environment, check_folder_changes, functions_code_checks]
     uses: ./.github/workflows/zip-and-store-cloud-functions.yml
     with:
       PROJECT_ID: ${{ needs.prepare_environment.outputs.PROJECT_ID }}
@@ -249,6 +256,7 @@ jobs:
         build_hasura,
         build_frontend,
         build_stujo,
+        functions_code_checks,
         zip_and_store_cloud_functions,
       ]
     runs-on: ubuntu-latest
@@ -264,6 +272,21 @@ jobs:
         working-directory: ./infrastructure/application
 
     steps:
+      - name: Harden the runner
+        uses: step-security/harden-runner@1d88384fd173af6ecb012dfd0264a306b711241a # v2.22.4
+        with:
+          egress-policy: audit
+
+      # `always()` above keeps this job running when a build job is skipped
+      # (and on PRs, where the zip job is skipped by design). It must not
+      # apply after failed function checks: the zips were not refreshed.
+      - name: Block apply when function checks failed
+        if: github.event_name == 'push' && needs.functions_code_checks.result != 'success'
+        working-directory: .
+        run: |
+          echo "::error::Functions Code Checks did not pass; not applying."
+          exit 1
+
       - name: Checkout
         uses: actions/checkout@v5
 

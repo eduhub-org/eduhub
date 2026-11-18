@@ -1,29 +1,8 @@
 import KcAdminClient from "@keycloak/keycloak-admin-client";
 import { GraphQLClient, gql } from "graphql-request";
-import { createRequire } from "module";
-
-const require = createRequire(import.meta.url);
-
-let mergeUserPutPayload;
-try {
-  ({ mergeUserPutPayload } = require("./shared_libs/node/keycloakUserMerge.cjs"));
-} catch {
-  ({ mergeUserPutPayload } = require("../shared_libs/node/keycloakUserMerge.cjs"));
-}
-
-let computeMatrixHandle;
-try {
-  ({ computeMatrixHandle } = require("./shared_libs/node/matrixHandle.cjs"));
-} catch {
-  ({ computeMatrixHandle } = require("../shared_libs/node/matrixHandle.cjs"));
-}
-
-let secretsMatch;
-try {
-  ({ secretsMatch } = require("./shared_libs/node/security.cjs"));
-} catch {
-  ({ secretsMatch } = require("../shared_libs/node/security.cjs"));
-}
+import { mergeUserPutPayload } from "./shared/keycloakUserMerge.js";
+import { computeMatrixHandle } from "./shared/matrixHandle.js";
+import { getProvidedSecret, secretsMatch } from "./shared/security.js";
 
 const FIND_USER = gql`
   query ($id: uuid!) {
@@ -144,7 +123,7 @@ export const updateFromKeycloak = async (req, res) => {
     return res.status(500).json({ error: "Server secret not configured" });
   }
 
-  if (secretsMatch(req.headers.secret, expectedSecret)) {
+  if (secretsMatch(getProvidedSecret(req.headers), expectedSecret)) {
     const kcAdminClient = new KcAdminClient({
       baseUrl: process.env.KEYCLOAK_URL,
       realmName: "master",
@@ -185,11 +164,21 @@ export const updateFromKeycloak = async (req, res) => {
       return res.status(403).json({ error: 'Account deleted' });
     }
 
+    if (user == null) {
+      return res.status(404).json({ error: 'User not found in Keycloak' });
+    }
+
     if (user != null) {
-      // Ensure matrix_user_handle is set in Keycloak (backfill for pre-SPI users)
-      let matrixHandle = user.attributes?.matrix_user_handle?.[0] || null;
-      if (!matrixHandle) {
-        matrixHandle = computeMatrixHandle(user.firstName, user.lastName, userid);
+      // Ensure matrix_user_handle is set in Keycloak (backfill for pre-SPI
+      // users). A handle Hasura already stores wins over a freshly computed
+      // one: Hasura keeps its handle below, and account deletion deactivates
+      // that one, so Keycloak must end up with the same handle.
+      const keycloakHandle = user.attributes?.matrix_user_handle?.[0] || null;
+      const matrixHandle =
+        keycloakHandle ||
+        findUserResponse?.matrixUserHandle ||
+        computeMatrixHandle(user.firstName, user.lastName, userid);
+      if (!keycloakHandle) {
         try {
           await kcAdminClient.users.update(
             { id: userid },
@@ -258,5 +247,5 @@ export const updateFromKeycloak = async (req, res) => {
     }
   }
 
-  return res.status(401).json({ error: "Unauthorized" });
+  return res.status(401).json({ error: "Unauthorized", message: "Unauthorized" });
 };

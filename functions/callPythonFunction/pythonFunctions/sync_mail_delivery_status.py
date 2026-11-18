@@ -34,7 +34,7 @@ import logging
 import os
 from datetime import datetime, timedelta, timezone
 
-from api_clients import EduHubClient, MailgunClient
+from api_clients import EduHubClient, HasuraQueryError, MailgunClient
 from api_clients.mailgun_client import maillog_id
 from pythonFunctions.mail_helpers import already_sent_keys, queue_mail
 
@@ -211,10 +211,16 @@ def apply_statuses(eduhub_client, statuses):
                 }
             }
             """
-            result = eduhub_client.send_query(mutation, {"where": where, "status": status})
-            if not isinstance(result, dict) or result.get("errors"):
-                logging.error("Failed to set %s on %d mail(s): %s", status, len(chunk), result)
-                failed_updates.append({"status": status, "mailIds": chunk, "response": result})
+            try:
+                result = eduhub_client.send_query(
+                    mutation, {"where": where, "status": status}
+                )
+            except HasuraQueryError as error:
+                # Record the chunk and go on: the other chunks still apply.
+                logging.error("Failed to set %s on %d mail(s): %s", status, len(chunk), error)
+                failed_updates.append(
+                    {"status": status, "mailIds": chunk, "response": str(error)}
+                )
                 continue
             affected += result["data"]["update_MailLog"]["affected_rows"]
 

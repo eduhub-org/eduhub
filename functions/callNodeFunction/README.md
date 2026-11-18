@@ -1,8 +1,15 @@
-# EduHub Email System - Node Functions
+# callNodeFunction
 
-This directory contains the Node.js cloud functions for EduHub's automated email system.
+The Node dispatchers' code: `index.js` exports three entry points, each a
+dispatcher that routes a Hasura request to a handler folder by its
+`Function-Name` header: `callNodeFunction`, `identity` (Keycloak and Matrix)
+and `media` (storage files). Terraform deploys this code once per entry
+point, each with only its own secrets. The request contract, how to add
+a handler and the Hasura metadata it needs are in
+[`docs/SERVERLESS_FUNCTIONS.md`](../../docs/SERVERLESS_FUNCTIONS.md). This file
+covers the email handlers and the test setup.
 
-## Functions
+## Email handlers
 
 ### sendEnrollmentEmail
 Automatically sends emails when course enrollment status changes. Triggered by Hasura event triggers.
@@ -23,9 +30,29 @@ Sends automated session reminder emails for the **first session only** of each c
 - 1 hour before (±15 minutes tolerance)  
 - 15 minutes before (±6 minutes tolerance)
 
+## Shared modules (`lib/`)
+
+Handlers use these instead of reading `process.env` or building clients:
+
+- `lib/config.js`: every environment variable, read at call time
+  (`requireEnv`, `hasuraConfig`, `frontendUrl`, `keycloakConfig`, ...).
+- `lib/hasura.js`: `createHasuraClient()`, the admin GraphQL client.
+- `lib/logger.js`: the winston logger for modules that are not passed one
+  (never import it from `../index.js`).
+- `lib/http.js`: fetch-based JSON client; `lib/keycloak.js`: admin login.
+- `lib/requestHeaders.js`: `getFunctionName`, `getBucket` (Hasura headers).
+- `lib/dispatcher.js`: `createDispatcher`, the request contract of all three
+  entry points.
+- `lib/queueEmail.js`: renders a MailTemplate into MailLog.
+
+A new handler is a folder with an `index.js`, imported and added to one
+unit's map in `index.js` (`callNodeFunctionHandlers`, `identityHandlers`,
+`mediaHandlers`, chosen by the secrets it needs); `__tests__/registry.test.js`
+fails until a Hasura entry with that unit's URL names it too. Step by step: `docs/SERVERLESS_FUNCTIONS.md`.
+
 ## Email Template Variables
 
-Both email functions use a **centralized variable system** (`emailTemplateVariables.js`) that provides:
+Both email functions use a **centralized variable system** (`lib/emailTemplateVariables.js`) that provides:
 
 ✅ **Centralized Management**: Single source of truth for all email variables  
 ✅ **Automatic Date Formatting**: Dates formatted based on app timezone settings  
@@ -35,7 +62,7 @@ Both email functions use a **centralized variable system** (`emailTemplateVariab
 
 ### Quick Usage
 ```javascript
-import { createEnrollmentVariableReplacer } from '../emailTemplateVariables.js';
+import { createEnrollmentVariableReplacer } from '../lib/emailTemplateVariables.js';
 
 const replaceVariables = createEnrollmentVariableReplacer(enrollmentDetails, formatDate);
 const emailContent = replaceVariables(template.content);
@@ -47,7 +74,7 @@ const emailContent = replaceVariables(template.content);
 
 ### Prerequisites
 ```bash
-npm install
+npm ci   # also run it in ../sendMail: its tests run from here
 ```
 
 ### Running Tests
@@ -70,20 +97,18 @@ VERBOSE=1 npm test
 
 ### Test Structure
 
+Tests live next to the code they test:
+
 ```
 functions/callNodeFunction/
-├── __tests__/
-│   └── helpers/
-│       └── mockData.js           # Shared mock data and utilities
-├── sendEnrollmentEmail/
-│   ├── __tests__/
-│   │   └── sendEnrollmentEmail.test.js
+├── __tests__/                    # dispatcher (index.js) tests only
+├── <handler>/
+│   ├── __tests__/<name>.test.js  # handler tests
 │   └── index.js
-├── sendSessionReminders/
-│   ├── __tests__/
-│   │   └── sendSessionReminders.test.js
-│   └── index.js
-├── jest.config.js                # Jest configuration
+├── lib/
+│   ├── __tests__/<name>.test.js  # shared helper tests
+│   └── <name>.js
+├── jest.config.js                # Jest configuration (also runs ../sendMail/__tests__)
 ├── jest.setup.js                 # Global test setup
 └── package.json
 ```
@@ -112,11 +137,8 @@ The tests cover:
 
 ### Mock Data
 
-The test suite uses comprehensive mock data including:
-- Sample users, courses, sessions, and enrollments
-- All email templates with variable placeholders
-- Hasura event trigger payloads
-- GraphQL response structures
+Each suite builds its own fixtures and mocks `graphql-request` (or the `lib/`
+module it depends on) with `jest.unstable_mockModule`.
 
 ### Environment Variables
 
@@ -167,7 +189,7 @@ The tests are designed to be deterministic and can be run in CI/CD environments.
 ### Adding New Tests
 
 1. Create test files in the `__tests__` directory next to the function
-2. Use the shared mock data from `__tests__/helpers/mockData.js`
+2. Create suite-local fixtures (see [Mock Data](#mock-data))
 3. Follow the existing test patterns for consistency
 4. Ensure good test coverage for both happy path and error scenarios
 

@@ -1,8 +1,15 @@
-# These packages are automatically installed
+# Runtime dependencies of the callPythonFunction Cloud Function (python311).
+# Direct imports only (incl. shared_py/api_clients), pinned with ==.
+# Test-only tools live in requirements-dev.txt.
 # Run this locally via: python -m pip install -r requirements.txt
-pandas
-requests
-flask>=1.0,<3.0  # Specifying Flask version to be compatible with Functions Framework
-thefuzz
-google-cloud-storage
-xhtml2pdf
+flask==2.3.3  # <3.0 to stay compatible with Functions Framework
+google-auth==2.62.2
+google-cloud-storage==3.17.1
+jinja2==3.1.6
+markupsafe==3.0.4
+numpy==2.4.6
+pandas==3.1.1
+python-dateutil==4.0.0
+requests==2.34.2
+thefuzz==0.22.1
+xhtml2pdf==0.2.28

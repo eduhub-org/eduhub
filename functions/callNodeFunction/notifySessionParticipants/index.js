@@ -1,7 +1,7 @@
-import { GraphQLClient } from 'graphql-request';
 import { sendSessionRescheduledEmails } from '../lib/sessionRescheduledEmail.js';
 import { describeSessionChange, referencedLocationAddressIds } from '../lib/sessionChange.js';
 import { ORG_ADMIN_ROLES, isOrgAdminOfCourse } from '../lib/orgAdminScope.js';
+import { createHasuraClient } from '../lib/hasura.js';
 
 // Request roles from session_variables, not the inherited-role names used in
 // actions.yaml: a request carries `instructor`/`admin`, Hasura maps it to
@@ -133,12 +133,7 @@ export default async function notifySessionParticipants(req, logger) {
   }
 
   try {
-    if (!process.env.HASURA_ENDPOINT || !process.env.HASURA_ADMIN_SECRET) {
-      throw new Error('HASURA_ENDPOINT or HASURA_ADMIN_SECRET not configured');
-    }
-    const client = new GraphQLClient(process.env.HASURA_ENDPOINT, {
-      headers: { 'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET },
-    });
+    const client = createHasuraClient();
 
     const result = await client.request(GET_SESSION_FOR_NOTIFICATION, { sessionId, userId });
     const session = result?.Session_by_pk;

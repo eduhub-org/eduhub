@@ -3,7 +3,7 @@ import logging
 import os
 from datetime import datetime, timedelta, timezone
 
-from api_clients import EduHubClient
+from api_clients import EduHubClient, HasuraQueryError
 
 from pythonFunctions.expire_job_postings import _get_mail_template, _queue_mail
 
@@ -52,10 +52,11 @@ def send_job_alerts(arguments):
             }
         }
         """
-        result = client.send_query(subs_query, {})
-        if not isinstance(result, dict) or result.get("errors"):
-            logging.error(f"Could not load subscriptions: {result}")
-            return {"success": False, "error": str(result)}
+        try:
+            result = client.send_query(subs_query, {})
+        except HasuraQueryError as error:
+            logging.error(f"Could not load subscriptions: {error}")
+            return {"success": False, "error": str(error)}
         subscriptions = result["data"]["JobAlertSubscription"]
 
         template = _get_mail_template(client, "JOB_ALERT")
@@ -96,9 +97,10 @@ def send_job_alerts(arguments):
 
             last_sent = sub.get("lastSentAt")
             since = last_sent or (now - timedelta(days=7)).isoformat()
-            postings_result = client.send_query(postings_query, {"since": since})
-            if not isinstance(postings_result, dict) or postings_result.get("errors"):
-                logging.warning(f"Posting query failed for subscription {sub['id']}: {postings_result}")
+            try:
+                postings_result = client.send_query(postings_query, {"since": since})
+            except HasuraQueryError as error:
+                logging.warning(f"Posting query failed for subscription {sub['id']}: {error}")
                 continue
             postings = postings_result["data"]["JobPosting"]
 
@@ -131,15 +133,16 @@ def send_job_alerts(arguments):
             }
             if _queue_mail(client, template, email, variables):
                 mailed += 1
-                update_result = client.send_query(
-                    update_sub, {"id": sub["id"], "now": now.isoformat()}
-                )
-                if not isinstance(update_result, dict) or update_result.get("errors"):
+                try:
+                    client.send_query(
+                        update_sub, {"id": sub["id"], "now": now.isoformat()}
+                    )
+                except HasuraQueryError as error:
                     # lastSentAt stays stale: without it the same postings would
                     # be re-sent next run, so surface the failure loudly.
                     logging.error(
                         f"Failed to update lastSentAt for subscription {sub['id']}: "
-                        f"{update_result}"
+                        f"{error}"
                     )
 
         logging.info(f"Job alerts: {len(subscriptions)} subscriptions, {mailed} mails queued")

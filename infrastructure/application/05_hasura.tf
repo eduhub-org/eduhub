@@ -83,31 +83,39 @@ module "hasura_service" {
     },
     {
       name  = "CLOUD_FUNCTION_LINK_CALL_PYTHON_FUNCTION"
-      value = google_cloudfunctions2_function.call_python_function.service_config[0].uri
+      value = module.cloud_function["call_python_function"].uri
     },
     {
       name  = "CLOUD_FUNCTION_LINK_ADD_KEYCLOAK_ROLE"
-      value = google_cloudfunctions2_function.add_keycloak_role.service_config[0].uri
+      value = module.cloud_function["add_keycloak_role"].uri
     },
     {
       name  = "CLOUD_FUNCTION_LINK_REMOVE_KEYCLOAK_ROLE"
-      value = google_cloudfunctions2_function.remove_keycloak_role.service_config[0].uri
+      value = module.cloud_function["remove_keycloak_role"].uri
     },
     {
       name  = "CLOUD_FUNCTION_LINK_UPDATE_FROM_KEYCLOAK"
-      value = google_cloudfunctions2_function.update_from_keycloak.service_config[0].uri
+      value = module.cloud_function["update_from_keycloak"].uri
     },
     {
       name  = "CLOUD_FUNCTION_LINK_SEND_MAIL"
-      value = google_cloudfunctions2_function.send_mail.service_config[0].uri
+      value = module.cloud_function["send_mail"].uri
     },
     {
       name  = "CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION"
-      value = google_cloudfunctions2_function.call_node_function.service_config[0].uri
+      value = module.cloud_function["call_node_function"].uri
+    },
+    {
+      name  = "CLOUD_FUNCTION_LINK_IDENTITY"
+      value = module.cloud_function["identity"].uri
+    },
+    {
+      name  = "CLOUD_FUNCTION_LINK_MEDIA"
+      value = module.cloud_function["media"].uri
     },
     {
       name  = "CLOUD_FUNCTION_LINK_SEND_QUESTIONAIRES"
-      value = google_cloudfunctions2_function.send_questionaires.service_config[0].uri
+      value = module.cloud_function["send_questionaires"].uri
     },
     {
       name  = "HASURA_GRAPHQL_JWT_SECRET"

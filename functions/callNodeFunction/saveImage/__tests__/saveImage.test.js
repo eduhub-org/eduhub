@@ -17,7 +17,7 @@ describe('saveImage', () => {
   let saveToBucketMock;
 
   beforeAll(async () => {
-    jest.unstable_mockModule('../../index.js', () => ({
+    jest.unstable_mockModule('../../lib/logger.js', () => ({
       logger: { info: jest.fn(), debug: jest.fn(), error: jest.fn(), warn: jest.fn() },
     }));
     jest.unstable_mockModule('@google-cloud/storage', () => ({ Storage: jest.fn() }));

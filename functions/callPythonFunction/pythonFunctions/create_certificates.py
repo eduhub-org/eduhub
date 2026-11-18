@@ -1,8 +1,5 @@
-from urllib.request import urlopen
 import logging
-import requests
 from api_clients import EduHubClient, StorageClient, safe_float_convert
-import requests
 from io import BytesIO
 from jinja2 import Environment, DictLoader
 from xhtml2pdf import pisa 

@@ -1,4 +1,5 @@
-import { trimAndNull } from "./matrixRoomUtils.js";
+import { readMatrixPayload, trimAndNull } from "./matrixRoomUtils.js";
+import * as appConfig from "./config.js";
 
 const normalizeBaseUrl = (url) => url.replace(/\/+$/, "");
 
@@ -97,28 +98,12 @@ const fetchMatrixWithRateLimitRetry = async (url, init, signal) => {
   return lastResponse;
 };
 
-const parseMatrixResponse = async (response) => {
-  let payload = null;
-  try {
-    payload = await response.json();
-  } catch (_error) {
-    payload = null;
-  }
-
-  if (response.ok) return payload;
-
-  const error = new Error(payload?.error || `Matrix request failed with HTTP ${response.status}`);
-  error.status = response.status;
-  error.errcode = payload?.errcode;
-  throw error;
-};
-
 export const getMatrixInviteConfig = ({ requireToken = true } = {}) => {
-  const homeserverUrl = trimAndNull(process.env.MATRIX_HOMESERVER_URL);
-  const token = trimAndNull(process.env.MATRIX_ADMIN_ACCESS_TOKEN);
-  const mainSpaceId = trimAndNull(process.env.MATRIX_MAIN_SPACE_ID);
-  const adminUserId = trimAndNull(process.env.MATRIX_ADMIN_USER_ID);
-  const explicitServerName = trimAndNull(process.env.MATRIX_SERVER_NAME);
+  const homeserverUrl = appConfig.trimmedEnv('MATRIX_HOMESERVER_URL');
+  const token = appConfig.trimmedEnv('MATRIX_ADMIN_ACCESS_TOKEN');
+  const mainSpaceId = appConfig.trimmedEnv('MATRIX_MAIN_SPACE_ID');
+  const adminUserId = appConfig.trimmedEnv('MATRIX_ADMIN_USER_ID');
+  const explicitServerName = appConfig.trimmedEnv('MATRIX_SERVER_NAME');
   const serverName = deriveServerName({ explicitServerName, mainSpaceId, adminUserId });
 
   if (!homeserverUrl || (requireToken && !token) || !serverName) return null;
@@ -138,7 +123,7 @@ export const getMatrixInviteConfig = ({ requireToken = true } = {}) => {
 export const getMatrixDeactivationConfig = () => {
   const config = getMatrixInviteConfig({ requireToken: false });
   if (!config) return null;
-  return { ...config, token: trimAndNull(process.env.MATRIX_SYNAPSE_ADMIN_TOKEN) };
+  return { ...config, token: appConfig.trimmedEnv('MATRIX_SYNAPSE_ADMIN_TOKEN') };
 };
 
 /**
@@ -160,12 +145,7 @@ export const ensureBotJoinedMatrixRoom = async ({ homeserverUrl, token, roomId, 
 
   if (response.ok) return { joined: true };
 
-  let payload = null;
-  try {
-    payload = await response.json();
-  } catch (_e) {
-    payload = null;
-  }
+  const payload = await readMatrixPayload(response);
 
   const errcode = payload?.errcode;
   const errMsg = (payload?.error || "").toString();
@@ -204,12 +184,7 @@ export const inviteUserToMatrixRoom = async ({ homeserverUrl, token, roomId, mat
 
   if (response.ok) return { invited: true };
 
-  let payload = null;
-  try {
-    payload = await response.json();
-  } catch (_e) {
-    payload = null;
-  }
+  const payload = await readMatrixPayload(response);
   const errcode = payload?.errcode;
   const errMsg = (payload?.error || "").toString();
 
@@ -249,12 +224,7 @@ export const deactivateMatrixUser = async ({ homeserverUrl, token, matrixUserId,
 
   if (response.ok) return { deactivated: true };
 
-  let payload = null;
-  try {
-    payload = await response.json();
-  } catch (_e) {
-    payload = null;
-  }
+  const payload = await readMatrixPayload(response);
   // Only Synapse's own "unknown user" counts as done; any other 404 (wrong URL, proxy) must fail.
   if (response.status === 404 && payload?.errcode === "M_NOT_FOUND") {
     return { deactivated: false, skipped: true };
