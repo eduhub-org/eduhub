@@ -14,8 +14,8 @@ const UNIT_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'
 const METADATA_DIR = path.resolve(UNIT_DIR, '../../backend/metadata');
 const URL_TEMPLATE = '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}';
 const URL_ENV = 'CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION';
-// Header the dispatcher routes on (Function-Name is the planned new name).
-const NAME_HEADERS = new Set(['name', 'function-name']);
+// Header the dispatcher routes on (index.js reads only `req.headers.name`).
+const NAME_HEADERS = new Set(['name']);
 
 // Folders with an index.js that are not handlers.
 const NON_HANDLER_DIRS = new Set(['lib', 'scripts', 'shared', 'node_modules', 'coverage', 'jest']);
