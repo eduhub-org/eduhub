@@ -55,11 +55,11 @@ describe('getSignedUrl', () => {
     expect(body.httpStatus).toBeUndefined();
   });
 
-  it('answers 500 with a Hasura error when the file cannot be loaded', async () => {
+  it('answers 400 with a Hasura error when the file cannot be loaded', async () => {
     loadFromBucket.mockRejectedValue(new Error('No such object'));
     const res = mockRes();
     await media(actionRequest('courses/1/private/x.pdf', 'admin'), res);
-    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json.mock.calls[0][0]).toMatchObject({
       messageKey: 'FILE_LOAD_ERROR',
       extensions: { code: 'FILE_LOAD_ERROR' },

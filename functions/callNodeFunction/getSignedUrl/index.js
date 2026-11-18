@@ -16,10 +16,11 @@ import { canAccessPath } from "./access.js";
  *   - messageKey (string): Translation key for messages
  *   - error (string, optional): Error message if operation failed
  *   - link (string, optional): The generated signed URL if successful
- *   - httpStatus (number, on failure): 403 when access is denied, 500 when
+ *   - httpStatus (number, on failure): 403 when access is denied, 400 when
  *     the file cannot be loaded. The action's output type only has a
- *     required `link`, so a 200 without one fails Hasura's validation;
- *     a non-2xx answer reaches the client as a normal GraphQL error.
+ *     required `link`, so a 200 without one fails Hasura's validation.
+ *     Hasura passes `message` and `extensions` through only for a 4xx
+ *     action answer, so both failures stay in the 4xx range.
  */
 const getSignedUrl = async (req) => {
   logger.info("########## Get Signed URL ##########");
@@ -64,7 +65,7 @@ const getSignedUrl = async (req) => {
       stack: error.stack 
     });
     return {
-      httpStatus: 500,
+      httpStatus: 400,
       success: false,
       messageKey: "FILE_LOAD_ERROR",
       error: "An error occurred while retrieving the file."

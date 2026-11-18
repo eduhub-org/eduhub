@@ -202,6 +202,11 @@ against the actual code rather than the advisory text alone.
   build, not the lockfile, runs in production. Never mark an alert on it or its
   transitive deps NOT-RELEVANT from dev scope alone: check which framework version
   the build installs and whether the vulnerable code is reachable, then classify.
+  Editing the lockfile or adding an `overrides` entry does not change the tree the
+  build installs, so classify such an alert as PATCH only if the patch also moves
+  `@google-cloud/functions-framework` into that unit's `dependencies` (at the fixed
+  version, lockfile regenerated), which makes the lockfile control what ships.
+  Otherwise classify it NEEDS-MANUAL-DECISION.
 - For runtime deps, check **reachability**: grep for the import, and for the specific
   vulnerable function or option the advisory names. State whether user-controlled input can
   actually reach it.
