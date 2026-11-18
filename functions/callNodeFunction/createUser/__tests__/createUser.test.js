@@ -6,10 +6,10 @@ const authenticateKeycloakAdmin = jest.fn();
 jest.unstable_mockModule('@keycloak/keycloak-admin-client', () => ({
   default: KcAdminClient,
 }));
-jest.unstable_mockModule('../lib/keycloak.js', () => ({
+jest.unstable_mockModule('../../lib/keycloak.js', () => ({
   authenticateKeycloakAdmin,
 }));
-const { default: createUser } = await import('../createUser/index.js');
+const { default: createUser } = await import('../index.js');
 
 const logger = { info: jest.fn(), debug: jest.fn(), error: jest.fn() };
 const req = {
