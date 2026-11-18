@@ -36,7 +36,9 @@
  */
 
 import Stripe from 'stripe';
-import { GraphQLClient, gql } from 'graphql-request';
+import { gql } from 'graphql-request';
+import { requireEnv } from '../lib/config.js';
+import { createHasuraClient } from '../lib/hasura.js';
 
 import { buildJobPostingMailVars, sendJobPostingMail } from '../publishJobPosting/index.js';
 
@@ -121,15 +123,6 @@ const logger = {
   error: (...args) => console.error(...args),
 };
 
-function requireEnv(name) {
-  const value = process.env[name];
-  if (!value) {
-    console.error(`${name} is required`);
-    process.exit(1);
-  }
-  return value;
-}
-
 /** Why the employer of this posting should (not) get the invoice mail now. */
 async function invoiceMailDecision(client, jobPostingId) {
   const { MailLog: mails } = await client.request(GET_QUEUED_MAILS, { jobPostingId });
@@ -144,9 +137,7 @@ async function invoiceMailDecision(client, jobPostingId) {
 }
 
 async function main() {
-  const client = new GraphQLClient(requireEnv('HASURA_ENDPOINT'), {
-    headers: { 'x-hasura-admin-secret': requireEnv('HASURA_ADMIN_SECRET') },
-  });
+  const client = createHasuraClient();
   const stripe = new Stripe(requireEnv('STRIPE_SECRET_KEY'));
 
   console.log(`Mode: ${SEND ? 'send' : APPLY ? 'apply' : 'report only'}`);

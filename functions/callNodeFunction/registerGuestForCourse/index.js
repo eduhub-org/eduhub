@@ -7,7 +7,6 @@ import {
   GUEST_THROTTLE,
   NO_SUCH_USER_ID,
   classifyGuestThrottle,
-  createHasuraClient,
   findUsersByEmail,
   isCourseRegistrationClosed,
   isHoneypotTripped,
@@ -18,8 +17,9 @@ import {
   normalizeEmail,
   normalizeName,
   normalizeOrganizationName,
-  queueGuestMail,
-} from '../guestRegistration.js';
+} from '../lib/guestRegistration.js';
+import { queueGuestMail } from '../lib/queueEmail.js';
+import { createHasuraClient } from '../lib/hasura.js';
 
 /**
  * Starts an account-less registration for an event.

@@ -391,72 +391,35 @@ $$ LANGUAGE plpgsql STABLE;
 
 ### Serverless Function Security
 
+Cloud functions are only called by Hasura (actions, event and cron triggers);
+there is no JWT middleware in `functions/`. Full contract:
+`docs/SERVERLESS_FUNCTIONS.md`.
+
 #### Function Authentication
-```javascript
-// functions/middleware/auth.js
-const verifyJWT = (token) => {
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    return { valid: true, payload: decoded };
-  } catch (error) {
-    return { valid: false, error: error.message };
-  }
-};
-
-const requireAuth = (handler) => {
-  return async (req, res) => {
-    const authHeader = req.headers.authorization;
-    
-    if (!authHeader?.startsWith('Bearer ')) {
-      return res.status(401).json({ error: 'Missing or invalid authorization header' });
-    }
-    
-    const token = authHeader.split(' ')[1];
-    const { valid, payload, error } = verifyJWT(token);
-    
-    if (!valid) {
-      return res.status(401).json({ error: 'Invalid token', details: error });
-    }
-    
-    req.user = payload;
-    return handler(req, res);
-  };
-};
-
-// Usage
-export default requireAuth(async (req, res) => {
-  // Protected function logic
-  console.log('Authenticated user:', req.user);
-});
-```
+- Hasura sends the shared secret `HASURA_CLOUD_FUNCTION_SECRET` in the
+  `Hasura-Secret` header (legacy `secret`, accepted until
+  `docs/plans/functions-header-switch.md` is done).
+- Node units check it with `secretsMatch(getProvidedSecret(req.headers), ...)`
+  from `functions/shared/security.js` (constant-time); `callPythonFunction`
+  uses `hmac.compare_digest`. Missing or wrong secret: 401; secret unset on
+  the server: 500.
 
 #### Role-Based Function Access
-```javascript
-const requireRole = (requiredRole) => {
-  return (handler) => {
-    return async (req, res) => {
-      const userRoles = req.user?.realm_access?.roles || [];
-      
-      if (!userRoles.includes(requiredRole)) {
-        return res.status(403).json({ 
-          error: 'Insufficient permissions',
-          required: requiredRole,
-          userRoles 
-        });
-      }
-      
-      return handler(req, res);
-    };
-  };
-};
+The secret only proves the request came from Hasura. For actions, the
+caller's identity is in the payload Hasura forwards, so handlers authorize
+from it:
 
-// Usage
-export default requireAuth(
-  requireRole('ADMIN')(async (req, res) => {
-    // Admin-only function logic
-  })
-);
+```javascript
+const role = req.body?.session_variables?.['x-hasura-role'];
+const userId = req.body?.session_variables?.['x-hasura-user-id'];
+if (role !== 'admin' && !(await isOwner(userId, input.courseId))) {
+  return { success: false, messageKey: 'UNAUTHORIZED', error: 'Not allowed' };
+}
 ```
+
+Action `permissions` in `backend/metadata/actions.yaml` decide which roles may
+call an action at all; handlers still check row-level rights (see
+`lib/uploadAuthorization.js`, `lib/orgAdminScope.js`).
 
 ## Security Best Practices
 

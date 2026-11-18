@@ -13,6 +13,8 @@ import html
 import logging
 from datetime import datetime
 
+from api_clients import HasuraQueryError
+
 # Candidate keys per dedup query. Keeps the generated GraphQL document small
 # when a run has an unusually large number of candidates.
 DEDUP_CHUNK_SIZE = 200
@@ -51,9 +53,10 @@ def get_default_mail_template(client, template_type):
         }
     }
     """
-    result = client.send_query(query, {"type": template_type})
-    if not isinstance(result, dict) or result.get("errors"):
-        logging.warning(f"Could not load mail template {template_type}: {result}")
+    try:
+        result = client.send_query(query, {"type": template_type})
+    except HasuraQueryError as error:
+        logging.warning(f"Could not load mail template {template_type}: {error}")
         return None
     templates = result.get("data", {}).get("MailTemplate", [])
     return templates[0] if templates else None
@@ -99,12 +102,13 @@ def already_sent_keys(client, mail_type, candidates, key_fields):
                 contains[field] = candidate.get(field)
             clauses.append({"metadata": {"_contains": contains}})
 
-        result = client.send_query(query, {"where": {"_or": clauses}})
-        if not isinstance(result, dict) or result.get("errors"):
+        try:
+            result = client.send_query(query, {"where": {"_or": clauses}})
+        except HasuraQueryError as error:
             # Fail closed: treating candidates as "already sent" risks a missing
             # mail, treating them as "not sent" risks a duplicate. Skipping the
             # chunk keeps this run silent and the next one retries.
-            logging.error(f"Dedup lookup failed for {mail_type}: {result}")
+            logging.error(f"Dedup lookup failed for {mail_type}: {error}")
             for candidate in chunk:
                 sent.add(tuple(candidate.get(field) for field in key_fields))
             continue
@@ -157,16 +161,17 @@ def queue_mail(client, template, to, variables, metadata=None):
         }
     }
     """
-    result = client.send_query(mutation, {
-        "subject": subject,
-        "content": content,
-        "from": template.get("from") or "noreply@opencampus.sh",
-        "to": to,
-        "cc": template.get("cc"),
-        "bcc": template.get("bcc"),
-        "metadata": metadata,
-    })
-    if not isinstance(result, dict) or result.get("errors"):
-        logging.error(f"Failed to queue mail to {to}: {result}")
+    try:
+        client.send_query(mutation, {
+            "subject": subject,
+            "content": content,
+            "from": template.get("from") or "noreply@opencampus.sh",
+            "to": to,
+            "cc": template.get("cc"),
+            "bcc": template.get("bcc"),
+            "metadata": metadata,
+        })
+    except HasuraQueryError as error:
+        logging.error(f"Failed to queue mail to {to}: {error}")
         return False
     return True

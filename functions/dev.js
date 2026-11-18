@@ -1,13 +1,30 @@
-// This script is run inside a docker container with node
-// it takes care of running npm install in all the directories for the functions
-// and calling npm run watch on each of them to startup the functions
-// basically this script is the server for the serverless functions
+// Local dev server for the Node cloud functions, run inside the
+// node_functions container by start-node.sh.
+//
+// It starts exactly the Node units listed in units.json (the same list the
+// zip workflow packages): installs each unit's dependencies from its
+// committed package-lock.json (`npm ci`, as the Cloud Functions build does,
+// so a host-built node_modules for another OS never leaks in), then runs its
+// `npm run watch` with PORT set to the unit's port from units.json. A unit
+// that fails to install stops the whole server, so a broken unit is visible
+// instead of silently missing.
+//
+// A unit with a `source` (identity, media) has no folder of its own: it runs
+// another unit's code with its own entry point, as in production, where
+// Terraform deploys that unit's zip with a different `entry_point`. It is
+// started from the source folder with FUNCTION_TARGET set to its entryPoint
+// (the source unit's start script passes it as --target) and reuses the
+// source unit's install.
+//
+// It also serves the emulated "Google Cloud Storage" bucket on port 4001.
 
-// then it starts an express static serve to serve the files stored in "google cloud storage", which is not real google cloud storage during development time
-
-const fs = require("fs");
+const path = require("path");
 const child_process = require("child_process");
 const express = require("express");
+
+const units = require(path.join(__dirname, "units.json")).filter(
+  (unit) => unit.runtime === "node"
+);
 
 function watchChildProc(cproc, name) {
   cproc.stdout.on("data", (data) =>
@@ -24,39 +41,38 @@ function watchChildProc(cproc, name) {
   );
 }
 
-// dirs which do not contain the standard setup with one js function and package.json for it
-const EXCLUDE_DIRS = ["lib", "callPythonFunction", "node_modules"];
-
-const getDirectories = (source) =>
-  fs
-    .readdirSync(source, { withFileTypes: true })
-    .filter((dirent) => dirent.isDirectory())
-    .map((dirent) => dirent.name);
-
-const dirs = getDirectories("/functions").filter(
-  (x) => !EXCLUDE_DIRS.includes(x)
+console.log(
+  "Will serve functions",
+  units.map((unit) => `${unit.name}:${unit.port}`)
 );
 
-console.log("Will serve functions", dirs);
-
-for (const dir of dirs) {
-  const cmd = `npm install --silent`;
-  const cwd = "/functions/" + dir;
-  console.log("npm install " + cwd);
-
+// Install every folder once, before any unit starts, so a unit with a
+// `source` never starts against a half-installed node_modules.
+for (const unit of units.filter((unit) => !unit.source)) {
+  const cwd = path.join(__dirname, unit.name);
+  console.log("npm ci " + cwd);
   try {
-    child_process.execSync(cmd, {
+    child_process.execSync("npm ci --silent --no-audit --no-fund", {
       cwd,
+      stdio: "inherit",
     });
-  
-    const watchProc = child_process.spawn("npm", ["run", "watch"], {
-      cwd,
-    });
-    watchChildProc(watchProc, dir);
   } catch (e) {
-    // if one fails, dont fail all, somehow createAchivementCertificate fails in my local system and it is not needed for me anyway
-    console.log("Failed stup of node cloud function!!!!", dir, e);
+    console.error(`Installing dependencies for ${unit.name} failed`, e.message);
+    process.exit(1);
   }
+}
+
+for (const unit of units) {
+  const cwd = path.join(__dirname, unit.source || unit.name);
+  const watchProc = child_process.spawn("npm", ["run", "watch"], {
+    cwd,
+    env: {
+      ...process.env,
+      PORT: String(unit.port),
+      FUNCTION_TARGET: unit.entryPoint,
+    },
+  });
+  watchChildProc(watchProc, unit.name);
 }
 
 const app = express();

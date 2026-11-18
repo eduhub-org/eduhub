@@ -1,5 +1,4 @@
 import Stripe from 'stripe';
-import { GraphQLClient } from 'graphql-request';
 
 import {
   getOrCreateTaxRate,
@@ -11,6 +10,8 @@ import {
   buildServicePeriodField,
 } from '../lib/stripeTax.js';
 import { MIN_SESSION_MS, checkoutAccess, placesOpenForRegistration } from '../lib/checkoutAccess.js';
+import { createHasuraClient } from '../lib/hasura.js';
+import * as config from '../lib/config.js';
 
 const GET_COURSE_AND_ADDONS = `
   query GetCourseAndAddons($courseId: Int!) {
@@ -131,7 +132,7 @@ export default async function createStripeCheckout(req, logger) {
     }
 
     // Build URLs server-side from trusted FRONTEND_URL
-    const frontendUrl = process.env.FRONTEND_URL;
+    const frontendUrl = config.env('FRONTEND_URL');
     if (!frontendUrl) {
       logger.error('FRONTEND_URL environment variable not configured');
       return {
@@ -145,7 +146,7 @@ export default async function createStripeCheckout(req, logger) {
     const successUrl = `${frontendUrl}/course/${courseId}/payment-success?session_id={CHECKOUT_SESSION_ID}`;
     const cancelUrl = `${frontendUrl}/course/${courseId}/payment-cancelled`;
 
-    const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+    const stripeSecretKey = config.stripeSecretKey();
     if (!stripeSecretKey) {
       logger.error('Stripe secret key missing');
       return {
@@ -158,11 +159,7 @@ export default async function createStripeCheckout(req, logger) {
     const stripe = new Stripe(stripeSecretKey);
 
     // Fetch course and addon mappings from Hasura
-    const client = new GraphQLClient(process.env.HASURA_ENDPOINT, {
-      headers: {
-        'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET,
-      },
-    });
+    const client = createHasuraClient();
 
     const courseData = await client.request(GET_COURSE_AND_ADDONS, { courseId });
     const course = courseData.Course_by_pk;

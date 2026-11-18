@@ -1,4 +1,3 @@
-import { GraphQLClient } from 'graphql-request';
 import { ORG_ADMIN_ROLES, isOrgAdminOfCourse } from '../lib/orgAdminScope.js';
 import {
   FormbricksResponsesError,
@@ -7,6 +6,7 @@ import {
   storeQuestionnaireResponse,
   toStoredQuestionnaireResponse,
 } from '../lib/formbricksResponses.js';
+import { createHasuraClient } from '../lib/hasura.js';
 
 const GET_ENROLLMENT = `
   query GetEnrollmentForQuestionnaire($id: Int!) {
@@ -18,11 +18,6 @@ const GET_ENROLLMENT = `
   }
 `;
 
-const adminClient = () =>
-  new GraphQLClient(process.env.HASURA_ENDPOINT, {
-    headers: { 'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET },
-  });
-
 /**
  * Stores the newest response on the enrollment so the applications tab can show it
  * without asking Formbricks again. Only when the enrollment really is the requested
@@ -31,7 +26,7 @@ const adminClient = () =>
 async function persistNewestResponse(loaded, formattedResponses, { courseId, userId, enrollmentId }, logger) {
   if (!enrollmentId || formattedResponses.length === 0) return;
   try {
-    const client = adminClient();
+    const client = createHasuraClient();
     const { CourseEnrollment_by_pk: enrollment } = await client.request(GET_ENROLLMENT, { id: Number(enrollmentId) });
     if (!enrollment || enrollment.userId !== String(userId) || enrollment.courseId !== Number(courseId)) {
       logger.warn('Not storing Formbricks response: enrollment does not match the request', { enrollmentId, courseId });
@@ -88,7 +83,7 @@ export default async function getFormbricksResponses(req, logger) {
     // The handler predates role checks for instructors; this does not add one for them.
     const sessionVariables = req.body?.session_variables || {};
     if (ORG_ADMIN_ROLES.has(sessionVariables['x-hasura-role'])) {
-      if (!(await isOrgAdminOfCourse(adminClient(), sessionVariables['x-hasura-user-id'], Number(courseId)))) {
+      if (!(await isOrgAdminOfCourse(createHasuraClient(), sessionVariables['x-hasura-user-id'], Number(courseId)))) {
         return {
           success: false,
           error: 'Not allowed to read the responses of this course',

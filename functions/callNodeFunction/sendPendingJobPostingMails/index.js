@@ -1,11 +1,13 @@
 import Stripe from 'stripe';
-import { GraphQLClient, gql } from 'graphql-request';
+import { gql } from 'graphql-request';
 
 import {
   buildJobPostingMailVars,
   formatJobPostingAmount,
   sendJobPostingMail,
 } from '../publishJobPosting/index.js';
+import { createHasuraClient } from '../lib/hasura.js';
+import * as config from '../lib/config.js';
 
 /**
  * Backstop for the StuJo job posting confirmation mail.
@@ -129,9 +131,7 @@ const BACKFILL_INVOICE_DOCUMENT = gql`
 export default async function sendPendingJobPostingMails(req, logger) {
   logger.info('########## Send Pending Job Posting Mails ##########');
 
-  const client = new GraphQLClient(process.env.HASURA_ENDPOINT, {
-    headers: { 'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET },
-  });
+  const client = createHasuraClient();
 
   const before = new Date(Date.now() - MIN_AGE_MINUTES * 60 * 1000).toISOString();
   const after = new Date(Date.now() - MAX_AGE_HOURS * 60 * 60 * 1000).toISOString();
@@ -155,7 +155,7 @@ export default async function sendPendingJobPostingMails(req, logger) {
     limit: PAGE_SIZE,
   });
 
-  const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+  const stripeSecretKey = config.stripeSecretKey();
   const stripe = stripeSecretKey ? new Stripe(stripeSecretKey) : null;
   if (!stripe) {
     logger.warn('STRIPE_SECRET_KEY not configured, sweep cannot resolve missing invoice PDFs');

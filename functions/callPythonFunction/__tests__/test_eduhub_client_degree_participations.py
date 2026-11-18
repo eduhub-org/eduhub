@@ -1,9 +1,9 @@
 """Unit tests for EduHubClient.fetch_degree_participations.
 
-The generic `send_query` helper returns a string on a non-200 response and
-ignores the GraphQL `errors` key. For degree certificates that leniency would
-silently produce an empty component list on a legal document, so this query uses
-the strict `_post_graphql` path instead - these tests pin that behaviour.
+For degree certificates a lenient query would silently produce an empty
+component list on a legal document, so this query uses the strict
+`_post_graphql` path (which also rejects a missing `data` object) - these tests
+pin that behaviour.
 """
 import json
 

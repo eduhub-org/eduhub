@@ -2,7 +2,7 @@ import logging
 import os
 from datetime import datetime, timezone
 
-from api_clients import EduHubClient
+from api_clients import EduHubClient, HasuraQueryError
 
 from pythonFunctions.mail_helpers import (
     already_sent_keys,
@@ -63,10 +63,11 @@ def check_course_continuation(arguments):
             }
         }
         """
-        result = client.send_query(query, {"now": now_iso})
-        if not isinstance(result, dict) or result.get("errors"):
-            logging.error(f"Failed to query courses for continuation check: {result}")
-            return {"success": False, "error": str(result)}
+        try:
+            result = client.send_query(query, {"now": now_iso})
+        except HasuraQueryError as error:
+            logging.error(f"Failed to query courses for continuation check: {error}")
+            return {"success": False, "error": str(error)}
 
         courses = result["data"]["Course"]
         template = get_default_mail_template(client, MAIL_TYPE)

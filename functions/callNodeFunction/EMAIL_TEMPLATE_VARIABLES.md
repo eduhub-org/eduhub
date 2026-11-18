@@ -4,7 +4,7 @@ This document provides a comprehensive reference for all available email templat
 
 ## Overview
 
-The email template variable system is centralized in `emailTemplateVariables.js` to ensure consistency, maintainability, and ease of use across all email functions.
+The email template variable system is centralized in `lib/emailTemplateVariables.js` to ensure consistency, maintainability, and ease of use across all email functions.
 
 ## Available Variables
 
@@ -280,7 +280,7 @@ The timezone is retrieved from the `AppSettings` table and mapped to appropriate
 The system includes template validation to ensure only known variables are used:
 
 ```javascript
-import { validateTemplate } from './emailTemplateVariables.js';
+import { validateTemplate } from './lib/emailTemplateVariables.js';
 
 const template = 'Hello [User:FirstName], welcome to [Unknown:Variable]!';
 const validation = validateTemplate(template);
@@ -293,7 +293,7 @@ console.log(validation);
 
 To add new variables to the system:
 
-1. **Update the registry** in `emailTemplateVariables.js`:
+1. **Update the registry** in `lib/emailTemplateVariables.js`:
 
 ```javascript
 export const EMAIL_VARIABLES = {
@@ -337,7 +337,7 @@ export function createEnrollmentVariableReplacer(enrollmentDetails, formatDate) 
 ### Generate Documentation
 
 ```javascript
-import { generateVariableDocumentation } from './emailTemplateVariables.js';
+import { generateVariableDocumentation } from './lib/emailTemplateVariables.js';
 
 // Generate documentation for all variables
 const fullDocs = generateVariableDocumentation();
@@ -349,7 +349,7 @@ const enrollmentDocs = generateVariableDocumentation('enrollment');
 ### Get Variables by Category
 
 ```javascript
-import { getVariablesByCategory } from './emailTemplateVariables.js';
+import { getVariablesByCategory } from './lib/emailTemplateVariables.js';
 
 const sessionVars = getVariablesByCategory('session');
 console.log(Object.keys(sessionVars)); // List of session variables
@@ -358,7 +358,7 @@ console.log(Object.keys(sessionVars)); // List of session variables
 ### Validate Templates
 
 ```javascript
-import { validateTemplate } from './emailTemplateVariables.js';
+import { validateTemplate } from './lib/emailTemplateVariables.js';
 
 const isValid = validateTemplate(templateContent);
 if (!isValid.valid) {
@@ -389,7 +389,7 @@ The system gracefully handles missing data:
 ### Enrollment Email Function
 
 ```javascript
-import { createEnrollmentVariableReplacer } from '../emailTemplateVariables.js';
+import { createEnrollmentVariableReplacer } from '../lib/emailTemplateVariables.js';
 
 const replaceVariables = createEnrollmentVariableReplacer(enrollmentDetails, formatDate);
 // `{ html: false }` for the subject: it is plain text, so entity-escaping a
@@ -406,7 +406,7 @@ the subject.
 ### Session Reminder Function
 
 ```javascript
-import { createSessionVariableReplacer } from '../emailTemplateVariables.js';
+import { createSessionVariableReplacer } from '../lib/emailTemplateVariables.js';
 
 const replaceVariables = createSessionVariableReplacer(session, enrollment, {
   startDateTime: sessionStart.toLocaleString(),
@@ -422,7 +422,7 @@ If you have existing email functions using manual variable replacement:
 
 1. **Import the centralized system**:
    ```javascript
-   import { createEnrollmentVariableReplacer } from '../emailTemplateVariables.js';
+   import { createEnrollmentVariableReplacer } from '../lib/emailTemplateVariables.js';
    ```
 
 2. **Replace manual logic**:

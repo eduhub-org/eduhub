@@ -151,7 +151,7 @@ All verified against `backend/migrations/` and `backend/metadata/`.
 | Mandate restriction (§2.4) | `JobPosting.restrictedToOrganizationId` | Replaces mandates/memberships/restrictions: visible to all when null, else only to users with matching `User.organizationId`. Covers the single real use case (HAW Kiel). |
 | Paid posting / invoice | `Invoice` + Stripe functions | `Invoice` is a lightweight reference (Stripe = system of record), `courseEnrollmentId` already nullable → add nullable `jobPostingId`. Generalize `functions/callNodeFunction/createStripeCheckout/`; extend webhook `frontend-nx/apps/edu-hub/pages/api/webhooks/stripe.ts`. |
 | Transactional mails | `MailTemplate`/`MailLog` + `functions/sendMail` (Mailgun) | Port the relevant `Notificator` mails (§6, §8). |
-| PDF/logo uploads (Paperclip, local disk) | GCS via `functions/shared_libs/api_clients/storage_client.py` | Single `BUCKET_NAME` env; blob layout follows the calling function's convention. |
+| PDF/logo uploads (Paperclip, local disk) | GCS via `functions/shared_py/api_clients/storage_client.py` | Single `BUCKET_NAME` env; blob layout follows the calling function's convention. |
 | Per-portal branding | `AppSettings` (extended, §5) | PK `appName`; current columns: `backgroundImageURL`, `previewImageURL`, `bannerTextDe/En`, `bannerBackgroundColor`, `bannerFontColor`, `timeZone`, `showFaqSection`, `faqCollectionName`, `defaultAttendanceCertificateTemplateId`. |
 | FAQ page | `Faq`/`FaqCollection`/`FaqTranslation` | One collection per portal. |
 | Legal pages | shared components | Done. `/impressum` + `/datenschutz` render `frontend-nx/apps/edu-hub/components/legal/*`; StuJo renders the subset of privacy sections that applies to it, plus a job-postings section EduHub does not have. On a campus edition both pages open with a note that CBB is the provider and the university a cooperation partner. `docs/LEGAL_DOCUMENTS.md`. |
@@ -293,7 +293,7 @@ welcome (`newcompanymail`), account migration mail (§7).
 
 ### 7.1 Approach
 One idempotent Python ETL script (repo `scripts/`, reusing
-`functions/shared_libs/api_clients/`), reading a snapshot of the StuJo
+`functions/shared_py/api_clients/`), reading a snapshot of the StuJo
 **MySQL** database (the draft wrongly said Postgres/pg_dump) and writing
 through Hasura/SQL into EduHub. Idempotency via `legacyStujoId` on
 `JobPosting` and a legacy-id mapping for organizations/users, so it can

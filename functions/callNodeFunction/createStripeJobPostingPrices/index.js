@@ -1,5 +1,7 @@
 import Stripe from 'stripe';
-import { GraphQLClient, gql } from 'graphql-request';
+import { gql } from 'graphql-request';
+import { createHasuraClient } from '../lib/hasura.js';
+import * as config from '../lib/config.js';
 
 /**
  * One-time bootstrap for the StuJo job board payments (admin action):
@@ -53,18 +55,16 @@ export default async function createStripeJobPostingPrices(req, logger) {
       return { success: false, error: 'Admin only', messageKey: 'UNAUTHORIZED' };
     }
 
-    const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+    const stripeSecretKey = config.stripeSecretKey();
     if (!stripeSecretKey) {
       return { success: false, error: 'Stripe secret key not configured', messageKey: 'STRIPE_NOT_CONFIGURED' };
     }
     const stripe = new Stripe(stripeSecretKey);
 
-    const client = new GraphQLClient(process.env.HASURA_ENDPOINT, {
-      headers: { 'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET },
-    });
+    const client = createHasuraClient();
 
     // 1. Ensure the fixed 19% VAT tax rate exists.
-    let taxRateId = process.env.STRIPE_TAX_RATE_ID || null;
+    let taxRateId = config.stripeTaxRateId();
     if (taxRateId) {
       try {
         const existing = await stripe.taxRates.retrieve(taxRateId);

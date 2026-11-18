@@ -1,7 +1,7 @@
 import os
 from flask import jsonify
 import logging
-from api_clients.eduhub_client import EduHubClient
+from api_clients.eduhub_client import EduHubClient, HasuraQueryError
 from datetime import datetime
 import markdown
 from course_id_utils import generate_course_hash_id
@@ -210,9 +210,13 @@ def handle_moochub_data(page=1, per_page=25):
         }"""
 
         # Query using existing client
-        courses = eduhub_client.send_query(query, variables=None)
-        
-        if not isinstance(courses, dict) or "data" not in courses:
+        try:
+            courses = eduhub_client.send_query(query, variables=None)
+        except HasuraQueryError as error:
+            logging.error(f"MOOCHub course query failed: {error}")
+            return {'error': 'Failed to fetch data from EduHub'}, 500
+
+        if "data" not in courses:
             return {'error': 'Failed to fetch data from EduHub'}, 500
 
         # Filter courses: COURSES programs; EVENTS only with DLC funding; exclude DEGREES
