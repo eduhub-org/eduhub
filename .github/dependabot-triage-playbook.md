@@ -192,7 +192,10 @@ against the actual code rather than the advisory text alone.
 
 - `scope: development` deps (build tooling, test libs, codegen) ship to nobody. Treat as
   NOT-RELEVANT unless exploitable at build time — supply-chain/registry compromise, or
-  reachable in CI with untrusted input.
+  reachable in CI with untrusted input. In `functions/` this holds too: the zip step
+  drops tests and Jest files, and the Cloud Functions build runs `npm ci` from the
+  lockfile with `NODE_ENV=production` (no `build`/`gcp-build` script), so
+  devDependencies are never installed in a deployed function.
 - For runtime deps, check **reachability**: grep for the import, and for the specific
   vulnerable function or option the advisory names. State whether user-controlled input can
   actually reach it.
@@ -351,11 +354,14 @@ If a check fails **because of** a bump, revert that one bump, move it to
 NEEDS-MANUAL-DECISION with the error quoted, and re-verify. Never open a PR with a red build
 you already know about.
 
-If a `functions/` directory changed, reproduce `.github/workflows/functions-code-checks.yml`
-for that unit: `npm ci && npm test` in `functions/callNodeFunction` (run
-`npm ci` in `functions/sendMail` first; its tests run from there), or
-`pip install -r requirements-dev.txt && pytest` for a Python unit. For another Node unit,
-at minimum confirm `npm ci` succeeds there.
+If anything under `functions/` changed, reproduce what
+`.github/workflows/functions-code-checks.yml` runs — read it for the exact commands and
+pinned tool versions rather than relying on this list. The key steps: `npm ci` in every
+Node unit listed in `functions/units.json` (skip entries with a `source`), `npm test`
+(Jest, which also runs sendMail's suites) in `functions/callNodeFunction`, `tsc` there,
+`node --test 'shared/*.test.js'` in `functions/`, ESLint and ruff over `functions/`, and
+`pip install -r requirements-dev.txt` + `pytest __tests__` for both Python units
+(`callPythonFunction`, `apiProxy`) on Python 3.11, the Cloud Functions runtime.
 
 ## 6. One PR
 
