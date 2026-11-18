@@ -52,6 +52,21 @@ select_permissions:
             User:
               id:
                 _eq: X-Hasura-User-Id
+  # Expert directory (docs/EXPERT_DIRECTORY.md): org admins find the achievement-option mentors of
+  # their organization's courses through these links.
+  - role: org_admin_access
+    permission:
+      columns:
+        - achievementOptionId
+        - courseId
+        - id
+      filter:
+        Course:
+          Program:
+            Organization:
+              OrganizationAdmins:
+                userId:
+                  _eq: X-Hasura-User-Id
 update_permissions:
   - role: instructor_access
     permission:

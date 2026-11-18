@@ -1,0 +1,83 @@
+table:
+  name: ExpertNote
+  schema: public
+object_relationships:
+  - name: Author
+    using:
+      foreign_key_constraint_on: authorId
+  - name: Expert
+    using:
+      foreign_key_constraint_on: expertId
+  - name: Organization
+    using:
+      foreign_key_constraint_on: organizationId
+# Expert Notes (ADR 0003). Central admins' notes have no organization and are seen by admins only;
+# an org admin sees and writes the notes of the organizations they manage programs of. Job-board-only
+# admins (canManageJobs alone) have no expert directory and get nothing here.
+insert_permissions:
+  - role: org_admin_access
+    permission:
+      check:
+        _and:
+          - Organization:
+              OrganizationAdmins:
+                _and:
+                  - userId:
+                      _eq: X-Hasura-User-Id
+                  - _or:
+                      - canManageCourses:
+                          _eq: true
+                      - canManageEvents:
+                          _eq: true
+                      - canManageDegrees:
+                          _eq: true
+                      - canManageSettings:
+                          _eq: true
+      set:
+        authorId: x-hasura-User-Id
+      columns:
+        - expertId
+        - organizationId
+        - text
+select_permissions:
+  - role: org_admin_access
+    permission:
+      columns:
+        - id
+        - expertId
+        - authorId
+        - organizationId
+        - text
+        - created_at
+        - updated_at
+      filter:
+        Organization:
+          OrganizationAdmins:
+            _and:
+              - userId:
+                  _eq: X-Hasura-User-Id
+              - _or:
+                  - canManageCourses:
+                      _eq: true
+                  - canManageEvents:
+                      _eq: true
+                  - canManageDegrees:
+                      _eq: true
+                  - canManageSettings:
+                      _eq: true
+# Authors edit and delete their own entries; admins (full access) can delete any.
+update_permissions:
+  - role: org_admin_access
+    permission:
+      columns:
+        - text
+      filter:
+        authorId:
+          _eq: X-Hasura-User-Id
+      check: null
+delete_permissions:
+  - role: org_admin_access
+    permission:
+      filter:
+        authorId:
+          _eq: X-Hasura-User-Id

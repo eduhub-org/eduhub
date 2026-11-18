@@ -474,3 +474,41 @@ describe('TableGrid selection across pages', () => {
     expect(screen.queryByText('common.table_grid.page_all_selected')).not.toBeInTheDocument();
   });
 });
+
+describe('TableGrid pagination', () => {
+  const rows: TestRow[] = [1, 2, 3, 4].map((id) => ({ id, name: `Row ${id}` }));
+
+  const secondPage = (data: TestRow[]) => (
+    <TableGrid
+      columns={columns}
+      data={data}
+      enablePagination
+      error={undefined}
+      loading={false}
+      pageIndex={1}
+      onPageChange={jest.fn()}
+      pageSize={2}
+      totalCount={rows.length}
+      onPageSizeChange={jest.fn()}
+      refetchQueries={[]}
+      searchFilter=""
+      onSearchFilterChange={jest.fn()}
+      showGlobalSearchField={false}
+    />
+  );
+
+  it('shows a page the server already paged, even without server-side sorting', () => {
+    render(secondPage(rows.slice(2, 4)));
+
+    expect(screen.getByText('Row 3')).toBeInTheDocument();
+    expect(screen.getByText('Row 4')).toBeInTheDocument();
+  });
+
+  it('pages through all rows itself when it was given all of them', () => {
+    render(secondPage(rows));
+
+    expect(screen.queryByText('Row 1')).not.toBeInTheDocument();
+    expect(screen.getByText('Row 3')).toBeInTheDocument();
+    expect(screen.getByText('Row 4')).toBeInTheDocument();
+  });
+});

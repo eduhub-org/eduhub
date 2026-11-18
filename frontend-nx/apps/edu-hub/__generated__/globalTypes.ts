@@ -975,9 +975,12 @@ export enum Course_select_column {
   projectProposalsEnabled = "projectProposalsEnabled",
   projectSubmissionDeadline = "projectSubmissionDeadline",
   published = "published",
+  registrationButtonLabelDe = "registrationButtonLabelDe",
+  registrationButtonLabelEn = "registrationButtonLabelEn",
   registrationType = "registrationType",
   requiredEcts = "requiredEcts",
   requiredEventCount = "requiredEventCount",
+  sessionReminderLeadHours = "sessionReminderLeadHours",
   showAvailablePlaces = "showAvailablePlaces",
   sourceSessionId = "sourceSessionId",
   startTime = "startTime",
@@ -1050,9 +1053,12 @@ export enum Course_update_column {
   projectProposalsEnabled = "projectProposalsEnabled",
   projectSubmissionDeadline = "projectSubmissionDeadline",
   published = "published",
+  registrationButtonLabelDe = "registrationButtonLabelDe",
+  registrationButtonLabelEn = "registrationButtonLabelEn",
   registrationType = "registrationType",
   requiredEcts = "requiredEcts",
   requiredEventCount = "requiredEventCount",
+  sessionReminderLeadHours = "sessionReminderLeadHours",
   showAvailablePlaces = "showAvailablePlaces",
   sourceSessionId = "sourceSessionId",
   startTime = "startTime",
@@ -1063,6 +1069,39 @@ export enum Course_update_column {
   title = "title",
   updated_at = "updated_at",
   weekDay = "weekDay",
+}
+
+/**
+ * unique or primary key constraints on table "ExpertNote"
+ */
+export enum ExpertNote_constraint {
+  ExpertNote_pkey = "ExpertNote_pkey",
+}
+
+/**
+ * select columns of table "ExpertNote"
+ */
+export enum ExpertNote_select_column {
+  authorId = "authorId",
+  created_at = "created_at",
+  expertId = "expertId",
+  id = "id",
+  organizationId = "organizationId",
+  text = "text",
+  updated_at = "updated_at",
+}
+
+/**
+ * update columns of table "ExpertNote"
+ */
+export enum ExpertNote_update_column {
+  authorId = "authorId",
+  created_at = "created_at",
+  expertId = "expertId",
+  id = "id",
+  organizationId = "organizationId",
+  text = "text",
+  updated_at = "updated_at",
 }
 
 /**
@@ -1776,6 +1815,7 @@ export enum MailTemplateType_enum {
   PROJECT_TEAM_CONFIRMED = "PROJECT_TEAM_CONFIRMED",
   REGISTRATION_CONFIRMED = "REGISTRATION_CONFIRMED",
   REGISTRATION_CONFIRMED_PAID = "REGISTRATION_CONFIRMED_PAID",
+  SESSION_LOCATION_CHANGED = "SESSION_LOCATION_CHANGED",
   SESSION_REMINDER = "SESSION_REMINDER",
   SESSION_RESCHEDULED = "SESSION_RESCHEDULED",
   SESSION_SPEAKER_ADDED = "SESSION_SPEAKER_ADDED",
@@ -3111,6 +3151,7 @@ export enum User_select_column {
   city = "city",
   country = "country",
   created_at = "created_at",
+  doNotContact = "doNotContact",
   email = "email",
   externalProfile = "externalProfile",
   firstName = "firstName",
@@ -3134,6 +3175,7 @@ export enum User_select_column {
  * select "User_aggregate_bool_exp_bool_and_arguments_columns" columns of table "User"
  */
 export enum User_select_column_User_aggregate_bool_exp_bool_and_arguments_columns {
+  doNotContact = "doNotContact",
   newsletterRegistration = "newsletterRegistration",
 }
 
@@ -3141,6 +3183,7 @@ export enum User_select_column_User_aggregate_bool_exp_bool_and_arguments_column
  * select "User_aggregate_bool_exp_bool_or_arguments_columns" columns of table "User"
  */
 export enum User_select_column_User_aggregate_bool_exp_bool_or_arguments_columns {
+  doNotContact = "doNotContact",
   newsletterRegistration = "newsletterRegistration",
 }
 
@@ -3154,6 +3197,7 @@ export enum User_update_column {
   city = "city",
   country = "country",
   created_at = "created_at",
+  doNotContact = "doNotContact",
   email = "email",
   externalProfile = "externalProfile",
   firstName = "firstName",
@@ -7012,6 +7056,7 @@ export interface Course_bool_exp {
   tagline?: String_comparison_exp | null;
   title?: String_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
+  waitlistCount?: bigint_comparison_exp | null;
   weekDay?: Weekday_enum_comparison_exp | null;
 }
 
@@ -7270,6 +7315,7 @@ export interface Course_order_by {
   tagline?: order_by | null;
   title?: order_by | null;
   updated_at?: order_by | null;
+  waitlistCount?: order_by | null;
   weekDay?: order_by | null;
 }
 
@@ -7494,6 +7540,176 @@ export interface DegreeParticipationStats_order_by {
   degreeCourseId?: order_by | null;
   ectsTotal?: order_by | null;
   userId?: order_by | null;
+}
+
+export interface ExpertNote_aggregate_bool_exp {
+  count?: ExpertNote_aggregate_bool_exp_count | null;
+}
+
+export interface ExpertNote_aggregate_bool_exp_count {
+  arguments?: ExpertNote_select_column[] | null;
+  distinct?: boolean | null;
+  filter?: ExpertNote_bool_exp | null;
+  predicate: Int_comparison_exp;
+}
+
+/**
+ * order by aggregate values of table "ExpertNote"
+ */
+export interface ExpertNote_aggregate_order_by {
+  avg?: ExpertNote_avg_order_by | null;
+  count?: order_by | null;
+  max?: ExpertNote_max_order_by | null;
+  min?: ExpertNote_min_order_by | null;
+  stddev?: ExpertNote_stddev_order_by | null;
+  stddev_pop?: ExpertNote_stddev_pop_order_by | null;
+  stddev_samp?: ExpertNote_stddev_samp_order_by | null;
+  sum?: ExpertNote_sum_order_by | null;
+  var_pop?: ExpertNote_var_pop_order_by | null;
+  var_samp?: ExpertNote_var_samp_order_by | null;
+  variance?: ExpertNote_variance_order_by | null;
+}
+
+/**
+ * input type for inserting array relation for remote table "ExpertNote"
+ */
+export interface ExpertNote_arr_rel_insert_input {
+  data: ExpertNote_insert_input[];
+  on_conflict?: ExpertNote_on_conflict | null;
+}
+
+/**
+ * order by avg() on columns of table "ExpertNote"
+ */
+export interface ExpertNote_avg_order_by {
+  id?: order_by | null;
+  organizationId?: order_by | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "ExpertNote". All fields are combined with a logical 'AND'.
+ */
+export interface ExpertNote_bool_exp {
+  Author?: User_bool_exp | null;
+  Expert?: User_bool_exp | null;
+  Organization?: Organization_bool_exp | null;
+  _and?: ExpertNote_bool_exp[] | null;
+  _not?: ExpertNote_bool_exp | null;
+  _or?: ExpertNote_bool_exp[] | null;
+  authorId?: uuid_comparison_exp | null;
+  created_at?: timestamptz_comparison_exp | null;
+  expertId?: uuid_comparison_exp | null;
+  id?: Int_comparison_exp | null;
+  organizationId?: Int_comparison_exp | null;
+  text?: String_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "ExpertNote"
+ */
+export interface ExpertNote_insert_input {
+  Author?: User_obj_rel_insert_input | null;
+  Expert?: User_obj_rel_insert_input | null;
+  Organization?: Organization_obj_rel_insert_input | null;
+  authorId?: any | null;
+  created_at?: any | null;
+  expertId?: any | null;
+  id?: number | null;
+  organizationId?: number | null;
+  text?: string | null;
+  updated_at?: any | null;
+}
+
+/**
+ * order by max() on columns of table "ExpertNote"
+ */
+export interface ExpertNote_max_order_by {
+  authorId?: order_by | null;
+  created_at?: order_by | null;
+  expertId?: order_by | null;
+  id?: order_by | null;
+  organizationId?: order_by | null;
+  text?: order_by | null;
+  updated_at?: order_by | null;
+}
+
+/**
+ * order by min() on columns of table "ExpertNote"
+ */
+export interface ExpertNote_min_order_by {
+  authorId?: order_by | null;
+  created_at?: order_by | null;
+  expertId?: order_by | null;
+  id?: order_by | null;
+  organizationId?: order_by | null;
+  text?: order_by | null;
+  updated_at?: order_by | null;
+}
+
+/**
+ * on_conflict condition type for table "ExpertNote"
+ */
+export interface ExpertNote_on_conflict {
+  constraint: ExpertNote_constraint;
+  update_columns: ExpertNote_update_column[];
+  where?: ExpertNote_bool_exp | null;
+}
+
+/**
+ * order by stddev() on columns of table "ExpertNote"
+ */
+export interface ExpertNote_stddev_order_by {
+  id?: order_by | null;
+  organizationId?: order_by | null;
+}
+
+/**
+ * order by stddev_pop() on columns of table "ExpertNote"
+ */
+export interface ExpertNote_stddev_pop_order_by {
+  id?: order_by | null;
+  organizationId?: order_by | null;
+}
+
+/**
+ * order by stddev_samp() on columns of table "ExpertNote"
+ */
+export interface ExpertNote_stddev_samp_order_by {
+  id?: order_by | null;
+  organizationId?: order_by | null;
+}
+
+/**
+ * order by sum() on columns of table "ExpertNote"
+ */
+export interface ExpertNote_sum_order_by {
+  id?: order_by | null;
+  organizationId?: order_by | null;
+}
+
+/**
+ * order by var_pop() on columns of table "ExpertNote"
+ */
+export interface ExpertNote_var_pop_order_by {
+  id?: order_by | null;
+  organizationId?: order_by | null;
+}
+
+/**
+ * order by var_samp() on columns of table "ExpertNote"
+ */
+export interface ExpertNote_var_samp_order_by {
+  id?: order_by | null;
+  organizationId?: order_by | null;
+}
+
+/**
+ * order by variance() on columns of table "ExpertNote"
+ */
+export interface ExpertNote_variance_order_by {
+  id?: order_by | null;
+  organizationId?: order_by | null;
 }
 
 /**
@@ -13150,6 +13366,7 @@ export interface Project_bool_exp {
   _not?: Project_bool_exp | null;
   _or?: Project_bool_exp[] | null;
   acceptingParticipants?: Boolean_comparison_exp | null;
+  courses?: Course_bool_exp | null;
   coverImageUrl?: String_comparison_exp | null;
   created_at?: timestamptz_comparison_exp | null;
   csvResults?: String_comparison_exp | null;
@@ -13327,6 +13544,7 @@ export interface Project_order_by {
   ProposedByUser?: User_order_by | null;
   SubmittedByUser?: User_order_by | null;
   acceptingParticipants?: order_by | null;
+  courses_aggregate?: Course_aggregate_order_by | null;
   coverImageUrl?: order_by | null;
   created_at?: order_by | null;
   csvResults?: order_by | null;
@@ -14459,6 +14677,8 @@ export interface User_bool_exp {
   CourseEnrollments_aggregate?: CourseEnrollment_aggregate_bool_exp | null;
   CourseInstructors?: CourseInstructor_bool_exp | null;
   CourseInstructors_aggregate?: CourseInstructor_aggregate_bool_exp | null;
+  ExpertNotes?: ExpertNote_bool_exp | null;
+  ExpertNotes_aggregate?: ExpertNote_aggregate_bool_exp | null;
   Organization?: Organization_bool_exp | null;
   OrganizationAdmins?: OrganizationAdmin_bool_exp | null;
   OrganizationAdmins_aggregate?: OrganizationAdmin_aggregate_bool_exp | null;
@@ -14483,7 +14703,9 @@ export interface User_bool_exp {
   city?: String_comparison_exp | null;
   country?: String_comparison_exp | null;
   created_at?: timestamptz_comparison_exp | null;
+  doNotContact?: Boolean_comparison_exp | null;
   email?: String_comparison_exp | null;
+  expertLastActiveAt?: timestamptz_comparison_exp | null;
   externalProfile?: String_comparison_exp | null;
   firstName?: String_comparison_exp | null;
   id?: uuid_comparison_exp | null;
@@ -14512,6 +14734,7 @@ export interface User_insert_input {
   Country?: Country_obj_rel_insert_input | null;
   CourseEnrollments?: CourseEnrollment_arr_rel_insert_input | null;
   CourseInstructors?: CourseInstructor_arr_rel_insert_input | null;
+  ExpertNotes?: ExpertNote_arr_rel_insert_input | null;
   Organization?: Organization_obj_rel_insert_input | null;
   OrganizationAdmins?: OrganizationAdmin_arr_rel_insert_input | null;
   OrganizationNewsletterSubscriptions?: OrganizationNewsletterSubscription_arr_rel_insert_input | null;
@@ -14527,6 +14750,7 @@ export interface User_insert_input {
   city?: string | null;
   country?: string | null;
   created_at?: any | null;
+  doNotContact?: boolean | null;
   email?: string | null;
   externalProfile?: string | null;
   firstName?: string | null;
@@ -14625,6 +14849,7 @@ export interface User_order_by {
   Country?: Country_order_by | null;
   CourseEnrollments_aggregate?: CourseEnrollment_aggregate_order_by | null;
   CourseInstructors_aggregate?: CourseInstructor_aggregate_order_by | null;
+  ExpertNotes_aggregate?: ExpertNote_aggregate_order_by | null;
   Organization?: Organization_order_by | null;
   OrganizationAdmins_aggregate?: OrganizationAdmin_aggregate_order_by | null;
   OrganizationNewsletterSubscriptions_aggregate?: OrganizationNewsletterSubscription_aggregate_order_by | null;
@@ -14640,7 +14865,9 @@ export interface User_order_by {
   city?: order_by | null;
   country?: order_by | null;
   created_at?: order_by | null;
+  doNotContact?: order_by | null;
   email?: order_by | null;
+  expertLastActiveAt?: order_by | null;
   externalProfile?: order_by | null;
   firstName?: order_by | null;
   id?: order_by | null;

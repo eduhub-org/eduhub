@@ -1,157 +1,279 @@
-import { FC, useMemo } from 'react';
-import { useTranslations } from 'next-intl';
+import { FC, useCallback, useMemo, useState } from 'react';
+import { useFormatter, useTranslations } from 'next-intl';
+import { useRouter } from 'next/router';
 import { ColumnDef } from '@tanstack/react-table';
 
 import TableGrid from '../../common/TableGrid';
 import Loading from '../../common/Loading';
+import UserAvatar from '../../common/UserAvatar';
+import { Button } from '../../common/Button';
+import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';
 import { usePersistedPageSize, useTableGrid } from '../../common/TableGrid/hooks';
-import { createMultiWordSearchCondition } from '../../common/TableGrid/utils';
-
-import { useAdminQuery } from '../../../hooks/authedQuery';
-import { EXPERTS_LIST } from '../../../queries/experts';
-import { ExpertsList_User } from '../../../queries/__generated__/ExpertsList';
+import { createMultiWordSearchCondition, NULLS_LAST } from '../../common/TableGrid/utils';
 import { PageBlock } from '../../common/PageBlock';
 import CommonPageHeader from '../../common/CommonPageHeader';
-import { ProgramType } from '../../../types/enums';
+import { buildCsv, downloadTextFile, exportFileName } from '../ManageCourseContent/ParticipantExport/participantExport';
 
-interface ExpertRole {
-  type: 'instructor' | 'speaker';
-  isEvent?: boolean;
-  courseTitle: string;
-  programShortTitle: string;
-  sessionTitle?: string;
+import { useManageQuery } from '../../../hooks/authedQuery';
+import { useIsAdmin } from '../../../hooks/authentication';
+import { useUserId } from '../../../hooks/user';
+import { EXPERT_NOTE_ORGANIZATIONS, EXPERTS_LIST } from '../../../queries/experts';
+import { ExpertsList, ExpertsList_User } from '../../../queries/__generated__/ExpertsList';
+import { ExpertNoteOrganizations } from '../../../queries/__generated__/ExpertNoteOrganizations';
+import {
+  EXPERT_SEARCH_FIELDS,
+  ExpertMatch,
+  ExpertRole,
+  expertCsvRows,
+  expertRoles,
+  findMatches,
+  highlight,
+  lastActive,
+  mailtoBcc,
+  matchedRoleKeys,
+  organizationOf,
+  searchWords,
+} from './expertDirectory';
+import { ExpandableExpertRow } from './ExpandableExpertRow';
+import { ExpertContactActions } from './ExpertContactActions';
+
+/** Roles held in a course of a program of an organization the viewer administers. */
+const orgAdminScope = (userId: string) => {
+  const ofMyOrganization = { Organization: { OrganizationAdmins: { userId: { _eq: userId } } } };
+  return {
+    _or: [
+      { CourseInstructors: { Course: { Program: ofMyOrganization } } },
+      { SessionSpeakers: { Session: { Course: { Program: ofMyOrganization } } } },
+      { ProjectMentors: { Project: { ProjectCourses: { Course: { Program: ofMyOrganization } } } } },
+      {
+        AchievementOptionMentors: {
+          AchievementOption: { AchievementOptionCourses: { Course: { Program: ofMyOrganization } } },
+        },
+      },
+    ],
+  };
+};
+
+const ADMIN_DEFAULT_SORT = [{ expertLastActiveAt: 'desc_nulls_last' }, { lastName: 'asc' }];
+const ORG_ADMIN_DEFAULT_SORT = [{ lastName: 'asc' }, { firstName: 'asc' }];
+// Enough for every expert at once; the org admin permission caps its reads at 100 rows anyway.
+const EXPORT_LIMIT = 5000;
+
+const sortColumnMapper = (columnId: string) => {
+  if (columnId === 'organization') return { organizationName: NULLS_LAST };
+  if (columnId === 'lastActive') return { expertLastActiveAt: NULLS_LAST };
+  return columnId;
+};
+
+interface ExpertView {
+  roles: ExpertRole[];
+  matches: ExpertMatch[];
+  lastActive: Date | null;
 }
 
-const ExpandableExpertRow: FC<{ row: ExpertsList_User }> = ({ row }) => {
+const MatchLine: FC<{ matches: ExpertMatch[]; words: string[] }> = ({ matches, words }) => {
   const t = useTranslations('manageExperts');
-
-  // Collect all roles for this user
-  const roles: ExpertRole[] = useMemo(() => {
-    const result: ExpertRole[] = [];
-
-    // Add instructor roles
-    row.CourseInstructors?.forEach((ci) => {
-      if (ci.Course) {
-        result.push({
-          type: 'instructor',
-          isEvent: ci.Course.Program?.type === ProgramType.EVENTS,
-          courseTitle: ci.Course.title,
-          programShortTitle: ci.Course.Program?.shortTitle || '',
-        });
-      }
-    });
-
-    // Add speaker roles
-    row.SessionSpeakers?.forEach((ss) => {
-      if (ss.Session?.Course) {
-        result.push({
-          type: 'speaker',
-          courseTitle: ss.Session.Course.title,
-          programShortTitle: ss.Session.Course.Program?.shortTitle || '',
-          sessionTitle: ss.Session.title,
-        });
-      }
-    });
-
-    return result;
-  }, [row.CourseInstructors, row.SessionSpeakers]);
-
-  if (roles.length === 0) {
-    return (
-      <div className="bg-fill-primary text-label-primary light p-4">
-        <p className="text-label-secondary text-sm">{t('no_roles')}</p>
-      </div>
-    );
-  }
-
+  if (!matches.length) return null;
+  const [first] = matches;
+  const year = first.role?.date ? ` (${first.role.date.getFullYear()})` : '';
+  // A title hit shows the title itself, so name the role kind; other fields name the role they are in.
+  const where = !first.role
+    ? t(`match_field.${first.field}`)
+    : first.field === 'title'
+    ? `${t(`role_${first.role.kind}`)}${year}`
+    : `${t(`match_field.${first.field}`)} · ${first.role.title}${year}`;
   return (
-    <div className="bg-fill-primary text-label-primary light">
-      <div className="hidden md:grid md:grid-cols-12 gap-2 p-2 font-medium text-label-primary border-b border-border-primary">
-        <div className="col-span-4 pl-3">{t('course')}</div>
-        <div className="col-span-2">{t('program')}</div>
-        <div className="col-span-3">{t('role')}</div>
-        <div className="col-span-3">{t('session')}</div>
-      </div>
-      {roles.map((role, index) => (
-        <div
-          key={index}
-          className="flex flex-col md:grid md:grid-cols-12 gap-2 p-2 text-label-secondary text-sm border-b border-border-primary last:border-b-0"
-        >
-          <div className="md:col-span-4 md:pl-3 truncate font-medium md:font-normal" title={role.courseTitle}>
-            {role.courseTitle}
-          </div>
-          <div className="md:col-span-2 truncate text-xs md:text-sm">{role.programShortTitle}</div>
-          <div className="md:col-span-3 text-xs md:text-sm">
-            {role.type === 'speaker' ? t('role_speaker') : role.isEvent ? t('role_organizer') : t('role_instructor')}
-          </div>
-          <div className="md:col-span-3 truncate text-xs md:text-sm" title={role.sessionTitle || ''}>
-            {role.sessionTitle || '-'}
-          </div>
-        </div>
-      ))}
+    <div className="text-xs text-label-secondary truncate" title={first.snippet}>
+      <span className="font-medium">{where}: </span>
+      {highlight(first.snippet, words).map((segment, index) =>
+        segment.hit ? (
+          <mark key={index} className="bg-transparent font-semibold text-label-primary underline">
+            {segment.text}
+          </mark>
+        ) : (
+          <span key={index}>{segment.text}</span>
+        )
+      )}
+      {matches.length > 1 && <span className="ml-1">{t('match_more', { count: matches.length - 1 })}</span>}
     </div>
   );
 };
 
 const ManageExpertsContent: FC = () => {
   const t = useTranslations('manageExperts');
+  const format = useFormatter();
+  const { locale } = useRouter();
+  const isAdmin = useIsAdmin();
+  const userId = useUserId();
   const [pageSize, setPageSize] = usePersistedPageSize('manageExperts', 20);
+  const [actionError, setActionError] = useState<string | null>(null);
 
-  const { data, loading, initialLoading, error, pageIndex, setPageIndex, searchFilter, setSearchFilter } = useTableGrid({
-    queryHook: useAdminQuery,
+  const queryVariables = useMemo(
+    () => ({ isAdmin, scope: isAdmin || !userId ? {} : orgAdminScope(userId) }),
+    [isAdmin, userId]
+  );
+
+  const {
+    data,
+    loading,
+    initialLoading,
+    error,
+    refetch,
+    pageIndex,
+    setPageIndex,
+    searchFilter,
+    setSearchFilter,
+    sorting,
+    setSorting,
+    fetchAllRows,
+  } = useTableGrid({
+    queryHook: useManageQuery,
     query: EXPERTS_LIST,
-    pageSize: pageSize,
-    refetchFilter: (searchFilter) => {
-      const searchCondition = createMultiWordSearchCondition(searchFilter, [
-        'lastName',
-        'firstName',
-        'email',
-        // Instructor course fields
-        'CourseInstructors.Course.title',
-        'CourseInstructors.Course.tagline',
-        'CourseInstructors.Course.contentDescriptionField1',
-        'CourseInstructors.Course.contentDescriptionField2',
-        'CourseInstructors.Course.headingDescriptionField1',
-        'CourseInstructors.Course.headingDescriptionField2',
-        // Session speaker fields
-        'SessionSpeakers.Session.title',
-        'SessionSpeakers.Session.description',
-        'SessionSpeakers.Session.Course.title',
-      ]);
-      return {
-        filter: searchCondition,
-      };
-    },
+    queryVariables,
+    pageSize,
+    defaultSort: isAdmin ? ADMIN_DEFAULT_SORT : ORG_ADMIN_DEFAULT_SORT,
+    sortColumnMapper,
+    refetchFilter: (search) => ({ filter: createMultiWordSearchCondition(search, EXPERT_SEARCH_FIELDS) }),
   });
+  const typedData = data as ExpertsList | undefined;
+
+  const { data: organizationData } = useManageQuery<ExpertNoteOrganizations>(EXPERT_NOTE_ORGANIZATIONS, {
+    variables: { userId },
+    skip: isAdmin || !userId,
+  });
+  const noteOrganizations = useMemo(
+    () =>
+      (organizationData?.OrganizationAdmin ?? []).flatMap((grant) =>
+        grant.Organization ? [{ id: grant.Organization.id, name: grant.Organization.name }] : []
+      ),
+    [organizationData]
+  );
+
+  const words = useMemo(() => searchWords(searchFilter), [searchFilter]);
+  const experts = useMemo(() => typedData?.User ?? [], [typedData]);
+  const views = useMemo(() => {
+    const result = new Map<string, ExpertView>();
+    experts.forEach((expert) => {
+      const roles = expertRoles(expert);
+      result.set(expert.id, { roles, matches: findMatches(expert, roles, searchFilter), lastActive: lastActive(roles) });
+    });
+    return result;
+  }, [experts, searchFilter]);
+
+  const totalCount = typedData?.User_aggregate?.aggregate?.count || 0;
+
+  const loadAllExperts = useCallback(async () => {
+    const all = (await fetchAllRows(totalCount)) as ExpertsList | undefined;
+    return all?.User ?? [];
+  }, [fetchAllRows, totalCount]);
 
   const handlePageSizeChange = (newPageSize: number) => {
     setPageSize(newPageSize);
     setPageIndex(0);
   };
 
-  const columns = useMemo<ColumnDef<ExpertsList_User>[]>(
-    () => [
+  const handleBulkAction = useCallback(
+    (action: string, selected: ExpertsList_User[]) => {
+      if (action !== 'email') return false;
+      const href = mailtoBcc(selected);
+      if (!href) {
+        setActionError(t('bulk_mail_nobody'));
+        return false;
+      }
+      window.location.href = href;
+      return true;
+    },
+    [t]
+  );
+
+  const exportCsv = async () => {
+    try {
+      const all = (await fetchAllRows(EXPORT_LIMIT)) as ExpertsList | undefined;
+      const header = [t('first_name'), t('last_name'), t('organization'), t('email'), t('last_active')];
+      const csv = buildCsv(expertCsvRows(all?.User ?? [], header), locale === 'de' ? ';' : ',');
+      downloadTextFile(csv, exportFileName(t('headline'), t('export_file_suffix'), 'csv'), 'text/csv;charset=utf-8');
+    } catch (exportError) {
+      setActionError(exportError instanceof Error ? exportError.message : String(exportError));
+    }
+  };
+
+  const columns = useMemo<ColumnDef<ExpertsList_User>[]>(() => {
+    const nameCell = (value: string | null) => <span className="truncate">{value || '-'}</span>;
+    const result: ColumnDef<ExpertsList_User>[] = [
+      {
+        id: 'photo',
+        header: '',
+        enableSorting: false,
+        size: 56,
+        cell: ({ row }) => (
+          <UserAvatar
+            picture={row.original.picture ?? null}
+            imageResolution={64}
+            imageSize={32}
+            alt=""
+            ariaHidden
+            className="rounded-full object-cover flex-shrink-0"
+          />
+        ),
+      },
       {
         header: t('first_name'),
         accessorKey: 'firstName',
         enableSorting: true,
-        size: 300,
+        size: 160,
+        cell: ({ row }) => nameCell(row.original.firstName),
       },
       {
         header: t('last_name'),
         accessorKey: 'lastName',
         enableSorting: true,
-        size: 300,
+        size: 160,
+        cell: ({ row }) => nameCell(row.original.lastName),
+      },
+      {
+        id: 'organization',
+        header: t('organization'),
+        enableSorting: true,
+        size: 200,
+        cell: ({ row }) => nameCell(organizationOf(row.original)),
       },
       {
         header: t('email'),
         accessorKey: 'email',
         enableSorting: true,
-        size: 300,
+        size: 240,
+        cell: ({ row }) => nameCell(row.original.email),
       },
-    ],
-    [t]
-  );
+      {
+        id: 'lastActive',
+        header: t('last_active'),
+        // Sorting needs the Last Active computed field, which only admins may read.
+        enableSorting: isAdmin,
+        size: 110,
+        cell: ({ row }) => {
+          const date = views.get(row.original.id)?.lastActive;
+          return <span>{date ? format.dateTime(date, { year: 'numeric', month: 'short' }) : '-'}</span>;
+        },
+      },
+      {
+        id: 'contact',
+        header: t('contact'),
+        enableSorting: false,
+        size: 120,
+        cell: ({ row }) => <ExpertContactActions expert={row.original} />,
+      },
+    ];
+    if (words.length) {
+      result.splice(result.length - 1, 0, {
+        id: 'matches',
+        header: t('match_label'),
+        enableSorting: false,
+        size: 320,
+        cell: ({ row }) => <MatchLine matches={views.get(row.original.id)?.matches ?? []} words={words} />,
+      });
+    }
+    return result;
+  }, [t, format, isAdmin, views, words]);
 
   return (
     <PageBlock>
@@ -164,8 +286,8 @@ const ManageExpertsContent: FC = () => {
             </div>
             <TableGrid
               columns={columns}
-              data={data?.User || []}
-              totalCount={data?.User_aggregate?.aggregate?.count || 0}
+              data={experts}
+              totalCount={totalCount}
               pageIndex={pageIndex}
               onPageChange={setPageIndex}
               pageSize={pageSize}
@@ -175,14 +297,52 @@ const ManageExpertsContent: FC = () => {
               error={error}
               loading={loading}
               refetchQueries={['ExpertsList']}
-              expandableRowComponent={({ row }) => <ExpandableExpertRow row={row} />}
+              sorting={sorting}
+              onSortingChange={setSorting}
+              bulkActions={[{ value: 'email', label: t('bulk_mail') }]}
+              onBulkAction={handleBulkAction}
+              loadAllRows={loadAllExperts}
+              toolbarActions={<Button onClick={exportCsv}>{t('export_csv')}</Button>}
+              rowClassName={(expert) => (expert.doNotContact ? 'opacity-60' : '')}
+              renderMobileRow={(expert) => (
+                <div className="flex flex-col gap-1">
+                  <div className="font-medium">
+                    {[expert.firstName, expert.lastName].filter(Boolean).join(' ')}
+                    {expert.doNotContact && (
+                      <span className="ml-2 text-xs text-label-secondary">{t('do_not_contact')}</span>
+                    )}
+                  </div>
+                  <div className="text-sm text-label-secondary">{organizationOf(expert) || expert.email}</div>
+                  <MatchLine matches={views.get(expert.id)?.matches ?? []} words={words} />
+                  <ExpertContactActions expert={expert} />
+                </div>
+              )}
+              expandableRowComponent={({ row }) => {
+                const view = views.get(row.id);
+                return (
+                  <ExpandableExpertRow
+                    expert={row}
+                    roles={view?.roles ?? []}
+                    matchedRoleKeys={matchedRoleKeys(view?.matches ?? [])}
+                    currentUserId={userId}
+                    isAdmin={isAdmin}
+                    noteOrganizations={noteOrganizations}
+                    onChanged={() => refetch()}
+                    onError={(message) => setActionError(t('error', { error: message }))}
+                  />
+                );
+              }}
             />
           </div>
         )}
+        <ErrorMessageDialog
+          errorMessage={actionError ?? ''}
+          open={actionError !== null}
+          onClose={() => setActionError(null)}
+        />
       </div>
     </PageBlock>
   );
 };
 
 export default ManageExpertsContent;
-
