@@ -2,9 +2,9 @@ import { MutationFunction } from '@apollo/client';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { CourseParticipations_Course_by_pk_Sessions } from '../../../../queries/__generated__/CourseParticipations';
 import {
-  InsertSingleAttendance,
-  InsertSingleAttendanceVariables,
-} from '../../../../queries/__generated__/InsertSingleAttendance';
+  SetManualAttendance,
+  SetManualAttendanceVariables,
+} from '../../../../queries/__generated__/SetManualAttendance';
 import {
   DeleteManualAttendances,
   DeleteManualAttendancesVariables,
@@ -18,14 +18,13 @@ import {
   getNextAttendanceOverride,
   splitAttendancesBySession,
 } from '../../../../helpers/courseParticipationAttendance';
-import { ATTENDANCE_SOURCE_INSTRUCTOR } from '../../../../helpers/attendance';
 
 const REFETCH_DEBOUNCE_MS = 1500;
 
 interface UseOptimisticAttendanceOptions {
   enrollments: readonly CourseEnrollmentWithAttendances[];
   sessions: readonly CourseParticipations_Course_by_pk_Sessions[];
-  insertAttendance: MutationFunction<InsertSingleAttendance, InsertSingleAttendanceVariables>;
+  setManualAttendance: MutationFunction<SetManualAttendance, SetManualAttendanceVariables>;
   deleteManualAttendances: MutationFunction<DeleteManualAttendances, DeleteManualAttendancesVariables>;
   refetchAttendances: () => Promise<unknown>;
   onError: (message: string) => void;
@@ -34,7 +33,7 @@ interface UseOptimisticAttendanceOptions {
 export function useOptimisticAttendance({
   enrollments,
   sessions,
-  insertAttendance,
+  setManualAttendance,
   deleteManualAttendances,
   refetchAttendances,
   onError,
@@ -120,16 +119,7 @@ export function useOptimisticAttendance({
         .then((): Promise<unknown> =>
           nextOverride === REVERT_TO_AUTOMATIC
             ? deleteManualAttendances({ variables: { userId, sessionId: session.id } })
-            : insertAttendance({
-                variables: {
-                  input: {
-                    status: nextOverride,
-                    sessionId: session.id,
-                    source: ATTENDANCE_SOURCE_INSTRUCTOR,
-                    userId,
-                  },
-                },
-              })
+            : setManualAttendance({ variables: { userId, sessionId: session.id, status: nextOverride } })
         );
       mutationQueuesRef.current[key] = mutation;
 
@@ -158,11 +148,11 @@ export function useOptimisticAttendance({
     }, [
       deleteManualAttendances,
       enrollments,
-      insertAttendance,
       onError,
       refetchAttendances,
       replaceOverrides,
       scheduleBackgroundSync,
+      setManualAttendance,
     ]
   );
 

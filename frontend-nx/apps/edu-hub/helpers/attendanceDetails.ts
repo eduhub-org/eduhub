@@ -123,7 +123,7 @@ export const summarizeSessionAttendances = (
 
 interface AssignableAttendance {
   source: string | null;
-  attendanceRecordIndex: number | null;
+  attendanceRecordIndexes: number[] | null;
   recordedIdentifier: string | null;
   matchType: string | null;
   User: { firstName: string; lastName: string } | null;
@@ -137,7 +137,8 @@ interface AssignableRecord {
 
 /**
  * Who each Attendance Record was matched to, keyed by the record's index in
- * Session.attendanceData. Attendances that stored their record index are
+ * Session.attendanceData. Attendances that stored their record indexes (one
+ * Attendance can combine several Zoom records of the same person) are
  * placed first; the rest (checked before record indexes existed) fall back to
  * the recorded name or email among the records still unassigned.
  */
@@ -150,12 +151,14 @@ export const assignRecordsToParticipants = (
   const result: Record<string, string> = {};
 
   automatic.forEach((a) => {
-    if (a.attendanceRecordIndex != null) result[String(a.attendanceRecordIndex)] = fullName(a);
+    a.attendanceRecordIndexes?.forEach((index) => {
+      result[String(index)] = fullName(a);
+    });
   });
 
   const normalise = (value: unknown) => (typeof value === 'string' ? value.trim().toLowerCase() : '');
   automatic
-    .filter((a) => a.attendanceRecordIndex == null && a.matchType && a.matchType !== 'NONE' && a.recordedIdentifier)
+    .filter((a) => !a.attendanceRecordIndexes?.length && a.matchType && a.matchType !== 'NONE' && a.recordedIdentifier)
     .forEach((a) => {
       const identifier = normalise(a.recordedIdentifier);
       const record = records.find(

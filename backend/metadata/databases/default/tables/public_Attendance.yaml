@@ -204,7 +204,7 @@ select_permissions:
         - source
         - location
         - matchScore
-        - attendanceRecordIndex
+        - attendanceRecordIndexes
         - closestCandidates
       filter:
         _or:
@@ -275,7 +275,7 @@ select_permissions:
         - source
         - location
         - matchScore
-        - attendanceRecordIndex
+        - attendanceRecordIndexes
         - closestCandidates
       filter:
         _or:

@@ -562,14 +562,15 @@ def build_attendance_sql(
         sql.append(
             'INSERT INTO public."Attendance" (id, "sessionId", "userId", status, created_at, updated_at, '
             '"recordedIdentifier", source, "startDateTime", "endDateTime", "totalAttendanceTime", "interruptionCount", '
-            'location, "matchType", "matchScore", "attendanceRecordIndex", "closestCandidates")\n'
+            'location, "matchType", "matchScore", "attendanceRecordIndexes", "closestCandidates")\n'
             "SELECT v.id, v.session_id, v.user_id::uuid, v.status,\n"
             "       s.\"endDateTime\" + CASE v.kind WHEN 'MANUAL' THEN interval '2 days' ELSE interval '6 hours' END,\n"
             "       s.\"endDateTime\" + CASE v.kind WHEN 'MANUAL' THEN interval '2 days' ELSE interval '6 hours' END,\n"
             "       v.identifier, v.source,\n"
             "       s.\"startDateTime\" + v.join_offset::int * interval '1 second',\n"
             "       s.\"startDateTime\" + v.leave_offset::int * interval '1 second',\n"
-            "       v.duration::int, v.interruptions::int, v.location, v.match_type, v.score::int, v.record_index::int,\n"
+            "       v.duration::int, v.interruptions::int, v.location, v.match_type, v.score::int,\n"
+            "       CASE WHEN v.record_index IS NULL THEN NULL ELSE ARRAY[v.record_index::int] END,\n"
             "       v.candidates::jsonb\n"
             "FROM (VALUES\n  " + values_sql(chunk) + "\n"
             ") AS v(id, session_id, user_id, status, kind, identifier, source, join_offset, leave_offset, duration,\n"
