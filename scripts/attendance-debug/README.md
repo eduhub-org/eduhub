@@ -25,7 +25,7 @@ export DATABASE_URL=$(gcloud secrets versions access latest --secret hasura-db-u
 The Python scripts open the database read-only (`default_transaction_read_only`).
 
 ```bash
-PYTHONPATH=functions/shared_libs:functions/callPythonFunction \
+PYTHONPATH=functions/shared_py:functions/callPythonFunction \
   python3 scripts/attendance-debug/dry_run_matching.py 691 704
 ```
 

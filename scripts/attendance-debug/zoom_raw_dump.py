@@ -5,7 +5,7 @@ filter drops), the raw participant rows of the person you look for
 (incl. breakout-room ids) and what aggregate_participants makes of them.
 
 Usage (env: ZOOM_API_KEY, ZOOM_API_SECRET, ZOOM_ACCOUNT_ID):
-  PYTHONPATH=functions/shared_libs python3 scripts/attendance-debug/zoom_raw_dump.py \
+  PYTHONPATH=functions/shared_py python3 scripts/attendance-debug/zoom_raw_dump.py \
       <meeting-url> <session-start-utc> <session-end-utc> <name-or-email-regex>
 """
 import re

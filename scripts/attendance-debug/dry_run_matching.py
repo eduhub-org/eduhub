@@ -11,7 +11,7 @@ into records (zoom_client) only take effect on a real re-check.
 
 Usage (from the repo root; DATABASE_URL e.g. via cloud-sql-proxy, see
 scripts/attendance-debug/README.md):
-  PYTHONPATH=functions/shared_libs:functions/callPythonFunction \
+  PYTHONPATH=functions/shared_py:functions/callPythonFunction \
     python3 scripts/attendance-debug/dry_run_matching.py 691 704
   ... dry_run_matching.py --running   # all courses with a session in the last 120 days
 """
