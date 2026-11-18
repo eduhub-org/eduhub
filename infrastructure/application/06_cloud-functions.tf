@@ -481,6 +481,15 @@ resource "google_secret_manager_secret_iam_member" "call_python_function_cloud_s
   member    = "serviceAccount:${google_service_account.custom_cloud_function_account.email}"
 }
 
+# Duplicate of the binding above, formerly sendMail's. Kept declared so
+# Terraform neither destroys the shared binding nor fails on a `removed`
+# block, which Terraform 1.3 (the workspaces' version) does not support.
+resource "google_secret_manager_secret_iam_member" "send_mail_cloud_function_secret" {
+  secret_id = google_secret_manager_secret.cloud_function.id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${google_service_account.custom_cloud_function_account.email}"
+}
+
 resource "google_secret_manager_secret_iam_member" "call_python_function_zoom_api_key" {
   secret_id  = google_secret_manager_secret.zoom_api_key.id
   role       = "roles/secretmanager.secretAccessor"

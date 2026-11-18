@@ -68,7 +68,15 @@ Remove them in the release after the split, once the gate holds.
 - [ ] `05_hasura.tf`: drop `CLOUD_FUNCTION_LINK_ADD_KEYCLOAK_ROLE`,
       `_REMOVE_KEYCLOAK_ROLE`, `_UPDATE_FROM_KEYCLOAK`, `_SEND_QUESTIONAIRES`.
 - [ ] Delete `06_cloud-functions-moved.tf` once staging and production have
-      applied it (the `moved` and `removed` blocks are no-ops after that).
+      applied it (its `moved` blocks are no-ops after that).
+- [ ] Drop the duplicate `send_mail_cloud_function_secret` grant from state
+      only, never destroy it (it shares the binding with
+      `call_python_function_cloud_secret_access` and
+      `call_node_function_cloud_function_secret`): once the workspaces run
+      Terraform >= 1.7, replace its resource with a `removed` block
+      (`lifecycle { destroy = false }`); until then
+      `terraform state rm google_secret_manager_secret_iam_member.send_mail_cloud_function_secret`
+      together with deleting the resource.
 - [ ] Consider: the default compute account's `formbricks_api_key` grant in
       `01_secrets.tf` has no reader (no Cloud Run service sets
       FORMBRICKS_API_KEY; callNodeFunction reads it through the shared
