@@ -38,6 +38,12 @@ def _run(client, query, variables, context):
 
 
 def _get_retention_months(client):
+    """Returns the configured retention period, or None if the lookup failed.
+
+    The default only stands in for a setting that is genuinely absent (no
+    AppSettings row, or a null value). A failed lookup must not fall back to
+    it: anonymization is irreversible and the configured period may be longer.
+    """
     query = """
     query GetGuestRetention {
         AppSettings(limit: 1) {
@@ -46,8 +52,8 @@ def _get_retention_months(client):
     }
     """
     data = _run(client, query, {}, "load retention setting")
-    if not data:
-        return DEFAULT_RETENTION_MONTHS
+    if data is None:
+        return None
     settings = data.get("AppSettings") or []
     if not settings:
         return DEFAULT_RETENTION_MONTHS
@@ -246,6 +252,8 @@ def anonymize_guest_data(arguments):
         client = EduHubClient()
 
         retention_months = _get_retention_months(client)
+        if retention_months is None:
+            return {"success": False, "error": "Could not load the guest retention period"}
         cutoff = _cutoff(retention_months)
         retention_cutoff = cutoff.isoformat()
         retention_cutoff_date = cutoff.date().isoformat()

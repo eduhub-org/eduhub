@@ -71,13 +71,28 @@ def test_a_failed_selection_fails_the_run(monkeypatch):
     }
 
 
-def test_a_failed_retention_lookup_falls_back_to_the_default(monkeypatch):
+def test_a_failed_retention_lookup_aborts_the_run(monkeypatch):
     class FailingSettings(FakeClient):
         def send_query(self, query, variables):
             if "AppSettings" in query:
                 raise _error()
             return super().send_query(query, variables)
 
-    result = _run(monkeypatch, FailingSettings())
+    client = FailingSettings()
+    result = _run(monkeypatch, client)
 
+    assert result == {
+        "success": False,
+        "error": "Could not load the guest retention period",
+    }
+    assert client.calls == []
+
+
+def test_a_missing_retention_setting_uses_the_default(monkeypatch):
+    client = FakeClient()
+
+    result = _run(monkeypatch, client)
+
+    assert result["success"] is True
     assert result["data"]["retentionMonths"] == mod.DEFAULT_RETENTION_MONTHS
+    assert any(query is mod.GUESTS_PAST_RETENTION for query, _ in client.calls)
