@@ -575,6 +575,7 @@ class ZoomClient:
                     "interruptionCount",
                     "meetingUuids",
                     "instanceStarts",
+                    "intervals",
                 ]
             )
 
@@ -639,6 +640,9 @@ class ZoomClient:
                     "interruptionCount": interruption_count if merged else None,
                     "meetingUuids": sorted(set(meeting_uuids)),
                     "instanceStarts": sorted(set(instance_starts)),
+                    # Occupied (start, end) spans, so check_attendance can
+                    # combine several records without counting their gaps.
+                    "intervals": merged,
                 }
             )
 

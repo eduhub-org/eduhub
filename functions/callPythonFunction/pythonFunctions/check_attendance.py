@@ -45,6 +45,16 @@ RECORD_COLUMNS = [
     "location",
 ]
 
+# In-memory only: the occupied (start, end) spans of a Zoom record, used to
+# combine records of the same person. Not stored in Session.attendanceData.
+INTERVALS = "intervals"
+
+
+def stored_records(records):
+    """The records as stored in Session.attendanceData."""
+    return records.reindex(columns=RECORD_COLUMNS)
+
+
 # Env vars required to talk to the Zoom API.
 ZOOM_REQUIRED_ENV_VARS = ("ZOOM_API_KEY", "ZOOM_API_SECRET", "ZOOM_ACCOUNT_ID")
 
@@ -183,7 +193,9 @@ def check_attendance(arguments):
             # automatic Attendances, Manual Attendances stay, and attendanceData is
             # only set when everything was stored, so a failure is retried.
             try:
-                eduhub_client.replace_session_attendances(session["id"], attendance_rows, records)
+                eduhub_client.replace_session_attendances(
+                    session["id"], attendance_rows, stored_records(records)
+                )
             except Exception as exc:
                 logging.error(
                     "Storing the attendances of session %s (id=%s) failed: %s. "
@@ -329,7 +341,7 @@ def collect_attendance_records(session, zoom_client):
         records = pd.concat(frames, ignore_index=True)
     else:
         records = pd.DataFrame(columns=RECORD_COLUMNS)
-    records = records.reindex(columns=RECORD_COLUMNS).reset_index(drop=True)
+    records = records.reindex(columns=RECORD_COLUMNS + [INTERVALS]).reset_index(drop=True)
     logging.debug("############# Attendance Records\n%s", records)
     return records, None
 
@@ -484,6 +496,16 @@ def _name_parts(participant, folding=WITHOUT_ACCENTS):
     )
 
 
+def _written_name_score(participant, record_name):
+    """Score of the names as written: breaks ties between participants whose
+    names only match after folding ("Jorg Muller") and the exact spelling."""
+    first, last = _name_parts(participant, AS_WRITTEN)
+    return max(
+        (_pair_score(" ".join(first + last), c) for c in _record_name_candidates(record_name, AS_WRITTEN)),
+        default=0,
+    )
+
+
 def _name_score(participant, record_name):
     best = 0
     for folding in FOLDINGS:
@@ -604,15 +626,31 @@ def _combine_zoom_records(records):
     it is a breakout-room move."""
     if len(records) == 1:
         return records[0]
+    intervals = [r.get(INTERVALS) for r in records]
+    if all(isinstance(i, (list, tuple)) and len(i) > 0 for i in intervals):
+        # Exact: the union of the time each record was actually present.
+        merged = _Zoom._merge_intervals(
+            [(pd.Timestamp(s), pd.Timestamp(e)) for spans in intervals for s, e in spans]
+        )
+        return {
+            **records[0],
+            "joinDateTime": merged[0][0],
+            "leaveDateTime": merged[-1][1],
+            "duration": sum((e - s).total_seconds() for s, e in merged),
+            "interruptionCount": count_interruptions(merged),
+        }
+
+    # Stored records keep only their outer span: approximate.
     spans = []
     for record in records:
         join, leave = record.get("joinDateTime"), record.get("leaveDateTime")
         if join is not None and leave is not None and not pd.isna(join) and not pd.isna(leave):
             spans.append((pd.Timestamp(join), pd.Timestamp(leave)))
     merged = _Zoom._merge_intervals(spans)
-    durations = [r.get("duration") for r in records]
-    duration = sum(float(d) for d in durations if d is not None and not pd.isna(d))
-    if len(spans) == len(records):
+    known = [float(r.get("duration")) for r in records
+             if r.get("duration") is not None and not pd.isna(r.get("duration"))]
+    duration = sum(known) if known else None
+    if duration is not None and len(spans) == len(records):
         duration = min(duration, sum((e - s).total_seconds() for s, e in merged))
     interruptions = sum(
         int(r.get("interruptionCount")) for r in records
@@ -662,7 +700,8 @@ def match_participants(participants, records, session):
     ]
 
     scores = [[0] * len(record_rows) for _ in participant_rows]
-    candidates = []  # (priority, score, participant index, record index, match type)
+    # (priority, score, participant index, record index, match type, as-written score)
+    candidates = []
     for p_idx, participant in enumerate(participant_rows):
         email = _clean_text(participant.get("email")).lower()
         for r_idx, record in enumerate(record_rows):
@@ -671,19 +710,20 @@ def match_participants(participants, records, session):
                 score = max(score, NAME_SUBSET_SCORE)
             scores[p_idx][r_idx] = score
             if email and _clean_text(record.get("email")).lower() == email:
-                candidates.append((3, 100, p_idx, r_idx, MATCH_TYPE_EMAIL))
+                candidates.append((3, 100, p_idx, r_idx, MATCH_TYPE_EMAIL, 100))
             elif score >= NAME_MATCH_THRESHOLD:
-                candidates.append((2, score, p_idx, r_idx, MATCH_TYPE_NAME))
+                written = _written_name_score(participant, record.get("name"))
+                candidates.append((2, score, p_idx, r_idx, MATCH_TYPE_NAME, written))
             elif any(
                 owners_by_key.get(key) == {p_idx}
                 for key in _partial_keys_of_record(record.get("name"))
             ):
-                candidates.append((1, score, p_idx, r_idx, MATCH_TYPE_PARTIAL_NAME))
+                candidates.append((1, score, p_idx, r_idx, MATCH_TYPE_PARTIAL_NAME, score))
 
-    candidates.sort(key=lambda c: (c[0], c[1]), reverse=True)
+    candidates.sort(key=lambda c: (c[0], c[1], c[5]), reverse=True)
     taken_records = set()
     claimed = {}  # participant index -> {source: [(record index, match type, score)]}
-    for _priority, score, p_idx, r_idx, match_type in candidates:
+    for _priority, score, p_idx, r_idx, match_type, _written in candidates:
         if r_idx in taken_records:
             continue
         source = record_rows[r_idx].get("source")
@@ -702,7 +742,7 @@ def match_participants(participants, records, session):
             continue
         if len({c[2] for c in matching}) != 1:
             continue
-        _priority, score, p_idx, _r, match_type = matching[0]
+        _priority, score, p_idx, _r, match_type, _written = matching[0]
         record_email = _clean_text(record_rows[r_idx].get("email")).lower()
         if record_email and record_email != _clean_text(participant_rows[p_idx].get("email")).lower():
             continue  # someone else's account

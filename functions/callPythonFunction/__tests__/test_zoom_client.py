@@ -214,6 +214,20 @@ class TestAggregation:
         # Minutes stay exact: the short gaps are not counted as presence.
         assert df.iloc[0]["duration"] == 60 * 60 - 1 - 30 - 5 * 60
 
+    def test_aggregated_rows_keep_their_intervals(self):
+        client = _make_client()
+        rows = [
+            {"name": "A", "user_email": "a@example.com",
+             "join_time": "2026-01-01T10:00:00Z", "leave_time": "2026-01-01T10:10:00Z"},
+            {"name": "A", "user_email": "a@example.com",
+             "join_time": "2026-01-01T10:20:00Z", "leave_time": "2026-01-01T10:30:00Z"},
+        ]
+        df = client.aggregate_participants(rows)
+        assert df.iloc[0]["intervals"] == [
+            (pd.Timestamp("2026-01-01T10:00:00Z"), pd.Timestamp("2026-01-01T10:10:00Z")),
+            (pd.Timestamp("2026-01-01T10:20:00Z"), pd.Timestamp("2026-01-01T10:30:00Z")),
+        ]
+
     def test_falls_back_to_name_when_email_missing(self):
         client = _make_client()
         rows = [

@@ -73,6 +73,12 @@ def _records(rows):
     )
 
 
+def _records_with_intervals(rows):
+    frame = _records(rows)
+    frame["intervals"] = [row.get("intervals") for row in rows]
+    return frame
+
+
 def _match(participants, records):
     return {row["userId"]: row for row in match_participants(participants, records, SESSION)}
 
@@ -336,6 +342,27 @@ class TestSplitZoomRecords:
         assert row["duration"] == 25 * 60
         assert row["status"] == "MISSED"
 
+    def test_gaps_inside_records_are_not_counted(self):
+        # A: 10:00-10:10 and 10:20-10:30 (one record after reconnecting),
+        # B: 10:05-10:15 on a second device. Present 25 min, not 30.
+        def at(hhmm):
+            return pd.Timestamp(f"2026-01-01T{hhmm}:00Z")
+
+        a = {**_zoom_between("Jane Doe", "10:00", "10:30", interruptions=1), "duration": 20 * 60,
+             "intervals": [(at("10:00"), at("10:10")), (at("10:20"), at("10:30"))]}
+        b = {**_zoom_between("Jane Doe (Phone)", "10:05", "10:15"),
+             "intervals": [(at("10:05"), at("10:15"))]}
+        row = _match(_participants(JANE), _records_with_intervals([a, b]))["u-0"]
+        assert row["duration"] == 25 * 60
+        assert row["interruptionCount"] == 1
+
+    def test_unknown_durations_stay_unknown(self):
+        records = _records([{**_zoom("Jane Doe", duration=None), "joinDateTime": None, "leaveDateTime": None},
+                            {**_zoom("Jane Doe", duration=None), "joinDateTime": None, "leaveDateTime": None}])
+        row = _match(_participants(JANE), records)["u-0"]
+        assert row["duration"] is None
+        assert row["status"] == "ATTENDED"
+
     def test_check_ins_are_not_combined(self):
         participants = _participants(JANE)
         records = _records([_check_in("Jane Doe"), _check_in("Jane Doe", place="Heide")])
@@ -363,6 +390,12 @@ class TestLooserNames:
         )
         result = _match(participants, _records([_zoom("Farid Khan")]))
         assert {row["status"] for row in result.values()} == {"MISSED"}
+
+    def test_exact_spelling_wins_over_folded_spelling(self):
+        participants = _participants(("Jorg", "Muller", "a@example.com"), ("Jörg", "Müller", "b@example.com"))
+        result = _match(participants, _records([_zoom("Jörg Müller")]))
+        assert result["u-1"]["status"] == "ATTENDED"
+        assert result["u-0"]["status"] == "MISSED"
 
     def test_umlauts_and_transliterations_are_equal(self):
         participants = _participants(("Jürgen", "Müller", "j@example.com"))
@@ -712,7 +745,7 @@ class TestCheckAttendanceOrchestration:
         assert reason is None
         assert fetches == [11]
         assert len(records) == 1
-        assert list(records.columns) == mod.RECORD_COLUMNS
+        assert list(mod.stored_records(records).columns) == mod.RECORD_COLUMNS
 
     def test_limesurvey_failure_leaves_session_unchecked(self, monkeypatch):
         from pythonFunctions import check_attendance as mod
@@ -860,6 +893,13 @@ class TestOfflineAttendance:
         assert list(records["name"]) == ["Ian Christ", "Annika Boock"]
         assert list(records["location"]) == ["SK", "SK"]
         assert records["joinDateTime"].iloc[0] == pd.Timestamp("2026-11-03T15:52:01+01:00")
+
+    def test_stored_records_leave_out_the_intervals(self):
+        from pythonFunctions.check_attendance import stored_records
+
+        records = _records_with_intervals([{**_zoom("A"), "intervals": [(1, 2)]}])
+        assert "intervals" not in stored_records(records).columns
+        assert "intervals" in records.columns
 
     def test_records_serialise_for_session_attendance_data(self):
         """Mixed Zoom (string) and LimeSurvey (timestamp) times must survive

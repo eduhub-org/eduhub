@@ -35,9 +35,10 @@ WHERE s."courseId" = 691
 ORDER BY s."startDateTime", a.created_at;
 
 -- 3) All Attendance Records of the session, unpacked, with who claimed each one.
---    Look for a second record of the same person (other device / name variant /
---    guest rejoin): it stays unclaimed, because a participant takes at most ONE
---    Zoom record, so its minutes are not added.
+--    A participant can claim several Zoom records (renamed, phone dial-in, second
+--    device); claimed_by then shows them on each. A record of the same person that
+--    stays unclaimed matched nobody on its own (e.g. a one-word name shared by two
+--    participants), so its minutes are not added.
 WITH s AS (
   SELECT id, "startDateTime", "endDateTime", "attendanceData"::jsonb AS d
   FROM "Session"

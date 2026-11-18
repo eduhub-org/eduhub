@@ -2,8 +2,10 @@
 
 Re-runs ``match_participants`` (the code in this checkout) on the records
 already stored in Session.attendanceData and prints every participant whose
-automatic Attendance would change. Writes nothing: the database is opened
-read-only through ``psql``.
+automatic Attendance would change its status or match type, and every
+Attendance a re-check would add with ATTENDED. Other fields (minutes,
+record indexes, recorded names) are not compared. Writes nothing: the
+database is opened read-only through ``psql``.
 
 The stored records are what Zoom/LimeSurvey returned at check time, so this
 shows the effect of matching changes. Changes in how Zoom rows are merged
@@ -110,12 +112,13 @@ def main(argv):
         names = {p["id"]: f"{p['firstName']} {p['lastName']}" for p in s["participants"]}
         header = f"\n== course {s['courseId']} session {s['id']} {s['startDateTime'][:10]} {s['title']}"
         for row in rows:
-            if row["userId"] not in current:
-                # Enrolled after the check: a re-check only adds a MISSED row.
+            old = current.get(row["userId"])
+            if old is None:
                 new_rows += 1
-                continue
-            old = current[row["userId"]]
-            if old.get("status") == row["status"] and old.get("matchType") == row["matchType"]:
+                if row["status"] != "ATTENDED":
+                    continue
+                old = {}
+            elif old.get("status") == row["status"] and old.get("matchType") == row["matchType"]:
                 continue
             if header:
                 print(header)
@@ -129,7 +132,7 @@ def main(argv):
                 f"{' ' + str(round(row['duration'] / 60)) + ' min' if row.get('duration') else ''}{manual}"
             )
     print(f"\n{changed} change(s) in {len(sessions)} session(s); "
-          f"{new_rows} participant(s) without an Attendance yet (enrolled after the check)")
+          f"{new_rows} Attendance(s) a re-check would add (ATTENDED ones are listed above)")
 
 
 if __name__ == "__main__":
