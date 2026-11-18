@@ -6,11 +6,11 @@
   },
   "type": "module",
   "dependencies": {
-    "@keycloak/keycloak-admin-client": "26.7.3",
+    "@keycloak/keycloak-admin-client": "26.8.2",
     "graphql-request": "6.1.0"
   },
   "devDependencies": {
-    "npm-watch": "^0.6.0",
+    "npm-watch": "^0.13.0",
     "@google-cloud/functions-framework": "^3.1.2"
   },
   "watch": {
