@@ -50,14 +50,14 @@ jobs:
           egress-policy: audit
 
       - name: Checkout develop
-        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v5
         with:
           ref: develop
           fetch-depth: 0
           token: ${{ secrets.DEPENDABOT_TRIAGE_TOKEN }}
 
       - name: Use Node.js 22
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 22.x
 
@@ -74,7 +74,7 @@ jobs:
           git config user.email "dependabot-triage@users.noreply.github.com"
 
       - name: Triage Dependabot alerts
-        uses: anthropics/claude-code-action@dcb57747bfceeaa1fa72638cae52295d1d853d4a # v1
+        uses: anthropics/claude-code-action@f3b070c88125d33dbae5653df5f143101d4ea9dc # v1
         env:
           GH_TOKEN: ${{ secrets.DEPENDABOT_TRIAGE_TOKEN }}
         with:
