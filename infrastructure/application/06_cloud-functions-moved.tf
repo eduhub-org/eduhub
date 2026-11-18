@@ -96,14 +96,9 @@ moved {
 # - the HASURA_CLOUD_FUNCTION_SECRET one duplicates
 #   call_python_function_cloud_secret_access and
 #   call_node_function_cloud_function_secret; destroying it would revoke the
-#   binding they manage, so it is only dropped from state;
-removed {
-  from = google_secret_manager_secret_iam_member.send_mail_cloud_function_secret
-
-  lifecycle {
-    destroy = false
-  }
-}
+#   binding they manage, so it stays declared (06_cloud-functions.tf). The
+#   workspaces run Terraform 1.3, which has no `removed` block; drop it from
+#   state once they run >= 1.7 (see docs/plans/functions-topology-cleanup.md).
 
 # - send_mail_hasura_mail_pw (HASURA_MAIL_PW on the shared account) has no
 #   reader and is destroyed.
