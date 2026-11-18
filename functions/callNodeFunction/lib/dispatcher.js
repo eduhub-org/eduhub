@@ -112,7 +112,8 @@ const formatResponse = (result) => {
  * missing or wrong secret, 500 when the server secret is unset, 400 when
  * `Function-Name` and `name` disagree, 404 for a handler not in `handlers`,
  * 503 for a failure the handler marks `retryable` in an event or cron
- * trigger, the handler's `httpStatus` when it sets one, and 200 otherwise,
+ * trigger (even when it also sets a 2xx `httpStatus`), the handler's
+ * `httpStatus` when it sets one, and 200 otherwise,
  * including `success: false` results and thrown errors. Every non-2xx body
  * also carries Hasura's `message` and `extensions: { code: messageKey }`.
  *
@@ -176,30 +177,36 @@ export const createDispatcher = ({ name: unitName, handlers, pinnedActions = {} 
     logger.info(`Executing function: ${functionName}`, { unit: unitName });
     const result = await handlers[functionName](req, logger);
 
+    // Event and cron triggers retry only on a non-2xx answer. Handlers opt in
+    // per failure with `retryable`, since most failures (a deleted row, a
+    // missing address) would fail the same way again; a handler that does opt
+    // in must make its side effect idempotent across deliveries. A cron request
+    // carries `scheduled_time` instead of `event`. `retryable` wins over a 2xx
+    // `httpStatus`, which would stop Hasura from retrying; a non-2xx one
+    // already makes Hasura retry and is passed through below.
+    const hasStatus = Number.isInteger(result?.httpStatus);
+    const is2xx = hasStatus && result.httpStatus >= 200 && result.httpStatus < 300;
+    if ((req.body.event || req.body.scheduled_time) && result?.retryable && (!hasStatus || is2xx)) {
+      const body = { ...result };
+      delete body.httpStatus;
+      logger.warn(`Retryable failure in ${functionName}`, { unit: unitName, response: redactForLogging(body) });
+      return res.status(503).json(withHasuraError(body));
+    }
+
     // A handler that must answer with a given status sets `httpStatus`, e.g.
     // an action whose caller relies on Hasura turning a 4xx into a GraphQL
     // error (updateFromKeycloak), or an event trigger that must fail with a
     // non-2xx so Hasura retries it. Hasura reads `message` (and
     // `extensions`) from an action's non-2xx body, so a non-2xx gets them.
     // The field itself is not sent.
-    if (Number.isInteger(result?.httpStatus)) {
+    if (hasStatus) {
       const { httpStatus, ...rest } = result;
-      const body = httpStatus >= 200 && httpStatus < 300 ? rest : withHasuraError(rest);
+      const body = is2xx ? rest : withHasuraError(rest);
       logger.info(`Function ${functionName} answered ${httpStatus}`, {
         unit: unitName,
         response: redactForLogging(body)
       });
       return res.status(httpStatus).json(body);
-    }
-
-    // Event and cron triggers retry only on a non-2xx answer. Handlers opt in
-    // per failure with `retryable`, since most failures (a deleted row, a
-    // missing address) would fail the same way again; a handler that does opt
-    // in must make its side effect idempotent across deliveries. A cron request
-    // carries `scheduled_time` instead of `event`.
-    if ((req.body.event || req.body.scheduled_time) && result?.retryable) {
-      logger.warn(`Retryable failure in ${functionName}`, { unit: unitName, response: redactForLogging(result) });
-      return res.status(503).json(withHasuraError(result));
     }
 
     // Mutation actions get the handler's result as is; everything else gets
