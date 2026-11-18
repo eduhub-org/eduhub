@@ -62,7 +62,7 @@ _Avoid_: attendance (for a raw entry)
 A Participant's result for one Session: attended or missed. It is set automatically from the Attendance Records, or by an Organizer as a Manual Attendance. Until a Session has been checked there is no Attendance: it is unknown, never missed. A checked Session with no Attendance Records at all makes everyone missed.
 
 **Minimum Attendance Time**:
-The share of a Session (50 %) someone must spend in the online meeting for it to count as attended. A check-in on site counts as attended regardless of time. When someone has both, the one that counts wins.
+The share of a Session (50 %) someone must spend in the online meeting for it to count as attended. Several Zoom records of the same person (renamed for breakout rooms, phone dial-in) add up; time on two devices at once counts once. A check-in on site counts as attended regardless of time. When someone has both, the one that counts wins.
 
 **Check-in Window**:
 From 30 minutes before a Session starts to 30 minutes after it ends. Only check-ins inside it belong to the Session.
@@ -139,7 +139,8 @@ _Avoid_: event confirmation vs. course confirmation as separate emails
 - A **Course** has zero or more **Sessions**; when it has any, exactly one of them is its **First Session**
 - A **Participant** receives at most one **Session Reminder** per **Course**
 - A **Session** has many **Attendance Records** and at most one **Attendance** per **Participant** (or person who completed the Course); a **Manual Attendance** overrides the automatic one
-- An **Attendance Record** belongs to at most one **Attendance**
+- An **Attendance Record** belongs to at most one **Attendance**; an **Attendance** can combine several Zoom **Attendance Records** of the same person
+- A **Session** has at most one **Manual Attendance** per **Participant**
 - A **Project** is listed in one or more **Courses**; removing it from its last course deletes it, so a **Passed Project** can't be removed from its last course
 - A **Project Template** has zero or more **Project Copies**; deleting the template keeps the copies as projects of their own
 - A **Passed Project** can't be deleted by anyone, **Admins** included

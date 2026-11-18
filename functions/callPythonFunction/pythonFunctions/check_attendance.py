@@ -5,7 +5,7 @@ import unicodedata
 import pandas as pd
 from thefuzz import fuzz
 from api_clients import EduHubClient, ZoomClient, LimeSurveyClient
-from api_clients.zoom_client import ZoomAttendanceError
+from api_clients.zoom_client import ZoomAttendanceError, ZoomClient as _Zoom, count_interruptions
 from pythonFunctions.limesurvey_location_mapping import LIMESURVEY_LOCATION_MAPPING
 
 
@@ -406,9 +406,11 @@ def location_option_of_record(record):
 def clean_display_name(name):
     """Turn handles into comparable names:
     ``@saikiran.panchireddi.20311a:opencampus.sh`` -> ``saikiran panchireddi``,
-    ``Hase, Christian`` -> ``hase christian``."""
+    ``Hase, Christian`` -> ``hase christian``,
+    ``Lisa Brandner (Example Institute)`` -> ``lisa brandner``."""
     text = _clean_text(name).lower().lstrip("@")
     text = text.split(":", 1)[0]
+    text = re.sub(r"\([^)]*\)?", " ", text)
     text = re.sub(r"[._,]", " ", text)
     return " ".join(t for t in text.split() if not any(c.isdigit() for c in t))
 
@@ -426,14 +428,35 @@ def _clean_text(value):
     return unicodedata.normalize("NFC", str(value)).strip()
 
 
-# Score of a record that leaves out a middle name ("Marlena Ruzicka" for
-# "Marlena Isabella Ruzicka"): above the threshold, below an exact name, so
-# a participant whose name matches exactly keeps priority.
-MISSING_MIDDLE_NAME_SCORE = 90
+UMLAUTS_WRITTEN_OUT = str.maketrans({"ä": "ae", "ö": "oe", "ü": "ue"})
+
+# Forms in which names are compared: as written, without accents
+# (Müller -> muller) and with umlauts written out (Müller -> mueller), so
+# Müller, Mueller and Muller all match. A score is the best over the forms.
+AS_WRITTEN, WITHOUT_ACCENTS, UMLAUTS_OUT = "as written", "without accents", "umlauts out"
+FOLDINGS = (AS_WRITTEN, WITHOUT_ACCENTS, UMLAUTS_OUT)
+
+
+def _fold(text, folding=WITHOUT_ACCENTS):
+    """Lower-case ``text`` in one of the FOLDINGS forms."""
+    text = unicodedata.normalize("NFC", _clean_text(text).lower())
+    if folding == AS_WRITTEN:
+        return text
+    text = text.replace("ß", "ss")
+    if folding == UMLAUTS_OUT:
+        text = text.translate(UMLAUTS_WRITTEN_OUT)
+    text = unicodedata.normalize("NFKD", text)
+    return "".join(c for c in text if not unicodedata.combining(c))
+
+
+# Score of a record that leaves out some of the participant's names ("Farid
+# Khan" for "Omar Farid Ben Khan"): above the threshold, below an exact
+# name, so a participant whose name matches exactly keeps priority.
+NAME_SUBSET_SCORE = 90
 
 
 def _pair_score(full_name, candidate):
-    """Similarity of two lower-case names.
+    """Similarity of two folded names.
 
     ``ratio`` compares the names as written, so a typo in the first letter
     of a token (Sann/Dann) costs one character; ``token_sort_ratio`` alone
@@ -445,46 +468,78 @@ def _pair_score(full_name, candidate):
     return max(fuzz.ratio(full_name, candidate), fuzz.token_sort_ratio(full_name, candidate))
 
 
-def _leaves_out_middle_name(full_name, last_name, candidate):
-    """True if the candidate is the participant's name minus some middle
-    tokens: every token belongs to the participant, the surname is there
-    and at least one first-name token too. A multiword first name alone
-    ("Mary Jane") is no surname evidence; it is a partial key instead."""
-    tokens = candidate.split()
-    surname = last_name.split()
+def _record_name_candidates(record_name, folding=WITHOUT_ACCENTS):
+    """The record name as written and as cleaned handle, both folded."""
+    raw = _clean_text(record_name)
+    if not raw:
+        return []
+    return [_fold(raw, folding), _fold(clean_display_name(raw), folding)]
+
+
+def _name_parts(participant, folding=WITHOUT_ACCENTS):
+    """(first name tokens, last name tokens), folded."""
     return (
-        len(tokens) > len(surname) > 0
-        and set(tokens) < set(full_name.split())
-        and all(t in tokens for t in surname)
+        _fold(participant.get("firstName"), folding).split(),
+        _fold(participant.get("lastName"), folding).split(),
     )
 
 
-def _name_score(participant_full_name, record_name, participant_last_name=""):
-    raw = _clean_text(record_name).lower()
-    if not raw:
-        return 0
-    score = 0
-    for candidate in (raw, clean_display_name(raw)):
-        score = max(score, _pair_score(participant_full_name, candidate))
-        if _leaves_out_middle_name(participant_full_name, participant_last_name, candidate):
-            score = max(score, MISSING_MIDDLE_NAME_SCORE)
-    return score
+def _name_score(participant, record_name):
+    best = 0
+    for folding in FOLDINGS:
+        first, last = _name_parts(participant, folding)
+        full_name = " ".join(first + last)
+        for candidate in _record_name_candidates(record_name, folding):
+            best = max(best, _pair_score(full_name, candidate))
+    return best
+
+
+def _is_name_subset(participant, record_name):
+    """True if the record names the participant by some, not all, of their
+    names, with at least one first name and one last name: "Farid Khan" for
+    "Omar Farid" "Ben Khan". A multiword first name alone ("Mary Jane") is
+    no last-name evidence; it is a partial key instead."""
+    return any(
+        _is_token_subset(*_name_parts(participant, folding), _record_name_candidates(record_name, folding))
+        for folding in FOLDINGS
+    )
+
+
+def _is_token_subset(first_tokens, last_tokens, record_candidates):
+    full = set(first_tokens) | set(last_tokens)
+    for candidate in record_candidates:
+        tokens = set(candidate.split())
+        if (
+            len(tokens) >= 2
+            and tokens < full
+            and any(
+                a != b and a in first_tokens and b in last_tokens
+                for a in tokens
+                for b in tokens
+            )
+        ):
+            return True
+    return False
 
 
 def _partial_keys_of_participant(participant):
     """Short forms a participant may appear under: the first name (and its
-    first part), the email local part and initial + last name."""
-    first = _clean_text(participant.get("firstName")).lower()
-    last = _clean_text(participant.get("lastName")).lower()
+    first part), the last name, the email local part and initial + last
+    name."""
     email = _clean_text(participant.get("email")).lower()
     keys = set()
-    if first:
-        keys.add(first)
-        keys.add(first.split()[0])
     if "@" in email:
         keys.add(email.split("@", 1)[0])
-    if first and last:
-        keys.add(first[0] + re.sub(r"[\s-]", "", last))
+    for folding in FOLDINGS:
+        first_tokens, last_tokens = _name_parts(participant, folding)
+        first, last = " ".join(first_tokens), " ".join(last_tokens)
+        if first:
+            keys.add(first)
+            keys.add(first_tokens[0])
+        if last:
+            keys.add(last)
+        if first and last:
+            keys.add(first[0] + re.sub(r"[\s-]", "", last))
     return {k for k in keys if len(k) >= MIN_PARTIAL_KEY_LENGTH}
 
 
@@ -492,16 +547,17 @@ def _partial_keys_of_record(record_name):
     """``Christine`` -> {christine}; ``HLee`` / ``H. Lee`` -> {hlee}."""
     keys = set()
     raw = _clean_text(record_name).lower()
-    if raw and " " not in raw:
-        keys.add(raw)
-    tokens = clean_display_name(raw).split()
-    if len(tokens) == 1:
-        keys.add(tokens[0])
-    elif len(tokens) == 2 and len(tokens[0]) == 1:
-        keys.add(tokens[0] + tokens[1])
-    if len(tokens) >= 2:
-        # A multiword first name alone ("Mary Jane").
-        keys.add(" ".join(tokens))
+    for folding in FOLDINGS:
+        if raw and " " not in raw:
+            keys.add(_fold(raw, folding))
+        tokens = _fold(clean_display_name(raw), folding).split()
+        if len(tokens) == 1:
+            keys.add(tokens[0])
+        elif len(tokens) == 2 and len(tokens[0]) == 1:
+            keys.add(tokens[0] + tokens[1])
+        if len(tokens) >= 2:
+            # A multiword first name alone ("Mary Jane").
+            keys.add(" ".join(tokens))
     return {k for k in keys if len(k) >= MIN_PARTIAL_KEY_LENGTH}
 
 
@@ -537,18 +593,55 @@ def _optional_int(value):
     return int(value)
 
 
+# Strength of a match type; a combined Attendance shows its weakest link.
+MATCH_PRIORITY = {MATCH_TYPE_EMAIL: 3, MATCH_TYPE_NAME: 2, MATCH_TYPE_PARTIAL_NAME: 1}
+
+
+def _combine_zoom_records(records):
+    """One Zoom stay from several records of the same person (renamed, phone
+    dial-in, second device). Minutes add up, but time on two devices at
+    once counts only once; a gap between records interrupts the stay unless
+    it is a breakout-room move."""
+    if len(records) == 1:
+        return records[0]
+    spans = []
+    for record in records:
+        join, leave = record.get("joinDateTime"), record.get("leaveDateTime")
+        if join is not None and leave is not None and not pd.isna(join) and not pd.isna(leave):
+            spans.append((pd.Timestamp(join), pd.Timestamp(leave)))
+    merged = _Zoom._merge_intervals(spans)
+    durations = [r.get("duration") for r in records]
+    duration = sum(float(d) for d in durations if d is not None and not pd.isna(d))
+    if len(spans) == len(records):
+        duration = min(duration, sum((e - s).total_seconds() for s, e in merged))
+    interruptions = sum(
+        int(r.get("interruptionCount")) for r in records
+        if r.get("interruptionCount") is not None and not pd.isna(r.get("interruptionCount"))
+    )
+    return {
+        **records[0],
+        "joinDateTime": merged[0][0] if merged else records[0].get("joinDateTime"),
+        "leaveDateTime": merged[-1][1] if merged else records[0].get("leaveDateTime"),
+        "duration": duration,
+        "interruptionCount": interruptions + count_interruptions(merged),
+    }
+
+
 def match_participants(participants, records, session):
     """Match every participant against the session's Attendance Records and
     return one Attendance row (dict) per participant.
 
-    Matching order: exact email, fuzzy name (>= NAME_MATCH_THRESHOLD, also
-    against cleaned handles), then a partial name (single first name, email
-    local part or initial + last name) that fits exactly one participant.
-    Each record goes to at most one participant (best match first); a
-    participant takes at most one record per source. A check-in wins over a
-    Zoom stay; a Zoom stay below the Minimum Attendance Time is MISSED but
-    keeps its match details. Unmatched participants get the closest
-    candidate per Attendance Location.
+    Matching order: exact email, name (fuzzy score >= NAME_MATCH_THRESHOLD,
+    also against cleaned handles, or some of the participant's names when
+    they fit no one else), then a partial name (single first or last name,
+    email local part or initial + last name) that fits exactly one
+    participant. Each record goes to at most one participant (best match
+    first) and a participant takes one record per source. Further Zoom
+    records that match only that participant are added to its Zoom stay
+    (renamed for breakout rooms, phone dial-in). A check-in wins over a Zoom
+    stay; a Zoom stay below the Minimum Attendance Time is MISSED but keeps
+    its match details. Unmatched participants get the closest candidate per
+    Attendance Location.
     """
     session_id = int(session["id"])
     session_seconds = (session["endDateTime"] - session["startDateTime"]).total_seconds()
@@ -561,15 +654,21 @@ def match_participants(participants, records, session):
         for key in _partial_keys_of_participant(participant):
             owners_by_key.setdefault(key, set()).add(p_idx)
 
+    # Participants each record names by a subset of their names; usable only if unique.
+    subset_owners = [
+        {p_idx for p_idx, participant in enumerate(participant_rows)
+         if _is_name_subset(participant, record.get("name"))}
+        for record in record_rows
+    ]
+
     scores = [[0] * len(record_rows) for _ in participant_rows]
     candidates = []  # (priority, score, participant index, record index, match type)
     for p_idx, participant in enumerate(participant_rows):
-        full_name = f"{_clean_text(participant.get('firstName'))} {_clean_text(participant.get('lastName'))}".strip().lower()
         email = _clean_text(participant.get("email")).lower()
         for r_idx, record in enumerate(record_rows):
-            score = _name_score(
-                full_name, record.get("name"), _clean_text(participant.get("lastName")).lower()
-            )
+            score = _name_score(participant, record.get("name"))
+            if subset_owners[r_idx] == {p_idx}:
+                score = max(score, NAME_SUBSET_SCORE)
             scores[p_idx][r_idx] = score
             if email and _clean_text(record.get("email")).lower() == email:
                 candidates.append((3, 100, p_idx, r_idx, MATCH_TYPE_EMAIL))
@@ -583,7 +682,7 @@ def match_participants(participants, records, session):
 
     candidates.sort(key=lambda c: (c[0], c[1]), reverse=True)
     taken_records = set()
-    claimed = {}  # participant index -> {source: (record index, match type, score)}
+    claimed = {}  # participant index -> {source: [(record index, match type, score)]}
     for _priority, score, p_idx, r_idx, match_type in candidates:
         if r_idx in taken_records:
             continue
@@ -592,24 +691,49 @@ def match_participants(participants, records, session):
         if source in claimed_by_source:
             continue
         taken_records.add(r_idx)
-        claimed_by_source[source] = (r_idx, match_type, score)
+        claimed_by_source[source] = [(r_idx, match_type, score)]
+
+    # Further Zoom records of a participant: left over, and matching nobody else.
+    owners_of_record = {}
+    for candidate in candidates:
+        owners_of_record.setdefault(candidate[3], []).append(candidate)
+    for r_idx, matching in owners_of_record.items():
+        if r_idx in taken_records or record_rows[r_idx].get("source") != SOURCE_ZOOM:
+            continue
+        if len({c[2] for c in matching}) != 1:
+            continue
+        _priority, score, p_idx, _r, match_type = matching[0]
+        record_email = _clean_text(record_rows[r_idx].get("email")).lower()
+        if record_email and record_email != _clean_text(participant_rows[p_idx].get("email")).lower():
+            continue  # someone else's account
+        zoom_claim = claimed.get(p_idx, {}).get(SOURCE_ZOOM)
+        if zoom_claim is not None:
+            taken_records.add(r_idx)
+            zoom_claim.append((r_idx, match_type, score))
 
     result = []
     for p_idx, participant in enumerate(participant_rows):
-        matches = list(claimed.get(p_idx, {}).values())
-        counting = [m for m in matches if _counts_as_attended(record_rows[m[0]], session_seconds)]
+        # One (records, merged record) entry per source.
+        stays = []
+        for claim in claimed.get(p_idx, {}).values():
+            claim.sort(key=lambda m: _sort_time(record_rows[m[0]].get("joinDateTime")))
+            parts = [record_rows[m[0]] for m in claim]
+            stays.append((claim, _combine_zoom_records(parts) if len(parts) > 1 else parts[0]))
+        counting = [stay for stay in stays if _counts_as_attended(stay[1], session_seconds)]
         if counting:
             # On site wins over online when both count.
-            counting.sort(key=lambda m: record_rows[m[0]].get("source") == SOURCE_ZOOM)
+            counting.sort(key=lambda stay: stay[1].get("source") == SOURCE_ZOOM)
             chosen, status = counting[0], "ATTENDED"
-        elif matches:
-            chosen, status = matches[0], "MISSED"
+        elif stays:
+            chosen, status = stays[0], "MISSED"
         else:
             chosen, status = None, "MISSED"
 
         if chosen is not None:
-            r_idx, match_type, score = chosen
-            record = record_rows[r_idx]
+            claim, record = chosen
+            weakest = min(claim, key=lambda m: (MATCH_PRIORITY[m[1]], m[2]))
+            match_type = weakest[1]
+            name_scores = [int(m[2]) for m in claim if m[1] != MATCH_TYPE_EMAIL]
             result.append(
                 {
                     "userId": participant["id"],
@@ -619,10 +743,12 @@ def match_participants(participants, records, session):
                     "joinDateTime": _format_datetime(record.get("joinDateTime")),
                     "leaveDateTime": _format_datetime(record.get("leaveDateTime")),
                     "status": status,
-                    "recordedIdentifier": _recorded_identifier(record),
+                    "recordedIdentifier": " + ".join(
+                        filter(None, (_recorded_identifier(record_rows[m[0]]) for m in claim))
+                    ) or None,
                     "matchType": match_type,
-                    "matchScore": None if match_type == MATCH_TYPE_EMAIL else int(score),
-                    "attendanceRecordIndex": r_idx,
+                    "matchScore": min(name_scores) if name_scores else None,
+                    "attendanceRecordIndexes": sorted(m[0] for m in claim),
                     "closestCandidates": None,
                     "source": record.get("source"),
                     "location": _clean_text(record.get("location")) or None,
@@ -657,7 +783,7 @@ def match_participants(participants, records, session):
                 "recordedIdentifier": closest[0]["identifier"] if closest else None,
                 "matchType": MATCH_TYPE_NONE,
                 "matchScore": None,
-                "attendanceRecordIndex": None,
+                "attendanceRecordIndexes": None,
                 "closestCandidates": [
                     {k: c[k] for k in ("location", "identifier", "score")} for c in closest
                 ]
@@ -668,3 +794,11 @@ def match_participants(participants, records, session):
         )
 
     return result
+
+
+def _sort_time(value):
+    """Join time for ordering records; records without one come last."""
+    if value is None or pd.isna(value):
+        return pd.Timestamp.max.tz_localize("UTC")
+    ts = pd.Timestamp(value)
+    return ts if ts.tzinfo else ts.tz_localize("UTC")

@@ -335,7 +335,7 @@ export enum Attendance_constraint {
  * select columns of table "Attendance"
  */
 export enum Attendance_select_column {
-  attendanceRecordIndex = "attendanceRecordIndex",
+  attendanceRecordIndexes = "attendanceRecordIndexes",
   closestCandidates = "closestCandidates",
   created_at = "created_at",
   endDateTime = "endDateTime",
@@ -358,7 +358,7 @@ export enum Attendance_select_column {
  * update columns of table "Attendance"
  */
 export enum Attendance_update_column {
-  attendanceRecordIndex = "attendanceRecordIndex",
+  attendanceRecordIndexes = "attendanceRecordIndexes",
   closestCandidates = "closestCandidates",
   created_at = "created_at",
   endDateTime = "endDateTime",
@@ -4244,7 +4244,6 @@ export interface Attendance_arr_rel_insert_input {
  * order by avg() on columns of table "Attendance"
  */
 export interface Attendance_avg_order_by {
-  attendanceRecordIndex?: order_by | null;
   id?: order_by | null;
   interruptionCount?: order_by | null;
   matchScore?: order_by | null;
@@ -4263,7 +4262,7 @@ export interface Attendance_bool_exp {
   _and?: Attendance_bool_exp[] | null;
   _not?: Attendance_bool_exp | null;
   _or?: Attendance_bool_exp[] | null;
-  attendanceRecordIndex?: Int_comparison_exp | null;
+  attendanceRecordIndexes?: _int4_comparison_exp | null;
   closestCandidates?: jsonb_comparison_exp | null;
   created_at?: timestamptz_comparison_exp | null;
   endDateTime?: timestamptz_comparison_exp | null;
@@ -4290,7 +4289,7 @@ export interface Attendance_insert_input {
   AttendanceStatus?: AttendanceStatus_obj_rel_insert_input | null;
   Session?: Session_obj_rel_insert_input | null;
   User?: User_obj_rel_insert_input | null;
-  attendanceRecordIndex?: number | null;
+  attendanceRecordIndexes?: any | null;
   closestCandidates?: any | null;
   created_at?: any | null;
   endDateTime?: any | null;
@@ -4313,7 +4312,6 @@ export interface Attendance_insert_input {
  * order by max() on columns of table "Attendance"
  */
 export interface Attendance_max_order_by {
-  attendanceRecordIndex?: order_by | null;
   created_at?: order_by | null;
   endDateTime?: order_by | null;
   id?: order_by | null;
@@ -4334,7 +4332,6 @@ export interface Attendance_max_order_by {
  * order by min() on columns of table "Attendance"
  */
 export interface Attendance_min_order_by {
-  attendanceRecordIndex?: order_by | null;
   created_at?: order_by | null;
   endDateTime?: order_by | null;
   id?: order_by | null;
@@ -4364,7 +4361,7 @@ export interface Attendance_on_conflict {
  * input type for updating data in table "Attendance"
  */
 export interface Attendance_set_input {
-  attendanceRecordIndex?: number | null;
+  attendanceRecordIndexes?: any | null;
   closestCandidates?: any | null;
   created_at?: any | null;
   endDateTime?: any | null;
@@ -4387,7 +4384,6 @@ export interface Attendance_set_input {
  * order by stddev() on columns of table "Attendance"
  */
 export interface Attendance_stddev_order_by {
-  attendanceRecordIndex?: order_by | null;
   id?: order_by | null;
   interruptionCount?: order_by | null;
   matchScore?: order_by | null;
@@ -4399,7 +4395,6 @@ export interface Attendance_stddev_order_by {
  * order by stddev_pop() on columns of table "Attendance"
  */
 export interface Attendance_stddev_pop_order_by {
-  attendanceRecordIndex?: order_by | null;
   id?: order_by | null;
   interruptionCount?: order_by | null;
   matchScore?: order_by | null;
@@ -4411,7 +4406,6 @@ export interface Attendance_stddev_pop_order_by {
  * order by stddev_samp() on columns of table "Attendance"
  */
 export interface Attendance_stddev_samp_order_by {
-  attendanceRecordIndex?: order_by | null;
   id?: order_by | null;
   interruptionCount?: order_by | null;
   matchScore?: order_by | null;
@@ -4423,7 +4417,6 @@ export interface Attendance_stddev_samp_order_by {
  * order by sum() on columns of table "Attendance"
  */
 export interface Attendance_sum_order_by {
-  attendanceRecordIndex?: order_by | null;
   id?: order_by | null;
   interruptionCount?: order_by | null;
   matchScore?: order_by | null;
@@ -4435,7 +4428,6 @@ export interface Attendance_sum_order_by {
  * order by var_pop() on columns of table "Attendance"
  */
 export interface Attendance_var_pop_order_by {
-  attendanceRecordIndex?: order_by | null;
   id?: order_by | null;
   interruptionCount?: order_by | null;
   matchScore?: order_by | null;
@@ -4447,7 +4439,6 @@ export interface Attendance_var_pop_order_by {
  * order by var_samp() on columns of table "Attendance"
  */
 export interface Attendance_var_samp_order_by {
-  attendanceRecordIndex?: order_by | null;
   id?: order_by | null;
   interruptionCount?: order_by | null;
   matchScore?: order_by | null;
@@ -4459,7 +4450,6 @@ export interface Attendance_var_samp_order_by {
  * order by variance() on columns of table "Attendance"
  */
 export interface Attendance_variance_order_by {
-  attendanceRecordIndex?: order_by | null;
   id?: order_by | null;
   interruptionCount?: order_by | null;
   matchScore?: order_by | null;
@@ -14768,6 +14758,21 @@ export interface Weekday_on_conflict {
 export interface Weekday_order_by {
   comment?: order_by | null;
   value?: order_by | null;
+}
+
+/**
+ * Boolean expression to compare columns of type "_int4". All fields are combined with logical 'AND'.
+ */
+export interface _int4_comparison_exp {
+  _eq?: any | null;
+  _gt?: any | null;
+  _gte?: any | null;
+  _in?: any[] | null;
+  _is_null?: boolean | null;
+  _lt?: any | null;
+  _lte?: any | null;
+  _neq?: any | null;
+  _nin?: any[] | null;
 }
 
 /**

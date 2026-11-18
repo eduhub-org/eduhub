@@ -93,7 +93,7 @@ class TestMatchParticipants:
         assert row["matchType"] == MATCH_TYPE_EMAIL
         assert row["recordedIdentifier"] == "jane@example.com"
         assert row["duration"] == 3600
-        assert row["attendanceRecordIndex"] == 0
+        assert row["attendanceRecordIndexes"] == [0]
         assert row["matchScore"] is None
 
     def test_email_match_is_case_insensitive(self):
@@ -114,7 +114,7 @@ class TestMatchParticipants:
         row = _match(_participants(JANE), records)["u-0"]
         assert row["status"] == "MISSED"
         assert row["matchType"] == MATCH_TYPE_NONE
-        assert row["attendanceRecordIndex"] is None
+        assert row["attendanceRecordIndexes"] is None
         locations = [c["location"] for c in row["closestCandidates"]]
         assert sorted(locations) == ["KIEL", "ONLINE"]
         assert row["closestCandidates"][0]["identifier"] == "Janet Dorn"
@@ -132,7 +132,7 @@ class TestMatchParticipants:
         assert row["status"] == "MISSED"
         assert row["matchType"] == MATCH_TYPE_NAME
         assert row["duration"] == 1200
-        assert row["attendanceRecordIndex"] == 0
+        assert row["attendanceRecordIndexes"] == [0]
 
     def test_check_in_counts_over_short_zoom_stay(self):
         records = _records([_zoom("Jane Doe", duration=600), _check_in("Jane Doe")])
@@ -237,7 +237,149 @@ class TestMatchParticipants:
         assert result["u-0"]["status"] == "MISSED"
 
 
+def _zoom_between(name, start, end, interruptions=0, email=None):
+    """A Zoom record from ``start`` to ``end`` (HH:MM on the session day)."""
+    join = pd.Timestamp(f"2026-01-01T{start}:00Z")
+    leave = pd.Timestamp(f"2026-01-01T{end}:00Z")
+    return {
+        **_zoom(name, email, int((leave - join).total_seconds())),
+        "joinDateTime": join,
+        "leaveDateTime": leave,
+        "interruptionCount": interruptions,
+    }
+
+
+class TestSplitZoomRecords:
+    """One person can leave several Zoom records: renamed for the breakout
+    rooms, dialled in by phone, or rejoined under another name. The records
+    that match the participant on their own are combined."""
+
+    def test_renamed_participant_gets_both_records(self):
+        # A short name until the breakout rooms opened, then the full name.
+        participants = _participants(("Omar Farid", "Ben Khan", "o@example.com"), JANE)
+        records = _records([
+            _zoom_between("Farid Khan", "10:00", "10:28"),
+            _zoom_between("Omar Farid Ben Khan", "10:28", "10:58", interruptions=3),
+        ])
+        row = _match(participants, records)["u-0"]
+        assert row["status"] == "ATTENDED"
+        assert row["duration"] == 58 * 60
+        assert row["attendanceRecordIndexes"] == [0, 1]
+        assert row["recordedIdentifier"] == "Farid Khan + Omar Farid Ben Khan"
+        # The weakest link is shown: the subset name, not the exact one.
+        assert row["matchType"] == MATCH_TYPE_NAME
+        assert row["matchScore"] < 100
+        assert row["joinDateTime"] == str(pd.Timestamp("2026-01-01T10:00:00Z"))
+        assert row["leaveDateTime"] == str(pd.Timestamp("2026-01-01T10:58:00Z"))
+        # Back-to-back records add no interruption of their own.
+        assert row["interruptionCount"] == 3
+
+    def test_phone_dial_in_is_added(self):
+        participants = _participants(JANE)
+        records = _records([
+            _zoom_between("Jane Doe", "10:00", "10:04"),
+            _zoom_between("49157 Jane Doe", "10:05", "10:59"),
+        ])
+        row = _match(participants, records)["u-0"]
+        assert row["status"] == "ATTENDED"
+        assert row["duration"] == 58 * 60
+        assert row["interruptionCount"] == 1
+        assert row["attendanceRecordIndexes"] == [0, 1]
+
+    def test_unique_last_name_alone_is_added(self):
+        participants = _participants(("Tom", "Becker", "t@example.com"), JANE)
+        records = _records([
+            _zoom_between("Tom Becker", "10:00", "10:15"),
+            _zoom_between("becker", "10:16", "10:58"),
+        ])
+        row = _match(participants, records)["u-0"]
+        assert row["status"] == "ATTENDED"
+        assert row["matchType"] == MATCH_TYPE_PARTIAL_NAME
+        assert row["recordedIdentifier"] == "Tom Becker + becker"
+
+    def test_shared_last_name_alone_is_not_added(self):
+        participants = _participants(("Tom", "Becker", "t@example.com"), ("Anna", "Becker", "a@example.com"))
+        records = _records([
+            _zoom_between("Tom Becker", "10:00", "10:15"),
+            _zoom_between("becker", "10:16", "10:58"),
+        ])
+        result = _match(participants, records)
+        assert result["u-0"]["attendanceRecordIndexes"] == [0]
+        assert result["u-0"]["status"] == "MISSED"
+        assert result["u-1"]["status"] == "MISSED"
+
+    def test_ambiguous_first_name_is_not_added(self):
+        # Two Lukases: the one-word record could be either.
+        participants = _participants(
+            ("Lukas", "Kuhn", "k@example.com"), ("Lukas", "Wolf", "w@example.com")
+        )
+        records = _records([
+            _zoom_between("Lukas Kuhn", "10:00", "10:10"),
+            _zoom_between("Lukas", "10:10", "10:58"),
+        ])
+        result = _match(participants, records)
+        assert result["u-0"]["attendanceRecordIndexes"] == [0]
+        assert {row["status"] for row in result.values()} == {"MISSED"}
+
+    def test_namesakes_each_keep_one_record(self):
+        participants = _participants(("Jane", "Doe", "j1@example.com"), ("Jane", "Doe", "j2@example.com"))
+        records = _records([_zoom("Jane Doe"), _zoom("Jane Doe")])
+        result = _match(participants, records)
+        assert sorted(row["attendanceRecordIndexes"] for row in result.values()) == [[0], [1]]
+
+    def test_simultaneous_devices_count_once(self):
+        participants = _participants(JANE)
+        records = _records([
+            _zoom_between("Jane Doe", "10:00", "10:25"),
+            _zoom_between("Jane Doe (iPad)", "10:00", "10:25"),
+        ])
+        row = _match(participants, records)["u-0"]
+        assert row["duration"] == 25 * 60
+        assert row["status"] == "MISSED"
+
+    def test_check_ins_are_not_combined(self):
+        participants = _participants(JANE)
+        records = _records([_check_in("Jane Doe"), _check_in("Jane Doe", place="Heide")])
+        row = _match(participants, records)["u-0"]
+        assert len(row["attendanceRecordIndexes"]) == 1
+
+
+class TestLooserNames:
+    def test_text_in_parentheses_is_ignored(self):
+        participants = _participants(("Lisa", "Brandner", "l@example.com"))
+        row = _match(participants, _records([_zoom("Lisa Brandner (Example Institute)")]))["u-0"]
+        assert row["matchType"] == MATCH_TYPE_NAME
+        assert row["matchScore"] == 100
+
+    def test_name_without_middle_names_matches(self):
+        # Neither the whole first name nor the whole last name is in the record.
+        participants = _participants(("Omar Farid", "Ben Khan", "o@example.com"), JANE)
+        row = _match(participants, _records([_zoom("Farid Khan")]))["u-0"]
+        assert row["status"] == "ATTENDED"
+        assert row["matchType"] == MATCH_TYPE_NAME
+
+    def test_name_without_middle_names_ignored_when_ambiguous(self):
+        participants = _participants(
+            ("Omar Farid", "Ben Khan", "o@example.com"), ("Farid", "Hassan Khan", "f@example.com")
+        )
+        result = _match(participants, _records([_zoom("Farid Khan")]))
+        assert {row["status"] for row in result.values()} == {"MISSED"}
+
+    def test_umlauts_and_transliterations_are_equal(self):
+        participants = _participants(("Jürgen", "Müller", "j@example.com"))
+        for name in ("Juergen Mueller", "Jurgen Muller"):
+            row = _match(participants, _records([_zoom(name)]))["u-0"]
+            assert row["matchScore"] == 100, name
+
+
+    def test_folding_never_lowers_a_score(self):
+        # "Svenja K" reached the threshold only with the umlaut as written.
+        participants = _participants(("Svenja", "Küster", "s@example.com"))
+        row = _match(participants, _records([_zoom("Svenja K")]))["u-0"]
+        assert row["matchType"] == MATCH_TYPE_NAME
+
 def test_clean_display_name():
+    assert clean_display_name("Lisa Brandner (Example Institute)") == "lisa brandner"
     assert clean_display_name("@saikiran.panchireddi.20311a:opencampus.sh") == "saikiran panchireddi"
     assert clean_display_name("Hase, Christian") == "hase christian"
     assert clean_display_name(None) == ""
@@ -846,3 +988,12 @@ def test_hamburg_sessions_collect_check_ins(monkeypatch):
     assert reason is None
     assert fetched == [["HAMBURG"]]
     assert list(records["name"]) == ["Bob Builder"]
+
+
+def test_record_indexes_are_sent_as_postgres_array_literal():
+    from api_clients.eduhub_client import EduHubClient
+
+    combined = EduHubClient._attendance_object({"sessionId": 1, "attendanceRecordIndexes": [0, 3]})
+    unmatched = EduHubClient._attendance_object({"sessionId": 1, "attendanceRecordIndexes": None})
+    assert combined["attendanceRecordIndexes"] == "{0,3}"
+    assert unmatched["attendanceRecordIndexes"] is None

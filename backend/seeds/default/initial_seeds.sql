@@ -4972,14 +4972,15 @@ UPDATE public."Session" s SET "attendanceData" = ($j${"name":{"0":"Leon Weber","
   || jsonb_build_object('joinDateTime', (SELECT jsonb_object_agg(k, (extract(epoch FROM s."startDateTime") * 1000)::bigint + v::bigint * 1000) FROM jsonb_each_text($j${"0": -262, "1": -229, "2": -217, "3": -214, "4": -96, "5": -86, "6": -42, "7": -32, "8": -11, "9": 22, "10": 34, "11": 60, "12": 64, "13": 91, "14": 103, "15": 106, "16": 118, "17": 143, "18": 207, "19": 298, "20": 372, "21": 374, "22": 392, "23": 420, "24": 449, "25": 471, "26": 489, "27": 511, "28": 532, "29": 553, "30": 573, "31": 575, "32": 580, "33": 1100}$j$::jsonb) AS t(k, v)), 'leaveDateTime', (SELECT jsonb_object_agg(k, (extract(epoch FROM s."startDateTime") * 1000)::bigint + v::bigint * 1000) FROM jsonb_each_text($j${"0": 3085, "1": 3422, "2": 3339, "3": 3159, "4": 2972, "5": 3161, "6": 3544, "7": 3560, "8": 3654, "9": 3380, "10": 3182, "11": 3456, "12": 3162, "13": 3579, "14": 3185, "15": 3660, "16": 3652, "17": 3385, "18": 3608, "19": 4044, "20": 3845, "21": 3831, "22": 3841, "23": 3665, "24": 3914, "25": 4006, "26": 4160, "27": 4011, "28": 4066, "29": 4252, "30": 4362, "31": 4089, "32": 4161, "33": 1806}$j$::jsonb) AS t(k, v))))::text
 WHERE s.id = 93401 AND s."endDateTime" < now();
 
-INSERT INTO public."Attendance" (id, "sessionId", "userId", status, created_at, updated_at, "recordedIdentifier", source, "startDateTime", "endDateTime", "totalAttendanceTime", "interruptionCount", location, "matchType", "matchScore", "attendanceRecordIndex", "closestCandidates")
+INSERT INTO public."Attendance" (id, "sessionId", "userId", status, created_at, updated_at, "recordedIdentifier", source, "startDateTime", "endDateTime", "totalAttendanceTime", "interruptionCount", location, "matchType", "matchScore", "attendanceRecordIndexes", "closestCandidates")
 SELECT v.id, v.session_id, v.user_id::uuid, v.status,
        s."endDateTime" + CASE v.kind WHEN 'MANUAL' THEN interval '2 days' ELSE interval '6 hours' END,
        s."endDateTime" + CASE v.kind WHEN 'MANUAL' THEN interval '2 days' ELSE interval '6 hours' END,
        v.identifier, v.source,
        s."startDateTime" + v.join_offset::int * interval '1 second',
        s."startDateTime" + v.leave_offset::int * interval '1 second',
-       v.duration::int, v.interruptions::int, v.location, v.match_type, v.score::int, v.record_index::int,
+       v.duration::int, v.interruptions::int, v.location, v.match_type, v.score::int,
+       CASE WHEN v.record_index IS NULL THEN NULL ELSE ARRAY[v.record_index::int] END,
        v.candidates::jsonb
 FROM (VALUES
   (800001, 72101, '90000000-0000-0000-0000-000000000191', 'ATTENDED', 'AUTO', 'Samir Adebayo', 'LIMESURVEY', 358, NULL, NULL, NULL, 'SK', 'NAME', 100, 43, NULL),
@@ -6989,14 +6990,15 @@ JOIN public."Session" s ON s.id = v.session_id
 WHERE s."endDateTime" < now()
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO public."Attendance" (id, "sessionId", "userId", status, created_at, updated_at, "recordedIdentifier", source, "startDateTime", "endDateTime", "totalAttendanceTime", "interruptionCount", location, "matchType", "matchScore", "attendanceRecordIndex", "closestCandidates")
+INSERT INTO public."Attendance" (id, "sessionId", "userId", status, created_at, updated_at, "recordedIdentifier", source, "startDateTime", "endDateTime", "totalAttendanceTime", "interruptionCount", location, "matchType", "matchScore", "attendanceRecordIndexes", "closestCandidates")
 SELECT v.id, v.session_id, v.user_id::uuid, v.status,
        s."endDateTime" + CASE v.kind WHEN 'MANUAL' THEN interval '2 days' ELSE interval '6 hours' END,
        s."endDateTime" + CASE v.kind WHEN 'MANUAL' THEN interval '2 days' ELSE interval '6 hours' END,
        v.identifier, v.source,
        s."startDateTime" + v.join_offset::int * interval '1 second',
        s."startDateTime" + v.leave_offset::int * interval '1 second',
-       v.duration::int, v.interruptions::int, v.location, v.match_type, v.score::int, v.record_index::int,
+       v.duration::int, v.interruptions::int, v.location, v.match_type, v.score::int,
+       CASE WHEN v.record_index IS NULL THEN NULL ELSE ARRAY[v.record_index::int] END,
        v.candidates::jsonb
 FROM (VALUES
   (802001, 72305, '77777777-7777-7777-7777-777777777777', 'MISSED', 'AUTO', 'Leila Okafor', 'LIMESURVEY', NULL, NULL, NULL, NULL, NULL, 'NONE', NULL, NULL, '[{"location": "KIEL", "identifier": "Leila Okafor", "score": 48}, {"location": "ONLINE", "identifier": "Lena Morgan", "score": 40}]'),
@@ -9006,14 +9008,15 @@ JOIN public."Session" s ON s.id = v.session_id
 WHERE s."endDateTime" < now()
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO public."Attendance" (id, "sessionId", "userId", status, created_at, updated_at, "recordedIdentifier", source, "startDateTime", "endDateTime", "totalAttendanceTime", "interruptionCount", location, "matchType", "matchScore", "attendanceRecordIndex", "closestCandidates")
+INSERT INTO public."Attendance" (id, "sessionId", "userId", status, created_at, updated_at, "recordedIdentifier", source, "startDateTime", "endDateTime", "totalAttendanceTime", "interruptionCount", location, "matchType", "matchScore", "attendanceRecordIndexes", "closestCandidates")
 SELECT v.id, v.session_id, v.user_id::uuid, v.status,
        s."endDateTime" + CASE v.kind WHEN 'MANUAL' THEN interval '2 days' ELSE interval '6 hours' END,
        s."endDateTime" + CASE v.kind WHEN 'MANUAL' THEN interval '2 days' ELSE interval '6 hours' END,
        v.identifier, v.source,
        s."startDateTime" + v.join_offset::int * interval '1 second',
        s."startDateTime" + v.leave_offset::int * interval '1 second',
-       v.duration::int, v.interruptions::int, v.location, v.match_type, v.score::int, v.record_index::int,
+       v.duration::int, v.interruptions::int, v.location, v.match_type, v.score::int,
+       CASE WHEN v.record_index IS NULL THEN NULL ELSE ARRAY[v.record_index::int] END,
        v.candidates::jsonb
 FROM (VALUES
   (804001, 72603, '90000000-0000-0000-0000-000000000197', 'ATTENDED', 'AUTO', 'Zhang, Sara', 'ZOOM', -41, 6454, 6495, 0, 'ZOOM', 'NAME', 100, 21, NULL),
@@ -11023,14 +11026,15 @@ JOIN public."Session" s ON s.id = v.session_id
 WHERE s."endDateTime" < now()
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO public."Attendance" (id, "sessionId", "userId", status, created_at, updated_at, "recordedIdentifier", source, "startDateTime", "endDateTime", "totalAttendanceTime", "interruptionCount", location, "matchType", "matchScore", "attendanceRecordIndex", "closestCandidates")
+INSERT INTO public."Attendance" (id, "sessionId", "userId", status, created_at, updated_at, "recordedIdentifier", source, "startDateTime", "endDateTime", "totalAttendanceTime", "interruptionCount", location, "matchType", "matchScore", "attendanceRecordIndexes", "closestCandidates")
 SELECT v.id, v.session_id, v.user_id::uuid, v.status,
        s."endDateTime" + CASE v.kind WHEN 'MANUAL' THEN interval '2 days' ELSE interval '6 hours' END,
        s."endDateTime" + CASE v.kind WHEN 'MANUAL' THEN interval '2 days' ELSE interval '6 hours' END,
        v.identifier, v.source,
        s."startDateTime" + v.join_offset::int * interval '1 second',
        s."startDateTime" + v.leave_offset::int * interval '1 second',
-       v.duration::int, v.interruptions::int, v.location, v.match_type, v.score::int, v.record_index::int,
+       v.duration::int, v.interruptions::int, v.location, v.match_type, v.score::int,
+       CASE WHEN v.record_index IS NULL THEN NULL ELSE ARRAY[v.record_index::int] END,
        v.candidates::jsonb
 FROM (VALUES
   (806001, 72903, '90000000-0000-0000-0000-000000000070', 'MISSED', 'AUTO', 'Nina Martinez', 'ZOOM', NULL, NULL, NULL, NULL, NULL, 'NONE', NULL, NULL, '[{"location": "ONLINE", "identifier": "Nina Martinez", "score": 56}, {"location": "KIEL", "identifier": "Jonas Moreno", "score": 42}]'),
