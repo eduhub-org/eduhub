@@ -106,6 +106,23 @@ def test_send_query_raises_on_a_non_json_body(monkeypatch):
     assert excinfo.value.status_code == 200
 
 
+@pytest.mark.parametrize("payload", [None, [], [{"data": {}}], "ok", 1])
+def test_send_query_raises_on_a_body_that_is_not_an_object(monkeypatch, payload):
+    _post_returning(monkeypatch, _Response(payload=payload))
+
+    with pytest.raises(HasuraQueryError) as excinfo:
+        _client().send_query("query { x }", {})
+
+    assert excinfo.value.status_code == 200
+    assert excinfo.value.graphql_errors is None
+
+
+def test_send_query_accepts_an_empty_object(monkeypatch):
+    _post_returning(monkeypatch, _Response(payload={}))
+
+    assert _client().send_query("query { x }", {}) == {}
+
+
 def test_send_query_raises_on_graphql_errors(monkeypatch):
     errors = [{"message": "field 'x' not found"}]
     _post_returning(monkeypatch, _Response(payload={"errors": errors}))

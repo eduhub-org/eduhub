@@ -189,7 +189,7 @@ The tests are designed to be deterministic and can be run in CI/CD environments.
 ### Adding New Tests
 
 1. Create test files in the `__tests__` directory next to the function
-2. Use the shared mock data from `__tests__/helpers/mockData.js`
+2. Create suite-local fixtures (see [Mock Data](#mock-data))
 3. Follow the existing test patterns for consistency
 4. Ensure good test coverage for both happy path and error scenarios
 
