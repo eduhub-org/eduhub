@@ -145,8 +145,12 @@ first. Also:
 - [ ] `functions/callNodeFunction/lib/requestHeaders.js`: `getFunctionName`
       reads only `function-name`; remove `LEGACY_FUNCTION_NAME_HEADER` and the
       `conflict` flag.
-- [ ] `functions/callNodeFunction/index.js`: remove the 400
-      `CONFLICTING_FUNCTION_NAME` branch and the header-spelling debug log.
+- [ ] `functions/callNodeFunction/lib/dispatcher.js`: drop `conflict` from
+      the 400 `CONFLICTING_FUNCTION_NAME` condition and remove the
+      header-spelling debug log ("Request header names", and `header` from
+      the `getFunctionName` destructuring). Keep the pinned-action check:
+      a routing header naming another handler than a pinned action's still
+      answers 400.
 - [ ] Tests: `__tests__/dispatcher.test.js` (legacy cases become 401/404),
       `lib/__tests__/requestHeaders.test.js`,
       `sendMail/__tests__/sendMailDeliveryVariables.test.js` (requests use
