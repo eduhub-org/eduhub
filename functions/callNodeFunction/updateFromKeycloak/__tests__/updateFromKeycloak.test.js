@@ -178,7 +178,13 @@ describe('updateFromKeycloak', () => {
       const { status, body } = await call(actionRequest({ 'hasura-secret': 'test-secret' }));
 
       expect(status).toBe(403);
-      expect(body).toEqual({ success: false, message: 'Account deleted', error: 'Account deleted' });
+      expect(body).toEqual({
+        success: false,
+        message: 'Account deleted',
+        error: 'Account deleted',
+        messageKey: 'ACCOUNT_DELETED',
+        extensions: { code: 'ACCOUNT_DELETED' },
+      });
     });
 
     // forward_client_headers: a caller's own routing header must not pick

@@ -98,7 +98,13 @@ const SET_USER_EMAIL = gql`
 `;
 
 /** A failure Hasura reports to the caller as a GraphQL error. */
-const fail = (httpStatus, message) => ({ httpStatus, success: false, message, error: message });
+const fail = (httpStatus, message, messageKey) => ({
+  httpStatus,
+  success: false,
+  message,
+  error: message,
+  ...(messageKey && { messageKey }),
+});
 
 /**
  * Frees `email` for the account `userid` when another non-guest User row
@@ -154,7 +160,7 @@ const syncUser = async (req, logger) => {
 
   // A still-valid token or a delayed login sync must never restore erased data.
   if (findUserResponse?.status === 'DELETED') {
-    return fail(403, 'Account deleted');
+    return fail(403, 'Account deleted', 'ACCOUNT_DELETED');
   }
 
   if (user == null) {
@@ -214,7 +220,7 @@ const syncUser = async (req, logger) => {
       });
       // The account was deleted after the status check above.
       if (response.update_User.affected_rows === 0) {
-        return fail(403, 'Account deleted');
+        return fail(403, 'Account deleted', 'ACCOUNT_DELETED');
       }
     }
   } catch (error) {
