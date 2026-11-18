@@ -50,7 +50,7 @@ jobs:
           egress-policy: audit
 
       - name: Checkout develop
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v5
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: develop
           fetch-depth: 0
@@ -85,8 +85,12 @@ jobs:
           # fail exactly as it did in the abandoned cloud-routine attempt (#1850).
           github_token: ${{ secrets.DEPENDABOT_TRIAGE_TOKEN }}
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          # Since claude-code-action 1.0.273 sessions start in auto mode, where
+          # --allowed-tools is no longer a strict list. This job holds a PAT that
+          # can push and close PRs, so keep the allowlist strict.
           claude_args: >-
             --model claude-opus-5
+            --permission-mode default
             --allowed-tools Bash,Read,Write,Edit,Glob,Grep,WebFetch
           prompt: |
             Run the daily Dependabot triage for eduhub-org/eduhub.
