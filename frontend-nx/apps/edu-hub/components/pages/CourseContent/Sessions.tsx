@@ -274,6 +274,16 @@ export const Sessions: FC<SessionsProps> = ({
     return map;
   }, [visibleSessions, courseLocations, addressMap, sharedLocations]);
 
+  // Online attendance is matched by the Zoom display name, so participants
+  // are asked to join under the name they registered with.
+  const hasOnlineSession = useMemo(
+    () =>
+      sessions.some((session) =>
+        resolveSessionLocations(session, courseLocations, addressMap).some((l) => l.locationOption === 'ONLINE')
+      ),
+    [sessions, courseLocations, addressMap]
+  );
+
   const dayGroups = useMemo(
     () => (isEvent ? groupSessionsByDay(visibleSessions, timeZone) : []),
     [isEvent, visibleSessions, timeZone]
@@ -293,12 +303,18 @@ export const Sessions: FC<SessionsProps> = ({
     </div>
   ) : null;
 
+  const zoomNameHint =
+    isLoggedInParticipant && hasOnlineSession ? (
+      <p className="max-w-2xl mb-4 text-sm text-label-secondary">{t('sessions.zoom_name_hint')}</p>
+    ) : null;
+
   if (isEvent) {
     // Every event agenda is grouped by day, a one-session event included: the
     // date is no longer shown above the tagline, so the day heading carries it.
     return (
       <div>
         {sectionHeader(t('sessions.agenda'))}
+        {zoomNameHint}
         <div>
           {dayGroups.map((group) => (
             <div
@@ -341,6 +357,7 @@ export const Sessions: FC<SessionsProps> = ({
   return (
     <div>
       {sectionHeader(sessions.length === 1 ? t('sessions.date_singular') : t('sessions.date_plural'))}
+      {zoomNameHint}
       {sharedLocationsLine}
       <ul className="max-w-2xl">
         {visibleSessions.map((session) => (

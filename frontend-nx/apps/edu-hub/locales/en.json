@@ -408,7 +408,8 @@
       "program_session_tooltip": "Takes place for all courses of “{program}”",
       "program_session_tooltip_event": "Takes place for all events of “{program}”",
       "untitled_session": "Agenda item",
-      "add_to_calendar_short": "Calendar"
+      "add_to_calendar_short": "Calendar",
+      "zoom_name_hint": "Join Zoom with the name you registered with here, otherwise your attendance won't be recognised."
     },
     "attendances": {
       "attendances": "Attendances",
