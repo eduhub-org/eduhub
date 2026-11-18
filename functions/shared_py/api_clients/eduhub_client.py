@@ -61,8 +61,8 @@ class EduHubClient:
 
         Raises:
             HasuraQueryError: On a transport error (timeout, connection
-                refused, ...), a non-200 response, a body that is not JSON or
-                a populated GraphQL `errors` key.
+                refused, ...), a non-200 response, a body that is not a JSON
+                object or a populated GraphQL `errors` key.
         """
         self.set_headers()
         # Never log the headers (they carry the admin secret) or variable
@@ -93,7 +93,12 @@ class EduHubClient:
             raise HasuraQueryError(
                 "GraphQL response is not JSON", status_code=r.status_code
             ) from error
-        if isinstance(result, dict) and result.get("errors"):
+        if not isinstance(result, dict):
+            raise HasuraQueryError(
+                "GraphQL response is not a JSON object",
+                status_code=r.status_code,
+            )
+        if result.get("errors"):
             raise HasuraQueryError(
                 f"GraphQL errors: {result['errors']}",
                 graphql_errors=result["errors"],
