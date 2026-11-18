@@ -183,6 +183,10 @@ locals {
           local.secret_env.MATRIX_ADMIN_ACCESS_TOKEN,
         ],
         local.matrix_synapse_admin_token,
+        # anonymizeUser / deleteMyAccount unsubscribe the user from each
+        # organization's Ghost newsletter, whose Admin API key is stored
+        # encrypted with this key (lib/organizationCredential.js).
+        [local.secret_env.GHOST_NEWSLETTER_CREDENTIALS_ENCRYPTION_KEY],
       )
       service_account_id = "cf-identity"
     }
