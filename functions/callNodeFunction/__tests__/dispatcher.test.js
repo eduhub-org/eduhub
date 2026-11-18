@@ -209,11 +209,30 @@ describe('callNodeFunction', () => {
       expect(body).toEqual({ success: true, messageKey: 'QUEUED' });
     });
 
-    it('takes httpStatus over retryable', async () => {
+    it('takes a non-2xx httpStatus over retryable', async () => {
       handlerMock.mockResolvedValue({ httpStatus: 400, retryable: true });
       const { status } = await call(eventRequest());
 
       expect(status).toBe(400);
+    });
+
+    // A 2xx would tell Hasura the event succeeded and stop its retries.
+    it('takes retryable over a 2xx httpStatus in an event trigger', async () => {
+      handlerMock.mockResolvedValue({
+        httpStatus: 200, success: false, retryable: true, error: 'Queue down', messageKey: 'EMAIL_QUEUE_FAILED',
+      });
+      const { status, body } = await call(eventRequest());
+
+      expect(status).toBe(503);
+      expect(body).not.toHaveProperty('httpStatus');
+      expectHasuraError(body, 'EMAIL_QUEUE_FAILED');
+    });
+
+    it('keeps a 2xx httpStatus with retryable outside a trigger', async () => {
+      handlerMock.mockResolvedValue({ httpStatus: 202, success: true, retryable: true });
+      const { status } = await call({ ...eventRequest(), body: { input: {} } });
+
+      expect(status).toBe(202);
     });
 
     it('ignores a httpStatus that is not an integer', async () => {

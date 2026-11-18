@@ -169,10 +169,16 @@ export const updateFromKeycloak = async (req, res) => {
     }
 
     if (user != null) {
-      // Ensure matrix_user_handle is set in Keycloak (backfill for pre-SPI users)
-      let matrixHandle = user.attributes?.matrix_user_handle?.[0] || null;
-      if (!matrixHandle) {
-        matrixHandle = computeMatrixHandle(user.firstName, user.lastName, userid);
+      // Ensure matrix_user_handle is set in Keycloak (backfill for pre-SPI
+      // users). A handle Hasura already stores wins over a freshly computed
+      // one: Hasura keeps its handle below, and account deletion deactivates
+      // that one, so Keycloak must end up with the same handle.
+      const keycloakHandle = user.attributes?.matrix_user_handle?.[0] || null;
+      const matrixHandle =
+        keycloakHandle ||
+        findUserResponse?.matrixUserHandle ||
+        computeMatrixHandle(user.firstName, user.lastName, userid);
+      if (!keycloakHandle) {
         try {
           await kcAdminClient.users.update(
             { id: userid },

@@ -91,8 +91,13 @@ an unpinned one. Today only `updateFromKeycloak` forwards client headers.
 | 401 | secret header missing or wrong | `MISSING_SECRET` / `INVALID_SECRET` |
 | 404 | no handler by that name in this unit | `FUNCTION_NOT_FOUND` |
 | 500 | `HASURA_CLOUD_FUNCTION_SECRET` unset on the server | `SERVER_MISCONFIGURED` |
-| 503 | event or cron delivery and the result has `retryable: true` | handler's own |
+| 503 | event or cron delivery and the result has `retryable: true` (Node: unless `httpStatus` is non-2xx) | handler's own |
 | any | Node only: the result has an integer `httpStatus` (removed from the body) | handler's own |
+
+Node precedence for an event or cron delivery: a `retryable: true` result
+answers 503 even when it also sets a 2xx `httpStatus`, since a 2xx would end
+Hasura's retries; a non-2xx `httpStatus` is sent as is (Hasura retries it
+anyway). Outside event and cron deliveries `retryable` is ignored.
 
 Hasura retries an event or cron delivery on any non-2xx status, up to the
 trigger's `retry_conf`. Actions never retry: they read the body, so a failed

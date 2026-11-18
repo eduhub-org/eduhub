@@ -266,17 +266,24 @@ Track email effectiveness through:
 ### Security Considerations
 1. **Validate email addresses**: Prevent injection attacks
 2. **Sanitize template variables**: Escape user input in templates
-3. **Protect SMTP credentials**: Use secure environment variable storage
+3. **Protect the Mailgun API key**: Keep it in Secret Manager, never in code
 4. **Rate limiting**: Prevent email spam through throttling
 5. **Authentication**: Verify sender authorization for sensitive emails
 
 ## Common Issues and Solutions
 
 ### Email Not Sending
-1. **Check SMTP configuration**: Verify credentials and server settings
+1. **Check the Mailgun configuration**: `sendMail` needs `MAILGUN_API_KEY`
+   and a sender whose domain is `MAILGUN_DOMAIN` or in
+   `MAILGUN_ADDITIONAL_DOMAINS`; `ENVIRONMENT` must be `staging` or
+   `production` (`development` only logs the message)
 2. **Validate recipient email**: Ensure email format is correct
-3. **Check function logs**: Review error messages in function logs
-4. **Test connectivity**: Ensure network access to SMTP server
+3. **Check function logs**: Review `sendMail` errors ("Email error") and the
+   `send_mail` event trigger's invocation log in Hasura (retries hourly)
+4. **Check Mailgun**: Look up the message in the Mailgun logs (EU region) for
+   rejected, failed or suppressed deliveries, and the `MailLog` row's
+   `status`: it stays `READY_TO_SEND` until `sync_mail_delivery_status`
+   writes `DELIVERED`, `BOUNCED` or `COMPLAINED`
 
 ### Template Variables Not Replaced
 1. **Verify variable names**: Ensure exact match with template variables

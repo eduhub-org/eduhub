@@ -42,8 +42,9 @@ profile, not by domain.
   `updateKeycloakUser`, `updateAdminUser`, `getAdminUsers`,
   `claimJobOrganization`, `anonymizeUser` / `deleteMyAccount`, the Matrix room
   handlers, and the folded `addKeycloakRole`, `removeKeycloakRole`,
-  `updateFromKeycloak`). Holds Hasura, Keycloak and Matrix secrets and may
-  delete bucket objects. 256 MB, 180 s, max 5.
+  `updateFromKeycloak`). Holds Hasura, Keycloak and Matrix secrets and the
+  Ghost encryption key (account deletion unsubscribes from newsletters), and
+  may delete bucket objects. 256 MB, 180 s, max 5.
 - **`media`**: storage files (`saveFile`, `saveImage`,
   `saveOrganizationLogo`, `removeOrganizationLogo`, `getSignedUrl`,
   `makeCertificatePublic`). Holds only Hasura secrets plus bucket access.
@@ -86,3 +87,34 @@ profile, not by domain.
   ships to all three.
 - More units mean more cold starts for rarely used handlers. The dashboard
   shows whether this matters.
+
+## Environment inventory
+
+What each unit's handlers read, following every import from the handler
+maps in `functions/callNodeFunction/index.js` (handlers, `lib/`, `shared/`,
+the dispatcher) and resolving each `lib/config.js` getter to its variables.
+Compared against `env` / `secrets` in
+`infrastructure/application/06_cloud-functions.tf`. Locally all Node units
+run in the one `node_functions` container (`functions/dev.js`), so identity
+and media see the same environment as `callNodeFunction`. Recheck this
+table when a handler moves or starts reading a new variable.
+
+| Unit | Secrets read | Plain config read |
+|------|--------------|-------------------|
+| all three (dispatcher) | `HASURA_CLOUD_FUNCTION_SECRET` | `ENVIRONMENT` |
+| identity | `HASURA_ADMIN_SECRET`, `KEYCLOAK_PW`, `MATRIX_ADMIN_ACCESS_TOKEN`, `MATRIX_SYNAPSE_ADMIN_TOKEN` (when set), `GHOST_NEWSLETTER_CREDENTIALS_ENCRYPTION_KEY` (anonymizeUser / deleteMyAccount) | `HASURA_ENDPOINT`, `KEYCLOAK_URL`, `KEYCLOAK_USER`, `MATRIX_*` (5), `FRONTEND_URL`, `STORAGE_BUCKET_PUBLIC_URL`, `STUJO_ADMIN_EMAIL` |
+| media | `HASURA_ADMIN_SECRET` | `HASURA_ENDPOINT` |
+| callNodeFunction | all of the above plus `FORMBRICKS_API_KEY`, `STRIPE_SECRET_KEY`, `GUEST_TOKEN_SECRET` (unchanged by the split) | identity's plus `FORMBRICKS_API_URL`, `STUJO_FRONTEND_URL`, `STRIPE_TAX_RATE_ID`, `STUJO_SELLER_ORGANIZATION_ID` (unchanged) |
+
+Notes:
+
+- `GUEST_TOKEN_SECRET` is in identity's import graph (`lib/queueEmail.js`
+  imports the guest mail footer) but never read there: `createUser` and
+  `claimJobOrganization` call `queueEmail` without a `recipientUser`, and the
+  footer is only built for guest recipients. identity does not get it.
+- `STORAGE_PORT` is read by the storage helpers only in development (local
+  emulator); deployed units do not set it.
+- `callNodeFunction` also reads `FORMBRICKS_TRUSTED_ORIGINS`,
+  `FORMBRICKS_BASE_URL`, `RAUSGEGANGEN_API_URL` and `STUJO_TERMS_URL`, which
+  Terraform did not set before the split either; the code falls back to
+  defaults.

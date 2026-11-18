@@ -43,6 +43,7 @@ A handler is not done until all steps are done:
 - Body `{ success, messageKey, error?, ...fields }`; failures are 200 with
   `success: false`.
 - `retryable: true` makes an event/cron delivery answer 503 so Hasura
-  retries; the side effect must be idempotent.
+  retries; the side effect must be idempotent. Node: it wins over a 2xx
+  `httpStatus`; a non-2xx `httpStatus` is sent as is.
 - Dispatchers answer 401 (secret), 404 (unknown function), 500 (server
   secret unset), and Node 400 when `Function-Name` and legacy `name` differ.

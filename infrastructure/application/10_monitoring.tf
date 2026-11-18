@@ -143,10 +143,15 @@ locals {
 
   cloud_function_dashboard_charts = [
     {
+      # request_latencies is a DELTA distribution with one series per
+      # response code. ALIGN_DELTA keeps each series a distribution, and
+      # REDUCE_PERCENTILE_95 takes the p95 of their merged distribution per
+      # service. A per-series p95 reduced with MAX would report the slowest
+      # response code's p95 instead, e.g. a handful of slow 500s.
       title     = "Request latency p95 (ms)"
       metric    = "run.googleapis.com/request_latencies"
-      aligner   = "ALIGN_PERCENTILE_95"
-      reducer   = "REDUCE_MAX"
+      aligner   = "ALIGN_DELTA"
+      reducer   = "REDUCE_PERCENTILE_95"
       plot_type = "LINE"
       y_label   = "ms"
     },

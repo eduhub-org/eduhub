@@ -98,7 +98,13 @@ const SET_USER_EMAIL = gql`
 `;
 
 /** A failure Hasura reports to the caller as a GraphQL error. */
-const fail = (httpStatus, message) => ({ httpStatus, success: false, message, error: message });
+const fail = (httpStatus, message, messageKey) => ({
+  httpStatus,
+  success: false,
+  message,
+  error: message,
+  ...(messageKey && { messageKey }),
+});
 
 /**
  * Frees `email` for the account `userid` when another non-guest User row
@@ -154,17 +160,23 @@ const syncUser = async (req, logger) => {
 
   // A still-valid token or a delayed login sync must never restore erased data.
   if (findUserResponse?.status === 'DELETED') {
-    return fail(403, 'Account deleted');
+    return fail(403, 'Account deleted', 'ACCOUNT_DELETED');
   }
 
   if (user == null) {
     return fail(404, 'User not found in Keycloak');
   }
 
-  // Ensure matrix_user_handle is set in Keycloak (backfill for pre-SPI users)
-  let matrixHandle = user.attributes?.matrix_user_handle?.[0] || null;
-  if (!matrixHandle) {
-    matrixHandle = computeMatrixHandle(user.firstName, user.lastName, userid);
+  // Ensure matrix_user_handle is set in Keycloak (backfill for pre-SPI users).
+  // A handle Hasura already stores wins over a freshly computed one: Hasura
+  // keeps its handle below, and account deletion deactivates that one, so
+  // Keycloak must end up with the same handle.
+  const keycloakHandle = user.attributes?.matrix_user_handle?.[0] || null;
+  const matrixHandle =
+    keycloakHandle ||
+    findUserResponse?.matrixUserHandle ||
+    computeMatrixHandle(user.firstName, user.lastName, userid);
+  if (!keycloakHandle) {
     try {
       await kcAdminClient.users.update(
         { id: userid },
@@ -208,7 +220,7 @@ const syncUser = async (req, logger) => {
       });
       // The account was deleted after the status check above.
       if (response.update_User.affected_rows === 0) {
-        return fail(403, 'Account deleted');
+        return fail(403, 'Account deleted', 'ACCOUNT_DELETED');
       }
     }
   } catch (error) {
