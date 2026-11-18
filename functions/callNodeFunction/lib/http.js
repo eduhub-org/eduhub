@@ -83,15 +83,18 @@ export const request = async (method, url, body, options = {}) => {
 };
 
 /**
- * True for a failure before any HTTP response arrived (connection refused or
- * reset, DNS, timeout), the cases worth retrying.
+ * True for a network failure without an HTTP error response (connection
+ * refused or reset, DNS, timeout), the cases worth retrying. This includes a
+ * socket reset while the response body is read: undici then rejects
+ * `response.text()` with `TypeError('terminated')`.
  * @param {any} error
  */
 export const isNetworkError = (error) =>
   !error?.response &&
   (error?.name === 'TimeoutError' ||
     error?.name === 'AbortError' ||
-    (error instanceof TypeError && error.message === 'fetch failed'));
+    (error instanceof TypeError &&
+      (error.message === 'fetch failed' || error.message === 'terminated')));
 
 export const http = {
   /** @param {string} url @param {HttpOptions} [options] */

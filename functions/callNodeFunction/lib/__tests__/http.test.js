@@ -72,4 +72,20 @@ describe('isNetworkError', () => {
     expect(isNetworkError(new HttpError(502, null))).toBe(false);
     expect(isNetworkError(new Error('other'))).toBe(false);
   });
+
+  it('is true for a socket reset while the body is read', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      status: 200,
+      headers: new Headers(),
+      text: async () => {
+        throw new TypeError('terminated');
+      },
+    });
+    const error = await http.get('https://x.test').catch((e) => e);
+    expect(isNetworkError(error)).toBe(true);
+    const withResponse = Object.assign(new TypeError('terminated'), {
+      response: { status: 502, data: null },
+    });
+    expect(isNetworkError(withResponse)).toBe(false);
+  });
 });
