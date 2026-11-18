@@ -72,11 +72,25 @@ Remove them in the release after the split, once the gate holds.
 - [ ] Drop the duplicate `send_mail_cloud_function_secret` grant from state
       only, never destroy it (it shares the binding with
       `call_python_function_cloud_secret_access` and
-      `call_node_function_cloud_function_secret`): once the workspaces run
-      Terraform >= 1.7, replace its resource with a `removed` block
-      (`lifecycle { destroy = false }`); until then
-      `terraform state rm google_secret_manager_secret_iam_member.send_mail_cloud_function_secret`
-      together with deleting the resource.
+      `call_node_function_cloud_function_secret`). Destroying it in any one
+      workspace revokes the shared grant there, so treat both workspaces as
+      one change:
+      - **Terraform >= 1.7 in both workspaces:** replace the resource with a
+        `removed` block (`lifecycle { destroy = false }`); the next apply in
+        each workspace forgets it without touching the grant.
+      - **Until then (Terraform 1.3):**
+        1. Pause applies in `eduhub-application-staging` and
+           `eduhub-application-production` (lock the workspaces / hold
+           merges to `staging` and `production`), so no run re-adds the
+           entry from the still-declared resource.
+        2. In each workspace run
+           `terraform state rm google_secret_manager_secret_iam_member.send_mail_cloud_function_secret`.
+        3. Verify with `terraform state list | grep send_mail_cloud_function_secret`
+           that it is gone in **both** workspaces.
+        4. Only then merge the deletion of the resource declaration and let
+           it reach both workspaces; their plans must show no change for
+           the grant.
+        5. Unlock the workspaces / resume applies.
 - [ ] Consider: the default compute account's `formbricks_api_key` grant in
       `01_secrets.tf` has no reader (no Cloud Run service sets
       FORMBRICKS_API_KEY; callNodeFunction reads it through the shared
