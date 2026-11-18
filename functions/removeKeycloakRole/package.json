@@ -10,8 +10,8 @@
     "graphql-request": "6.1.0"
   },
   "devDependencies": {
-    "npm-watch": "^0.6.0",
-    "@google-cloud/functions-framework": "^3.1.2"
+    "@google-cloud/functions-framework": "^5.0.5",
+    "npm-watch": "^0.13.0"
   },
   "watch": {
     "start": "*.js"
@@ -19,5 +19,9 @@
   "scripts": {
     "watch": "npm-watch start",
     "start": "npx @google-cloud/functions-framework --target=removeKeycloakRole"
+  },
+  "overrides": {
+    "minimatch": "^11.0.1",
+    "uuid": "^11.1.1"
   }
 }
