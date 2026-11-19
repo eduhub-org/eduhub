@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime, timedelta, timezone
-from api_clients import EduHubClient
+from api_clients import EduHubClient, HasuraQueryError
 from pythonFunctions.limesurvey_location_mapping import LIMESURVEY_LOCATION_MAPPING
 
 
@@ -53,13 +53,13 @@ def update_enrollment_locations(arguments):
         }
         """
         
-        sessions_result = eduhub_client.send_query(
-            sessions_query,
-            {"timeThreshold": time_threshold}
-        )
-        
-        if sessions_result.get("data") is None:
-            error_msg = f"Failed to query sessions: {sessions_result}"
+        try:
+            sessions_result = eduhub_client.send_query(
+                sessions_query,
+                {"timeThreshold": time_threshold}
+            )
+        except HasuraQueryError as error:
+            error_msg = f"Failed to query sessions: {error}"
             logging.error(error_msg)
             return {
                 "success": False,
@@ -101,13 +101,13 @@ def update_enrollment_locations(arguments):
         }
         """
         
-        enrollments_result = eduhub_client.send_query(
-            enrollments_query,
-            {"courseIds": course_ids}
-        )
-        
-        if enrollments_result.get("data") is None:
-            error_msg = f"Failed to query enrollments: {enrollments_result}"
+        try:
+            enrollments_result = eduhub_client.send_query(
+                enrollments_query,
+                {"courseIds": course_ids}
+            )
+        except HasuraQueryError as error:
+            error_msg = f"Failed to query enrollments: {error}"
             logging.error(error_msg)
             return {
                 "success": False,
@@ -146,13 +146,13 @@ def update_enrollment_locations(arguments):
         }
         """
         
-        attendances_result = eduhub_client.send_query(
-            attendances_query,
-            {"courseIds": course_ids}
-        )
-        
-        if attendances_result.get("data") is None:
-            error_msg = f"Failed to query attendances: {attendances_result}"
+        try:
+            attendances_result = eduhub_client.send_query(
+                attendances_query,
+                {"courseIds": course_ids}
+            )
+        except HasuraQueryError as error:
+            error_msg = f"Failed to query attendances: {error}"
             logging.error(error_msg)
             return {
                 "success": False,
@@ -273,14 +273,21 @@ def update_enrollment_locations(arguments):
             }
             """
             
-            result = eduhub_client.send_query(
-                update_mutation,
-                {
-                    "enrollmentId": update["enrollment_id"],
-                    "location": update["location"]
-                }
-            )
-            
+            try:
+                result = eduhub_client.send_query(
+                    update_mutation,
+                    {
+                        "enrollmentId": update["enrollment_id"],
+                        "location": update["location"]
+                    }
+                )
+            except HasuraQueryError as error:
+                # One failed update must not stop the others.
+                logging.error(
+                    f"Failed to update enrollment {update['enrollment_id']}: {error}"
+                )
+                continue
+
             if result.get("data") and result["data"].get("update_CourseEnrollment"):
                 affected_rows = result["data"]["update_CourseEnrollment"]["affected_rows"]
                 if affected_rows > 0:

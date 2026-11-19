@@ -1,12 +1,16 @@
 {
   "name": "send-mail",
   "version": "0.1.0",
+  "engines": {
+    "node": ">=22 <23"
+  },
+  "type": "module",
   "dependencies": {
     "form-data": "^4.0.6",
     "mailgun.js": "^10.4.0"
   },
   "devDependencies": {
-    "@google-cloud/functions-framework": "^3.4.5",
+    "@google-cloud/functions-framework": "^5.0.5",
     "npm-watch": "^0.13.0"
   },
   "watch": {
@@ -14,6 +18,10 @@
   },
   "scripts": {
     "watch": "npm-watch start",
-    "start": "npx @google-cloud/functions-framework --port 42019 --target=sendMail"
+    "start": "npx @google-cloud/functions-framework --target=sendMail"
+  },
+  "overrides": {
+    "minimatch": "^11.0.1",
+    "uuid": "^11.1.1"
   }
 }

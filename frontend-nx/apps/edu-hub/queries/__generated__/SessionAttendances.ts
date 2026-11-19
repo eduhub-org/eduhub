@@ -42,9 +42,9 @@ export interface SessionAttendances_Attendance {
    */
   location: string | null;
   /**
-   * Key of the matched Attendance Record in Session.attendanceData (the pandas row index). NULL when nothing was matched. Each Attendance Record is matched to at most one Attendance.
+   * Keys of the matched Attendance Records in Session.attendanceData (the pandas row indexes), in join order. Several when one person left several Zoom records that were combined. NULL when nothing was matched. Each Attendance Record is matched to at most one Attendance.
    */
-  attendanceRecordIndex: number | null;
+  attendanceRecordIndexes: any | null;
   /**
    * Identifier from the external attendance source (Zoom, LimeSurvey, ...) that was used for — or was the closest candidate to — matching this Attendance row to the enrolled user. Contains the email when the source provided one, otherwise the recorded display name. NULL only when there was no attendance data at all for the session.
    */

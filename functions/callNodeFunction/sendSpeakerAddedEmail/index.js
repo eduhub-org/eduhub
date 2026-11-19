@@ -1,6 +1,8 @@
-import { gql, GraphQLClient } from 'graphql-request';
-import { createVariableReplacer } from '../emailTemplateVariables.js';
+import { gql } from 'graphql-request';
+import { createVariableReplacer } from '../lib/emailTemplateVariables.js';
 import { queueEmail } from '../lib/queueEmail.js';
+import { createHasuraClient } from '../lib/hasura.js';
+import * as config from '../lib/config.js';
 
 /**
  * Tells a person that they are listed as a speaker on a public course page.
@@ -95,11 +97,7 @@ export default async function sendSpeakerAddedEmail(req, logger) {
     const sessionSpeakerId = event.data.new.id;
     const actingUserId = event.session_variables?.['x-hasura-user-id'];
 
-    const client = new GraphQLClient(process.env.HASURA_ENDPOINT, {
-      headers: {
-        'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET,
-      },
-    });
+    const client = createHasuraClient();
 
     const request = async (document, variables) => {
       const controller = new AbortController();
@@ -158,7 +156,7 @@ export default async function sendSpeakerAddedEmail(req, logger) {
         user: User,
         course: Course ?? { title: Program.title },
         enrollment: {},
-        courseLink: Course ? undefined : process.env.FRONTEND_URL || 'https://edu.opencampus.sh',
+        courseLink: Course ? undefined : config.frontendUrl(),
       },
       () => ''
     );

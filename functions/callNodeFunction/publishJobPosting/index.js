@@ -1,6 +1,7 @@
 import Stripe from 'stripe';
 import { applyConditionalBlocks } from '../lib/conditionalBlocks.js';
-import { GraphQLClient, gql } from 'graphql-request';
+import { escapeHtml } from '../lib/html.js';
+import { gql } from 'graphql-request';
 
 import {
   buildInvoiceCreation,
@@ -19,6 +20,8 @@ import {
   loadInvoiceOrganization,
   normalizeBillingInput,
 } from './invoicePayment.js';
+import { createHasuraClient } from '../lib/hasura.js';
+import * as config from '../lib/config.js';
 
 /**
  * Single entry point for publishing a StuJo job posting (phase 4 of
@@ -211,14 +214,8 @@ const JOB_POSTING_TYPE_LABELS = {
   PERMANENT: 'Festanstellung',
 };
 
-export function escapeHtml(value) {
-  return String(value)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
+// Re-exported for the existing tests.
+export { escapeHtml };
 
 // Shared with the session-change mails; re-exported for the existing tests.
 export { applyConditionalBlocks };
@@ -308,9 +305,9 @@ export function formatJobPostingAmount(cents, currency) {
  * [#if:Invoice] block is dropped.
  */
 export function buildJobPostingMailVars(posting, { expiresAt, publishedAt, paymentDescription, invoice = null }) {
-  const frontendUrl = process.env.STUJO_FRONTEND_URL || process.env.FRONTEND_URL || '';
+  const frontendUrl = config.stujoFrontendUrl() || '';
   // The job board admin UI lives in the edu-hub app, not the stujo app.
-  const adminAppUrl = process.env.FRONTEND_URL || frontendUrl;
+  const adminAppUrl = config.env('FRONTEND_URL') || frontendUrl;
   const vatRate =
     invoice && invoice.netTotal > 0
       ? String(Math.round((invoice.vatTotal / invoice.netTotal) * 100))
@@ -338,7 +335,7 @@ export function buildJobPostingMailVars(posting, { expiresAt, publishedAt, payme
     '[Invoice:HostedUrl]': invoice?.hostedUrl || '',
     '[Invoice:PaymentStatus]': invoice ? (invoice.paid ? 'bezahlt' : 'Zahlung ausstehend') : '',
     // Absolute: this is read in an email, where a relative path is dead.
-    '[Legal:TermsUrl]': process.env.STUJO_TERMS_URL || `${frontendUrl}/agb`,
+    '[Legal:TermsUrl]': config.env('STUJO_TERMS_URL') || `${frontendUrl}/agb`,
   };
 }
 
@@ -381,7 +378,7 @@ export async function publishAndNotify(client, logger, posting, durationDays) {
       posting.id
     );
   }
-  const adminMail = process.env.STUJO_ADMIN_EMAIL;
+  const adminMail = config.env('STUJO_ADMIN_EMAIL');
   if (adminMail) {
     await sendJobPostingMail(
       client,
@@ -484,12 +481,12 @@ async function publishByInvoice({
       // The posting is live but the invoice is not finalized: needs a human,
       // not a retry that would publish (and bill) a second time. Not deduped
       // on the posting, so an earlier publication's notice cannot swallow it.
-      if (process.env.STUJO_ADMIN_EMAIL) {
+      if (config.env('STUJO_ADMIN_EMAIL')) {
         await sendJobPostingMail(
           client,
           logger,
           'JOB_POSTING_ADMIN_NOTICE',
-          process.env.STUJO_ADMIN_EMAIL,
+          config.env('STUJO_ADMIN_EMAIL'),
           buildJobPostingMailVars(posting, {
             expiresAt: published.expiresAt,
             publishedAt: published.publishedAt,
@@ -586,12 +583,12 @@ async function publishByInvoice({
         : null
     );
   }
-  if (process.env.STUJO_ADMIN_EMAIL) {
+  if (config.env('STUJO_ADMIN_EMAIL')) {
     await sendJobPostingMail(
       client,
       logger,
       'JOB_POSTING_ADMIN_NOTICE',
-      process.env.STUJO_ADMIN_EMAIL,
+      config.env('STUJO_ADMIN_EMAIL'),
       vars,
       null,
       { ...flags, InvoicePdf: false },
@@ -622,9 +619,7 @@ export default async function publishJobPosting(req, logger) {
       return { success: false, error: 'Missing authenticated session user', messageKey: 'UNAUTHORIZED' };
     }
 
-    const client = new GraphQLClient(process.env.HASURA_ENDPOINT, {
-      headers: { 'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET },
-    });
+    const client = createHasuraClient();
 
     const data = await client.request(GET_POSTING, { id: jobPostingId });
     const posting = data.JobPosting_by_pk;
@@ -756,11 +751,11 @@ export default async function publishJobPosting(req, logger) {
       billing = normalized.billing;
     }
 
-    const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+    const stripeSecretKey = config.stripeSecretKey();
     if (!stripeSecretKey) {
       return { success: false, error: 'Stripe secret key not configured', messageKey: 'STRIPE_NOT_CONFIGURED' };
     }
-    const frontendUrl = process.env.STUJO_FRONTEND_URL || process.env.FRONTEND_URL;
+    const frontendUrl = config.stujoFrontendUrl();
     if (!frontendUrl) {
       return { success: false, error: 'Frontend URL not configured', messageKey: 'FRONTEND_URL_NOT_CONFIGURED' };
     }
@@ -803,7 +798,7 @@ export default async function publishJobPosting(req, logger) {
     // account); when unset we find-or-create the matching rate on the fly,
     // mirroring the course checkout flow so no manual bootstrap step is
     // required. The createStripeJobPostingPrices action creates the same rate.
-    let taxRateId = process.env.STRIPE_TAX_RATE_ID || null;
+    let taxRateId = config.stripeTaxRateId();
     if (!taxRateId) {
       taxRateId = await getOrCreateTaxRate(stripe, 19, false, logger);
     }
@@ -816,7 +811,7 @@ export default async function publishJobPosting(req, logger) {
     // The platform organization sells the posting; its invoice footer and
     // tax notes go onto the Stripe invoice (production review 2026-07-11).
     let sellerOrganization = null;
-    const sellerOrgId = Number.parseInt(process.env.STUJO_SELLER_ORGANIZATION_ID || '', 10);
+    const sellerOrgId = Number.parseInt(config.env('STUJO_SELLER_ORGANIZATION_ID') || '', 10);
     if (Number.isInteger(sellerOrgId)) {
       try {
         const sellerData = await client.request(

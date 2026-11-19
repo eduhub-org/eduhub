@@ -1,5 +1,6 @@
-import { GraphQLClient } from 'graphql-request';
 import { validateAndExtractFormbricksSurvey } from '../lib/formbricks.js';
+import { createHasuraClient } from '../lib/hasura.js';
+import * as config from '../lib/config.js';
 
 const UPDATE_COURSE_FORMBRICKS_SURVEY = `
   mutation UpdateCourseFormbricksSurvey($courseId: Int!, $surveyUrl: String) {
@@ -19,14 +20,6 @@ const parseActionInput = (req) => {
     itemId: payload.itemId,
     text: payload.text,
   };
-};
-
-const buildHasuraClient = () => {
-  return new GraphQLClient(process.env.HASURA_ENDPOINT, {
-    headers: {
-      'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET,
-    },
-  });
 };
 
 const updateCourseSurveyUrl = async (client, courseId, surveyUrl) => {
@@ -99,7 +92,7 @@ export default async function saveCourseFormbricksEnrollmentSurvey(req, logger) 
       };
     }
 
-    if (!process.env.HASURA_ENDPOINT || !process.env.HASURA_ADMIN_SECRET) {
+    if (!config.env('HASURA_ENDPOINT') || !config.env('HASURA_ADMIN_SECRET')) {
       logger.error('Hasura endpoint/admin secret missing');
       return {
         success: false,
@@ -109,7 +102,7 @@ export default async function saveCourseFormbricksEnrollmentSurvey(req, logger) 
     }
 
     const normalizedInput = typeof text === 'string' ? text.trim() : '';
-    const hasuraClient = buildHasuraClient();
+    const hasuraClient = createHasuraClient();
 
     if (!normalizedInput) {
       const updatedCourse = await updateCourseSurveyUrl(hasuraClient, courseId, null);
@@ -132,9 +125,9 @@ export default async function saveCourseFormbricksEnrollmentSurvey(req, logger) 
     const surveyParts = validateAndExtractFormbricksSurvey(normalizedInput, logger);
     if (!surveyParts) {
       const hasTrustedOrigins = !!(
-        process.env.FORMBRICKS_API_URL ||
-        process.env.FORMBRICKS_BASE_URL ||
-        process.env.FORMBRICKS_TRUSTED_ORIGINS
+        config.env('FORMBRICKS_API_URL') ||
+        config.env('FORMBRICKS_BASE_URL') ||
+        config.formbricksTrustedOrigins()
       );
 
       return {
@@ -146,7 +139,7 @@ export default async function saveCourseFormbricksEnrollmentSurvey(req, logger) 
       };
     }
 
-    const formbricksApiKey = process.env.FORMBRICKS_API_KEY;
+    const formbricksApiKey = config.formbricksApiKey();
     if (!formbricksApiKey) {
       logger.error('Formbricks API key missing');
       return {

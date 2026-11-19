@@ -1,0 +1,159 @@
+name: Code Checks functions
+
+# Unit tests and errors-only lint for the serverless functions in functions/.
+# Also called (workflow_call) by build-staging-infrastructure.yml and
+# build-production-infrastructure.yml, so a red check blocks packaging and
+# deploying the cloud function zips.
+
+on:
+  push:
+    paths:
+      - functions/**
+      # callNodeFunction's registry test checks the function names here.
+      - backend/metadata/**
+      - .github/workflows/functions-code-checks.yml
+    branches:
+      - develop
+      - staging
+      - production
+  pull_request:
+    paths:
+      - functions/**
+      # callNodeFunction's registry test checks the function names here.
+      - backend/metadata/**
+      - .github/workflows/functions-code-checks.yml
+    branches:
+      - develop
+      - staging
+      - production
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  node:
+    name: Node tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: functions
+    steps:
+      - name: Harden the runner
+        uses: step-security/harden-runner@1d88384fd173af6ecb012dfd0264a306b711241a # v2.22.4
+        with:
+          egress-policy: audit
+
+      - name: Checkout project
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22.x
+
+      # Every Node unit commits its own package-lock.json (Cloud Functions
+      # builds each zip on its own, so there is no shared root lockfile).
+      # Install all of them, so a broken lockfile in any deployed unit fails
+      # here. sendMail's suites run under callNodeFunction's Jest config
+      # (roots include ../sendMail) and need sendMail's own dependencies.
+      # Units with a `source` field are built from another unit's directory.
+      - name: Install dependencies of every Node unit (functions/units.json)
+        run: |
+          set -euo pipefail
+          jq -r '.[] | select(.runtime == "node" and (has("source") | not)) | .name' units.json |
+            while read -r unit; do
+              echo "::group::npm ci (${unit})"
+              (cd "${unit}" && npm ci --no-audit --no-fund)
+              echo "::endgroup::"
+            done
+
+      - name: Jest (callNodeFunction + sendMail)
+        working-directory: functions/callNodeFunction
+        run: npm test
+
+      # JSDoc type check of the dispatcher and typed lib/ modules. TypeScript
+      # is pinned here, not added to the unit's dependencies.
+      - name: tsc (callNodeFunction, checkJs)
+        working-directory: functions/callNodeFunction
+        run: npx --yes -p typescript@5.9.3 tsc -p tsconfig.json
+
+      - name: node --test (functions/shared)
+        run: node --test 'shared/*.test.js'
+
+  python:
+    name: Python tests (${{ matrix.unit }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        unit: [callPythonFunction, apiProxy]
+    defaults:
+      run:
+        working-directory: functions/${{ matrix.unit }}
+    steps:
+      - name: Harden the runner
+        uses: step-security/harden-runner@1d88384fd173af6ecb012dfd0264a306b711241a # v2.22.4
+        with:
+          egress-policy: audit
+
+      - name: Checkout project
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      # Matches the Cloud Functions runtime (python311).
+      - name: Use Python 3.11
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: functions/${{ matrix.unit }}/requirements*.txt
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements-dev.txt
+
+      - name: pytest
+        run: python -m pytest __tests__
+
+  lint:
+    name: Lint (ESLint + ruff, errors only)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: functions
+    steps:
+      - name: Harden the runner
+        uses: step-security/harden-runner@1d88384fd173af6ecb012dfd0264a306b711241a # v2.22.4
+        with:
+          egress-policy: audit
+
+      - name: Checkout project
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22.x
+
+      - name: Use Python 3.11
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.11"
+
+      # Linters are pinned here, not added to any unit's dependencies.
+      - name: ESLint (functions/eslint.config.mjs)
+        run: npx --yes eslint@10.14.0 .
+
+      - name: Install ruff
+        run: python -m pip install ruff==0.17.3
+
+      - name: ruff (functions/ruff.toml)
+        run: ruff check --output-format=github .

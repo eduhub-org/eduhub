@@ -62,19 +62,29 @@ describe('assignRecordsToParticipants', () => {
     const result = assignRecordsToParticipants(
       [{ _idx: '0', name: 'Christine' }, { _idx: '1', name: 'Mahmoud' }],
       [
-        { source: 'ZOOM', attendanceRecordIndex: 0, recordedIdentifier: 'Christine', matchType: 'PARTIAL_NAME', User: user('Christine', 'Avery') },
-        { source: 'INSTRUCTOR', attendanceRecordIndex: null, recordedIdentifier: null, matchType: null, User: user('Rawand', 'Mahmood') },
+        { source: 'ZOOM', attendanceRecordIndexes: [0], recordedIdentifier: 'Christine', matchType: 'PARTIAL_NAME', User: user('Christine', 'Avery') },
+        { source: 'INSTRUCTOR', attendanceRecordIndexes: null, recordedIdentifier: null, matchType: null, User: user('Rawand', 'Mahmood') },
       ]
     );
     expect(result).toEqual({ '0': 'Christine Avery' });
+  });
+
+  it('assigns every record of a combined Attendance', () => {
+    const result = assignRecordsToParticipants(
+      [{ _idx: '0', name: 'Farid Khan' }, { _idx: '1', name: 'Omar Farid Ben Khan' }],
+      [
+        { source: 'ZOOM', attendanceRecordIndexes: [0, 1], recordedIdentifier: 'Farid Khan + Omar Farid Ben Khan', matchType: 'NAME', User: user('Omar Farid', 'Ben Khan') },
+      ]
+    );
+    expect(result).toEqual({ '0': 'Omar Farid Ben Khan', '1': 'Omar Farid Ben Khan' });
   });
 
   it('combines stored indexes with the identifier fallback in one session', () => {
     const result = assignRecordsToParticipants(
       [{ _idx: '0', name: 'Christine' }, { _idx: '1', name: 'Bob Builder' }],
       [
-        { source: 'ZOOM', attendanceRecordIndex: 0, recordedIdentifier: 'Christine', matchType: 'PARTIAL_NAME', User: user('Christine', 'Avery') },
-        { source: 'ZOOM', attendanceRecordIndex: null, recordedIdentifier: 'Bob Builder', matchType: 'NAME', User: user('Bob', 'Builder') },
+        { source: 'ZOOM', attendanceRecordIndexes: [0], recordedIdentifier: 'Christine', matchType: 'PARTIAL_NAME', User: user('Christine', 'Avery') },
+        { source: 'ZOOM', attendanceRecordIndexes: null, recordedIdentifier: 'Bob Builder', matchType: 'NAME', User: user('Bob', 'Builder') },
       ]
     );
     expect(result).toEqual({ '0': 'Christine Avery', '1': 'Bob Builder' });
@@ -84,8 +94,8 @@ describe('assignRecordsToParticipants', () => {
     const result = assignRecordsToParticipants(
       [{ _idx: '0', name: 'Work Laptop', email: 'jane@example.com' }, { _idx: '1', name: 'Bob Builder' }],
       [
-        { source: 'ZOOM', attendanceRecordIndex: null, recordedIdentifier: 'jane@example.com', matchType: 'EMAIL', User: user('Jane', 'Doe') },
-        { source: 'ZOOM', attendanceRecordIndex: null, recordedIdentifier: 'Bob Builder', matchType: 'NONE', User: user('Bob', 'Smith') },
+        { source: 'ZOOM', attendanceRecordIndexes: null, recordedIdentifier: 'jane@example.com', matchType: 'EMAIL', User: user('Jane', 'Doe') },
+        { source: 'ZOOM', attendanceRecordIndexes: null, recordedIdentifier: 'Bob Builder', matchType: 'NONE', User: user('Bob', 'Smith') },
       ]
     );
     expect(result).toEqual({ '0': 'Jane Doe' });

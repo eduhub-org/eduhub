@@ -11,7 +11,7 @@ import { Card } from '../../../common/Card';
 import { useRoleQuery } from '../../../../hooks/authedQuery';
 import {
   DELETE_MANUAL_ATTENDANCES,
-  INSERT_SINGLE_ATTENDANCE,
+  SET_MANUAL_ATTENDANCE,
   REMOVE_ACHIEVEMENT_CERTIFICATES,
   REMOVE_ATTENDANCE_CERTIFICATES,
 } from '../../../../queries/courseEnrollment';
@@ -36,9 +36,9 @@ import {
   CourseParticipationsVariables,
 } from '../../../../queries/__generated__/CourseParticipations';
 import {
-  InsertSingleAttendance,
-  InsertSingleAttendanceVariables,
-} from '../../../../queries/__generated__/InsertSingleAttendance';
+  SetManualAttendance,
+  SetManualAttendanceVariables,
+} from '../../../../queries/__generated__/SetManualAttendance';
 import { ManagedCourse_Course_by_pk } from '../../../../queries/__generated__/ManagedCourse';
 import {
   AttendanceStatus_enum,
@@ -252,8 +252,8 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
   // A page is settled only when its participants and attendance data are ready.
   const isPageLoading = loading || attendanceLoading;
 
-  const [insertAttendance] = useRoleMutation<InsertSingleAttendance, InsertSingleAttendanceVariables>(
-    INSERT_SINGLE_ATTENDANCE
+  const [setManualAttendance] = useRoleMutation<SetManualAttendance, SetManualAttendanceVariables>(
+    SET_MANUAL_ATTENDANCE
   );
   const [deleteManualAttendances] = useRoleMutation<DeleteManualAttendances, DeleteManualAttendancesVariables>(
     DELETE_MANUAL_ATTENDANCES
@@ -267,7 +267,7 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
   const { enrollmentsWithOverrides, handleDotClick } = useOptimisticAttendance({
     enrollments,
     sessions,
-    insertAttendance,
+    setManualAttendance,
     deleteManualAttendances,
     refetchAttendances,
     onError: handleAttendanceError,

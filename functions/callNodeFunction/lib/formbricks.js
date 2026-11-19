@@ -1,3 +1,4 @@
+import * as config from './config.js';
 /**
  * Builds a map of questionId -> { normalizedLabel -> choiceId } from survey elements.
  * Used for matching Formbricks response labels (which vary by language) to choice IDs.
@@ -166,8 +167,8 @@ export function validateAndExtractFormbricksSurvey(surveyUrl, logger) {
 
     // 2. Validate against trusted origins
     const trustedOrigins = [];
-    if (process.env.FORMBRICKS_TRUSTED_ORIGINS) {
-      const origins = process.env.FORMBRICKS_TRUSTED_ORIGINS.split(',').map(o => o.trim()).filter(Boolean);
+    if (config.formbricksTrustedOrigins()) {
+      const origins = config.formbricksTrustedOrigins().split(',').map(o => o.trim()).filter(Boolean);
       for (const origin of origins) {
         try {
           const trustedUrl = new URL(origin);
@@ -177,7 +178,7 @@ export function validateAndExtractFormbricksSurvey(surveyUrl, logger) {
         }
       }
     }
-    const formbricksUrl = process.env.FORMBRICKS_API_URL || process.env.FORMBRICKS_BASE_URL;
+    const formbricksUrl = config.formbricksApiUrl();
     if (formbricksUrl) {
       try {
         const trustedUrl = new URL(formbricksUrl);

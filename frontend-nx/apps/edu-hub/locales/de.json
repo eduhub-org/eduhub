@@ -408,7 +408,8 @@
       "program_session_tooltip": "Findet für alle Kurse von „{program}“ statt",
       "program_session_tooltip_event": "Findet für alle Events von „{program}“ statt",
       "untitled_session": "Programmpunkt",
-      "add_to_calendar_short": "Kalender"
+      "add_to_calendar_short": "Kalender",
+      "zoom_name_hint": "Tritt Zoom mit dem Namen bei, mit dem Du hier angemeldet bist, sonst wird Deine Teilnahme nicht erkannt."
     },
     "attendances": {
       "attendances": "Anwesenheiten",

@@ -1,8 +1,8 @@
-import { GraphQLClient, gql } from 'graphql-request';
+import { gql } from 'graphql-request';
 
 import { addKeycloakClientRole } from '../lib/keycloakClientRole.js';
 import { queueEmail } from '../lib/queueEmail.js';
-import { createOrganizationClaimVariableReplacer } from '../emailTemplateVariables.js';
+import { createOrganizationClaimVariableReplacer } from '../lib/emailTemplateVariables.js';
 import {
   CLAIM_NEW_ORGANIZATION,
   FIND_ORGANIZATION_CANDIDATES,
@@ -14,6 +14,8 @@ import {
   resolveContactEmail,
   verificationLabel,
 } from '../lib/jobOrganizationClaim.js';
+import { createHasuraClient } from '../lib/hasura.js';
+import * as config from '../lib/config.js';
 
 /**
  * Self-service claim of job-offer management for an organization.
@@ -179,7 +181,7 @@ async function notifyClaim(
   // the review signal that makes an instant grant acceptable. So the platform address, which only
   // the deployment can set, is always copied in when it is configured and is not already the
   // recipient — whatever portal the caller names, the responsible mailbox learns of the claim.
-  const platformEmail = process.env.STUJO_ADMIN_EMAIL || null;
+  const platformEmail = config.stujoAdminEmail();
   const contactEmail = await resolveContactEmail(client, portalAppName, logger);
   if (!contactEmail) {
     logger.warn('No StuJo contact address configured, claim notification skipped', {
@@ -252,9 +254,7 @@ export default async function claimJobOrganization(req, logger) {
       };
     }
 
-    const client = new GraphQLClient(process.env.HASURA_ENDPOINT, {
-      headers: { 'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET },
-    });
+    const client = createHasuraClient();
 
     const claimer = (await client.request(GET_CLAIMER, { userId: sessionUserId }))?.User_by_pk;
     if (!claimer) {

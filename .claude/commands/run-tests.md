@@ -27,7 +27,7 @@ between this environment failure and an actual assertion failure.
 ## Conventions
 
 - Co-locate tests next to source: `MyComponent.tsx` ↔ `MyComponent.test.tsx`.
-- Function tests live under `functions/<name>/__tests__/`.
+- Function tests: see "Serverless functions" below.
 - Prefer `screen.getByRole(...)` over `getByTestId(...)`.
 - Mock externals (`next-auth/react`, `next-intl`, role-aware GraphQL hooks)
   explicitly; reset with `jest.clearAllMocks()` in `beforeEach`.
@@ -35,6 +35,26 @@ between this environment failure and an actual assertion failure.
   of `{ request, result }` mocks; set `addTypename={false}` unless you need it.
 - Test observable behavior (what the user sees / can do), not internal
   implementation details.
+
+## Serverless functions
+
+`functions/callNodeFunction` has its own Jest setup (it also runs
+`functions/sendMail/__tests__`):
+
+```bash
+cd functions/sendMail && npm ci
+cd ../callNodeFunction && npm ci && npm test
+npm test -- publishJobPosting          # filter by path
+```
+
+Layout (jest only matches `**/__tests__/**/*.test.js`):
+- `<handler>/__tests__/*.test.js` for a handler,
+- `lib/__tests__/*.test.js` for shared helpers,
+- root `__tests__/` only for the dispatcher (`index.js`, incl. the registry
+  check against Hasura metadata).
+
+`functions/shared/*.test.js` run with `node --test 'shared/*.test.js'` from
+`functions/`.
 
 ## Sample pattern
 

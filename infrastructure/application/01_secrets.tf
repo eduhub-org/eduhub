@@ -330,6 +330,11 @@ resource "google_secret_manager_secret_version" "matrix_synapse_admin_token" {
 
 # =========================================================================================
 # IAM bindings for default compute engine service account
+#
+# The Cloud Run services (Keycloak, Hasura, edu, StuJo) run as this account.
+# The cloud functions do not any more: each has a dedicated account or the
+# shared custom_cloud_function_account (06_cloud-functions.tf), so a secret
+# only a function reads (HASURA_MAIL_PW, MAILGUN_API_KEY) is not granted here.
 # =========================================================================================
 resource "google_secret_manager_secret_iam_member" "nextauth_secret" {
   secret_id  = google_secret_manager_secret.nextauth_secret.id
@@ -378,20 +383,6 @@ resource "google_secret_manager_secret_iam_member" "cloud_function" {
   role       = "roles/secretmanager.secretAccessor"
   member     = "serviceAccount:${data.google_project.eduhub.number}-compute@developer.gserviceaccount.com"
   depends_on = [google_secret_manager_secret.cloud_function]
-}
-
-resource "google_secret_manager_secret_iam_member" "hasura_mail_pw" {
-  secret_id  = google_secret_manager_secret.hasura_mail_pw.id
-  role       = "roles/secretmanager.secretAccessor"
-  member     = "serviceAccount:${data.google_project.eduhub.number}-compute@developer.gserviceaccount.com"
-  depends_on = [google_secret_manager_secret.hasura_mail_pw]
-}
-
-resource "google_secret_manager_secret_iam_member" "mailgun_api_key" {
-  secret_id  = google_secret_manager_secret.mailgun_api_key.id
-  role       = "roles/secretmanager.secretAccessor"
-  member     = "serviceAccount:${data.google_project.eduhub.number}-compute@developer.gserviceaccount.com"
-  depends_on = [google_secret_manager_secret.mailgun_api_key]
 }
 
 resource "google_secret_manager_secret_iam_member" "formbricks_api_key" {

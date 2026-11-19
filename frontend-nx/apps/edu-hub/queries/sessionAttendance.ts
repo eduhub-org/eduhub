@@ -9,7 +9,7 @@ export const SESSION_ATTENDANCES = gql`
       status
       source
       location
-      attendanceRecordIndex
+      attendanceRecordIndexes
       recordedIdentifier
       matchType
       User {

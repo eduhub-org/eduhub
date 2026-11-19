@@ -1,6 +1,4 @@
-import winston from "winston";
-import { createRequire } from "node:module";
-import createCertificate from "./createCertificate/index.js";
+// @ts-check
 import getSignedUrl from "./getSignedUrl/index.js";
 import saveFile from "./saveFile/index.js";
 import saveImage from "./saveImage/index.js";
@@ -53,53 +51,81 @@ import manageTestEnrollment from "./manageTestEnrollment/index.js";
 import syncRausgegangenEvent from "./syncRausgegangenEvent/index.js";
 import searchRausgegangenLocations from "./searchRausgegangenLocations/index.js";
 import geocodeLocationAddress from "./geocodeLocationAddress/index.js";
+import updateFromKeycloak from "./updateFromKeycloak/index.js";
+import addKeycloakRole from "./addKeycloakRole/index.js";
+import removeKeycloakRole from "./removeKeycloakRole/index.js";
+import sendQuestionaires from "./sendQuestionaires/index.js";
 import syncExpertEmbeddings from "./syncExpertEmbeddings/index.js";
 import semanticExpertSearch from "./semanticExpertSearch/index.js";
+import { createDispatcher } from "./lib/dispatcher.js";
 
-const require = createRequire(import.meta.url);
-let constantTimeSecretsEqual;
-try {
-  ({ constantTimeSecretsEqual } = require("./shared_libs/node/security.cjs"));
-} catch {
-  ({ constantTimeSecretsEqual } = require("../shared_libs/node/security.cjs"));
-}
+// Handlers by the `Function-Name` (legacy: `name`) header Hasura sends, one map
+// per unit. Static imports on purpose: a Cloud Functions entry point must be
+// resolvable without scanning folders. __tests__/registry.test.js checks the
+// maps against the handler folders and the Hasura metadata.
+//
+// All three units deploy this same code (callNodeFunction.zip) with a
+// different entry point; what separates them is the secrets Terraform gives
+// each one (docs/adr/0002-function-units-by-secret-scope.md). Put a handler in
+// the unit that holds the credentials it needs.
 
 /**
- * Creates a logger instance with structured logging.
+ * Keycloak and Matrix accounts: everything that needs the Keycloak admin
+ * login or a Matrix token.
+ * @type {Record<string, import('./lib/types.js').Handler>}
  */
-export const logger = winston.createLogger({
-  level: process.env.ENVIRONMENT === "production" ? "info" : "debug",
-  format: winston.format.combine(
-    winston.format.timestamp(),
-    winston.format.errors({ stack: true }),
-    winston.format.splat(),
-    winston.format.json()  // Changed to JSON format for better structured logging
-  ),
-  transports: [
-    new winston.transports.Console(),
-    new winston.transports.File({ filename: "error.log", level: "error" }),
-    new winston.transports.File({ filename: "combined.log" }),
-  ],
-});
-
-const functionMap = {
-  createCertificate,
-  getSignedUrl,
-  saveFile,
-  saveImage,
-  anonymizeUser,
-  deleteMyAccount,
+export const identityHandlers = {
+  createUser,
   updateKeycloakUser,
   updateAdminUser,
   getAdminUsers,
+  claimJobOrganization,
+  anonymizeUser,
+  deleteMyAccount,
+  createMatrixRoom,
+  syncProgramInstructorMatrixRoom,
+  updateMatrixInstructorPowerLevel,
+  updateFromKeycloak,
+  addKeycloakRole,
+  removeKeycloakRole,
+};
+
+/**
+ * Identity actions whose handler follows the action name instead of the
+ * routing header, because the action forwards client headers (see
+ * pinnedActions in lib/dispatcher.js).
+ * @type {Record<string, string>}
+ */
+export const identityPinnedActions = {
+  updateFromKeycloak: "updateFromKeycloak",
+};
+
+/**
+ * Files in the storage bucket: uploads, image resizing, signed URLs. Hasura
+ * and storage only, with more memory for sharp.
+ * @type {Record<string, import('./lib/types.js').Handler>}
+ */
+export const mediaHandlers = {
+  saveFile,
+  saveImage,
+  saveOrganizationLogo,
+  removeOrganizationLogo,
+  getSignedUrl,
+  makeCertificatePublic,
+};
+
+/**
+ * Everything else: enrollment, guest registration, Formbricks, Stripe, job
+ * postings, mails and syncs.
+ * @type {Record<string, import('./lib/types.js').Handler>}
+ */
+export const callNodeFunctionHandlers = {
   sendEnrollmentEmail,
   sendOrganizerAddedEmail,
   sendInstructorCertificateEmail,
   sendSpeakerAddedEmail,
   sendCancellationRequestEmail,
   sendSessionReminders,
-  makeCertificatePublic,
-  createUser,
   getFormbricksResponses,
   syncFormbricksResponses,
   getFormbricksAddonSelections,
@@ -113,15 +139,9 @@ const functionMap = {
   sendPendingJobPostingMails,
   archiveJobPosting,
   setJobPostingActive,
-  claimJobOrganization,
   requestJobOrganizationAccess,
-  saveOrganizationLogo,
-  removeOrganizationLogo,
   updateOrganizationWebsite,
   createEnrollmentWithAddons,
-  createMatrixRoom,
-  updateMatrixInstructorPowerLevel,
-  syncProgramInstructorMatrixRoom,
   syncGhostNewsletterSubscription,
   copyProjectFromTemplate,
   setProjectDocumentationInstructionDefault,
@@ -137,173 +157,50 @@ const functionMap = {
   syncRausgegangenEvent,
   searchRausgegangenLocations,
   geocodeLocationAddress,
+  sendQuestionaires,
   syncExpertEmbeddings,
   semanticExpertSearch,
 };
 
-const constantTimeEquals = (providedSecret, expectedSecret) => {
-  return constantTimeSecretsEqual(providedSecret, expectedSecret);
-};
-
 /**
- * Validates the Hasura secret from the request headers.
- * @param {string} hasuraSecret - The secret from request headers
- * @returns {Object} Validation result
+ * Handlers that moved from callNodeFunction to identity or media and that
+ * callNodeFunction still routes for one release, so a Hasura revision or an
+ * event retry that still targets callNodeFunction's URL during the rollout
+ * does not get a 404. Remove with
+ * docs/plans/functions-topology-cleanup.md.
+ * @type {Record<string, import('./lib/types.js').Handler>}
  */
-const validateSecret = (hasuraSecret) => {
-  const hasuraCloudFunctionSecret = process.env.HASURA_CLOUD_FUNCTION_SECRET;
-
-  if (!hasuraCloudFunctionSecret || typeof hasuraCloudFunctionSecret !== "string" || hasuraCloudFunctionSecret.trim() === "") {
-    return {
-      isValid: false,
-      statusCode: 500,
-      error: {
-        success: false,
-        error: "Server secret is not configured.",
-        messageKey: "SERVER_MISCONFIGURED"
-      }
-    };
-  }
-
-  if (!hasuraSecret || typeof hasuraSecret !== "string") {
-    return {
-      isValid: false,
-      statusCode: 401,
-      error: {
-        success: false,
-        error: "Missing secret header.",
-        messageKey: "MISSING_SECRET"
-      }
-    };
-  }
-
-  if (!constantTimeEquals(hasuraSecret, hasuraCloudFunctionSecret)) {
-    return {
-      isValid: false,
-      statusCode: 401,
-      error: {
-        success: false,
-        error: "Invalid secret provided.",
-        messageKey: "INVALID_SECRET"
-      }
-    };
-  }
-  
-  return { isValid: true };
+export const movedHandlers = {
+  createUser,
+  updateKeycloakUser,
+  updateAdminUser,
+  getAdminUsers,
+  claimJobOrganization,
+  anonymizeUser,
+  deleteMyAccount,
+  createMatrixRoom,
+  syncProgramInstructorMatrixRoom,
+  updateMatrixInstructorPowerLevel,
+  saveFile,
+  saveImage,
+  saveOrganizationLogo,
+  removeOrganizationLogo,
+  getSignedUrl,
+  makeCertificatePublic,
 };
 
-/**
- * Returns a redacted summary of a response for safe logging (avoids persisting URLs, tokens, etc.).
- * @param {*} response - The raw response object
- * @returns {Object} Safe summary for logging
- */
-const redactForLogging = (response) => {
-  if (!response || typeof response !== "object") return { type: typeof response };
-  const summary = { success: response.success, messageKey: response.messageKey };
-  if (response.enrollmentId) summary.hasEnrollmentId = true;
-  if (response.checkoutUrl) summary.hasCheckoutUrl = true;
-  if (response.link) summary.hasLink = true;
-  if (response.filePath) summary.hasFilePath = true;
-  if (response.accessUrl) summary.hasAccessUrl = true;
-  if (response.sessionId) summary.hasSessionId = true;
-  if (response.selectedAddons) summary.addonCount = response.selectedAddons.length;
-  return summary;
-};
+/** Entry point of the callNodeFunction unit. */
+export const callNodeFunction = createDispatcher({
+  name: "callNodeFunction",
+  handlers: { ...callNodeFunctionHandlers, ...movedHandlers },
+});
 
-/**
- * Standardizes the response format by ensuring success flag is present.
- * @param {*} result - The function result
- * @returns {Object} Standardized response with success flag
- */
-const formatResponse = (result) => {
-  // If result already has success/error properties, return it directly
-  if (result && typeof result === 'object' && ('success' in result || 'error' in result)) {
-    return result;
-  }
-  // Add success flag for normal responses
-  return {
-    success: true,
-    data: result
-  };
-};
+/** Entry point of the identity unit (same zip as callNodeFunction). */
+export const identity = createDispatcher({
+  name: "identity",
+  handlers: identityHandlers,
+  pinnedActions: identityPinnedActions,
+});
 
-/**
- * Responds to any HTTP request from Hasura.
- * @param {express.Request} req - HTTP request context
- * @param {express.Response} res - HTTP response context
- */
-export const callNodeFunction = async (req, res) => {
-  const functionName = req.headers.name;
-
-  // Validate secret
-  const secretValidation = validateSecret(req.headers.secret);
-  if (!secretValidation.isValid) {
-    return res.status(secretValidation.statusCode).json(secretValidation.error);
-  }
-
-  logger.info(`Received request for function: ${functionName}`);
-
-  // Own properties only: `in` walks the prototype chain, so a `name` header of
-  // `constructor` would resolve to `Object` and `__proto__` to `Object.prototype`.
-  // Neither is reachable without the shared secret, checked above - this is
-  // defence in depth, not a fix for a live hole.
-  if (!Object.prototype.hasOwnProperty.call(functionMap, functionName)) {
-    return res.status(404).json({
-      success: false,
-      error: "Function Not Found",
-      messageKey: "FUNCTION_NOT_FOUND"
-    });
-  }
-
-  try {
-    logger.info(`Executing function: ${functionName}`);
-    const result = await functionMap[functionName](req, logger);
-    
-
-    if (req.body.request_query?.includes('mutation')) {
-      return res.status(200).json(result);
-    }
-
-    // Event and cron triggers retry only on a non-2xx answer. Handlers opt in
-    // per failure with `retryable`, since most failures (a deleted row, a
-    // missing address) would fail the same way again; a handler that does opt
-    // in must make its side effect idempotent across deliveries. A cron request
-    // carries `scheduled_time` instead of `event`.
-    if ((req.body.event || req.body.scheduled_time) && result?.retryable) {
-      logger.warn(`Retryable failure in ${functionName}`, { response: redactForLogging(result) });
-      return res.status(500).json(result);
-    }
-    
-    // Define formattedResponse with the output from formatResponse.
-    const formattedResponse = formatResponse(result);
-    
-    logger.info(`Successfully executed function: ${functionName}`, {
-      response: redactForLogging(formattedResponse)
-    });
-    
-    return res.status(200).json(formattedResponse);
-    
-  } catch (error) {
-    logger.error(`Error in ${functionName}`, {
-      error: error.message,
-      stack: error.stack
-    });
-    
-
-    if (req.body.request_query?.includes('mutation')) {
-      return res.status(200).json({
-        success: false,
-        error: error.message || "Internal Server Error",
-        messageKey: error.messageKey || "INTERNAL_SERVER_ERROR",
-      });
-    }
-    
-  
-    return res.status(200).json({
-      success: false,
-      error: error.message || "Internal Server Error",
-      messageKey: error.messageKey || "INTERNAL_SERVER_ERROR",
-      details: error.details || "An unexpected error occurred"
-    });
-  }
-};
+/** Entry point of the media unit (same zip as callNodeFunction). */
+export const media = createDispatcher({ name: "media", handlers: mediaHandlers });
