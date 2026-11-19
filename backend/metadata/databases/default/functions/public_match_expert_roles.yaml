@@ -1,0 +1,5 @@
+# Semantic expert search (ADR 0004). No role permissions: only the semanticExpertSearch action calls
+# it, with the admin secret.
+function:
+  name: match_expert_roles
+  schema: public

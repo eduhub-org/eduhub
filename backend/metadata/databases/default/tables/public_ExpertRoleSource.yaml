@@ -1,0 +1,4 @@
+# View of the texts to embed for semantic expert search (ADR 0004); admin secret only.
+table:
+  name: ExpertRoleSource
+  schema: public

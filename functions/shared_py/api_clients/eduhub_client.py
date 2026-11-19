@@ -575,7 +575,12 @@ class EduHubClient:
             "recordedIdentifier": value("recordedIdentifier"),
             "matchType": value("matchType"),
             "matchScore": value("matchScore", int),
-            "attendanceRecordIndex": value("attendanceRecordIndex", int),
+            # Hasura v2 takes Postgres arrays as literals ("{0,3}") only.
+            "attendanceRecordIndexes": (
+                "{" + ",".join(str(int(i)) for i in row["attendanceRecordIndexes"]) + "}"
+                if row.get("attendanceRecordIndexes")
+                else None
+            ),
             "closestCandidates": value("closestCandidates"),
         }
 

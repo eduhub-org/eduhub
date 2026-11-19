@@ -72,7 +72,7 @@ jobs:
 
     steps:
       - name: Check Out the Repository Branch
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
       - name: Authenticate to Google Cloud
         id: "auth"
         uses: "google-github-actions/auth@v3"

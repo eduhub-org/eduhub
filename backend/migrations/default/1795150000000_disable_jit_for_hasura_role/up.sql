@@ -1,0 +1,11 @@
+-- Turn off Postgres JIT for the role Hasura connects as (and runs migrations as).
+--
+-- Hasura's permission filters (e.g. the org admin row filter on "User") produce large queries
+-- that the planner estimates far above jit_above_cost. JIT then spends seconds compiling them:
+-- locally ~9.5 s of compilation for a query that runs in 7 ms. EduHub runs short web queries
+-- only, so JIT never pays off here.
+--
+-- Cloud SQL does not offer "jit" as a database flag, so it is set as a role default instead. Any
+-- role may set its own defaults for this user-level setting; it applies to new connections, which
+-- Hasura opens on restart and when it recycles pooled connections.
+ALTER ROLE CURRENT_USER SET jit = off;

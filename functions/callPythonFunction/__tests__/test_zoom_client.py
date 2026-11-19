@@ -195,6 +195,39 @@ class TestAggregation:
         assert df.iloc[0]["duration"] == 40 * 60
         assert df.iloc[0]["interruptionCount"] == 0
 
+    def test_breakout_room_moves_are_no_interruptions(self):
+        # Moving into and out of a breakout room ends one row and starts the
+        # next a second later; only a real gap (here 5 min) interrupts.
+        client = _make_client()
+        rows = [
+            {"name": "A", "user_email": "a@example.com",
+             "join_time": "2026-01-01T10:00:00Z", "leave_time": "2026-01-01T10:20:00Z"},
+            {"name": "A", "user_email": "a@example.com",
+             "join_time": "2026-01-01T10:20:01Z", "leave_time": "2026-01-01T10:40:00Z"},
+            {"name": "A", "user_email": "a@example.com",
+             "join_time": "2026-01-01T10:40:30Z", "leave_time": "2026-01-01T10:50:00Z"},
+            {"name": "A", "user_email": "a@example.com",
+             "join_time": "2026-01-01T10:55:00Z", "leave_time": "2026-01-01T11:00:00Z"},
+        ]
+        df = client.aggregate_participants(rows)
+        assert df.iloc[0]["interruptionCount"] == 1
+        # Minutes stay exact: the short gaps are not counted as presence.
+        assert df.iloc[0]["duration"] == 60 * 60 - 1 - 30 - 5 * 60
+
+    def test_aggregated_rows_keep_their_intervals(self):
+        client = _make_client()
+        rows = [
+            {"name": "A", "user_email": "a@example.com",
+             "join_time": "2026-01-01T10:00:00Z", "leave_time": "2026-01-01T10:10:00Z"},
+            {"name": "A", "user_email": "a@example.com",
+             "join_time": "2026-01-01T10:20:00Z", "leave_time": "2026-01-01T10:30:00Z"},
+        ]
+        df = client.aggregate_participants(rows)
+        assert df.iloc[0]["intervals"] == [
+            (pd.Timestamp("2026-01-01T10:00:00Z"), pd.Timestamp("2026-01-01T10:10:00Z")),
+            (pd.Timestamp("2026-01-01T10:20:00Z"), pd.Timestamp("2026-01-01T10:30:00Z")),
+        ]
+
     def test_falls_back_to_name_when_email_missing(self):
         client = _make_client()
         rows = [

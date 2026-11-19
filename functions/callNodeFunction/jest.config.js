@@ -1,5 +1,5 @@
 export default {
-  testEnvironment: 'node',
+  testEnvironment: '<rootDir>/jest/environment.js',
   transform: {},
   moduleNameMapper: {
     '^sanitize-html$': '<rootDir>/jest/sanitizeHtml.js',

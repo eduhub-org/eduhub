@@ -43,9 +43,14 @@ updates:
       call-python-function-minor-patch:
         update-types: [minor, patch]
     ignore:
-      # Flask stays <3.0 for Functions Framework compatibility.
+      # Flask major updates need a Functions Framework compatibility check.
       - dependency-name: flask
         update-types: [version-update:semver-major]
+      # numpy 2.5+ requires Python >= 3.12; the functions run python311
+      # (infrastructure/application/06_cloud-functions.tf). Lift this when
+      # the runtime moves to python312.
+      - dependency-name: numpy
+        versions: [">=2.5"]
 
   - package-ecosystem: pip
     directory: /functions/apiProxy
@@ -70,6 +75,11 @@ updates:
         update-types: [version-update:semver-major]
       - dependency-name: google-cloud-storage
         update-types: [version-update:semver-major]
+      # numpy 2.5+ requires Python >= 3.12; the functions run python311
+      # (infrastructure/application/06_cloud-functions.tf). Lift this when
+      # the runtime moves to python312.
+      - dependency-name: numpy
+        versions: [">=2.5"]
 
   # Keeps the SHA-pinned actions (and their version comments) current.
   - package-ecosystem: github-actions
