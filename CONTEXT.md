@@ -96,6 +96,25 @@ _Avoid_: Super admin
 **Org Admin**:
 Someone who manages the programs of one organization, limited to the kinds of program (courses, events, degrees) they are allowed to manage.
 
+### Experts
+
+**Expert**:
+A person who taught, spoke or mentored on the platform: an instructor of a course (an organizer for events), a speaker at a session, a mentor of a project or a mentor of an achievement option. Only active accounts count. The **Expert Directory** lists them so admins can find someone for a topic again.
+_Avoid_: Referent:in (as the umbrella term), Dozent:in
+
+**Expert Role**:
+One thing an **Expert** did: one course they led, one session they spoke at, one project or achievement option they mentored. Search, match explanations and similarity all work per role, not per person.
+
+**Last Active**:
+The date of an **Expert's** most recent **Expert Role**: a course's program start, a session's start, or when a mentored project or achievement option was created.
+
+**Expert Note**:
+A dated entry an **Admin** or **Org Admin** writes about an **Expert**, e.g. what they talked about or when they are available. Notes from central admins are seen by admins only; notes from an org admin are seen by that organization's admins and by central admins. Written as if the expert will read them: they can ask to see them.
+_Avoid_: Bewertung, rating (notes are facts, not judgements)
+
+**Do Not Contact**:
+A mark on a person that they do not want to be contacted about new formats. Admins and the org admins of their courses can set it; only admins can remove it. The **Expert Directory** greys them out, hides the contact buttons and leaves them out of exports.
+
 ### Projects
 
 **Project**:
@@ -144,6 +163,8 @@ _Avoid_: event confirmation vs. course confirmation as separate emails
 - A **Project** is listed in one or more **Courses**; removing it from its last course deletes it, so a **Passed Project** can't be removed from its last course
 - A **Project Template** has zero or more **Project Copies**; deleting the template keeps the copies as projects of their own
 - A **Passed Project** can't be deleted by anyone, **Admins** included
+- An **Expert** has one or more **Expert Roles** and zero or more **Expert Notes**; each note belongs to no organization (central admins) or exactly one
+- An **Org Admin** sees only the **Experts** of their organization's courses, and only their organization's **Expert Notes**
 
 ## Example dialogue
 
@@ -152,6 +173,7 @@ _Avoid_: event confirmation vs. course confirmation as separate emails
 
 ## Flagged ambiguities
 
+- "Expertendatenbank" was the admin page of instructors and speakers. Resolved: it is the **Expert Directory**, and mentors of projects and achievement options are **Experts** too.
 - "Invite" meant both the application decision (green rating) and moving someone up from the waitlist. Both are an **Invitation**: the same held place with a deadline; how it is accepted depends on the course (confirm or pay).
 - "Attendance" meant both a raw Zoom/LimeSurvey entry and a Participant's result for a Session. Resolved: the entry is an **Attendance Record**, the result an **Attendance**.
 - "Session reminder" meant three emails (24h, 1h, 15min) before sessions. Resolved: one email, before the First Session only, at the Course's Reminder Lead Time.

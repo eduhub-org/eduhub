@@ -33,6 +33,7 @@
 - "!include public_CourseSeries.yaml"
 - "!include public_CourseStatus.yaml"
 - "!include public_DegreeParticipationStats.yaml"
+- "!include public_ExpertNote.yaml"
 - "!include public_Faq.yaml"
 - "!include public_FaqCollection.yaml"
 - "!include public_FaqTranslation.yaml"

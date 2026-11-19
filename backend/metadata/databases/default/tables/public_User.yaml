@@ -50,6 +50,13 @@ array_relationships:
         table:
           name: CourseInstructor
           schema: public
+  - name: ExpertNotes
+    using:
+      foreign_key_constraint_on:
+        column: expertId
+        table:
+          name: ExpertNote
+          schema: public
   - name: OrganizationAdmins
     using:
       foreign_key_constraint_on:
@@ -92,6 +99,15 @@ array_relationships:
         table:
           name: Project
           schema: public
+computed_fields:
+  # Last Active (CONTEXT.md): sorts the expert directory. Admin only - for org admins it would reveal
+  # activity with other organizations.
+  - name: expertLastActiveAt
+    definition:
+      function:
+        name: user_expert_last_active_at
+        schema: public
+      table_argument: user_row
 select_permissions:
   - role: anonymous
     permission:
@@ -319,6 +335,9 @@ select_permissions:
         - externalProfile
         - occupation
         - organizationName
+        # Expert directory (docs/EXPERT_DIRECTORY.md): the chat link and the do-not-contact mark.
+        - matrixUserHandle
+        - doNotContact
       filter:
         _or:
           - id:
@@ -545,6 +564,49 @@ select_permissions:
                                     _eq: X-Hasura-User-Id
                                 - canManageSettings:
                                     _eq: true
+          - AchievementOptionMentors:
+              AchievementOption:
+                AchievementOptionCourses:
+                  Course:
+                    Program:
+                      _or:
+                        - _and:
+                            - type:
+                                _eq: EVENTS
+                            - Organization:
+                                OrganizationAdmins:
+                                  _and:
+                                    - userId:
+                                        _eq: X-Hasura-User-Id
+                                    - canManageEvents:
+                                        _eq: true
+                        - _and:
+                            - type:
+                                _eq: COURSES
+                            - Organization:
+                                OrganizationAdmins:
+                                  _and:
+                                    - userId:
+                                        _eq: X-Hasura-User-Id
+                                    - canManageCourses:
+                                        _eq: true
+                        - _and:
+                            - type:
+                                _eq: DEGREES
+                            - Organization:
+                                OrganizationAdmins:
+                                  _and:
+                                    - userId:
+                                        _eq: X-Hasura-User-Id
+                                    - canManageDegrees:
+                                        _eq: true
+                        - Organization:
+                            OrganizationAdmins:
+                              _and:
+                                - userId:
+                                    _eq: X-Hasura-User-Id
+                                - canManageSettings:
+                                    _eq: true
       limit: 100
       # The admin table on /manage/settings/access is paginated and reads User_aggregate { count }.
       allow_aggregations: true
@@ -583,6 +645,187 @@ select_permissions:
                           _eq: true
       limit: 100
 update_permissions:
+  # Org admins may only set the do-not-contact mark (ADR 0003) on the experts of courses whose
+  # program type they may manage (the same capability rule as the select permission); the check keeps
+  # them from removing it again, which only admins may.
+  - role: org_admin_access
+    permission:
+      columns:
+        - doNotContact
+      filter:
+        _or:
+          - CourseInstructors:
+              Course:
+                Program:
+                  _or:
+                    - _and:
+                        - type:
+                            _eq: EVENTS
+                        - Organization:
+                            OrganizationAdmins:
+                              _and:
+                                - userId:
+                                    _eq: X-Hasura-User-Id
+                                - canManageEvents:
+                                    _eq: true
+                    - _and:
+                        - type:
+                            _eq: COURSES
+                        - Organization:
+                            OrganizationAdmins:
+                              _and:
+                                - userId:
+                                    _eq: X-Hasura-User-Id
+                                - canManageCourses:
+                                    _eq: true
+                    - _and:
+                        - type:
+                            _eq: DEGREES
+                        - Organization:
+                            OrganizationAdmins:
+                              _and:
+                                - userId:
+                                    _eq: X-Hasura-User-Id
+                                - canManageDegrees:
+                                    _eq: true
+                    - Organization:
+                        OrganizationAdmins:
+                          _and:
+                            - userId:
+                                _eq: X-Hasura-User-Id
+                            - canManageSettings:
+                                _eq: true
+          - SessionSpeakers:
+              Session:
+                Course:
+                  Program:
+                    _or:
+                      - _and:
+                          - type:
+                              _eq: EVENTS
+                          - Organization:
+                              OrganizationAdmins:
+                                _and:
+                                  - userId:
+                                      _eq: X-Hasura-User-Id
+                                  - canManageEvents:
+                                      _eq: true
+                      - _and:
+                          - type:
+                              _eq: COURSES
+                          - Organization:
+                              OrganizationAdmins:
+                                _and:
+                                  - userId:
+                                      _eq: X-Hasura-User-Id
+                                  - canManageCourses:
+                                      _eq: true
+                      - _and:
+                          - type:
+                              _eq: DEGREES
+                          - Organization:
+                              OrganizationAdmins:
+                                _and:
+                                  - userId:
+                                      _eq: X-Hasura-User-Id
+                                  - canManageDegrees:
+                                      _eq: true
+                      - Organization:
+                          OrganizationAdmins:
+                            _and:
+                              - userId:
+                                  _eq: X-Hasura-User-Id
+                              - canManageSettings:
+                                  _eq: true
+          - ProjectMentors:
+              Project:
+                ProjectCourses:
+                  Course:
+                    Program:
+                      _or:
+                        - _and:
+                            - type:
+                                _eq: EVENTS
+                            - Organization:
+                                OrganizationAdmins:
+                                  _and:
+                                    - userId:
+                                        _eq: X-Hasura-User-Id
+                                    - canManageEvents:
+                                        _eq: true
+                        - _and:
+                            - type:
+                                _eq: COURSES
+                            - Organization:
+                                OrganizationAdmins:
+                                  _and:
+                                    - userId:
+                                        _eq: X-Hasura-User-Id
+                                    - canManageCourses:
+                                        _eq: true
+                        - _and:
+                            - type:
+                                _eq: DEGREES
+                            - Organization:
+                                OrganizationAdmins:
+                                  _and:
+                                    - userId:
+                                        _eq: X-Hasura-User-Id
+                                    - canManageDegrees:
+                                        _eq: true
+                        - Organization:
+                            OrganizationAdmins:
+                              _and:
+                                - userId:
+                                    _eq: X-Hasura-User-Id
+                                - canManageSettings:
+                                    _eq: true
+          - AchievementOptionMentors:
+              AchievementOption:
+                AchievementOptionCourses:
+                  Course:
+                    Program:
+                      _or:
+                        - _and:
+                            - type:
+                                _eq: EVENTS
+                            - Organization:
+                                OrganizationAdmins:
+                                  _and:
+                                    - userId:
+                                        _eq: X-Hasura-User-Id
+                                    - canManageEvents:
+                                        _eq: true
+                        - _and:
+                            - type:
+                                _eq: COURSES
+                            - Organization:
+                                OrganizationAdmins:
+                                  _and:
+                                    - userId:
+                                        _eq: X-Hasura-User-Id
+                                    - canManageCourses:
+                                        _eq: true
+                        - _and:
+                            - type:
+                                _eq: DEGREES
+                            - Organization:
+                                OrganizationAdmins:
+                                  _and:
+                                    - userId:
+                                        _eq: X-Hasura-User-Id
+                                    - canManageDegrees:
+                                        _eq: true
+                        - Organization:
+                            OrganizationAdmins:
+                              _and:
+                                - userId:
+                                    _eq: X-Hasura-User-Id
+                                - canManageSettings:
+                                    _eq: true
+      check:
+        doNotContact:
+          _eq: true
   - role: user_access
     permission:
       columns:
