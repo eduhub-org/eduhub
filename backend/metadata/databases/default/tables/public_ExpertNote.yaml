@@ -17,6 +17,8 @@ object_relationships:
 insert_permissions:
   - role: org_admin_access
     permission:
+      # The note's organization must be one the author manages and one the expert worked with,
+      # so the note is not shown to admins of an organization that never worked with the expert.
       check:
         _and:
           - Organization:
@@ -33,6 +35,41 @@ insert_permissions:
                           _eq: true
                       - canManageSettings:
                           _eq: true
+          - Expert:
+              _or:
+                - CourseInstructors:
+                    Course:
+                      Program:
+                        organizationId:
+                          _ceq:
+                            - $
+                            - organizationId
+                - SessionSpeakers:
+                    Session:
+                      Course:
+                        Program:
+                          organizationId:
+                            _ceq:
+                              - $
+                              - organizationId
+                - ProjectMentors:
+                    Project:
+                      ProjectCourses:
+                        Course:
+                          Program:
+                            organizationId:
+                              _ceq:
+                                - $
+                                - organizationId
+                - AchievementOptionMentors:
+                    AchievementOption:
+                      AchievementOptionCourses:
+                        Course:
+                          Program:
+                            organizationId:
+                              _ceq:
+                                - $
+                                - organizationId
       set:
         authorId: x-hasura-User-Id
       columns:
@@ -65,19 +102,50 @@ select_permissions:
                       _eq: true
                   - canManageSettings:
                       _eq: true
-# Authors edit and delete their own entries; admins (full access) can delete any.
+# Authors edit and delete their own entries while they still manage the note's organization;
+# admins (full access) can delete any.
 update_permissions:
   - role: org_admin_access
     permission:
       columns:
         - text
       filter:
-        authorId:
-          _eq: X-Hasura-User-Id
+        _and:
+          - authorId:
+              _eq: X-Hasura-User-Id
+          - Organization:
+              OrganizationAdmins:
+                _and:
+                  - userId:
+                      _eq: X-Hasura-User-Id
+                  - _or:
+                      - canManageCourses:
+                          _eq: true
+                      - canManageEvents:
+                          _eq: true
+                      - canManageDegrees:
+                          _eq: true
+                      - canManageSettings:
+                          _eq: true
       check: null
 delete_permissions:
   - role: org_admin_access
     permission:
       filter:
-        authorId:
-          _eq: X-Hasura-User-Id
+        _and:
+          - authorId:
+              _eq: X-Hasura-User-Id
+          - Organization:
+              OrganizationAdmins:
+                _and:
+                  - userId:
+                      _eq: X-Hasura-User-Id
+                  - _or:
+                      - canManageCourses:
+                          _eq: true
+                      - canManageEvents:
+                          _eq: true
+                      - canManageDegrees:
+                          _eq: true
+                      - canManageSettings:
+                          _eq: true

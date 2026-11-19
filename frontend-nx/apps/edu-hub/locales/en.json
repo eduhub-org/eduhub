@@ -3025,7 +3025,9 @@
     "edit": "Edit",
     "delete": "Delete",
     "delete_note_question": "Delete this note?",
-    "error": "That did not work: {error}"
+    "error": "That did not work: {error}",
+    "load_error": "The experts could not be loaded: {error}",
+    "retry": "Try again"
   },
   "manageOrganizations": {
     "headline": "Organizations",

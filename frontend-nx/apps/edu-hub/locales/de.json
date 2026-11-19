@@ -3010,7 +3010,9 @@
     "edit": "Bearbeiten",
     "delete": "Löschen",
     "delete_note_question": "Diese Notiz löschen?",
-    "error": "Das hat nicht geklappt: {error}"
+    "error": "Das hat nicht geklappt: {error}",
+    "load_error": "Die Expert:innen konnten nicht geladen werden: {error}",
+    "retry": "Erneut versuchen"
   },
   "manageOrganizations": {
     "headline": "Organisationen",

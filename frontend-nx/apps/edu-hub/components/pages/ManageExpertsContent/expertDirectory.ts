@@ -14,6 +14,8 @@ export interface ExpertRole {
   /** Program short title or, for speakers, the course the session belongs to. */
   context: string;
   date: Date | null;
+  /** Organizations whose programs the role belongs to (via its course or the course it is used in). */
+  organizationIds: number[];
   texts: { field: MatchField; value: string | null | undefined }[];
 }
 
@@ -51,6 +53,9 @@ const toDate = (value: unknown): Date | null => {
   return Number.isNaN(date.getTime()) ? null : date;
 };
 
+const ids = (values: (number | null | undefined)[]): number[] =>
+  Array.from(new Set(values.filter((value): value is number => typeof value === 'number')));
+
 export const organizationOf = (expert: ExpertsList_User): string =>
   expert.Organization?.name || expert.organizationName || '';
 
@@ -72,6 +77,7 @@ export const expertRoles = (expert: ExpertsList_User): ExpertRole[] => {
       title: Course.title,
       context: Course.Program?.shortTitle ?? '',
       date: toDate(Course.Program?.lectureStart),
+      organizationIds: ids([Course.Program?.organizationId]),
       texts: [
         { field: 'title', value: Course.title },
         { field: 'tagline', value: Course.tagline },
@@ -91,6 +97,7 @@ export const expertRoles = (expert: ExpertsList_User): ExpertRole[] => {
       title: Session.title,
       context: Session.Course?.title ?? '',
       date: toDate(Session.startDateTime),
+      organizationIds: ids([Session.Course?.Program?.organizationId]),
       texts: [
         { field: 'title', value: Session.title },
         { field: 'description', value: Session.description },
@@ -107,6 +114,7 @@ export const expertRoles = (expert: ExpertsList_User): ExpertRole[] => {
       title: Project.title,
       context: '',
       date: toDate(Project.created_at),
+      organizationIds: ids(Project.ProjectCourses?.map((link) => link.Course?.Program?.organizationId) ?? []),
       texts: [
         { field: 'title', value: Project.title },
         { field: 'tagline', value: Project.tagline },
@@ -123,6 +131,9 @@ export const expertRoles = (expert: ExpertsList_User): ExpertRole[] => {
       title: AchievementOption.title,
       context: '',
       date: toDate(AchievementOption.created_at),
+      organizationIds: ids(
+        AchievementOption.AchievementOptionCourses?.map((link) => link.Course?.Program?.organizationId) ?? []
+      ),
       texts: [
         { field: 'title', value: AchievementOption.title },
         { field: 'description', value: AchievementOption.description },
@@ -131,6 +142,15 @@ export const expertRoles = (expert: ExpertsList_User): ExpertRole[] => {
   });
 
   return roles.sort((a, b) => (b.date?.getTime() ?? -Infinity) - (a.date?.getTime() ?? -Infinity));
+};
+
+/**
+ * The organizations an org admin may write an Expert Note for: those they manage that the expert
+ * worked with (the insert permission checks the same).
+ */
+export const noteOrganizationsFor = <T extends { id: number }>(managed: T[], roles: ExpertRole[]): T[] => {
+  const worked = new Set(roles.flatMap((role) => role.organizationIds));
+  return managed.filter((organization) => worked.has(organization.id));
 };
 
 /** Last Active (CONTEXT.md), from the roles the viewer can see. */
@@ -247,7 +267,7 @@ export const profileKind = (url: string): ProfileKind => {
 };
 
 /** BCC so recipients do not see each other; null when nobody can be written to. */
-export const mailtoBcc = (experts: ExpertsList_User[]): string | null => {
+export const mailtoBcc = (experts: Pick<ExpertsList_User, 'email' | 'doNotContact'>[]): string | null => {
   const emails = experts.filter((expert) => !expert.doNotContact && expert.email).map((expert) => expert.email);
   return emails.length ? `mailto:?bcc=${emails.map(encodeURIComponent).join(',')}` : null;
 };

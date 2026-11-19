@@ -25,6 +25,10 @@ export interface ExpertFields_CourseInstructors_Course_Program {
    * The first day a course lecture can possibly be in this program.
    */
   lectureStart: any | null;
+  /**
+   * Organization that owns the program. References Organization.id (0 = platform default)
+   */
+  organizationId: number;
 }
 
 export interface ExpertFields_CourseInstructors_Course {
@@ -76,6 +80,10 @@ export interface ExpertFields_SessionSpeakers_Session_Course_Program {
    * The 6 letter short title for the program.
    */
   shortTitle: string | null;
+  /**
+   * Organization that owns the program. References Organization.id (0 = platform default)
+   */
+  organizationId: number;
 }
 
 export interface ExpertFields_SessionSpeakers_Session_Course {
@@ -121,6 +129,33 @@ export interface ExpertFields_SessionSpeakers {
   Session: ExpertFields_SessionSpeakers_Session;
 }
 
+export interface ExpertFields_ProjectMentors_Project_ProjectCourses_Course_Program {
+  __typename: "Program";
+  id: number;
+  /**
+   * Organization that owns the program. References Organization.id (0 = platform default)
+   */
+  organizationId: number;
+}
+
+export interface ExpertFields_ProjectMentors_Project_ProjectCourses_Course {
+  __typename: "Course";
+  id: number;
+  /**
+   * An object relationship
+   */
+  Program: ExpertFields_ProjectMentors_Project_ProjectCourses_Course_Program;
+}
+
+export interface ExpertFields_ProjectMentors_Project_ProjectCourses {
+  __typename: "ProjectCourse";
+  id: number;
+  /**
+   * An object relationship
+   */
+  Course: ExpertFields_ProjectMentors_Project_ProjectCourses_Course;
+}
+
 export interface ExpertFields_ProjectMentors_Project {
   __typename: "Project";
   id: number;
@@ -128,6 +163,10 @@ export interface ExpertFields_ProjectMentors_Project {
   tagline: string | null;
   description: string | null;
   created_at: any;
+  /**
+   * An array relationship
+   */
+  ProjectCourses: ExpertFields_ProjectMentors_Project_ProjectCourses[];
 }
 
 export interface ExpertFields_ProjectMentors {
@@ -137,6 +176,33 @@ export interface ExpertFields_ProjectMentors {
    * An object relationship
    */
   Project: ExpertFields_ProjectMentors_Project;
+}
+
+export interface ExpertFields_AchievementOptionMentors_AchievementOption_AchievementOptionCourses_Course_Program {
+  __typename: "Program";
+  id: number;
+  /**
+   * Organization that owns the program. References Organization.id (0 = platform default)
+   */
+  organizationId: number;
+}
+
+export interface ExpertFields_AchievementOptionMentors_AchievementOption_AchievementOptionCourses_Course {
+  __typename: "Course";
+  id: number;
+  /**
+   * An object relationship
+   */
+  Program: ExpertFields_AchievementOptionMentors_AchievementOption_AchievementOptionCourses_Course_Program;
+}
+
+export interface ExpertFields_AchievementOptionMentors_AchievementOption_AchievementOptionCourses {
+  __typename: "AchievementOptionCourse";
+  id: number;
+  /**
+   * An object relationship
+   */
+  Course: ExpertFields_AchievementOptionMentors_AchievementOption_AchievementOptionCourses_Course;
 }
 
 export interface ExpertFields_AchievementOptionMentors_AchievementOption {
@@ -151,6 +217,10 @@ export interface ExpertFields_AchievementOptionMentors_AchievementOption {
    */
   description: string | null;
   created_at: any | null;
+  /**
+   * An array relationship
+   */
+  AchievementOptionCourses: ExpertFields_AchievementOptionMentors_AchievementOption_AchievementOptionCourses[];
 }
 
 export interface ExpertFields_AchievementOptionMentors {

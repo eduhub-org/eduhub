@@ -5,6 +5,7 @@ import {
   findMatches,
   highlight,
   lastActive,
+  noteOrganizationsFor,
   linkedInSearchUrl,
   mailtoBcc,
   matchedRoleKeys,
@@ -39,7 +40,7 @@ const expert = (overrides: Partial<ExpertsList_User> = {}): ExpertsList_User =>
           contentDescriptionField2: null,
           headingDescriptionField1: null,
           headingDescriptionField2: null,
-          Program: { __typename: 'Program', id: 1, shortTitle: 'WS24', type: 'COURSES', lectureStart: '2024-10-14' },
+          Program: { __typename: 'Program', id: 1, shortTitle: 'WS24', type: 'COURSES', lectureStart: '2024-10-14', organizationId: 7 },
         },
       },
     ],
@@ -53,7 +54,12 @@ const expert = (overrides: Partial<ExpertsList_User> = {}): ExpertsList_User =>
           title: 'Ethics of AI',
           description: null,
           startDateTime: '2026-03-01T17:00:00Z',
-          Course: { __typename: 'Course', id: 300, title: 'Open Talks', Program: null },
+          Course: {
+            __typename: 'Course',
+            id: 300,
+            title: 'Open Talks',
+            Program: { __typename: 'Program', id: 3, shortTitle: 'OT', organizationId: 9 },
+          },
         },
       },
     ],
@@ -72,7 +78,7 @@ describe('expertRoles', () => {
             ...expert().CourseInstructors[0],
             Course: {
               ...expert().CourseInstructors[0].Course,
-              Program: { __typename: 'Program', id: 2, shortTitle: 'EV', type: 'EVENTS', lectureStart: null },
+              Program: { __typename: 'Program', id: 2, shortTitle: 'EV', type: 'EVENTS', lectureStart: null, organizationId: 8 },
             },
           },
         ],
@@ -83,6 +89,17 @@ describe('expertRoles', () => {
       ['speaker', 'Ethics of AI'],
       ['organizer', 'Deep Learning'],
     ]);
+  });
+});
+
+describe('noteOrganizationsFor', () => {
+  it('offers only managed organizations the expert worked with', () => {
+    const managed = [
+      { id: 7, name: 'Courses org' },
+      { id: 42, name: 'Unrelated org' },
+      { id: 9, name: 'Talks org' },
+    ];
+    expect(noteOrganizationsFor(managed, expertRoles(expert())).map((org) => org.id)).toEqual([7, 9]);
   });
 });
 

@@ -1,4 +1,5 @@
 import { FC, useCallback, useMemo, useState } from 'react';
+import { DocumentNode } from '@apollo/client';
 import { useFormatter, useTranslations } from 'next-intl';
 import { useRouter } from 'next/router';
 import { ColumnDef } from '@tanstack/react-table';
@@ -17,7 +18,8 @@ import { buildCsv, downloadTextFile, exportFileName } from '../ManageCourseConte
 import { useManageQuery } from '../../../hooks/authedQuery';
 import { useIsAdmin } from '../../../hooks/authentication';
 import { useUserId } from '../../../hooks/user';
-import { EXPERT_NOTE_ORGANIZATIONS, EXPERTS_LIST } from '../../../queries/experts';
+import { EXPERT_CONTACTS, EXPERT_NOTE_ORGANIZATIONS, EXPERTS_LIST } from '../../../queries/experts';
+import { ExpertContacts } from '../../../queries/__generated__/ExpertContacts';
 import { ExpertsList, ExpertsList_User } from '../../../queries/__generated__/ExpertsList';
 import { ExpertNoteOrganizations } from '../../../queries/__generated__/ExpertNoteOrganizations';
 import {
@@ -31,6 +33,7 @@ import {
   lastActive,
   mailtoBcc,
   matchedRoleKeys,
+  noteOrganizationsFor,
   organizationOf,
   searchWords,
 } from './expertDirectory';
@@ -56,8 +59,10 @@ const orgAdminScope = (userId: string) => {
 
 const ADMIN_DEFAULT_SORT = [{ expertLastActiveAt: 'desc_nulls_last' }, { lastName: 'asc' }];
 const ORG_ADMIN_DEFAULT_SORT = [{ lastName: 'asc' }, { firstName: 'asc' }];
-// Enough for every expert at once; the org admin permission caps its reads at 100 rows anyway.
-const EXPORT_LIMIT = 5000;
+// The org admin permission caps every read at 100 rows, so the export fetches pages of that size.
+const EXPORT_PAGE_SIZE = 100;
+// A stable order, so paging through the export neither skips nor repeats anyone.
+const EXPORT_ORDER = [{ lastName: 'asc' }, { firstName: 'asc' }, { id: 'asc' }];
 
 const sortColumnMapper = (columnId: string) => {
   if (columnId === 'organization') return { organizationName: NULLS_LAST };
@@ -119,6 +124,7 @@ const ManageExpertsContent: FC = () => {
     initialLoading,
     error,
     refetch,
+    queryResult,
     pageIndex,
     setPageIndex,
     searchFilter,
@@ -172,25 +178,63 @@ const ManageExpertsContent: FC = () => {
     setPageIndex(0);
   };
 
+  /** Runs a query under the table's role, bypassing the cache so the visible page is untouched. */
+  const queryFresh = useCallback(
+    async <T,>(query: DocumentNode, variables: Record<string, unknown>): Promise<T> => {
+      const result: { data: T } = await queryResult.client.query({
+        query,
+        variables,
+        context: queryResult.observable?.options.context,
+        fetchPolicy: 'no-cache',
+      });
+      return result.data;
+    },
+    [queryResult.client, queryResult.observable]
+  );
+
   const handleBulkAction = useCallback(
-    (action: string, selected: ExpertsList_User[]) => {
+    async (action: string, selected: ExpertsList_User[]) => {
       if (action !== 'email') return false;
-      const href = mailtoBcc(selected);
-      if (!href) {
-        setActionError(t('bulk_mail_nobody'));
+      try {
+        // Rows selected on another page may predate a Do Not Contact mark set since then.
+        const current = await queryFresh<ExpertContacts>(EXPERT_CONTACTS, { ids: selected.map((row) => row.id) });
+        const href = mailtoBcc(current.User);
+        if (!href) {
+          setActionError(t('bulk_mail_nobody'));
+          return false;
+        }
+        window.location.href = href;
+        return true;
+      } catch (mailError) {
+        setActionError(t('error', { error: mailError instanceof Error ? mailError.message : String(mailError) }));
         return false;
       }
-      window.location.href = href;
-      return true;
     },
-    [t]
+    [queryFresh, t]
   );
+
+  /** Every expert matching the search as typed (not the debounced one), page by page. */
+  const loadExportRows = async (): Promise<ExpertsList_User[]> => {
+    const filter = createMultiWordSearchCondition(searchFilter, EXPERT_SEARCH_FIELDS);
+    const rows: ExpertsList_User[] = [];
+    for (let offset = 0; ; offset += EXPORT_PAGE_SIZE) {
+      const page = await queryFresh<ExpertsList>(EXPERTS_LIST, {
+        ...queryVariables,
+        filter,
+        order_by: EXPORT_ORDER,
+        offset,
+        limit: EXPORT_PAGE_SIZE,
+      });
+      rows.push(...page.User);
+      if (page.User.length < EXPORT_PAGE_SIZE) return rows;
+    }
+  };
 
   const exportCsv = async () => {
     try {
-      const all = (await fetchAllRows(EXPORT_LIMIT)) as ExpertsList | undefined;
+      const all = await loadExportRows();
       const header = [t('first_name'), t('last_name'), t('organization'), t('email'), t('last_active')];
-      const csv = buildCsv(expertCsvRows(all?.User ?? [], header), locale === 'de' ? ';' : ',');
+      const csv = buildCsv(expertCsvRows(all, header), locale === 'de' ? ';' : ',');
       downloadTextFile(csv, exportFileName(t('headline'), t('export_file_suffix'), 'csv'), 'text/csv;charset=utf-8');
     } catch (exportError) {
       setActionError(exportError instanceof Error ? exportError.message : String(exportError));
@@ -279,6 +323,13 @@ const ManageExpertsContent: FC = () => {
     <PageBlock>
       <div className="max-w-screen-xl mx-auto mt-20">
         {initialLoading && <Loading />}
+        {!initialLoading && error && (
+          <div className="flex flex-col items-start gap-3">
+            <CommonPageHeader headline={t('headline')} />
+            <p>{t('load_error', { error: error.message })}</p>
+            <Button onClick={() => refetch()}>{t('retry')}</Button>
+          </div>
+        )}
         {!initialLoading && !error && (
           <div>
             <div className="flex justify-between items-center mb-4">
@@ -326,7 +377,7 @@ const ManageExpertsContent: FC = () => {
                     matchedRoleKeys={matchedRoleKeys(view?.matches ?? [])}
                     currentUserId={userId}
                     isAdmin={isAdmin}
-                    noteOrganizations={noteOrganizations}
+                    noteOrganizations={noteOrganizationsFor(noteOrganizations, view?.roles ?? [])}
                     onChanged={() => refetch()}
                     onError={(message) => setActionError(t('error', { error: message }))}
                   />

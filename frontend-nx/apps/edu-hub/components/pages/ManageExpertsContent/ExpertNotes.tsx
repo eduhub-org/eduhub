@@ -73,7 +73,10 @@ export const ExpertNotes: FC<ExpertNotesProps> = ({
     }
   };
 
-  const noteOrganizationId = isAdmin ? null : organizationId ?? organizations[0]?.id ?? null;
+  // Only organizations the expert worked with are offered; fall back if the choice is no longer one.
+  const noteOrganizationId = isAdmin
+    ? null
+    : organizations.find((organization) => organization.id === organizationId)?.id ?? organizations[0]?.id ?? null;
   const canWrite = isAdmin || noteOrganizationId !== null;
 
   const addNote = async () => {

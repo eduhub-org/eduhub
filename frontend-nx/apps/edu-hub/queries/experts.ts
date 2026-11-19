@@ -31,6 +31,7 @@ const EXPERT_FIELDS = gql`
           shortTitle
           type
           lectureStart
+          organizationId
         }
       }
     }
@@ -47,6 +48,7 @@ const EXPERT_FIELDS = gql`
           Program {
             id
             shortTitle
+            organizationId
           }
         }
       }
@@ -59,6 +61,16 @@ const EXPERT_FIELDS = gql`
         tagline
         description
         created_at
+        ProjectCourses {
+          id
+          Course {
+            id
+            Program {
+              id
+              organizationId
+            }
+          }
+        }
       }
     }
     AchievementOptionMentors {
@@ -68,6 +80,16 @@ const EXPERT_FIELDS = gql`
         title
         description
         created_at
+        AchievementOptionCourses {
+          id
+          Course {
+            id
+            Program {
+              id
+              organizationId
+            }
+          }
+        }
       }
     }
     ExpertNotes(order_by: [{ created_at: desc }, { id: desc }]) {
@@ -126,6 +148,18 @@ export const EXPERTS_LIST = gql`
       aggregate {
         count
       }
+    }
+  }
+`;
+
+// Current contact details of selected experts: a selection can hold rows loaded before they were
+// marked Do Not Contact on another page.
+export const EXPERT_CONTACTS = gql`
+  query ExpertContacts($ids: [uuid!]!) {
+    User(where: { id: { _in: $ids } }) {
+      id
+      email
+      doNotContact
     }
   }
 `;
