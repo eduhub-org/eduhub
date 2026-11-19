@@ -9,7 +9,7 @@
     "@google-cloud/storage": "^8.4.0",
     "@keycloak/keycloak-admin-client": "26.8.2",
     "graphql-request": "^6.1.0",
-    "marked": "^15.0.12",
+    "marked": "^18.2.0",
     "sanitize-html": "^2.18.1",
     "sharp": "^0.35.5",
     "stripe": "^22.6.2",
