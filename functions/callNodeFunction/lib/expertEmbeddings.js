@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { env } from "./config.js";
 
 /**
  * Embeddings for semantic expert search (ADR 0004, docs/EXPERT_DIRECTORY.md).
@@ -19,19 +20,23 @@ const DEFAULT_MIN_SIMILARITY = { vertex: 0.6, fake: 0.2 };
 // gemini-embedding-001 reads up to 2048 tokens; longer course descriptions are cut, not rejected.
 const MAX_TEXT_CHARS = 8000;
 const METADATA_URL = "http://metadata.google.internal/computeMetadata/v1";
+// The metadata server answers in milliseconds; without a bound a hung lookup would outlive the
+// Vertex AI timeout and the whole invocation.
+const METADATA_TIMEOUT_MS = 5_000;
 
-export const embeddingConfig = (env = process.env) => {
-  const provider = (env.EMBEDDING_PROVIDER || "").trim().toLowerCase();
+/** `read` looks up one setting by name (lib/config.js by default; tests pass their own). */
+export const embeddingConfig = (read = env) => {
+  const provider = (read("EMBEDDING_PROVIDER") || "").trim().toLowerCase();
   if (provider !== "vertex" && provider !== "fake") return null;
-  const model = provider === "vertex" ? env.EMBEDDING_MODEL || DEFAULT_VERTEX_MODEL : FAKE_MODEL;
-  const minSimilarity = Number(env.EXPERT_SEARCH_MIN_SIMILARITY);
+  const model = provider === "vertex" ? read("EMBEDDING_MODEL") || DEFAULT_VERTEX_MODEL : FAKE_MODEL;
+  const minSimilarity = Number(read("EXPERT_SEARCH_MIN_SIMILARITY"));
   return {
     provider,
     model,
     // Stored with every vector, so a provider or model change re-embeds everything.
     modelKey: `${provider}:${model}`,
-    location: env.EMBEDDING_LOCATION,
-    projectId: env.EMBEDDING_PROJECT_ID,
+    location: read("EMBEDDING_LOCATION"),
+    projectId: read("EMBEDDING_PROJECT_ID"),
     minSimilarity: Number.isFinite(minSimilarity) ? minSimilarity : DEFAULT_MIN_SIMILARITY[provider],
   };
 };
@@ -70,7 +75,10 @@ export const fakeEmbedding = (text) => {
 let cachedToken = null;
 
 const metadata = async (path, fetchImpl) => {
-  const response = await fetchImpl(`${METADATA_URL}/${path}`, { headers: { "Metadata-Flavor": "Google" } });
+  const response = await fetchImpl(`${METADATA_URL}/${path}`, {
+    headers: { "Metadata-Flavor": "Google" },
+    signal: AbortSignal.timeout(METADATA_TIMEOUT_MS),
+  });
   if (!response.ok) throw new Error(`Metadata server answered ${response.status} for ${path}`);
   return response;
 };
@@ -120,6 +128,10 @@ export const embedText = async (config, text, taskType, { fetchImpl = globalThis
   if (!cleaned) throw new Error("Nothing to embed");
   return config.provider === "vertex" ? vertexEmbedding(config, cleaned, taskType, fetchImpl) : fakeEmbedding(cleaned);
 };
+
+/** A vector without direction (e.g. a fake embedding of words too short to count); pgvector's
+ * cosine distance to it is NaN, which would match everything. */
+export const isZeroVector = (values) => values.every((value) => value === 0);
 
 /** For tests: forget the cached access token. */
 export const resetTokenCache = () => {

@@ -237,6 +237,21 @@ describe('semantic search helpers', () => {
     expect(matchesAllWords(row, expertRoles(row), 'transformer gardening')).toBe(false);
   });
 
+  it('excludes exactly the people the server keyword filter lists', () => {
+    const row = expert({
+      organizationName: 'Legacy Labs',
+      SessionSpeakers: [],
+      CourseInstructors: [
+        { ...expert().CourseInstructors[0], Course: { ...expert().CourseInstructors[0].Course, title: 'Tensor_Flow' } },
+      ],
+    });
+    // Organization.name ("Analytical Engines") wins for display, but both columns are searched.
+    expect(matchesAllWords(row, expertRoles(row), 'legacy')).toBe(true);
+    // The raw title keeps its underscore, so "tensorflow" matches neither the server nor here.
+    expect(matchesAllWords(row, expertRoles(row), 'tensorflow')).toBe(false);
+    expect(matchesAllWords(row, expertRoles(row), 'tensor_flow')).toBe(true);
+  });
+
   it("picks the person's role closest to the search", () => {
     const closest = closestRole(expertRoles(expert()), matches);
     expect(closest?.role.title).toBe('Ethics of AI');

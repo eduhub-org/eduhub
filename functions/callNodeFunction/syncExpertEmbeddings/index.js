@@ -1,4 +1,4 @@
-import { GraphQLClient } from "graphql-request";
+import { createHasuraClient } from "../lib/hasura.js";
 import { embedText, embeddingConfig, toVectorLiteral } from "../lib/expertEmbeddings.js";
 
 /**
@@ -11,7 +11,9 @@ import { embedText, embeddingConfig, toVectorLiteral } from "../lib/expertEmbedd
 
 const BATCH_SIZE = 100;
 const CONCURRENCY = 4;
-// Below the cron trigger's 170 s timeout and callNodeFunction's 180 s, with room for the last batch.
+// No new group of embeddings starts after this; a started group can still take up to the Vertex AI
+// timeout (30 s) plus its writes, which keeps a run below the cron trigger's 170 s and
+// callNodeFunction's 180 s.
 const TIME_BUDGET_MS = 120_000;
 
 const DELETE_STALE = `
@@ -52,18 +54,14 @@ const UPSERT_EMBEDDING = `
   }
 `;
 
-const client = () =>
-  new GraphQLClient(process.env.HASURA_ENDPOINT, {
-    headers: { "x-hasura-admin-secret": process.env.HASURA_ADMIN_SECRET },
-  });
-
 export default async function syncExpertEmbeddings(
   req,
   logger,
-  { gql = client(), env = process.env, fetchImpl, now = Date.now, timeBudgetMs = TIME_BUDGET_MS } = {}
+  { gql, read, fetchImpl, now = Date.now, timeBudgetMs = TIME_BUDGET_MS } = {}
 ) {
-  const config = embeddingConfig(env);
+  const config = embeddingConfig(read);
   if (!config) return { success: true, skipped: "EMBEDDING_PROVIDER is not set" };
+  gql = gql ?? createHasuraClient();
 
   const startedAt = now();
   const deleted = (await gql.request(DELETE_STALE, { model: config.modelKey })).delete_ExpertRoleEmbedding
@@ -96,12 +94,17 @@ export default async function syncExpertEmbeddings(
     }
   };
 
-  while (now() - startedAt < timeBudgetMs) {
+  const withinBudget = () => now() - startedAt < timeBudgetMs;
+
+  // The deadline is checked before every group, not just every batch: with slow embedding calls a
+  // whole batch could run far past it. Sources not reached stay pending for the next night.
+  batches: while (withinBudget()) {
     const result = await gql.request(SOURCES_TO_EMBED, { limit: BATCH_SIZE + failedKeys.size });
     remaining = result.ExpertRoleSource_aggregate.aggregate.count;
     const sources = result.ExpertRoleSource.filter((source) => !failedKeys.has(keyOf(source)));
     if (sources.length === 0) break;
     for (let index = 0; index < sources.length; index += CONCURRENCY) {
+      if (!withinBudget()) break batches;
       await Promise.all(sources.slice(index, index + CONCURRENCY).map(embedSource));
     }
   }

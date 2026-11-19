@@ -169,10 +169,12 @@ export const SEMANTIC_EXPERT_SEARCH = gql`
 `;
 
 // The experts behind those sources. Keyword hits are removed in the browser: `_not` over the keyword
-// condition drops everyone with an empty searched column (NOT of SQL NULL is NULL, not true).
+// condition drops everyone with an empty searched column (NOT of SQL NULL is NULL, not true). The
+// limit only guards against runaway results: at most 50 sources come back, each with a handful of
+// people, so all of them arrive before the browser drops keyword hits and ranks the rest.
 export const SIMILAR_EXPERTS = gql`
   ${EXPERT_FIELDS}
-  query SimilarExperts($sources: User_bool_exp!, $scope: User_bool_exp = {}, $isAdmin: Boolean!, $limit: Int = 50) {
+  query SimilarExperts($sources: User_bool_exp!, $scope: User_bool_exp = {}, $isAdmin: Boolean!, $limit: Int = 500) {
     User(limit: $limit, where: { _and: [{ status: { _eq: ACTIVE } }, $scope, $sources] }) {
       ...ExpertFields
     }

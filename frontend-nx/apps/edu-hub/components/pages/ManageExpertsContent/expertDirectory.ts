@@ -244,15 +244,24 @@ export const findMatches = (expert: ExpertsList_User, roles: ExpertRole[], searc
 };
 
 /**
- * Whether the keyword search lists this person: every word is in one of their searched fields
- * (the same fields and "contains" rule as EXPERT_SEARCH_FIELDS).
+ * Whether the keyword search lists this person: every word is in one of their searched fields.
+ * It mirrors the server filter (EXPERT_SEARCH_FIELDS, case-insensitive "contains" on the raw
+ * column), so it reads both organization columns and the unformatted texts, unlike the match
+ * explanation.
  */
 export const matchesAllWords = (expert: ExpertsList_User, roles: ExpertRole[], search: string): boolean => {
   const words = searchWords(search);
   if (!words.length) return false;
-  const texts = [...personTexts(expert), ...roles.flatMap((role) => role.texts)]
-    .map(({ value }) => (value ? plainText(value).toLowerCase() : ''))
-    .filter(Boolean);
+  const texts = [
+    expert.firstName,
+    expert.lastName,
+    expert.email,
+    expert.organizationName,
+    expert.Organization?.name,
+    ...roles.flatMap((role) => role.texts.map(({ value }) => value)),
+  ]
+    .filter((value): value is string => Boolean(value))
+    .map((value) => value.toLowerCase());
   return words.every((word) => texts.some((text) => text.includes(word)));
 };
 

@@ -13,16 +13,18 @@ import syncExpertEmbeddings from '../syncExpertEmbeddings/index.js';
 import semanticExpertSearch from '../semanticExpertSearch/index.js';
 
 const logger = { info: jest.fn(), warn: jest.fn(), error: jest.fn() };
+// Settings as lib/config.js's env() reads them.
+const settings = (values) => (name) => values[name];
 const cosine = (a, b) => a.reduce((sum, value, index) => sum + value * b[index], 0);
 
 describe('embeddingConfig', () => {
   it('is off without a provider and keys the model by provider', () => {
-    expect(embeddingConfig({})).toBeNull();
-    expect(embeddingConfig({ EMBEDDING_PROVIDER: 'vertex', EMBEDDING_LOCATION: 'europe-west3' })).toMatchObject({
+    expect(embeddingConfig(settings({}))).toBeNull();
+    expect(embeddingConfig(settings({ EMBEDDING_PROVIDER: 'vertex', EMBEDDING_LOCATION: 'europe-west3' }))).toMatchObject({
       modelKey: 'vertex:gemini-embedding-001',
       minSimilarity: 0.6,
     });
-    expect(embeddingConfig({ EMBEDDING_PROVIDER: 'fake', EXPERT_SEARCH_MIN_SIMILARITY: '0.3' }).minSimilarity).toBe(0.3);
+    expect(embeddingConfig(settings({ EMBEDDING_PROVIDER: 'fake', EXPERT_SEARCH_MIN_SIMILARITY: '0.3' })).minSimilarity).toBe(0.3);
   });
 });
 
@@ -52,11 +54,11 @@ describe('Vertex AI provider', () => {
       if (String(url).endsWith('/token')) return { ok: true, json: async () => ({ access_token: 'tok', expires_in: 3600 }) };
       return { ok: true, json: async () => ({ predictions: [{ embeddings: { values } }] }) };
     });
-    const config = embeddingConfig({
+    const config = embeddingConfig(settings({
       EMBEDDING_PROVIDER: 'vertex',
       EMBEDDING_LOCATION: 'europe-west3',
       EMBEDDING_PROJECT_ID: 'proj',
-    });
+    }));
 
     const result = await embedText(config, '<b>KI</b> im Mittelstand', 'RETRIEVAL_QUERY', { fetchImpl });
 
@@ -76,7 +78,7 @@ describe('Vertex AI provider', () => {
 describe('syncExpertEmbeddings', () => {
   it('does nothing while semantic search is off', async () => {
     const gql = { request: jest.fn() };
-    expect(await syncExpertEmbeddings({}, logger, { gql, env: {} })).toMatchObject({ success: true });
+    expect(await syncExpertEmbeddings({}, logger, { gql, read: settings({}) })).toMatchObject({ success: true });
     expect(gql.request).not.toHaveBeenCalled();
   });
 
@@ -102,7 +104,7 @@ describe('syncExpertEmbeddings', () => {
   it('drops stale vectors and embeds new or changed sources', async () => {
     const gql = fakeGql([{ sourceType: 'COURSE', sourceId: 7, text: 'Deep Learning', contentHash: 'h' }]);
 
-    const result = await syncExpertEmbeddings({}, logger, { gql, env: { EMBEDDING_PROVIDER: 'fake' } });
+    const result = await syncExpertEmbeddings({}, logger, { gql, read: settings({ EMBEDDING_PROVIDER: 'fake' }) });
 
     expect(result).toEqual({ success: true, deleted: 2, embedded: 1, failed: 0, remaining: 0 });
     expect(gql.request.mock.calls[0][1]).toEqual({ model: 'fake:word-hash-768' });
@@ -119,29 +121,36 @@ describe('syncExpertEmbeddings', () => {
       contentHash: `h${index}`,
     }));
 
-    const result = await syncExpertEmbeddings({}, logger, { gql: fakeGql(sources), env: { EMBEDDING_PROVIDER: 'fake' } });
+    const result = await syncExpertEmbeddings({}, logger, { gql: fakeGql(sources), read: settings({ EMBEDDING_PROVIDER: 'fake' }) });
 
     expect(result).toEqual({ success: false, deleted: 2, embedded: 249, failed: 1, remaining: 1 });
   });
 
-  it('stops after its time budget and reports what is left', async () => {
+  it('stops starting new groups once its time budget is used up', async () => {
     const sources = Array.from({ length: 250 }, (_, index) => ({
       sourceType: 'COURSE',
       sourceId: index,
       text: `Course ${index}`,
       contentHash: `h${index}`,
     }));
+    // Time passes while embeddings are written (10 s per text), not only when the clock is read.
     let clock = 0;
-    const now = () => (clock += 1000);
-
-    const result = await syncExpertEmbeddings({}, logger, {
-      gql: fakeGql(sources),
-      env: { EMBEDDING_PROVIDER: 'fake' },
-      now,
-      timeBudgetMs: 1500,
+    const gql = fakeGql(sources);
+    const request = gql.request;
+    gql.request = jest.fn(async (query, variables) => {
+      if (query.includes('insert_ExpertRoleEmbedding_one')) clock += 10_000;
+      return request(query, variables);
     });
 
-    expect(result).toMatchObject({ embedded: 100, remaining: 150 });
+    const result = await syncExpertEmbeddings({}, logger, {
+      gql,
+      read: settings({ EMBEDDING_PROVIDER: 'fake' }),
+      now: () => clock,
+      timeBudgetMs: 120_000,
+    });
+
+    // Groups of 4 start at 0, 40, 80 s; at 120 s no further group starts.
+    expect(result).toMatchObject({ embedded: 12, remaining: 238 });
   });
 });
 
@@ -152,7 +161,7 @@ describe('semanticExpertSearch', () => {
 
   it('only answers admins and org admins', async () => {
     const gql = { request: jest.fn() };
-    expect(await semanticExpertSearch(request('user'), logger, { gql, env: { EMBEDDING_PROVIDER: 'fake' } })).toMatchObject({
+    expect(await semanticExpertSearch(request('user'), logger, { gql, read: settings({ EMBEDDING_PROVIDER: 'fake' }) })).toMatchObject({
       success: false,
       matches: [],
     });
@@ -161,24 +170,54 @@ describe('semanticExpertSearch', () => {
 
   it('reports itself disabled without a provider and skips very short searches', async () => {
     const gql = { request: jest.fn() };
-    expect(await semanticExpertSearch(request('admin'), logger, { gql, env: {} })).toEqual({
+    expect(await semanticExpertSearch(request('admin'), logger, { gql, read: settings({}) })).toEqual({
       success: true,
       enabled: false,
       matches: [],
     });
     expect(
-      await semanticExpertSearch(request('org_admin', 'ki'), logger, { gql, env: { EMBEDDING_PROVIDER: 'fake' } })
+      await semanticExpertSearch(request('org_admin', 'ki'), logger, { gql, read: settings({ EMBEDDING_PROVIDER: 'fake' }) })
     ).toEqual({ success: true, enabled: true, matches: [] });
     expect(gql.request).not.toHaveBeenCalled();
+  });
+
+  it('finds nothing for a search without words long enough to embed', async () => {
+    const gql = { request: jest.fn() };
+    expect(
+      await semanticExpertSearch(request('admin', 'AI ML UX'), logger, { gql, read: settings({ EMBEDDING_PROVIDER: 'fake' }) })
+    ).toEqual({ success: true, enabled: true, matches: [] });
+    expect(gql.request).not.toHaveBeenCalled();
+  });
+
+  it("limits an org admin's matches to their organizations before the match limit", async () => {
+    const gql = {
+      request: jest.fn(async (query) =>
+        query.includes('ExpertSearchOrganizations')
+          ? { OrganizationAdmin: [{ organizationId: 4 }, { organizationId: 9 }, { organizationId: 4 }] }
+          : { match_expert_roles: [] }
+      ),
+    };
+    const orgAdmin = request('org_admin');
+    orgAdmin.body.session_variables['x-hasura-user-id'] = 'u-1';
+
+    await semanticExpertSearch(orgAdmin, logger, { gql, read: settings({ EMBEDDING_PROVIDER: 'fake' }) });
+
+    expect(gql.request.mock.calls[0][1]).toEqual({ userId: 'u-1' });
+    expect(gql.request.mock.calls[1][1]).toMatchObject({ organizationIds: '{4,9}' });
   });
 
   it('returns the matched sources for the model in use', async () => {
     const matches = [{ sourceType: 'SESSION', sourceId: 3, similarity: 0.7 }];
     const gql = { request: jest.fn(async () => ({ match_expert_roles: matches })) };
 
-    const result = await semanticExpertSearch(request('org_admin'), logger, { gql, env: { EMBEDDING_PROVIDER: 'fake' } });
+    const result = await semanticExpertSearch(request('admin'), logger, { gql, read: settings({ EMBEDDING_PROVIDER: 'fake' }) });
 
     expect(result).toEqual({ success: true, enabled: true, matches });
-    expect(gql.request.mock.calls[0][1]).toMatchObject({ model: 'fake:word-hash-768', minSimilarity: 0.2, count: 50 });
+    expect(gql.request.mock.calls[0][1]).toMatchObject({
+      model: 'fake:word-hash-768',
+      minSimilarity: 0.2,
+      count: 50,
+      organizationIds: null,
+    });
   });
 });

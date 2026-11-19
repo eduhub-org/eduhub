@@ -67,12 +67,15 @@ COMMENT ON TABLE "public"."ExpertRoleMatch" IS
   E'Return type of match_expert_roles (semantic expert search); always empty.';
 
 -- The sources most similar to a query embedding (cosine similarity), for one model. The embedding
--- is passed as text ("[0.1, ...]") since GraphQL has no vector type.
+-- is passed as text ("[0.1, ...]") since GraphQL has no vector type. organization_ids (null for
+-- admins) keeps only sources in programs of those organizations, before the limit applies, so an
+-- org admin's best matches are not crowded out by other organizations' sources.
 CREATE OR REPLACE FUNCTION "public"."match_expert_roles"(
   query_embedding text,
   embedding_model text,
   min_similarity double precision,
-  match_count integer
+  match_count integer,
+  organization_ids integer[] DEFAULT NULL
 )
 RETURNS SETOF "public"."ExpertRoleMatch"
 LANGUAGE sql
@@ -82,6 +85,27 @@ AS $$
     FROM "public"."ExpertRoleEmbedding" e
    WHERE e."model" = embedding_model
      AND 1 - (e."embedding" <=> query_embedding::vector) >= min_similarity
+     AND (
+       organization_ids IS NULL
+       OR (e."sourceType" = 'COURSE' AND EXISTS (
+             SELECT 1 FROM "public"."Course" c JOIN "public"."Program" p ON p."id" = c."programId"
+              WHERE c."id" = e."sourceId" AND p."organizationId" = ANY (organization_ids)))
+       OR (e."sourceType" = 'SESSION' AND EXISTS (
+             SELECT 1 FROM "public"."Session" s
+               JOIN "public"."Course" c ON c."id" = s."courseId"
+               JOIN "public"."Program" p ON p."id" = c."programId"
+              WHERE s."id" = e."sourceId" AND p."organizationId" = ANY (organization_ids)))
+       OR (e."sourceType" = 'PROJECT' AND EXISTS (
+             SELECT 1 FROM "public"."ProjectCourse" pc
+               JOIN "public"."Course" c ON c."id" = pc."courseId"
+               JOIN "public"."Program" p ON p."id" = c."programId"
+              WHERE pc."projectId" = e."sourceId" AND p."organizationId" = ANY (organization_ids)))
+       OR (e."sourceType" = 'ACHIEVEMENT_OPTION' AND EXISTS (
+             SELECT 1 FROM "public"."AchievementOptionCourse" aoc
+               JOIN "public"."Course" c ON c."id" = aoc."courseId"
+               JOIN "public"."Program" p ON p."id" = c."programId"
+              WHERE aoc."achievementOptionId" = e."sourceId" AND p."organizationId" = ANY (organization_ids)))
+     )
    ORDER BY e."embedding" <=> query_embedding::vector
    LIMIT match_count
 $$;

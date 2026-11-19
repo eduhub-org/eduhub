@@ -29,14 +29,18 @@ export const SimilarExperts: FC<SimilarExpertsProps> = ({ search, isAdmin, scope
   const query = search.trim();
   const tooShort = query.length < MIN_SEARCH_LENGTH;
 
-  const { data: searchData, loading: searching } = useManageQuery<SemanticExpertSearch>(SEMANTIC_EXPERT_SEARCH, {
+  const {
+    data: searchData,
+    loading: searching,
+    error: searchError,
+  } = useManageQuery<SemanticExpertSearch>(SEMANTIC_EXPERT_SEARCH, {
     variables: { query },
     skip: tooShort,
   });
   const result = searchData?.semanticExpertSearch;
   const matches = useMemo(() => (tooShort ? [] : result?.matches ?? []), [tooShort, result]);
 
-  const { data, loading } = useManageQuery<SimilarExpertsData>(SIMILAR_EXPERTS, {
+  const { data, loading, error: peopleError } = useManageQuery<SimilarExpertsData>(SIMILAR_EXPERTS, {
     variables: { sources: sourcesCondition(matches), scope, isAdmin },
     skip: matches.length === 0,
   });
@@ -56,6 +60,9 @@ export const SimilarExperts: FC<SimilarExpertsProps> = ({ search, isAdmin, scope
     [data, matches, query]
   );
 
+  // A failed request (Apollo error) or a failed search (success: false) is not an empty result.
+  const unavailable = Boolean(searchError || peopleError || result?.success === false);
+
   if (tooShort || result?.enabled === false) return null;
 
   return (
@@ -63,10 +70,10 @@ export const SimilarExperts: FC<SimilarExpertsProps> = ({ search, isAdmin, scope
       <h3 className="text-lg font-medium">{t('similar_headline')}</h3>
       <p className="text-sm text-label-secondary mb-3">{t('similar_hint')}</p>
       {(searching || loading) && <p className="text-sm text-label-secondary">{t('similar_loading')}</p>}
-      {!searching && !loading && result?.success === false && (
+      {!searching && !loading && unavailable && (
         <p className="text-sm text-label-secondary">{t('similar_unavailable')}</p>
       )}
-      {!searching && !loading && result?.success !== false && ranked.length === 0 && (
+      {!searching && !loading && !unavailable && ranked.length === 0 && (
         <p className="text-sm text-label-secondary">{t('similar_none')}</p>
       )}
       <ul className="flex flex-col gap-2">
