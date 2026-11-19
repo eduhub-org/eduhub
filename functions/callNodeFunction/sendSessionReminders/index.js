@@ -73,11 +73,14 @@ function formatDuration(start, end) {
 /**
  * Where the session takes place, as display strings: a linked venue as
  * "Label (Address)", else the free-text address, which for online sessions is
- * the meeting link. Online without a link yet just says "Online".
+ * the meeting link. A session without its own venue or address uses its course
+ * location's default, as the course page does. Online without a link yet just
+ * says "Online".
  */
 export function resolveSessionLocations(sessionAddresses = []) {
   const locations = sessionAddresses.map((sa) => {
-    const venue = sa.LocationAddress;
+    const courseLocation = sa.CourseLocation;
+    const venue = sa.LocationAddress ?? courseLocation?.DefaultSessionAddress;
     const label = venue?.shortLabel?.trim();
     const venueAddress = venue?.address?.trim();
     if (venueAddress) {
@@ -85,9 +88,9 @@ export function resolveSessionLocations(sessionAddresses = []) {
         ? `${label} (${venueAddress})`
         : venueAddress;
     }
-    const address = sa.address?.trim();
+    const address = sa.address?.trim() || courseLocation?.defaultSessionAddress?.trim();
     if (address) return address;
-    return sa.CourseLocation?.locationOption === 'ONLINE' ? 'Online' : '';
+    return (courseLocation?.locationOption ?? sa.locationOption) === 'ONLINE' ? 'Online' : '';
   });
   return [...new Set(locations.filter(Boolean))];
 }
@@ -116,8 +119,14 @@ const GET_REMINDER_CANDIDATES = gql`
         endDateTime
         SessionAddresses(order_by: { id: asc }) {
           address
+          locationOption
           CourseLocation {
             locationOption
+            defaultSessionAddress
+            DefaultSessionAddress {
+              shortLabel
+              address
+            }
           }
           LocationAddress {
             shortLabel
