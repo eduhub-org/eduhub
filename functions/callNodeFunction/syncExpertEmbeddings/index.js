@@ -3,13 +3,16 @@ import { embedText, embeddingConfig, toVectorLiteral } from "../lib/expertEmbedd
 
 /**
  * Keeps the Expert Role embeddings (ADR 0004) in step with the course, session, project and
- * achievement-option texts. Run by a Hasura cron trigger: it drops vectors of another model or of
- * sources that no longer have instructors, speakers or mentors, then embeds up to BATCH_SIZE new or
- * changed sources. A first run on an existing database therefore backfills over several runs.
+ * achievement-option texts. Run nightly by a Hasura cron trigger: it drops vectors of another model
+ * or of sources that no longer have instructors, speakers or mentors, then embeds new or changed
+ * sources batch by batch until none are left or the time budget is used up. A first run on an
+ * existing database backfills as much as fits; the following nights finish the rest.
  */
 
-const BATCH_SIZE = 200;
+const BATCH_SIZE = 100;
 const CONCURRENCY = 4;
+// Below the cron trigger's 170 s timeout and callNodeFunction's 180 s, with room for the last batch.
+const TIME_BUDGET_MS = 120_000;
 
 const DELETE_STALE = `
   mutation DeleteStaleExpertRoleEmbeddings($model: String!) {
@@ -54,42 +57,56 @@ const client = () =>
     headers: { "x-hasura-admin-secret": process.env.HASURA_ADMIN_SECRET },
   });
 
-export default async function syncExpertEmbeddings(req, logger, { gql = client(), env = process.env, fetchImpl } = {}) {
+export default async function syncExpertEmbeddings(
+  req,
+  logger,
+  { gql = client(), env = process.env, fetchImpl, now = Date.now, timeBudgetMs = TIME_BUDGET_MS } = {}
+) {
   const config = embeddingConfig(env);
   if (!config) return { success: true, skipped: "EMBEDDING_PROVIDER is not set" };
 
+  const startedAt = now();
   const deleted = (await gql.request(DELETE_STALE, { model: config.modelKey })).delete_ExpertRoleEmbedding
     .affected_rows;
-  const result = await gql.request(SOURCES_TO_EMBED, { limit: BATCH_SIZE });
-  const sources = result.ExpertRoleSource;
-  const pending = result.ExpertRoleSource_aggregate.aggregate.count;
 
   let embedded = 0;
-  let failed = 0;
-  for (let index = 0; index < sources.length; index += CONCURRENCY) {
-    await Promise.all(
-      sources.slice(index, index + CONCURRENCY).map(async (source) => {
-        try {
-          const values = await embedText(config, source.text, "RETRIEVAL_DOCUMENT", { fetchImpl });
-          await gql.request(UPSERT_EMBEDDING, {
-            object: {
-              sourceType: source.sourceType,
-              sourceId: source.sourceId,
-              model: config.modelKey,
-              contentHash: source.contentHash,
-              embedding: toVectorLiteral(values),
-            },
-          });
-          embedded += 1;
-        } catch (error) {
-          // One bad text must not block the others; it is retried on the next run.
-          failed += 1;
-          logger.warn(`Could not embed ${source.sourceType} ${source.sourceId}`, { error: error.message });
-        }
-      })
-    );
+  let remaining = 0;
+  // Sources that failed in this run still need embedding; skipping them keeps them from blocking
+  // the others. They are retried the next night.
+  const failedKeys = new Set();
+  const keyOf = (source) => `${source.sourceType}:${source.sourceId}`;
+
+  const embedSource = async (source) => {
+    try {
+      const values = await embedText(config, source.text, "RETRIEVAL_DOCUMENT", { fetchImpl });
+      await gql.request(UPSERT_EMBEDDING, {
+        object: {
+          sourceType: source.sourceType,
+          sourceId: source.sourceId,
+          model: config.modelKey,
+          contentHash: source.contentHash,
+          embedding: toVectorLiteral(values),
+        },
+      });
+      embedded += 1;
+      remaining -= 1;
+    } catch (error) {
+      failedKeys.add(keyOf(source));
+      logger.warn(`Could not embed ${source.sourceType} ${source.sourceId}`, { error: error.message });
+    }
+  };
+
+  while (now() - startedAt < timeBudgetMs) {
+    const result = await gql.request(SOURCES_TO_EMBED, { limit: BATCH_SIZE + failedKeys.size });
+    remaining = result.ExpertRoleSource_aggregate.aggregate.count;
+    const sources = result.ExpertRoleSource.filter((source) => !failedKeys.has(keyOf(source)));
+    if (sources.length === 0) break;
+    for (let index = 0; index < sources.length; index += CONCURRENCY) {
+      await Promise.all(sources.slice(index, index + CONCURRENCY).map(embedSource));
+    }
   }
 
-  logger.info("Synced expert role embeddings", { deleted, embedded, failed, remaining: pending - embedded });
-  return { success: failed === 0, deleted, embedded, failed, remaining: pending - embedded };
+  const failed = failedKeys.size;
+  logger.info("Synced expert role embeddings", { deleted, embedded, failed, remaining });
+  return { success: failed === 0, deleted, embedded, failed, remaining };
 }

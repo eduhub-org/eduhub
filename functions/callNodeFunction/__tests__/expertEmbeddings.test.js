@@ -80,19 +80,27 @@ describe('syncExpertEmbeddings', () => {
     expect(gql.request).not.toHaveBeenCalled();
   });
 
-  it('drops stale vectors and embeds new or changed sources', async () => {
-    const gql = {
-      request: jest.fn(async (query) => {
+  // A fake database: sources stop needing an embedding once one was stored for them.
+  const fakeGql = (sources) => {
+    const pending = [...sources];
+    return {
+      request: jest.fn(async (query, variables) => {
         if (query.includes('delete_ExpertRoleEmbedding')) return { delete_ExpertRoleEmbedding: { affected_rows: 2 } };
         if (query.includes('ExpertRoleSourcesToEmbed')) {
           return {
-            ExpertRoleSource: [{ sourceType: 'COURSE', sourceId: 7, text: 'Deep Learning', contentHash: 'h' }],
-            ExpertRoleSource_aggregate: { aggregate: { count: 1 } },
+            ExpertRoleSource: pending.slice(0, variables.limit),
+            ExpertRoleSource_aggregate: { aggregate: { count: pending.length } },
           };
         }
+        const { sourceType, sourceId } = variables.object;
+        pending.splice(pending.findIndex((source) => source.sourceType === sourceType && source.sourceId === sourceId), 1);
         return { insert_ExpertRoleEmbedding_one: { id: 1 } };
       }),
     };
+  };
+
+  it('drops stale vectors and embeds new or changed sources', async () => {
+    const gql = fakeGql([{ sourceType: 'COURSE', sourceId: 7, text: 'Deep Learning', contentHash: 'h' }]);
 
     const result = await syncExpertEmbeddings({}, logger, { gql, env: { EMBEDDING_PROVIDER: 'fake' } });
 
@@ -101,6 +109,39 @@ describe('syncExpertEmbeddings', () => {
     const upsert = gql.request.mock.calls[2][1].object;
     expect(upsert).toMatchObject({ sourceType: 'COURSE', sourceId: 7, model: 'fake:word-hash-768', contentHash: 'h' });
     expect(upsert.embedding.startsWith('[')).toBe(true);
+  });
+
+  it('keeps embedding batches until nothing is left, skipping texts that fail', async () => {
+    const sources = Array.from({ length: 250 }, (_, index) => ({
+      sourceType: 'SESSION',
+      sourceId: index,
+      text: index === 3 ? '' : `Session ${index} about machine learning`,
+      contentHash: `h${index}`,
+    }));
+
+    const result = await syncExpertEmbeddings({}, logger, { gql: fakeGql(sources), env: { EMBEDDING_PROVIDER: 'fake' } });
+
+    expect(result).toEqual({ success: false, deleted: 2, embedded: 249, failed: 1, remaining: 1 });
+  });
+
+  it('stops after its time budget and reports what is left', async () => {
+    const sources = Array.from({ length: 250 }, (_, index) => ({
+      sourceType: 'COURSE',
+      sourceId: index,
+      text: `Course ${index}`,
+      contentHash: `h${index}`,
+    }));
+    let clock = 0;
+    const now = () => (clock += 1000);
+
+    const result = await syncExpertEmbeddings({}, logger, {
+      gql: fakeGql(sources),
+      env: { EMBEDDING_PROVIDER: 'fake' },
+      now,
+      timeBudgetMs: 1500,
+    });
+
+    expect(result).toMatchObject({ embedded: 100, remaining: 150 });
   });
 });
 

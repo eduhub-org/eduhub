@@ -24,14 +24,14 @@ setup yet.
    Cloud SQL).
 5. **Hybrid results:** exact keyword hits first, then semantic hits labelled
    "similar". Without a search the directory keeps its Last Active order.
-6. **Freshness:** a Hasura cron trigger (`sync_expert_embeddings`, every 10
-   minutes) embeds up to 200 new or changed sources per run and drops vectors
-   of removed sources or of another model. The view `ExpertRoleSource` marks
+6. **Freshness:** a Hasura cron trigger (`sync_expert_embeddings`, nightly at
+   02:00 UTC) embeds new or changed sources for up to two minutes per run and
+   drops vectors of removed sources or of another model. The view `ExpertRoleSource` marks
    what needs embedding by comparing an md5 of the text, so the first runs
    backfill an existing database without a separate script. We chose this over
    event triggers on four tables (plus their instructor, speaker and mentor
-   links): one job covers every way a text or a role can change, and a few
-   minutes of delay do not matter for finding experts.
+   links): one job covers every way a text or a role can change, and a day of
+   delay does not matter for finding experts.
 7. **Only sources with people are embedded:** courses with instructors,
    sessions with speakers, projects and achievement options with mentors.
 8. **Local development** uses a `fake` provider that embeds by shared words,

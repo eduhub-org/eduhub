@@ -61,7 +61,8 @@ semantic search (phase 2) covers finding people by topic.
 - Google Vertex AI (`gemini-embedding-001`, 768 dimensions) in the region
   production runs in, stored with `pgvector`. The cron trigger
   `sync_expert_embeddings` (node function `syncExpertEmbeddings`) keeps the
-  vectors in step every 10 minutes and backfills on its first runs.
+  vectors in step nightly and backfills on its first runs; new courses and
+  sessions show up among similar experts the next day.
 - **Hybrid results**: the table keeps the keyword hits; below it,
   **Similar Experts** lists up to 20 people whose roles are close in meaning to
   the search but who did not match its words, each with the role they are
