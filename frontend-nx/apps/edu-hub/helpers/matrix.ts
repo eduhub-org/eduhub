@@ -58,9 +58,8 @@ export const toMatrixUserId = (
 
 /**
  * A matrix.to link to this person, from where they can be messaged in Element
- * X, Element Classic or the browser - see matrixRoomUrl for why not our own
- * Element web client. Null when the handle cannot be addressed. The server name
- * falls back to DEFAULT_MATRIX_SERVER_NAME, so this works unconfigured.
+ * X or Element Classic. Null when the handle cannot be addressed. The server
+ * name falls back to DEFAULT_MATRIX_SERVER_NAME, so this works unconfigured.
  */
 export const matrixDirectMessageUrl = (
   matrixUserHandle: string | null | undefined,
@@ -73,13 +72,29 @@ export const matrixDirectMessageUrl = (
 };
 
 /**
+ * A link that opens a direct message with this person in our own Element web
+ * client, or null when the handle or the Element client is missing.
+ */
+export const elementDirectMessageUrl = (
+  matrixUserHandle: string | null | undefined,
+  serverName: string | null | undefined = process.env.NEXT_PUBLIC_MATRIX_SERVER_NAME,
+  elementClientUrl: string | null | undefined = process.env.NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL
+): string | null => {
+  const matrixUserId = toMatrixUserId(matrixUserHandle, trimAndNull(serverName) ?? DEFAULT_MATRIX_SERVER_NAME);
+  const base = trimAndNull(elementClientUrl)?.replace(/\/+$/, '');
+  if (!matrixUserId || !base) return null;
+  return `${base}/#/user/${matrixUserId}`;
+};
+
+/**
  * A matrix.to link to a room, or null when there is no room id.
  *
- * matrix.to rather than our own Element web client, because matrix.to lets the
- * person choose where the room opens: Element X, Element Classic or the
- * browser. A link to element-chat.opencampus.sh always opens the browser on a
- * phone, so app users had to log in there once before the room appeared in
- * their app - participants are not invited, they join through this link.
+ * This is the link for the Element apps (X and Classic): matrix.to offers to
+ * open the room in an installed app, whereas a link to our own Element web
+ * client always opens the browser on a phone. It is no link for the browser,
+ * though: matrix.to sends web users to app.element.io and ignores a
+ * `web-instance` hint for any host outside its own allowlist, so it can never
+ * open element-chat.opencampus.sh. Hence the pair in matrixRoomLinks.
  *
  * `via` names a server that can let the person join. It comes from the room
  * id's own server part and falls back to the EduHub server name for room ids
@@ -95,3 +110,33 @@ export const matrixRoomUrl = (
   const via = roomServer ?? trimAndNull(serverName) ?? DEFAULT_MATRIX_SERVER_NAME;
   return `https://matrix.to/#/${id}?via=${encodeURIComponent(via)}`;
 };
+
+/** A link that opens a room in our own Element web client, or null when either is missing. */
+export const elementRoomUrl = (
+  roomId: string | null | undefined,
+  elementClientUrl: string | null | undefined = process.env.NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL
+): string | null => {
+  const id = trimAndNull(roomId);
+  const base = trimAndNull(elementClientUrl)?.replace(/\/+$/, '');
+  return id && base ? `${base}/#/room/${id}` : null;
+};
+
+/**
+ * Where a Matrix link should go: `web` opens our Element web client (where
+ * people are already logged in on a laptop), `app` goes through matrix.to so
+ * Element X or Element Classic can take it on a phone. Without a configured
+ * web client, matrix.to is the only link and `app` is null.
+ */
+export interface MatrixLinks {
+  web: string | null;
+  app: string | null;
+}
+
+const pairLinks = (web: string | null, app: string | null): MatrixLinks =>
+  web ? { web, app } : { web: app, app: null };
+
+export const matrixRoomLinks = (roomId: string | null | undefined): MatrixLinks =>
+  pairLinks(elementRoomUrl(roomId), matrixRoomUrl(roomId));
+
+export const matrixDirectMessageLinks = (matrixUserHandle: string | null | undefined): MatrixLinks =>
+  pairLinks(elementDirectMessageUrl(matrixUserHandle), matrixDirectMessageUrl(matrixUserHandle));

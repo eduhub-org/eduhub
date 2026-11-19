@@ -50,7 +50,7 @@ import InputField from '../../../inputs/InputField';
 import { Button as ChatLinkButton } from '../../../common/Button';
 import MobileCollapsible from './MobileCollapsible';
 import { CourseTeamCard } from './CourseTeamCard';
-import { matrixRoomUrl } from '../../../../helpers/matrix';
+import { matrixRoomLinks } from '../../../../helpers/matrix';
 interface IProps {
   course: ManagedCourse_Course_by_pk;
   qResult: QueryResult<any, any>;
@@ -62,7 +62,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
   const tCourse = useTranslations('course');
 
   const programInstructorRoomId = course.Program?.matrixInstructorRoomId?.trim();
-  const programOrganizerChatLink = matrixRoomUrl(programInstructorRoomId);
+  const programOrganizerChatLink = matrixRoomLinks(programInstructorRoomId).web;
 
   const [insertCourseLocation] = useRoleMutation<InsertCourseLocation, InsertCourseLocationVariables>(
     INSERT_COURSE_LOCATION,

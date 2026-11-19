@@ -367,6 +367,7 @@
       "ects": "ECTS",
       "course_not_available": "This offering is not available.",
       "to_course_chat": "GO TO CHAT",
+      "open_chat_in_app": "Open in the Element app",
       "to_online_meeting": "GO TO ONLINE MEETING",
       "no_online_participation_available": "Online participation is not offered.",
       "speaker": "Speaker",
@@ -788,6 +789,7 @@
     "participants": {
       "title": "Who's here",
       "message_on_element": "Message on Element",
+      "message_in_app": "in the app",
       "and_more": "and {count} more",
       "count": "{count, plural, one {# participant} other {# participants}}",
       "show_all": "Show all",
@@ -2359,6 +2361,7 @@
     "course_team": {
       "title": "Course team",
       "message_on_element": "Message on Element",
+      "message_in_app": "in the app",
       "split_explanation": "The fee of {total} covers the whole course, regardless of how many instructors there are. Please agree among yourselves and split it according to the time and effort each of you put into the course (e.g. number of sessions). As soon as one person downloads their invoice, the split is fixed for everyone.",
       "split_explanation_event": "The fee of {total} covers the whole event, regardless of how many organizers there are. Please agree among yourselves and split it according to the time and effort each of you put into the event. As soon as one person downloads their invoice, the split is fixed for everyone.",
       "share_label": "Share of {name} in euros",

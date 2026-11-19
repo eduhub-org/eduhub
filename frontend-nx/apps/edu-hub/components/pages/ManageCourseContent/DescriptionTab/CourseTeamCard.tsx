@@ -8,7 +8,7 @@ import { Button } from '../../../common/Button';
 import { ErrorMessageDialog } from '../../../common/dialogs/ErrorMessageDialog';
 import { QuestionConfirmationDialog } from '../../../common/dialogs/QuestionConfirmationDialog';
 import InputField from '../../../inputs/InputField';
-import { matrixDirectMessageUrl } from '../../../../helpers/matrix';
+import { matrixDirectMessageLinks } from '../../../../helpers/matrix';
 import { getCertificateDownloadUrl } from '../../../../helpers/certificateDownload';
 import { centsToEuroInput, formatEuro, summarizeSplit } from '../../../../helpers/instructorPayment';
 import { useRoleQuery } from '../../../../hooks/authedQuery';
@@ -176,21 +176,36 @@ export const CourseTeamCard: FC<IProps> = ({ courseId, isEventCourse }) => {
         {members.map((member) => {
           const isMe = member.User.id === userId;
           // Undefined for org admins, whose query leaves the handle out.
-          const elementUrl = isMe ? null : matrixDirectMessageUrl(member.User.matrixUserHandle);
+          const chat = isMe ? null : matrixDirectMessageLinks(member.User.matrixUserHandle);
           return (
             <li key={member.id} className="flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-3">
                 <UserCard user={member.User} size="compact" />
-                {elementUrl ? (
-                  <a
-                    href={elementUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 text-xs text-label-secondary transition-colors hover:text-brand min-h-[24px]"
-                  >
-                    <SiElement aria-hidden="true" />
-                    {t('message_on_element')}
-                  </a>
+                {chat?.web ? (
+                  <span className="inline-flex flex-wrap items-center gap-x-1.5 text-xs text-label-secondary">
+                    <a
+                      href={chat.web}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 transition-colors hover:text-brand min-h-[24px]"
+                    >
+                      <SiElement aria-hidden="true" />
+                      {t('message_on_element')}
+                    </a>
+                    {chat.app ? (
+                      <>
+                        <span aria-hidden="true">·</span>
+                        <a
+                          href={chat.app}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center transition-colors hover:text-brand min-h-[24px]"
+                        >
+                          {t('message_in_app')}
+                        </a>
+                      </>
+                    ) : null}
+                  </span>
                 ) : null}
               </div>
               {payment && !isSoleInstructor ? (

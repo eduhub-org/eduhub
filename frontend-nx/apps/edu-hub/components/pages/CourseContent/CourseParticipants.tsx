@@ -5,7 +5,7 @@ import { SiElement } from 'react-icons/si';
 
 import { SectionTitle } from '../../common/SectionTitle';
 import UserAvatar from '../../common/UserAvatar';
-import { matrixDirectMessageUrl } from '../../../helpers/matrix';
+import { matrixDirectMessageLinks } from '../../../helpers/matrix';
 import { useRoleQuery } from '../../../hooks/authedQuery';
 import { COURSE_PARTICIPANTS } from '../../../queries/courseParticipant';
 import {
@@ -41,7 +41,7 @@ const Participant: FC<{ participant: CourseParticipants_CourseParticipant }> = (
   const t = useTranslations('course');
   const user = participant.User;
 
-  const elementUrl = useMemo(() => matrixDirectMessageUrl(user?.matrixUserHandle), [user?.matrixUserHandle]);
+  const chat = useMemo(() => matrixDirectMessageLinks(user?.matrixUserHandle), [user?.matrixUserHandle]);
 
   return (
     <div className="flex items-center gap-3 min-w-0">
@@ -55,16 +55,31 @@ const Participant: FC<{ participant: CourseParticipants_CourseParticipant }> = (
       />
       <div className="flex flex-col min-w-0">
         <span className="text-sm font-semibold truncate">{fullName(user)}</span>
-        {elementUrl ? (
-          <a
-            href={elementUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-xs text-label-secondary hover:text-brand transition-colors min-h-[24px]"
-          >
-            <SiElement aria-hidden="true" />
-            {t('participants.message_on_element')}
-          </a>
+        {chat.web ? (
+          <span className="inline-flex flex-wrap items-center gap-x-1.5 text-xs text-label-secondary">
+            <a
+              href={chat.web}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 hover:text-brand transition-colors min-h-[24px]"
+            >
+              <SiElement aria-hidden="true" />
+              {t('participants.message_on_element')}
+            </a>
+            {chat.app ? (
+              <>
+                <span aria-hidden="true">·</span>
+                <a
+                  href={chat.app}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-brand transition-colors min-h-[24px] inline-flex items-center"
+                >
+                  {t('participants.message_in_app')}
+                </a>
+              </>
+            ) : null}
+          </span>
         ) : null}
       </div>
     </div>

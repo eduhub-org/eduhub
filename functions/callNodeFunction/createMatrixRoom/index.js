@@ -98,13 +98,8 @@ const deriveServerName = ({ explicitServerName, mainSpaceId, adminUserId }) => {
   return null;
 };
 
-// matrix.to lets people choose Element X, Element Classic or the browser; a link
-// to our own Element web client always opened the browser on phones. Mirrors
-// matrixRoomUrl in frontend-nx/apps/edu-hub/helpers/matrix.ts.
-const buildChatLink = (roomId, serverName) => {
-  const roomServer = roomId.includes(":") ? roomId.split(":").slice(1).join(":") : "";
-  return `https://matrix.to/#/${roomId}?via=${encodeURIComponent(roomServer || serverName)}`;
-};
+const buildChatLink = (elementClientUrl, roomId) =>
+  `${normalizeBaseUrl(elementClientUrl)}/#/room/${roomId}`;
 
 const matrixHeaders = (token) => ({
   Authorization: `Bearer ${token}`,
@@ -211,12 +206,13 @@ const sanitizeAliasLocalPart = (value) =>
 const getMatrixConfig = () => {
   const homeserverUrl = config.trimmedEnv('MATRIX_HOMESERVER_URL');
   const token = config.trimmedEnv('MATRIX_ADMIN_ACCESS_TOKEN');
+  const elementClientUrl = config.trimmedEnv('MATRIX_ELEMENT_CLIENT_URL');
   const mainSpaceId = config.trimmedEnv('MATRIX_MAIN_SPACE_ID');
   const adminUserId = config.trimmedEnv('MATRIX_ADMIN_USER_ID');
   const explicitServerName = config.trimmedEnv('MATRIX_SERVER_NAME');
   const serverName = deriveServerName({ explicitServerName, mainSpaceId, adminUserId });
 
-  if (!homeserverUrl || !token || !mainSpaceId || !serverName) {
+  if (!homeserverUrl || !token || !elementClientUrl || !mainSpaceId || !serverName) {
     return null;
   }
 
@@ -225,6 +221,7 @@ const getMatrixConfig = () => {
   return {
     homeserverUrl: normalizeBaseUrl(homeserverUrl),
     token,
+    elementClientUrl: normalizeBaseUrl(elementClientUrl),
     mainSpaceId,
     serverName,
     adminUserId: resolvedAdminUserId,
@@ -401,7 +398,7 @@ export default async function createMatrixRoom(req, logger) {
         messageKey: "MATRIX_ROOM_ALREADY_EXISTS",
         roomId: course.matrixRoomId,
         spaceId: program.matrixSpaceId,
-        chatLink: buildChatLink(course.matrixRoomId, matrixConfig.serverName),
+        chatLink: buildChatLink(matrixConfig.elementClientUrl, course.matrixRoomId),
         alreadyExists: true,
       };
     }
@@ -565,7 +562,7 @@ export default async function createMatrixRoom(req, logger) {
       messageKey: "MATRIX_ROOM_CREATED",
       spaceId,
       roomId: persistedRoomId,
-      chatLink: buildChatLink(persistedRoomId, matrixConfig.serverName),
+      chatLink: buildChatLink(matrixConfig.elementClientUrl, persistedRoomId),
       alreadyExists: persistedRoomId !== roomId,
     };
   } catch (error) {

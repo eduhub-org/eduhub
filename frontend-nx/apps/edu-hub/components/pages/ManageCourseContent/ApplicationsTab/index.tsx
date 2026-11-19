@@ -87,7 +87,7 @@ import {
 } from '../../../../__generated__/globalTypes';
 import { getPaymentStatusFromInvoices } from '../../../../utils/invoicePaymentStatus';
 import { useDisplayDate } from '../../../../helpers/dateTimeHelpers';
-import { matrixRoomUrl } from '../../../../helpers/matrix';
+import { matrixRoomLinks } from '../../../../helpers/matrix';
 import { BulkAction, ExpandedRowProps } from '../../../common/TableGrid/types';
 import { ApolloError } from '@apollo/client';
 import { ErrorMessageDialog } from '../../../common/dialogs/ErrorMessageDialog';
@@ -448,7 +448,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
   // admins, and org admins whose grant covers the course's program type (manageAsOrgAdmin).
   const canDecideRegistrations = isInstructor || isAdmin;
   const matrixRoomId = course.matrixRoomId?.trim();
-  const organizerCourseChatLink = matrixRoomUrl(matrixRoomId);
+  const organizerCourseChatLink = matrixRoomLinks(matrixRoomId).web;
 
   const features = useMemo(
     () => getRegistrationFeatures(course.registrationType),

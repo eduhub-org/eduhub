@@ -367,6 +367,7 @@
       "ects": "ECTS",
       "course_not_available": "Dieses Angebot ist nicht verfügbar.",
       "to_course_chat": "ZUM CHAT",
+      "open_chat_in_app": "In der Element-App öffnen",
       "to_online_meeting": "ZUM ONLINE-MEETING",
       "no_online_participation_available": "Eine Online-Teilnahme wird nicht angeboten.",
       "speaker": "Referent:in",
@@ -788,6 +789,7 @@
     "participants": {
       "title": "Wer ist dabei",
       "message_on_element": "Auf Element schreiben",
+      "message_in_app": "in der App",
       "and_more": "und {count} weitere",
       "count": "{count, plural, one {# Teilnehmer:in} other {# Teilnehmende}}",
       "show_all": "Alle anzeigen",
@@ -2344,6 +2346,7 @@
     "course_team": {
       "title": "Kursteam",
       "message_on_element": "Auf Element schreiben",
+      "message_in_app": "in der App",
       "split_explanation": "Die Vergütung von {total} gilt für den gesamten Kurs, unabhängig von der Anzahl der Kursleitenden. Bitte stimmt euch untereinander ab und teilt den Betrag danach auf, wie viel Zeit und Aufwand jede*r in den Kurs gesteckt hat (z. B. Anzahl der Sessions). Sobald eine Person ihre Rechnung herunterlädt, ist die Aufteilung für alle festgelegt.",
       "split_explanation_event": "Die Vergütung von {total} gilt für das gesamte Event, unabhängig von der Anzahl der Organisator:innen. Bitte stimmt euch untereinander ab und teilt den Betrag danach auf, wie viel Zeit und Aufwand jede*r in das Event gesteckt hat. Sobald eine Person ihre Rechnung herunterlädt, ist die Aufteilung für alle festgelegt.",
       "share_label": "Anteil von {name} in Euro",

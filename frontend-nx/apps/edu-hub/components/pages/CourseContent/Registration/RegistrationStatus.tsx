@@ -8,7 +8,7 @@ import { Course_Course_by_pk } from '../../../../queries/__generated__/Course';
 import { CourseWithEnrollment_Course_by_pk_CourseEnrollments } from '../../../../queries/__generated__/CourseWithEnrollment';
 import { Button } from '../../../common/Button';
 import { useDisplayDate } from '../../../../helpers/dateTimeHelpers';
-import { matrixRoomUrl } from '../../../../helpers/matrix';
+import { MatrixLinks, matrixRoomLinks } from '../../../../helpers/matrix';
 import { isInvitationExpired } from './types';
 
 /**
@@ -62,8 +62,9 @@ const getSafeExternalUrl = (value: string | null | undefined): string | null => 
   }
 };
 
-const buildCourseChatLink = (course: Course_Course_by_pk & { matrixRoomId?: string | null }): string | null => {
-  return matrixRoomUrl(course.matrixRoomId) ?? course.chatLink ?? null;
+const buildCourseChatLinks = (course: Course_Course_by_pk & { matrixRoomId?: string | null }): MatrixLinks => {
+  const links = matrixRoomLinks(course.matrixRoomId);
+  return links.web ? links : { web: course.chatLink ?? null, app: null };
 };
 
 /**
@@ -80,7 +81,7 @@ const courseActionButtonClassName =
 const CourseLinkInfos: FC<{ course: Course_Course_by_pk }> = ({ course }) => {
   const t = useTranslations('course');
 
-  const chatLink = buildCourseChatLink(course);
+  const { web: chatLink, app: chatAppLink } = buildCourseChatLinks(course);
   const onlineLocation = course.CourseLocations?.find((location) => location.locationOption === 'ONLINE');
   const hasOnlineLocation = Boolean(onlineLocation);
   const onlineMeetingUrl = getSafeExternalUrl(onlineLocation?.defaultSessionAddress?.trim());
@@ -97,9 +98,23 @@ const CourseLinkInfos: FC<{ course: Course_Course_by_pk }> = ({ course }) => {
   return (
     <div className="flex flex-col items-center w-full gap-3">
       {chatLink && (
-        <Button className={courseActionButtonClassName} as="a" href={chatLink} filled>
-          {t('general.to_course_chat')}
-        </Button>
+        <div className="flex flex-col items-center w-full gap-1">
+          <Button className={courseActionButtonClassName} as="a" href={chatLink} filled>
+            {t('general.to_course_chat')}
+          </Button>
+          {/* The button opens our Element web client, which on a phone is the
+              browser. This one hands the room to Element X or Classic. */}
+          {chatAppLink && (
+            <a
+              href={chatAppLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm text-label-secondary underline hover:text-brand min-h-[24px] inline-flex items-center"
+            >
+              {t('general.open_chat_in_app')}
+            </a>
+          )}
+        </div>
       )}
       {hasOnlineMeeting ? (
         <Button

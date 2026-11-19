@@ -6,7 +6,7 @@ import { Button } from "../../common/Button";
 import { AdminCourseList_Course } from "../../../queries/__generated__/AdminCourseList";
 import { useRoleMutation } from "../../../hooks/authedMutation";
 import { CREATE_MATRIX_ROOM } from "../../../queries/matrix";
-import { matrixRoomUrl } from "../../../helpers/matrix";
+import { matrixRoomLinks } from "../../../helpers/matrix";
 
 interface CreateMatrixRoomDialogProps {
   open: boolean;
@@ -73,7 +73,7 @@ const CreateMatrixRoomDialog: FC<CreateMatrixRoomDialogProps> = ({ open, course,
 
       const payload = result?.data?.createMatrixRoom;
       if (payload?.success) {
-        setSuccessLink(matrixRoomUrl(payload.roomId) || payload.chatLink || "");
+        setSuccessLink(matrixRoomLinks(payload.roomId).web || payload.chatLink || "");
         return;
       }
 
