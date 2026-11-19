@@ -5,7 +5,7 @@ import { SiElement } from 'react-icons/si';
 
 import { SectionTitle } from '../../common/SectionTitle';
 import UserAvatar from '../../common/UserAvatar';
-import { elementDirectMessageUrl } from '../../../helpers/matrix';
+import { matrixDirectMessageUrl } from '../../../helpers/matrix';
 import { useRoleQuery } from '../../../hooks/authedQuery';
 import { COURSE_PARTICIPANTS } from '../../../queries/courseParticipant';
 import {
@@ -41,7 +41,7 @@ const Participant: FC<{ participant: CourseParticipants_CourseParticipant }> = (
   const t = useTranslations('course');
   const user = participant.User;
 
-  const elementUrl = useMemo(() => elementDirectMessageUrl(user?.matrixUserHandle), [user?.matrixUserHandle]);
+  const elementUrl = useMemo(() => matrixDirectMessageUrl(user?.matrixUserHandle), [user?.matrixUserHandle]);
 
   return (
     <div className="flex items-center gap-3 min-w-0">

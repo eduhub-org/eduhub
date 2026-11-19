@@ -1,4 +1,4 @@
-import { DEFAULT_MATRIX_SERVER_NAME, elementDirectMessageUrl, matrixRoomUrl, toMatrixUserId } from './matrix';
+import { DEFAULT_MATRIX_SERVER_NAME, matrixDirectMessageUrl, matrixRoomUrl, toMatrixUserId } from './matrix';
 
 describe('toMatrixUserId', () => {
   it('qualifies a bare localpart with the server name', () => {
@@ -31,37 +31,23 @@ describe('toMatrixUserId', () => {
   });
 });
 
-describe('elementDirectMessageUrl', () => {
-  it('builds a direct-message link', () => {
-    expect(elementDirectMessageUrl('nina', 'matrix.opencampus.sh', 'https://element.example')).toBe(
-      'https://element.example/#/user/@nina:matrix.opencampus.sh'
+describe('matrixDirectMessageUrl', () => {
+  it('builds a matrix.to link to the person', () => {
+    expect(matrixDirectMessageUrl('nina', 'matrix.opencampus.sh')).toBe(
+      'https://matrix.to/#/@nina:matrix.opencampus.sh'
     );
-  });
-
-  it('tolerates a trailing slash on the client url', () => {
-    expect(elementDirectMessageUrl('nina', 'matrix.opencampus.sh', 'https://element.example/')).toBe(
-      'https://element.example/#/user/@nina:matrix.opencampus.sh'
-    );
-  });
-
-  it('returns null when the element client is not configured', () => {
-    expect(elementDirectMessageUrl('nina', 'matrix.opencampus.sh', undefined)).toBeNull();
   });
 
   it('returns null when the handle cannot be addressed', () => {
-    expect(elementDirectMessageUrl(null, 'matrix.opencampus.sh', 'https://element.example')).toBeNull();
+    expect(matrixDirectMessageUrl(null, 'matrix.opencampus.sh')).toBeNull();
   });
 
   it.each([undefined, null, ''])('falls back to the default server name for %p', (serverName) => {
-    expect(elementDirectMessageUrl('nina', serverName, 'https://element.example')).toBe(
-      `https://element.example/#/user/@nina:${DEFAULT_MATRIX_SERVER_NAME}`
-    );
+    expect(matrixDirectMessageUrl('nina', serverName)).toBe(`https://matrix.to/#/@nina:${DEFAULT_MATRIX_SERVER_NAME}`);
   });
 
   it('still prefers a handle that carries its own domain over the fallback', () => {
-    expect(elementDirectMessageUrl('@nina:matrix.org', undefined, 'https://element.example')).toBe(
-      'https://element.example/#/user/@nina:matrix.org'
-    );
+    expect(matrixDirectMessageUrl('@nina:matrix.org', undefined)).toBe('https://matrix.to/#/@nina:matrix.org');
   });
 });
 

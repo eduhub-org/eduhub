@@ -57,21 +57,19 @@ export const toMatrixUserId = (
 };
 
 /**
- * A link that opens a direct message with this person in the configured Element
- * client, or null when the handle or the Element client is missing. The server
- * name falls back to DEFAULT_MATRIX_SERVER_NAME, so this works unconfigured.
+ * A matrix.to link to this person, from where they can be messaged in Element
+ * X, Element Classic or the browser - see matrixRoomUrl for why not our own
+ * Element web client. Null when the handle cannot be addressed. The server name
+ * falls back to DEFAULT_MATRIX_SERVER_NAME, so this works unconfigured.
  */
-export const elementDirectMessageUrl = (
+export const matrixDirectMessageUrl = (
   matrixUserHandle: string | null | undefined,
-  serverName: string | null | undefined = process.env.NEXT_PUBLIC_MATRIX_SERVER_NAME,
-  elementClientUrl: string | null | undefined = process.env.NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL
+  serverName: string | null | undefined = process.env.NEXT_PUBLIC_MATRIX_SERVER_NAME
 ): string | null => {
   // Resolved here rather than in the default argument so that an empty string
   // falls back too: an unset Docker build arg inlines as "", not undefined.
   const matrixUserId = toMatrixUserId(matrixUserHandle, trimAndNull(serverName) ?? DEFAULT_MATRIX_SERVER_NAME);
-  const base = trimAndNull(elementClientUrl)?.replace(/\/+$/, '');
-  if (!matrixUserId || !base) return null;
-  return `${base}/#/user/${matrixUserId}`;
+  return matrixUserId ? `https://matrix.to/#/${matrixUserId}` : null;
 };
 
 /**

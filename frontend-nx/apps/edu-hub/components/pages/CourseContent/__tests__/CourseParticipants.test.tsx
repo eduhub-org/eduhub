@@ -52,7 +52,6 @@ describe('CourseParticipants', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     process.env.NEXT_PUBLIC_MATRIX_SERVER_NAME = 'matrix.example';
-    process.env.NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL = 'https://element.example';
   });
 
   it('lists the others and leaves the viewer out', () => {
@@ -74,7 +73,7 @@ describe('CourseParticipants', () => {
 
     const links = screen.getAllByRole('link');
     expect(links).toHaveLength(1);
-    expect(links[0]).toHaveAttribute('href', 'https://element.example/#/user/@aisha.test.ab12cd:matrix.example');
+    expect(links[0]).toHaveAttribute('href', 'https://matrix.to/#/@aisha.test.ab12cd:matrix.example');
   });
 
   it('counts the people it could not fit, discounting the viewer', () => {

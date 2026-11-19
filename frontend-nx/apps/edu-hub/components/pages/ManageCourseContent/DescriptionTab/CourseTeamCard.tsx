@@ -8,7 +8,7 @@ import { Button } from '../../../common/Button';
 import { ErrorMessageDialog } from '../../../common/dialogs/ErrorMessageDialog';
 import { QuestionConfirmationDialog } from '../../../common/dialogs/QuestionConfirmationDialog';
 import InputField from '../../../inputs/InputField';
-import { elementDirectMessageUrl } from '../../../../helpers/matrix';
+import { matrixDirectMessageUrl } from '../../../../helpers/matrix';
 import { getCertificateDownloadUrl } from '../../../../helpers/certificateDownload';
 import { centsToEuroInput, formatEuro, summarizeSplit } from '../../../../helpers/instructorPayment';
 import { useRoleQuery } from '../../../../hooks/authedQuery';
@@ -176,7 +176,7 @@ export const CourseTeamCard: FC<IProps> = ({ courseId, isEventCourse }) => {
         {members.map((member) => {
           const isMe = member.User.id === userId;
           // Undefined for org admins, whose query leaves the handle out.
-          const elementUrl = isMe ? null : elementDirectMessageUrl(member.User.matrixUserHandle);
+          const elementUrl = isMe ? null : matrixDirectMessageUrl(member.User.matrixUserHandle);
           return (
             <li key={member.id} className="flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-3">

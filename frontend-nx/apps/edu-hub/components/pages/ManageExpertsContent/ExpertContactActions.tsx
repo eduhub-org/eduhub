@@ -3,7 +3,7 @@ import { useTranslations } from 'next-intl';
 import { MdLink, MdMailOutline, MdPersonSearch } from 'react-icons/md';
 import { SiElement, SiLinkedin, SiXing } from 'react-icons/si';
 
-import { elementDirectMessageUrl } from '../../../helpers/matrix';
+import { matrixDirectMessageUrl } from '../../../helpers/matrix';
 import { ExpertsList_User } from '../../../queries/__generated__/ExpertsList';
 import { linkedInSearchUrl, profileKind, profileUrl } from './expertDirectory';
 
@@ -35,7 +35,7 @@ const PROFILE_ICONS = { linkedin: <SiLinkedin />, xing: <SiXing />, other: <MdLi
 export const ExpertContactActions: FC<{ expert: ExpertsList_User }> = ({ expert }) => {
   const t = useTranslations('manageExperts');
   const profile = profileUrl(expert.externalProfile);
-  const chatUrl = elementDirectMessageUrl(expert.matrixUserHandle);
+  const chatUrl = matrixDirectMessageUrl(expert.matrixUserHandle);
 
   return (
     <div className="flex items-center gap-1">
