@@ -1,5 +1,6 @@
 import { FC, useCallback, useMemo, useState } from 'react';
 import { DocumentNode } from '@apollo/client';
+import { useDebounce } from 'use-debounce';
 import { useFormatter, useTranslations } from 'next-intl';
 import { useRouter } from 'next/router';
 import { ColumnDef } from '@tanstack/react-table';
@@ -39,6 +40,7 @@ import {
 } from './expertDirectory';
 import { ExpandableExpertRow } from './ExpandableExpertRow';
 import { ExpertContactActions } from './ExpertContactActions';
+import { SimilarExperts } from './SimilarExperts';
 
 /** Roles held in a course of a program of an organization the viewer administers. */
 const orgAdminScope = (userId: string) => {
@@ -156,6 +158,8 @@ const ManageExpertsContent: FC = () => {
   );
 
   const words = useMemo(() => searchWords(searchFilter), [searchFilter]);
+  // The table's search is debounced the same way, so both lists answer the same search.
+  const [debouncedSearch] = useDebounce(searchFilter, 300);
   const experts = useMemo(() => typedData?.User ?? [], [typedData]);
   const views = useMemo(() => {
     const result = new Map<string, ExpertView>();
@@ -383,6 +387,11 @@ const ManageExpertsContent: FC = () => {
                   />
                 );
               }}
+            />
+            <SimilarExperts
+              search={debouncedSearch}
+              isAdmin={isAdmin}
+              scope={queryVariables.scope}
             />
           </div>
         )}

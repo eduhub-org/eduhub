@@ -1,0 +1,16 @@
+# Semantic expert search (ADR 0004). Written and read only by the expert embedding functions with
+# the admin secret; no role permissions.
+table:
+  name: ExpertRoleEmbedding
+  schema: public
+object_relationships:
+  - name: Source
+    using:
+      manual_configuration:
+        column_mapping:
+          sourceId: sourceId
+          sourceType: sourceType
+        insertion_order: null
+        remote_table:
+          name: ExpertRoleSource
+          schema: public

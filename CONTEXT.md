@@ -112,6 +112,9 @@ The date of an **Expert's** most recent **Expert Role**: a course's program star
 A dated entry an **Admin** or **Org Admin** writes about an **Expert**, e.g. what they talked about or when they are available. Notes from central admins are seen by admins only; notes from an org admin are seen by that organization's admins and by central admins. Written as if the expert will read them: they can ask to see them.
 _Avoid_: Bewertung, rating (notes are facts, not judgements)
 
+**Similar Expert**:
+An **Expert** who did not match the words of a search, but one of whose **Expert Roles** is close to it in meaning. Shown below the keyword results, with the role that made them similar.
+
 **Do Not Contact**:
 A mark on a person that they do not want to be contacted about new formats. Admins and the org admins of their courses can set it; only admins can remove it. The **Expert Directory** greys them out, hides the contact buttons and leaves them out of exports.
 

@@ -543,3 +543,13 @@ variable "alert_budget_emails" {
     error_message = "A billing budget accepts at most 5 notification channels."
   }
 }
+variable "embedding_provider" {
+  description = "Embedding provider of the semantic expert search: vertex, or empty to turn it off (ADR 0004)"
+  type        = string
+  default     = "vertex"
+}
+variable "embedding_location" {
+  description = "Vertex AI region for the expert search embeddings; empty uses var.region"
+  type        = string
+  default     = ""
+}

@@ -140,7 +140,9 @@ update (only `PRIVACY_POLICY_VERSION` was bumped). Whoever writes the next
   notes about instructors, speakers and mentors and a "do not contact" mark,
   to contact them about future formats; org admins see these people for their
   own organization's courses. Changed practice (the notes are new), worded as
-  such.
+  such. The directory also finds people by meaning: course, session,
+  project and achievement-option texts are turned into vectors with Google
+  Cloud Vertex AI (no notes).
 
 The policy has no public change history: GDPR asks for the current policy and
 for telling users about material changes, not for a changelog. What applied
