@@ -223,6 +223,20 @@ describe('resolveSessionLocations', () => {
     ).toEqual(['ZBW Kiel (Düsternbrooker Weg 120)', 'https://meet.example.com/y']);
   });
 
+  it('keeps a venue label when the venue has no address', () => {
+    expect(
+      resolveSessionLocations([
+        {
+          address: '',
+          CourseLocation: {
+            locationOption: 'KIEL',
+            DefaultSessionAddress: { shortLabel: 'Starterkitchen', address: '' },
+          },
+        },
+      ])
+    ).toEqual(['Starterkitchen']);
+  });
+
   it('drops the migration placeholder label', () => {
     expect(
       resolveSessionLocations([{ LocationAddress: { shortLabel: 'generic address', address: 'Wall 1' } }])

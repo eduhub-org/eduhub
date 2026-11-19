@@ -81,13 +81,14 @@ export function resolveSessionLocations(sessionAddresses = []) {
   const locations = sessionAddresses.map((sa) => {
     const courseLocation = sa.CourseLocation;
     const venue = sa.LocationAddress ?? courseLocation?.DefaultSessionAddress;
-    const label = venue?.shortLabel?.trim();
+    const rawLabel = venue?.shortLabel?.trim();
+    const label = rawLabel && rawLabel.toLowerCase() !== PLACEHOLDER_LABEL ? rawLabel : '';
     const venueAddress = venue?.address?.trim();
     if (venueAddress) {
-      return label && label.toLowerCase() !== PLACEHOLDER_LABEL && label !== venueAddress
-        ? `${label} (${venueAddress})`
-        : venueAddress;
+      return label && label !== venueAddress ? `${label} (${venueAddress})` : venueAddress;
     }
+    // A venue with a name but no address still says where (frontend does too).
+    if (label) return label;
     const address = sa.address?.trim() || courseLocation?.defaultSessionAddress?.trim();
     if (address) return address;
     return (courseLocation?.locationOption ?? sa.locationOption) === 'ONLINE' ? 'Online' : '';
