@@ -52,6 +52,9 @@ interface CourseManagementProps extends Props {
   orgAdminOfCourse?: boolean;
 }
 
+// The tab holding participations and, with achievement certificates, the course's projects.
+const PARTICIPATIONS_TAB_INDEX = 3;
+
 const determineTabClasses = (tabIndex: number, selectedTabIndex: number) =>
   tabIndex === selectedTabIndex
     ? 'bg-bg-card text-label-primary'
@@ -163,8 +166,9 @@ const CourseManagement: FC<CourseManagementProps> = ({ courseId, manageAsOrgAdmi
   const [rememberedTabIndex, setRememberedTabIndex] = useState<number | null>(null);
 
   // Read on mount, while the course is still loading, so the page opens on the right tab directly.
+  // Project emails to instructors and mentors link to `#projects`, which lives on the participations tab.
   useEffect(() => {
-    setChosenTabIndex(null);
+    setChosenTabIndex(window.location.hash === '#projects' ? PARTICIPATIONS_TAB_INDEX : null);
     setRememberedTabIndex(readLastOpenedTab(courseId));
   }, [courseId]);
 

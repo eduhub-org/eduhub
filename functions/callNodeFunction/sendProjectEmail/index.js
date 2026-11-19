@@ -34,7 +34,8 @@ export function resolveJoinRequestRecipients(project) {
  *
  * Wired to two Hasura event triggers:
  *   - send_project_author_email on public.ProjectAuthor (INSERT + UPDATE of participationStatus)
- *   - send_project_status_email on public.Project (UPDATE of status)
+ *   - send_project_status_email on public.Project (UPDATE of status or
+ *     projectReviewRequestedAt, the team's "request approval" on a proposal)
  *
  * Review emails (approved / sent back / rejected) carry the instructor's
  * ratingComment via [Project:ReviewComment]. ReviewProjectDialog saves that
@@ -68,7 +69,7 @@ export default async function sendProjectEmail(req, logger) {
     // Decide the template, the affected project, and (for author events) the affected user.
     let projectId;
     let templateType;
-    let recipientSelector; // 'authors' | 'team' | 'staff_and_authors' | 'affected_user'
+    let recipientSelector; // 'authors' | 'team' | 'staff' | 'staff_and_authors' | 'affected_user'
     let affectedUserId = null;
     let applicantUserId = null;
 
@@ -95,35 +96,41 @@ export default async function sendProjectEmail(req, logger) {
     } else if (tableName === 'Project') {
       const projectNew = data.new;
       const projectOld = data.old;
-      if (op !== 'UPDATE' || projectNew.status === projectOld?.status) {
-        return { success: true, messageKey: 'NO_ACTION_NEEDED', message: 'Project status unchanged' };
-      }
       projectId = projectNew.id;
-      switch (projectNew.status) {
-        case 'ONGOING':
-          // Distinguish first confirmation vs. a send-back after review.
-          if (projectOld?.status === 'SUBMITTED') {
-            templateType = 'PROJECT_SENT_BACK';
-          } else {
-            templateType = 'PROJECT_TEAM_CONFIRMED';
-          }
-          recipientSelector = 'authors';
-          break;
-        case 'SUBMITTED':
-          templateType = 'PROJECT_SUBMITTED';
-          recipientSelector = 'staff_and_authors';
-          break;
-        case 'COMPLETED':
-          templateType = 'PROJECT_APPROVED';
-          recipientSelector = 'authors';
-          break;
-        case 'INCOMPLETE':
-          templateType = 'PROJECT_REJECTED';
-          recipientSelector = 'authors';
-          break;
-        default:
-          // No email for PROPOSED / PUBLISHED / other transitions.
-          return { success: true, messageKey: 'NO_TEMPLATE_FOR_STATUS', message: `No email for project status: ${projectNew.status}` };
+      const reviewRequested =
+        op === 'UPDATE' && !projectOld?.projectReviewRequestedAt && Boolean(projectNew.projectReviewRequestedAt);
+      if (reviewRequested) {
+        templateType = 'PROJECT_REVIEW_REQUESTED';
+        recipientSelector = 'staff';
+      } else if (op !== 'UPDATE' || projectNew.status === projectOld?.status) {
+        return { success: true, messageKey: 'NO_ACTION_NEEDED', message: 'Project status unchanged' };
+      } else {
+        switch (projectNew.status) {
+          case 'ONGOING':
+            // Distinguish first confirmation vs. a send-back after review.
+            if (projectOld?.status === 'SUBMITTED') {
+              templateType = 'PROJECT_SENT_BACK';
+            } else {
+              templateType = 'PROJECT_TEAM_CONFIRMED';
+            }
+            recipientSelector = 'authors';
+            break;
+          case 'SUBMITTED':
+            templateType = 'PROJECT_SUBMITTED';
+            recipientSelector = 'staff_and_authors';
+            break;
+          case 'COMPLETED':
+            templateType = 'PROJECT_APPROVED';
+            recipientSelector = 'authors';
+            break;
+          case 'INCOMPLETE':
+            templateType = 'PROJECT_REJECTED';
+            recipientSelector = 'authors';
+            break;
+          default:
+            // No email for PROPOSED / PUBLISHED / other transitions.
+            return { success: true, messageKey: 'NO_TEMPLATE_FOR_STATUS', message: `No email for project status: ${projectNew.status}` };
+        }
       }
     } else {
       return { success: true, messageKey: 'NO_ACTION_NEEDED', message: `Unhandled table: ${tableName}` };
@@ -148,6 +155,7 @@ export default async function sendProjectEmail(req, logger) {
           ProjectCourses(order_by: { courseId: asc }) {
             Course {
               id
+              title
               projectSubmissionDeadline
               Program {
                 defaultProjectSubmissionDeadline
@@ -185,6 +193,9 @@ export default async function sendProjectEmail(req, logger) {
     switch (recipientSelector) {
       case 'authors':
         recipients = acceptedAuthors;
+        break;
+      case 'staff':
+        recipients = staff;
         break;
       case 'staff_and_authors':
         recipients = [...staff, ...acceptedAuthors];
@@ -248,13 +259,21 @@ export default async function sendProjectEmail(req, logger) {
     };
 
     const results = [];
-    for (const recipient of uniqueRecipients) {
-      const replacer = createProjectVariableReplacer(projectForTemplate, recipient, { applicantName, courseId });
+    for (const [index, recipient] of uniqueRecipients.entries()) {
+      const replacer = createProjectVariableReplacer(projectForTemplate, recipient, {
+        applicantName,
+        courseId,
+        courseTitle: course?.title ?? '',
+        // Instructors and mentors act on an approval request in course management.
+        forStaff: recipientSelector === 'staff',
+      });
       const result = await queueEmail({
         templateType,
         variableReplacer: replacer,
         recipientEmail: recipient.email,
         courseId,
+        // The template's cc/bcc (e.g. the EduHub team) hears of the event once.
+        includeTemplateCopies: index === 0,
         client,
         logger,
       });

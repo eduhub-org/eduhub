@@ -231,6 +231,11 @@ export const EMAIL_VARIABLES = {
       description: 'Name of the user who requested to join the project (join-request emails only)',
       example: 'Jane Doe',
       categories: ['project']
+    },
+    '[Project:CourseTitle]': {
+      description: 'Title of the course the project belongs to',
+      example: 'Applied Machine Learning',
+      categories: ['project']
     }
   },
 
@@ -520,6 +525,7 @@ export function createVariableReplacer(data, formatDate) {
         data.projectLink || `${process.env.FRONTEND_URL || 'https://edu.opencampus.sh'}/project/${data.project?.id || ''}`
       )
       .replaceAll('[Project:ApplicantName]', escape(data.applicantName || ''))
+      .replaceAll('[Project:CourseTitle]', escape(data.projectCourseTitle || ''))
       .replaceAll('[Project:SubmissionDeadline]', submissionDeadlineBlock)
       .replaceAll('[Project:ReviewComment]', reviewCommentBlock);
 
@@ -659,21 +665,27 @@ export function createSessionVariableReplacer(session, enrollment, sessionData =
  * Convenience function for project lifecycle emails
  * @param {Object} project - Project data ({ id, title })
  * @param {Object} recipientUser - Recipient user ({ firstName, lastName, email })
- * @param {Object} [extra] - Optional extra values ({ applicantName, courseId })
+ * @param {Object} [extra] - Optional extra values ({ applicantName, courseId,
+ *   courseTitle, forStaff }). forStaff links to the course management page,
+ *   where instructors and mentors act, instead of the participants' course page.
  * @returns {Function} Variable replacement function
  */
 export function createProjectVariableReplacer(project, recipientUser, extra = {}) {
   const baseUrl = process.env.FRONTEND_URL || 'https://edu.opencampus.sh';
   // Lifecycle emails ask the team to act (answer a join request, revise a
   // sent-back project), which happens in the course page's projects section.
-  const projectLink = extra.courseId
-    ? `${baseUrl}/course/${extra.courseId}#projects`
-    : `${baseUrl}/project/${project?.id || ''}`;
+  let projectLink = `${baseUrl}/project/${project?.id || ''}`;
+  if (extra.courseId) {
+    projectLink = extra.forStaff
+      ? `${baseUrl}/manage/course/${extra.courseId}#projects`
+      : `${baseUrl}/course/${extra.courseId}#projects`;
+  }
   return createVariableReplacer({
     user: recipientUser,
     project,
     projectLink,
-    applicantName: extra.applicantName || ''
+    applicantName: extra.applicantName || '',
+    projectCourseTitle: extra.courseTitle || ''
   });
 }
 

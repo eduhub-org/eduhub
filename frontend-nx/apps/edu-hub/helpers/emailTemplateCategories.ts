@@ -51,6 +51,7 @@ const CATEGORY_BY_TYPE: Record<string, EmailTemplateCategory> = {
   CERTIFICATE_ATTENDANCE_READY: 'application',
   // Project notifications
   PROJECT_JOIN_REQUESTED: 'projects',
+  PROJECT_REVIEW_REQUESTED: 'projects',
   PROJECT_JOIN_ACCEPTED: 'projects',
   PROJECT_JOIN_DECLINED: 'projects',
   PROJECT_AUTHOR_EXCLUDED: 'projects',
