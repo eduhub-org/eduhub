@@ -53,18 +53,24 @@ them access to all Experts would need each Expert's opt-in and is not planned
 No filters and no tags for now: hand-maintained tags tend to go stale, and
 semantic search (phase 2) covers finding people by topic.
 
-## Phase 2 — semantic search (separate PR)
+## Phase 2 — semantic search
 
-- One embedding per **Expert Role** from its course or session title and
-  description; **Expert Notes are never embedded**.
-- Google Vertex AI embeddings in the region production runs in, stored with
-  `pgvector`; refreshed by a Hasura event trigger when a course or session text
-  changes, plus a one-off backfill.
-- **Hybrid results**: exact keyword hits first, then semantic hits labelled
-  "similar", each pointing at the role it is similar to. Without a search the
-  list stays in **Last Active** order.
-- Needs GCP setup before deploy: Vertex AI API, IAM for the calling function,
-  `pgvector` on Cloud SQL.
+- One embedding per **Expert Role** source (course, session, project,
+  achievement option) from its title and description; **Expert Notes are never
+  embedded**. Table `ExpertRoleEmbedding`, view `ExpertRoleSource`.
+- Google Vertex AI (`gemini-embedding-001`, 768 dimensions) in the region
+  production runs in, stored with `pgvector`. The cron trigger
+  `sync_expert_embeddings` (node function `syncExpertEmbeddings`) keeps the
+  vectors in step every 10 minutes and backfills on its first runs.
+- **Hybrid results**: the table keeps the keyword hits; below it,
+  **Similar Experts** lists up to 20 people whose roles are close in meaning to
+  the search but who did not match its words, each with the role they are
+  similar to and a percentage. The action `semanticExpertSearch` only returns
+  source ids, so org admins still only see the experts of their own courses.
+- Configuration of `callNodeFunction`: `EMBEDDING_PROVIDER` (`vertex`, `fake`
+  for local development, or empty to turn it off), `EMBEDDING_LOCATION`,
+  optional `EMBEDDING_PROJECT_ID`, `EMBEDDING_MODEL` and
+  `EXPERT_SEARCH_MIN_SIMILARITY`.
 
 ## Not planned
 

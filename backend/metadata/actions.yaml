@@ -855,6 +855,19 @@ actions:
       # org_admin_access action permission. The handler checks the grant.
       - role: org_admin
     comment: Pushes an event to rausgegangen.de right away instead of waiting for the triggers.
+  - name: semanticExpertSearch
+    definition:
+      kind: ""
+      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      timeout: 30
+      headers:
+        - name: name
+          value: semanticExpertSearch
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+    permissions:
+      - role: org_admin
+    comment: Expert Role sources (courses, sessions, projects, achievement options) closest in meaning to a search, for the expert directory (ADR 0004). Admins and org admins.
 custom_types:
   enums: []
   input_objects:
@@ -865,6 +878,8 @@ custom_types:
     - name: PreviousSessionState
     - name: SelectedAddonInput
   objects:
+    - name: SemanticExpertSearchResult
+    - name: ExpertRoleMatchResult
     - name: NotifySessionParticipantsResult
     - name: CreateUserResult
     - name: loadFileOutput

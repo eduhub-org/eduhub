@@ -3012,7 +3012,13 @@
     "delete_note_question": "Diese Notiz löschen?",
     "error": "Das hat nicht geklappt: {error}",
     "load_error": "Die Expert:innen konnten nicht geladen werden: {error}",
-    "retry": "Erneut versuchen"
+    "retry": "Erneut versuchen",
+    "similar_headline": "Ähnliche Expert:innen",
+    "similar_hint": "Gefunden über die Bedeutung deiner Suche, nicht über die genauen Wörter.",
+    "similar_loading": "Suche ähnliche Expert:innen …",
+    "similar_none": "Keine weiteren ähnlichen Expert:innen gefunden.",
+    "similar_unavailable": "Die Ähnlichkeitssuche ist gerade nicht erreichbar.",
+    "similar_to": "Ähnlich zu {role}: {title}{year} · {percent} %"
   },
   "manageOrganizations": {
     "headline": "Organisationen",

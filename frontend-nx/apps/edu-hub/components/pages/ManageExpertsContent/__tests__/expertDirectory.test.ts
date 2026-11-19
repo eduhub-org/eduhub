@@ -1,10 +1,12 @@
 import { ExpertsList_User } from '../../../../queries/__generated__/ExpertsList';
 import {
+  closestRole,
   expertCsvRows,
   expertRoles,
   findMatches,
   highlight,
   lastActive,
+  matchesAllWords,
   noteOrganizationsFor,
   linkedInSearchUrl,
   mailtoBcc,
@@ -12,6 +14,7 @@ import {
   profileKind,
   profileUrl,
   snippet,
+  sourcesCondition,
 } from '../expertDirectory';
 
 const expert = (overrides: Partial<ExpertsList_User> = {}): ExpertsList_User =>
@@ -207,5 +210,37 @@ describe('contacting and exporting', () => {
       ['h'],
       ['Ada', 'Lovelace', 'Analytical Engines', 'ada@example.com', '2026'],
     ]);
+  });
+});
+
+describe('semantic search helpers', () => {
+  const matches = [
+    { sourceType: 'COURSE', sourceId: 100, similarity: 0.62 },
+    { sourceType: 'SESSION', sourceId: 200, similarity: 0.71 },
+    { sourceType: 'PROJECT', sourceId: 999, similarity: 0.9 },
+  ];
+
+  it('looks people up by the matched sources of each kind', () => {
+    expect(sourcesCondition(matches)).toEqual({
+      _or: [
+        { CourseInstructors: { courseId: { _in: [100] } } },
+        { SessionSpeakers: { sessionId: { _in: [200] } } },
+        { ProjectMentors: { projectId: { _in: [999] } } },
+        { AchievementOptionMentors: { achievementOptionId: { _in: [] } } },
+      ],
+    });
+  });
+
+  it('tells whether the keyword search lists a person', () => {
+    const row = expert();
+    expect(matchesAllWords(row, expertRoles(row), 'transformer ada')).toBe(true);
+    expect(matchesAllWords(row, expertRoles(row), 'transformer gardening')).toBe(false);
+  });
+
+  it("picks the person's role closest to the search", () => {
+    const closest = closestRole(expertRoles(expert()), matches);
+    expect(closest?.role.title).toBe('Ethics of AI');
+    expect(closest?.similarity).toBe(0.71);
+    expect(closestRole(expertRoles(expert()), [{ sourceType: 'COURSE', sourceId: 1, similarity: 1 }])).toBeNull();
   });
 });

@@ -152,6 +152,33 @@ export const EXPERTS_LIST = gql`
   }
 `;
 
+// Semantic search (ADR 0004): course, session, project and achievement-option ids close in meaning
+// to the search, with their similarity.
+export const SEMANTIC_EXPERT_SEARCH = gql`
+  query SemanticExpertSearch($query: String!) {
+    semanticExpertSearch(query: $query) {
+      success
+      enabled
+      matches {
+        sourceType
+        sourceId
+        similarity
+      }
+    }
+  }
+`;
+
+// The experts behind those sources. Keyword hits are removed in the browser: `_not` over the keyword
+// condition drops everyone with an empty searched column (NOT of SQL NULL is NULL, not true).
+export const SIMILAR_EXPERTS = gql`
+  ${EXPERT_FIELDS}
+  query SimilarExperts($sources: User_bool_exp!, $scope: User_bool_exp = {}, $isAdmin: Boolean!, $limit: Int = 50) {
+    User(limit: $limit, where: { _and: [{ status: { _eq: ACTIVE } }, $scope, $sources] }) {
+      ...ExpertFields
+    }
+  }
+`;
+
 // Current contact details of selected experts: a selection can hold rows loaded before they were
 // marked Do Not Contact on another page.
 export const EXPERT_CONTACTS = gql`

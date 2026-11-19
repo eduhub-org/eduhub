@@ -53,6 +53,8 @@ import manageTestEnrollment from "./manageTestEnrollment/index.js";
 import syncRausgegangenEvent from "./syncRausgegangenEvent/index.js";
 import searchRausgegangenLocations from "./searchRausgegangenLocations/index.js";
 import geocodeLocationAddress from "./geocodeLocationAddress/index.js";
+import syncExpertEmbeddings from "./syncExpertEmbeddings/index.js";
+import semanticExpertSearch from "./semanticExpertSearch/index.js";
 
 const require = createRequire(import.meta.url);
 let constantTimeSecretsEqual;
@@ -135,6 +137,8 @@ const functionMap = {
   syncRausgegangenEvent,
   searchRausgegangenLocations,
   geocodeLocationAddress,
+  syncExpertEmbeddings,
+  semanticExpertSearch,
 };
 
 const constantTimeEquals = (providedSecret, expectedSecret) => {

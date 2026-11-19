@@ -1004,3 +1004,22 @@ type SyncRausgegangenEventResult {
   previewUrl: String
   publicUrl: String
 }
+
+type Query {
+  semanticExpertSearch(
+    query: String!
+  ): SemanticExpertSearchResult!
+}
+
+type SemanticExpertSearchResult {
+  success: Boolean!
+  enabled: Boolean!
+  error: String
+  matches: [ExpertRoleMatchResult!]!
+}
+
+type ExpertRoleMatchResult {
+  sourceType: String!
+  sourceId: Int!
+  similarity: Float!
+}

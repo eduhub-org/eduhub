@@ -24,6 +24,19 @@ resource "google_project_iam_member" "service_account_token_creator" {
   member  = "serviceAccount:${google_service_account.custom_cloud_function_account.email}"
 }
 
+# Semantic expert search (ADR 0004): callNodeFunction embeds course and session texts with Vertex AI.
+resource "google_project_service" "aiplatform" {
+  project            = var.project_id
+  service            = "aiplatform.googleapis.com"
+  disable_on_destroy = false
+}
+
+resource "google_project_iam_member" "vertex_ai_user" {
+  project = var.project_id
+  role    = "roles/aiplatform.user"
+  member  = "serviceAccount:${google_service_account.custom_cloud_function_account.email}"
+}
+
 # Add Cloud Run invoker role to the service account
 resource "google_project_iam_member" "cloud_run_invoker" {
   project = var.project_id
@@ -357,6 +370,9 @@ resource "google_cloudfunctions2_function" "call_node_function" {
       STUJO_ADMIN_EMAIL            = var.stujo_admin_email
       STRIPE_TAX_RATE_ID           = var.stripe_tax_rate_id
       STUJO_SELLER_ORGANIZATION_ID = var.stujo_seller_organization_id
+      # Semantic expert search (ADR 0004); "" turns it off.
+      EMBEDDING_PROVIDER = var.embedding_provider
+      EMBEDDING_LOCATION = var.embedding_location != "" ? var.embedding_location : var.region
     }
 
     secret_environment_variables {

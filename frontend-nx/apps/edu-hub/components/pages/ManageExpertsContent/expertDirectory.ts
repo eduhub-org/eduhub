@@ -4,12 +4,16 @@ import { ProgramType } from '../../../types/enums';
 /** Where a search word was found; a translation key under `manageExperts.match_field`. */
 export type MatchField = 'name' | 'email' | 'organization' | 'title' | 'tagline' | 'description' | 'course_title';
 
+/** What an Expert Role is about, as the semantic search identifies it (ADR 0004). */
+export type ExpertRoleSourceType = 'COURSE' | 'SESSION' | 'PROJECT' | 'ACHIEVEMENT_OPTION';
+
 export type ExpertRoleKind = 'instructor' | 'organizer' | 'speaker' | 'project_mentor' | 'achievement_mentor';
 
 /** One Expert Role (CONTEXT.md): a course led, a session spoken at, a project or option mentored. */
 export interface ExpertRole {
   key: string;
   kind: ExpertRoleKind;
+  source: { type: ExpertRoleSourceType; id: number };
   title: string;
   /** Program short title or, for speakers, the course the session belongs to. */
   context: string;
@@ -74,6 +78,7 @@ export const expertRoles = (expert: ExpertsList_User): ExpertRole[] => {
     roles.push({
       key: `instructor-${id}`,
       kind: Course.Program?.type === ProgramType.EVENTS ? 'organizer' : 'instructor',
+      source: { type: 'COURSE', id: Course.id },
       title: Course.title,
       context: Course.Program?.shortTitle ?? '',
       date: toDate(Course.Program?.lectureStart),
@@ -94,6 +99,7 @@ export const expertRoles = (expert: ExpertsList_User): ExpertRole[] => {
     roles.push({
       key: `speaker-${id}`,
       kind: 'speaker',
+      source: { type: 'SESSION', id: Session.id },
       title: Session.title,
       context: Session.Course?.title ?? '',
       date: toDate(Session.startDateTime),
@@ -111,6 +117,7 @@ export const expertRoles = (expert: ExpertsList_User): ExpertRole[] => {
     roles.push({
       key: `project-${id}`,
       kind: 'project_mentor',
+      source: { type: 'PROJECT', id: Project.id },
       title: Project.title,
       context: '',
       date: toDate(Project.created_at),
@@ -128,6 +135,7 @@ export const expertRoles = (expert: ExpertsList_User): ExpertRole[] => {
     roles.push({
       key: `achievement-${id}`,
       kind: 'achievement_mentor',
+      source: { type: 'ACHIEVEMENT_OPTION', id: AchievementOption.id },
       title: AchievementOption.title,
       context: '',
       date: toDate(AchievementOption.created_at),
@@ -235,6 +243,19 @@ export const findMatches = (expert: ExpertsList_User, roles: ExpertRole[], searc
   return matches;
 };
 
+/**
+ * Whether the keyword search lists this person: every word is in one of their searched fields
+ * (the same fields and "contains" rule as EXPERT_SEARCH_FIELDS).
+ */
+export const matchesAllWords = (expert: ExpertsList_User, roles: ExpertRole[], search: string): boolean => {
+  const words = searchWords(search);
+  if (!words.length) return false;
+  const texts = [...personTexts(expert), ...roles.flatMap((role) => role.texts)]
+    .map(({ value }) => (value ? plainText(value).toLowerCase() : ''))
+    .filter(Boolean);
+  return words.every((word) => texts.some((text) => text.includes(word)));
+};
+
 /** Roles of a person that hold a search hit, to mark them in the expanded row. */
 export const matchedRoleKeys = (matches: ExpertMatch[]): Set<string> =>
   new Set(matches.flatMap((match) => (match.role ? [match.role.key] : [])));
@@ -288,3 +309,37 @@ export const expertCsvRows = (experts: ExpertsList_User[], header: string[]): st
       ];
     }),
 ];
+
+export interface SourceMatch {
+  sourceType: string;
+  sourceId: number;
+  similarity: number;
+}
+
+const sourceKey = (type: string, id: number) => `${type}:${id}`;
+
+/** A Hasura condition on User for "has a role in one of these sources". */
+export const sourcesCondition = (matches: SourceMatch[]) => {
+  const ids = (type: ExpertRoleSourceType) =>
+    matches.filter((match) => match.sourceType === type).map((match) => match.sourceId);
+  return {
+    _or: [
+      { CourseInstructors: { courseId: { _in: ids('COURSE') } } },
+      { SessionSpeakers: { sessionId: { _in: ids('SESSION') } } },
+      { ProjectMentors: { projectId: { _in: ids('PROJECT') } } },
+      { AchievementOptionMentors: { achievementOptionId: { _in: ids('ACHIEVEMENT_OPTION') } } },
+    ],
+  };
+};
+
+/** The role of a person closest in meaning to the search, or null if none of their roles matched. */
+export const closestRole = (
+  roles: ExpertRole[],
+  matches: SourceMatch[]
+): { role: ExpertRole; similarity: number } | null => {
+  const similarity = new Map(matches.map((match) => [sourceKey(match.sourceType, match.sourceId), match.similarity]));
+  return roles.reduce<{ role: ExpertRole; similarity: number } | null>((best, role) => {
+    const value = similarity.get(sourceKey(role.source.type, role.source.id));
+    return value !== undefined && (!best || value > best.similarity) ? { role, similarity: value } : best;
+  }, null);
+};
