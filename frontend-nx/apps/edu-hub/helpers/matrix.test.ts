@@ -1,4 +1,4 @@
-import { DEFAULT_MATRIX_SERVER_NAME, elementDirectMessageUrl, toMatrixUserId } from './matrix';
+import { DEFAULT_MATRIX_SERVER_NAME, elementDirectMessageUrl, matrixRoomUrl, toMatrixUserId } from './matrix';
 
 describe('toMatrixUserId', () => {
   it('qualifies a bare localpart with the server name', () => {
@@ -62,5 +62,23 @@ describe('elementDirectMessageUrl', () => {
     expect(elementDirectMessageUrl('@nina:matrix.org', undefined, 'https://element.example')).toBe(
       'https://element.example/#/user/@nina:matrix.org'
     );
+  });
+});
+
+describe('matrixRoomUrl', () => {
+  it('links a room id through matrix.to with its own server as via', () => {
+    expect(matrixRoomUrl('!hlHJnEyyeNJCWHyTWE:opencampus.sh', 'other.server')).toBe(
+      'https://matrix.to/#/!hlHJnEyyeNJCWHyTWE:opencampus.sh?via=opencampus.sh'
+    );
+  });
+
+  it('falls back to the server name for a room id without a server part', () => {
+    expect(matrixRoomUrl('!abc', 'matrix.example')).toBe('https://matrix.to/#/!abc?via=matrix.example');
+    expect(matrixRoomUrl('!abc', '  ')).toBe(`https://matrix.to/#/!abc?via=${DEFAULT_MATRIX_SERVER_NAME}`);
+  });
+
+  it('returns null for an empty or missing room id', () => {
+    expect(matrixRoomUrl(null)).toBeNull();
+    expect(matrixRoomUrl('   ')).toBeNull();
   });
 });

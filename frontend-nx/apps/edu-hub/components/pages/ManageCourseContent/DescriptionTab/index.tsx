@@ -1,5 +1,5 @@
 import { QueryResult } from '@apollo/client';
-import { FC, useMemo } from 'react';
+import { FC } from 'react';
 import Tooltip from '@mui/material/Tooltip';
 import { HelpOutline } from '@mui/icons-material';
 import { useRoleMutation } from '../../../../hooks/authedMutation';
@@ -50,6 +50,7 @@ import InputField from '../../../inputs/InputField';
 import { Button as ChatLinkButton } from '../../../common/Button';
 import MobileCollapsible from './MobileCollapsible';
 import { CourseTeamCard } from './CourseTeamCard';
+import { matrixRoomUrl } from '../../../../helpers/matrix';
 interface IProps {
   course: ManagedCourse_Course_by_pk;
   qResult: QueryResult<any, any>;
@@ -61,11 +62,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
   const tCourse = useTranslations('course');
 
   const programInstructorRoomId = course.Program?.matrixInstructorRoomId?.trim();
-  const elementBaseUrl = process.env.NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL?.replace(/\/+$/, '');
-  const programOrganizerChatLink = useMemo(() => {
-    if (!programInstructorRoomId || !elementBaseUrl) return null;
-    return `${elementBaseUrl}/#/room/${programInstructorRoomId}`;
-  }, [programInstructorRoomId, elementBaseUrl]);
+  const programOrganizerChatLink = matrixRoomUrl(programInstructorRoomId);
 
   const [insertCourseLocation] = useRoleMutation<InsertCourseLocation, InsertCourseLocationVariables>(
     INSERT_COURSE_LOCATION,

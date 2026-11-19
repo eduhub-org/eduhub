@@ -6,6 +6,7 @@ import { Button } from "../../common/Button";
 import { AdminCourseList_Course } from "../../../queries/__generated__/AdminCourseList";
 import { useRoleMutation } from "../../../hooks/authedMutation";
 import { CREATE_MATRIX_ROOM } from "../../../queries/matrix";
+import { matrixRoomUrl } from "../../../helpers/matrix";
 
 interface CreateMatrixRoomDialogProps {
   open: boolean;
@@ -21,12 +22,6 @@ const mapErrorToMessage = (
   if (messageKey === "MATRIX_CONFIG_MISSING") return t("manageCourses.matrix_room.error_no_config");
   if (messageKey === "MATRIX_INVALID_INPUT") return t("manageCourses.matrix_room.error_invalid_input");
   return `${t("manageCourses.matrix_room.error_creation_failed")}: ${fallback}`;
-};
-
-const buildElementLink = (roomId: string | null | undefined) => {
-  const elementBaseUrl = process.env.NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL?.replace(/\/+$/, "");
-  if (!elementBaseUrl || !roomId) return "";
-  return `${elementBaseUrl}/#/room/${roomId}`;
 };
 
 /**
@@ -78,7 +73,7 @@ const CreateMatrixRoomDialog: FC<CreateMatrixRoomDialogProps> = ({ open, course,
 
       const payload = result?.data?.createMatrixRoom;
       if (payload?.success) {
-        setSuccessLink(payload.chatLink || buildElementLink(payload.roomId));
+        setSuccessLink(matrixRoomUrl(payload.roomId) || payload.chatLink || "");
         return;
       }
 

@@ -73,3 +73,27 @@ export const elementDirectMessageUrl = (
   if (!matrixUserId || !base) return null;
   return `${base}/#/user/${matrixUserId}`;
 };
+
+/**
+ * A matrix.to link to a room, or null when there is no room id.
+ *
+ * matrix.to rather than our own Element web client, because matrix.to lets the
+ * person choose where the room opens: Element X, Element Classic or the
+ * browser. A link to element-chat.opencampus.sh always opens the browser on a
+ * phone, so app users had to log in there once before the room appeared in
+ * their app - participants are not invited, they join through this link.
+ *
+ * `via` names a server that can let the person join. It comes from the room
+ * id's own server part and falls back to the EduHub server name for room ids
+ * that carry none (room version 12 and later).
+ */
+export const matrixRoomUrl = (
+  roomId: string | null | undefined,
+  serverName: string | null | undefined = process.env.NEXT_PUBLIC_MATRIX_SERVER_NAME
+): string | null => {
+  const id = trimAndNull(roomId);
+  if (!id) return null;
+  const roomServer = id.includes(':') ? trimAndNull(id.split(':').slice(1).join(':')) : null;
+  const via = roomServer ?? trimAndNull(serverName) ?? DEFAULT_MATRIX_SERVER_NAME;
+  return `https://matrix.to/#/${id}?via=${encodeURIComponent(via)}`;
+};

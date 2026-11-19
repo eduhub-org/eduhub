@@ -72,6 +72,7 @@ import useErrorHandler from '../../../hooks/useErrorHandler';
 import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';
 import { InfoDialog } from '../../common/dialogs/InfoDialog';
 import { translateErrorMessage } from '../../../helpers/errorHandling';
+import { matrixRoomUrl } from '../../../helpers/matrix';
 import { useRoleQuery, useLazyRoleQuery } from '../../../hooks/authedQuery';
 import { useCurrentRole } from '../../../hooks/authentication';
 import { useManagementRoleContext } from '../../../hooks/managementRole';
@@ -570,9 +571,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
   });
 
   const matrixRoomId = (course as any).matrixRoomId as string | undefined;
-  const elementBaseUrl = process.env.NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL?.replace(/\/+$/, '');
-  const derivedMatrixLink =
-    matrixRoomId && elementBaseUrl ? `${elementBaseUrl}/#/room/${matrixRoomId}` : '';
+  const derivedMatrixLink = matrixRoomUrl(matrixRoomId) ?? '';
   const legacyChatUrl = course.chatLink?.trim() ? course.chatLink.trim() : '';
   const openParticipantChatHref = derivedMatrixLink || legacyChatUrl || '';
 

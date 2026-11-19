@@ -8,6 +8,7 @@ import { Course_Course_by_pk } from '../../../../queries/__generated__/Course';
 import { CourseWithEnrollment_Course_by_pk_CourseEnrollments } from '../../../../queries/__generated__/CourseWithEnrollment';
 import { Button } from '../../../common/Button';
 import { useDisplayDate } from '../../../../helpers/dateTimeHelpers';
+import { matrixRoomUrl } from '../../../../helpers/matrix';
 import { isInvitationExpired } from './types';
 
 /**
@@ -62,12 +63,7 @@ const getSafeExternalUrl = (value: string | null | undefined): string | null => 
 };
 
 const buildCourseChatLink = (course: Course_Course_by_pk & { matrixRoomId?: string | null }): string | null => {
-  const matrixRoomId = course.matrixRoomId;
-  const elementBaseUrl = process.env.NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL?.replace(/\/+$/, '');
-  if (matrixRoomId && elementBaseUrl) {
-    return `${elementBaseUrl}/#/room/${matrixRoomId}`;
-  }
-  return course.chatLink ?? null;
+  return matrixRoomUrl(course.matrixRoomId) ?? course.chatLink ?? null;
 };
 
 /**
