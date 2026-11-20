@@ -11,10 +11,12 @@ interface MatrixAuthStatusProps {
   error?: string | null;
   /** Where "try again" leads, e.g. back to /matrix/login. */
   retryHref?: string;
+  /** The page the user came from (a same-site path); replaces "start page" when set. */
+  backHref?: string | null;
 }
 
 /** Full-page status for the chat login redirect and callback pages. */
-const MatrixAuthStatus: FC<MatrixAuthStatusProps> = ({ message, error, retryHref }) => {
+const MatrixAuthStatus: FC<MatrixAuthStatusProps> = ({ message, error, retryHref, backHref }) => {
   const t = useTranslations('matrixChat');
 
   return (
@@ -28,9 +30,15 @@ const MatrixAuthStatus: FC<MatrixAuthStatusProps> = ({ message, error, retryHref
                 {t('try_again')}
               </Button>
             )}
-            <Button as="a" href="/">
-              {t('back_home')}
-            </Button>
+            {backHref && backHref !== '/' ? (
+              <Button as="a" href={backHref}>
+                {t('back_to_course')}
+              </Button>
+            ) : (
+              <Button as="a" href="/">
+                {t('back_home')}
+              </Button>
+            )}
           </div>
         </>
       ) : (

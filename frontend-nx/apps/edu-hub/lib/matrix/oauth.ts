@@ -23,6 +23,7 @@ import {
   loadMatrixSession,
   loadRegisteredClientId,
   MatrixSession,
+  PendingMatrixLogin,
   saveMatrixSession,
   savePendingMatrixLogin,
   saveRegisteredClientId,
@@ -40,7 +41,9 @@ export class MatrixLoginError extends Error {
       | 'WRONG_MATRIX_ACCOUNT'
       | 'DENIED'
       | 'EXCHANGE_FAILED',
-    message?: string
+    message?: string,
+    /** Where the user wanted to go, when the failed login got that far; for a "back" link. */
+    public readonly returnTo?: string
   ) {
     super(message ?? reason);
     this.name = 'MatrixLoginError';
@@ -164,9 +167,41 @@ export const completeMatrixLogin = async ({
   const pending = takePendingMatrixLogin(state);
   if (!pending) throw new MatrixLoginError('UNKNOWN_STATE');
   // The login was started for another EduHub account (e.g. someone else
-  // signed in to EduHub in between); do not hand them this Matrix session.
+  // signed in to EduHub in between); do not hand them this Matrix session,
+  // nor where that person was going.
   if (pending.eduHubUserId !== eduHubUserId) throw new MatrixLoginError('WRONG_USER');
 
+  try {
+    return await exchangeAndStoreSession({ code, pending, eduHubUserId, expectedMatrixHandle, origin });
+  } catch (error) {
+    const failure =
+      error instanceof MatrixLoginError ? error : new MatrixLoginError('EXCHANGE_FAILED', (error as Error).message);
+    throw new MatrixLoginError(failure.reason, failure.message, pending.returnTo);
+  }
+};
+
+/**
+ * Ends a login the auth server sent back without a code (e.g. the user denied
+ * consent): forgets it and returns where that user wanted to go, if known.
+ */
+export const abandonMatrixLogin = (state: string | undefined, eduHubUserId: string): string | null => {
+  const pending = state ? takePendingMatrixLogin(state) : null;
+  return pending && pending.eduHubUserId === eduHubUserId ? pending.returnTo : null;
+};
+
+const exchangeAndStoreSession = async ({
+  code,
+  pending,
+  eduHubUserId,
+  expectedMatrixHandle,
+  origin,
+}: {
+  code: string;
+  pending: PendingMatrixLogin;
+  eduHubUserId: string;
+  expectedMatrixHandle: string | null;
+  origin: string;
+}): Promise<{ session: MatrixSession; returnTo: string }> => {
   const { OAuth2, createClient } = await loadSdk();
   const metadata = await getAuthMetadata(pending.homeserverUrl);
   const oauth = new OAuth2(metadata, {

@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 
 import MatrixAuthStatus from '../../components/pages/MatrixAuth/MatrixAuthStatus';
 import { useSignedInMatrixHandle, useSignedInUserId } from '../../hooks/authentication';
-import { completeMatrixLogin, MatrixLoginError, parseMatrixCallback } from '../../lib/matrix/oauth';
+import { abandonMatrixLogin, completeMatrixLogin, MatrixLoginError, parseMatrixCallback } from '../../lib/matrix/oauth';
 
 /**
  * Where the homeserver's OAuth 2.0 server sends the browser back after the
@@ -18,6 +18,8 @@ const MatrixCallbackPage = () => {
   const eduHubUserId = useSignedInUserId();
   const expectedMatrixHandle = useSignedInMatrixHandle();
   const [error, setError] = useState<string | null>(null);
+  // Where the user wanted to go, for the links on the error page.
+  const [returnTo, setReturnTo] = useState<string | null>(null);
   const started = useRef(false);
 
   useEffect(() => {
@@ -33,10 +35,12 @@ const MatrixCallbackPage = () => {
       return;
     }
     if (oauthError) {
+      setReturnTo(abandonMatrixLogin(state, eduHubUserId));
       setError(oauthError === 'access_denied' ? t('login_denied') : t('login_failed'));
       return;
     }
     if (!code || !state) {
+      setReturnTo(abandonMatrixLogin(state, eduHubUserId));
       setError(t('login_failed'));
       return;
     }
@@ -45,6 +49,7 @@ const MatrixCallbackPage = () => {
       .then(({ returnTo }) => router.replace(returnTo))
       .catch((loginError) => {
         console.error('Could not complete the Matrix login', loginError);
+        if (loginError instanceof MatrixLoginError) setReturnTo(loginError.returnTo ?? null);
         if (loginError instanceof MatrixLoginError && loginError.reason === 'WRONG_MATRIX_ACCOUNT') {
           setError(t('wrong_account', { matrixId: loginError.message }));
         } else if (loginError instanceof MatrixLoginError && loginError.reason === 'WRONG_USER') {
@@ -55,7 +60,8 @@ const MatrixCallbackPage = () => {
       });
   }, [status, eduHubUserId, expectedMatrixHandle, router, t]);
 
-  return <MatrixAuthStatus message={t('login_completing')} error={error} retryHref="/matrix/login" />;
+  const retryHref = returnTo ? `/matrix/login?returnTo=${encodeURIComponent(returnTo)}` : '/matrix/login';
+  return <MatrixAuthStatus message={t('login_completing')} error={error} retryHref={retryHref} backHref={returnTo} />;
 };
 
 export default MatrixCallbackPage;

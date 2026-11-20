@@ -57,7 +57,14 @@ const MatrixLoginPage = () => {
       });
   }, [router.isReady, router.query.returnTo, status, eduHubUserId, settingsLoading, matrixChatEnabled, t]);
 
-  return <MatrixAuthStatus message={t('login_redirecting')} error={error} retryHref={router.asPath} />;
+  return (
+    <MatrixAuthStatus
+      message={t('login_redirecting')}
+      error={error}
+      retryHref={router.asPath}
+      backHref={safeReturnTo(router.query.returnTo)}
+    />
+  );
 };
 
 export default MatrixLoginPage;

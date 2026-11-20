@@ -1,5 +1,6 @@
 import { safeReturnTo } from './config';
 import {
+  abandonMatrixLogin,
   completeMatrixLogin,
   logoutAllMatrixSessions,
   logoutMatrix,
@@ -256,6 +257,57 @@ describe('completeMatrixLogin', () => {
       completeMatrixLogin({ code: 'code-1', state: stateOf(url), eduHubUserId: 'u2', expectedMatrixHandle: 'someone.else.def456', origin })
     ).rejects.toBeInstanceOf(MatrixLoginError);
     expect(loadMatrixSession('u2')).toBeNull();
+  });
+
+  describe('when it fails, it says where the user wanted to go', () => {
+    const login = async (returnTo: string) => {
+      const url = await startMatrixLogin({ eduHubUserId: 'u1', returnTo, origin });
+      return completeMatrixLogin({ code: 'code-1', state: stateOf(url), eduHubUserId: 'u1', expectedMatrixHandle: 'ina.lehr.abc123', origin });
+    };
+
+    it('for a login the auth server refused', async () => {
+      completeAuthorizationCodeGrant.mockRejectedValueOnce(new Error('invalid_grant'));
+      await expect(login('/course/12')).rejects.toMatchObject({ reason: 'EXCHANGE_FAILED', returnTo: '/course/12' });
+    });
+
+    it('for the wrong Matrix account', async () => {
+      whoami.mockResolvedValueOnce({ user_id: '@admin.admin.8914be:test', device_id: 'DEVICE1' });
+      await expect(login('/course/12')).rejects.toMatchObject({
+        reason: 'WRONG_MATRIX_ACCOUNT',
+        message: '@admin.admin.8914be:test',
+        returnTo: '/course/12',
+      });
+    });
+
+    it('for an unexpected error, e.g. the homeserver is unreachable', async () => {
+      whoami.mockRejectedValueOnce(new TypeError('Failed to fetch'));
+      const failure = login('/course/12');
+      await expect(failure).rejects.toBeInstanceOf(MatrixLoginError);
+      await expect(failure).rejects.toMatchObject({ reason: 'EXCHANGE_FAILED', returnTo: '/course/12' });
+    });
+
+    it('but not for a login another EduHub user started', async () => {
+      const url = await startMatrixLogin({ eduHubUserId: 'u1', returnTo: '/course/12', origin });
+      const failure = completeMatrixLogin({ code: 'code-1', state: stateOf(url), eduHubUserId: 'u2', expectedMatrixHandle: null, origin });
+      await expect(failure).rejects.toMatchObject({ reason: 'WRONG_USER', returnTo: undefined });
+    });
+  });
+});
+
+describe('abandonMatrixLogin', () => {
+  it('forgets the login and returns where the user wanted to go', async () => {
+    const url = await startMatrixLogin({ eduHubUserId: 'u1', returnTo: '/course/12', origin });
+
+    expect(abandonMatrixLogin(stateOf(url), 'u1')).toBe('/course/12');
+    expect(takePendingMatrixLogin(stateOf(url))).toBeNull();
+  });
+
+  it('knows nothing without a matching login of the same user', async () => {
+    const url = await startMatrixLogin({ eduHubUserId: 'u1', returnTo: '/course/12', origin });
+
+    expect(abandonMatrixLogin(undefined, 'u1')).toBeNull();
+    expect(abandonMatrixLogin('unknown-state', 'u1')).toBeNull();
+    expect(abandonMatrixLogin(stateOf(url), 'u2')).toBeNull();
   });
 });
 
