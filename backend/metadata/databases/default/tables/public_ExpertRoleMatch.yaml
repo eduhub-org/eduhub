@@ -1,0 +1,4 @@
+# Return type of match_expert_roles; never holds rows. No role permissions.
+table:
+  name: ExpertRoleMatch
+  schema: public

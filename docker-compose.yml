@@ -148,6 +148,9 @@ services:
       # but MUST be a real secret elsewhere: anyone who knows it can mint a link to
       # any guest's data.
       GUEST_TOKEN_SECRET: ${GUEST_TOKEN_SECRET:-dev-guest-token-secret}
+      # Semantic expert search (ADR 0004). "fake" embeds by shared words, so the whole pipeline runs
+      # without Google credentials; the real Vertex AI provider only runs on GCP (metadata server).
+      EMBEDDING_PROVIDER: ${EMBEDDING_PROVIDER:-fake}
 
   python_functions:
     container_name: eduhub-python-functions
@@ -240,7 +243,9 @@ services:
 
   db_hasura:
     container_name: eduhub-db_hasura
-    image: postgres:17
+    # Postgres 17 with the pgvector extension (semantic expert search, ADR 0004). The trixie
+    # variant has the same glibc as postgres:17, so existing volumes keep their collation version.
+    image: pgvector/pgvector:pg17-trixie
     environment:
       POSTGRES_PASSWORD: postgrespassword
     volumes:
