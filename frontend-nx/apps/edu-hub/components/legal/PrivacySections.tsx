@@ -603,6 +603,19 @@ export const PrivacyCourseParticipation: FC = () => {
           ? 'If you lead a course or speak at an event, your name and, if you have uploaded one, your profile picture are shown publicly on the page of the course or event. For instructors the legal basis is Art. 6 para. 1 lit. b GDPR, for speakers our legitimate interest in presenting the event (Art. 6 para. 1 lit. f GDPR). The profile picture is voluntary; you can remove it in your profile at any time.'
           : 'Wenn du einen Kurs leitest oder bei einer Veranstaltung sprichst, werden dein Name und, falls du eines hochgeladen hast, dein Profilbild öffentlich auf der Seite des Kurses bzw. der Veranstaltung angezeigt. Rechtsgrundlage ist für Kursleitungen Art. 6 Abs. 1 lit. b DSGVO, für Referent:innen unser berechtigtes Interesse an der Vorstellung der Veranstaltung (Art. 6 Abs. 1 lit. f DSGVO). Das Profilbild ist freiwillig; du kannst es jederzeit in deinem Profil entfernen.'}
       </p>
+      <h3 className="text-lg mt-2 mb-2 italic">
+        {isEnglish ? 'Expert Directory' : 'Verzeichnis der Expert:innen'}
+      </h3>
+      <p>
+        {isEnglish
+          ? 'If you lead a course, speak at a session or mentor a project, we list you in an internal directory so that we can contact you about future courses and events. It shows your name, profile picture, organization, contact details and the courses, sessions and projects you were part of. Our admins can add dated notes, for example on topics you could cover or when you are available, and can mark that you do not want to be contacted. The admins of a partner organization see the people of their own organization\'s courses, and only the notes of their organization. To find people for related topics too, we turn the titles and descriptions of courses, sessions, projects and achievement options - never the notes - into numerical vectors with Google Cloud Vertex AI, operated in the EU by Google, which already hosts our platform.'
+          : 'Wenn du einen Kurs leitest, bei einem Termin sprichst oder ein Projekt betreust, führen wir dich in einem internen Verzeichnis, damit wir dich für künftige Kurse und Veranstaltungen ansprechen können. Es zeigt deinen Namen, dein Profilbild, deine Organisation, deine Kontaktdaten und die Kurse, Termine und Projekte, an denen du beteiligt warst. Unsere Admins können datierte Notizen ergänzen, etwa zu Themen, die du abdecken könntest, oder wann du verfügbar bist, und vermerken, dass du nicht kontaktiert werden möchtest. Die Admins einer Partnerorganisation sehen die Personen der Kurse ihrer eigenen Organisation und nur die Notizen ihrer Organisation. Um auch Personen zu verwandten Themen zu finden, wandeln wir Titel und Beschreibungen von Kursen, Terminen, Projekten und Leistungsnachweisoptionen - nie die Notizen - mit Google Cloud Vertex AI in Zahlenvektoren um; der Dienst wird von Google in der EU betrieben, das bereits unsere Plattform hostet.'}
+      </p>
+      <p>
+        {isEnglish
+          ? 'The legal basis is Art. 6 para. 1 lit. f GDPR; our legitimate interest is to find and contact suitable people for our courses and events. You can object at any time, for example by replying to one of our e-mails; we then mark you as not to be contacted. On request we tell you which notes we keep about you. We keep the entries for as long as your user account exists.'
+          : 'Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO; unser berechtigtes Interesse liegt darin, passende Personen für unsere Kurse und Veranstaltungen zu finden und anzusprechen. Du kannst dem jederzeit widersprechen, etwa indem du auf eine unserer E-Mails antwortest; wir vermerken dann, dass du nicht kontaktiert werden möchtest. Auf Anfrage teilen wir dir mit, welche Notizen wir zu dir führen. Wir speichern die Einträge, solange dein Nutzerkonto besteht.'}
+      </p>
     </>
   );
 };

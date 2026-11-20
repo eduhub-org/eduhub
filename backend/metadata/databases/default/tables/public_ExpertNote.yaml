@@ -1,0 +1,151 @@
+table:
+  name: ExpertNote
+  schema: public
+object_relationships:
+  - name: Author
+    using:
+      foreign_key_constraint_on: authorId
+  - name: Expert
+    using:
+      foreign_key_constraint_on: expertId
+  - name: Organization
+    using:
+      foreign_key_constraint_on: organizationId
+# Expert Notes (ADR 0003). Central admins' notes have no organization and are seen by admins only;
+# an org admin sees and writes the notes of the organizations they manage programs of. Job-board-only
+# admins (canManageJobs alone) have no expert directory and get nothing here.
+insert_permissions:
+  - role: org_admin_access
+    permission:
+      # The note's organization must be one the author manages and one the expert worked with,
+      # so the note is not shown to admins of an organization that never worked with the expert.
+      check:
+        _and:
+          - Organization:
+              OrganizationAdmins:
+                _and:
+                  - userId:
+                      _eq: X-Hasura-User-Id
+                  - _or:
+                      - canManageCourses:
+                          _eq: true
+                      - canManageEvents:
+                          _eq: true
+                      - canManageDegrees:
+                          _eq: true
+                      - canManageSettings:
+                          _eq: true
+          - Expert:
+              _or:
+                - CourseInstructors:
+                    Course:
+                      Program:
+                        organizationId:
+                          _ceq:
+                            - $
+                            - organizationId
+                - SessionSpeakers:
+                    Session:
+                      Course:
+                        Program:
+                          organizationId:
+                            _ceq:
+                              - $
+                              - organizationId
+                - ProjectMentors:
+                    Project:
+                      ProjectCourses:
+                        Course:
+                          Program:
+                            organizationId:
+                              _ceq:
+                                - $
+                                - organizationId
+                - AchievementOptionMentors:
+                    AchievementOption:
+                      AchievementOptionCourses:
+                        Course:
+                          Program:
+                            organizationId:
+                              _ceq:
+                                - $
+                                - organizationId
+      set:
+        authorId: x-hasura-User-Id
+      columns:
+        - expertId
+        - organizationId
+        - text
+select_permissions:
+  - role: org_admin_access
+    permission:
+      columns:
+        - id
+        - expertId
+        - authorId
+        - organizationId
+        - text
+        - created_at
+        - updated_at
+      filter:
+        Organization:
+          OrganizationAdmins:
+            _and:
+              - userId:
+                  _eq: X-Hasura-User-Id
+              - _or:
+                  - canManageCourses:
+                      _eq: true
+                  - canManageEvents:
+                      _eq: true
+                  - canManageDegrees:
+                      _eq: true
+                  - canManageSettings:
+                      _eq: true
+# Authors edit and delete their own entries while they still manage the note's organization;
+# admins (full access) can delete any.
+update_permissions:
+  - role: org_admin_access
+    permission:
+      columns:
+        - text
+      filter:
+        _and:
+          - authorId:
+              _eq: X-Hasura-User-Id
+          - Organization:
+              OrganizationAdmins:
+                _and:
+                  - userId:
+                      _eq: X-Hasura-User-Id
+                  - _or:
+                      - canManageCourses:
+                          _eq: true
+                      - canManageEvents:
+                          _eq: true
+                      - canManageDegrees:
+                          _eq: true
+                      - canManageSettings:
+                          _eq: true
+      check: null
+delete_permissions:
+  - role: org_admin_access
+    permission:
+      filter:
+        _and:
+          - authorId:
+              _eq: X-Hasura-User-Id
+          - Organization:
+              OrganizationAdmins:
+                _and:
+                  - userId:
+                      _eq: X-Hasura-User-Id
+                  - _or:
+                      - canManageCourses:
+                          _eq: true
+                      - canManageEvents:
+                          _eq: true
+                      - canManageDegrees:
+                          _eq: true
+                      - canManageSettings:
+                          _eq: true

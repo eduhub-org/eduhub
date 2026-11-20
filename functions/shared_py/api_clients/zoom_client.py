@@ -55,6 +55,21 @@ def _resolve_default_timeout():
     return (seconds, seconds)
 
 
+# Gaps shorter than this are no interruption: moving into or out of a
+# breakout room ends one participant row and starts the next a second later.
+MIN_INTERRUPTION_GAP = pd.Timedelta(seconds=60)
+
+
+def count_interruptions(intervals):
+    """Gaps of at least MIN_INTERRUPTION_GAP between sorted, merged
+    ``(start, end)`` intervals."""
+    return sum(
+        1
+        for (_s, previous_end), (next_start, _e) in zip(intervals, intervals[1:])
+        if next_start - previous_end >= MIN_INTERRUPTION_GAP
+    )
+
+
 class ZoomAttendanceError(Exception):
     """Raised when Zoom attendance for a session cannot be fully
     collected (e.g. one or more meeting-instance participant fetches
@@ -560,6 +575,7 @@ class ZoomClient:
                     "interruptionCount",
                     "meetingUuids",
                     "instanceStarts",
+                    "intervals",
                 ]
             )
 
@@ -605,9 +621,7 @@ class ZoomClient:
             total_duration = int(sum((e - s).total_seconds() for s, e in merged))
             join_dt = merged[0][0] if merged else None
             leave_dt = merged[-1][1] if merged else None
-            # Number of separate joins = number of merged intervals; a single
-            # continuous presence implies zero interruptions.
-            interruption_count = max(len(merged) - 1, 0) if merged else 0
+            interruption_count = count_interruptions(merged)
 
             most_common_name = (
                 max(set(names), key=names.count) if names else None
@@ -626,6 +640,9 @@ class ZoomClient:
                     "interruptionCount": interruption_count if merged else None,
                     "meetingUuids": sorted(set(meeting_uuids)),
                     "instanceStarts": sorted(set(instance_starts)),
+                    # Occupied (start, end) spans, so check_attendance can
+                    # combine several records without counting their gaps.
+                    "intervals": merged,
                 }
             )
 

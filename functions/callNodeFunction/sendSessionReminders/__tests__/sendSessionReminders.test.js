@@ -203,6 +203,40 @@ describe('resolveSessionLocations', () => {
     ).toEqual(['https://meet.example.com/x', 'Online']);
   });
 
+  it("falls back to the course location's default venue and address", () => {
+    expect(
+      resolveSessionLocations([
+        {
+          address: '',
+          LocationAddress: null,
+          CourseLocation: {
+            locationOption: 'KIEL',
+            defaultSessionAddress: null,
+            DefaultSessionAddress: { shortLabel: 'ZBW Kiel', address: 'Düsternbrooker Weg 120' },
+          },
+        },
+        {
+          address: '',
+          CourseLocation: { locationOption: 'ONLINE', defaultSessionAddress: 'https://meet.example.com/y' },
+        },
+      ])
+    ).toEqual(['ZBW Kiel (Düsternbrooker Weg 120)', 'https://meet.example.com/y']);
+  });
+
+  it('keeps a venue label when the venue has no address', () => {
+    expect(
+      resolveSessionLocations([
+        {
+          address: '',
+          CourseLocation: {
+            locationOption: 'KIEL',
+            DefaultSessionAddress: { shortLabel: 'Starterkitchen', address: '' },
+          },
+        },
+      ])
+    ).toEqual(['Starterkitchen']);
+  });
+
   it('drops the migration placeholder label', () => {
     expect(
       resolveSessionLocations([{ LocationAddress: { shortLabel: 'generic address', address: 'Wall 1' } }])
