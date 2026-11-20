@@ -77,6 +77,19 @@ const SET_COURSE_ROOM_IF_EMPTY = `
 
 const ALLOWED_ROLES = new Set(["admin", "instructor_access", "instructor"]);
 
+/**
+ * Room settings in course rooms that only the bot may change. Everything else
+ * stays at state_default (50), e.g. m.room.pinned_events for instructors.
+ */
+const COURSE_ROOM_BOT_ONLY_EVENTS = {
+  "m.room.encryption": 100,
+  "m.room.power_levels": 100,
+  "m.room.join_rules": 100,
+  "m.room.history_visibility": 100,
+  "m.room.tombstone": 100,
+  "m.room.server_acl": 100,
+};
+
 const trimAndNull = (value) => {
   if (value == null) return null;
   const trimmed = String(value).trim();
@@ -532,6 +545,10 @@ export default async function createMatrixRoom(req, logger) {
               users_default: 0,
               events_default: 0,
               state_default: 50,
+              // Instructors (50) may pin, rename and moderate, but these
+              // settings would break or open up the room, so only the bot
+              // (100, or creator in room version 12) may change them.
+              events: COURSE_ROOM_BOT_ONLY_EVENTS,
               redact: 50,
               ban: 50,
               kick: 50,

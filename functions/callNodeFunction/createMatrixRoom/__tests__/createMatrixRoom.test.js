@@ -96,3 +96,22 @@ it('keeps the bot at power level 100 in room versions before 12', async () => {
   expect(body.room_version).toBe('11');
   expect(powerLevelUsers(body)).toEqual({ '@bot:test': 100, '@ina.lehr.abc123:test': 50 });
 });
+
+it('lets only the bot change the settings that would break or open up the room', async () => {
+  mockHomeserver('12');
+
+  await createMatrixRoom(req, logger);
+
+  const powerLevels = createRoomBody().initial_state.find((event) => event.type === 'm.room.power_levels').content;
+  expect(powerLevels.events).toEqual({
+    'm.room.encryption': 100,
+    'm.room.power_levels': 100,
+    'm.room.join_rules': 100,
+    'm.room.history_visibility': 100,
+    'm.room.tombstone': 100,
+    'm.room.server_acl': 100,
+  });
+  // Pinning is not listed, so instructors (50) keep it via state_default.
+  expect(powerLevels.events['m.room.pinned_events']).toBeUndefined();
+  expect(powerLevels.state_default).toBe(50);
+});
