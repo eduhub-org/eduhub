@@ -15,7 +15,7 @@
  */
 import type { MatrixClient, ValidatedAuthMetadata } from 'matrix-js-sdk';
 
-import { getMatrixHomeserverUrl, matrixCallbackUrl, safeReturnTo } from './config';
+import { getMatrixHomeserverUrl, getMatrixOAuthClientId, matrixCallbackUrl, safeReturnTo } from './config';
 import {
   clearMatrixSession,
   forgetRegisteredClientId,
@@ -63,8 +63,16 @@ const getAuthMetadata = async (homeserverUrl: string): Promise<ValidatedAuthMeta
   return createClient({ baseUrl: homeserverUrl }).getAuthMetadata();
 };
 
-/** Step 2: register EduHub as a public OAuth client (no secret; PKCE protects the code). */
+/**
+ * Step 2: register EduHub as a public OAuth client (no secret; PKCE protects the code).
+ * A client id configured for this deployment is used as is, without falling back
+ * to registration, so a wrong id shows up as a failed login instead of silently
+ * bringing back the consent screen.
+ */
 const getOrRegisterClientId = async (metadata: ValidatedAuthMetadata, origin: string): Promise<string> => {
+  const configured = getMatrixOAuthClientId();
+  if (configured) return configured;
+
   const stored = loadRegisteredClientId(metadata.issuer, origin);
   if (stored) return stored;
 

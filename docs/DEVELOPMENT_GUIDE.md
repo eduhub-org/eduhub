@@ -109,6 +109,12 @@ re-imported without any handles, and Matrix logins fail until they are back.
 Then "Create Matrix room" in Manage Courses creates real rooms, and any local
 EduHub user (e.g. `admin@example.com` / `dev`) can log in to Element.
 
+The course chat registers EduHub as an OAuth client in MAS on its own, once per
+browser, so MAS asks for consent on login. A deployment where EduHub is
+registered in MAS up front sets `NEXT_PUBLIC_MATRIX_OAUTH_CLIENT_ID` instead
+(build time). That id is then always used, without falling back to
+registration: a wrong id makes the chat login fail. Leave it empty locally.
+
 ## 🌱 Seeds
 
 Seed data is used to initialize the database with an initial set of values, especially useful during development and testing. The initial database state is defined in `backend/seeds/default/initial_seeds.sql` and is automatically applied when starting a fresh database.

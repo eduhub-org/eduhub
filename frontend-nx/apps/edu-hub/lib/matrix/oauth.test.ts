@@ -133,6 +133,34 @@ describe('startMatrixLogin', () => {
     const url = await startMatrixLogin({ eduHubUserId: 'u1', returnTo: 'https://evil.example', origin });
     expect(takePendingMatrixLogin(stateOf(url))?.returnTo).toBe('/');
   });
+
+  describe('with a client id configured for the deployment', () => {
+    beforeEach(() => {
+      process.env.NEXT_PUBLIC_MATRIX_OAUTH_CLIENT_ID = ' fixed-client ';
+    });
+
+    afterEach(() => {
+      delete process.env.NEXT_PUBLIC_MATRIX_OAUTH_CLIENT_ID;
+    });
+
+    it('uses it and never registers a client', async () => {
+      const url = await startMatrixLogin({ eduHubUserId: 'u1', returnTo: '/', origin });
+
+      expect(registerClient).not.toHaveBeenCalled();
+      expect(oauthContexts[0].clientId).toBe('fixed-client');
+      expect(takePendingMatrixLogin(stateOf(url))?.clientId).toBe('fixed-client');
+    });
+
+    it('prefers it over a client registered earlier in this browser', async () => {
+      delete process.env.NEXT_PUBLIC_MATRIX_OAUTH_CLIENT_ID;
+      await startMatrixLogin({ eduHubUserId: 'u1', returnTo: '/', origin });
+      process.env.NEXT_PUBLIC_MATRIX_OAUTH_CLIENT_ID = 'fixed-client';
+
+      await startMatrixLogin({ eduHubUserId: 'u1', returnTo: '/', origin });
+
+      expect(oauthContexts.map((context) => context.clientId)).toEqual(['client-1', 'fixed-client']);
+    });
+  });
 });
 
 describe('completeMatrixLogin', () => {

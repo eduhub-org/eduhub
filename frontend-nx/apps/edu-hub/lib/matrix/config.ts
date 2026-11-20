@@ -8,6 +8,13 @@ export const getMatrixHomeserverUrl = (): string | null => {
   return url ? url.replace(/\/+$/, '') : null;
 };
 
+/**
+ * OAuth client id of EduHub when it is registered in the auth server (MAS) up
+ * front, or null to register dynamically in each browser. A fixed client can be
+ * marked as trusted in MAS, so people are not asked for consent on every login.
+ */
+export const getMatrixOAuthClientId = (): string | null => process.env.NEXT_PUBLIC_MATRIX_OAUTH_CLIENT_ID?.trim() || null;
+
 /** Where the homeserver's OAuth 2.0 server sends the browser back to after login. */
 export const matrixCallbackUrl = (origin: string): string => `${origin}/matrix/callback`;
 
