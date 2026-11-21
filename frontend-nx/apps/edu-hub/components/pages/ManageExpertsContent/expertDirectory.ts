@@ -199,14 +199,14 @@ export const highlight = (text: string, words: string[]): TextSegment[] => {
 
 const SNIPPET_CONTEXT = 40;
 
-/** A short excerpt around the first hit, so long descriptions stay readable in a table row. */
-export const snippet = (value: string, words: string[]): string => {
+/** An excerpt around the first hit: `context` characters before it and twice that after it. */
+export const snippet = (value: string, words: string[], context = SNIPPET_CONTEXT): string => {
   const text = plainText(value);
   const lower = text.toLowerCase();
   const first = Math.min(...words.map((word) => lower.indexOf(word)).filter((index) => index >= 0));
-  if (!Number.isFinite(first) || text.length <= 2 * SNIPPET_CONTEXT + 20) return text;
-  const start = Math.max(0, first - SNIPPET_CONTEXT);
-  const end = Math.min(text.length, first + SNIPPET_CONTEXT * 2);
+  if (!Number.isFinite(first) || text.length <= 3 * context + 20) return text;
+  const start = Math.max(0, first - context);
+  const end = Math.min(text.length, first + context * 2);
   return `${start > 0 ? '…' : ''}${text.slice(start, end).trim()}${end < text.length ? '…' : ''}`;
 };
 
@@ -222,7 +222,12 @@ export interface ExpertMatch {
  * case-insensitive "contains" the search condition uses). Person fields come first, then roles,
  * newest first; one entry per role and field.
  */
-export const findMatches = (expert: ExpertsList_User, roles: ExpertRole[], search: string): ExpertMatch[] => {
+export const findMatches = (
+  expert: ExpertsList_User,
+  roles: ExpertRole[],
+  search: string,
+  snippetContext = SNIPPET_CONTEXT
+): ExpertMatch[] => {
   const words = searchWords(search);
   if (!words.length) return [];
 
@@ -235,7 +240,7 @@ export const findMatches = (expert: ExpertsList_User, roles: ExpertRole[], searc
     const id = `${role?.key ?? 'person'}:${field}`;
     if (!found.length || seen.has(id)) return;
     seen.add(id);
-    matches.push({ role, field, snippet: snippet(value, found) });
+    matches.push({ role, field, snippet: snippet(value, found, snippetContext) });
   };
 
   personTexts(expert).forEach(({ field, value }) => check(null, field, value));

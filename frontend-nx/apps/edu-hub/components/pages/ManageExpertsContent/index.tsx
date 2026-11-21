@@ -33,7 +33,6 @@ import {
   highlight,
   lastActive,
   mailtoBcc,
-  matchedRoleKeys,
   noteOrganizationsFor,
   organizationOf,
   searchWords,
@@ -311,17 +310,8 @@ const ManageExpertsContent: FC = () => {
         cell: ({ row }) => <ExpertContactActions expert={row.original} />,
       },
     ];
-    if (words.length) {
-      result.splice(result.length - 1, 0, {
-        id: 'matches',
-        header: t('match_label'),
-        enableSorting: false,
-        size: 320,
-        cell: ({ row }) => <MatchLine matches={views.get(row.original.id)?.matches ?? []} words={words} />,
-      });
-    }
     return result;
-  }, [t, format, isAdmin, views, words]);
+  }, [t, format, isAdmin, views]);
 
   return (
     <PageBlock>
@@ -378,7 +368,7 @@ const ManageExpertsContent: FC = () => {
                   <ExpandableExpertRow
                     expert={row}
                     roles={view?.roles ?? []}
-                    matchedRoleKeys={matchedRoleKeys(view?.matches ?? [])}
+                    search={searchFilter}
                     currentUserId={userId}
                     isAdmin={isAdmin}
                     noteOrganizations={noteOrganizationsFor(noteOrganizations, view?.roles ?? [])}
