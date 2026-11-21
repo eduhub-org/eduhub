@@ -473,6 +473,7 @@
         "presentation_link": "Open presentation",
         "presentation_download": "Download presentation",
         "external_link": "Open project link",
+        "open_project_page": "Open project page",
         "expandable_authors_heading": "Authors",
         "expandable_authors_none": "No authors listed.",
         "expandable_tagline_missing": "No tagline has been provided yet.",

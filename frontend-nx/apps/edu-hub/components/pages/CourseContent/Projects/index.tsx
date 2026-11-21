@@ -187,6 +187,7 @@ const Projects: FC<ProjectsProps> = ({
             <div className="flex flex-col w-full min-w-0">
               <MyProjectPanel
                 project={myProject!}
+                courseId={courseId}
                 userId={userId}
                 isExcludedAuthor={isExcludedFromMyProject}
                 courseDefaultSubmissionDeadline={effectiveSubmissionDeadline}
