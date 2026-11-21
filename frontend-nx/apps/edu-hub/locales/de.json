@@ -473,6 +473,7 @@
         "presentation_link": "Präsentation öffnen",
         "presentation_download": "Präsentation herunterladen",
         "external_link": "Projektlink öffnen",
+        "open_project_page": "Projektseite öffnen",
         "expandable_authors_heading": "Autor:innen",
         "expandable_authors_none": "Keine Autor:innen eingetragen.",
         "expandable_tagline_missing": "Es ist noch kein Untertitel hinterlegt.",
@@ -3409,6 +3410,7 @@
       "INVITATION_EXPIRING_SOON": "Einladung läuft ab",
       "INVITATION_EXPIRED": "Einladung abgelaufen",
       "PROJECT_JOIN_REQUESTED": "Projekt-Beitrittsanfrage",
+      "PROJECT_REVIEW_REQUESTED": "Projektfreigabe angefragt",
       "PROJECT_JOIN_ACCEPTED": "Projekt-Beitritt angenommen",
       "PROJECT_JOIN_DECLINED": "Projekt-Beitritt abgelehnt",
       "PROJECT_AUTHOR_EXCLUDED": "Aus Projekt entfernt",
@@ -3473,6 +3475,7 @@
       "INVITATION_EXPIRING_SOON": "Gesendet 24 Stunden, bevor eine Kurseinladung abläuft",
       "INVITATION_EXPIRED": "Gesendet, wenn eine Kurseinladung ungenutzt abgelaufen ist",
       "PROJECT_JOIN_REQUESTED": "Gesendet an das Projektteam, wenn jemand dem Projekt beitreten möchte",
+      "PROJECT_REVIEW_REQUESTED": "Gesendet an Kursleitung und Mentor:innen, wenn ein Team die Freigabe seines Projektvorschlags anfragt",
       "PROJECT_JOIN_ACCEPTED": "Gesendet, wenn eine Beitrittsanfrage für ein Projekt angenommen wird",
       "PROJECT_JOIN_DECLINED": "Gesendet, wenn eine Beitrittsanfrage für ein Projekt abgelehnt wird",
       "PROJECT_AUTHOR_EXCLUDED": "Gesendet, wenn eine Person aus der Projektabgabe entfernt wird",
@@ -3700,7 +3703,8 @@
     }
   },
   "project": {
-    "not_found": "Projekt nicht gefunden",
+    "not_found_or_no_access": "Projekt nicht gefunden – oder Du hast keinen Zugriff darauf.",
+    "not_found_logged_out": "Projekt nicht gefunden. Wenn Du zu diesem Projekt gehörst, melde Dich an, um es zu sehen.",
     "status": {
       "PUBLISHED": "Veröffentlicht"
     },

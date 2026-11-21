@@ -130,6 +130,20 @@ _Avoid_: Vorlage (in code)
 **Project Copy**:
 A team's own project, created from a **Project Template**. Its title comes from the template and can't be changed while it is still linked to that template.
 
+**Project Team**:
+The participants accepted onto a project. They do the work and decide on **Join Requests**.
+_Avoid_: owner (for the team)
+
+**Project Proposer**:
+The person who started a project: whoever proposed it, created it in a course, or took on the **Project Template** it was copied from. For a **Project Copy** that is the team member who took on the template, never the template's creator. Being the proposer gives no say over the project once a team exists.
+_Avoid_: owner
+
+**Join Request**:
+A participant's request to become a member of an existing **Project Team**. The team accepts or declines it; course instructors can as well.
+
+**Project Page**:
+The page showing one project. Anyone can see a published project or an open **Project Template**; every other project only the people who can see it in its course: its team, its proposer, its mentors, the course's instructors and participants.
+
 **Passed Project**:
 A project whose review rated it as passed, whether it has been published or not, and any project shown in the public showcase. A project rated as not passed and not shown in the showcase is not a passed project.
 
@@ -166,6 +180,7 @@ _Avoid_: event confirmation vs. course confirmation as separate emails
 - A **Project** is listed in one or more **Courses**; removing it from its last course deletes it, so a **Passed Project** can't be removed from its last course
 - A **Project Template** has zero or more **Project Copies**; deleting the template keeps the copies as projects of their own
 - A **Passed Project** can't be deleted by anyone, **Admins** included
+- A **Join Request** is announced to the **Project Team**; only a project with no team yet announces it to its mentors (or, without mentors, the course instructors)
 - An **Expert** has one or more **Expert Roles** and zero or more **Expert Notes**; each note belongs to no organization (central admins) or exactly one
 - An **Org Admin** sees only the **Experts** of their organization's courses, and only their organization's **Expert Notes**
 
@@ -180,4 +195,5 @@ _Avoid_: event confirmation vs. course confirmation as separate emails
 - "Invite" meant both the application decision (green rating) and moving someone up from the waitlist. Both are an **Invitation**: the same held place with a deadline; how it is accepted depends on the course (confirm or pay).
 - "Attendance" meant both a raw Zoom/LimeSurvey entry and a Participant's result for a Session. Resolved: the entry is an **Attendance Record**, the result an **Attendance**.
 - "Session reminder" meant three emails (24h, 1h, 15min) before sessions. Resolved: one email, before the First Session only, at the Course's Reminder Lead Time.
+- "Project owner" meant both the person who started a project and the team running it, and a **Project Copy** treated the template's creator as its starter. Resolved: the **Project Proposer** is whoever started that project (for a copy, the team member who took on the template), and the **Project Team** decides on **Join Requests**.
 - "Event confirmation mail" was asked for as a separate template from the course one. Resolved: there is one **Registration Confirmation**; a Course with a single Session simply reads like an event invitation because it has one date.

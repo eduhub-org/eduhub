@@ -473,6 +473,7 @@
         "presentation_link": "Open presentation",
         "presentation_download": "Download presentation",
         "external_link": "Open project link",
+        "open_project_page": "Open project page",
         "expandable_authors_heading": "Authors",
         "expandable_authors_none": "No authors listed.",
         "expandable_tagline_missing": "No tagline has been provided yet.",
@@ -3424,6 +3425,7 @@
       "INVITATION_EXPIRING_SOON": "Invitation Expiring Soon",
       "INVITATION_EXPIRED": "Invitation Expired",
       "PROJECT_JOIN_REQUESTED": "Project Join Requested",
+      "PROJECT_REVIEW_REQUESTED": "Project Approval Requested",
       "PROJECT_JOIN_ACCEPTED": "Project Join Accepted",
       "PROJECT_JOIN_DECLINED": "Project Join Declined",
       "PROJECT_AUTHOR_EXCLUDED": "Removed from Project",
@@ -3488,6 +3490,7 @@
       "INVITATION_EXPIRING_SOON": "Sent 24 hours before a course invitation expires",
       "INVITATION_EXPIRED": "Sent when a course invitation has expired unused",
       "PROJECT_JOIN_REQUESTED": "Sent to the project team when someone requests to join their project",
+      "PROJECT_REVIEW_REQUESTED": "Sent to course instructors and project mentors when a team requests approval of its project proposal",
       "PROJECT_JOIN_ACCEPTED": "Sent when a request to join a project is accepted",
       "PROJECT_JOIN_DECLINED": "Sent when a request to join a project is declined",
       "PROJECT_AUTHOR_EXCLUDED": "Sent when an author is removed from a project's final submission",
@@ -3715,7 +3718,8 @@
     }
   },
   "project": {
-    "not_found": "Project not found",
+    "not_found_or_no_access": "Project not found – or you don't have access to it.",
+    "not_found_logged_out": "Project not found. If you belong to this project, log in to see it.",
     "status": {
       "PUBLISHED": "Published"
     },
