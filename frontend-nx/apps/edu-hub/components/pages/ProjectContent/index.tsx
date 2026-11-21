@@ -7,6 +7,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
 import { AuthRoles } from '../../../types/enums';
+import { ProjectParticipationStatus_enum } from '../../../__generated__/globalTypes';
 import { useRoleQuery } from '../../../hooks/authedQuery';
 import { useCurrentRole, useIsLoggedIn, useIsSessionLoading } from '../../../hooks/authentication';
 import { LoginButton } from '../../layout/LoginButton';
@@ -22,7 +23,7 @@ import { Button } from '../../common/Button';
 import TileSlider from '../../common/TileSlider';
 import { ProjectTile } from '../../common/TileSlider/ProjectTile';
 import { BadgeBanner, pickPrimaryBadge } from '../../common/badges/ProjectBadges';
-import { isOpenTemplate, isProjectPublished } from '../CourseContent/Projects/projectStatusDisplay';
+import { isOpenTemplate } from '../CourseContent/Projects/projectStatusDisplay';
 import { Avatar } from '../../shared-components';
 
 export type ProjectPageContext = 'public' | 'withinCourse';
@@ -126,11 +127,16 @@ const ProjectContent: FC<ProjectContentProps> = ({ id, context, courseId }) => {
     );
   }
 
-  // A published showcase renders the showcase layout; an open template (even a
-  // published one, e.g. a showcased template) keeps the template + join layout.
-  const showcase = isProjectPublished(project) && !isOpenTemplate(project);
+  // Only an open template (even a published one) gets the template + join
+  // layout. Every other project a visitor can see (a published showcase, or a
+  // team's project shown to its team, mentors, instructors and course
+  // participants) gets the project layout, without a join action.
+  const projectLayout = !isOpenTemplate(project);
   const mentor = project.ProjectMentors[0]?.User;
-  const team = project.ProjectAuthors;
+  // Logged-in visitors also receive requested/declined/excluded authors.
+  const team = project.ProjectAuthors.filter(
+    (author) => author.participationStatus === ProjectParticipationStatus_enum.ACCEPTED
+  );
   // Only the course name is shown (program / term intentionally omitted).
   const courseLine = course ? course.title : project.Organization?.name ?? '';
   const primaryBadge = pickPrimaryBadge(project.ProjectBadges);
@@ -156,8 +162,8 @@ const ProjectContent: FC<ProjectContentProps> = ({ id, context, courseId }) => {
     </ReactMarkdown>
   ) : null;
 
-  // -------- Published showcase layout (V1) --------
-  if (showcase) {
+  // -------- Project layout: published showcase or team project (V1) --------
+  if (projectLayout) {
     return (
       <div className="text-white">
         <div

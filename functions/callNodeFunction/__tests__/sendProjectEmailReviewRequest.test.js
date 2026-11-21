@@ -76,10 +76,33 @@ it('does not email again when an already requested approval is touched', async (
   expect(queueEmail).not.toHaveBeenCalled();
 });
 
-it('keeps linking participants to the course page', async () => {
+it('links staff to course management and the team to the project page on submission', async () => {
   await sendProjectEmail(projectEvent({ ...base, status: 'ONGOING' }, { ...base, status: 'SUBMITTED' }), logger);
 
-  const [first] = queueEmail.mock.calls[0];
-  expect(first.templateType).toBe('PROJECT_SUBMITTED');
-  expect(first.variableReplacer('[Project:Link]')).toBe('https://test.example.com/course/42#projects');
+  const links = Object.fromEntries(
+    queueEmail.mock.calls.map(([args]) => [args.recipientEmail, args.variableReplacer('[Project:Link]')])
+  );
+  expect(queueEmail.mock.calls[0][0].templateType).toBe('PROJECT_SUBMITTED');
+  expect(links).toEqual({
+    'ivo@example.com': 'https://test.example.com/manage/course/42#projects',
+    'ida@example.com': 'https://test.example.com/manage/course/42#projects',
+    'mia@example.com': 'https://test.example.com/manage/course/42#projects',
+    'ann@example.com': 'https://test.example.com/project/5',
+  });
+});
+
+it('links the team to the course page when it has to act there', async () => {
+  await sendProjectEmail(projectEvent({ ...base, status: 'SUBMITTED' }, { ...base, status: 'ONGOING' }), logger);
+
+  const [args] = queueEmail.mock.calls[0];
+  expect(args.templateType).toBe('PROJECT_SENT_BACK');
+  expect(args.variableReplacer('[Project:Link]')).toBe('https://test.example.com/course/42#projects');
+});
+
+it('links the team to the project page once the project is approved', async () => {
+  await sendProjectEmail(projectEvent({ ...base, status: 'SUBMITTED' }, { ...base, status: 'COMPLETED' }), logger);
+
+  const [args] = queueEmail.mock.calls[0];
+  expect(args.templateType).toBe('PROJECT_APPROVED');
+  expect(args.variableReplacer('[Project:Link]')).toBe('https://test.example.com/project/5');
 });

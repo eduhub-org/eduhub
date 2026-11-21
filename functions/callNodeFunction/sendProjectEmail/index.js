@@ -30,6 +30,31 @@ export function resolveJoinRequestRecipients(project) {
     .filter(Boolean);
 }
 
+// Emails asking the team to act, which they do in the course page's projects
+// section while the course runs (that section needs a confirmed enrollment).
+const TEAM_ACTION_TEMPLATES = new Set([
+  'PROJECT_JOIN_REQUESTED',
+  'PROJECT_JOIN_ACCEPTED',
+  'PROJECT_TEAM_CONFIRMED',
+  'PROJECT_SENT_BACK',
+]);
+
+/**
+ * Where [Project:Link] points for one recipient: instructors and mentors to
+ * course management, the team to the course page when it has to act there,
+ * everyone else to the project page, which stays reachable for the team after
+ * the course has ended (approved, rejected, submitted, declined, excluded).
+ *
+ * @param {string} templateType - The project email being sent
+ * @param {boolean} isStaff - Whether the recipient is a course instructor or mentor
+ * @returns {'manage'|'course'|'project'}
+ */
+export function projectLinkTarget(templateType, isStaff) {
+  if (isStaff) return 'manage';
+  if (TEAM_ACTION_TEMPLATES.has(templateType)) return 'course';
+  return 'project';
+}
+
 /**
  * Sends project lifecycle emails.
  *
@@ -186,6 +211,7 @@ export default async function sendProjectEmail(req, logger) {
       ...(project.ProjectCourses || []).flatMap((pc) => (pc.Course?.CourseInstructors || []).map((ci) => ci.User)),
       ...(project.ProjectMentors || []).map((m) => m.User),
     ].filter(Boolean);
+    const staffIds = new Set(staff.map((u) => u.id));
 
     // Resolve recipients based on the selector.
     let recipients = [];
@@ -263,8 +289,7 @@ export default async function sendProjectEmail(req, logger) {
         applicantName,
         courseId,
         courseTitle: course?.title ?? '',
-        // Instructors and mentors act on an approval request in course management.
-        forStaff: recipientSelector === 'staff',
+        linkTarget: projectLinkTarget(templateType, staffIds.has(recipient.id)),
       });
       const result = await queueEmail({
         templateType,

@@ -215,7 +215,7 @@ export const EMAIL_VARIABLES = {
       categories: ['project']
     },
     '[Project:Link]': {
-      description: 'Link to where the team works on the project: the projects section of its course page, or the project page when it has no course',
+      description: 'Link for the recipient: course management for instructors and mentors, the course page\'s projects section when the team has to act, otherwise the project page',
       example: 'https://edu.opencampus.sh/course/42#projects',
       categories: ['project']
     },
@@ -668,19 +668,21 @@ export function createSessionVariableReplacer(session, enrollment, sessionData =
  * @param {Object} project - Project data ({ id, title })
  * @param {Object} recipientUser - Recipient user ({ firstName, lastName, email })
  * @param {Object} [extra] - Optional extra values ({ applicantName, courseId,
- *   courseTitle, forStaff }). forStaff links to the course management page,
- *   where instructors and mentors act, instead of the participants' course page.
+ *   courseTitle, linkTarget })
+ * @param {'manage'|'course'|'project'} [extra.linkTarget] - Where [Project:Link]
+ *   points: 'manage' is the course management projects section (instructors
+ *   and mentors act there), 'course' the participants' projects section on
+ *   the course page (the team acts there while the course runs), 'project'
+ *   (default) the project page, which stays reachable after the course.
  * @returns {Function} Variable replacement function
  */
 export function createProjectVariableReplacer(project, recipientUser, extra = {}) {
   const baseUrl = config.frontendUrl();
-  // Lifecycle emails ask the team to act (answer a join request, revise a
-  // sent-back project), which happens in the course page's projects section.
   let projectLink = `${baseUrl}/project/${project?.id || ''}`;
-  if (extra.courseId) {
-    projectLink = extra.forStaff
-      ? `${baseUrl}/manage/course/${extra.courseId}#projects`
-      : `${baseUrl}/course/${extra.courseId}#projects`;
+  if (extra.courseId && extra.linkTarget === 'manage') {
+    projectLink = `${baseUrl}/manage/course/${extra.courseId}#projects`;
+  } else if (extra.courseId && extra.linkTarget === 'course') {
+    projectLink = `${baseUrl}/course/${extra.courseId}#projects`;
   }
   return createVariableReplacer({
     user: recipientUser,
