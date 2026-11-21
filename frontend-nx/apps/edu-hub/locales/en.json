@@ -3031,7 +3031,8 @@
     "relevance_similar": "Similar {percent} %",
     "similar_role": "Similar in meaning · {percent} %",
     "ranked_hint": "Sorted by relevance: people with every search word, and people with courses, sessions or projects similar in meaning.",
-    "ranked_capped": "Of {total} keyword matches, the {ranked} most recently active are included – refine your search to see all of them."
+    "ranked_capped": "Of {total} keyword matches, the {ranked} most recently active are included – refine your search to see all of them.",
+    "similar_capped": "Too many matches similar in meaning to include them all – refine your search."
   },
   "manageOrganizations": {
     "headline": "Organizations",

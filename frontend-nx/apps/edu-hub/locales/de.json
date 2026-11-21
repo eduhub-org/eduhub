@@ -3016,7 +3016,8 @@
     "relevance_similar": "Ähnlich {percent} %",
     "similar_role": "Inhaltlich ähnlich · {percent} %",
     "ranked_hint": "Sortiert nach Relevanz: Personen, bei denen alle Suchwörter vorkommen, und Personen mit inhaltlich ähnlichen Kursen, Sessions oder Projekten.",
-    "ranked_capped": "Von {total} Stichwort-Treffern wurden die {ranked} zuletzt aktiven berücksichtigt – verfeinere deine Suche, um alle zu sehen."
+    "ranked_capped": "Von {total} Stichwort-Treffern wurden die {ranked} zuletzt aktiven berücksichtigt – verfeinere deine Suche, um alle zu sehen.",
+    "similar_capped": "Zu viele inhaltlich ähnliche Treffer, um alle zu berücksichtigen – verfeinere deine Suche."
   },
   "manageOrganizations": {
     "headline": "Organisationen",

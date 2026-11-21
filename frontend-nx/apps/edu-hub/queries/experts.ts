@@ -169,12 +169,23 @@ export const SEMANTIC_EXPERT_SEARCH = gql`
 `;
 
 // The experts behind those sources, merged with the keyword hits and ranked in the browser
-// (useRankedExperts). The limit only guards against runaway results: at most 200 sources come
-// back, each with a handful of people, so all of them arrive before the browser ranks them.
+// (useRankedExperts). Read in pages ordered by id: the org admin permission caps every read at
+// 100 rows, and a stable order lets the pages add up to everyone without skipping or repeating.
 export const SIMILAR_EXPERTS = gql`
   ${EXPERT_FIELDS}
-  query SimilarExperts($sources: User_bool_exp!, $scope: User_bool_exp = {}, $isAdmin: Boolean!, $limit: Int = 1000) {
-    User(limit: $limit, where: { _and: [{ status: { _eq: ACTIVE } }, $scope, $sources] }) {
+  query SimilarExperts(
+    $sources: User_bool_exp!
+    $scope: User_bool_exp = {}
+    $isAdmin: Boolean!
+    $limit: Int!
+    $offset: Int!
+  ) {
+    User(
+      limit: $limit
+      offset: $offset
+      order_by: [{ id: asc }]
+      where: { _and: [{ status: { _eq: ACTIVE } }, $scope, $sources] }
+    ) {
       ...ExpertFields
     }
   }

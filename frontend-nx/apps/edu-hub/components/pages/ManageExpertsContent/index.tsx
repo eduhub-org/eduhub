@@ -398,6 +398,7 @@ const ManageExpertsContent: FC = () => {
                   <p>{t('ranked_capped', { ranked: ranked.keywordRanked, total: ranked.keywordTotal })}</p>
                 )}
                 {ranked.semanticUnavailable && <p>{t('similar_unavailable')}</p>}
+                {!ranked.similarComplete && <p>{t('similar_capped')}</p>}
               </div>
             )}
             <TableGrid
@@ -439,6 +440,8 @@ const ManageExpertsContent: FC = () => {
                 const view = views.get(row.id);
                 return (
                   <ExpandableExpertRow
+                    // A new search starts with the other involvements collapsed again.
+                    key={debouncedSearch}
                     expert={row}
                     roles={view?.roles ?? []}
                     search={debouncedSearch}
