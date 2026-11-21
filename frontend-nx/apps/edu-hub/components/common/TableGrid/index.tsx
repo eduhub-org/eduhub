@@ -844,14 +844,14 @@ const TableGrid = <T extends BaseRow,>({
     [onRowNavigate, rowHref, router]
   );
 
-  // When server-side sorting is enabled, pagination is also server-side
-  // Don't slice - data is already paginated by the server
-  // When server-side sorting is NOT enabled but pagination is enabled,
-  // we slice for client-side pagination (backward compatibility)
-  const rowsToDisplay =
-    enablePagination && !isServerSideSorting
-      ? table.getRowModel().rows.slice(tablePageIndex * tablePageSize, (tablePageIndex + 1) * tablePageSize)
-      : table.getRowModel().rows;
+  // Callers either pass every row (client-side paging, e.g. filtered sessions) or only the current
+  // page, which the server already paged. Only the former holds more rows than fit on one page;
+  // slicing a server page again by pageIndex would leave every page after the first empty.
+  const allRows = table.getRowModel().rows;
+  const isClientSidePaging = enablePagination && !isServerSideSorting && allRows.length > tablePageSize;
+  const rowsToDisplay = isClientSidePaging
+    ? allRows.slice(tablePageIndex * tablePageSize, (tablePageIndex + 1) * tablePageSize)
+    : allRows;
 
   const expandedRowProps = (rowIndex: number): ExpandedRowProps<T> => {
     const row = rowsToDisplay[rowIndex].original;

@@ -22,7 +22,7 @@ import java.util.Map;
  * first 6 hex characters of the user's Keycloak UUID (hyphens stripped).
  *
  * Must produce the same handle as computeMatrixHandle in
- * functions/shared_libs/node/matrixHandle.cjs; keep the two in sync.
+ * functions/shared/matrixHandle.js; keep the two in sync.
  *
  * Once set, the attribute is never overwritten.
  */

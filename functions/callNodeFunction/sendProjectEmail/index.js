@@ -1,7 +1,8 @@
-import { gql, GraphQLClient } from 'graphql-request';
+import { gql } from 'graphql-request';
 import { queueEmail } from '../lib/queueEmail.js';
 import { withRetry } from '../lib/withRetry.js';
-import { createProjectVariableReplacer } from '../emailTemplateVariables.js';
+import { createProjectVariableReplacer } from '../lib/emailTemplateVariables.js';
+import { createHasuraClient } from '../lib/hasura.js';
 
 /**
  * Who is told about a Join Request (see CONTEXT.md): the Project Team, who
@@ -136,9 +137,7 @@ export default async function sendProjectEmail(req, logger) {
       return { success: true, messageKey: 'NO_ACTION_NEEDED', message: `Unhandled table: ${tableName}` };
     }
 
-    const client = new GraphQLClient(process.env.HASURA_ENDPOINT, {
-      headers: { 'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET },
-    });
+    const client = createHasuraClient();
 
     // Load the project with everyone potentially involved.
     const GET_PROJECT = gql`

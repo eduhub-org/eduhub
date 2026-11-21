@@ -1,5 +1,5 @@
-import { GraphQLClient } from "graphql-request";
 import { saveFileUnchecked } from "../saveFile/index.js";
+import { createHasuraClient } from "../lib/hasura.js";
 
 /**
  * Roles other than admin that may store an instruction PDF. The value is the
@@ -16,17 +16,6 @@ const NON_ADMIN_ROLES = new Set(["instructor", "org_admin"]);
 // filePath" and the messageKey never reaches the client. Callers check `success`
 // first, so these are never read.
 const FAILURE_DEFAULTS = { filePath: "", accessUrl: "" };
-
-const ensureHasuraClient = () => {
-  if (!process.env.HASURA_ENDPOINT || !process.env.HASURA_ADMIN_SECRET) {
-    throw new Error("HASURA_ENDPOINT or HASURA_ADMIN_SECRET not configured");
-  }
-  return new GraphQLClient(process.env.HASURA_ENDPOINT, {
-    headers: {
-      "x-hasura-admin-secret": process.env.HASURA_ADMIN_SECRET,
-    },
-  });
-};
 
 const GET_INSTRUCTION_OWNER = `
   query GetProjectDocumentationInstructionOwner($id: Int!) {
@@ -78,7 +67,7 @@ export default async function saveProjectDocumentationInstruction(req, logger) {
 
     let hasuraClient;
     try {
-      hasuraClient = ensureHasuraClient();
+      hasuraClient = createHasuraClient();
     } catch (error) {
       logger.error("Hasura client misconfigured", { error: error.message });
       return {

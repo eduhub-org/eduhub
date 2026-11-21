@@ -1,0 +1,35 @@
+---
+description: "Apply when working on serverless functions in functions/ (callNodeFunction, callPythonFunction handlers) or the Hasura actions and triggers that call them"
+globs: ["functions/**", "backend/metadata/actions.yaml", "backend/metadata/cron_triggers.yaml"]
+alwaysApply: false
+---
+
+# Serverless Functions
+
+> **Full guide**: `docs/SERVERLESS_FUNCTIONS.md`. Step by step:
+> `.claude/commands/create-function.md`.
+
+- **Unit** = deployed Cloud Function (`functions/units.json`). **Dispatcher**
+  = `callNodeFunction`, `identity`, `media` (one Node codebase in
+  `functions/callNodeFunction`, three entry points) and `callPythonFunction`,
+  routing by `Function-Name`. **Handler** = one routed function. Add
+  handlers, not units; pick the Node dispatcher by the secrets the handler
+  needs (Keycloak/Matrix → identity, storage only → media, else
+  callNodeFunction; `docs/adr/0002-function-units-by-secret-scope.md`).
+- Headers: `Hasura-Secret`, `Function-Name`, `Bucket`. The Node dispatchers
+  and sendMail still accept the legacy `secret` / `name` until
+  `docs/plans/functions-header-switch.md` is done; new metadata uses the
+  standard names.
+- Status codes: 401 secret, 404 unknown function, 500 server secret unset,
+  400 (Node) conflicting names, 503 for a `retryable` event/cron failure,
+  a handler's own `httpStatus` (Node; e.g. `getSignedUrl` 403/400, since an
+  action whose output type has only required fields cannot answer 200 on
+  failure, and Hasura passes on `message` only for a 4xx), else 200 with
+  `{ success, messageKey, error? }`. Non-2xx bodies also carry
+  Hasura's `message` (= `error`) and `extensions: { code: messageKey }`.
+- Node handlers read env via `lib/config.js`, Hasura via `lib/hasura.js`,
+  HTTP via `lib/http.js`, the bucket via `lib/requestHeaders.js`.
+- Register in `callNodeFunctionHandlers` / `identityHandlers` /
+  `mediaHandlers` / `PYTHON_FUNCTIONS`; the registry test
+  (`callNodeFunction/__tests__/registry.test.js`) checks each metadata entry
+  calls the unit whose map holds the handler.

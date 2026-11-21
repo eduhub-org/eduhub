@@ -20,7 +20,7 @@ functions/
 ├── callNodeFunction/           # Email template processing
 │   ├── sendEnrollmentEmail/    # Course enrollment emails
 │   ├── sendSessionReminders/   # Session reminder emails
-│   ├── emailTemplateVariables.js  # Template variable definitions
+│   ├── lib/emailTemplateVariables.js  # Template variable definitions
 │   └── EMAIL_TEMPLATE_VARIABLES.md # Documentation
 └── callPythonFunction/         # Python email functions
 ```
@@ -90,53 +90,50 @@ See [EMAIL_TEMPLATE_VARIABLES.md](mdc:functions/callNodeFunction/EMAIL_TEMPLATE_
 
 ## Email Function Usage
 
-### Sending Enrollment Emails
-```javascript
-// GraphQL mutation trigger
-const { data } = await client.mutate({
-  mutation: SEND_ENROLLMENT_EMAIL,
-  variables: {
-    userId: user.id,
-    courseId: course.id,
-    emailType: 'APPLICATION_RECEIVED'
-  }
-});
-```
+There is no client API that calls a function by name: Hasura calls the
+functions (contract in `docs/SERVERLESS_FUNCTIONS.md`). Mail goes out in two
+hops:
 
-### Sending Session Reminders
-```javascript
-// Scheduled function call
-const reminderResult = await callNodeFunction({
-  functionName: 'sendSessionReminders',
-  payload: {
-    sessionId: session.id,
-    reminderType: 'SESSION_REMINDER_24H'
-  }
-});
-```
+1. A handler in `callNodeFunction` renders a MailTemplate and inserts a
+   `MailLog` row with `queueEmail` from `lib/queueEmail.js`:
+   ```javascript
+   import { queueEmail } from '../lib/queueEmail.js';
 
-### Custom Email Sending
-```javascript
-// Direct sendMail function usage
-const emailResult = await sendMail({
-  to: user.email,
-  subject: 'Custom Notification',
-  content: 'Email content with [User:FirstName] substitution',
-  variables: {
-    '[User:FirstName]': 'John'
-  }
-});
-```
+   const result = await queueEmail({
+     templateType: 'SESSION_SPEAKER_ADDED',
+     variableReplacer,             // from lib/emailTemplateVariables.js
+     recipientEmail: user.email,
+     recipientUser: user,
+     courseId: course?.id ?? null,
+     metadata: { type: 'SESSION_SPEAKER_ADDED', sessionSpeakerId },
+     client,                       // createHasuraClient() from lib/hasura.js
+     logger,
+   });
+   ```
+2. The `send_mail` event trigger on `MailLog` calls the `sendMail` unit,
+   which sends through Mailgun (retried hourly, up to 10 times).
+
+### What triggers which handler
+- Enrollment emails: event trigger `send_enrollment_status_email` on
+  `CourseEnrollment` -> `sendEnrollmentEmail`.
+- Session reminders: cron `send_session_reminders` (every 15 minutes) and the
+  `sendSessionReminders` action -> `sendSessionReminders`.
+- Other mails: the `send_*_email` event triggers in
+  `backend/metadata/databases/default/tables/`.
+
+To send a new kind of mail, add a handler that calls `queueEmail` and the
+trigger or action that calls it (`.claude/commands/create-function.md`).
 
 ## Email Configuration
 
-### SMTP Settings
-Email configuration is managed through environment variables:
-- `SMTP_HOST`: Email server hostname
-- `SMTP_PORT`: Email server port (usually 587 for TLS)
-- `SMTP_USER`: Authentication username
-- `SMTP_PASSWORD`: Authentication password
-- `SMTP_FROM`: Default sender email address
+### Mailgun Settings
+`sendMail` reads (set in `infrastructure/application/06_cloud-functions.tf`,
+the API key from Secret Manager):
+- `MAILGUN_API_KEY`, `MAILGUN_DOMAIN`: Mailgun account and sending domain
+- `MAILGUN_ADDITIONAL_DOMAINS`: further domains a sender may be aligned to
+
+Locally `node_functions` runs with `ENVIRONMENT=development`, where `sendMail`
+logs the assembled message instead of sending it.
 
 ### Template Management
 Templates are stored in the database and can be managed through:
@@ -269,17 +266,24 @@ Track email effectiveness through:
 ### Security Considerations
 1. **Validate email addresses**: Prevent injection attacks
 2. **Sanitize template variables**: Escape user input in templates
-3. **Protect SMTP credentials**: Use secure environment variable storage
+3. **Protect the Mailgun API key**: Keep it in Secret Manager, never in code
 4. **Rate limiting**: Prevent email spam through throttling
 5. **Authentication**: Verify sender authorization for sensitive emails
 
 ## Common Issues and Solutions
 
 ### Email Not Sending
-1. **Check SMTP configuration**: Verify credentials and server settings
+1. **Check the Mailgun configuration**: `sendMail` needs `MAILGUN_API_KEY`
+   and a sender whose domain is `MAILGUN_DOMAIN` or in
+   `MAILGUN_ADDITIONAL_DOMAINS`; `ENVIRONMENT` must be `staging` or
+   `production` (`development` only logs the message)
 2. **Validate recipient email**: Ensure email format is correct
-3. **Check function logs**: Review error messages in function logs
-4. **Test connectivity**: Ensure network access to SMTP server
+3. **Check function logs**: Review `sendMail` errors ("Email error") and the
+   `send_mail` event trigger's invocation log in Hasura (retries hourly)
+4. **Check Mailgun**: Look up the message in the Mailgun logs (EU region) for
+   rejected, failed or suppressed deliveries, and the `MailLog` row's
+   `status`: it stays `READY_TO_SEND` until `sync_mail_delivery_status`
+   writes `DELIVERED`, `BOUNCED` or `COMPLAINED`
 
 ### Template Variables Not Replaced
 1. **Verify variable names**: Ensure exact match with template variables

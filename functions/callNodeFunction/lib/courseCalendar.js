@@ -1,4 +1,5 @@
 import { resolveSessionLocations } from '../sendSessionReminders/index.js';
+import * as config from './config.js';
 
 const CRLF = '\r\n';
 
@@ -60,7 +61,7 @@ export function buildCourseCalendar(course, { now = new Date() } = {}) {
   const sessions = (course?.Sessions ?? []).filter((s) => s.startDateTime && s.endDateTime);
   if (sessions.length === 0) return null;
 
-  const frontendUrl = process.env.FRONTEND_URL || 'https://edu.opencampus.sh';
+  const frontendUrl = config.frontendUrl();
   const courseLink = `${frontendUrl}/course/${course.id}`;
   const uidDomain = new URL(frontendUrl).hostname;
   const stamp = formatUtc(now);

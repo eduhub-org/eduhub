@@ -63,13 +63,15 @@
       value_from_env: HASURA_CLOUD_FUNCTION_SECRET
   comment: Reminds accepted project authors before their project submission deadline
 - name: send_questionaires
-  webhook: '{{CLOUD_FUNCTION_LINK_SEND_QUESTIONAIRES}}'
+  webhook: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
   schedule: 0 */2 * * *
   include_in_metadata: true
   payload: {}
   headers:
-    - name: secret
+    - name: Hasura-Secret
       value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+    - name: Function-Name
+      value: sendQuestionaires
   comment: Sends out questionaires if necessary
 - name: update_enrollment_locations
   webhook: '{{CLOUD_FUNCTION_LINK_CALL_PYTHON_FUNCTION}}'
@@ -177,9 +179,9 @@
     Normally sent at checkout.session.completed or on invoice.finalized; this
     sweep covers the case where neither fired (most plausibly because
     invoice.finalized is not enabled on the Stripe endpoint), so an employer
-    never pays without hearing anything. Note the headers differ from the Python
-    crons - callNodeFunction dispatches on name/secret, not
-    Function-Name/Hasura-Secret.
+    never pays without hearing anything. The legacy name/secret headers are
+    still accepted by callNodeFunction alongside Function-Name/Hasura-Secret
+    until docs/plans/functions-header-switch.md is done.
 - name: sync_formbricks_responses
   webhook: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
   schedule: 20 2 * * *
@@ -241,3 +243,21 @@
     Course.sessionReminderLeadHours before the first session. A late enrollee
     or a missed run is caught by the next run; MailLog metadata keeps it to one
     mail per participant and course.
+- name: sync_expert_embeddings
+  webhook: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+  # Nightly is enough: a new course or session shows up among similar experts the next day.
+  schedule: '0 2 * * *'
+  include_in_metadata: true
+  payload: {}
+  retry_conf:
+    num_retries: 0
+    retry_interval_seconds: 10
+    # Below callNodeFunction's 180 s timeout; the function stops embedding after 120 s.
+    timeout_seconds: 170
+    tolerance_seconds: 600
+  headers:
+    - name: Function-Name
+      value: syncExpertEmbeddings
+    - name: Hasura-Secret
+      value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+  comment: Embeds new or changed course, session, project and achievement-option texts for the semantic expert search (ADR 0004)

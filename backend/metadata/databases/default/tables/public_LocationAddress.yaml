@@ -281,7 +281,7 @@ event_triggers:
       interval_sec: 300
       num_retries: 5
       timeout_sec: 120
-    webhook: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+    webhook_from_env: CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION
     headers:
       - name: name
         value: syncRausgegangenEvent

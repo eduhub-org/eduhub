@@ -39,8 +39,8 @@ Stopping here stops the **alert-driven** half of the job only. The watchlist pas
 | Path | Manager | Notes |
 | --- | --- | --- |
 | `frontend-nx/` | Yarn 3.4.1 (`nodeLinker: node-modules`) | Next.js app, `frontend-nx/yarn.lock`. The only deployed frontend. |
-| `functions/<name>/` | npm (`package-lock.json`) | Cloud Functions. |
-| `functions/apiProxy`, `functions/callPythonFunction` | pip (`requirements.txt`) | |
+| `functions/<name>/` (Node units, listed in `functions/units.json`) | npm, one committed `package-lock.json` per unit | Cloud Functions. Each unit is zipped and built on its own (`npm ci` from that unit's lockfile), so there is no shared root lockfile. `functions/shared/` has no dependencies. |
+| `functions/apiProxy`, `functions/callPythonFunction` | pip (`requirements.txt`, `==` pins; tests use `requirements-dev.txt`) | |
 | `keycloak/spi/*` | Maven (`pom.xml`) | |
 
 ## 2. Collect
@@ -143,6 +143,9 @@ every published advisory's vulnerable range. Do not filter by publication date: 
 from months ago whose range still covers the shipped version is still a finding, and a date
 filter would make this pass depend on when it last ran.
 
+`functions/` Node units ship what their own `functions/<name>/package-lock.json` resolves
+(`npm ls <pkg>` in that unit after `npm ci`, or read the lockfile entry).
+
 **Second check, for the fix that ships without an advisory.** Not every security fix gets
 one; some land in a release with a line in the changelog and nothing else. For each
 watchlist entry, compare the shipped version against the newest release in its bump class —
@@ -189,7 +192,21 @@ against the actual code rather than the advisory text alone.
 
 - `scope: development` deps (build tooling, test libs, codegen) ship to nobody. Treat as
   NOT-RELEVANT unless exploitable at build time — supply-chain/registry compromise, or
-  reachable in CI with untrusted input.
+  reachable in CI with untrusted input. In `functions/` this holds too: the zip step
+  drops tests and Jest files, and the Cloud Functions build runs `npm ci` from the
+  lockfile with `NODE_ENV=production` (no `build`/`gcp-build` script), so
+  devDependencies are never installed in a deployed function.
+  **Exception: `@google-cloud/functions-framework`.** The units list it only in
+  devDependencies, but the Cloud Functions Node.js build adds the framework itself
+  when `dependencies` lacks it, so a version (and dependency tree) chosen by the
+  build, not the lockfile, runs in production. Never mark an alert on it or its
+  transitive deps NOT-RELEVANT from dev scope alone: check which framework version
+  the build installs and whether the vulnerable code is reachable, then classify.
+  Editing the lockfile or adding an `overrides` entry does not change the tree the
+  build installs, so classify such an alert as PATCH only if the patch also moves
+  `@google-cloud/functions-framework` into that unit's `dependencies` (at the fixed
+  version, lockfile regenerated), which makes the lockfile control what ships.
+  Otherwise classify it NEEDS-MANUAL-DECISION.
 - For runtime deps, check **reachability**: grep for the import, and for the specific
   vulnerable function or option the advisory names. State whether user-controlled input can
   actually reach it.
@@ -285,8 +302,13 @@ Then apply the bump with the manager that owns the manifest:
   direct deps. For transitive-only, add or raise a `resolutions` entry in
   `frontend-nx/package.json`, then `cd frontend-nx && yarn install --mode=update-lockfile`.
   Never hand-edit `yarn.lock`.
-- **npm**: in the function directory, `npm install <pkg>@<version>`, or
-  `npm install <pkg>@<version> --package-lock-only` for transitive-only.
+- **npm** (`functions/<name>/`): run npm inside the unit's own directory, with Node 22
+  and the npm it ships. For a direct dependency, `npm install <pkg>@<version>`, which
+  updates both `package.json` and that unit's `package-lock.json`. For transitive-only,
+  `npm update <pkg>` when the parent's range already admits the fix; otherwise add an
+  `overrides` entry to that unit's `package.json` and run `npm install`. Commit both
+  files. Never hand-edit `package-lock.json`. A package used by several units needs the
+  same change in each of them.
 - **pip**: edit the pin in `requirements.txt`.
 - **Maven**: bump the `<version>` in the relevant `pom.xml`.
 - **Keycloak** (`keycloak/spi/matrix-handle-listener`): the pom alone remediates **nothing**.
@@ -343,7 +365,14 @@ If a check fails **because of** a bump, revert that one bump, move it to
 NEEDS-MANUAL-DECISION with the error quoted, and re-verify. Never open a PR with a red build
 you already know about.
 
-If a `functions/` directory changed, at minimum confirm `npm ci` resolves there.
+If anything under `functions/` changed, reproduce what
+`.github/workflows/functions-code-checks.yml` runs — read it for the exact commands and
+pinned tool versions rather than relying on this list. The key steps: `npm ci` in every
+Node unit listed in `functions/units.json` (skip entries with a `source`), `npm test`
+(Jest, which also runs sendMail's suites) in `functions/callNodeFunction`, `tsc` there,
+`node --test 'shared/*.test.js'` in `functions/`, ESLint and ruff over `functions/`, and
+`pip install -r requirements-dev.txt` + `pytest __tests__` for both Python units
+(`callPythonFunction`, `apiProxy`) on Python 3.11, the Cloud Functions runtime.
 
 ## 6. One PR
 

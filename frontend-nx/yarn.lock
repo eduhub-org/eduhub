@@ -7455,15 +7455,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dompurify@npm:^3.4.17":
-  version: 3.4.17
-  resolution: "dompurify@npm:3.4.17"
+"dompurify@npm:^3.4.18":
+  version: 3.4.18
+  resolution: "dompurify@npm:3.4.18"
   dependencies:
     "@types/trusted-types": ^2.0.7
   dependenciesMeta:
     "@types/trusted-types":
       optional: true
-  checksum: 7db2c669f966047fc605321df29369acd8bf25265309b169eca620b79dfa30cc87142fa83b868ddca3636527e97e85afd76a583ea82b68303050218216e1c8b6
+  checksum: 8dadf1ca0fe81967c1c1997922fd4cb63d987d6568b34a067158cade0ac31eed13c4afc6752f930894a5e2a56b5bddbb348616bf93d285df71b9232284e56ec1
   languageName: node
   linkType: hard
 
@@ -14305,7 +14305,7 @@ __metadata:
     cookie: ^0.7.0
     date-fns: ^3.6.0
     date-fns-tz: ^3.1.3
-    dompurify: ^3.4.17
+    dompurify: ^3.4.18
     eslint: ^9.39.5
     eslint-config-next: 16.2.10
     eslint-plugin-react: ^7.37.5

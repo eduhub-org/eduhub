@@ -1,4 +1,3 @@
-import { GraphQLClient } from "graphql-request";
 import { trimAndNull, normalizeMatrixRoomId, isValidMatrixRoomId } from "../lib/matrixRoomUtils.js";
 import {
   ensureBotJoinedMatrixRoom,
@@ -6,6 +5,7 @@ import {
   inviteUserToMatrixRoom,
   toMatrixUserId,
 } from "../lib/matrixInvite.js";
+import { createHasuraClient } from "../lib/hasura.js";
 
 /** Room for 429 retries (backoff in matrixInvite.js) when many instructors sync at once. */
 const MATRIX_TIMEOUT_MS = 120_000;
@@ -35,17 +35,6 @@ const GET_USERS_MATRIX_HANDLES = `
     }
   }
 `;
-
-const ensureHasuraClient = () => {
-  if (!process.env.HASURA_ENDPOINT || !process.env.HASURA_ADMIN_SECRET) {
-    throw new Error("HASURA_ENDPOINT or HASURA_ADMIN_SECRET not configured");
-  }
-  return new GraphQLClient(process.env.HASURA_ENDPOINT, {
-    headers: {
-      "x-hasura-admin-secret": process.env.HASURA_ADMIN_SECRET,
-    },
-  });
-};
 
 const ALLOWED_ROLES = new Set(["admin"]);
 
@@ -83,7 +72,7 @@ export default async function syncProgramInstructorMatrixRoom(req, logger) {
 
   let timeout;
   try {
-    const hasuraClient = ensureHasuraClient();
+    const hasuraClient = createHasuraClient();
     const controller = new AbortController();
     timeout = setTimeout(() => controller.abort(), MATRIX_TIMEOUT_MS);
 

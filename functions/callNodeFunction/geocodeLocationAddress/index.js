@@ -1,4 +1,4 @@
-import { GraphQLClient } from 'graphql-request';
+import { createHasuraClient } from '../lib/hasura.js';
 
 /**
  * Looks up the coordinates of a location address from its structured address
@@ -35,9 +35,7 @@ export default async function geocodeLocationAddress(req, logger, { fetchImpl = 
     return { success: false, error: 'Only super admins can geocode location addresses' };
   }
 
-  const client = new GraphQLClient(process.env.HASURA_ENDPOINT, {
-    headers: { 'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET },
-  });
+  const client = createHasuraClient();
   const id = Number(req.body.input?.locationAddressId);
   const locationAddress = (await client.request(GET_LOCATION_ADDRESS, { id }))?.LocationAddress_by_pk;
   if (!locationAddress) return { success: false, error: 'Location address not found' };

@@ -1,18 +1,12 @@
 import KcAdminClient from "@keycloak/keycloak-admin-client";
-import { GraphQLClient, gql } from 'graphql-request';
+import { gql } from 'graphql-request';
 import { queueEmail } from '../lib/queueEmail.js';
-import { createVariableReplacer } from '../emailTemplateVariables.js';
-import { logger } from '../index.js';
-import { createRequire } from 'module';
+import { createVariableReplacer } from '../lib/emailTemplateVariables.js';
 import { computeMatrixHandle } from '../lib/matrixHandle.js';
-
-const require = createRequire(import.meta.url);
-let mergeUserPutPayload;
-try {
-  ({ mergeUserPutPayload } = require('../shared_libs/node/keycloakUserMerge.cjs'));
-} catch {
-  ({ mergeUserPutPayload } = require('../../shared_libs/node/keycloakUserMerge.cjs'));
-}
+import { mergeUserPutPayload } from '../shared/keycloakUserMerge.js';
+import { createHasuraClient } from '../lib/hasura.js';
+import * as config from '../lib/config.js';
+import { authenticateKeycloakAdmin } from '../lib/keycloak.js';
 
 /**
  * Creates a new user in both Keycloak and Hasura
@@ -49,28 +43,22 @@ export default async function createUser(req, logger) {
     };
   }
 
-  const kcAdminClient = new KcAdminClient({
-    baseUrl: process.env.KEYCLOAK_URL,
-    realmName: "master",
-  });
-
-  const graphqlClient = new GraphQLClient(process.env.HASURA_ENDPOINT, {
-    headers: {
-      'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET,
-    },
-  });
-
+  // Created inside the try, so missing configuration ends in the normal
+  // USER_CREATION_FAILED response instead of rejecting the handler.
+  let kcAdminClient;
+  let graphqlClient;
   let keycloakUserId = null;
   let hasuraUserId = null;
 
   try {
-    // Authenticate with Keycloak
-    await kcAdminClient.auth({
-      username: process.env.KEYCLOAK_USER || "keycloak",
-      password: process.env.KEYCLOAK_PW,
-      grantType: "password",
-      clientId: "admin-cli",
+    kcAdminClient = new KcAdminClient({
+      baseUrl: config.keycloakConfig().url,
+      realmName: "master",
     });
+    graphqlClient = createHasuraClient();
+
+    // Authenticate with Keycloak
+    await authenticateKeycloakAdmin(kcAdminClient);
     kcAdminClient.setConfig({
       realmName: "edu-hub",
     });
@@ -140,7 +128,7 @@ export default async function createUser(req, logger) {
     logger.info(`Set matrix_user_handle=${matrixHandle} for user ${keycloakUserId}`);
 
     // Construct password reset link
-    const keycloakBaseUrl = process.env.KEYCLOAK_URL.replace('/auth', '');
+    const keycloakBaseUrl = config.keycloakConfig().url.replace('/auth', '');
     const passwordResetLink = `${keycloakBaseUrl}/realms/edu-hub/login-actions/reset-credentials?client_id=hasura`;
 
     // Create user in Hasura database
@@ -225,7 +213,7 @@ export default async function createUser(req, logger) {
       logger.info(`Assigned 'user' role to Keycloak user: ${keycloakUserId}`);
     }
 
-    const portalUrl = process.env.FRONTEND_URL || 'https://edu.opencampus.sh';
+    const portalUrl = config.frontendUrl();
 
     let emailQueued = false;
     
@@ -281,8 +269,9 @@ export default async function createUser(req, logger) {
     // Log full error details server-side
     logger.error(`Error creating user: ${error.message}`, { error: error.stack });
 
-    // Rollback: Delete user from Keycloak if created
-    if (keycloakUserId) {
+    // Rollback: Delete user from Keycloak if created. The ids are only set
+    // after both clients exist, so a config failure skips the rollback.
+    if (keycloakUserId && kcAdminClient) {
       try {
         await kcAdminClient.users.del({ id: keycloakUserId });
         logger.info(`Rolled back Keycloak user: ${keycloakUserId}`);
@@ -292,7 +281,7 @@ export default async function createUser(req, logger) {
     }
 
     // Rollback: Delete user from Hasura if created
-    if (hasuraUserId) {
+    if (hasuraUserId && graphqlClient) {
       try {
         const DELETE_USER = gql`
           mutation DeleteUser($id: uuid!) {
@@ -309,7 +298,7 @@ export default async function createUser(req, logger) {
     }
 
     // Return error message to client for debugging (in development) but sanitize sensitive info
-    const errorMessage = process.env.ENVIRONMENT === 'development' 
+    const errorMessage = config.isDevelopment() 
       ? error.message 
       : 'An error occurred while creating the user. Please check the server logs for details.';
 
@@ -320,5 +309,4 @@ export default async function createUser(req, logger) {
     };
   }
 }
-
 

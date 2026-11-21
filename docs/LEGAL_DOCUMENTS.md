@@ -130,6 +130,20 @@ add a mail template and a send script in the same PR as the policy change.
 For a change that is not material, only bump `PRIVACY_POLICY_VERSION`; leave
 `PRIVACY_NOTICE_VERSION` and `PRIVACY_NOTICES` alone.
 
+### Pending for the next notice
+
+Material changes whose notice was deliberately deferred to the next material
+update (only `PRIVACY_POLICY_VERSION` was bumped). Whoever writes the next
+`PRIVACY_NOTICES` entry adds an item for each of them and empties this list.
+
+- **Expert Directory** (policy version 2026-11-17, ADR 0003): we keep dated
+  notes about instructors, speakers and mentors and a "do not contact" mark,
+  to contact them about future formats; org admins see these people for their
+  own organization's courses. Changed practice (the notes are new), worded as
+  such. The directory also finds people by meaning: course, session,
+  project and achievement-option texts are turned into vectors with Google
+  Cloud Vertex AI (no notes).
+
 The policy has no public change history: GDPR asks for the current policy and
 for telling users about material changes, not for a changelog. What applied
 when is recovered from git (below), and what users were told from

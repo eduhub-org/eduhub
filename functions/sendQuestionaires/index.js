@@ -1,10 +1,5 @@
-const { GraphQLClient, gql } = require("graphql-request");
-let secretsMatch;
-try {
-  ({ secretsMatch } = require("./shared_libs/node/security.cjs"));
-} catch {
-  ({ secretsMatch } = require("../shared_libs/node/security.cjs"));
-}
+import { GraphQLClient, gql } from "graphql-request";
+import { getProvidedSecret, secretsMatch } from "./shared/security.js";
 
 const COURSES_WITH_SESSIONS = gql`query { 
             Course(where: {Program: {published: {_eq: true}}, published: {_eq: true}}) {
@@ -57,13 +52,13 @@ const MARK_QUESTIONAIRE_SENT = gql`
   }
 `;
 
-exports.sendQuestionaires = async (req, res) => {
+export const sendQuestionaires = async (req, res) => {
   const expectedSecret = process.env.HASURA_CLOUD_FUNCTION_SECRET;
   if (!expectedSecret) {
     return res.status(500).json({ error: "Server secret not configured" });
   }
 
-  if (secretsMatch(req.headers.secret, expectedSecret)) {
+  if (secretsMatch(getProvidedSecret(req.headers), expectedSecret)) {
 
     const client = new GraphQLClient(process.env.HASURA_ENDPOINT, {
       headers: {
@@ -206,5 +201,5 @@ exports.sendQuestionaires = async (req, res) => {
     });
   }
 
-  return res.status(401).json({ error: "Unauthorized" });
+  return res.status(401).json({ error: "Unauthorized", message: "Unauthorized" });
 };

@@ -1,8 +1,9 @@
 import { Storage } from "@google-cloud/storage";
 import { buildCloudStorage } from "../lib/cloud-storage.js";
+import { getBucket } from "../lib/requestHeaders.js";
 import { replacePlaceholders } from "../lib/utils.js";
 import { sanitizeStoredFileName } from "../lib/fileName.js";
-import { logger } from "../index.js";
+import { logger } from "../lib/logger.js";
 import { authorizeUpload } from "../lib/uploadAuthorization.js";
 import sharp from "sharp";
 import path from "path";
@@ -78,7 +79,7 @@ export const saveImageUnchecked = async (req) => {
   logger.debug("Request parameters", {
     filename: req.body.input.filename,
     templatePath: req.headers['file-path'],
-    bucket: req.headers.bucket,
+    bucket: getBucket(req),
     isPublic: req.headers['is-public'],
     maxFileSize: req.headers['max-file-size-mb'],
     sizes: req.headers.sizes
@@ -86,7 +87,7 @@ export const saveImageUnchecked = async (req) => {
 
   try {
     // Validate required fields
-    if (!req.body.input.base64file || !req.headers['file-path'] || !req.headers.bucket) {
+    if (!req.body.input.base64file || !req.headers['file-path'] || !getBucket(req)) {
       logger.error("Missing required fields");
       return {
         success: false,
@@ -135,7 +136,7 @@ export const saveImageUnchecked = async (req) => {
       ...pathInputs,
       filename: safeFileName,
     });
-    const accessUrl = await storage.saveToBucket(filePath, req.headers.bucket, contentBuffer.toString('base64'), isPublic);
+    const accessUrl = await storage.saveToBucket(filePath, getBucket(req), contentBuffer.toString('base64'), isPublic);
     logger.debug(`Original image saved successfully: ${filePath}, public: ${isPublic}`);
 
     // Handle resized versions if sizes are specified
@@ -146,7 +147,7 @@ export const saveImageUnchecked = async (req) => {
         const resizedBuffer = await resizeImage(contentBuffer, size);
         const resizedUrl = await storage.saveToBucket(
           resizedFilePath, 
-          req.headers.bucket, 
+          getBucket(req), 
           resizedBuffer.toString('base64'), 
           isPublic
         );

@@ -1,0 +1,6 @@
+{
+  "name": "@eduhub/functions-shared",
+  "private": true,
+  "description": "Code shared by the Node cloud functions. Each unit links it as ./shared (git symlink); zips carry a real copy. No dependencies allowed.",
+  "type": "module"
+}

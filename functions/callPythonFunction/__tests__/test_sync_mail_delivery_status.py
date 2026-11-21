@@ -10,6 +10,7 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 
+from api_clients import HasuraQueryError
 from api_clients.mailgun_client import (
     EVENT_FILTER,
     MailgunClient,
@@ -45,11 +46,18 @@ class FakeEduHubClient:
     def send_query(self, query, variables):
         self.calls.append({"query": query, "variables": variables})
         if self.responses:
-            return self.responses.pop(0)
+            response = self.responses.pop(0)
+            if isinstance(response, Exception):
+                raise response
+            return response
         if "update_MailLog" in query:
             ids = variables["where"]["id"]["_in"]
             return {"data": {"update_MailLog": {"affected_rows": len(ids)}}}
         return {"data": {"MailLog": []}}
+
+
+def graphql_error():
+    return HasuraQueryError("GraphQL errors: boom", graphql_errors=[{"message": "boom"}])
 
 
 class FakeMailgunClient:
@@ -418,7 +426,7 @@ class TestApplyStatuses:
             "pythonFunctions.sync_mail_delivery_status.UPDATE_CHUNK_SIZE", 2
         )
         client = FakeEduHubClient(responses=[
-            {"errors": [{"message": "boom"}]},
+            graphql_error(),
             {"data": {"update_MailLog": {"affected_rows": 2}}},
         ])
 
@@ -428,7 +436,7 @@ class TestApplyStatuses:
         assert failed == [{
             "status": STATUS_DELIVERED,
             "mailIds": [0, 1],
-            "response": {"errors": [{"message": "boom"}]},
+            "response": "GraphQL errors: boom",
         }]
 
     def test_nothing_to_do_makes_no_calls(self):
@@ -466,7 +474,7 @@ class TestSyncMailDeliveryStatus:
 
     def test_failed_update_ids_are_returned_and_degrade_the_run(self, monkeypatch):
         mailgun = FakeMailgunClient({"stujo.net": [event("delivered", 4711)]})
-        eduhub = FakeEduHubClient(responses=[{"errors": [{"message": "boom"}]}])
+        eduhub = FakeEduHubClient(responses=[graphql_error()])
         monkeypatch.setattr(
             "pythonFunctions.sync_mail_delivery_status.MailgunClient", lambda: mailgun
         )
@@ -481,7 +489,7 @@ class TestSyncMailDeliveryStatus:
         assert result["data"]["failedUpdates"] == [{
             "status": STATUS_DELIVERED,
             "mailIds": [4711],
-            "response": {"errors": [{"message": "boom"}]},
+            "response": "GraphQL errors: boom",
         }]
 
 

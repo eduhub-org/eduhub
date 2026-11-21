@@ -5,8 +5,7 @@
 
 ## 🚀 Serverless Functions
 For developing serverless functions, please refer to:
-- [Serverless Functions Guide](./docs/SERVERLESS_FUNCTIONS.md) - Complete guide for creating and maintaining serverless functions
-- [Function Templates](./docs/templates/FUNCTION_TEMPLATES.md) - Ready-to-use templates for new functions
+- [Serverless Functions Guide](./SERVERLESS_FUNCTIONS.md) - Complete guide for creating and maintaining serverless functions
 
 ## 🔐 Environment Variables
 
@@ -70,7 +69,7 @@ Stop the preview when it is finished.
 - `8080` - Hasura API
 - `5000` - Edu frontend
 - `28080` - Keycloak admin interface, login as **admin** with password **admin**
-- `42000` to `420025` - serverless functions (currently most functions have their own port)
+- `42000` to `42025` - serverless functions (currently most functions have their own port)
 
 ## 🌱 Seeds
 

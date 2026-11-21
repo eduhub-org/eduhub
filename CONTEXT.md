@@ -62,7 +62,7 @@ _Avoid_: attendance (for a raw entry)
 A Participant's result for one Session: attended or missed. It is set automatically from the Attendance Records, or by an Organizer as a Manual Attendance. Until a Session has been checked there is no Attendance: it is unknown, never missed. A checked Session with no Attendance Records at all makes everyone missed.
 
 **Minimum Attendance Time**:
-The share of a Session (50 %) someone must spend in the online meeting for it to count as attended. A check-in on site counts as attended regardless of time. When someone has both, the one that counts wins.
+The share of a Session (50 %) someone must spend in the online meeting for it to count as attended. Several Zoom records of the same person (renamed for breakout rooms, phone dial-in) add up; time on two devices at once counts once. A check-in on site counts as attended regardless of time. When someone has both, the one that counts wins.
 
 **Check-in Window**:
 From 30 minutes before a Session starts to 30 minutes after it ends. Only check-ins inside it belong to the Session.
@@ -95,6 +95,28 @@ _Avoid_: Super admin
 
 **Org Admin**:
 Someone who manages the programs of one organization, limited to the kinds of program (courses, events, degrees) they are allowed to manage.
+
+### Experts
+
+**Expert**:
+A person who taught, spoke or mentored on the platform: an instructor of a course (an organizer for events), a speaker at a session, a mentor of a project or a mentor of an achievement option. Only active accounts count. The **Expert Directory** lists them so admins can find someone for a topic again.
+_Avoid_: Referent:in (as the umbrella term), Dozent:in
+
+**Expert Role**:
+One thing an **Expert** did: one course they led, one session they spoke at, one project or achievement option they mentored. Search, match explanations and similarity all work per role, not per person.
+
+**Last Active**:
+The date of an **Expert's** most recent **Expert Role**: a course's program start, a session's start, or when a mentored project or achievement option was created.
+
+**Expert Note**:
+A dated entry an **Admin** or **Org Admin** writes about an **Expert**, e.g. what they talked about or when they are available. Notes from central admins are seen by admins only; notes from an org admin are seen by that organization's admins and by central admins. Written as if the expert will read them: they can ask to see them.
+_Avoid_: Bewertung, rating (notes are facts, not judgements)
+
+**Similar Expert**:
+An **Expert** who did not match the words of a search, but one of whose **Expert Roles** is close to it in meaning. Shown below the keyword results, with the role that made them similar.
+
+**Do Not Contact**:
+A mark on a person that they do not want to be contacted about new formats. Admins and the org admins of their courses can set it; only admins can remove it. The **Expert Directory** greys them out, hides the contact buttons and leaves them out of exports.
 
 ### Projects
 
@@ -153,11 +175,14 @@ _Avoid_: event confirmation vs. course confirmation as separate emails
 - A **Course** has zero or more **Sessions**; when it has any, exactly one of them is its **First Session**
 - A **Participant** receives at most one **Session Reminder** per **Course**
 - A **Session** has many **Attendance Records** and at most one **Attendance** per **Participant** (or person who completed the Course); a **Manual Attendance** overrides the automatic one
-- An **Attendance Record** belongs to at most one **Attendance**
+- An **Attendance Record** belongs to at most one **Attendance**; an **Attendance** can combine several Zoom **Attendance Records** of the same person
+- A **Session** has at most one **Manual Attendance** per **Participant**
 - A **Project** is listed in one or more **Courses**; removing it from its last course deletes it, so a **Passed Project** can't be removed from its last course
 - A **Project Template** has zero or more **Project Copies**; deleting the template keeps the copies as projects of their own
 - A **Passed Project** can't be deleted by anyone, **Admins** included
 - A **Join Request** is announced to the **Project Team**; only a project with no team yet announces it to its mentors (or, without mentors, the course instructors)
+- An **Expert** has one or more **Expert Roles** and zero or more **Expert Notes**; each note belongs to no organization (central admins) or exactly one
+- An **Org Admin** sees only the **Experts** of their organization's courses, and only their organization's **Expert Notes**
 
 ## Example dialogue
 
@@ -166,6 +191,7 @@ _Avoid_: event confirmation vs. course confirmation as separate emails
 
 ## Flagged ambiguities
 
+- "Expertendatenbank" was the admin page of instructors and speakers. Resolved: it is the **Expert Directory**, and mentors of projects and achievement options are **Experts** too.
 - "Invite" meant both the application decision (green rating) and moving someone up from the waitlist. Both are an **Invitation**: the same held place with a deadline; how it is accepted depends on the course (confirm or pay).
 - "Attendance" meant both a raw Zoom/LimeSurvey entry and a Participant's result for a Session. Resolved: the entry is an **Attendance Record**, the result an **Attendance**.
 - "Session reminder" meant three emails (24h, 1h, 15min) before sessions. Resolved: one email, before the First Session only, at the Course's Reminder Lead Time.

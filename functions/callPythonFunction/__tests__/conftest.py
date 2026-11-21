@@ -1,7 +1,7 @@
 """Shared test fixtures for callPythonFunction unit tests.
 
 The Python serverless function imports are relative to
-``functions/callPythonFunction`` and ``functions/shared_libs``. These
+``functions/callPythonFunction`` and ``functions/shared_py``. These
 paths are added to ``sys.path`` here so tests can be run from the
 repository root via ``pytest functions/callPythonFunction/__tests__``.
 """
@@ -10,10 +10,10 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[3]
-SHARED_LIBS = ROOT / "functions" / "shared_libs"
+SHARED_PY = ROOT / "functions" / "shared_py"
 FUNCTION_ROOT = ROOT / "functions" / "callPythonFunction"
 
-for path in (str(SHARED_LIBS), str(FUNCTION_ROOT)):
+for path in (str(SHARED_PY), str(FUNCTION_ROOT)):
     if path not in sys.path:
         sys.path.insert(0, path)
 

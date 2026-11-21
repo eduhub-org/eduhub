@@ -135,3 +135,31 @@ export const isValidMatrixRoomId = (roomId) => {
   if (!localpart || !server || /[\s#/?]/.test(localpart)) return false;
   return isValidMatrixServerPart(server);
 };
+
+/**
+ * JSON body of a Matrix response, or null when it has none or is not JSON.
+ * @param {Response} response
+ */
+export const readMatrixPayload = async (response) => {
+  try {
+    return await response.json();
+  } catch (_error) {
+    return null;
+  }
+};
+
+/**
+ * JSON body of a successful Matrix response. Otherwise throws an Error
+ * carrying Matrix's message, `status`, `errcode` and the raw `payload`.
+ * @param {Response} response
+ */
+export const parseMatrixResponse = async (response) => {
+  const payload = await readMatrixPayload(response);
+  if (response.ok) return payload;
+
+  const error = new Error(payload?.error || `Matrix request failed with HTTP ${response.status}`);
+  error.status = response.status;
+  error.errcode = payload?.errcode;
+  error.payload = payload;
+  throw error;
+};

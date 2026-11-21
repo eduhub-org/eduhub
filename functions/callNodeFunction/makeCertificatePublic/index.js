@@ -1,6 +1,7 @@
 import { Storage } from "@google-cloud/storage";
 import { buildCloudStorage } from "../lib/cloud-storage.js";
-import { logger } from "../index.js";
+import { getBucket } from "../lib/requestHeaders.js";
+import { logger } from "../lib/logger.js";
 
 /**
  * Makes a certificate file public in cloud storage and returns the public URL.
@@ -57,7 +58,7 @@ const makeCertificatePublic = async (req) => {
     }
 
     // Make the certificate public and get public URL using the storage wrapper
-    const bucketName = req.headers.bucket;
+    const bucketName = getBucket(req);
     const publicUrl = await storage.setPublic(certificatePath, bucketName);
     
     logger.info("Certificate made public", { certificatePath, userRole, userUUID, publicUrl });

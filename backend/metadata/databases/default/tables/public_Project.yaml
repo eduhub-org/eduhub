@@ -601,7 +601,7 @@ event_triggers:
       interval_sec: 3660
       num_retries: 10
       timeout_sec: 600
-    webhook: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+    webhook_from_env: CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION
     headers:
       - name: name
         value: sendProjectEmail

@@ -124,7 +124,6 @@ services:
       HASURA_ENDPOINT: http://hasura:8080/v1/graphql
       HASURA_ADMIN_SECRET: ${DEV_HASURA_ADMIN_SECRET:-myadminsecretkey}
       HASURA_CLOUD_FUNCTION_SECRET: test1234
-      LIBRARY_PATH: "../lib/cloud-storage.js"
       FORMBRICKS_API_KEY: ${FORMBRICKS_API_KEY:-}
       FORMBRICKS_API_URL: ${FORMBRICKS_API_URL:-https://app.formbricks.com}
       STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
@@ -149,6 +148,9 @@ services:
       # but MUST be a real secret elsewhere: anyone who knows it can mint a link to
       # any guest's data.
       GUEST_TOKEN_SECRET: ${GUEST_TOKEN_SECRET:-dev-guest-token-secret}
+      # Semantic expert search (ADR 0004). "fake" embeds by shared words, so the whole pipeline runs
+      # without Google credentials; the real Vertex AI provider only runs on GCP (metadata server).
+      EMBEDDING_PROVIDER: ${EMBEDDING_PROVIDER:-fake}
 
   python_functions:
     container_name: eduhub-python-functions
@@ -227,9 +229,10 @@ services:
       CLOUD_FUNCTION_LINK_SEND_MAIL: "http://node_functions:42019"
       CLOUD_FUNCTION_LINK_ADD_KEYCLOAK_ROLE: "http://node_functions:42000"
       CLOUD_FUNCTION_LINK_REMOVE_KEYCLOAK_ROLE: "http://node_functions:42002"
-      CLOUD_FUNCTION_LINK_CREATE_PARTICIPATION_CERTIFICATE: "http://node_functions:42023"
       CLOUD_FUNCTION_LINK_SEND_QUESTIONAIRES: "http://node_functions:42024"
       CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION: "http://node_functions:42022"
+      CLOUD_FUNCTION_LINK_IDENTITY: "http://node_functions:42021"
+      CLOUD_FUNCTION_LINK_MEDIA: "http://node_functions:42023"
       CLOUD_FUNCTION_LINK_CALL_PYTHON_FUNCTION: "http://python_functions:42025"
     volumes:
       - ./backend:/hasura
@@ -240,7 +243,9 @@ services:
 
   db_hasura:
     container_name: eduhub-db_hasura
-    image: postgres:17
+    # Postgres 17 with the pgvector extension (semantic expert search, ADR 0004). The trixie
+    # variant has the same glibc as postgres:17, so existing volumes keep their collation version.
+    image: pgvector/pgvector:pg17-trixie
     environment:
       POSTGRES_PASSWORD: postgrespassword
     volumes:

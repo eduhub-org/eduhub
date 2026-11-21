@@ -105,6 +105,8 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
   // they can manage any program type.
   const canViewCalendarMenu =
     canManageCoursesMenu || canManageEventsMenu || canManageDegreesMenu || canManageSettingsMenu;
+  // Expert directory: org admins see the experts of their organization's courses (same audience).
+  const canViewExpertsMenu = canViewCalendarMenu;
   // Whether the "Verwaltung" section has any entries for this user. Plain instructors have no
   // management entries and skip the section.
   const hasManagement =
@@ -195,7 +197,7 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
         </MenuItem>
       )}
 
-      {isAdmin && (
+      {canViewExpertsMenu && (
         <MenuItem
           component={Link}
           href="/manage/experts"

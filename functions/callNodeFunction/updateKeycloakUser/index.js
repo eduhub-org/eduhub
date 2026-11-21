@@ -1,43 +1,14 @@
-import { createRequire } from "module";
-import { logger } from "../index.js";
-import axios from "axios";
+import { logger } from "../lib/logger.js";
+import { http } from "../lib/http.js";
 import { computeMatrixHandle } from "../lib/matrixHandle.js";
-
-const require = createRequire(import.meta.url);
-let mergeUserPutPayload;
-try {
-  ({ mergeUserPutPayload } = require("../shared_libs/node/keycloakUserMerge.cjs"));
-} catch {
-  ({ mergeUserPutPayload } = require("../../shared_libs/node/keycloakUserMerge.cjs"));
-}
-
-const getKeycloakToken = async () => {
-  try {
-    const response = await axios.post(
-      `${process.env.KEYCLOAK_URL}/realms/master/protocol/openid-connect/token`,
-      new URLSearchParams({
-        grant_type: 'password',
-        client_id: 'admin-cli',
-        username: process.env.KEYCLOAK_USER || 'keycloak',
-        password: process.env.KEYCLOAK_PW,
-      }),
-      {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-      }
-    );
-    return response.data.access_token;
-  } catch (error) {
-    logger.error('Error getting Keycloak token', error);
-    throw error;
-  }
-};
+import { mergeUserPutPayload } from "../shared/keycloakUserMerge.js";
+import * as config from "../lib/config.js";
+import { getKeycloakToken } from "../lib/keycloak.js";
 
 const updateKeycloakUser = async (userId, updatedFields, token) => {
   try {
-    await axios.put(
-      `${process.env.KEYCLOAK_URL}/admin/realms/edu-hub/users/${userId}`,
+    await http.put(
+      `${config.keycloakConfig().url}/admin/realms/edu-hub/users/${userId}`,
       updatedFields,
       {
         headers: {
@@ -82,7 +53,7 @@ const resolvePictureUrl = (picturePath) => {
     return picturePath;
   }
   if (picturePath.startsWith('public/') || picturePath.includes('/public/')) {
-    const bucketUrl = process.env.STORAGE_BUCKET_PUBLIC_URL;
+    const bucketUrl = config.storageBucketPublicUrl();
     if (!bucketUrl) {
       logger.warn('STORAGE_BUCKET_PUBLIC_URL not set, cannot resolve picture URL');
       return null;
@@ -146,8 +117,8 @@ const updateKeycloakUserHandler = async (req) => {
 
     let userResponse;
     try {
-      userResponse = await axios.get(
-        `${process.env.KEYCLOAK_URL}/admin/realms/edu-hub/users/${userId}`,
+      userResponse = await http.get(
+        `${config.keycloakConfig().url}/admin/realms/edu-hub/users/${userId}`,
         { headers: { Authorization: `Bearer ${keycloakToken}` } }
       );
     } catch (err) {

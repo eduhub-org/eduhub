@@ -1,4 +1,5 @@
 import { gql } from 'graphql-request';
+import * as config from './config.js';
 
 /**
  * Shared pieces of the StuJo self-service organization claim, used by the
@@ -224,12 +225,12 @@ export async function resolveContactEmail(client, portalAppName, logger) {
       });
     }
   }
-  return process.env.STUJO_ADMIN_EMAIL || null;
+  return config.stujoAdminEmail();
 }
 
 /** Link the notification mails point at to review or revoke a grant. */
 export function adminAccessUrl() {
-  const base = process.env.FRONTEND_URL || 'https://edu.opencampus.sh';
+  const base = config.frontendUrl();
   return `${base.replace(/\/+$/, '')}/manage/settings/access`;
 }
 

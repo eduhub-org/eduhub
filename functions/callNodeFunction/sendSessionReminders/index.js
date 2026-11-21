@@ -1,6 +1,8 @@
-import { gql, GraphQLClient } from 'graphql-request';
-import { createVariableReplacer } from '../emailTemplateVariables.js';
+import { gql } from 'graphql-request';
+import { createVariableReplacer } from '../lib/emailTemplateVariables.js';
 import { queueEmail } from '../lib/queueEmail.js';
+import { createHasuraClient } from '../lib/hasura.js';
+import * as config from '../lib/config.js';
 
 const HOUR_MS = 60 * 60 * 1000;
 const TIME_ZONE = 'Europe/Berlin';
@@ -71,21 +73,25 @@ function formatDuration(start, end) {
 /**
  * Where the session takes place, as display strings: a linked venue as
  * "Label (Address)", else the free-text address, which for online sessions is
- * the meeting link. Online without a link yet just says "Online".
+ * the meeting link. A session without its own venue or address uses its course
+ * location's default, as the course page does. Online without a link yet just
+ * says "Online".
  */
 export function resolveSessionLocations(sessionAddresses = []) {
   const locations = sessionAddresses.map((sa) => {
-    const venue = sa.LocationAddress;
-    const label = venue?.shortLabel?.trim();
+    const courseLocation = sa.CourseLocation;
+    const venue = sa.LocationAddress ?? courseLocation?.DefaultSessionAddress;
+    const rawLabel = venue?.shortLabel?.trim();
+    const label = rawLabel && rawLabel.toLowerCase() !== PLACEHOLDER_LABEL ? rawLabel : '';
     const venueAddress = venue?.address?.trim();
     if (venueAddress) {
-      return label && label.toLowerCase() !== PLACEHOLDER_LABEL && label !== venueAddress
-        ? `${label} (${venueAddress})`
-        : venueAddress;
+      return label && label !== venueAddress ? `${label} (${venueAddress})` : venueAddress;
     }
-    const address = sa.address?.trim();
+    // A venue with a name but no address still says where (frontend does too).
+    if (label) return label;
+    const address = sa.address?.trim() || courseLocation?.defaultSessionAddress?.trim();
     if (address) return address;
-    return sa.CourseLocation?.locationOption === 'ONLINE' ? 'Online' : '';
+    return (courseLocation?.locationOption ?? sa.locationOption) === 'ONLINE' ? 'Online' : '';
   });
   return [...new Set(locations.filter(Boolean))];
 }
@@ -114,8 +120,14 @@ const GET_REMINDER_CANDIDATES = gql`
         endDateTime
         SessionAddresses(order_by: { id: asc }) {
           address
+          locationOption
           CourseLocation {
             locationOption
+            defaultSessionAddress
+            DefaultSessionAddress {
+              shortLabel
+              address
+            }
           }
           LocationAddress {
             shortLabel
@@ -160,11 +172,7 @@ export default async function sendSessionReminders(req, logger) {
   logger.info('########## Send Session Reminders ##########');
 
   try {
-    const client = new GraphQLClient(process.env.HASURA_ENDPOINT, {
-      headers: {
-        'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET,
-      },
-    });
+    const client = createHasuraClient();
 
     const now = new Date();
     const horizon = new Date(now.getTime() + MAX_LEAD_HOURS * HOUR_MS);
@@ -211,7 +219,7 @@ export default async function sendSessionReminders(req, logger) {
             duration: formatDuration(session.startDateTime, session.endDateTime),
             location,
           },
-          courseLink: `${process.env.FRONTEND_URL || 'https://edu.opencampus.sh'}/course/${course.id}`,
+          courseLink: `${config.frontendUrl()}/course/${course.id}`,
         });
 
         const result = await queueEmail({

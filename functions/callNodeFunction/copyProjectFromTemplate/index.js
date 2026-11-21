@@ -1,17 +1,6 @@
-import { GraphQLClient } from "graphql-request";
+import { createHasuraClient } from "../lib/hasura.js";
 
 const ALLOWED_ROLES = new Set(["admin", "user_access", "user", "instructor_access", "instructor"]);
-
-const ensureHasuraClient = () => {
-  if (!process.env.HASURA_ENDPOINT || !process.env.HASURA_ADMIN_SECRET) {
-    throw new Error("HASURA_ENDPOINT or HASURA_ADMIN_SECRET not configured");
-  }
-  return new GraphQLClient(process.env.HASURA_ENDPOINT, {
-    headers: {
-      "x-hasura-admin-secret": process.env.HASURA_ADMIN_SECRET,
-    },
-  });
-};
 
 const GET_TEMPLATE = `
   query GetProjectTemplate($parentProjectId: Int!, $courseId: Int!) {
@@ -203,7 +192,7 @@ export default async function copyProjectFromTemplate(req, logger) {
 
   let hasuraClient;
   try {
-    hasuraClient = ensureHasuraClient();
+    hasuraClient = createHasuraClient();
   } catch (error) {
     logger.error("Hasura client misconfigured", { error: error.message });
     return {
