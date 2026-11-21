@@ -257,6 +257,17 @@ export const findMatches = (
 export const matchesAllWords = (expert: ExpertsList_User, roles: ExpertRole[], search: string): boolean => {
   const words = searchWords(search);
   if (!words.length) return false;
+  // The server compares with ILIKE, where "_" stands for any one character and "%" for any run.
+  const patterns = words.map(
+    (word) =>
+      new RegExp(
+        word
+          .replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+          .replace(/_/g, '.')
+          .replace(/%/g, '.*'),
+        's'
+      )
+  );
   const texts = [
     expert.firstName,
     expert.lastName,
@@ -267,7 +278,7 @@ export const matchesAllWords = (expert: ExpertsList_User, roles: ExpertRole[], s
   ]
     .filter((value): value is string => Boolean(value))
     .map((value) => value.toLowerCase());
-  return words.every((word) => texts.some((text) => text.includes(word)));
+  return patterns.every((pattern) => texts.some((text) => pattern.test(text)));
 };
 
 export const linkedInSearchUrl = (expert: ExpertsList_User): string => {

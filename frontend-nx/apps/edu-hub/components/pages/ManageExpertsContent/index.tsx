@@ -188,9 +188,14 @@ const ManageExpertsContent: FC = () => {
     orderBy: defaultSort,
   });
 
+  // The ranked rows are paged here rather than in TableGrid, so its page checkbox only selects
+  // the rows on screen; "select all matching" still reaches every ranked row via loadAllRows.
   const experts = useMemo(
-    () => (ranked.active ? ranked.rows.map((row) => row.expert) : typedData?.User ?? []),
-    [ranked.active, ranked.rows, typedData]
+    () =>
+      ranked.active
+        ? ranked.rows.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize).map((row) => row.expert)
+        : typedData?.User ?? [],
+    [ranked.active, ranked.rows, pageIndex, pageSize, typedData]
   );
   const views = useMemo(() => {
     const result = new Map<string, ExpertView>();
@@ -262,9 +267,9 @@ const ManageExpertsContent: FC = () => {
     [queryFresh, t]
   );
 
-  /** Every expert matching the search as typed (not the debounced one), page by page. */
-  const loadExportRows = async (): Promise<ExpertsList_User[]> => {
-    const filter = createMultiWordSearchCondition(searchFilter, EXPERT_SEARCH_FIELDS);
+  /** Every expert whose fields hold all words of the search, page by page. */
+  const loadExportRows = async (search: string): Promise<ExpertsList_User[]> => {
+    const filter = createMultiWordSearchCondition(search, EXPERT_SEARCH_FIELDS);
     const rows: ExpertsList_User[] = [];
     for (let offset = 0; ; offset += EXPORT_PAGE_SIZE) {
       const page = await queryFresh<ExpertsList>(EXPERTS_LIST, {
@@ -281,8 +286,11 @@ const ManageExpertsContent: FC = () => {
 
   const exportCsv = async () => {
     try {
-      // The ranked list is already complete in the browser, in the order shown.
-      const all = ranked.active ? ranked.rows.map((row) => row.expert) : await loadExportRows();
+      // A ranked search exports every keyword match (not only the ranked candidates) and the
+      // semantic hits, in ranked order.
+      const all = ranked.active
+        ? ranked.rankWith(await loadExportRows(debouncedSearch)).map((row) => row.expert)
+        : await loadExportRows(searchFilter);
       const header = [t('first_name'), t('last_name'), t('organization'), t('email'), t('last_active')];
       const csv = buildCsv(expertCsvRows(all, header), locale === 'de' ? ';' : ',');
       downloadTextFile(csv, exportFileName(t('headline'), t('export_file_suffix'), 'csv'), 'text/csv;charset=utf-8');
@@ -420,7 +428,12 @@ const ManageExpertsContent: FC = () => {
               bulkActions={[{ value: 'email', label: t('bulk_mail') }]}
               onBulkAction={handleBulkAction}
               loadAllRows={loadAllExperts}
-              toolbarActions={<Button onClick={exportCsv}>{t('export_csv')}</Button>}
+              toolbarActions={
+                // Until the results answer the search as typed, an export would hold the previous ones.
+                <Button onClick={exportCsv} disabled={searchFilter !== debouncedSearch || ranked.loading}>
+                  {t('export_csv')}
+                </Button>
+              }
               rowClassName={(expert) => (expert.doNotContact ? 'opacity-60' : '')}
               renderMobileRow={(expert) => (
                 <div className="flex flex-col gap-1">

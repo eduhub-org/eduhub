@@ -250,6 +250,10 @@ describe('semantic search helpers', () => {
     // The raw title keeps its underscore, so "tensorflow" matches neither the server nor here.
     expect(matchesAllWords(row, expertRoles(row), 'tensorflow')).toBe(false);
     expect(matchesAllWords(row, expertRoles(row), 'tensor_flow')).toBe(true);
+    // ILIKE wildcards: "_" is any one character, "%" any run of them.
+    expect(matchesAllWords(row, expertRoles(row), 'tensor_flow legacy%labs')).toBe(true);
+    expect(matchesAllWords(expert(), expertRoles(expert()), 'deep_learning')).toBe(true);
+    expect(matchesAllWords(expert(), expertRoles(expert()), 'deep.learning')).toBe(false);
   });
 
   it("lists the person's roles the search found, closest first", () => {

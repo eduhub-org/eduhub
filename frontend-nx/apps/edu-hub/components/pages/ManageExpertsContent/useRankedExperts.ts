@@ -125,6 +125,8 @@ export const useRankedExperts = ({ search, isAdmin, scope, orderBy }: UseRankedE
     keywordRanked: keyword.data?.User.length ?? 0,
     // A failed request or a failed search is not an empty result; a search that is turned off is.
     semanticUnavailable: active && Boolean(semantic.error || similar.error || result?.success === false),
+    /** Ranks a complete keyword result (e.g. for the export) together with the semantic hits. */
+    rankWith: (keywordExperts: ExpertsList_User[]) => rankExperts(keywordExperts, similar.users, matches, query),
     refetch,
   };
 };
