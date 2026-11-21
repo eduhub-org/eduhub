@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { ProjectStatus_enum } from "./../../__generated__/globalTypes";
+import { ProjectStatus_enum, ProjectParticipationStatus_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: ProjectPage
@@ -61,6 +61,7 @@ export interface ProjectPage_Project_ProjectAuthors_User {
 export interface ProjectPage_Project_ProjectAuthors {
   __typename: "ProjectAuthor";
   id: number;
+  participationStatus: ProjectParticipationStatus_enum;
   /**
    * An object relationship
    */

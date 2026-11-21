@@ -347,5 +347,6 @@ export interface SimilarExpertsVariables {
   sources: User_bool_exp;
   scope?: User_bool_exp | null;
   isAdmin: boolean;
-  limit?: number | null;
+  limit: number;
+  offset: number;
 }

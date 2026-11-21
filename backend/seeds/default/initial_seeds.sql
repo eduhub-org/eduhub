@@ -3563,6 +3563,170 @@ SELECT pg_catalog.setval(pg_get_serial_sequence('public."OrganizationAdmin"', 'i
 SELECT pg_catalog.setval(pg_get_serial_sequence('public."CourseInstructor"', 'id'), (SELECT max(id) FROM public."CourseInstructor"), true);
 SELECT pg_catalog.setval(pg_get_serial_sequence('public."JobPosting"', 'id'), (SELECT max(id) FROM public."JobPosting"), true);
 
+-- BEGIN Expert directory fixtures (docs/EXPERT_DIRECTORY.md, /manage/experts)
+-- Twenty experts with courses, sessions, a project and an achievement option, so the directory
+-- has a second page and every search case can be tried. All ids are in the 95xx range (users
+-- e1e10000-…), and the block is repeatable: it adds what is missing and changes nothing else.
+-- Programs and courses are unpublished, so they stay out of the public pages.
+--
+-- Searches to try (semantic hits need embeddings: see the README's "Expert Directory"):
+-- - "Startup Finanzierung": Jana Krüger gave the same course in three semesters, which counts
+--   once, so on keywords alone Malte Sörensen (two different courses) is ahead of her; she ranks
+--   first because the semantic search finds her too. Aylin Demir only shares the word
+--   "Finanzierung", so she shows up as similar, not as a keyword hit.
+-- - "Solar": Nora Solar is found by her name and comes first, before Tim Hansen, who teaches
+--   "Solarenergie für Kommunen".
+-- - "Energie": Henrik Albers is marked "do not contact" (greyed out, no contact buttons).
+-- - "Ethik": Ulrike Brandes has seven involvements, so the others start collapsed.
+-- - No search: more than 20 experts, so the table has a second page.
+-- - orgadmin@example.com sees only Paula Jung, Tim Hansen and Ida Martens, the experts of
+--   org 9100's course "Klimaanpassung in Städten", and only org 9100's notes.
+INSERT INTO public."Program" (id, title, "lectureStart", "lectureEnd", visibility, "shortTitle", "defaultMaxMissedSessions", published, type, "organizationId") VALUES
+  (9510, 'Sommersemester 2025 (Expert:innen)', '2025-04-14', '2025-07-25', true, 'SoSe25', 2, false, 'COURSES', 0),
+  (9511, 'Wintersemester 2025/26 (Expert:innen)', '2025-10-13', '2026-02-06', true, 'WiSe25', 2, false, 'COURSES', 0),
+  (9512, 'Sommersemester 2026 (Expert:innen)', '2026-04-13', '2026-07-24', true, 'SoSe26', 2, false, 'COURSES', 0)
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO public."Course" (id, title, status, ects, tagline, language, cost, "achievementCertificatePossible", "attendanceCertificatePossible", "maxMissedSessions", "weekDay", "programId", "applicationEnd", "contentDescriptionField1", "maxParticipants", "startTime", "endTime", published, "registrationType") VALUES
+  (9510, 'Startup-Finanzierung für Gründende', 'APPLICANTS_INVITED', '5', 'Von Bootstrapping bis Venture Capital: wie ein Startup an Geld kommt', 'DE', 'NO_COST', true, true, 2, 'TUESDAY', 9510, '2025-04-01', 'Wir vergleichen Förderprogramme, Business Angels und Wagniskapital und üben den Pitch vor Investoren.', 25, '18:00:00', '20:00:00', false, 'APPROVAL_WITH_INPUT'),
+  (9511, 'Startup-Finanzierung für Gründende', 'APPLICANTS_INVITED', '5', 'Von Bootstrapping bis Venture Capital: wie ein Startup an Geld kommt', 'DE', 'NO_COST', true, true, 2, 'TUESDAY', 9511, '2025-10-01', 'Wir vergleichen Förderprogramme, Business Angels und Wagniskapital und üben den Pitch vor Investoren.', 25, '18:00:00', '20:00:00', false, 'APPROVAL_WITH_INPUT'),
+  (9512, 'Startup-Finanzierung für Gründende', 'APPLICANTS_INVITED', '5', 'Von Bootstrapping bis Venture Capital: wie ein Startup an Geld kommt', 'DE', 'NO_COST', true, true, 2, 'TUESDAY', 9512, '2026-04-01', 'Wir vergleichen Förderprogramme, Business Angels und Wagniskapital und üben den Pitch vor Investoren.', 25, '18:00:00', '20:00:00', false, 'APPROVAL_WITH_INPUT'),
+  (9513, 'Gründungsfinanzierung und Business Angels', 'APPLICANTS_INVITED', '5', 'Finanzierung für Startups in der Frühphase', 'DE', 'NO_COST', true, true, 2, 'WEDNESDAY', 9511, '2025-10-01', 'Wie Business Angels Startups bewerten und was in einen Beteiligungsvertrag gehört.', 25, '18:00:00', '20:00:00', false, 'APPROVAL_WITH_INPUT'),
+  (9514, 'Pitch-Training für Startups', 'APPLICANTS_INVITED', '2.5', 'In fünf Minuten überzeugen', 'DE', 'NO_COST', false, true, 2, 'THURSDAY', 9512, '2026-04-01', 'Aufbau eines Pitch Decks, Storytelling und Fragen der Jury zur Finanzierung.', 20, '18:00:00', '20:00:00', false, 'APPROVAL_WITH_INPUT'),
+  (9515, 'Solarenergie für Kommunen', 'APPLICANTS_INVITED', '5', 'Photovoltaik auf öffentlichen Gebäuden planen', 'DE', 'NO_COST', true, true, 2, 'MONDAY', 9512, '2026-04-01', 'Von der Dachanalyse bis zum Bürgerenergie-Modell: wie Gemeinden Solarstrom erzeugen.', 25, '18:00:00', '20:00:00', false, 'APPROVAL_WITH_INPUT'),
+  (9516, 'Klimaanpassung in Städten', 'APPLICANTS_INVITED', '5', 'Hitze, Starkregen und grüne Infrastruktur', 'DE', 'NO_COST', true, true, 2, 'TUESDAY', 9201, '2026-03-15', 'Wie Städte sich mit Schwammstadt-Konzepten und Begrünung auf den Klimawandel einstellen.', 25, '18:00:00', '20:00:00', false, 'APPROVAL_WITH_INPUT'),
+  (9517, 'KI und Ethik', 'APPLICANTS_INVITED', '5', 'Verantwortung beim Einsatz künstlicher Intelligenz', 'DE', 'NO_COST', true, true, 2, 'MONDAY', 9510, '2025-04-01', 'Fairness, Transparenz und Haftung: ethische Fragen an KI-Systeme.', 30, '18:00:00', '20:00:00', false, 'APPROVAL_WITH_INPUT'),
+  (9518, 'Ringvorlesung Digitale Gesellschaft', 'APPLICANTS_INVITED', '2.5', 'Jede Woche ein neues Thema mit Gästen aus der Praxis', 'DE', 'NO_COST', false, true, 3, 'THURSDAY', 9511, '2025-10-01', 'Eine offene Vortragsreihe über Technik, Wirtschaft und Gesellschaft.', 80, '18:00:00', '19:30:00', false, 'APPROVAL_WITH_INPUT')
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO public."User" (id, "firstName", "lastName", email, "externalProfile", "organizationName", status, "doNotContact", created_at, updated_at) VALUES
+  ('e1e10000-0000-0000-0000-000000000001', 'Jana', 'Krüger', 'jana.krueger@example.com', 'xing.com/profile/Jana_Krueger', 'Kieler Gründungsnetzwerk', 'ACTIVE', false, '2025-03-01', '2025-03-01'),
+  ('e1e10000-0000-0000-0000-000000000002', 'Malte', 'Sörensen', 'malte.soerensen@example.com', 'https://www.linkedin.com/in/malte-soerensen-example', 'Förde Ventures', 'ACTIVE', false, '2025-03-01', '2025-03-01'),
+  ('e1e10000-0000-0000-0000-000000000003', 'Tim', 'Hansen', 'tim.hansen@example.com', NULL, 'Stadtwerke Kiel', 'ACTIVE', false, '2025-03-01', '2025-03-01'),
+  ('e1e10000-0000-0000-0000-000000000004', 'Paula', 'Jung', 'paula.jung@example.com', NULL, 'Landeshauptstadt Kiel', 'ACTIVE', false, '2025-03-01', '2025-03-01'),
+  ('e1e10000-0000-0000-0000-000000000005', 'Ulrike', 'Brandes', 'ulrike.brandes@example.com', 'https://www.linkedin.com/in/ulrike-brandes-example', 'Universität zu Kiel', 'ACTIVE', false, '2025-03-01', '2025-03-01'),
+  ('e1e10000-0000-0000-0000-000000000006', 'Aylin', 'Demir', 'aylin.demir@example.com', NULL, 'Nordkapital', 'ACTIVE', false, '2025-03-01', '2025-03-01'),
+  ('e1e10000-0000-0000-0000-000000000007', 'Henrik', 'Albers', 'henrik.albers@example.com', NULL, 'Port of Kiel', 'ACTIVE', true, '2025-03-01', '2025-03-01'),
+  ('e1e10000-0000-0000-0000-000000000008', 'Nora', 'Solar', 'nora.solar@example.com', NULL, 'Designbüro Nord', 'ACTIVE', false, '2025-03-01', '2025-03-01'),
+  ('e1e10000-0000-0000-0000-000000000009', 'Kai', 'Lorenz', 'kai.lorenz@example.com', NULL, 'AgriTech Schleswig-Holstein', 'ACTIVE', false, '2025-03-01', '2025-03-01'),
+  ('e1e10000-0000-0000-0000-000000000010', 'Sophie', 'Wendt', 'sophie.wendt@example.com', NULL, NULL, 'ACTIVE', false, '2025-03-01', '2025-03-01'),
+  ('e1e10000-0000-0000-0000-000000000011', 'Jonas', 'Petersen', 'jonas.petersen@example.com', NULL, 'Pflegeheim Am Hafen', 'ACTIVE', false, '2025-03-01', '2025-03-01'),
+  ('e1e10000-0000-0000-0000-000000000012', 'Mira', 'Schulz', 'mira.schulz@example.com', NULL, NULL, 'ACTIVE', false, '2025-03-01', '2025-03-01'),
+  ('e1e10000-0000-0000-0000-000000000013', 'Lars', 'Ehlers', 'lars.ehlers@example.com', NULL, 'IHK Kiel', 'ACTIVE', false, '2025-03-01', '2025-03-01'),
+  ('e1e10000-0000-0000-0000-000000000014', 'Eva', 'Lindner', 'eva.lindner@example.com', NULL, 'GEOMAR', 'ACTIVE', false, '2025-03-01', '2025-03-01'),
+  ('e1e10000-0000-0000-0000-000000000015', 'Ben', 'Okoye', 'ben.okoye@example.com', NULL, 'Textil im Kreislauf e. V.', 'ACTIVE', false, '2025-03-01', '2025-03-01'),
+  ('e1e10000-0000-0000-0000-000000000016', 'Clara', 'Voss', 'clara.voss@example.com', NULL, NULL, 'ACTIVE', false, '2025-03-01', '2025-03-01'),
+  ('e1e10000-0000-0000-0000-000000000017', 'Deniz', 'Arslan', 'deniz.arslan@example.com', NULL, 'Ledger Labs', 'ACTIVE', false, '2025-03-01', '2025-03-01'),
+  ('e1e10000-0000-0000-0000-000000000018', 'Greta', 'Holm', 'greta.holm@example.com', NULL, 'Kreis Plön', 'ACTIVE', false, '2025-03-01', '2025-03-01'),
+  ('e1e10000-0000-0000-0000-000000000019', 'Felix', 'Brodersen', 'felix.brodersen@example.com', NULL, 'Offshore Nord', 'ACTIVE', false, '2025-03-01', '2025-03-01'),
+  ('e1e10000-0000-0000-0000-000000000020', 'Ida', 'Martens', 'ida.martens@example.com', NULL, 'UKSH', 'ACTIVE', false, '2025-03-01', '2025-03-01')
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO public."CourseInstructor" (id, "courseId", "userId") VALUES
+  (9510, 9510, 'e1e10000-0000-0000-0000-000000000001'),
+  (9511, 9511, 'e1e10000-0000-0000-0000-000000000001'),
+  (9512, 9512, 'e1e10000-0000-0000-0000-000000000001'),
+  (9513, 9513, 'e1e10000-0000-0000-0000-000000000002'),
+  (9514, 9514, 'e1e10000-0000-0000-0000-000000000002'),
+  (9515, 9515, 'e1e10000-0000-0000-0000-000000000003'),
+  (9516, 9516, 'e1e10000-0000-0000-0000-000000000004'),
+  (9517, 9517, 'e1e10000-0000-0000-0000-000000000005'),
+  (9518, 9518, 'e1e10000-0000-0000-0000-000000000005')
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO public."Session" (id, title, description, "startDateTime", "endDateTime", "courseId") VALUES
+  (9510, 'Algorithmen und Verantwortung', 'Wer haftet, wenn ein Algorithmus falsch entscheidet?', '2025-10-16 17:00:00+00', '2025-10-16 18:30:00+00', 9518),
+  (9511, 'Datenschutz im Alltag', 'Was Apps über uns wissen und wie wir das ändern können.', '2025-10-23 17:00:00+00', '2025-10-23 18:30:00+00', 9518),
+  (9512, 'Desinformation erkennen', 'Werkzeuge gegen Falschmeldungen in sozialen Netzwerken.', '2025-10-30 17:00:00+00', '2025-10-30 18:30:00+00', 9518),
+  (9513, 'Digitale Teilhabe im Alter', 'Wie ältere Menschen digitale Angebote sicher nutzen.', '2025-11-06 17:00:00+00', '2025-11-06 18:30:00+00', 9518),
+  (9514, 'Künstliche Intelligenz in der Schule', 'Chancen und Grenzen von KI im Unterricht, mit Blick auf Ethik und Prüfungen.', '2025-11-13 17:00:00+00', '2025-11-13 18:30:00+00', 9518),
+  (9515, 'Plattformen und Öffentlichkeit', 'Wie Plattformen die öffentliche Debatte prägen.', '2025-11-20 17:00:00+00', '2025-11-20 18:30:00+00', 9518),
+  (9516, 'Wie Wagniskapital funktioniert', 'Wie die Finanzierung junger Unternehmen durch Wagniskapital abläuft und was Investoren erwarten.', '2025-11-27 17:00:00+00', '2025-11-27 18:30:00+00', 9518),
+  (9517, 'Nachhaltige Energie im Hafen', 'Landstrom, Wasserstoff und Batterien: wie ein Hafen klimaneutral wird.', '2025-12-04 17:00:00+00', '2025-12-04 18:30:00+00', 9518),
+  (9518, 'Design Thinking in der Verwaltung', 'Wie Behörden Angebote gemeinsam mit Bürgerinnen und Bürgern entwickeln.', '2025-12-11 17:00:00+00', '2025-12-11 18:30:00+00', 9518),
+  (9519, 'Robotik in der Pflege', 'Was Roboter in Pflegeheimen heute leisten und was nicht.', '2025-12-18 17:00:00+00', '2025-12-18 18:30:00+00', 9518),
+  (9520, 'UX Research mit kleinem Budget', 'Nutzerinterviews und Usability-Tests ohne großes Labor.', '2026-01-08 17:00:00+00', '2026-01-08 18:30:00+00', 9518),
+  (9521, 'Cybersecurity für kleine Unternehmen', 'Die wichtigsten Schutzmaßnahmen gegen Phishing und Ransomware.', '2026-01-15 17:00:00+00', '2026-01-15 18:30:00+00', 9518),
+  (9522, 'Quantencomputing verständlich erklärt', 'Qubits, Verschränkung und was Quantenrechner bald können.', '2026-01-22 17:00:00+00', '2026-01-22 18:30:00+00', 9518),
+  (9523, 'Kreislaufwirtschaft in der Textilindustrie', 'Recycling, Reparatur und Second Hand statt Fast Fashion.', '2026-01-29 17:00:00+00', '2026-01-29 18:30:00+00', 9518),
+  (9524, 'Social-Media-Marketing für Vereine', 'Mit wenig Aufwand mehr Mitglieder erreichen.', '2026-02-05 17:00:00+00', '2026-02-05 18:30:00+00', 9518),
+  (9525, 'Blockchain jenseits von Kryptowährungen', 'Lieferketten, Urkunden und Abstimmungen auf der Blockchain.', '2026-02-12 17:00:00+00', '2026-02-12 18:30:00+00', 9518),
+  (9526, 'Bürgerbeteiligung digital gestalten', 'Online-Beteiligung, die wirklich etwas verändert.', '2026-02-19 17:00:00+00', '2026-02-19 18:30:00+00', 9518),
+  (9527, 'Offshore-Windenergie und Netzausbau', 'Wie der Strom von der Nordsee in den Süden kommt.', '2026-02-26 17:00:00+00', '2026-02-26 18:30:00+00', 9518),
+  (9528, 'Gesundheitsdaten sicher nutzen', 'Wie Kliniken Daten für die Forschung teilen, ohne Patienten zu gefährden.', '2026-05-05 16:00:00+00', '2026-05-05 18:00:00+00', 9516),
+  (9529, 'Solarstrom auf öffentlichen Dächern', 'Ein Praxisbericht der Stadtwerke über Photovoltaik und Energie für Schulen.', '2026-05-12 16:00:00+00', '2026-05-12 18:00:00+00', 9516)
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO public."SessionSpeaker" (id, "sessionId", "userId") VALUES
+  (9510, 9510, 'e1e10000-0000-0000-0000-000000000005'),
+  (9511, 9511, 'e1e10000-0000-0000-0000-000000000005'),
+  (9512, 9512, 'e1e10000-0000-0000-0000-000000000005'),
+  (9513, 9513, 'e1e10000-0000-0000-0000-000000000005'),
+  (9514, 9514, 'e1e10000-0000-0000-0000-000000000005'),
+  (9515, 9515, 'e1e10000-0000-0000-0000-000000000005'),
+  (9516, 9516, 'e1e10000-0000-0000-0000-000000000006'),
+  (9517, 9517, 'e1e10000-0000-0000-0000-000000000007'),
+  (9518, 9518, 'e1e10000-0000-0000-0000-000000000008'),
+  (9519, 9519, 'e1e10000-0000-0000-0000-000000000011'),
+  (9520, 9520, 'e1e10000-0000-0000-0000-000000000012'),
+  (9521, 9521, 'e1e10000-0000-0000-0000-000000000013'),
+  (9522, 9522, 'e1e10000-0000-0000-0000-000000000014'),
+  (9523, 9523, 'e1e10000-0000-0000-0000-000000000015'),
+  (9524, 9524, 'e1e10000-0000-0000-0000-000000000016'),
+  (9525, 9525, 'e1e10000-0000-0000-0000-000000000017'),
+  (9526, 9526, 'e1e10000-0000-0000-0000-000000000018'),
+  (9527, 9527, 'e1e10000-0000-0000-0000-000000000019'),
+  (9528, 9528, 'e1e10000-0000-0000-0000-000000000020'),
+  (9529, 9529, 'e1e10000-0000-0000-0000-000000000003')
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO public."Project" (id, title, tagline, description, status, "proposedByUserId", created_at, updated_at) VALUES
+  (9510, 'Smarte Bewässerung mit IoT', 'Sensoren sagen, wann das Feld Wasser braucht', 'Bodenfeuchte-Sensoren und eine kleine App sparen Wasser in der Landwirtschaft.', 'PROPOSED', 'e1e10000-0000-0000-0000-000000000009', '2026-04-20', '2026-04-20')
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO public."ProjectCourse" (id, "projectId", "courseId") VALUES
+  (9510, 9510, 9515)
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO public."ProjectMentor" (id, "projectId", "userId") VALUES
+  (9510, 9510, 'e1e10000-0000-0000-0000-000000000009')
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO public."AchievementOption" (id, title, description, "recordType", published, created_at, updated_at) VALUES
+  (9510, 'Datenanalyse-Portfolio', 'Drei kleine Datenanalysen mit Python, dokumentiert in Notebooks.', 'DOCUMENTATION', false, '2025-04-01', '2025-04-01')
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO public."AchievementOptionCourse" (id, "achievementOptionId", "courseId") VALUES
+  (9510, 9510, 9517)
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO public."AchievementOptionMentor" (id, "achievementOptionId", "userId") VALUES
+  (9510, 9510, 'e1e10000-0000-0000-0000-000000000010')
+ON CONFLICT (id) DO NOTHING;
+
+-- Notes: admin notes (no organization) are seen by admins only; org 9100's notes also by its org admin.
+INSERT INTO public."ExpertNote" (id, "expertId", "authorId", "organizationId", text, created_at, updated_at) VALUES
+  (9510, 'e1e10000-0000-0000-0000-000000000001', '8914bee9-0549-44af-bcae-cafeec5ba92e', NULL, 'Hat zugesagt, den Kurs im Wintersemester 2026/27 wieder anzubieten.', '2026-05-04 10:00:00+00', '2026-05-04 10:00:00+00'),
+  (9511, 'e1e10000-0000-0000-0000-000000000003', '8914bee9-0549-44af-bcae-cafeec5ba92e', NULL, 'Kann auch zu Windenergie vortragen.', '2026-03-10 10:00:00+00', '2026-03-10 10:00:00+00'),
+  (9512, 'e1e10000-0000-0000-0000-000000000003', 'dddddddd-dddd-dddd-dddd-dddddddddddd', 9100, 'Bevorzugt Termine am Dienstagnachmittag.', '2026-05-13 09:00:00+00', '2026-05-13 09:00:00+00'),
+  (9513, 'e1e10000-0000-0000-0000-000000000004', 'dddddddd-dddd-dddd-dddd-dddddddddddd', 9100, 'Bringt Material zur Schwammstadt mit, braucht einen Beamer.', '2026-04-02 09:00:00+00', '2026-04-02 09:00:00+00')
+ON CONFLICT (id) DO NOTHING;
+
+-- Keep the sequences past the explicit ids, without moving them backwards.
+DO $$
+DECLARE
+  t text;
+  seq text;
+BEGIN
+  FOREACH t IN ARRAY ARRAY['Program', 'Course', 'CourseInstructor', 'Session', 'SessionSpeaker', 'Project',
+                           'ProjectCourse', 'ProjectMentor', 'AchievementOption', 'AchievementOptionCourse',
+                           'AchievementOptionMentor', 'ExpertNote'] LOOP
+    seq := pg_get_serial_sequence(format('public.%I', t), 'id');
+    EXECUTE format('SELECT setval(%L, GREATEST((SELECT max(id) FROM public.%I), (SELECT last_value FROM %s)))', seq, t, seq);
+  END LOOP;
+END $$;
+-- END Expert directory fixtures
+
 -- Course funding-logo fixtures: reuse the checked-in website footer SVGs.
 -- Single wide logo: Applied Machine Learning (7009), Introduction to Data Science & Machine Learning (7005).
 -- Multiple logos: From LLMs to AI Agents (7004).

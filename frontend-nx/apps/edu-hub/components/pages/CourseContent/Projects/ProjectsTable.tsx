@@ -32,6 +32,7 @@ import {
   shouldShowProjectResourceDownloadLinks,
 } from './projectStatusDisplay';
 import ProjectPreviewLayout from './ProjectPreviewLayout';
+import { projectHref } from '../../../common/TileSlider/projectTileHelpers';
 import ProjectSubmissionDeadlineBelowTitle from './ProjectSubmissionDeadlineBelowTitle';
 import { ProjectRow } from './types';
 import { CourseProjectSubmissionDefaultSource } from './projectEffectiveSubmissionDeadline';
@@ -353,6 +354,7 @@ const ProjectsTable: FC<ProjectsTableProps> = ({
             project={row}
             showResourceLinks={showFullDetails}
             includeExcludedAuthors={canViewExcludedAuthors}
+            projectPageHref={projectHref(row, 'withinCourse', courseId)}
             titleRow={
               <div className="flex flex-wrap items-center gap-2 mb-1">
                 <h4 className="text-xl font-semibold text-label-primary min-w-0 break-words">{row.title}</h4>
@@ -367,7 +369,7 @@ const ProjectsTable: FC<ProjectsTableProps> = ({
         </div>
       );
     },
-    [canViewExcludedAuthors, courseDefaultSubmissionDeadline, submissionDeadlineDefaultSource]
+    [canViewExcludedAuthors, courseDefaultSubmissionDeadline, courseId, submissionDeadlineDefaultSource]
   );
 
   return (

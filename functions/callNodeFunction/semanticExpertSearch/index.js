@@ -8,7 +8,9 @@ import { embedText, embeddingConfig, isZeroVector, toVectorLiteral } from "../li
  * experts of their organization's courses.
  */
 
-const MATCH_COUNT = 50;
+// Courses repeat every semester with the same session texts, so near-identical sources fill the top
+// places; 200 leaves room for enough different people. An exact scan of a few thousand vectors.
+const MATCH_COUNT = 200;
 const MIN_QUERY_LENGTH = 3;
 const MAX_QUERY_LENGTH = 500;
 const ALLOWED_ROLES = ["admin", "org_admin"];

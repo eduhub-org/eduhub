@@ -61,6 +61,7 @@ import {
 import ManageRequestsDialog from './ManageRequestsDialog';
 import PublicationConsentField from './PublicationConsentField';
 import ProjectPreviewLayout from './ProjectPreviewLayout';
+import { projectHref } from '../../../common/TileSlider/projectTileHelpers';
 import ProjectReviewComment from './ProjectReviewComment';
 import ProjectFormFieldSection from './ProjectFormFieldSection';
 import ProjectSubmissionDeadlineBelowTitle from './ProjectSubmissionDeadlineBelowTitle';
@@ -73,6 +74,7 @@ const PROJECT_UPLOAD_MAX_FILE_SIZE = 23_000_000;
 
 interface MyProjectPanelProps {
   project: ProjectRow;
+  courseId: number;
   userId: string;
   /** The viewer was EXCLUDED from this project's final submission (read-only view). */
   isExcludedAuthor?: boolean;
@@ -85,6 +87,7 @@ interface MyProjectPanelProps {
 
 const MyProjectPanel: FC<MyProjectPanelProps> = ({
   project,
+  courseId,
   userId,
   isExcludedAuthor = false,
   courseDefaultSubmissionDeadline,
@@ -504,6 +507,7 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
           <ProjectPreviewLayout
             project={project}
             includeExcludedAuthors
+            projectPageHref={projectHref(project, 'withinCourse', courseId)}
             showResourceLinks={
               shouldShowProjectResourceDownloadLinks(project.status) &&
               Boolean(
@@ -680,6 +684,7 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
           <ProjectPreviewLayout
             project={project}
             includeExcludedAuthors
+            projectPageHref={projectHref(project, 'withinCourse', courseId)}
             showResourceLinks={
               shouldShowProjectResourceDownloadLinks(project.status) &&
               Boolean(
