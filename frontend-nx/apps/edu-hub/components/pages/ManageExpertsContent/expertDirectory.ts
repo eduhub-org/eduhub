@@ -199,14 +199,14 @@ export const highlight = (text: string, words: string[]): TextSegment[] => {
 
 const SNIPPET_CONTEXT = 40;
 
-/** A short excerpt around the first hit, so long descriptions stay readable in a table row. */
-export const snippet = (value: string, words: string[]): string => {
+/** An excerpt around the first hit: `context` characters before it and twice that after it. */
+export const snippet = (value: string, words: string[], context = SNIPPET_CONTEXT): string => {
   const text = plainText(value);
   const lower = text.toLowerCase();
   const first = Math.min(...words.map((word) => lower.indexOf(word)).filter((index) => index >= 0));
-  if (!Number.isFinite(first) || text.length <= 2 * SNIPPET_CONTEXT + 20) return text;
-  const start = Math.max(0, first - SNIPPET_CONTEXT);
-  const end = Math.min(text.length, first + SNIPPET_CONTEXT * 2);
+  if (!Number.isFinite(first) || text.length <= 3 * context + 20) return text;
+  const start = Math.max(0, first - context);
+  const end = Math.min(text.length, first + context * 2);
   return `${start > 0 ? '…' : ''}${text.slice(start, end).trim()}${end < text.length ? '…' : ''}`;
 };
 
@@ -222,7 +222,12 @@ export interface ExpertMatch {
  * case-insensitive "contains" the search condition uses). Person fields come first, then roles,
  * newest first; one entry per role and field.
  */
-export const findMatches = (expert: ExpertsList_User, roles: ExpertRole[], search: string): ExpertMatch[] => {
+export const findMatches = (
+  expert: ExpertsList_User,
+  roles: ExpertRole[],
+  search: string,
+  snippetContext = SNIPPET_CONTEXT
+): ExpertMatch[] => {
   const words = searchWords(search);
   if (!words.length) return [];
 
@@ -235,7 +240,7 @@ export const findMatches = (expert: ExpertsList_User, roles: ExpertRole[], searc
     const id = `${role?.key ?? 'person'}:${field}`;
     if (!found.length || seen.has(id)) return;
     seen.add(id);
-    matches.push({ role, field, snippet: snippet(value, found) });
+    matches.push({ role, field, snippet: snippet(value, found, snippetContext) });
   };
 
   personTexts(expert).forEach(({ field, value }) => check(null, field, value));
@@ -252,6 +257,17 @@ export const findMatches = (expert: ExpertsList_User, roles: ExpertRole[], searc
 export const matchesAllWords = (expert: ExpertsList_User, roles: ExpertRole[], search: string): boolean => {
   const words = searchWords(search);
   if (!words.length) return false;
+  // The server compares with ILIKE, where "_" stands for any one character and "%" for any run.
+  const patterns = words.map(
+    (word) =>
+      new RegExp(
+        word
+          .replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+          .replace(/_/g, '.')
+          .replace(/%/g, '.*'),
+        's'
+      )
+  );
   const texts = [
     expert.firstName,
     expert.lastName,
@@ -262,12 +278,8 @@ export const matchesAllWords = (expert: ExpertsList_User, roles: ExpertRole[], s
   ]
     .filter((value): value is string => Boolean(value))
     .map((value) => value.toLowerCase());
-  return words.every((word) => texts.some((text) => text.includes(word)));
+  return patterns.every((pattern) => texts.some((text) => pattern.test(text)));
 };
-
-/** Roles of a person that hold a search hit, to mark them in the expanded row. */
-export const matchedRoleKeys = (matches: ExpertMatch[]): Set<string> =>
-  new Set(matches.flatMap((match) => (match.role ? [match.role.key] : [])));
 
 export const linkedInSearchUrl = (expert: ExpertsList_User): string => {
   const keywords = [expert.firstName, expert.lastName, organizationOf(expert)].filter(Boolean).join(' ');
@@ -341,14 +353,134 @@ export const sourcesCondition = (matches: SourceMatch[]) => {
   };
 };
 
-/** The role of a person closest in meaning to the search, or null if none of their roles matched. */
-export const closestRole = (
-  roles: ExpertRole[],
-  matches: SourceMatch[]
-): { role: ExpertRole; similarity: number } | null => {
+export interface SimilarRole {
+  role: ExpertRole;
+  similarity: number;
+}
+
+/** The roles of a person the semantic search found, closest in meaning first. */
+export const similarRoles = (roles: ExpertRole[], matches: SourceMatch[]): SimilarRole[] => {
   const similarity = new Map(matches.map((match) => [sourceKey(match.sourceType, match.sourceId), match.similarity]));
-  return roles.reduce<{ role: ExpertRole; similarity: number } | null>((best, role) => {
-    const value = similarity.get(sourceKey(role.source.type, role.source.id));
-    return value !== undefined && (!best || value > best.similarity) ? { role, similarity: value } : best;
-  }, null);
+  return roles
+    .flatMap((role) => {
+      const value = similarity.get(sourceKey(role.source.type, role.source.id));
+      return value === undefined ? [] : [{ role, similarity: value }];
+    })
+    .sort((a, b) => b.similarity - a.similarity);
+};
+
+/** The beginning of a text as plain text, cut at a word near `length` characters. */
+export const leadExcerpt = (value: string | null | undefined, length = 300): string => {
+  const text = plainText(value ?? '');
+  if (text.length <= length) return text;
+  const cut = text.lastIndexOf(' ', length);
+  return `${text.slice(0, cut > length / 2 ? cut : length)}…`;
+};
+
+/** One row of the search results: why the person is in it and how relevant they are. */
+export interface RankedExpert {
+  expert: ExpertsList_User;
+  roles: ExpertRole[];
+  /** Every search word is in one of their searched fields (the keyword search lists them). */
+  keywordHit: boolean;
+  /** Roles close in meaning to the search, best first; empty when only the words matched. */
+  similar: SimilarRole[];
+}
+
+// Reciprocal rank fusion: each list adds 1 / (K + rank). K = 60 is the usual choice; it keeps
+// a person found by both searches above one found by only one, without tuning weights to the
+// different scales of keyword and cosine scores.
+const RRF_K = 60;
+
+// How telling a keyword hit is, by the field it is in: a title says what the role is about, a
+// description may only mention the word.
+const FIELD_WEIGHT: Record<MatchField, number> = {
+  name: 0,
+  email: 0,
+  organization: 1,
+  title: 3,
+  tagline: 2,
+  course_title: 1,
+  description: 1,
+};
+
+/**
+ * The weight of a person's keyword hits. Courses and sessions repeat every semester under the same
+ * title, so roles sharing a title count once, with their strongest hit: giving one talk twice is
+ * not twice the expertise.
+ */
+const keywordStrength = (expert: ExpertsList_User, roles: ExpertRole[], search: string): number => {
+  const perRole = new Map<string, { title: string; weight: number }>();
+  findMatches(expert, roles, search).forEach((match) => {
+    const key = match.role?.key ?? 'person';
+    const title = match.role ? match.role.title.trim().toLowerCase() : 'person';
+    const entry = perRole.get(key) ?? { title, weight: 0 };
+    entry.weight += FIELD_WEIGHT[match.field];
+    perRole.set(key, entry);
+  });
+  const perTitle = new Map<string, number>();
+  perRole.forEach(({ title, weight }) => perTitle.set(title, Math.max(perTitle.get(title) ?? 0, weight)));
+  return Array.from(perTitle.values()).reduce((sum, weight) => sum + weight, 0);
+};
+
+/** Every search word is in the person's name or email: someone searched for them by name. */
+const isPersonHit = (expert: ExpertsList_User, search: string): boolean => {
+  const words = searchWords(search);
+  const text = [expert.firstName, expert.lastName, expert.email].filter(Boolean).join(' ').toLowerCase();
+  return words.length > 0 && words.every((word) => text.includes(word));
+};
+
+/**
+ * One list of the people the keyword and the semantic search found (ADR 0004): someone searched
+ * by name or email comes first; everyone else is ordered by reciprocal rank fusion of their rank
+ * in both searches, then by Last Active.
+ */
+export const rankExperts = (
+  keywordExperts: ExpertsList_User[],
+  similarExperts: ExpertsList_User[],
+  matches: SourceMatch[],
+  search: string
+): RankedExpert[] => {
+  const people = new Map<string, ExpertsList_User>();
+  [...keywordExperts, ...similarExperts].forEach((expert) => people.set(expert.id, expert));
+
+  const candidates = Array.from(people.values()).flatMap((expert) => {
+    const roles = expertRoles(expert);
+    const keywordHit = matchesAllWords(expert, roles, search);
+    const similar = similarRoles(roles, matches);
+    if (!keywordHit && !similar.length) return [];
+    return [
+      {
+        ranked: { expert, roles, keywordHit, similar },
+        personHit: keywordHit && isPersonHit(expert, search),
+        strength: keywordHit ? keywordStrength(expert, roles, search) : 0,
+        active: lastActive(roles)?.getTime() ?? 0,
+      },
+    ];
+  });
+
+  const rankBy = (subset: typeof candidates, value: (candidate: (typeof candidates)[number]) => number) =>
+    new Map(
+      [...subset]
+        .sort((a, b) => value(b) - value(a) || b.active - a.active)
+        .map((candidate, index) => [candidate.ranked.expert.id, index + 1])
+    );
+  const keywordRank = rankBy(
+    candidates.filter((candidate) => candidate.ranked.keywordHit),
+    (candidate) => candidate.strength
+  );
+  const semanticRank = rankBy(
+    candidates.filter((candidate) => candidate.ranked.similar.length > 0),
+    (candidate) => candidate.ranked.similar[0].similarity
+  );
+  const fused = (id: string) =>
+    [keywordRank.get(id), semanticRank.get(id)].reduce<number>(
+      (sum, rank) => (rank === undefined ? sum : sum + 1 / (RRF_K + rank)),
+      0
+    );
+
+  return candidates
+    .map((candidate) => ({ ...candidate, score: fused(candidate.ranked.expert.id) }))
+    .sort((a, b) => Number(b.personHit) - Number(a.personHit) || b.score - a.score || b.active - a.active)
+    .map((candidate) => candidate.ranked);
 };

@@ -62,12 +62,20 @@ semantic search (phase 2) covers finding people by topic.
   production runs in, stored with `pgvector`. The cron trigger
   `sync_expert_embeddings` (node function `syncExpertEmbeddings`) keeps the
   vectors in step nightly and backfills on its first runs; new courses and
-  sessions show up among similar experts the next day.
-- **Hybrid results**: the table keeps the keyword hits; below it,
-  **Similar Experts** lists up to 20 people whose roles are close in meaning to
-  the search but who did not match its words, each with the role they are
-  similar to and a percentage. The action `semanticExpertSearch` only returns
-  source ids, so org admins still only see the experts of their own courses.
+  sessions show up in semantic matches the next day.
+- **Hybrid results, one ranked list**: a search of three or more characters
+  shows the people whose fields hold every search word (up to 300 for admins,
+  100 for org admins, the most recently active first) together with the
+  people behind the 200 roles closest in meaning, ranked in the browser. A
+  search for a name or email comes first; everyone else is ordered by
+  reciprocal rank fusion (k = 60) of their keyword rank (title hits weigh
+  more than description hits, and a title repeated across semesters counts
+  once) and their semantic rank, then by Last Active.
+  A Match column says whether a row matched by keyword, by meaning (with the
+  similarity) or both; the expanded row shows the keyword excerpts and the
+  closest similar roles. Shorter searches keep the server-paged keyword table.
+  The action `semanticExpertSearch` only returns source ids, so org admins
+  still only see the experts of their own courses.
 - Configuration of `callNodeFunction`: `EMBEDDING_PROVIDER` (`vertex`, `fake`
   for local development, or empty to turn it off), `EMBEDDING_LOCATION`,
   optional `EMBEDDING_PROJECT_ID`, `EMBEDDING_MODEL` and

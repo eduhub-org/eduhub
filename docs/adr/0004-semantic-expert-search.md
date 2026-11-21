@@ -22,8 +22,12 @@ setup yet.
    agreement is needed. The model must handle German and English.
 4. **Storage: `pgvector`** in the existing Postgres database (supported on
    Cloud SQL).
-5. **Hybrid results:** exact keyword hits first, then semantic hits labelled
-   "similar". Without a search the directory keeps its Last Active order.
+5. **Hybrid results in one ranked list:** a name or email hit first, then
+   keyword and semantic candidates merged by reciprocal rank fusion, each row
+   labelled with why it matched. Keyword search alone is ambiguous for topics
+   and semantic search alone misses exact terms; ranking both together beat
+   listing similar experts below a paged keyword table, where nobody saw
+   them. Without a search the directory keeps its Last Active order.
 6. **Freshness:** a Hasura cron trigger (`sync_expert_embeddings`, nightly at
    02:00 UTC) embeds new or changed sources for up to two minutes per run and
    drops vectors of removed sources or of another model. The view `ExpertRoleSource` marks
