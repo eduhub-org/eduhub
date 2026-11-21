@@ -270,10 +270,6 @@ export const matchesAllWords = (expert: ExpertsList_User, roles: ExpertRole[], s
   return words.every((word) => texts.some((text) => text.includes(word)));
 };
 
-/** Roles of a person that hold a search hit, to mark them in the expanded row. */
-export const matchedRoleKeys = (matches: ExpertMatch[]): Set<string> =>
-  new Set(matches.flatMap((match) => (match.role ? [match.role.key] : [])));
-
 export const linkedInSearchUrl = (expert: ExpertsList_User): string => {
   const keywords = [expert.firstName, expert.lastName, organizationOf(expert)].filter(Boolean).join(' ');
   return `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(keywords)}`;
@@ -346,14 +342,118 @@ export const sourcesCondition = (matches: SourceMatch[]) => {
   };
 };
 
-/** The role of a person closest in meaning to the search, or null if none of their roles matched. */
-export const closestRole = (
-  roles: ExpertRole[],
-  matches: SourceMatch[]
-): { role: ExpertRole; similarity: number } | null => {
+export interface SimilarRole {
+  role: ExpertRole;
+  similarity: number;
+}
+
+/** The roles of a person the semantic search found, closest in meaning first. */
+export const similarRoles = (roles: ExpertRole[], matches: SourceMatch[]): SimilarRole[] => {
   const similarity = new Map(matches.map((match) => [sourceKey(match.sourceType, match.sourceId), match.similarity]));
-  return roles.reduce<{ role: ExpertRole; similarity: number } | null>((best, role) => {
-    const value = similarity.get(sourceKey(role.source.type, role.source.id));
-    return value !== undefined && (!best || value > best.similarity) ? { role, similarity: value } : best;
-  }, null);
+  return roles
+    .flatMap((role) => {
+      const value = similarity.get(sourceKey(role.source.type, role.source.id));
+      return value === undefined ? [] : [{ role, similarity: value }];
+    })
+    .sort((a, b) => b.similarity - a.similarity);
+};
+
+/** The beginning of a text as plain text, cut at a word near `length` characters. */
+export const leadExcerpt = (value: string | null | undefined, length = 300): string => {
+  const text = plainText(value ?? '');
+  if (text.length <= length) return text;
+  const cut = text.lastIndexOf(' ', length);
+  return `${text.slice(0, cut > length / 2 ? cut : length)}…`;
+};
+
+/** One row of the search results: why the person is in it and how relevant they are. */
+export interface RankedExpert {
+  expert: ExpertsList_User;
+  roles: ExpertRole[];
+  /** Every search word is in one of their searched fields (the keyword search lists them). */
+  keywordHit: boolean;
+  /** Roles close in meaning to the search, best first; empty when only the words matched. */
+  similar: SimilarRole[];
+}
+
+// Reciprocal rank fusion: each list adds 1 / (K + rank). K = 60 is the usual choice; it keeps
+// a person found by both searches above one found by only one, without tuning weights to the
+// different scales of keyword and cosine scores.
+const RRF_K = 60;
+
+// How telling a keyword hit is, by the field it is in: a title says what the role is about, a
+// description may only mention the word.
+const FIELD_WEIGHT: Record<MatchField, number> = {
+  name: 0,
+  email: 0,
+  organization: 1,
+  title: 3,
+  tagline: 2,
+  course_title: 1,
+  description: 1,
+};
+
+const keywordStrength = (expert: ExpertsList_User, roles: ExpertRole[], search: string): number =>
+  findMatches(expert, roles, search).reduce((sum, match) => sum + FIELD_WEIGHT[match.field], 0);
+
+/** Every search word is in the person's name or email: someone searched for them by name. */
+const isPersonHit = (expert: ExpertsList_User, search: string): boolean => {
+  const words = searchWords(search);
+  const text = [expert.firstName, expert.lastName, expert.email].filter(Boolean).join(' ').toLowerCase();
+  return words.length > 0 && words.every((word) => text.includes(word));
+};
+
+/**
+ * One list of the people the keyword and the semantic search found (ADR 0004): someone searched
+ * by name or email comes first; everyone else is ordered by reciprocal rank fusion of their rank
+ * in both searches, then by Last Active.
+ */
+export const rankExperts = (
+  keywordExperts: ExpertsList_User[],
+  similarExperts: ExpertsList_User[],
+  matches: SourceMatch[],
+  search: string
+): RankedExpert[] => {
+  const people = new Map<string, ExpertsList_User>();
+  [...keywordExperts, ...similarExperts].forEach((expert) => people.set(expert.id, expert));
+
+  const candidates = Array.from(people.values()).flatMap((expert) => {
+    const roles = expertRoles(expert);
+    const keywordHit = matchesAllWords(expert, roles, search);
+    const similar = similarRoles(roles, matches);
+    if (!keywordHit && !similar.length) return [];
+    return [
+      {
+        ranked: { expert, roles, keywordHit, similar },
+        personHit: keywordHit && isPersonHit(expert, search),
+        strength: keywordHit ? keywordStrength(expert, roles, search) : 0,
+        active: lastActive(roles)?.getTime() ?? 0,
+      },
+    ];
+  });
+
+  const rankBy = (subset: typeof candidates, value: (candidate: (typeof candidates)[number]) => number) =>
+    new Map(
+      [...subset]
+        .sort((a, b) => value(b) - value(a) || b.active - a.active)
+        .map((candidate, index) => [candidate.ranked.expert.id, index + 1])
+    );
+  const keywordRank = rankBy(
+    candidates.filter((candidate) => candidate.ranked.keywordHit),
+    (candidate) => candidate.strength
+  );
+  const semanticRank = rankBy(
+    candidates.filter((candidate) => candidate.ranked.similar.length > 0),
+    (candidate) => candidate.ranked.similar[0].similarity
+  );
+  const fused = (id: string) =>
+    [keywordRank.get(id), semanticRank.get(id)].reduce<number>(
+      (sum, rank) => (rank === undefined ? sum : sum + 1 / (RRF_K + rank)),
+      0
+    );
+
+  return candidates
+    .map((candidate) => ({ ...candidate, score: fused(candidate.ranked.expert.id) }))
+    .sort((a, b) => Number(b.personHit) - Number(a.personHit) || b.score - a.score || b.active - a.active)
+    .map((candidate) => candidate.ranked);
 };

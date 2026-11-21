@@ -95,6 +95,28 @@ describe('ExpandableExpertRow', () => {
     expect(screen.getByText('MVP')).toBeInTheDocument();
   });
 
+  it('explains roles found by meaning with their similarity and what they are about', () => {
+    const roles = expertRoles(expert);
+    render(
+      <ExpandableExpertRow
+        expert={expert}
+        roles={roles}
+        search="geld beschaffen"
+        similar={[{ role: roles.find((role) => role.title === 'Startup Finanzierung')!, similarity: 0.78 }]}
+        currentUserId="me"
+        isAdmin
+        noteOrganizations={[]}
+        onChanged={jest.fn()}
+        onError={jest.fn()}
+      />
+    );
+
+    expect(screen.getAllByRole('heading')[0].textContent).toContain('matches_headline');
+    expect(screen.getByText('Startup Finanzierung')).toBeInTheDocument();
+    expect(screen.getByText('similar_role {"percent":78}')).toBeInTheDocument();
+    expect(screen.getByText(/Wie finanziere ich ein Startup/)).toBeInTheDocument();
+  });
+
   it('shows the newest involvements without a search', () => {
     renderRow('');
 

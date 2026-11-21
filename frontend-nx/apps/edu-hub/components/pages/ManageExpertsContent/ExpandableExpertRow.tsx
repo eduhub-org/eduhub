@@ -6,7 +6,15 @@ import { QuestionConfirmationDialog } from '../../common/dialogs/QuestionConfirm
 import { useRoleMutation } from '../../../hooks/authedMutation';
 import { SET_DO_NOT_CONTACT } from '../../../queries/experts';
 import { ExpertsList_User } from '../../../queries/__generated__/ExpertsList';
-import { ExpertMatch, ExpertRole, findMatches, highlight, searchWords } from './expertDirectory';
+import {
+  ExpertMatch,
+  ExpertRole,
+  SimilarRole,
+  findMatches,
+  highlight,
+  leadExcerpt,
+  searchWords,
+} from './expertDirectory';
 import { ExpertNotes, NoteOrganization } from './ExpertNotes';
 
 interface ExpandableExpertRowProps {
@@ -14,6 +22,8 @@ interface ExpandableExpertRowProps {
   roles: ExpertRole[];
   /** The search the table shows; its hits are listed first, with readable excerpts. */
   search: string;
+  /** Roles the semantic search found close in meaning to the search, best first. */
+  similar?: SimilarRole[];
   currentUserId: string | undefined;
   isAdmin: boolean;
   noteOrganizations: NoteOrganization[];
@@ -25,12 +35,19 @@ interface ExpandableExpertRowProps {
 const EXCERPT_CONTEXT = 160;
 // Without a search, the newest involvements are shown and the rest stay collapsed.
 const SHOWN_WITHOUT_SEARCH = 5;
+// Roles similar in meaning, beyond the keyword hits: the closest few explain the result.
+const SIMILAR_SHOWN = 3;
 
 const Highlighted: FC<{ text: string; words: string[] }> = ({ text, words }) => (
   <>
     {highlight(text, words).map((segment, index) =>
+      // The brand colour is a CSS variable, so Tailwind cannot tint a background with it (bg-brand/20
+      // leaves the browser's yellow); an underline in the brand colour marks the hit instead.
       segment.hit ? (
-        <mark key={index} className="rounded-sm bg-brand/20 px-0.5 font-semibold text-label-primary">
+        <mark
+          key={index}
+          className="bg-transparent font-semibold text-label-primary underline decoration-brand decoration-2 underline-offset-2"
+        >
           {segment.text}
         </mark>
       ) : (
@@ -78,10 +95,26 @@ const MatchGroup: FC<{ role: ExpertRole | null; matches: ExpertMatch[]; words: s
   );
 };
 
+/** A role close in meaning to the search: how close, and what it is about. */
+const SimilarGroup: FC<SimilarRole> = ({ role, similarity }) => {
+  const t = useTranslations('manageExperts');
+  const about = role.texts.find(({ field, value }) => field !== 'title' && field !== 'course_title' && value)?.value;
+  return (
+    <li className="rounded-lg border border-border-primary p-3">
+      <RoleLine role={role} />
+      <div className="mt-1 text-xs uppercase tracking-wide text-label-secondary">
+        {t('similar_role', { percent: Math.round(similarity * 100) })}
+      </div>
+      {about && <p className="mt-1 text-sm leading-relaxed text-label-primary">{leadExcerpt(about)}</p>}
+    </li>
+  );
+};
+
 export const ExpandableExpertRow: FC<ExpandableExpertRowProps> = ({
   expert,
   roles,
   search,
+  similar = [],
   currentUserId,
   isAdmin,
   noteOrganizations,
@@ -106,7 +139,10 @@ export const ExpandableExpertRow: FC<ExpandableExpertRowProps> = ({
     return Array.from(groups.values());
   }, [expert, roles, search]);
 
-  const matchedKeys = new Set(matchGroups.flatMap((group) => (group.role ? [group.role.key] : [])));
+  const keywordKeys = new Set(matchGroups.flatMap((group) => (group.role ? [group.role.key] : [])));
+  const similarGroups = similar.filter(({ role }) => !keywordKeys.has(role.key)).slice(0, SIMILAR_SHOWN);
+  const hasHits = matchGroups.length > 0 || similarGroups.length > 0;
+  const matchedKeys = new Set([...keywordKeys, ...similarGroups.map(({ role }) => role.key)]);
   const otherRoles = roles.filter((role) => !matchedKeys.has(role.key));
   // With a search the other involvements are context only, so they start collapsed.
   const collapsedByDefault = words.length > 0 ? 0 : SHOWN_WITHOUT_SEARCH;
@@ -138,12 +174,15 @@ export const ExpandableExpertRow: FC<ExpandableExpertRowProps> = ({
         </div>
       )}
 
-      {matchGroups.length > 0 && (
+      {hasHits && (
         <section>
           <h4 className="font-medium mb-2">{t('matches_headline', { search: search.trim() })}</h4>
           <ul className="flex flex-col gap-2">
             {matchGroups.map((group) => (
               <MatchGroup key={group.role?.key ?? 'person'} role={group.role} matches={group.matches} words={words} />
+            ))}
+            {similarGroups.map((group) => (
+              <SimilarGroup key={group.role.key} {...group} />
             ))}
           </ul>
         </section>
@@ -160,7 +199,7 @@ export const ExpandableExpertRow: FC<ExpandableExpertRowProps> = ({
       />
 
       <section>
-        <h4 className="font-medium mb-2">{matchGroups.length > 0 ? t('involvements_other') : t('involvements')}</h4>
+        <h4 className="font-medium mb-2">{hasHits ? t('involvements_other') : t('involvements')}</h4>
         {roles.length === 0 && <p className="text-label-secondary text-sm">{t('no_roles')}</p>}
         {visibleRoles.length > 0 && (
           <ul className="flex flex-col divide-y divide-border-primary">
