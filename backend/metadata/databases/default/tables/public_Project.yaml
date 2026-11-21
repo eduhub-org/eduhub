@@ -596,6 +596,7 @@ event_triggers:
       update:
         columns:
           - status
+          - projectReviewRequestedAt
     retry_conf:
       interval_sec: 3660
       num_retries: 10

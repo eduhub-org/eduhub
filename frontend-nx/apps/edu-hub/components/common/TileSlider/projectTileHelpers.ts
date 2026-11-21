@@ -36,7 +36,7 @@ export const projectMentorName = (project: ProjectTileFragment): string | null =
 };
 
 export const projectHref = (
-  project: ProjectTileFragment,
+  project: Pick<ProjectTileFragment, 'id'>,
   context: ProjectTileContext,
   courseId?: number
 ): string =>

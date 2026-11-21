@@ -85,6 +85,7 @@ import {
 } from '../../../CourseContent/Projects/projectStatusDisplay';
 import { IoIosCheckmarkCircle, IoIosCloseCircle } from 'react-icons/io';
 import ProjectPreviewLayout from '../../../CourseContent/Projects/ProjectPreviewLayout';
+import { projectHref } from '../../../../common/TileSlider/projectTileHelpers';
 import ProjectReviewComment from '../../../CourseContent/Projects/ProjectReviewComment';
 import ProjectFormFieldSection from '../../../CourseContent/Projects/ProjectFormFieldSection';
 import ProjectSubmissionDeadlineBelowTitle from '../../../CourseContent/Projects/ProjectSubmissionDeadlineBelowTitle';
@@ -928,6 +929,7 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
                   project={row}
                   showResourceLinks={showResourceLinks}
                   includeExcludedAuthors
+                  projectPageHref={projectHref(row, 'withinCourse', courseId)}
                   titleRow={
                     <div className="flex flex-wrap items-start gap-2 mb-1 w-full">
                       <div className="min-w-0 flex-1">
@@ -1073,7 +1075,12 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
               refetchQueries={REFETCH_QUERIES}
             />
             <div className="rounded-lg border border-border-primary p-3 bg-bg-secondary/20">
-              <ProjectPreviewLayout project={row} showResourceLinks={showResourceLinks} includeExcludedAuthors />
+              <ProjectPreviewLayout
+                project={row}
+                showResourceLinks={showResourceLinks}
+                includeExcludedAuthors
+                projectPageHref={projectHref(row, 'withinCourse', courseId)}
+              />
             </div>
           </div>
 
@@ -1090,6 +1097,7 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
       );
     },
     [
+      courseId,
       documentationInstructionsWithPdf,
       handleCoverUploadError,
       handleRemoveMentor,

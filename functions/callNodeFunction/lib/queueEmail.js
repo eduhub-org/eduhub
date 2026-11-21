@@ -19,6 +19,10 @@ import { escapeHtml } from './emailTemplateVariables.js';
  *   addition to the template's own bcc, for recipients that are not a property
  *   of the template but of the request (e.g. a per-portal contact address). It
  *   is still subject to the guest copy rules below.
+ * @param {boolean} params.includeTemplateCopies - Whether to add the template's
+ *   own cc/bcc (default true). A caller sending one event to several
+ *   recipients passes false for all but the first, so a copy address gets the
+ *   event once rather than once per recipient.
  * @param {Object|null} params.metadata - Optional jsonb written to
  *   MailLog.metadata, for callers that need to recognise their own mails later
  *   (deduplication, rate limiting). Note the partial unique index
@@ -34,6 +38,7 @@ async function queueEmail({
   courseId = null,
   recipientUser = null,
   extraBcc = null,
+  includeTemplateCopies = true,
   metadata = null,
   client,
   logger
@@ -214,11 +219,11 @@ async function queueEmail({
     if (extraBcc && !validExtraBcc) {
       logger.error('Ignoring an extraBcc value that is not a single valid email address');
     }
-    const templateBcc = [template.bcc, validExtraBcc]
+    const templateBcc = [includeTemplateCopies ? template.bcc : null, validExtraBcc]
       .filter((address) => address && String(address).trim() !== '')
       .join(',');
     const copies = guestSafeCopyRecipients(recipientUser, {
-      cc: template.cc,
+      cc: includeTemplateCopies ? template.cc : null,
       bcc: templateBcc || null,
     });
 

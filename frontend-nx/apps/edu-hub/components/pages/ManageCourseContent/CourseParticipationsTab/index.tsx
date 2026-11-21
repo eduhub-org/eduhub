@@ -1,6 +1,6 @@
 import { ApolloError, QueryResult } from '@apollo/client';
 import { useTranslations } from 'next-intl';
-import { FC, ReactNode, useCallback, useMemo, useState, type JSX } from 'react';
+import { FC, ReactNode, useCallback, useEffect, useMemo, useState, type JSX } from 'react';
 import { useIsAdmin, useIsInstructor } from '../../../../hooks/authentication';
 import { useManagementRoleContext } from '../../../../hooks/managementRole';
 import { AuthRoles, ProgramType } from '../../../../types/enums';
@@ -127,6 +127,12 @@ function getAttendanceStatus(
 const abortMailTemplate = enrollmentStatusMailTemplate({ oldStatus: 'CONFIRMED', newStatus: 'ABORTED' });
 
 export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ course, qResult }) => {
+  // Project emails to instructors and mentors link to `#projects`.
+  useEffect(() => {
+    if (window.location.hash === '#projects') {
+      document.getElementById('projects')?.scrollIntoView({ block: 'start' });
+    }
+  }, []);
   const t = useTranslations('manageCourse');
   const displayDate = useDisplayDate();
   const tCommon = useTranslations('common');
@@ -949,7 +955,7 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
 
   return (
     <div className="flex flex-col gap-10">
-      <section className="space-y-3 rounded-lg border border-border-primary bg-bg-secondary/40 p-4 sm:p-5">
+      <section id="projects" className="scroll-mt-24 space-y-3 rounded-lg border border-border-primary bg-bg-secondary/40 p-4 sm:p-5">
         <header className="border-b border-border-primary pb-3">
           <h2 className="text-lg font-semibold text-label-primary tracking-tight">
             {t('participations_tab_projects_heading')}

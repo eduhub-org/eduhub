@@ -7,6 +7,10 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
 import { AuthRoles } from '../../../types/enums';
+import { ProjectParticipationStatus_enum } from '../../../__generated__/globalTypes';
+import { useRoleQuery } from '../../../hooks/authedQuery';
+import { useCurrentRole, useIsLoggedIn, useIsSessionLoading } from '../../../hooks/authentication';
+import { LoginButton } from '../../layout/LoginButton';
 import { PROJECT_PAGE, SIMILAR_PROJECT_TILES } from '../../../queries/projectPage';
 import { ProjectPage, ProjectPageVariables } from '../../../queries/__generated__/ProjectPage';
 import {
@@ -19,7 +23,7 @@ import { Button } from '../../common/Button';
 import TileSlider from '../../common/TileSlider';
 import { ProjectTile } from '../../common/TileSlider/ProjectTile';
 import { BadgeBanner, pickPrimaryBadge } from '../../common/badges/ProjectBadges';
-import { isOpenTemplate, isProjectPublished } from '../CourseContent/Projects/projectStatusDisplay';
+import { isOpenTemplate } from '../CourseContent/Projects/projectStatusDisplay';
 import { Avatar } from '../../shared-components';
 
 export type ProjectPageContext = 'public' | 'withinCourse';
@@ -36,11 +40,24 @@ const ProjectContent: FC<ProjectContentProps> = ({ id, context, courseId }) => {
   const t = useTranslations('project');
   const locale = useLocale();
   const anonymous = { role: AuthRoles.anonymous };
+  const role = useCurrentRole();
+  const isLoggedIn = useIsLoggedIn();
+  const sessionLoading = useIsSessionLoading();
 
-  const { data, loading, error } = useQuery<ProjectPage, ProjectPageVariables>(PROJECT_PAGE, {
+  // Read the project with the visitor's own role: logged-out visitors see
+  // published projects and open templates, logged-in ones also every project
+  // they can see in its course (team, proposer, mentors, instructors,
+  // participants). Wait for the session so the role is known.
+  const {
+    data,
+    loading: projectLoading,
+    error,
+  } = useRoleQuery<ProjectPage, ProjectPageVariables>(PROJECT_PAGE, {
     variables: { id },
-    context: anonymous,
+    context: { role },
+    skip: sessionLoading,
   });
+  const loading = sessionLoading || projectLoading;
 
   const project: ProjectPageFragment | undefined = data?.Project?.[0];
 
@@ -102,16 +119,24 @@ const ProjectContent: FC<ProjectContentProps> = ({ id, context, courseId }) => {
   if (!project) {
     return (
       <div className="flex justify-center max-w-screen-xl mx-auto w-full pt-32">
-        <div className="text-white">{t('not_found')}</div>
+        <div className="flex flex-col items-center gap-6 text-white">
+          <div>{isLoggedIn ? t('not_found_or_no_access') : t('not_found_logged_out')}</div>
+          {!isLoggedIn && <LoginButton />}
+        </div>
       </div>
     );
   }
 
-  // A published showcase renders the showcase layout; an open template (even a
-  // published one, e.g. a showcased template) keeps the template + join layout.
-  const showcase = isProjectPublished(project) && !isOpenTemplate(project);
+  // Only an open template (even a published one) gets the template + join
+  // layout. Every other project a visitor can see (a published showcase, or a
+  // team's project shown to its team, mentors, instructors and course
+  // participants) gets the project layout, without a join action.
+  const projectLayout = !isOpenTemplate(project);
   const mentor = project.ProjectMentors[0]?.User;
-  const team = project.ProjectAuthors;
+  // Logged-in visitors also receive requested/declined/excluded authors.
+  const team = project.ProjectAuthors.filter(
+    (author) => author.participationStatus === ProjectParticipationStatus_enum.ACCEPTED
+  );
   // Only the course name is shown (program / term intentionally omitted).
   const courseLine = course ? course.title : project.Organization?.name ?? '';
   const primaryBadge = pickPrimaryBadge(project.ProjectBadges);
@@ -137,8 +162,8 @@ const ProjectContent: FC<ProjectContentProps> = ({ id, context, courseId }) => {
     </ReactMarkdown>
   ) : null;
 
-  // -------- Published showcase layout (V1) --------
-  if (showcase) {
+  // -------- Project layout: published showcase or team project (V1) --------
+  if (projectLayout) {
     return (
       <div className="text-white">
         <div

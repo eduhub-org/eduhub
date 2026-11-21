@@ -1,6 +1,7 @@
 import { FC, ReactNode } from 'react';
+import Link from 'next/link';
 import { useTranslations } from 'next-intl';
-import { MdDownload, MdOpenInNew } from 'react-icons/md';
+import { MdArrowForward, MdDownload, MdOpenInNew } from 'react-icons/md';
 import UserCard from '../../../common/UserCard';
 import { Button } from '../../../common/Button';
 import { ProjectRow } from './types';
@@ -31,6 +32,8 @@ interface ProjectPreviewLayoutProps {
    * (instructors/admins) and the excluded author's own "My Project" view.
    */
   includeExcludedAuthors?: boolean;
+  /** Optional: link to the project's own page (e.g. to share it or reach it after the course). */
+  projectPageHref?: string;
 }
 
 const ProjectPreviewLayout: FC<ProjectPreviewLayoutProps> = ({
@@ -41,6 +44,7 @@ const ProjectPreviewLayout: FC<ProjectPreviewLayoutProps> = ({
   taglineSlot,
   descriptionSlot,
   includeExcludedAuthors = false,
+  projectPageHref,
 }) => {
   const t = useTranslations('course');
 
@@ -196,6 +200,16 @@ const ProjectPreviewLayout: FC<ProjectPreviewLayoutProps> = ({
             </Button>
           ) : null}
         </div>
+      ) : null}
+
+      {projectPageHref ? (
+        <Link
+          href={projectPageHref}
+          className="inline-flex w-fit items-center gap-1 text-sm font-medium text-brand hover:underline"
+        >
+          {t('projects.table.open_project_page')}
+          <MdArrowForward className="shrink-0" aria-hidden />
+        </Link>
       ) : null}
     </div>
   );

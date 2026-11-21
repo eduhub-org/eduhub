@@ -288,6 +288,18 @@ describe('Email Template Variables System', () => {
       expect(result).toBe('Hi Bob, Eve &lt;x&gt; joins &lt;b&gt;Solar&lt;/b&gt; &amp; Co at https://test.example.com/project/99');
     });
 
+    it('should point [Project:Link] at the requested place', () => {
+      process.env.FRONTEND_URL = 'https://test.example.com';
+      const link = (extra) =>
+        createProjectVariableReplacer({ id: 99, title: 'Solar' }, {}, extra)('[Project:Link]');
+
+      expect(link({ courseId: 42, linkTarget: 'course' })).toBe('https://test.example.com/course/42#projects');
+      expect(link({ courseId: 42, linkTarget: 'manage' })).toBe('https://test.example.com/manage/course/42#projects');
+      expect(link({ courseId: 42 })).toBe('https://test.example.com/project/99');
+      // Without a course there is no projects section to link to.
+      expect(link({ linkTarget: 'course' })).toBe('https://test.example.com/project/99');
+    });
+
     it('should render the review comment as a labelled block', () => {
       const replacer = createProjectVariableReplacer(
         { id: 3, title: 'Solar', ratingComment: 'Bitte die Quellen ergänzen.\nDanke!' },
