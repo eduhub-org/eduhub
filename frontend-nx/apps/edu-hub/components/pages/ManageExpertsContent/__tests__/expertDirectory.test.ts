@@ -323,6 +323,25 @@ describe('rankExperts', () => {
     expect(ranked.map((row) => row.expert.id)).toEqual(['newer', 'title', 'text']);
   });
 
+  it('counts a title repeated across semesters once', () => {
+    // The same course given in three semesters (3 title hits) against two different courses.
+    const repeated = person('rep', 'Rea', 'Robotics', 1, '2025-01-01');
+    repeated.CourseInstructors = [1, 2, 3].map((id) => ({
+      ...repeated.CourseInstructors[0],
+      id,
+      Course: { ...repeated.CourseInstructors[0].Course, id },
+    }));
+    const varied = person('var', 'Val', 'Robotics', 4, '2020-01-01');
+    varied.CourseInstructors = [
+      ...varied.CourseInstructors,
+      { ...varied.CourseInstructors[0], id: 5, Course: { ...varied.CourseInstructors[0].Course, id: 5, title: 'Robotics Lab' } },
+    ];
+
+    const ranked = rankExperts([repeated, varied], [], [], 'robotics');
+
+    expect(ranked.map((row) => row.expert.id)).toEqual(['var', 'rep']);
+  });
+
   it('leaves out people that neither search found', () => {
     expect(rankExperts([person('x', 'Xu', 'Pottery', 1)], [], [], 'robotics')).toEqual([]);
   });

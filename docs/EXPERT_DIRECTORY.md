@@ -69,7 +69,8 @@ semantic search (phase 2) covers finding people by topic.
   people behind the 200 roles closest in meaning, ranked in the browser. A
   search for a name or email comes first; everyone else is ordered by
   reciprocal rank fusion (k = 60) of their keyword rank (title hits weigh
-  more than description hits) and their semantic rank, then by Last Active.
+  more than description hits, and a title repeated across semesters counts
+  once) and their semantic rank, then by Last Active.
   A Match column says whether a row matched by keyword, by meaning (with the
   similarity) or both; the expanded row shows the keyword excerpts and the
   closest similar roles. Shorter searches keep the server-paged keyword table.

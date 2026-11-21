@@ -393,8 +393,24 @@ const FIELD_WEIGHT: Record<MatchField, number> = {
   description: 1,
 };
 
-const keywordStrength = (expert: ExpertsList_User, roles: ExpertRole[], search: string): number =>
-  findMatches(expert, roles, search).reduce((sum, match) => sum + FIELD_WEIGHT[match.field], 0);
+/**
+ * The weight of a person's keyword hits. Courses and sessions repeat every semester under the same
+ * title, so roles sharing a title count once, with their strongest hit: giving one talk twice is
+ * not twice the expertise.
+ */
+const keywordStrength = (expert: ExpertsList_User, roles: ExpertRole[], search: string): number => {
+  const perRole = new Map<string, { title: string; weight: number }>();
+  findMatches(expert, roles, search).forEach((match) => {
+    const key = match.role?.key ?? 'person';
+    const title = match.role ? match.role.title.trim().toLowerCase() : 'person';
+    const entry = perRole.get(key) ?? { title, weight: 0 };
+    entry.weight += FIELD_WEIGHT[match.field];
+    perRole.set(key, entry);
+  });
+  const perTitle = new Map<string, number>();
+  perRole.forEach(({ title, weight }) => perTitle.set(title, Math.max(perTitle.get(title) ?? 0, weight)));
+  return Array.from(perTitle.values()).reduce((sum, weight) => sum + weight, 0);
+};
 
 /** Every search word is in the person's name or email: someone searched for them by name. */
 const isPersonHit = (expert: ExpertsList_User, search: string): boolean => {
