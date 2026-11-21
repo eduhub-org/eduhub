@@ -27,20 +27,20 @@ import {
   EXPERT_SEARCH_FIELDS,
   ExpertMatch,
   ExpertRole,
+  SimilarRole,
   expertCsvRows,
   expertRoles,
   findMatches,
   highlight,
   lastActive,
   mailtoBcc,
-  matchedRoleKeys,
   noteOrganizationsFor,
   organizationOf,
   searchWords,
 } from './expertDirectory';
 import { ExpandableExpertRow } from './ExpandableExpertRow';
 import { ExpertContactActions } from './ExpertContactActions';
-import { SimilarExperts } from './SimilarExperts';
+import { useRankedExperts } from './useRankedExperts';
 
 /** Roles held in a course of a program of an organization the viewer administers. */
 const orgAdminScope = (userId: string) => {
@@ -76,7 +76,25 @@ interface ExpertView {
   roles: ExpertRole[];
   matches: ExpertMatch[];
   lastActive: Date | null;
+  /** Only in the ranked search results. */
+  keywordHit: boolean;
+  similar: SimilarRole[];
 }
+
+/** Why a person is in the ranked search results: their words, their meaning, or both. */
+const Relevance: FC<{ view: ExpertView | undefined }> = ({ view }) => {
+  const t = useTranslations('manageExperts');
+  if (!view) return null;
+  const badge = 'whitespace-nowrap rounded-full border border-border-primary px-2 py-0.5 text-xs';
+  return (
+    <div className="flex flex-wrap gap-1">
+      {view.keywordHit && <span className={badge}>{t('relevance_keyword')}</span>}
+      {view.similar.length > 0 && (
+        <span className={badge}>{t('relevance_similar', { percent: Math.round(view.similar[0].similarity * 100) })}</span>
+      )}
+    </div>
+  );
+};
 
 const MatchLine: FC<{ matches: ExpertMatch[]; words: string[] }> = ({ matches, words }) => {
   const t = useTranslations('manageExperts');
@@ -157,25 +175,52 @@ const ManageExpertsContent: FC = () => {
     [organizationData]
   );
 
-  const words = useMemo(() => searchWords(searchFilter), [searchFilter]);
-  // The table's search is debounced the same way, so both lists answer the same search.
+  // Debounced like the table's own query, so rows and their explanations answer the same search.
   const [debouncedSearch] = useDebounce(searchFilter, 300);
-  const experts = useMemo(() => typedData?.User ?? [], [typedData]);
+  const words = useMemo(() => searchWords(debouncedSearch), [debouncedSearch]);
+  const defaultSort = isAdmin ? ADMIN_DEFAULT_SORT : ORG_ADMIN_DEFAULT_SORT;
+  // A search of a few letters filters the server-paged table; a longer one shows the keyword and
+  // semantic hits as one list ranked by relevance, paged in the browser.
+  const ranked = useRankedExperts({
+    search: debouncedSearch,
+    isAdmin,
+    scope: queryVariables.scope,
+    orderBy: defaultSort,
+  });
+
+  const experts = useMemo(
+    () => (ranked.active ? ranked.rows.map((row) => row.expert) : typedData?.User ?? []),
+    [ranked.active, ranked.rows, typedData]
+  );
   const views = useMemo(() => {
     const result = new Map<string, ExpertView>();
-    experts.forEach((expert) => {
+    if (ranked.active) {
+      ranked.rows.forEach(({ expert, roles, keywordHit, similar }) => {
+        const matches = keywordHit ? findMatches(expert, roles, debouncedSearch) : [];
+        result.set(expert.id, { roles, matches, lastActive: lastActive(roles), keywordHit, similar });
+      });
+      return result;
+    }
+    (typedData?.User ?? []).forEach((expert) => {
       const roles = expertRoles(expert);
-      result.set(expert.id, { roles, matches: findMatches(expert, roles, searchFilter), lastActive: lastActive(roles) });
+      const matches = findMatches(expert, roles, debouncedSearch);
+      result.set(expert.id, { roles, matches, lastActive: lastActive(roles), keywordHit: false, similar: [] });
     });
     return result;
-  }, [experts, searchFilter]);
+  }, [ranked.active, ranked.rows, typedData, debouncedSearch]);
 
-  const totalCount = typedData?.User_aggregate?.aggregate?.count || 0;
+  const totalCount = ranked.active ? ranked.rows.length : typedData?.User_aggregate?.aggregate?.count || 0;
 
   const loadAllExperts = useCallback(async () => {
+    if (ranked.active) return ranked.rows.map((row) => row.expert);
     const all = (await fetchAllRows(totalCount)) as ExpertsList | undefined;
     return all?.User ?? [];
-  }, [fetchAllRows, totalCount]);
+  }, [ranked.active, ranked.rows, fetchAllRows, totalCount]);
+
+  const refetchAll = useCallback(() => {
+    refetch();
+    ranked.refetch();
+  }, [refetch, ranked]);
 
   const handlePageSizeChange = (newPageSize: number) => {
     setPageSize(newPageSize);
@@ -236,7 +281,8 @@ const ManageExpertsContent: FC = () => {
 
   const exportCsv = async () => {
     try {
-      const all = await loadExportRows();
+      // The ranked list is already complete in the browser, in the order shown.
+      const all = ranked.active ? ranked.rows.map((row) => row.expert) : await loadExportRows();
       const header = [t('first_name'), t('last_name'), t('organization'), t('email'), t('last_active')];
       const csv = buildCsv(expertCsvRows(all, header), locale === 'de' ? ';' : ',');
       downloadTextFile(csv, exportFileName(t('headline'), t('export_file_suffix'), 'csv'), 'text/csv;charset=utf-8');
@@ -268,14 +314,14 @@ const ManageExpertsContent: FC = () => {
         header: t('first_name'),
         accessorKey: 'firstName',
         enableSorting: true,
-        size: 160,
+        size: 140,
         cell: ({ row }) => nameCell(row.original.firstName),
       },
       {
         header: t('last_name'),
         accessorKey: 'lastName',
         enableSorting: true,
-        size: 160,
+        size: 140,
         cell: ({ row }) => nameCell(row.original.lastName),
       },
       {
@@ -289,7 +335,7 @@ const ManageExpertsContent: FC = () => {
         header: t('email'),
         accessorKey: 'email',
         enableSorting: true,
-        size: 240,
+        size: 220,
         cell: ({ row }) => nameCell(row.original.email),
       },
       {
@@ -311,17 +357,23 @@ const ManageExpertsContent: FC = () => {
         cell: ({ row }) => <ExpertContactActions expert={row.original} />,
       },
     ];
-    if (words.length) {
-      result.splice(result.length - 1, 0, {
-        id: 'matches',
-        header: t('match_label'),
-        enableSorting: false,
-        size: 320,
-        cell: ({ row }) => <MatchLine matches={views.get(row.original.id)?.matches ?? []} words={words} />,
-      });
-    }
-    return result;
-  }, [t, format, isAdmin, views, words]);
+    if (!ranked.active) return result;
+    // Ranked results are ordered by relevance; their columns do not sort. The organization column
+    // gives up the room the Match column needs, so the table still fits without scrolling.
+    const unsorted = result.map((column) => ({
+      ...column,
+      enableSorting: false,
+      ...(column.id === 'organization' && { size: 160 }),
+    }));
+    unsorted.splice(4, 0, {
+      id: 'relevance',
+      header: t('relevance'),
+      enableSorting: false,
+      size: 120,
+      cell: ({ row }) => <Relevance view={views.get(row.original.id)} />,
+    });
+    return unsorted;
+  }, [t, format, isAdmin, views, ranked.active]);
 
   return (
     <PageBlock>
@@ -339,6 +391,15 @@ const ManageExpertsContent: FC = () => {
             <div className="flex justify-between items-center mb-4">
               <CommonPageHeader headline={t('headline')} />
             </div>
+            {ranked.active && (
+              <div className="mb-2 flex flex-col gap-0.5 text-sm text-label-secondary">
+                <p>{t('ranked_hint')}</p>
+                {ranked.keywordTotal > ranked.keywordRanked && (
+                  <p>{t('ranked_capped', { ranked: ranked.keywordRanked, total: ranked.keywordTotal })}</p>
+                )}
+                {ranked.semanticUnavailable && <p>{t('similar_unavailable')}</p>}
+              </div>
+            )}
             <TableGrid
               columns={columns}
               data={experts}
@@ -349,11 +410,12 @@ const ManageExpertsContent: FC = () => {
               onPageSizeChange={handlePageSizeChange}
               searchFilter={searchFilter}
               onSearchFilterChange={setSearchFilter}
-              error={error}
-              loading={loading}
+              error={ranked.error ?? error}
+              loading={loading || ranked.loading}
               refetchQueries={['ExpertsList']}
-              sorting={sorting}
-              onSortingChange={setSorting}
+              // Without sorting state TableGrid pages the ranked rows itself.
+              sorting={ranked.active ? undefined : sorting}
+              onSortingChange={ranked.active ? undefined : setSorting}
               bulkActions={[{ value: 'email', label: t('bulk_mail') }]}
               onBulkAction={handleBulkAction}
               loadAllRows={loadAllExperts}
@@ -369,6 +431,7 @@ const ManageExpertsContent: FC = () => {
                   </div>
                   <div className="text-sm text-label-secondary">{organizationOf(expert) || expert.email}</div>
                   <MatchLine matches={views.get(expert.id)?.matches ?? []} words={words} />
+                  {ranked.active && <Relevance view={views.get(expert.id)} />}
                   <ExpertContactActions expert={expert} />
                 </div>
               )}
@@ -378,20 +441,16 @@ const ManageExpertsContent: FC = () => {
                   <ExpandableExpertRow
                     expert={row}
                     roles={view?.roles ?? []}
-                    matchedRoleKeys={matchedRoleKeys(view?.matches ?? [])}
+                    search={debouncedSearch}
+                    similar={view?.similar ?? []}
                     currentUserId={userId}
                     isAdmin={isAdmin}
                     noteOrganizations={noteOrganizationsFor(noteOrganizations, view?.roles ?? [])}
-                    onChanged={() => refetch()}
+                    onChanged={refetchAll}
                     onError={(message) => setActionError(t('error', { error: message }))}
                   />
                 );
               }}
-            />
-            <SimilarExperts
-              search={debouncedSearch}
-              isAdmin={isAdmin}
-              scope={queryVariables.scope}
             />
           </div>
         )}

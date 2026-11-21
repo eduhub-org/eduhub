@@ -1,18 +1,19 @@
 import { ExpertsList_User } from '../../../../queries/__generated__/ExpertsList';
 import {
-  closestRole,
   expertCsvRows,
   expertRoles,
   findMatches,
   highlight,
+  leadExcerpt,
   lastActive,
   matchesAllWords,
   noteOrganizationsFor,
   linkedInSearchUrl,
   mailtoBcc,
-  matchedRoleKeys,
   profileKind,
   profileUrl,
+  rankExperts,
+  similarRoles,
   snippet,
   sourcesCondition,
 } from '../expertDirectory';
@@ -137,7 +138,6 @@ describe('findMatches', () => {
     expect(matches[0].role?.title).toBe('Deep Learning');
     expect(matches[0].field).toBe('description');
     expect(matches[0].snippet).toBe('We build a transformer step by step.');
-    expect(matchedRoleKeys(matches)).toEqual(new Set(['instructor-10']));
   });
 
   it('explains hits in the person fields and in several roles', () => {
@@ -252,10 +252,78 @@ describe('semantic search helpers', () => {
     expect(matchesAllWords(row, expertRoles(row), 'tensor_flow')).toBe(true);
   });
 
-  it("picks the person's role closest to the search", () => {
-    const closest = closestRole(expertRoles(expert()), matches);
-    expect(closest?.role.title).toBe('Ethics of AI');
-    expect(closest?.similarity).toBe(0.71);
-    expect(closestRole(expertRoles(expert()), [{ sourceType: 'COURSE', sourceId: 1, similarity: 1 }])).toBeNull();
+  it("lists the person's roles the search found, closest first", () => {
+    const similar = similarRoles(expertRoles(expert()), matches);
+    expect(similar.map(({ role, similarity }) => [role.title, similarity])).toEqual([
+      ['Ethics of AI', 0.71],
+      ['Deep Learning', 0.62],
+    ]);
+    expect(similarRoles(expertRoles(expert()), [{ sourceType: 'COURSE', sourceId: 1, similarity: 1 }])).toEqual([]);
+  });
+
+  it('cuts a long text at a word', () => {
+    expect(leadExcerpt('<p>Short <b>text</b></p>')).toBe('Short text');
+    expect(leadExcerpt('one two three four', 10)).toBe('one two…');
+  });
+});
+
+describe('rankExperts', () => {
+  // A person with one course, which the semantic search may find as source `courseId`.
+  const person = (id: string, firstName: string, title: string, courseId: number, lectureStart = '2024-10-14') =>
+    expert({
+      id,
+      firstName,
+      lastName: 'Example',
+      email: `${firstName.toLowerCase()}@example.com`,
+      Organization: null,
+      SessionSpeakers: [],
+      CourseInstructors: [
+        {
+          ...expert().CourseInstructors[0],
+          id: courseId,
+          Course: {
+            ...expert().CourseInstructors[0].Course,
+            id: courseId,
+            title,
+            tagline: '',
+            contentDescriptionField1: null,
+            Program: { ...expert().CourseInstructors[0].Course.Program, lectureStart },
+          },
+        },
+      ],
+    });
+  const course = (sourceId: number, similarity: number) => ({ sourceType: 'COURSE', sourceId, similarity });
+
+  it('puts people found by both searches above those found by one, and a name search first', () => {
+    const both = person('both', 'Bo', 'Data Science Basics', 1);
+    const keywordOnly = person('kw', 'Kim', 'Data Science Lab', 2);
+    const meaningOnly = person('sem', 'Sam', 'Machine Learning', 3, '2023-10-01');
+    const named = person('named', 'Science', 'Gardening', 4);
+
+    const ranked = rankExperts(
+      [keywordOnly, both, named],
+      [both, meaningOnly],
+      [course(1, 0.8), course(3, 0.9)],
+      'science'
+    );
+
+    expect(ranked.map((row) => row.expert.id)).toEqual(['named', 'both', 'kw', 'sem']);
+    expect(ranked.find((row) => row.expert.id === 'both')).toMatchObject({ keywordHit: true });
+    expect(ranked.find((row) => row.expert.id === 'sem')?.similar[0].similarity).toBe(0.9);
+  });
+
+  it('ranks keyword hits in titles above hits in descriptions, then by Last Active', () => {
+    const inTitle = person('title', 'Tia', 'Robotics', 1, '2020-01-01');
+    const inText = person('text', 'Tex', 'Workshop', 2, '2025-01-01');
+    inText.CourseInstructors[0].Course.contentDescriptionField1 = 'We build robotics kits.';
+    const newerTitle = person('newer', 'Nia', 'Robotics II', 3, '2024-01-01');
+
+    const ranked = rankExperts([inText, inTitle, newerTitle], [], [], 'robotics');
+
+    expect(ranked.map((row) => row.expert.id)).toEqual(['newer', 'title', 'text']);
+  });
+
+  it('leaves out people that neither search found', () => {
+    expect(rankExperts([person('x', 'Xu', 'Pottery', 1)], [], [], 'robotics')).toEqual([]);
   });
 });
