@@ -11,6 +11,26 @@
 -- public project sliders sort by updated_at.
 ALTER TABLE "public"."Project" DISABLE TRIGGER "set_public_Project_updated_at";
 
+-- Keeps each changed copy's previous proposer so down.sql can restore it.
+-- Internal to this migration (not tracked in Hasura); down.sql drops it.
+CREATE TABLE "public"."ProjectProposerBackfill" (
+  "projectId" integer PRIMARY KEY,
+  "previousProposedByUserId" uuid NOT NULL
+);
+
+WITH first_member AS (
+  SELECT DISTINCT ON (pa."projectId") pa."projectId", pa."userId"
+  FROM "public"."ProjectAuthor" AS pa
+  WHERE pa."participationStatus" = 'ACCEPTED'
+  ORDER BY pa."projectId", pa."created_at", pa."id"
+)
+INSERT INTO "public"."ProjectProposerBackfill" ("projectId", "previousProposedByUserId")
+SELECT p."id", p."proposedByUserId"
+FROM "public"."Project" AS p
+JOIN first_member ON first_member."projectId" = p."id"
+WHERE p."parentProjectId" IS NOT NULL
+  AND p."proposedByUserId" IS DISTINCT FROM first_member."userId";
+
 UPDATE "public"."Project" AS p
 SET "proposedByUserId" = first_member."userId"
 FROM (
