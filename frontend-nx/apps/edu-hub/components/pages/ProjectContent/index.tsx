@@ -9,6 +9,7 @@ import remarkGfm from 'remark-gfm';
 import { AuthRoles } from '../../../types/enums';
 import { ProjectParticipationStatus_enum } from '../../../__generated__/globalTypes';
 import { useRoleQuery } from '../../../hooks/authedQuery';
+import { coursePath } from '../../../helpers/coursePath';
 import { useCurrentRole, useIsLoggedIn, useIsSessionLoading } from '../../../hooks/authentication';
 import { LoginButton } from '../../layout/LoginButton';
 import { PROJECT_PAGE, SIMILAR_PROJECT_TILES } from '../../../queries/projectPage';
@@ -252,7 +253,7 @@ const ProjectContent: FC<ProjectContentProps> = ({ id, context, courseId }) => {
                 </div>
                 <div className="text-lg font-semibold">{course.title}</div>
                 {program?.shortTitle && <div className="text-label-secondary text-sm">{program.shortTitle}</div>}
-                <Link href={`/course/${linkedCourseId}`} className="text-brand text-sm mt-3 inline-block">
+                <Link href={coursePath(linkedCourseId)} className="text-brand text-sm mt-3 inline-block">
                   {t('course_card.go_to_course')} →
                 </Link>
               </div>
@@ -329,7 +330,7 @@ const ProjectContent: FC<ProjectContentProps> = ({ id, context, courseId }) => {
               <div className="mt-6 flex justify-center">
                 <Button
                   as="link"
-                  href={`/course/${linkedCourseId}`}
+                  href={coursePath(linkedCourseId)}
                   filled
                   inverted
                   className="justify-center"

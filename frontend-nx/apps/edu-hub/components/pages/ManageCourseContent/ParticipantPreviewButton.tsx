@@ -1,4 +1,5 @@
 import { useRouter } from 'next/router';
+import { coursePath } from '../../../helpers/coursePath';
 import { FC, useCallback, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
@@ -57,7 +58,7 @@ export const ParticipantPreviewButton: FC<ParticipantPreviewButtonProps> = ({ co
     RemoveTestEnrollmentVariables
   >(REMOVE_TEST_ENROLLMENT);
 
-  const coursePath = `/course/${courseId}`;
+  const publicPath = coursePath(courseId);
 
   const handleCreate = useCallback(async () => {
     setConfirming(null);
@@ -69,11 +70,11 @@ export const ParticipantPreviewButton: FC<ParticipantPreviewButtonProps> = ({ co
         return;
       }
       await refetch();
-      router.push(coursePath);
+      router.push(publicPath);
     } catch {
       setErrorMessage(t('errors.TEST_ENROLLMENT_FAILED'));
     }
-  }, [createTestEnrollment, courseId, coursePath, refetch, router, t]);
+  }, [createTestEnrollment, courseId, publicPath, refetch, router, t]);
 
   const handleRemove = useCallback(async () => {
     setConfirming(null);
@@ -94,7 +95,7 @@ export const ParticipantPreviewButton: FC<ParticipantPreviewButtonProps> = ({ co
     <div className="flex flex-wrap items-center gap-3">
       {hasPreview ? (
         <>
-          <Button as="link" href={coursePath} filled inverted>
+          <Button as="link" href={publicPath} filled inverted>
             {t('open')}
           </Button>
           <Button onClick={() => setConfirming('remove')} disabled={removing} inverted>

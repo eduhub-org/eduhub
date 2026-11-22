@@ -8,6 +8,8 @@
 
 import { formatInTimeZone, fromZonedTime } from 'date-fns-tz';
 import { compareByUpcoming, formatSessionDateSpan, lastSessionEnd, ScheduleSession } from './sessionSchedule';
+import { courseUrl } from './coursePath';
+import { ProgramType } from '../types/enums';
 
 const TIME_ZONE = 'Europe/Berlin';
 
@@ -100,7 +102,7 @@ export const renderDescriptionFields = (
 };
 
 const renderItem = (event: RssEvent, baseUrl: string, renderMarkdown: (markdown: string) => string): string => {
-  const link = `${baseUrl}/course/${event.id}`;
+  const link = courseUrl(event.id, ProgramType.EVENTS, baseUrl);
   const description = [formatSessionDateSpan(event.Sessions ?? [], TIME_ZONE), event.tagline?.trim()]
     .filter(Boolean)
     .join(' – ');
