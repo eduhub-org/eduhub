@@ -83,7 +83,7 @@ interface Options {
 
 const PROPOSED_MESSAGE = 'Not saved yet. Show the Organizer before and after; only apply saves it.';
 
-const pick = <T extends string>(fields: CourseFields, keys: readonly T[]) =>
+const pick = <T extends keyof CourseFields>(fields: CourseFields, keys: readonly T[]) =>
   Object.fromEntries(keys.map((k) => [k, fields[k]])) as Record<T, CourseFields[T]>;
 
 const upper = (value: unknown) => (typeof value === 'string' ? value.toUpperCase() : value);
@@ -179,7 +179,7 @@ export const createCourseSetup = ({ store, secret, now = Date.now }: Options) =>
 
   const resolveLocations = (course: CourseSnapshot, input: LocationInput[] | undefined): SessionLocation[] => {
     const options = new Map(course.courseLocations.map((o) => [o.id, o]));
-    const wanted = input ?? course.courseLocations.map((o) => ({ courseLocationId: o.id }));
+    const wanted: LocationInput[] = input ?? course.courseLocations.map((o) => ({ courseLocationId: o.id }));
     return wanted.map(({ courseLocationId, address }) => {
       const option = options.get(courseLocationId);
       if (!option) {

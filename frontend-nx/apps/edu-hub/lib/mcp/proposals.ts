@@ -40,7 +40,7 @@ export const verifyProposal = (token: string, secret: string, now = Date.now()):
   }
   const expected = Buffer.from(hmac(secret, body));
   const given = Buffer.from(signature);
-  if (expected.length !== given.length || !crypto.timingSafeEqual(expected, given)) {
+  if (expected.length !== given.length || !crypto.timingSafeEqual(new Uint8Array(expected), new Uint8Array(given))) {
     throw new OperationError('INVALID', 'This Proposed Change token has been altered or was not issued by EduHub.');
   }
   const payload = JSON.parse(Buffer.from(body, 'base64url').toString('utf8')) as ProposalPayload;
