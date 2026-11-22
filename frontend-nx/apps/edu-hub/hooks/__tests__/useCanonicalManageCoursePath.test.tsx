@@ -2,6 +2,7 @@ import { renderHook } from '@testing-library/react';
 
 import { useCanonicalManageCoursePath } from '../useCanonicalManageCoursePath';
 import { ProgramType } from '../../types/enums';
+import { CourseSegment } from '../../helpers/coursePath';
 
 const replace = jest.fn();
 const push = jest.fn();
@@ -51,10 +52,10 @@ describe('useCanonicalManageCoursePath', () => {
   });
 
   it('settles after one correction rather than looping', () => {
+    type Props = { segment: CourseSegment };
     const { rerender } = renderHook(
-      ({ segment }: { segment: 'course' | 'event' }) =>
-        useCanonicalManageCoursePath(42, segment, ProgramType.EVENTS),
-      { initialProps: { segment: 'course' as const } }
+      ({ segment }: Props) => useCanonicalManageCoursePath(42, segment, ProgramType.EVENTS),
+      { initialProps: { segment: 'course' } as Props }
     );
     expect(replace).toHaveBeenCalledTimes(1);
 
