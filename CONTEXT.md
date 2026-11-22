@@ -170,7 +170,7 @@ _Avoid_: event confirmation vs. course confirmation as separate emails
 ### Chat
 
 **Chat Account**:
-The opencampus.sh chat identity (`@<Chat Handle>:opencampus.sh`) of one EduHub account. Every EduHub account has exactly one; a person with two EduHub accounts therefore has two Chat Accounts.
+The opencampus.sh chat identity (`@<Chat Handle>:opencampus.sh`) of one EduHub account. Every EduHub account has exactly one, fixed by its Chat Handle; it is created on the chat server at the person's first confirmed Registration in a Course with a Course Chat or at their first chat login, whichever comes first. A person with two EduHub accounts therefore has two Chat Accounts.
 _Avoid_: Matrix user, Element account; accounts on other chat servers (e.g. matrix.org), which are not Chat Accounts
 
 **Chat Handle**:

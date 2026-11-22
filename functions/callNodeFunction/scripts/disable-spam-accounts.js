@@ -11,7 +11,8 @@
  *
  * Disabling blocks the EduHub and chat login immediately. Nothing is deleted.
  * The report file (required with --apply) lists every selected user, and
- * --restore re-enables exactly the users in such a file.
+ * --restore re-enables exactly the users in such a file. The script refuses
+ * to overwrite an existing report, so use a new path for every run.
  *
  * Without --apply the script only reports what it would do (dry run).
  * (A marker attribute is not an option: the realm's user profile drops
@@ -33,7 +34,7 @@
  *   node scripts/disable-spam-accounts.js --restore spam.tsv [--apply]
  */
 
-import { appendFileSync, readFileSync, writeFileSync } from 'fs';
+import { appendFileSync, existsSync, readFileSync, writeFileSync } from 'fs';
 import { pathToFileURL } from 'url';
 import KcAdminClient from '@keycloak/keycloak-admin-client';
 import { mergeUserPutPayload } from '../shared/keycloakUserMerge.js';
@@ -185,6 +186,12 @@ async function main() {
     console.error('--apply needs --report <file>, the list --restore uses to undo it');
     process.exit(1);
   }
+  // A rerun selects only the accounts still enabled, so overwriting an earlier
+  // report would lose the restore list of the accounts that run disabled.
+  if (REPORT_FILE && !RESTORE && existsSync(REPORT_FILE)) {
+    console.error(`Report ${REPORT_FILE} already exists; pass a new path for each run`);
+    process.exit(1);
+  }
 
   const kcAdminClient = new KcAdminClient({ baseUrl: process.env.KEYCLOAK_URL, realmName: 'master' });
   await keycloakAuth(kcAdminClient);
@@ -219,7 +226,7 @@ async function main() {
       const name = `${user.firstName || ''} ${user.lastName || ''}`.replace(/\s+/g, ' ').trim().slice(0, 100);
       lines.push([user.id, user.email || '', reason, name].join('\t'));
     }
-    writeFileSync(REPORT_FILE, `${lines.join('\n')}\n`);
+    writeFileSync(REPORT_FILE, `${lines.join('\n')}\n`, { flag: 'wx' });
     console.log(`Report written to ${REPORT_FILE}`);
   }
 
