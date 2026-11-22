@@ -1287,7 +1287,9 @@
       "add": "Add Instructor",
       "add_event": "Add organizer",
       "help_text": "Instructors can manage the offering and are named on its page.",
-      "help_text_event": "Organizers can manage the event and are named on its page."
+      "help_text_event": "Organizers can manage the event and are named on its page.",
+      "last_required": "A published course needs at least one instructor. Add another instructor first or unpublish the course.",
+      "last_required_event": "A published event needs at least one organizer. Add another organizer first or unpublish the event."
     },
     "funding_organizations": {
       "label": "Funding Organizations",
@@ -1470,6 +1472,11 @@
         "courses": "Successfully unpublished {count} courses",
         "events": "Successfully unpublished {count} events",
         "degrees": "Successfully unpublished {count} degrees"
+      },
+      "publish_requires_instructor": {
+        "courses": "These courses have no instructor yet and cannot be published: {titles}. Add an instructor first.",
+        "events": "These events have no organizer yet and cannot be published: {titles}. Add an organizer first.",
+        "degrees": "These degrees cannot be published: {titles}."
       },
       "bulk_action_failed": {
         "courses": "The bulk action on the selected courses failed. Please try again.",

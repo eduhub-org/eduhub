@@ -67,6 +67,7 @@ import Card from '../../common/Card';
 import InstructorPaymentSection from './InstructorPaymentSection';
 import InstructorCertificatesButton from './InstructorCertificatesButton';
 import { ProgramType } from '../../../types/enums';
+import { isLastInstructorOfPublishedCourse } from '../../../helpers/courseInstructorRequirement';
 import { UPDATE_COURSE_COVER_IMAGE_CREDITS, UPDATE_COURSE_PROPERTY } from '../../../queries/mutateCourse';
 import useErrorHandler from '../../../hooks/useErrorHandler';
 import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';
@@ -406,18 +407,34 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
 
   const deleteInstructorFromCourse = useCallback(
     async (userId: string) => {
-      const response = await deleteInstructorAPI({
-        variables: {
-          courseId: course.id,
-          userId,
-        },
-      });
+      // A published course or event keeps at least one instructor/organizer (the database
+      // refuses removing the last one too).
+      const lastInstructorMessage = t(
+        isEventCourse ? 'manageCourses.instructors.last_required_event' : 'manageCourses.instructors.last_required'
+      );
+      if (isLastInstructorOfPublishedCourse(course, course.Program?.type as ProgramType | undefined)) {
+        handleError(lastInstructorMessage);
+        return;
+      }
 
-      if (response.errors) {
-        handleError(response.errors?.[0]?.message || t('operation_failed'));
+      try {
+        const response = await deleteInstructorAPI({
+          variables: {
+            courseId: course.id,
+            userId,
+          },
+        });
+
+        const message = response.errors?.[0]?.message;
+        if (message) {
+          handleError(message.includes('published_course_requires_instructor') ? lastInstructorMessage : message);
+        }
+      } catch (error) {
+        const message = error instanceof Error ? error.message : '';
+        handleError(message.includes('published_course_requires_instructor') ? lastInstructorMessage : t('common.error'));
       }
     },
-    [deleteInstructorAPI, course.id, handleError, t]
+    [deleteInstructorAPI, course, handleError, isEventCourse, t]
   );
 
   const addInstructorHandler = useCallback(

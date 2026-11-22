@@ -173,6 +173,7 @@ _Avoid_: event confirmation vs. course confirmation as separate emails
 - A **Waitlist** belongs to one **Course**; **Moving up** takes someone off it
 - An **Invitation** holds one **Place** until it is accepted, declined or expires
 - A **Course** has zero or more **Sessions**; when it has any, exactly one of them is its **First Session**
+- A published course or event has at least one instructor (for an event, its **Organizers**); a degree has none
 - A **Participant** receives at most one **Session Reminder** per **Course**
 - A **Session** has many **Attendance Records** and at most one **Attendance** per **Participant** (or person who completed the Course); a **Manual Attendance** overrides the automatic one
 - An **Attendance Record** belongs to at most one **Attendance**; an **Attendance** can combine several Zoom **Attendance Records** of the same person

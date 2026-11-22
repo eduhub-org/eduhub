@@ -1271,7 +1271,9 @@
       "add": "Leitung hinzufügen",
       "add_event": "Organisator:in hinzufügen",
       "help_text": "Die Leitung kann das Angebot verwalten und wird auf seiner Seite genannt.",
-      "help_text_event": "Organisator:innen können das Event verwalten und werden auf seiner Seite genannt."
+      "help_text_event": "Organisator:innen können das Event verwalten und werden auf seiner Seite genannt.",
+      "last_required": "Ein veröffentlichter Kurs braucht mindestens eine Kursleitung. Füge zuerst eine weitere Kursleitung hinzu oder nimm den Kurs offline.",
+      "last_required_event": "Ein veröffentlichtes Event braucht mindestens eine Organisator:in. Füge zuerst eine weitere Organisator:in hinzu oder nimm das Event offline."
     },
     "funding_organizations": {
       "label": "Förderorganisationen",
@@ -1452,6 +1454,11 @@
         "courses": "{count} Kurse erfolgreich zurückgezogen",
         "events": "{count} Events erfolgreich zurückgezogen",
         "degrees": "{count} Degrees erfolgreich zurückgezogen"
+      },
+      "publish_requires_instructor": {
+        "courses": "Diese Kurse haben noch keine Kursleitung und können nicht veröffentlicht werden: {titles}. Füge zuerst eine Kursleitung hinzu.",
+        "events": "Diese Events haben noch keine Organisator:innen und können nicht veröffentlicht werden: {titles}. Füge zuerst eine Organisator:in hinzu.",
+        "degrees": "Diese Degrees können nicht veröffentlicht werden: {titles}."
       },
       "bulk_action_failed": {
         "courses": "Die Massenaktion für die ausgewählten Kurse ist fehlgeschlagen. Bitte versuche es erneut.",
