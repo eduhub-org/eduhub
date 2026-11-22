@@ -30,6 +30,7 @@ import {
 } from '../../../queries/__generated__/UpdateCourseAchievementCertificatePossible';
 import { isKnownCourseGroupOptionTitle } from '../../../helpers/courseGroupOptions';
 import { programTypeMessageKey } from '../../../helpers/programType';
+import { coursesWithoutInstructor } from '../../../helpers/courseInstructorRequirement';
 import { DEGREE_COURSES } from '../../../queries/courseDegree';
 import { DegreeCourses } from '../../../queries/__generated__/DegreeCourses';
 import { DELETE_A_COURSE } from '../../../queries/mutateCourse';
@@ -468,6 +469,18 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
 
       try {
         if (action === 'publish') {
+          // A course or event can only go public with an instructor/organizer (the database
+          // refuses it too). Name the ones missing one instead of a generic failure.
+          const withoutInstructor = coursesWithoutInstructor(selectedCourses, programType);
+          if (withoutInstructor.length > 0) {
+            setErrorMessage(
+              t(`notifications.publish_requires_instructor.${messageKey}`, {
+                titles: withoutInstructor.map((course) => course.title).join(', '),
+              })
+            );
+            setShowErrorNotification(true);
+            return false;
+          }
           // Update all selected courses to published
           await Promise.all(
             courseIds.map((id) =>
@@ -540,7 +553,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
         throw error;
       }
     },
-    [copyBulkAction, refetch, updateCourse, createInstructorCertificates, t, messageKey, confirmUnpublish]
+    [copyBulkAction, refetch, updateCourse, createInstructorCertificates, t, messageKey, confirmUnpublish, programType]
   );
 
   const bulkActions = [
