@@ -53,9 +53,10 @@ import { CourseEnrollmentStatus_enum, order_by } from '../../../__generated__/gl
 import { useTranslations, useLocale } from 'next-intl';
 import { CourseStatus_enum, LocationOption_enum } from '../../../__generated__/globalTypes';
 import InputField from '../../inputs/InputField';
-import { UPDATE_COURSE_PROPERTY, INSERT_COURSE } from '../../../queries/mutateCourse';
+import { UPDATE_COURSE_PROPERTY, INSERT_COURSE, PUBLISH_COURSES } from '../../../queries/mutateCourse';
 import { UPDATE_COURSE_TITLE } from '../../../queries/course';
 import { UpdateCourseByPk, UpdateCourseByPkVariables } from '../../../queries/__generated__/UpdateCourseByPk';
+import { PublishCourses, PublishCoursesVariables } from '../../../queries/__generated__/PublishCourses';
 import {
   InsertCourseWithLocation,
   InsertCourseWithLocationVariables,
@@ -408,6 +409,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
   });
 
   const [updateCourse] = useManageMutation<UpdateCourseByPk, UpdateCourseByPkVariables>(UPDATE_COURSE_PROPERTY);
+  const [publishCourses] = useManageMutation<PublishCourses, PublishCoursesVariables>(PUBLISH_COURSES);
   const { confirmUnpublish, dialog: rausgegangenUnpublishDialog } = useRausgegangenUnpublishPrompt();
 
   const [insertCourse] = useManageMutation<InsertCourseWithLocation, InsertCourseWithLocationVariables>(INSERT_COURSE);
@@ -481,17 +483,8 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
             setShowErrorNotification(true);
             return false;
           }
-          // Update all selected courses to published
-          await Promise.all(
-            courseIds.map((id) =>
-              updateCourse({
-                variables: {
-                  id,
-                  changes: { published: true },
-                },
-              })
-            )
-          );
+          // One statement for all selected courses: they all go public or none do.
+          await publishCourses({ variables: { ids: courseIds } });
           // The publish mutation only returns the id, so the list rows (published marker and
           // status) have to be refetched for the page to show the new state.
           await refetch();
@@ -553,7 +546,17 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
         throw error;
       }
     },
-    [copyBulkAction, refetch, updateCourse, createInstructorCertificates, t, messageKey, confirmUnpublish, programType]
+    [
+      copyBulkAction,
+      refetch,
+      updateCourse,
+      publishCourses,
+      createInstructorCertificates,
+      t,
+      messageKey,
+      confirmUnpublish,
+      programType,
+    ]
   );
 
   const bulkActions = [

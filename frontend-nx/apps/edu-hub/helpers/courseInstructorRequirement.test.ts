@@ -13,6 +13,10 @@ describe('coursesWithoutInstructor', () => {
     expect(coursesWithoutInstructor([none, course(2)], ProgramType.EVENTS)).toEqual([none]);
   });
 
+  it('ignores courses that are already published', () => {
+    expect(coursesWithoutInstructor([course(0, true)], ProgramType.COURSES)).toEqual([]);
+  });
+
   it('never blocks degrees, which have no instructors', () => {
     expect(coursesWithoutInstructor([course(0)], ProgramType.DEGREES)).toEqual([]);
   });

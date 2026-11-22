@@ -18,6 +18,9 @@ BEGIN
     RETURN NEW;
   END IF;
 
+  -- The UPDATE already holds this course's row lock, which instructor removal
+  -- waits for (see published_course_keeps_an_instructor), so this check and a
+  -- concurrent removal can't both pass.
   IF NOT EXISTS (
     SELECT 1 FROM "CourseInstructor" WHERE "courseId" = NEW.id
   ) THEN
@@ -42,6 +45,11 @@ BEGIN
     RETURN OLD;
   END IF;
 
+  -- Lock the course before reading it. Publishing updates (and so locks) the
+  -- same row, and concurrent removals take this lock too, so neither can pass
+  -- its check on a state the other is about to change.
+  PERFORM 1 FROM "Course" WHERE id = OLD."courseId" FOR UPDATE;
+
   IF NOT EXISTS (
     SELECT 1
     FROM "Course" AS c
@@ -52,9 +60,6 @@ BEGIN
   ) THEN
     RETURN OLD;
   END IF;
-
-  -- Serialise concurrent removals so two of them can't both see the other.
-  PERFORM 1 FROM "Course" WHERE id = OLD."courseId" FOR UPDATE;
 
   IF NOT EXISTS (
     SELECT 1

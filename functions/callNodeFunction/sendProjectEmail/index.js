@@ -41,19 +41,22 @@ const TEAM_ACTION_TEMPLATES = new Set([
 
 /**
  * Where [Project:Link] points for one recipient: the course's instructors to
- * course management, the team to the course page when it has to act there,
- * everyone else to the project page, which stays reachable for the team after
- * the course has ended (approved, rejected, submitted, declined, excluded).
- * Mentors get the project page too unless they also instruct the course:
- * course management only opens for the course's instructors and admins.
+ * course management, team members to the course page when they have to act
+ * there, everyone else to the project page, which stays reachable for the
+ * team after the course has ended (approved, rejected, submitted, declined,
+ * excluded). Mentors get the project page unless they also instruct the
+ * course: course management only opens for the course's instructors and
+ * admins, and the course page's projects section only for its participants.
  *
  * @param {string} templateType - The project email being sent
- * @param {boolean} isCourseInstructor - Whether the recipient instructs the project's course
+ * @param {Object} recipient
+ * @param {boolean} recipient.isCourseInstructor - Instructs the course the link points to
+ * @param {boolean} recipient.isTeamMember - Is an accepted member of the project team
  * @returns {'manage'|'course'|'project'}
  */
-export function projectLinkTarget(templateType, isCourseInstructor) {
+export function projectLinkTarget(templateType, { isCourseInstructor, isTeamMember }) {
   if (isCourseInstructor) return 'manage';
-  if (TEAM_ACTION_TEMPLATES.has(templateType)) return 'course';
+  if (isTeamMember && TEAM_ACTION_TEMPLATES.has(templateType)) return 'course';
   return 'project';
 }
 
@@ -288,6 +291,7 @@ export default async function sendProjectEmail(req, logger) {
     const instructorIds = new Set(
       (course?.CourseInstructors || []).map((ci) => ci.User?.id).filter(Boolean)
     );
+    const teamIds = new Set(acceptedAuthors.map((u) => u.id));
 
     const results = [];
     for (const [index, recipient] of uniqueRecipients.entries()) {
@@ -295,7 +299,10 @@ export default async function sendProjectEmail(req, logger) {
         applicantName,
         courseId,
         courseTitle: course?.title ?? '',
-        linkTarget: projectLinkTarget(templateType, instructorIds.has(recipient.id)),
+        linkTarget: projectLinkTarget(templateType, {
+          isCourseInstructor: instructorIds.has(recipient.id),
+          isTeamMember: teamIds.has(recipient.id),
+        }),
       });
       const result = await queueEmail({
         templateType,
