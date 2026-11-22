@@ -1,0 +1,177 @@
+import { OperationError } from '../errors';
+import { CourseSnapshot, CourseStore, SETTING_FIELDS, SessionChanges, TEXT_FIELDS } from '../types';
+
+/**
+ * In-memory CourseStore for tests. It models the parts of Hasura's permissions the operations rely
+ * on: which roles a token allows, which courses a role may manage (instructor of the course, org
+ * admin of the program's organization, admin) and which Course columns a role may update.
+ */
+
+export interface FakeCourse extends Omit<CourseSnapshot, 'registrationCount'> {
+  organizationId: number;
+  instructorIds: string[];
+  registrations: number;
+}
+
+export interface FakeWorld {
+  courses: FakeCourse[];
+  /** userId → roles the token allows (x-hasura-allowed-roles). */
+  allowedRoles: Record<string, string[]>;
+  /** userId → organizations they are an Org Admin of (with the matching capability). */
+  orgAdminOf: Record<string, number[]>;
+}
+
+/** Instructors can't update these columns in Hasura (see public_Course.yaml). */
+const NOT_SETTABLE_BY_INSTRUCTOR = ['applicationEnd', 'attendanceCertificatePossible', 'achievementCertificatePossible'];
+
+let clock = Date.parse('2026-11-22T10:00:00Z');
+const nextTimestamp = () => new Date((clock += 1000)).toISOString();
+
+export const createFakeCourseStore = (world: FakeWorld, userId: string, role: string): CourseStore => {
+  const manages = (c: FakeCourse) =>
+    role === 'admin' ||
+    (role === 'instructor' && c.instructorIds.includes(userId)) ||
+    (role === 'org_admin' && (world.orgAdminOf[userId] ?? []).includes(c.organizationId));
+
+  const snapshot = (c: FakeCourse): CourseSnapshot => {
+    const { organizationId, instructorIds, registrations, ...rest } = structuredClone(c);
+    void organizationId;
+    void instructorIds;
+    return { ...rest, registrationCount: registrations };
+  };
+
+  const find = (courseId: number) => world.courses.find((c) => c.id === courseId);
+
+  return {
+    async verifyCaller() {
+      if (!(world.allowedRoles[userId] ?? []).includes(role)) {
+        throw new OperationError('UNAUTHENTICATED', `Hasura refused the token or role "${role}".`);
+      }
+      return { userId, role };
+    },
+    async listManagedCourses() {
+      return world.courses.filter(manages).map((c) => ({
+        id: c.id,
+        title: String(c.fields.title),
+        language: String(c.fields.language),
+        status: null,
+        programType: c.programType,
+        registrationCount: c.registrations,
+      }));
+    },
+    async getManagedCourse(_caller, courseId) {
+      const c = find(courseId);
+      return c && manages(c) ? snapshot(c) : null;
+    },
+    async settableCourseColumns() {
+      if (role === 'user') return new Set();
+      const all = [...TEXT_FIELDS, ...SETTING_FIELDS] as string[];
+      return new Set(role === 'instructor' ? all.filter((f) => !NOT_SETTABLE_BY_INSTRUCTOR.includes(f)) : all);
+    },
+    async updateCourse(courseId, expectedUpdatedAt, set) {
+      const c = find(courseId);
+      if (!c || !manages(c) || c.updatedAt !== expectedUpdatedAt) return false;
+      Object.assign(c.fields, set);
+      c.updatedAt = nextTimestamp();
+      return true;
+    },
+    async applySessionChanges(courseId, changes: SessionChanges) {
+      const c = find(courseId);
+      if (!c || !manages(c)) throw new OperationError('HASURA_ERROR', 'permission denied');
+      c.sessions = c.sessions.filter((s) => !changes.delete.includes(s.id));
+      changes.update.forEach((u) => {
+        const s = c.sessions.find((x) => x.id === u.sessionId);
+        if (s) Object.assign(s, u.set, u.locations ? { locations: u.locations } : {});
+      });
+      changes.create.forEach((s) => {
+        c.sessions.push({ id: Math.max(0, ...c.sessions.map((x) => x.id)) + 1, ...s });
+      });
+    },
+  };
+};
+
+const fields = (title: string, language = 'DE') => ({
+  title,
+  tagline: 'Kurz',
+  learningGoals: 'Ziele',
+  headingDescriptionField1: 'Worum geht es?',
+  contentDescriptionField1: 'Inhalt',
+  headingDescriptionField2: null,
+  contentDescriptionField2: null,
+  maxParticipants: 20,
+  applicationEnd: '2027-01-10',
+  maxMissedSessions: 2,
+  language,
+  weekDay: 'TUESDAY',
+  startTime: '18:00:00',
+  endTime: '19:30:00',
+  sessionReminderLeadHours: 24,
+  showAvailablePlaces: true,
+  attendanceCertificatePossible: true,
+  achievementCertificatePossible: false,
+});
+
+const locations = (courseId: number) => [
+  { id: courseId * 100, locationOption: 'ONLINE', defaultSessionAddress: 'https://zoom.example/j/1', defaultSessionAddressId: null },
+  { id: courseId * 100 + 1, locationOption: 'KIEL', defaultSessionAddress: 'Wall 47-51, 24103 Kiel', defaultSessionAddressId: 1 },
+];
+
+const session = (id: number, day: string) => ({
+  id,
+  title: `Termin ${id}`,
+  description: '',
+  startDateTime: `${day}T17:00:00+00:00`,
+  endDateTime: `${day}T18:30:00+00:00`,
+  locations: [{ courseLocationId: null, address: 'https://zoom.example/j/1', locationAddressId: null }],
+});
+
+/**
+ * Org 1 runs courses 1 (instructor ins-1, nobody registered) and 2 (instructor ins-2, 3
+ * Registrations). Org 2 runs course 3. oa-1 / oa-2 are the Org Admins of org 1 / org 2.
+ */
+export const createWorld = (): FakeWorld => ({
+  courses: [
+    {
+      id: 1,
+      updatedAt: '2026-11-01T09:00:00+00:00',
+      programType: 'COURSES',
+      organizationId: 1,
+      instructorIds: ['ins-1'],
+      registrations: 0,
+      fields: fields('Einführung in Machine Learning'),
+      courseLocations: locations(1),
+      sessions: [session(11, '2027-01-12'), session(12, '2027-01-19')],
+    },
+    {
+      id: 2,
+      updatedAt: '2026-11-01T09:00:00+00:00',
+      programType: 'COURSES',
+      organizationId: 1,
+      instructorIds: ['ins-2'],
+      registrations: 3,
+      fields: fields('Deep Learning with PyTorch', 'EN'),
+      courseLocations: locations(2),
+      sessions: [session(21, '2027-01-14')],
+    },
+    {
+      id: 3,
+      updatedAt: '2026-11-01T09:00:00+00:00',
+      programType: 'COURSES',
+      organizationId: 2,
+      instructorIds: [],
+      registrations: 0,
+      fields: fields('Kurs einer anderen Organisation'),
+      courseLocations: locations(3),
+      sessions: [],
+    },
+  ],
+  allowedRoles: {
+    'ins-1': ['instructor', 'user'],
+    'ins-2': ['instructor', 'user'],
+    'oa-1': ['org_admin', 'user'],
+    'oa-2': ['org_admin', 'user'],
+    admin: ['admin', 'user'],
+    'u-1': ['user'],
+  },
+  orgAdminOf: { 'oa-1': [1], 'oa-2': [2] },
+});

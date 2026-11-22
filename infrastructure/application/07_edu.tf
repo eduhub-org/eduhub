@@ -107,6 +107,16 @@ resource "google_cloud_run_service" "eduhub" {
             }
           }
         }
+        # Signs the Proposed Changes of the MCP server (pages/api/mcp).
+        env {
+          name = "MCP_PROPOSAL_SECRET"
+          value_from {
+            secret_key_ref {
+              name = google_secret_manager_secret.mcp_proposal_secret.secret_id
+              key  = "latest"
+            }
+          }
+        }
         # The Stripe webhook handler (pages/api/webhooks/stripe.ts) runs in this
         # service, not in the cloud function: it needs the secret key to build
         # the client and the signing secret to verify event signatures. Without
@@ -162,6 +172,8 @@ resource "google_cloud_run_service" "eduhub" {
     google_secret_manager_secret_version.ghost_newsletter_credentials_encryption_key,
     google_secret_manager_secret_version.stripe_secret_key,
     google_secret_manager_secret_version.stripe_webhook_secret,
+    google_secret_manager_secret_version.mcp_proposal_secret,
+    google_secret_manager_secret_iam_member.mcp_proposal_secret,
     google_secret_manager_secret_iam_member.stripe_secret_key_eduhub,
     google_secret_manager_secret_iam_member.stripe_webhook_secret_eduhub,
   ]
