@@ -34,12 +34,9 @@
  */
 
 import { appendFileSync, readFileSync, writeFileSync } from 'fs';
-import { createRequire } from 'module';
 import { pathToFileURL } from 'url';
 import KcAdminClient from '@keycloak/keycloak-admin-client';
-
-const require = createRequire(import.meta.url);
-const { mergeUserPutPayload } = require('../../shared_libs/node/keycloakUserMerge.cjs');
+import { mergeUserPutPayload } from '../shared/keycloakUserMerge.js';
 
 // Marked SPAM in EduHub, but used as session speaker placeholders or kept on
 // purpose (reviewed 2026-11-13).
