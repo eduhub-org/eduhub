@@ -167,6 +167,20 @@ The email organizers send by hand when Sessions are rescheduled or their Session
 The email a person gets once their Registration is confirmed. It is the same for Events and other Courses: when and where it names follow the Course's Sessions and Session Locations, not its Program type.
 _Avoid_: event confirmation vs. course confirmation as separate emails
 
+### Chat
+
+**Chat Account**:
+The opencampus.sh chat identity (`@<Chat Handle>:opencampus.sh`) of one EduHub account. Every EduHub account has exactly one; a person with two EduHub accounts therefore has two Chat Accounts.
+_Avoid_: Matrix user, Element account; accounts on other chat servers (e.g. matrix.org), which are not Chat Accounts
+
+**Chat Handle**:
+The fixed name of a Chat Account. It is set when the EduHub account is created and never changes, not even when the person's name does.
+_Avoid_: Matrix ID, username
+
+**Course Chat**:
+A Course's chat room. Participants enter it with their Chat Account; nobody from outside opencampus.sh can. A Participant is invited once their Registration is confirmed and is never removed automatically, not even after cancelling or dropping out; only Organizers remove people.
+_Avoid_: Matrix room, Element room, Kanal, "SIS-Element"; "Element" names the app only
+
 ## Relationships
 
 - A **Course** has a number of **Places** and at most one **Registration** per person
@@ -175,6 +189,7 @@ _Avoid_: event confirmation vs. course confirmation as separate emails
 - A **Course** has zero or more **Sessions**; when it has any, exactly one of them is its **First Session**
 - A published course or event has at least one instructor (for an event, its **Organizers**); a degree has none
 - A **Participant** receives at most one **Session Reminder** per **Course**
+- An EduHub account has exactly one **Chat Account**; a **Course** has at most one **Course Chat**
 - A **Session** has many **Attendance Records** and at most one **Attendance** per **Participant** (or person who completed the Course); a **Manual Attendance** overrides the automatic one
 - An **Attendance Record** belongs to at most one **Attendance**; an **Attendance** can combine several Zoom **Attendance Records** of the same person
 - A **Session** has at most one **Manual Attendance** per **Participant**
