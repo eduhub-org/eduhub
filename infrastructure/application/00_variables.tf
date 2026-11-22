@@ -556,3 +556,43 @@ variable "embedding_location" {
   type        = string
   default     = ""
 }
+variable "assistant_llm_provider" {
+  description = "LLM provider of the Assistant: vertex, or empty to turn the Assistant off (ADR 0005)"
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = contains(["", "vertex"], var.assistant_llm_provider)
+    error_message = "assistant_llm_provider must be \"vertex\" or empty."
+  }
+}
+variable "assistant_llm_location" {
+  description = "Vertex AI location of the Assistant's model: the eu multi-region or an EU region. Never global: it gives no control over where requests are processed (ADR 0005)."
+  type        = string
+  default     = "eu"
+
+  validation {
+    condition     = var.assistant_llm_location == "eu" || startswith(var.assistant_llm_location, "europe-")
+    error_message = "assistant_llm_location must be \"eu\" or a europe-* region, never global."
+  }
+}
+variable "assistant_llm_model" {
+  description = "Model id of the Assistant for Vertex's OpenAI-compatible API; set from the trial in issue #2191"
+  type        = string
+  default     = "google/gemini-3.8-flash"
+}
+variable "assistant_monthly_spend_cap_eur" {
+  description = "Monthly spending cap of the Assistant in EUR; once reached, the Assistant is off until the next month"
+  type        = number
+  default     = 50
+}
+variable "vertex_global_endpoint_policy" {
+  description = "Organization policy constraints/gcp.restrictEndpointUsage denying the global Vertex AI endpoint in this project: empty (not managed), dry_run (violations are only logged) or enforce. Needs roles/orgpolicy.policyAdmin, which can only be granted at the organization, for the Terraform service account."
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = contains(["", "dry_run", "enforce"], var.vertex_global_endpoint_policy)
+    error_message = "vertex_global_endpoint_policy must be empty, \"dry_run\" or \"enforce\"."
+  }
+}
