@@ -216,7 +216,7 @@ describe('semanticExpertSearch', () => {
     expect(gql.request.mock.calls[0][1]).toMatchObject({
       model: 'fake:word-hash-768',
       minSimilarity: 0.2,
-      count: 50,
+      count: 200,
       organizationIds: null,
     });
   });

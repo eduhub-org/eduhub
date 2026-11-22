@@ -19,7 +19,6 @@ const GET_TEMPLATE = `
       type
       documentationInstructionId
       organizationId
-      proposedByUserId
       status
       submissionDeadline
       ProjectAuthors(where: { participationStatus: { _eq: ACCEPTED } }) {
@@ -318,7 +317,9 @@ export default async function copyProjectFromTemplate(req, logger) {
         type: parent.type ?? null,
         documentationInstructionId: parent.documentationInstructionId ?? null,
         organizationId: parent.organizationId ?? null,
-        proposedByUserId: parent.proposedByUserId,
+        // The team member who takes on the template proposed the copy, not the
+        // template's creator (see Project Proposer in CONTEXT.md).
+        proposedByUserId: userId,
         parentProjectId,
         authorUserId: userId,
         courseId,

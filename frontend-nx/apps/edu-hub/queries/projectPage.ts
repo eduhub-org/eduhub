@@ -37,6 +37,7 @@ export const PROJECT_PAGE_FRAGMENT = gql`
     }
     ProjectAuthors {
       id
+      participationStatus
       User {
         id
         firstName

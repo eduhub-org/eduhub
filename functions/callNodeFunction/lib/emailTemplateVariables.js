@@ -215,8 +215,8 @@ export const EMAIL_VARIABLES = {
       categories: ['project']
     },
     '[Project:Link]': {
-      description: 'Link to the project page',
-      example: 'https://edu.opencampus.sh/project/123',
+      description: 'Link for the recipient: course management for instructors and mentors, the course page\'s projects section when the team has to act, otherwise the project page',
+      example: 'https://edu.opencampus.sh/course/42#projects',
       categories: ['project']
     },
     '[Project:ReviewComment]': {
@@ -232,6 +232,11 @@ export const EMAIL_VARIABLES = {
     '[Project:ApplicantName]': {
       description: 'Name of the user who requested to join the project (join-request emails only)',
       example: 'Jane Doe',
+      categories: ['project']
+    },
+    '[Project:CourseTitle]': {
+      description: 'Title of the course the project belongs to',
+      example: 'Applied Machine Learning',
       categories: ['project']
     }
   },
@@ -522,6 +527,7 @@ export function createVariableReplacer(data, formatDate) {
         data.projectLink || `${config.frontendUrl()}/project/${data.project?.id || ''}`
       )
       .replaceAll('[Project:ApplicantName]', escape(data.applicantName || ''))
+      .replaceAll('[Project:CourseTitle]', escape(data.projectCourseTitle || ''))
       .replaceAll('[Project:SubmissionDeadline]', submissionDeadlineBlock)
       .replaceAll('[Project:ReviewComment]', reviewCommentBlock);
 
@@ -661,15 +667,29 @@ export function createSessionVariableReplacer(session, enrollment, sessionData =
  * Convenience function for project lifecycle emails
  * @param {Object} project - Project data ({ id, title })
  * @param {Object} recipientUser - Recipient user ({ firstName, lastName, email })
- * @param {Object} [extra] - Optional extra values ({ applicantName })
+ * @param {Object} [extra] - Optional extra values ({ applicantName, courseId,
+ *   courseTitle, linkTarget })
+ * @param {'manage'|'course'|'project'} [extra.linkTarget] - Where [Project:Link]
+ *   points: 'manage' is the course management projects section (instructors
+ *   and mentors act there), 'course' the participants' projects section on
+ *   the course page (the team acts there while the course runs), 'project'
+ *   (default) the project page, which stays reachable after the course.
  * @returns {Function} Variable replacement function
  */
 export function createProjectVariableReplacer(project, recipientUser, extra = {}) {
+  const baseUrl = config.frontendUrl();
+  let projectLink = `${baseUrl}/project/${project?.id || ''}`;
+  if (extra.courseId && extra.linkTarget === 'manage') {
+    projectLink = `${baseUrl}/manage/course/${extra.courseId}#projects`;
+  } else if (extra.courseId && extra.linkTarget === 'course') {
+    projectLink = `${baseUrl}/course/${extra.courseId}#projects`;
+  }
   return createVariableReplacer({
     user: recipientUser,
     project,
-    projectLink: `${config.frontendUrl()}/project/${project?.id || ''}`,
-    applicantName: extra.applicantName || ''
+    projectLink,
+    applicantName: extra.applicantName || '',
+    projectCourseTitle: extra.courseTitle || ''
   });
 }
 

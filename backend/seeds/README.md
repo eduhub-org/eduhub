@@ -53,6 +53,33 @@ sed -n '/^-- Course funding-logo fixtures/,/^-- BEGIN GENERATED COURSE_ATTENDANC
 
 The fixture block is repeatable and does not reset existing development data.
 
+### Expert Directory
+
+The block between `-- BEGIN Expert directory fixtures` and `-- END Expert
+directory fixtures` adds twenty experts for `/manage/experts`: a second page,
+a course repeated over three semesters, a name that is also a topic ("Solar"),
+a person marked "do not contact", someone with seven involvements, a project
+mentor, an achievement-option mentor, notes, and experts of org 9100's course
+for `orgadmin@example.com`. The comment at the top of the block lists the
+searches to try.
+
+They load automatically with a fresh database. To add them to an existing
+local Docker database, run from the repository root (repeatable):
+
+```bash
+sed -n '/^-- BEGIN Expert directory fixtures/,/^-- END Expert directory fixtures/p' backend/seeds/default/initial_seeds.sql |
+  docker compose exec -T db_hasura psql -U postgres -d postgres \
+    -v ON_ERROR_STOP=1 --single-transaction
+```
+
+Semantic matches ("Ähnlich …") need embeddings. The cron trigger embeds new
+texts nightly; to embed them right away, call the sync directly (locally it
+uses the `fake` provider, which only finds texts sharing whole words):
+
+```bash
+curl -s -X POST http://127.0.0.1:42022/ -H 'Function-Name: syncExpertEmbeddings' -H 'Hasura-Secret: test1234' -H 'Content-Type: application/json' -d '{}'
+```
+
 ### Regenerating the ML Degree Participant Seeds
 
 The 300 Machine Learning Degree participant rows in
