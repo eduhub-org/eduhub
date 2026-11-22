@@ -1,4 +1,4 @@
-# ADR 0005: Provision Chat Accounts when a Registration is confirmed
+# ADR 0007: Provision Chat Accounts when a Registration is confirmed
 
 ## Status
 Accepted (2026-11-12)

@@ -181,6 +181,16 @@ _Avoid_: Matrix ID, username
 A Course's chat room. Participants enter it with their Chat Account; nobody from outside opencampus.sh can. A Participant is invited once their Registration is confirmed and is never removed automatically, not even after cancelling or dropping out; only Organizers remove people.
 _Avoid_: Matrix room, Element room, Kanal, "SIS-Element"; "Element" names the app only
 
+### Assistant
+
+**Assistant**:
+The in-app AI chat that answers questions about the platform, its courses and the asker's own data, and helps **Organizers** set up their courses. It acts only on behalf of the person chatting and can never see or do more than they can. It is plainly a machine: it has no human name or persona and never claims to be human.
+_Avoid_: Chatbot, agent, bot (in copy), any persona name
+
+**Proposed Change**:
+A change to a course the **Assistant** has drafted for an **Organizer**, shown as before and after. Nothing is saved until the Organizer applies it; they can also discard it. A Proposed Change can only touch a Course's Sessions while nobody has registered for the Course yet, in any state (applied, invited, waitlisted or confirmed). It can only create a Course for someone who may already create one.
+_Avoid_: Action, auto-edit
+
 ## Relationships
 
 - A **Course** has a number of **Places** and at most one **Registration** per person
@@ -199,6 +209,7 @@ _Avoid_: Matrix room, Element room, Kanal, "SIS-Element"; "Element" names the ap
 - A **Join Request** is announced to the **Project Team**; only a project with no team yet announces it to its mentors (or, without mentors, the course instructors)
 - An **Expert** has one or more **Expert Roles** and zero or more **Expert Notes**; each note belongs to no organization (central admins) or exactly one
 - An **Org Admin** sees only the **Experts** of their organization's courses, and only their organization's **Expert Notes**
+- An **Assistant** conversation belongs to one person and acts with that person's rights only; a **Proposed Change** belongs to one **Course** and is applied by one of its **Organizers**
 
 ## Example dialogue
 
@@ -213,3 +224,4 @@ _Avoid_: Matrix room, Element room, Kanal, "SIS-Element"; "Element" names the ap
 - "Session reminder" meant three emails (24h, 1h, 15min) before sessions. Resolved: one email, before the First Session only, at the Course's Reminder Lead Time.
 - "Project owner" meant both the person who started a project and the team running it, and a **Project Copy** treated the template's creator as its starter. Resolved: the **Project Proposer** is whoever started that project (for a copy, the team member who took on the template), and the **Project Team** decides on **Join Requests**.
 - "Event confirmation mail" was asked for as a separate template from the course one. Resolved: there is one **Registration Confirmation**; a Course with a single Session simply reads like an event invitation because it has one date.
+- "Chatbot" was used for the in-app AI help, and "instructors" for those who may change courses through it. Resolved: it is the **Assistant**, and course changes through it are for **Organizers** (and **Admins**), within the rights they already have.
