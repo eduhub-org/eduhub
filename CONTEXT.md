@@ -174,7 +174,7 @@ The in-app AI chat that answers questions about the platform, its courses and th
 _Avoid_: Chatbot, agent, bot (in copy), any persona name
 
 **Proposed Change**:
-A change to a course the **Assistant** has drafted for an **Organizer**, shown as before and after. Nothing is saved until the Organizer applies it; they can also discard it.
+A change to a course the **Assistant** has drafted for an **Organizer**, shown as before and after. Nothing is saved until the Organizer applies it; they can also discard it. A Proposed Change can only touch a Course's Sessions while the Course has no **Participants**.
 _Avoid_: Action, auto-edit
 
 ## Relationships
