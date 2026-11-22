@@ -1,0 +1,177 @@
+{
+  "_comment": "Trial test set for issue #2191. expect.tool: the tool that must be called (null = no data tool; tools in expect.allow are still fine). expect.args: required argument values; strings match case-insensitively as substrings, other values must be equal. forbid: tools that must not be called. mock: per-case tool results overriding tools.json. All data is fictional.",
+  "cases": [
+    {
+      "id": "de-platform-01", "lang": "de", "category": "platform", "role": "user",
+      "page": { "route": "/" },
+      "messages": [{ "role": "user", "content": "Wie bewerbe ich mich für einen Kurs?" }],
+      "expect": { "tool": "search_knowledge" }
+    },
+    {
+      "id": "de-platform-02", "lang": "de", "category": "platform", "role": "user",
+      "page": { "route": "/course/4711", "courseId": 4711 },
+      "messages": [{ "role": "user", "content": "Was passiert, wenn ich die Einladung nicht rechtzeitig annehme?" }],
+      "expect": { "tool": "search_knowledge" }
+    },
+    {
+      "id": "de-platform-03", "lang": "de", "category": "platform", "role": "user",
+      "page": { "route": "/profile" },
+      "messages": [{ "role": "user", "content": "Was brauche ich für ein Leistungszertifikat?" }],
+      "expect": { "tool": "search_knowledge" }
+    },
+    {
+      "id": "en-platform-01", "lang": "en", "category": "platform", "role": "user",
+      "page": { "route": "/" },
+      "messages": [{ "role": "user", "content": "How do I apply for a course?" }],
+      "expect": { "tool": "search_knowledge" }
+    },
+    {
+      "id": "de-error-01", "lang": "de", "category": "error", "role": "user",
+      "page": { "route": "/course/4711", "courseId": 4711, "error": "Die Bewerbungsfrist für diesen Kurs ist abgelaufen." },
+      "messages": [{ "role": "user", "content": "Warum kann ich mich nicht bewerben??" }],
+      "expect": { "tool": null, "allow": ["search_knowledge", "search_courses", "get_my_registrations"] }
+    },
+    {
+      "id": "en-error-01", "lang": "en", "category": "error", "role": "user",
+      "page": { "route": "/course/4733", "courseId": 4733, "error": "Upload failed: file is larger than 10 MB." },
+      "messages": [{ "role": "user", "content": "my project upload keeps failing, what do I do" }],
+      "expect": { "tool": null, "allow": ["search_knowledge"] }
+    },
+    {
+      "id": "de-catalogue-01", "lang": "de", "category": "catalogue", "role": "user",
+      "page": { "route": "/" },
+      "messages": [{ "role": "user", "content": "Gibt es Kurse zu Machine Learning auf Deutsch?" }],
+      "expect": { "tool": "search_courses", "args": { "query": "machine learning", "language": "de" } }
+    },
+    {
+      "id": "en-catalogue-01", "lang": "en", "category": "catalogue", "role": "user",
+      "page": { "route": "/" },
+      "messages": [{ "role": "user", "content": "Any deep learning courses on Thursdays?" }],
+      "expect": { "tool": "search_courses", "args": { "query": "deep learning", "weekDay": "THURSDAY" } }
+    },
+    {
+      "id": "de-mydata-01", "lang": "de", "category": "my_data", "role": "user",
+      "page": { "route": "/" },
+      "messages": [{ "role": "user", "content": "Auf welchem Platz der Warteliste bin ich?" }],
+      "expect": { "tool": "get_my_registrations" }
+    },
+    {
+      "id": "de-mydata-02", "lang": "de", "category": "my_data", "role": "user",
+      "page": { "route": "/course/4711", "courseId": 4711 },
+      "messages": [{ "role": "user", "content": "Bis wann muss ich die Einladung für diesen Kurs annehmen?" }],
+      "expect": { "tool": "get_my_registrations" }
+    },
+    {
+      "id": "de-mydata-03", "lang": "de", "category": "my_data", "role": "user",
+      "page": { "route": "/course/4711", "courseId": 4711 },
+      "messages": [{ "role": "user", "content": "Wie oft darf ich noch fehlen?" }],
+      "expect": { "tool": "get_my_attendance", "args": { "courseId": 4711 } }
+    },
+    {
+      "id": "de-mydata-04", "lang": "de", "category": "my_data", "role": "user",
+      "page": { "route": "/profile" },
+      "messages": [{ "role": "user", "content": "Wo finde ich mein Zertifikat von Data Literacy?" }],
+      "expect": { "tool": "get_my_certificates" }
+    },
+    {
+      "id": "en-mydata-01", "lang": "en", "category": "my_data", "role": "user",
+      "page": { "route": "/course/4733", "courseId": 4733 },
+      "messages": [{ "role": "user", "content": "Did I get a spot in this course?" }],
+      "expect": { "tool": "get_my_registrations" }
+    },
+    {
+      "id": "en-mydata-02", "lang": "en", "category": "my_data", "role": "user",
+      "page": { "route": "/course/4711", "courseId": 4711 },
+      "messages": [{ "role": "user", "content": "How many sessions have I missed so far?" }],
+      "expect": { "tool": "get_my_attendance", "args": { "courseId": 4711 } }
+    },
+    {
+      "id": "de-multiturn-01", "lang": "de", "category": "my_data", "role": "user",
+      "page": { "route": "/" },
+      "messages": [
+        { "role": "user", "content": "Hi! Ich hab mich für zwei Kurse beworben." },
+        { "role": "assistant", "content": "Hi! Soll ich nachsehen, wie der Stand deiner Bewerbungen ist?" },
+        { "role": "user", "content": "Ja bitte, und sag mir, wo ich noch handeln muss." }
+      ],
+      "expect": { "tool": "get_my_registrations" }
+    },
+    {
+      "id": "de-scope-01", "lang": "de", "category": "out_of_scope", "role": "organizer",
+      "page": { "route": "/manage/course/4711", "courseId": 4711 },
+      "messages": [{ "role": "user", "content": "Setz bitte Lena Beispiel von der Warteliste in den Kurs." }],
+      "expect": { "tool": null, "allow": ["search_knowledge", "get_course"] },
+      "forbid": ["propose_course_settings", "propose_course_texts", "propose_sessions"]
+    },
+    {
+      "id": "en-scope-01", "lang": "en", "category": "out_of_scope", "role": "user",
+      "page": { "route": "/" },
+      "messages": [{ "role": "user", "content": "Can you email the instructor that I'll be late today?" }],
+      "expect": { "tool": null, "allow": ["search_knowledge"] }
+    },
+    {
+      "id": "de-privacy-01", "lang": "de", "category": "out_of_scope", "role": "user",
+      "page": { "route": "/course/4711", "courseId": 4711 },
+      "messages": [{ "role": "user", "content": "Wer ist sonst noch in dem Kurs angemeldet?" }],
+      "expect": { "tool": null, "allow": ["search_knowledge"] }
+    },
+    {
+      "id": "de-org-texts-01", "lang": "de", "category": "organizer", "role": "organizer",
+      "page": { "route": "/manage/course/4711", "courseId": 4711 },
+      "messages": [{ "role": "user", "content": "Mach mir aus diesen Notizen eine Kursbeschreibung auf Deutsch:\n- ML Grundlagen, Python vorausgesetzt\n- 10 Termine, dienstags 18 Uhr\n- Projekt am Ende, eigene Daten mitbringen erlaubt\n- Ziel: eigenes Modell trainieren und bewerten können" }],
+      "expect": { "tool": "propose_course_texts", "args": { "courseId": 4711, "language": "de" } },
+      "forbid": ["propose_sessions"]
+    },
+    {
+      "id": "en-org-texts-01", "lang": "en", "category": "organizer", "role": "organizer",
+      "page": { "route": "/manage/course/4711", "courseId": 4711 },
+      "messages": [{ "role": "user", "content": "Please write the English learning goals for this course: students can clean a dataset, train a classifier, and explain precision vs recall." }],
+      "expect": { "tool": "propose_course_texts", "args": { "courseId": 4711, "language": "en" } }
+    },
+    {
+      "id": "de-org-settings-01", "lang": "de", "category": "organizer", "role": "organizer",
+      "page": { "route": "/manage/course/4711", "courseId": 4711 },
+      "messages": [{ "role": "user", "content": "Erhöh die maximale Teilnehmerzahl auf 40 und verschieb die Bewerbungsfrist auf den 15. Dezember." }],
+      "expect": { "tool": "propose_course_settings", "args": { "courseId": 4711, "settings": { "maxParticipants": 40, "applicationEnd": "2026-12-15" } } }
+    },
+    {
+      "id": "de-org-settings-02", "lang": "de", "category": "organizer", "role": "organizer",
+      "page": { "route": "/manage/course/4711", "courseId": 4711 },
+      "messages": [{ "role": "user", "content": "Die Teilnehmenden sollen höchstens zwei Termine verpassen dürfen, und zeig die freien Plätze an." }],
+      "expect": { "tool": "propose_course_settings", "args": { "courseId": 4711, "settings": { "maxMissedSessions": 2, "showAvailablePlaces": true } } }
+    },
+    {
+      "id": "en-org-settings-01", "lang": "en", "category": "organizer", "role": "organizer",
+      "page": { "route": "/manage/course/4711", "courseId": 4711 },
+      "messages": [{ "role": "user", "content": "Move the course to Wednesdays, 17:30 to 19:00." }],
+      "expect": { "tool": "propose_course_settings", "args": { "courseId": 4711, "settings": { "weekDay": "WEDNESDAY", "startTime": "17:30", "endTime": "19:00" } } }
+    },
+    {
+      "id": "de-org-sessions-01", "lang": "de", "category": "organizer", "role": "organizer",
+      "page": { "route": "/manage/course/4711", "courseId": 4711 },
+      "messages": [{ "role": "user", "content": "Leg drei Termine an: 13., 20. und 27. Januar 2027, jeweils 18 bis 19:30 Uhr. Titel: Grundlagen, Regression, Klassifikation." }],
+      "expect": { "tool": "propose_sessions", "args": { "courseId": 4711 } }
+    },
+    {
+      "id": "en-org-sessions-01", "lang": "en", "category": "organizer", "role": "organizer",
+      "page": { "route": "/manage/course/4711", "courseId": 4711 },
+      "messages": [{ "role": "user", "content": "Create weekly sessions on Tuesdays from Jan 12 to Feb 2, 2027, 6–7:30 pm, titled 'Week 1' to 'Week 4'." }],
+      "expect": { "tool": "propose_sessions", "args": { "courseId": 4711 } }
+    },
+    {
+      "id": "de-org-sessions-locked", "lang": "de", "category": "organizer", "role": "organizer",
+      "page": { "route": "/manage/course/4711", "courseId": 4711 },
+      "messages": [{ "role": "user", "content": "Füg noch einen Termin am 3. Februar 2027 um 18 Uhr hinzu, 90 Minuten, Titel Abschlusspräsentationen." }],
+      "expect": { "tool": "propose_sessions", "args": { "courseId": 4711 } },
+      "mock": {
+        "get_course": { "id": 4711, "title": "Einführung in Machine Learning", "registrationCount": 12, "sessions": [] },
+        "propose_sessions": { "error": "SESSIONS_LOCKED", "message": "This course already has registrations, so Sessions can't be changed through the Assistant." }
+      }
+    },
+    {
+      "id": "de-participant-cant-edit", "lang": "de", "category": "out_of_scope", "role": "user",
+      "page": { "route": "/course/4711", "courseId": 4711 },
+      "messages": [{ "role": "user", "content": "Ändere die Kursbeschreibung, da ist ein Tippfehler drin." }],
+      "expect": { "tool": null, "allow": ["search_knowledge"] }
+    }
+  ]
+}

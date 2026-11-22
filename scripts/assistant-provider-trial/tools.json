@@ -1,0 +1,240 @@
+{
+  "_comment": "Mock versions of the Assistant tools planned in #2193 and the course-setup MCP operations of ADR 0006. Field names follow the Hasura schema (Course, Session). 'roles' says who is offered the tool; 'mock_result' is what the harness answers. All data is fictional.",
+  "tools": [
+    {
+      "roles": ["user", "organizer"],
+      "definition": {
+        "name": "search_knowledge",
+        "description": "Search the EduHub manual, the organization's rules and the glossary. Use for questions about how the platform works, what a status means, or what to do about an error message.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "query": { "type": "string", "description": "Search query, in the user's language" }
+          },
+          "required": ["query"],
+          "additionalProperties": false
+        }
+      },
+      "mock_result": {
+        "results": [
+          {
+            "title": "Bewerbung und Einladung",
+            "text": "Nach der Bewerbungsfrist verschicken die Kursleitenden Einladungen. Eine Einladung muss innerhalb der genannten Frist angenommen werden, sonst verfällt sie und der Platz geht an die nächste Person auf der Warteliste.",
+            "url": "https://edu.opencampus.sh/manual/registration"
+          },
+          {
+            "title": "Leistungszertifikat",
+            "text": "Ein Leistungszertifikat gibt es, wenn das Abschlussprojekt angenommen wurde und höchstens so viele Termine verpasst wurden, wie der Kurs erlaubt.",
+            "url": "https://edu.opencampus.sh/manual/certificates"
+          }
+        ]
+      }
+    },
+    {
+      "roles": ["user", "organizer"],
+      "definition": {
+        "name": "search_courses",
+        "description": "Search the public course catalogue.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "query": { "type": "string", "description": "Topic or title words" },
+            "language": { "type": "string", "enum": ["de", "en"], "description": "Course language" },
+            "weekDay": {
+              "type": "string",
+              "enum": ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"]
+            }
+          },
+          "required": ["query"],
+          "additionalProperties": false
+        }
+      },
+      "mock_result": {
+        "courses": [
+          { "id": 4711, "title": "Einführung in Machine Learning", "language": "de", "weekDay": "TUESDAY", "startTime": "18:00", "applicationEnd": "2026-12-10", "maxParticipants": 30 },
+          { "id": 4733, "title": "Deep Learning with PyTorch", "language": "en", "weekDay": "THURSDAY", "startTime": "18:30", "applicationEnd": "2026-12-15", "maxParticipants": 25 }
+        ]
+      }
+    },
+    {
+      "roles": ["user", "organizer"],
+      "definition": {
+        "name": "get_my_registrations",
+        "description": "The asker's own course registrations with status (APPLIED, WAITLIST, INVITED, CONFIRMED, ...), waitlist position and invitation deadline.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "courseId": { "type": "integer", "description": "Only this course; omit for all" }
+          },
+          "additionalProperties": false
+        }
+      },
+      "mock_result": {
+        "registrations": [
+          { "courseId": 4711, "courseTitle": "Einführung in Machine Learning", "status": "INVITED", "invitationExpirationDate": "2026-11-29" },
+          { "courseId": 4733, "courseTitle": "Deep Learning with PyTorch", "status": "WAITLIST", "waitlistPosition": 3 }
+        ]
+      }
+    },
+    {
+      "roles": ["user", "organizer"],
+      "definition": {
+        "name": "get_my_attendance",
+        "description": "The asker's attendance per Session of one course, and how many Sessions they may still miss.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "courseId": { "type": "integer" }
+          },
+          "required": ["courseId"],
+          "additionalProperties": false
+        }
+      },
+      "mock_result": {
+        "courseTitle": "Einführung in Machine Learning",
+        "maxMissedSessions": 2,
+        "sessions": [
+          { "title": "Kick-off", "startDateTime": "2026-10-20T18:00:00+02:00", "status": "ATTENDED" },
+          { "title": "Lineare Regression", "startDateTime": "2026-10-27T18:00:00+01:00", "status": "MISSED" },
+          { "title": "Klassifikation", "startDateTime": "2026-11-03T18:00:00+01:00", "status": "ATTENDED" },
+          { "title": "Entscheidungsbäume", "startDateTime": "2026-11-10T18:00:00+01:00", "status": "MISSED" },
+          { "title": "Neuronale Netze", "startDateTime": "2026-11-17T18:00:00+01:00", "status": "NO_INFO" }
+        ]
+      }
+    },
+    {
+      "roles": ["user", "organizer"],
+      "definition": {
+        "name": "get_my_certificates",
+        "description": "The asker's certificates (attendance and achievement), issued or still pending, with download links.",
+        "parameters": { "type": "object", "properties": {}, "additionalProperties": false }
+      },
+      "mock_result": {
+        "certificates": [
+          { "courseTitle": "Data Literacy", "type": "ATTENDANCE", "issued": true, "url": "https://edu.opencampus.sh/certificates/abc" },
+          { "courseTitle": "Data Literacy", "type": "ACHIEVEMENT", "issued": false, "reason": "Project not yet reviewed" }
+        ]
+      }
+    },
+    {
+      "roles": ["organizer"],
+      "definition": {
+        "name": "get_course",
+        "description": "A course the asker organizes: texts, settings, Sessions and the number of Registrations.",
+        "parameters": {
+          "type": "object",
+          "properties": { "courseId": { "type": "integer" } },
+          "required": ["courseId"],
+          "additionalProperties": false
+        }
+      },
+      "mock_result": {
+        "id": 4711,
+        "title": "Einführung in Machine Learning",
+        "language": "de",
+        "maxParticipants": 30,
+        "applicationEnd": "2026-12-10",
+        "weekDay": "TUESDAY",
+        "startTime": "18:00",
+        "endTime": "19:30",
+        "registrationCount": 0,
+        "sessions": []
+      }
+    },
+    {
+      "roles": ["organizer"],
+      "definition": {
+        "name": "propose_course_texts",
+        "description": "Draft new texts for a course in one language. Returns a Proposed Change (before and after); nothing is saved until the Organizer applies it.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "courseId": { "type": "integer" },
+            "language": { "type": "string", "enum": ["de", "en"] },
+            "texts": {
+              "type": "object",
+              "properties": {
+                "title": { "type": "string" },
+                "tagline": { "type": "string" },
+                "learningGoals": { "type": "string" },
+                "headingDescriptionField1": { "type": "string" },
+                "contentDescriptionField1": { "type": "string" },
+                "headingDescriptionField2": { "type": "string" },
+                "contentDescriptionField2": { "type": "string" }
+              },
+              "additionalProperties": false
+            }
+          },
+          "required": ["courseId", "language", "texts"],
+          "additionalProperties": false
+        }
+      },
+      "mock_result": { "proposedChangeId": "pc_1", "status": "PROPOSED", "message": "Shown to the Organizer as before/after; not saved yet." }
+    },
+    {
+      "roles": ["organizer"],
+      "definition": {
+        "name": "propose_course_settings",
+        "description": "Draft changes to course settings. Returns a Proposed Change; nothing is saved until the Organizer applies it.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "courseId": { "type": "integer" },
+            "settings": {
+              "type": "object",
+              "properties": {
+                "maxParticipants": { "type": "integer" },
+                "applicationEnd": { "type": "string", "description": "Date, YYYY-MM-DD" },
+                "maxMissedSessions": { "type": "integer" },
+                "language": { "type": "string", "enum": ["de", "en"] },
+                "weekDay": {
+                  "type": "string",
+                  "enum": ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY", "NONE"]
+                },
+                "startTime": { "type": "string", "description": "HH:MM" },
+                "endTime": { "type": "string", "description": "HH:MM" },
+                "showAvailablePlaces": { "type": "boolean" },
+                "attendanceCertificatePossible": { "type": "boolean" },
+                "achievementCertificatePossible": { "type": "boolean" }
+              },
+              "additionalProperties": false
+            }
+          },
+          "required": ["courseId", "settings"],
+          "additionalProperties": false
+        }
+      },
+      "mock_result": { "proposedChangeId": "pc_2", "status": "PROPOSED", "message": "Shown to the Organizer as before/after; not saved yet." }
+    },
+    {
+      "roles": ["organizer"],
+      "definition": {
+        "name": "propose_sessions",
+        "description": "Draft Sessions to add to a course. Only possible while the course has no Registrations. Returns a Proposed Change; nothing is saved until the Organizer applies it.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "courseId": { "type": "integer" },
+            "sessions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "title": { "type": "string" },
+                  "startDateTime": { "type": "string", "description": "ISO 8601 with offset, Europe/Berlin" },
+                  "endDateTime": { "type": "string", "description": "ISO 8601 with offset, Europe/Berlin" },
+                  "description": { "type": "string" }
+                },
+                "required": ["title", "startDateTime", "endDateTime"],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": ["courseId", "sessions"],
+          "additionalProperties": false
+        }
+      },
+      "mock_result": { "proposedChangeId": "pc_3", "status": "PROPOSED", "message": "Shown to the Organizer as before/after; not saved yet." }
+    }
+  ]
+}

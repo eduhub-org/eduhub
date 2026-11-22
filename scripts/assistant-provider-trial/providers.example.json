@@ -1,0 +1,29 @@
+{
+  "_comment": "Copy to providers.json (git-ignored) and fill in. Keys come from the env vars named in api_key_env. Find the exact model ids with --list-models. Prices: EUR per 1M tokens from the providers' price lists.",
+  "targets": [
+    {
+      "name": "stackit-qwen",
+      "base_url": "https://api.openai-compat.model-serving.eu01.onstackit.cloud/v1",
+      "api_key_env": "STACKIT_API_KEY",
+      "model": "FILL-IN-qwen3.8-27b-id",
+      "price_eur_per_mtok": { "input": null, "output": null },
+      "extra_body": {}
+    },
+    {
+      "name": "stackit-gemma",
+      "base_url": "https://api.openai-compat.model-serving.eu01.onstackit.cloud/v1",
+      "api_key_env": "STACKIT_API_KEY",
+      "model": "FILL-IN-gemma-4-31b-id",
+      "price_eur_per_mtok": { "input": null, "output": null },
+      "extra_body": {}
+    },
+    {
+      "name": "ionos-qwen",
+      "base_url": "https://openai.inference.de-txl.ionos.com/v1",
+      "api_key_env": "IONOS_API_TOKEN",
+      "model": "FILL-IN-qwen3.8-27b-id",
+      "price_eur_per_mtok": { "input": null, "output": null },
+      "extra_body": {}
+    }
+  ]
+}
