@@ -59,10 +59,12 @@ it('emails instructors and mentors once a team requests approval of its proposal
   expect(calls.every((c) => c.templateType === 'PROJECT_REVIEW_REQUESTED' && c.courseId === 42)).toBe(true);
   // The template's bcc (the EduHub team) goes along with the first mail only.
   expect(calls.map((c) => c.includeTemplateCopies)).toEqual([true, false, false]);
-  // Staff land in course management, where they confirm the project.
+  // Instructors land in course management, where they confirm the project;
+  // a mentor who doesn't instruct the course gets the project page.
   expect(calls[0].variableReplacer('[Project:Link] [Project:CourseTitle]')).toBe(
     'https://test.example.com/manage/course/42#projects Future of Food'
   );
+  expect(calls[2].variableReplacer('[Project:Link]')).toBe('https://test.example.com/project/5');
 });
 
 it('does not email again when an already requested approval is touched', async () => {
@@ -76,7 +78,7 @@ it('does not email again when an already requested approval is touched', async (
   expect(queueEmail).not.toHaveBeenCalled();
 });
 
-it('links staff to course management and the team to the project page on submission', async () => {
+it('links instructors to course management, mentors and the team to the project page on submission', async () => {
   await sendProjectEmail(projectEvent({ ...base, status: 'ONGOING' }, { ...base, status: 'SUBMITTED' }), logger);
 
   const links = Object.fromEntries(
@@ -86,7 +88,8 @@ it('links staff to course management and the team to the project page on submiss
   expect(links).toEqual({
     'ivo@example.com': 'https://test.example.com/manage/course/42#projects',
     'ida@example.com': 'https://test.example.com/manage/course/42#projects',
-    'mia@example.com': 'https://test.example.com/manage/course/42#projects',
+    // A mentor who doesn't instruct the course can't open course management.
+    'mia@example.com': 'https://test.example.com/project/5',
     'ann@example.com': 'https://test.example.com/project/5',
   });
 });
