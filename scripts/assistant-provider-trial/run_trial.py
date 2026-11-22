@@ -12,15 +12,18 @@ import json
 import os
 import re
 import statistics
+import subprocess
 import sys
 import time
 import urllib.error
 import urllib.request
 from pathlib import Path
+from urllib.parse import urlparse
 
 HERE = Path(__file__).resolve().parent
 MAX_ROUNDS = 4  # model turns per case (tool call -> result -> ... -> answer)
 TODAY = "2026-11-22"
+TOKEN_TTL = 45 * 60  # re-run api_key_command after this many seconds
 
 
 # ---------------------------------------------------------------- validation
@@ -122,23 +125,61 @@ class ApiError(Exception):
     pass
 
 
+_tokens = {}
+
+
+def api_key(target, refresh=False):
+    """Key from api_key_env, or the output of api_key_command (cached, so a
+    short-lived access token such as gcloud's is renewed during long runs)."""
+    cmd = target.get("api_key_command")
+    if not cmd:
+        return os.environ.get(target.get("api_key_env", ""), "")
+    cached = _tokens.get(cmd)
+    if cached and not refresh and time.monotonic() - cached[1] < TOKEN_TTL:
+        return cached[0]
+    token = subprocess.run(cmd, shell=True, check=True, capture_output=True, text=True).stdout.strip()
+    _tokens[cmd] = (token, time.monotonic())
+    return token
+
+
+def check_endpoint(target):
+    """Refuse Vertex AI's global endpoint: it gives no control over where a
+    request is processed (ADR 0005)."""
+    url = target["base_url"]
+    host = urlparse(url).hostname or ""
+    if "/locations/global/" in url + "/" or host == "aiplatform.googleapis.com":
+        sys.exit(f"{target['name']}: the global Vertex AI endpoint is not allowed; use a regional or eu endpoint")
+
+
+def strip_keys(schema, keys):
+    if isinstance(schema, dict):
+        return {k: strip_keys(v, keys) for k, v in schema.items() if k not in keys}
+    if isinstance(schema, list):
+        return [strip_keys(v, keys) for v in schema]
+    return schema
+
+
 def post_stream(target, body, rate_limit_hits):
     """POST a streaming chat completion; return the assembled message and
     timings. Retries on 429/5xx with backoff."""
     url = target["base_url"].rstrip("/") + "/chat/completions"
-    key = os.environ.get(target.get("api_key_env", ""), "")
     data = json.dumps(body).encode()
-    headers = {"Content-Type": "application/json", "Accept": "text/event-stream"}
-    if key:
-        headers["Authorization"] = f"Bearer {key}"
+    refresh = False
 
     for attempt in range(4):
+        headers = {"Content-Type": "application/json", "Accept": "text/event-stream"}
+        key = api_key(target, refresh)
+        if key:
+            headers["Authorization"] = f"Bearer {key}"
         req = urllib.request.Request(url, data=data, headers=headers, method="POST")
         start = time.monotonic()
         try:
             resp = urllib.request.urlopen(req, timeout=target.get("timeout", 120))
         except urllib.error.HTTPError as e:
             detail = e.read().decode(errors="replace")[:300]
+            if e.code == 401 and target.get("api_key_command") and not refresh:
+                refresh = True
+                continue
             if e.code == 429 or e.code >= 500:
                 if e.code == 429:
                     rate_limit_hits.append(1)
@@ -206,7 +247,7 @@ def read_stream(resp, start):
 def list_models(target):
     url = target["base_url"].rstrip("/") + "/models"
     req = urllib.request.Request(url)
-    key = os.environ.get(target.get("api_key_env", ""), "")
+    key = api_key(target)
     if key:
         req.add_header("Authorization", f"Bearer {key}")
     with urllib.request.urlopen(req, timeout=30) as resp:
@@ -226,7 +267,8 @@ def run_case(target, case, tools, system_prompt):
     page = json.dumps(case.get("page", {}), ensure_ascii=False)
     system = system_prompt.format(today=TODAY, page=page, role=role)
     messages = [{"role": "system", "content": system}] + copy.deepcopy(case["messages"])
-    tool_defs = [{"type": "function", "function": t["definition"]} for t in offered]
+    strip = set(target.get("strip_schema_keys", []))
+    tool_defs = [{"type": "function", "function": strip_keys(t["definition"], strip)} for t in offered]
 
     rec = {
         "case": case["id"], "lang": case["lang"], "category": case["category"],
@@ -246,6 +288,7 @@ def run_case(target, case, tools, system_prompt):
                 "temperature": target.get("temperature", 0.2),
                 "stream": True,
                 "stream_options": {"include_usage": True},
+                "store": False,
                 **target.get("extra_body", {}),
             }
             out = post_stream(target, body, hits)
@@ -347,7 +390,7 @@ def fmt_s(x):
 
 
 def summarize(target, recs):
-    price = target.get("price_eur_per_mtok") or {}
+    price = target.get("price_per_mtok") or {}
     pin, pout = price.get("input"), price.get("output")
     costs = None
     if pin is not None and pout is not None:
@@ -372,7 +415,7 @@ def summarize(target, recs):
         "total_p50": fmt_s(quantile([r["total"] for r in recs], 0.5)),
         "tokens_avg": round(statistics.mean(r["prompt_tokens"] + r["completion_tokens"] for r in recs)) if recs else 0,
         "usage_missing": sum(not r["usage_reported"] for r in recs),
-        "cost_avg_eur": "–" if costs is None else f"{statistics.mean(costs):.5f}",
+        "cost_avg": "–" if costs is None else f"{statistics.mean(costs):.5f} {target.get('currency', '')}".strip(),
     }
 
 
@@ -383,7 +426,7 @@ COLUMNS = [
     ("errors", "Errors"), ("rate_limited", "429s"),
     ("du", "German \"du\""), ("sie_or_mixed", "\"Sie\"/mixed"), ("lang_match", "Language match"),
     ("ttft_p50", "TTFT p50"), ("ttft_p95", "TTFT p95"), ("total_p50", "Total p50"),
-    ("tokens_avg", "Tokens/conv."), ("usage_missing", "Usage missing"), ("cost_avg_eur", "€/conv."),
+    ("tokens_avg", "Tokens/conv."), ("usage_missing", "Usage missing"), ("cost_avg", "Cost/conv."),
 ]
 
 
@@ -431,6 +474,8 @@ def main():
     if a.targets:
         wanted = set(a.targets.split(","))
         targets = [t for t in targets if t["name"] in wanted]
+    for t in targets:
+        check_endpoint(t)
     if a.list_models:
         for t in targets:
             try:
