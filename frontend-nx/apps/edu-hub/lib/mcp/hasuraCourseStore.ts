@@ -6,6 +6,7 @@ import {
   CourseStore,
   CourseSummary,
   MANAGING_ROLES,
+  ProgramSummary,
   SessionChanges,
   SessionLocation,
   SETTING_FIELDS,
@@ -40,6 +41,27 @@ export const pickRole = (token: string, requested?: string | null): string => {
 };
 
 /**
+ * The programs whose courses an Org Admin manages, mirroring the Program part of Hasura's Course
+ * insert/update permissions: the capability matching the program type, or canManageSettings.
+ */
+const orgAdminProgramWhere = (userId: string) => {
+  const admin = (capability: string) => ({
+    Organization: { OrganizationAdmins: { userId: { _eq: userId }, [capability]: { _eq: true } } },
+  });
+  return {
+    _or: [
+      { type: { _eq: 'EVENTS' }, ...admin('canManageEvents') },
+      { type: { _eq: 'COURSES' }, ...admin('canManageCourses') },
+      { type: { _eq: 'DEGREES' }, ...admin('canManageDegrees') },
+      admin('canManageSettings'),
+    ],
+  };
+};
+
+/** Matches nothing: for roles that manage no courses or programs. */
+const NOTHING = { id: { _is_null: true } };
+
+/**
  * The courses `userId` may manage under `role`, mirroring the row filters of Hasura's
  * Course/Session update permissions (backend/metadata/.../public_Course.yaml, public_Session.yaml).
  * It only decides what is offered and checked up front; Hasura enforces the real rules on write.
@@ -47,23 +69,18 @@ export const pickRole = (token: string, requested?: string | null): string => {
 export const managedCourseWhere = (role: string, userId: string): Record<string, unknown> => {
   if (role === 'admin') return {};
   if (role === 'instructor') return { CourseInstructors: { User: { id: { _eq: userId } } } };
-  if (role === 'org_admin') {
-    const admin = (capability: string) => ({
-      Organization: { OrganizationAdmins: { userId: { _eq: userId }, [capability]: { _eq: true } } },
-    });
-    return {
-      Program: {
-        _or: [
-          { type: { _eq: 'EVENTS' }, ...admin('canManageEvents') },
-          { type: { _eq: 'COURSES' }, ...admin('canManageCourses') },
-          { type: { _eq: 'DEGREES' }, ...admin('canManageDegrees') },
-          admin('canManageSettings'),
-        ],
-      },
-    };
-  }
-  // Any other role manages nothing.
-  return { id: { _is_null: true } };
+  if (role === 'org_admin') return { Program: orgAdminProgramWhere(userId) };
+  return NOTHING;
+};
+
+/**
+ * The programs `userId` may create courses in under `role`, mirroring Hasura's Course insert
+ * permission: only Org Admins (by capability) and admins; instructors create no courses.
+ */
+export const creatableProgramWhere = (role: string, userId: string): Record<string, unknown> => {
+  if (role === 'admin') return {};
+  if (role === 'org_admin') return orgAdminProgramWhere(userId);
+  return NOTHING;
 };
 
 const COURSE_FIELDS = [...TEXT_FIELDS, ...SETTING_FIELDS].join('\n');
@@ -94,6 +111,26 @@ const LIST_QUERY = `
     }
   }
 `;
+
+const PROGRAM_QUERY = `
+  query McpCreatablePrograms($where: Program_bool_exp!) {
+    Program(where: $where, order_by: { id: desc }, limit: 200) {
+      id title type defaultApplicationEnd
+      Organization { name }
+    }
+  }
+`;
+
+const toProgram = (p: any): ProgramSummary => ({
+  id: p.id,
+  title: p.title,
+  type: p.type ?? null,
+  organization: p.Organization?.name ?? null,
+  defaultApplicationEnd: p.defaultApplicationEnd ?? null,
+});
+
+const inputFields = (data: { __type: { inputFields: { name: string }[] } | null }) =>
+  new Set((data.__type?.inputFields ?? []).map((f) => f.name));
 
 interface Options {
   /** Hasura GraphQL endpoint, e.g. http://localhost:8080/v1/graphql */
@@ -183,7 +220,7 @@ export const createHasuraCourseStore = ({ url, token, role, fetchImpl = fetch }:
       const data = await request<{ __type: { inputFields: { name: string }[] } | null }>(
         'query McpCourseSetInput { __type(name: "Course_set_input") { inputFields { name } } }'
       );
-      return new Set((data.__type?.inputFields ?? []).map((f) => f.name));
+      return inputFields(data);
     },
 
     async updateCourse(courseId, expectedUpdatedAt, set) {
@@ -210,6 +247,53 @@ export const createHasuraCourseStore = ({ url, token, role, fetchImpl = fetch }:
           `Some Sessions could not be changed with your role (${skipped.join(', ')}); the rest was saved.`
         );
       }
+    },
+
+    async listCreatablePrograms(caller) {
+      const data = await request<{ Program: any[] }>(PROGRAM_QUERY, { where: creatableProgramWhere(caller.role, caller.userId) });
+      return data.Program.map(toProgram);
+    },
+
+    async getCreatableProgram(caller, programId) {
+      const where = { _and: [{ id: { _eq: programId } }, creatableProgramWhere(caller.role, caller.userId)] };
+      const data = await request<{ Program: any[] }>(PROGRAM_QUERY, { where });
+      return data.Program[0] ? toProgram(data.Program[0]) : null;
+    },
+
+    async insertableCourseColumns() {
+      return inputFields(
+        await request<{ __type: { inputFields: { name: string }[] } | null }>('query McpCourseInsertInput { __type(name: "Course_insert_input") { inputFields { name } } }')
+      );
+    },
+
+    async locationOptions() {
+      const data = await request<{ LocationOption: { value: string }[] }>('query McpLocationOptions { LocationOption { value } }');
+      return data.LocationOption.map((o) => o.value);
+    },
+
+    async coursesCreatedSince(programId, title, since) {
+      const data = await request<{ Course: { id: number }[] }>(
+        `query McpRecentCourses($programId: Int!, $title: String!, $since: timestamptz!) {
+          Course(where: { programId: { _eq: $programId }, title: { _eq: $title }, created_at: { _gte: $since } }) { id }
+        }`,
+        { programId, title, since }
+      );
+      return data.Course.map((c) => c.id);
+    },
+
+    async createCourse({ programId, fields, locationOptions }) {
+      const data = await request<{ insert_Course_one: { id: number } | null }>(
+        `mutation McpCreateCourse($course: Course_insert_input!) { insert_Course_one(object: $course) { id } }`,
+        {
+          course: {
+            ...fields,
+            programId,
+            CourseLocations: { data: locationOptions.map((locationOption) => ({ locationOption, defaultSessionAddress: '' })) },
+          },
+        }
+      );
+      if (!data.insert_Course_one) throw new OperationError('FORBIDDEN', 'Hasura did not create the course.');
+      return data.insert_Course_one.id;
     },
   };
 };

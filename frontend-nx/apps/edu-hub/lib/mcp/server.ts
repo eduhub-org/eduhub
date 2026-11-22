@@ -19,6 +19,32 @@ const location = z
   })
   .strict();
 
+/** Course texts other than the title. */
+const bodyTextFields = {
+  tagline: z.string().optional(),
+  learningGoals: z.string().optional(),
+  headingDescriptionField1: z.string().optional(),
+  contentDescriptionField1: z.string().optional(),
+  headingDescriptionField2: z.string().optional(),
+  contentDescriptionField2: z.string().optional(),
+};
+const textFields = { title: z.string().min(1).optional(), ...bodyTextFields };
+
+/** Course settings other than the language. */
+const otherSettingsFields = {
+  maxParticipants: z.number().int().min(0).optional(),
+  applicationEnd: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional().describe('YYYY-MM-DD'),
+  maxMissedSessions: z.number().int().min(0).optional(),
+  weekDay: z.enum(['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY', 'NONE']).optional(),
+  startTime: z.string().regex(/^\d{2}:\d{2}(:\d{2})?$/).optional().describe('HH:MM'),
+  endTime: z.string().regex(/^\d{2}:\d{2}(:\d{2})?$/).optional().describe('HH:MM'),
+  sessionReminderLeadHours: z.number().int().min(0).optional().describe('Reminder Lead Time in hours'),
+  showAvailablePlaces: z.boolean().optional(),
+  attendanceCertificatePossible: z.boolean().optional(),
+  achievementCertificatePossible: z.boolean().optional(),
+};
+const settingsSchema = z.object({ ...otherSettingsFields, language: language.optional() }).strict();
+
 const run = async (fn: () => Promise<unknown>) => {
   try {
     const result = await fn();
@@ -74,17 +100,7 @@ export const createMcpServer = (setup: CourseSetup) => {
       inputSchema: {
         courseId,
         language: language.optional().describe('Language the texts are written in; must be the course language'),
-        texts: z
-          .object({
-            title: z.string().min(1).optional(),
-            tagline: z.string().optional(),
-            learningGoals: z.string().optional(),
-            headingDescriptionField1: z.string().optional(),
-            contentDescriptionField1: z.string().optional(),
-            headingDescriptionField2: z.string().optional(),
-            contentDescriptionField2: z.string().optional(),
-          })
-          .strict(),
+        texts: z.object(textFields).strict(),
       },
       annotations: proposes,
     },
@@ -97,23 +113,7 @@ export const createMcpServer = (setup: CourseSetup) => {
       description: `Draft changes to course settings. ${PROPOSES}`,
       inputSchema: {
         courseId,
-        settings: z
-          .object({
-            maxParticipants: z.number().int().min(0).optional(),
-            applicationEnd: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional().describe('YYYY-MM-DD'),
-            maxMissedSessions: z.number().int().min(0).optional(),
-            language: language.optional(),
-            weekDay: z
-              .enum(['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY', 'NONE'])
-              .optional(),
-            startTime: z.string().regex(/^\d{2}:\d{2}(:\d{2})?$/).optional().describe('HH:MM'),
-            endTime: z.string().regex(/^\d{2}:\d{2}(:\d{2})?$/).optional().describe('HH:MM'),
-            sessionReminderLeadHours: z.number().int().min(0).optional().describe('Reminder Lead Time in hours'),
-            showAvailablePlaces: z.boolean().optional(),
-            attendanceCertificatePossible: z.boolean().optional(),
-            achievementCertificatePossible: z.boolean().optional(),
-          })
-          .strict(),
+        settings: settingsSchema,
       },
       annotations: proposes,
     },
@@ -162,6 +162,35 @@ export const createMcpServer = (setup: CourseSetup) => {
       annotations: proposes,
     },
     (args) => run(() => setup.proposeSessions(args))
+  );
+
+  server.registerTool(
+    'list_programs',
+    {
+      description: 'The programs the caller can create courses in (Org Admins and Admins; empty for instructors).',
+      annotations: readOnly,
+    },
+    () => run(() => setup.listPrograms())
+  );
+
+  server.registerTool(
+    'propose_create_course',
+    {
+      description:
+        'Draft a new course in a program (see list_programs). Only Org Admins and Admins can create courses. ' +
+        'Unset fields get the defaults of the manage courses page. Texts are written in the course language. ' +
+        `${PROPOSES} After applying, fill it in with the other propose tools using the returned courseId.`,
+      inputSchema: {
+        programId: z.number().int().positive(),
+        title: z.string().min(1),
+        language: language.optional().describe('Course language, default DE'),
+        texts: z.object(bodyTextFields).strict().optional(),
+        settings: z.object(otherSettingsFields).strict().optional(),
+        locationOptions: z.array(z.string()).optional().describe('e.g. ONLINE, KIEL; default ONLINE'),
+      },
+      annotations: proposes,
+    },
+    (args) => run(() => setup.proposeCreateCourse(args))
   );
 
   server.registerTool(

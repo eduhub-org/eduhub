@@ -12,7 +12,8 @@
  *
  * Seed data it relies on (backend/seeds): instructor@example.com teaches course 7001, which has
  * Registrations; orgadmin@example.com is a settings admin of organization 9100, whose course 9002
- * has none. The test changes course 9002 and puts it back.
+ * has none and is in program 9201. The test changes course 9002 and puts it back, and deletes the
+ * course it creates in program 9201.
  */
 import { createHasuraCourseStore, pickRole } from './hasuraCourseStore';
 import { createCourseSetup } from './operations';
@@ -33,6 +34,16 @@ const setupFor = (token: string | undefined, role?: string) =>
 
 const SEEDED_WITH_REGISTRATIONS = 7001; // taught by instructor@example.com
 const ORG_9100_COURSE = 9002; // organization 9100, no Registrations
+const ORG_9100_PROGRAM = 9201; // organization 9100, COURSES
+
+/** Deletes a course as the Org Admin (cleanup only; not an MCP operation). */
+const deleteCourseAsOrgAdmin = async (id: number) => {
+  await fetch(url as string, {
+    method: 'POST',
+    headers: { authorization: `Bearer ${tokens.orgadmin}`, 'x-hasura-role': 'org_admin', 'content-type': 'application/json' },
+    body: JSON.stringify({ query: 'mutation ($id: Int!) { delete_Course_by_pk(id: $id) { id } }', variables: { id } }),
+  });
+};
 
 (enabled ? describe : describe.skip)('course setup against local Hasura', () => {
   beforeAll(() => jest.spyOn(console, 'info').mockImplementation(() => undefined));
@@ -115,5 +126,32 @@ const ORG_9100_COURSE = 9002; // organization 9100, no Registrations
     const remove = await setup.proposeSessions({ courseId: ORG_9100_COURSE, deleteSessionIds: [added?.id as number] });
     await setup.applyProposedChange(remove);
     expect((await setup.getCourse({ courseId: ORG_9100_COURSE })).sessions).toHaveLength(before.sessions.length);
+  });
+
+  it('an Org Admin creates a course in their program; an instructor and another org are refused', async () => {
+    await expect(
+      setupFor(tokens.instructor, 'instructor').proposeCreateCourse({ programId: ORG_9100_PROGRAM, title: 'x' })
+    ).rejects.toMatchObject({ code: 'FORBIDDEN' });
+    await expect(
+      setupFor(tokens.orgadmin, 'org_admin').proposeCreateCourse({ programId: 6, title: 'x' }) // organization 0
+    ).rejects.toMatchObject({ code: 'NOT_FOUND' });
+
+    const setup = setupFor(tokens.orgadmin, 'org_admin');
+    expect((await setup.listPrograms()).programs.map((p) => p.id)).toContain(ORG_9100_PROGRAM);
+    const proposal = await setup.proposeCreateCourse({
+      programId: ORG_9100_PROGRAM,
+      title: `MCP test course ${Date.now()}`,
+      texts: { tagline: 'Created by the integration test' },
+      locationOptions: ['ONLINE', 'KIEL'],
+    });
+    const applied = (await setup.applyProposedChange(proposal)) as { courseId: number };
+    try {
+      const course = await setup.getCourse({ courseId: applied.courseId });
+      expect(course).toMatchObject({ tagline: 'Created by the integration test', maxMissedSessions: 2, language: 'DE' });
+      expect(course.courseLocations.map((l) => l.locationOption)).toEqual(['ONLINE', 'KIEL']);
+      await expect(setup.applyProposedChange(proposal)).rejects.toMatchObject({ code: 'ALREADY_APPLIED' });
+    } finally {
+      await deleteCourseAsOrgAdmin(applied.courseId);
+    }
   });
 });

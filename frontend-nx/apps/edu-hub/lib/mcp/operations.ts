@@ -15,6 +15,7 @@ import {
   CourseSnapshot,
   CourseStore,
   MANAGING_ROLES,
+  NewCourse,
   NewSession,
   SessionChanges,
   SessionLocation,
@@ -61,6 +62,17 @@ export interface ProposeSessionsInput {
   sessions?: NewSessionInput[];
   changes?: SessionChangeInput[];
   deleteSessionIds?: number[];
+}
+
+export interface CreateCourseInput {
+  programId: number;
+  title: string;
+  /** Course language; the texts are written in it. Defaults to DE. */
+  language?: string;
+  texts?: Partial<Record<Exclude<TextField, 'title'>, string>>;
+  settings?: Partial<Record<Exclude<SettingField, 'language'>, unknown>>;
+  /** Location options such as ONLINE or KIEL. Defaults to ONLINE. */
+  locationOptions?: string[];
 }
 
 export interface ProposedChangeResult {
@@ -134,23 +146,26 @@ export const createCourseSetup = ({ store, secret, now = Date.now }: Options) =>
     }
   };
 
-  const propose = (
+  const issue = (
     who: Caller,
-    course: CourseSnapshot,
     kind: ProposalKind,
+    courseId: number,
+    proposalFingerprint: string,
     changes: ProposalPayload['changes'],
     before: unknown,
     after: unknown
   ): ProposedChangeResult => {
-    const exp = Math.floor(now() / 1000) + PROPOSAL_TTL_SECONDS;
+    const iat = Math.floor(now() / 1000);
+    const exp = iat + PROPOSAL_TTL_SECONDS;
     const payload: ProposalPayload = {
       v: 1,
       kind,
-      courseId: course.id,
+      courseId,
       userId: who.userId,
       role: who.role,
-      fingerprint: fingerprint(course, kind),
+      fingerprint: proposalFingerprint,
       changes,
+      iat,
       exp,
     };
     countProposal('created', kind);
@@ -158,12 +173,59 @@ export const createCourseSetup = ({ store, secret, now = Date.now }: Options) =>
       status: 'PROPOSED',
       proposedChangeId: signProposal(payload, secret),
       kind,
-      courseId: course.id,
+      courseId,
       before,
       after,
       expiresAt: new Date(exp * 1000).toISOString(),
       message: PROPOSED_MESSAGE,
     };
+  };
+
+  const propose = (
+    who: Caller,
+    course: CourseSnapshot,
+    kind: Exclude<ProposalKind, 'create_course'>,
+    changes: ProposalPayload['changes'],
+    before: unknown,
+    after: unknown
+  ) => issue(who, kind, course.id, fingerprint(course, kind), changes, before, after);
+
+  const assertMayCreateCourses = (who: Caller) => {
+    if (who.role !== 'admin' && who.role !== 'org_admin') {
+      throw new OperationError(
+        'FORBIDDEN',
+        'Only Org Admins and Admins can create courses. Instructors fill in the courses they are assigned to.'
+      );
+    }
+  };
+
+  const creatableProgram = async (who: Caller, programId: number) => {
+    const program = await store.getCreatableProgram(who, programId);
+    if (!program) {
+      throw new OperationError('NOT_FOUND', `Program ${programId} does not exist or you can't create courses in it.`);
+    }
+    return program;
+  };
+
+  const assertInsertable = async (who: Caller, columns: string[]) => {
+    const insertable = await store.insertableCourseColumns();
+    const denied = columns.filter((c) => !insertable.has(c));
+    if (denied.length) {
+      throw new OperationError('FORBIDDEN', `Your role (${who.role}) can't set when creating a course: ${denied.join(', ')}.`);
+    }
+  };
+
+  const normalizeSettings = (settings: Partial<Record<SettingField, unknown>>) => ({
+    ...settings,
+    ...(settings.language !== undefined && { language: upper(settings.language) }),
+    ...(settings.weekDay !== undefined && { weekDay: upper(settings.weekDay) }),
+    ...(settings.startTime !== undefined && { startTime: normalizeTime(settings.startTime) }),
+    ...(settings.endTime !== undefined && { endTime: normalizeTime(settings.endTime) }),
+  });
+
+  const unknownKeys = (given: object, allowed: readonly string[], label: string) => {
+    const unknown = Object.keys(given).filter((k) => !allowed.includes(k));
+    if (unknown.length) throw new OperationError('INVALID', `Unknown ${label}: ${unknown.join(', ')}.`);
   };
 
   /** Only the fields that differ from the course; refuses an empty change. */
@@ -202,6 +264,28 @@ export const createCourseSetup = ({ store, secret, now = Date.now }: Options) =>
     if (Date.parse(end) <= Date.parse(start)) {
       throw new OperationError('INVALID', `${label}: the end must be after the start.`);
     }
+  };
+
+  const applyCreateCourse = async (who: Caller, proposal: ProposalPayload) => {
+    assertMayCreateCourses(who);
+    const course = proposal.changes as NewCourse;
+    const program = await creatableProgram(who, course.programId);
+    // Proposals are not stored, so a second apply of the same proposal is caught by looking for a
+    // course with this title created in the program since the proposal was made.
+    const title = String(course.fields.title);
+    const since = new Date(proposal.iat * 1000).toISOString();
+    const existing = await store.coursesCreatedSince(program.id, title, since);
+    if (existing.length) {
+      throw new OperationError(
+        'ALREADY_APPLIED',
+        `A course named "${title}" was already created in program ${program.id} since this was proposed ` +
+          `(course ${existing.join(', ')}), so no second one was created.`
+      );
+    }
+    await assertInsertable(who, Object.keys(course.fields));
+    const courseId = await store.createCourse(course);
+    countProposal('applied', 'create_course');
+    return { status: 'APPLIED' as const, kind: 'create_course' as const, courseId, programId: program.id };
   };
 
   return {
@@ -260,13 +344,7 @@ export const createCourseSetup = ({ store, secret, now = Date.now }: Options) =>
       const course = await managedCourse(who, courseId);
       const unknown = Object.keys(settings).filter((k) => !(SETTING_FIELDS as readonly string[]).includes(k));
       if (unknown.length) throw new OperationError('INVALID', `Unknown settings: ${unknown.join(', ')}.`);
-      const normalized: Partial<Record<SettingField, unknown>> = {
-        ...settings,
-        ...(settings.language !== undefined && { language: upper(settings.language) }),
-        ...(settings.weekDay !== undefined && { weekDay: upper(settings.weekDay) }),
-        ...(settings.startTime !== undefined && { startTime: normalizeTime(settings.startTime) }),
-        ...(settings.endTime !== undefined && { endTime: normalizeTime(settings.endTime) }),
-      };
+      const normalized = normalizeSettings(settings);
       const { changed, before, after } = fieldDiff<SettingField>(course, normalized);
       await assertSettable(who, changed);
       return propose(who, course, 'course_settings', after, before, after);
@@ -328,12 +406,63 @@ export const createCourseSetup = ({ store, secret, now = Date.now }: Options) =>
       });
     },
 
+    /** Programs the caller may create courses in (empty for instructors). */
+    async listPrograms() {
+      const who = await caller();
+      return { programs: await store.listCreatablePrograms(who) };
+    },
+
+    async proposeCreateCourse({ programId, title, language, texts = {}, settings = {}, locationOptions }: CreateCourseInput) {
+      const who = await caller();
+      assertMayCreateCourses(who);
+      const program = await creatableProgram(who, programId);
+      if (!title.trim()) throw new OperationError('INVALID', 'A new course needs a title.');
+      unknownKeys(texts, TEXT_FIELDS.filter((f) => f !== 'title'), 'text fields');
+      unknownKeys(settings, SETTING_FIELDS.filter((f) => f !== 'language'), 'settings');
+
+      // The same defaults as "add" on the manage courses page.
+      const today = new Date(now()).toISOString().slice(0, 10);
+      const applicationEnd =
+        program.defaultApplicationEnd && program.defaultApplicationEnd > today ? program.defaultApplicationEnd : today;
+      const fields = Object.fromEntries(
+        Object.entries({
+          title,
+          tagline: '',
+          language: upper(language ?? 'DE'),
+          applicationEnd,
+          maxMissedSessions: 2,
+          ...texts,
+          ...normalizeSettings(settings),
+        }).filter(([, v]) => v !== undefined)
+      ) as Partial<CourseFields>;
+
+      const known = await store.locationOptions();
+      const options = [...new Set((locationOptions ?? ['ONLINE']).map((o) => String(upper(o))))];
+      const unknownOptions = options.filter((o) => !known.includes(o));
+      if (unknownOptions.length || !options.length) {
+        throw new OperationError(
+          'INVALID',
+          `Unknown location options: ${unknownOptions.join(', ') || 'none given'}. Choose from ${known.join(', ')}.`
+        );
+      }
+      await assertInsertable(who, Object.keys(fields));
+
+      const newCourse: NewCourse = { programId, fields, locationOptions: options };
+      return issue(who, 'create_course', 0, 'new', newCourse, null, {
+        program: { id: program.id, title: program.title, organization: program.organization },
+        ...fields,
+        locationOptions: options,
+      });
+    },
+
     async applyProposedChange({ proposedChangeId }: { proposedChangeId: string }) {
       const who = await caller();
       const proposal = verifyProposal(proposedChangeId, secret, now());
       if (proposal.userId !== who.userId || proposal.role !== who.role) {
         throw new OperationError('FORBIDDEN', 'This Proposed Change was made for someone else or another role.');
       }
+      if (proposal.kind === 'create_course') return applyCreateCourse(who, proposal);
+
       const course = await managedCourse(who, proposal.courseId);
       if (fingerprint(course, proposal.kind) !== proposal.fingerprint) {
         throw new OperationError(

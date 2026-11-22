@@ -23,6 +23,13 @@ checks the token and role on every call; the server adds no rights of its own.
 
 - Instructors manage the courses they teach; Org Admins the courses of their
   organization's programs (by capability); admins all.
+- Only Org Admins (with the capability for the program type, or
+  canManageSettings) and admins can create courses, in the programs
+  `list_programs` returns. A new course gets the defaults of "add" on the manage
+  courses page (empty tagline, DE, the program's application end or today, 2
+  missable Sessions, ONLINE). Applying the same create proposal twice is refused
+  (`ALREADY_APPLIED`): the server looks for a course with that title created in
+  the program since the proposal was made.
 - Sessions can only be proposed **and applied** while the course has no
   Registrations in any state.
 - Apply refuses a proposal whose part of the course (texts/settings, or the
@@ -59,10 +66,9 @@ trial with the real list:
   optional `locations`; adds `changes` and `deleteSessionIds`.
 - The result field `proposedChangeId` is the signed token to pass to
   `apply_proposed_change`; the mock returned a short id.
-- New: `list_courses`, `get_registration_count`, `apply_proposed_change`,
-  `discard_proposed_change`.
+- New: `list_courses`, `list_programs`, `get_registration_count`,
+  `propose_create_course`, `apply_proposed_change`, `discard_proposed_change`.
 
 ## Not in v1
 
-- Creating a course (Org Admins and Admins only).
 - People actions, emails, OAuth for external clients (v2).

@@ -84,6 +84,22 @@ export interface CourseSummary {
   registrationCount: number;
 }
 
+/** A program the caller may create courses in (Org Admin with the matching capability, or admin). */
+export interface ProgramSummary {
+  id: number;
+  title: string;
+  type: string | null;
+  organization: string | null;
+  defaultApplicationEnd: string | null;
+}
+
+export interface NewCourse {
+  programId: number;
+  fields: Partial<CourseFields>;
+  /** Location options (ONLINE, KIEL, …); each gets an empty default Session address. */
+  locationOptions: string[];
+}
+
 export interface NewSession {
   title: string;
   description: string;
@@ -121,4 +137,15 @@ export interface CourseStore {
   updateCourse(courseId: number, expectedUpdatedAt: string, set: Partial<CourseFields>): Promise<boolean>;
   /** Saves Session changes in one transaction. */
   applySessionChanges(courseId: number, changes: SessionChanges): Promise<void>;
+  /** Programs the caller may create courses in, as Hasura's Course insert rule allows. */
+  listCreatablePrograms(caller: Caller): Promise<ProgramSummary[]>;
+  getCreatableProgram(caller: Caller, programId: number): Promise<ProgramSummary | null>;
+  /** Course columns the caller's role may set when creating a course. */
+  insertableCourseColumns(): Promise<Set<string>>;
+  /** The location options that exist (LocationOption values). */
+  locationOptions(): Promise<string[]>;
+  /** Ids of the program's courses with this title created at or after `since` (ISO). */
+  coursesCreatedSince(programId: number, title: string, since: string): Promise<number[]>;
+  /** Creates the course with its location options; returns its id. */
+  createCourse(course: NewCourse): Promise<number>;
 }

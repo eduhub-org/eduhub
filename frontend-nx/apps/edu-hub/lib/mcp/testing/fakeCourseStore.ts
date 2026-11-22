@@ -13,8 +13,16 @@ export interface FakeCourse extends Omit<CourseSnapshot, 'registrationCount'> {
   registrations: number;
 }
 
+export interface FakeProgram {
+  id: number;
+  title: string;
+  organizationId: number;
+  defaultApplicationEnd: string | null;
+}
+
 export interface FakeWorld {
-  courses: FakeCourse[];
+  programs: FakeProgram[];
+  courses: (FakeCourse & { programId?: number; createdAt?: string })[];
   /** userId → roles the token allows (x-hasura-allowed-roles). */
   allowedRoles: Record<string, string[]>;
   /** userId → organizations they are an Org Admin of (with the matching capability). */
@@ -23,6 +31,8 @@ export interface FakeWorld {
 
 /** Instructors can't update these columns in Hasura (see public_Course.yaml). */
 const NOT_SETTABLE_BY_INSTRUCTOR = ['applicationEnd', 'attendanceCertificatePossible', 'achievementCertificatePossible'];
+/** Org Admins can't set this column when creating a course (see public_Course.yaml). */
+const NOT_INSERTABLE = ['sessionReminderLeadHours'];
 
 let clock = Date.parse('2026-11-22T10:00:00Z');
 const nextTimestamp = () => new Date((clock += 1000)).toISOString();
@@ -41,6 +51,15 @@ export const createFakeCourseStore = (world: FakeWorld, userId: string, role: st
   };
 
   const find = (courseId: number) => world.courses.find((c) => c.id === courseId);
+  const mayCreateIn = (p: FakeProgram) =>
+    role === 'admin' || (role === 'org_admin' && (world.orgAdminOf[userId] ?? []).includes(p.organizationId));
+  const toSummary = (p: FakeProgram) => ({
+    id: p.id,
+    title: p.title,
+    type: 'COURSES',
+    organization: `Org ${p.organizationId}`,
+    defaultApplicationEnd: p.defaultApplicationEnd,
+  });
 
   return {
     async verifyCaller() {
@@ -87,6 +106,50 @@ export const createFakeCourseStore = (world: FakeWorld, userId: string, role: st
         c.sessions.push({ id: Math.max(0, ...c.sessions.map((x) => x.id)) + 1, ...s });
       });
     },
+    async listCreatablePrograms() {
+      return world.programs.filter(mayCreateIn).map(toSummary);
+    },
+    async getCreatableProgram(_caller, programId) {
+      const p = world.programs.find((x) => x.id === programId);
+      return p && mayCreateIn(p) ? toSummary(p) : null;
+    },
+    async insertableCourseColumns() {
+      if (role !== 'admin' && role !== 'org_admin') return new Set();
+      const all = [...TEXT_FIELDS, ...SETTING_FIELDS] as string[];
+      return new Set(role === 'admin' ? all : all.filter((f) => !NOT_INSERTABLE.includes(f)));
+    },
+    async locationOptions() {
+      return ['ONLINE', 'KIEL', 'HEIDE', 'HAMBURG'];
+    },
+    async coursesCreatedSince(programId, title, since) {
+      return world.courses
+        .filter((c) => c.programId === programId && c.fields.title === title && (c.createdAt ?? '') >= since)
+        .map((c) => c.id);
+    },
+    async createCourse({ programId, fields: set, locationOptions: options }) {
+      const program = world.programs.find((x) => x.id === programId);
+      if (!program || !mayCreateIn(program)) throw new OperationError('HASURA_ERROR', 'check constraint violation');
+      const id = Math.max(...world.courses.map((c) => c.id)) + 1;
+      world.courses.push({
+        id,
+        programId,
+        createdAt: new Date().toISOString(),
+        updatedAt: nextTimestamp(),
+        programType: 'COURSES',
+        organizationId: program.organizationId,
+        instructorIds: [],
+        registrations: 0,
+        fields: { ...fields(String(set.title)), ...set },
+        courseLocations: options.map((o, i) => ({
+          id: id * 100 + i,
+          locationOption: o,
+          defaultSessionAddress: '',
+          defaultSessionAddressId: null,
+        })),
+        sessions: [],
+      });
+      return id;
+    },
   };
 };
 
@@ -127,9 +190,13 @@ const session = (id: number, day: string) => ({
 
 /**
  * Org 1 runs courses 1 (instructor ins-1, nobody registered) and 2 (instructor ins-2, 3
- * Registrations). Org 2 runs course 3. oa-1 / oa-2 are the Org Admins of org 1 / org 2.
+ * Registrations) in program 10. Org 2 runs course 3 in program 20. oa-1 / oa-2 are the Org Admins of org 1 / org 2.
  */
 export const createWorld = (): FakeWorld => ({
+  programs: [
+    { id: 10, title: 'Wintersemester', organizationId: 1, defaultApplicationEnd: '2027-01-31' },
+    { id: 20, title: 'Andere Organisation', organizationId: 2, defaultApplicationEnd: null },
+  ],
   courses: [
     {
       id: 1,

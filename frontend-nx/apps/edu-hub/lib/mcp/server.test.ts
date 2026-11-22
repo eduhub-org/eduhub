@@ -38,8 +38,10 @@ describe('EduHub MCP server', () => {
       'get_course',
       'get_registration_count',
       'list_courses',
+      'list_programs',
       'propose_course_settings',
       'propose_course_texts',
+      'propose_create_course',
       'propose_sessions',
     ]);
     expect(tools.find((t) => t.name === 'apply_proposed_change')?.annotations?.destructiveHint).toBe(true);

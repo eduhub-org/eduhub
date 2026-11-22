@@ -317,3 +317,105 @@ describe('Sessions', () => {
     expect(await errorCode(setup.proposeSessions({ courseId: 1 }))).toBe('INVALID');
   });
 });
+
+describe('creating a course', () => {
+  const draft = { programId: 10, title: 'Generative KI im Alltag' };
+  const NOW = Date.parse('2026-11-22T10:00:00Z');
+
+  it('an Org Admin proposes a course with the manage page defaults and applies it', async () => {
+    const setup = setupFor(world, 'oa-1', 'org_admin', () => NOW);
+    const proposal = await setup.proposeCreateCourse({
+      ...draft,
+      texts: { tagline: 'Was KI heute kann' },
+      settings: { maxParticipants: 25 },
+      locationOptions: ['online', 'KIEL'],
+    });
+    expect(proposal).toMatchObject({
+      status: 'PROPOSED',
+      kind: 'create_course',
+      before: null,
+      after: {
+        program: { id: 10, title: 'Wintersemester' },
+        title: 'Generative KI im Alltag',
+        tagline: 'Was KI heute kann',
+        language: 'DE',
+        applicationEnd: '2027-01-31', // the program's default, as it is still in the future
+        maxMissedSessions: 2,
+        maxParticipants: 25,
+        locationOptions: ['ONLINE', 'KIEL'],
+      },
+    });
+    expect(world.courses).toHaveLength(3);
+
+    const applied = await setup.applyProposedChange(proposal);
+    expect(applied).toMatchObject({ status: 'APPLIED', kind: 'create_course', programId: 10 });
+    const created = world.courses.find((c) => c.id === (applied as { courseId: number }).courseId);
+    expect(created?.fields).toMatchObject({ title: 'Generative KI im Alltag', maxParticipants: 25 });
+    expect(created?.courseLocations.map((l) => l.locationOption)).toEqual(['ONLINE', 'KIEL']);
+    expect(metrics.map((m) => `${m.event}:${m.kind}`)).toEqual(['created:create_course', 'applied:create_course']);
+
+    // The Organizer can now fill it in.
+    await expect(
+      setup.proposeCourseTexts({ courseId: created?.id as number, texts: { learningGoals: 'Prompts schreiben' } })
+    ).resolves.toMatchObject({ status: 'PROPOSED' });
+  });
+
+  it('an admin can create courses in any program', async () => {
+    const setup = setupFor(world, 'admin', 'admin');
+    await expect(setup.proposeCreateCourse({ ...draft, programId: 20 })).resolves.toMatchObject({ status: 'PROPOSED' });
+    expect((await setup.listPrograms()).programs.map((p) => p.id)).toEqual([10, 20]);
+  });
+
+  it('an instructor cannot create courses', async () => {
+    const setup = setupFor(world, 'ins-1', 'instructor');
+    expect(await errorCode(setup.proposeCreateCourse(draft))).toBe('FORBIDDEN');
+    expect((await setup.listPrograms()).programs).toEqual([]);
+  });
+
+  it("an Org Admin cannot create a course in another organization's program", async () => {
+    const setup = setupFor(world, 'oa-2', 'org_admin');
+    expect(await errorCode(setup.proposeCreateCourse(draft))).toBe('NOT_FOUND');
+    expect((await setup.listPrograms()).programs.map((p) => p.id)).toEqual([20]);
+  });
+
+  it('a plain user is refused', async () => {
+    expect(await errorCode(setupFor(world, 'u-1', 'user').proposeCreateCourse(draft))).toBe('FORBIDDEN');
+  });
+
+  it('apply re-checks the rules: a forged create proposal for another program is refused', async () => {
+    const proposal = await setupFor(world, 'oa-1', 'org_admin').proposeCreateCourse(draft);
+    const payload = verifyProposal(proposal.proposedChangeId, SECRET);
+    const forged = signProposal(
+      { ...payload, userId: 'oa-2', changes: { ...(payload.changes as object), programId: 10 } } as typeof payload,
+      SECRET
+    );
+    const result = setupFor(world, 'oa-2', 'org_admin').applyProposedChange({ proposedChangeId: forged });
+    expect(await errorCode(result)).toBe('NOT_FOUND');
+    expect(world.courses).toHaveLength(3);
+  });
+
+  it('applying the same create proposal twice creates only one course', async () => {
+    const setup = setupFor(world, 'oa-1', 'org_admin');
+    const proposal = await setup.proposeCreateCourse(draft);
+    await setup.applyProposedChange(proposal);
+    await expect(setup.applyProposedChange(proposal)).rejects.toMatchObject({
+      code: 'ALREADY_APPLIED',
+      message: expect.stringContaining('no second one was created'),
+    });
+    expect(world.courses).toHaveLength(4);
+  });
+
+  it('refuses unknown location options and columns the role may not set on insert', async () => {
+    const setup = setupFor(world, 'oa-1', 'org_admin');
+    expect(await errorCode(setup.proposeCreateCourse({ ...draft, locationOptions: ['MARS'] }))).toBe('INVALID');
+    expect(
+      await errorCode(setup.proposeCreateCourse({ ...draft, settings: { sessionReminderLeadHours: 48 } }))
+    ).toBe('FORBIDDEN');
+  });
+
+  it('uses today as application end when the program default has passed', async () => {
+    world.programs[0].defaultApplicationEnd = '2026-01-31';
+    const proposal = await setupFor(world, 'oa-1', 'org_admin', () => NOW).proposeCreateCourse(draft);
+    expect(proposal.after).toMatchObject({ applicationEnd: '2026-11-22' });
+  });
+});

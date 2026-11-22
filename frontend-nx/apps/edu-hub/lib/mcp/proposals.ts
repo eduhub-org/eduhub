@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 import { OperationError } from './errors';
-import type { CourseFields, CourseSnapshot, SessionChanges } from './types';
+import type { CourseFields, CourseSnapshot, NewCourse, SessionChanges } from './types';
 
 /**
  * Proposed Changes are stateless: the server signs what it proposed and the client hands the token
@@ -9,17 +9,20 @@ import type { CourseFields, CourseSnapshot, SessionChanges } from './types';
  * part of the course it touches, so apply can refuse a proposal made against an older state.
  */
 
-export type ProposalKind = 'course_texts' | 'course_settings' | 'sessions';
+export type ProposalKind = 'course_texts' | 'course_settings' | 'sessions' | 'create_course';
 
 export interface ProposalPayload {
   v: 1;
   kind: ProposalKind;
+  /** The course changed; 0 for `create_course` (its program is in `changes`). */
   courseId: number;
   userId: string;
   role: string;
   /** Fingerprint of the touched part of the course when the change was proposed. */
   fingerprint: string;
-  changes: Partial<CourseFields> | SessionChanges;
+  changes: Partial<CourseFields> | SessionChanges | NewCourse;
+  /** Issued at, seconds since the epoch. */
+  iat: number;
   /** Expiry, seconds since the epoch. */
   exp: number;
 }
@@ -69,7 +72,7 @@ const sha256 = (value: unknown) => crypto.createHash('sha256').update(canonical(
  * row (including `updated_at`); Sessions use the Sessions and their Session Locations, which do not
  * change the course's `updated_at`. Registrations are not part of it: they are re-checked on apply.
  */
-export const fingerprint = (course: CourseSnapshot, kind: ProposalKind): string => {
+export const fingerprint = (course: CourseSnapshot, kind: Exclude<ProposalKind, 'create_course'>): string => {
   if (kind === 'sessions') {
     const sessions = [...course.sessions].sort((a, b) => a.id - b.id);
     return sha256({ sessions, courseLocations: course.courseLocations });
