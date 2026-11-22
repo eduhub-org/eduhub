@@ -1,52 +1,67 @@
-# ADR 0005: The Assistant runs on open-weight models from an EU company
+# ADR 0005: The Assistant runs on Gemini Flash on Vertex AI, processed in the EU
 
 ## Status
-Accepted; provider pending a trial
+Accepted; Gemini model pending a short trial
 
 ## Context
 
 The **Assistant** answers questions with the asker's own data (registrations,
-attendance, invitations) and helps **Organizers** set up courses. Its prompts
-therefore carry personal data. The mid-term goal is that no user data is
-processed by US companies, because of the CLOUD Act; production still runs on
-GCP and expert search already uses Vertex AI (ADR 0004).
+attendance, invitations) and helps **Organizers** set up courses, so its
+prompts carry personal data. The mid-term goal is to stop having user data
+processed by US companies, because of the CLOUD Act. Production runs on GCP,
+and expert search already uses Vertex AI (ADR 0004). We postponed moving the
+Assistant to an EU provider so it can use the existing Google account,
+contract and setup.
 
 ## Decision
 
-1. **Provider: an EU-headquartered company with inference on EU servers.**
-   EU regions of a US company (e.g. Vertex AI in europe-west1) do not meet the
-   bar. Candidates are STACKIT and IONOS (both German, no prompt storage, no
-   training on inputs); the provider is chosen after a short trial with the real
-   tools and German "Du" prompts, and needs a signed AVV and a C5 certificate
-   that covers the product. The other provider, serving the same model, is the
-   fallback.
-2. **Open-weight models behind an OpenAI-compatible API.** Default model
-   Qwen3.8 27B, which every candidate (STACKIT, IONOS, OVHcloud, Scaleway)
-   hosts and vLLM can serve. Base URL, key and model are configuration, so
-   switching provider or self-hosting changes no code.
-3. **Managed API, not self-hosted.** A GPU server for a ~27B model costs about
-   €1,000/month plus operations, which buys 1.5–2 billion tokens from the API.
-   We revisit when usage approaches that.
+1. **Model: Gemini Flash on Vertex AI, with ML processing guaranteed in the
+   EU.** The candidates are Gemini 3.8 Flash on the `eu` multi-region endpoint
+   (preferred) and Gemini 2.5 Flash in europe-west1 (cheaper, older). A short
+   trial with the real tools and German "Du" prompts decides between them. The
+   `global` endpoint is never used: it gives no control over where requests
+   are processed, and the organization policy
+   `constraints/gcp.restrictEndpointUsage` should block it.
+2. **The Assistant calls Vertex AI through its OpenAI-compatible Chat
+   Completions API.** Base URL, credentials and model are configuration, so
+   moving to an EU provider later needs no code change, only a prompt retest.
+3. **Zero retention on Google's side:** request-response logging off,
+   `store=false`, caching off (`disableCache`), and no Grounding with Google
+   Search.
 4. **Built in EduHub, not an adopted chat platform.** LibreChat, Open WebUI or
    Chatwoot would bring their own users and storage and cannot act within
-   EduHub's Hasura roles; the Assistant's tools act as the person chatting.
+   EduHub's Hasura roles. The Assistant's tools act as the person chatting.
+5. **The knowledge index uses the existing Vertex embeddings**
+   (`gemini-embedding-001`, ADR 0004), in its own table.
 
 ## Considered options
 
-- **Vertex AI / Gemini** (already in use): rejected, US company.
-- **Mistral La Plateforme**: rejected for now. EU inference needs a separate
-  endpoint, inputs are kept 30 days by default, and subprocessors outside the
-  chosen region (reportedly US clouds) are allowed.
+- **An EU-company provider** (STACKIT or IONOS, both German, with open-weight
+  models such as Qwen3.8 27B): this remains the target once user data moves
+  off US companies. It was postponed, not rejected.
+- **Open-weight models on Vertex AI:** rejected. The managed open models
+  (gpt-oss, Gemma 4, DeepSeek, GLM, Llama 4) are served only on the global
+  endpoint or in US regions, and managed Qwen3 was retired in October 2026.
+  Mistral Small 3.1 runs in europe-west4, but through its own API and with
+  undocumented tool calling. Self-deploying with vLLM in the EU costs roughly
+  $1.7k–4.5k a month per GPU endpoint, plus the work of running it.
+- **Mistral La Plateforme:** rejected. EU inference needs a separate endpoint,
+  inputs are kept 30 days by default, and subprocessors outside the chosen
+  region are allowed.
 
 ## Consequences
 
-- 24–32B models call tools less reliably than large proprietary models; every
-  change goes through a **Proposed Change** the Organizer applies, and tool
-  calls are retried.
-- Conversations are not stored on our side; only a conversation rated 👎 is kept,
-  with consent, for 30 days. The privacy policy names the provider, and the
-  widget says that the Assistant is an AI.
-- The Assistant is for logged-in users only; anonymous visitors see a prompt to
-  log in. Each person has a rate limit and the platform a monthly spending cap.
-- Expert search (ADR 0004) can move to the same provider later; it needs an
-  OpenAI-compatible embeddings provider and a full re-embed.
+- Google is already a processor, so no new data processing agreement is
+  needed. The privacy policy still gets an Assistant section, and the widget
+  says that the Assistant is an AI.
+- Moving to an EU provider later means an open-weight model, which calls tools
+  less reliably than Gemini. Every change already goes through a **Proposed
+  Change** that the Organizer applies, and tool calls are retried, but prompts
+  must be retested before the switch.
+- Gemini 3.x costs about 10% more on regional and `eu` endpoints than on the
+  global endpoint.
+- Conversations are not stored on our side. Only a conversation rated 👎 is
+  kept, with consent, for 30 days.
+- The Assistant is for logged-in users only; anonymous visitors see a prompt
+  to log in. Each person has a rate limit and the platform a monthly spending
+  cap.
