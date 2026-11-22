@@ -54,14 +54,24 @@ describe.each(LOCALES)('program-type wording in %s.json', (locale, messages) => 
    */
   const OVERRIDE_KEYS = [...PROGRAM_TYPES, 'other'];
 
+  const isOverrideGroup = (group: MessageTree): boolean => {
+    const keys = Object.keys(group);
+    return keys.some((k) => PROGRAM_TYPES.includes(k)) && keys.every((k) => OVERRIDE_KEYS.includes(k));
+  };
+
   const overrideGroups = (tree: MessageTree, prefix = ''): Array<[string, MessageTree]> =>
     Object.entries(tree).flatMap(([key, value]) => {
       if (typeof value === 'string') return [];
       const path = prefix ? `${prefix}.${key}` : key;
-      const keys = Object.keys(value);
-      const isOverrideGroup =
-        keys.some((k) => PROGRAM_TYPES.includes(k)) && keys.every((k) => OVERRIDE_KEYS.includes(k));
-      return isOverrideGroup ? [[path, value] as [string, MessageTree]] : overrideGroups(value, path);
+      return isOverrideGroup(value) ? [[path, value] as [string, MessageTree]] : overrideGroups(value, path);
+    });
+
+  /** Every message except those inside an override set, where the noun is deliberate. */
+  const messagesOutsideOverrides = (tree: MessageTree, prefix = ''): Array<[string, string]> =>
+    Object.entries(tree).flatMap(([key, value]) => {
+      const path = prefix ? `${prefix}.${key}` : key;
+      if (typeof value === 'string') return [[path, value] as [string, string]];
+      return isOverrideGroup(value) ? [] : messagesOutsideOverrides(value, path);
     });
 
   // A partial override set with no base is the one shape that fails silently: a degree
@@ -86,13 +96,11 @@ describe.each(LOCALES)('program-type wording in %s.json', (locale, messages) => 
   // listed per locale in programTypeWordingAllowlist.json; the two tests below fail for any
   // NEW one and for any entry that no longer offends, so the lists can only shrink. Clear one
   // by giving its key a neutral `other` plus the overrides that need the precise noun.
-  const NAMES_ONE_TYPE = /Kurs|Veranstaltung|Studiengang|course/i;
+  const NAMES_ONE_TYPE = /Kurs|Veranstaltung|Studiengang|course|event|degree/i;
 
   const offendingKeys = (): string[] =>
     COURSE_NAMESPACES.flatMap((namespace) =>
-      flatten(messages[namespace] as MessageTree)
-        // A message inside an override set is deliberate wording, not a slip.
-        .filter(([path]) => !PROGRAM_TYPES.includes(path.split('.').pop() ?? ''))
+      messagesOutsideOverrides(messages[namespace] as MessageTree)
         .filter(([, message]) => NAMES_ONE_TYPE.test(message))
         .map(([path]) => `${namespace}.${path}`)
     );
@@ -101,6 +109,27 @@ describe.each(LOCALES)('program-type wording in %s.json', (locale, messages) => 
     const allowed = ALLOWED_PROGRAM_TYPE_WORDING[locale];
 
     expect(offendingKeys().filter((key) => !allowed.has(key))).toEqual([]);
+  });
+
+  it('spots wording for any of the three types, not just German and course', () => {
+    expect(NAMES_ONE_TYPE.test('Cancel event')).toBe(true);
+    expect(NAMES_ONE_TYPE.test('Cancel degree')).toBe(true);
+    expect(NAMES_ONE_TYPE.test('Kurs abbrechen')).toBe(true);
+    expect(NAMES_ONE_TYPE.test('Teilnahme absagen')).toBe(false);
+  });
+
+  // The exemption follows the group's structure, so a message that merely happens to be
+  // called `events` -- e.g. course.general.events, the word "Event" -- stays checked.
+  it('exempts override sets but not an ordinary message named after a type', () => {
+    const tree: MessageTree = {
+      real_override: { courses: 'Kurs', events: 'Event', degrees: 'Degree' },
+      ordinary: { events: 'Event', save: 'Speichern' },
+    };
+
+    expect(messagesOutsideOverrides(tree).map(([path]) => path).sort()).toEqual([
+      'ordinary.events',
+      'ordinary.save',
+    ]);
   });
 
   it('keeps no allowlist entry that has already been fixed', () => {

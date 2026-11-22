@@ -62,7 +62,9 @@ describe('buildEventsRss', () => {
     expect(xml).toContain('<atom:link href="https://edu.example/events/rss.xml" rel="self"');
     expect(xml).toContain('<title>AI &amp; Society &lt;Kiel&gt;</title>');
     expect(xml).toContain('<link>https://edu.example/event/7</link>');
-    expect(xml).toContain('<guid isPermaLink="true">https://edu.example/event/7</guid>');
+    // The GUID is item identity, so it stays on the pre-split URL: a reader that
+    // already has this event must not see it again as a new one.
+    expect(xml).toContain('<guid isPermaLink="true">https://edu.example/course/7</guid>');
     expect(xml).toContain('<description>01.10.2026, 10:00 – 17:30 – Talks and workshops</description>');
     expect(xml).toContain('<pubDate>Sat, 01 Aug 2026 12:00:00 GMT</pubDate>');
   });
