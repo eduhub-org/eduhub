@@ -35,6 +35,6 @@ course-setup rules.
 
 - A thin layer sits between clients and Hasura; it must not grant more than the
   caller's Hasura role, so it calls Hasura with the caller's token, never as admin.
-- Opening it to external clients means data leaves our EU setup through the
+- Opening it to external clients means data leaves our setup through the
   Organizer's chosen LLM; that is the Organizer's decision and needs a privacy
   note and Keycloak OAuth client registration (v2).
