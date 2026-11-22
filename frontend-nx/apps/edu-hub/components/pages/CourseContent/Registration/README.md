@@ -76,7 +76,7 @@ The registration system works in conjunction with the **Onboarding component** t
 **User Experience:**
 - **Visual Distinction**: Special background color (`bg-edu-course-invited`) to highlight invitation status
 - **Clear Messaging**: Congratulatory message and important information about course participation
-- **Mattermost Integration**: Information about course chat access after confirmation
+- **Course Chat**: Information about course chat access after confirmation
 - **Responsive Design**: Mobile-friendly layout with proper spacing and button arrangement
 
 ### Status Transition Flow
@@ -158,7 +158,7 @@ Shows the current enrollment status for users who are already enrolled.
 
 **Course Resource Access:**
 For confirmed and completed enrollments, displays action buttons for:
-- **Course Chat**: Direct link to the course's Mattermost chat channel
+- **Course Chat**: Direct link to the course's chat
 - **Online Meeting**: Link to video conference (when course has online sessions)
 
 ### RegistrationModal
@@ -312,7 +312,6 @@ Potential improvements to the invitation confirmation flow:
 - Email verification step before confirmation
 - Course-specific onboarding questions
 - Integration with calendar systems for session reminders
-- Automated Mattermost channel invitation upon confirmation
 
 ## Benefits
 

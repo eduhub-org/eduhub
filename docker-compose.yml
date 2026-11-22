@@ -45,7 +45,6 @@ services:
       STUJO_FRONTEND_URL: ${STUJO_FRONTEND_URL:-http://${DEV_HOST:-localhost}:5001}
       STUJO_TERMS_URL: ${STUJO_TERMS_URL:-}
       STUJO_ADMIN_EMAIL: ${STUJO_ADMIN_EMAIL:-}
-      MM_URL: ${MM_URL:-https://chat.opencampus.sh}
       # Enable file watching in Docker environment
       CHOKIDAR_USEPOLLING: "true"
       WATCHPACK_POLLING: "true"
@@ -189,8 +188,6 @@ services:
       LMS_USER: ${LMS_USER:-}
       LMS_PASSWORD: ${LMS_PASSWORD:-}
       LMS_ATTENDANCE_SURVEY_ID: ${LMS_ATTENDANCE_SURVEY_ID:-}
-      MM_URL: ${MM_URL:-}
-      MM_TOKEN: ${MM_TOKEN:-}
       # sync_mail_delivery_status reads the Mailgun events API. Unset locally,
       # where the function then reports a missing key instead of running -- the
       # events endpoint has no emulator, so there is nothing to point it at.

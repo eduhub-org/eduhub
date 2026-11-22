@@ -142,7 +142,7 @@ const CourseLinkInfos: FC<{ course: Course_Course_by_pk }> = ({ course }) => {
  * - Course resource access (chat, online meeting) for CONFIRMED and COMPLETED statuses
  * - Responsive design for mobile and desktop
  * - Localized status messages and button text
- * - Integration with course chat (Mattermost) and video conferencing
+ * - Integration with course chat and video conferencing
  *
  * @param props - The component props
  * @returns JSX element representing the enrollment status and available actions

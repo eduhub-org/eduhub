@@ -576,21 +576,9 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
   const legacyChatUrl = course.chatLink?.trim() ? course.chatLink.trim() : '';
   const openParticipantChatHref = derivedMatrixLink || legacyChatUrl || '';
 
-  const isLikelyMattermostChatUrl = (url: string) => {
-    try {
-      const host = new URL(url).hostname.toLowerCase();
-      return host.includes('mattermost') || host.includes('chat.opencampus');
-    } catch {
-      return false;
-    }
-  };
-
-  let participantChatButtonKey = 'manageCourses.participant_chat.button_open_chat';
-  if (matrixRoomId) {
-    participantChatButtonKey = 'manageCourses.participant_chat.button_open_element';
-  } else if (legacyChatUrl && isLikelyMattermostChatUrl(legacyChatUrl)) {
-    participantChatButtonKey = 'manageCourses.participant_chat.button_open_mattermost';
-  }
+  const participantChatButtonKey = matrixRoomId
+    ? 'manageCourses.participant_chat.button_open_element'
+    : 'manageCourses.participant_chat.button_open_chat';
 
   return (
     <div className="w-full flex-1 min-w-0 light">

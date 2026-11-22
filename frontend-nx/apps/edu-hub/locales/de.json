@@ -758,8 +758,6 @@
       "form_intro": "Bitte aktualisiere Deinen aktuellen Beschäftigungsstatus:",
       "confirm_sufficient_time": "Bitte bestätige die Kursteilnahme nur, wenn Du Zeit hast, bis zum Ende am Kurs teilzunehmen.",
       "important": "WICHTIG: KURSEINLADUNG BESTÄTIGEN!",
-      "mattermost_info_1": "Nach der Bestätigung gehe bitte direkt auf den Button zum Kurs-Chat.",
-      "mattermost_info_2": "Falls Du noch keinen Account in unserem Chat hast, musst Du Dich dort zunächst noch einmal anmelden.\nDer Kurs-Chat ist unser zentrales Kommunikationstool für die Kurse.",
       "newsletter_title": "Updates von {organization} abonnieren",
       "newsletter_description": "Erhalte Infos zu neuen Kursen, Lernangeboten und Programm-Neuigkeiten von {organization}.",
       "newsletter_legal": "Du kannst deine Einwilligung jederzeit in deinem Profil widerrufen. Die Verarbeitung erfolgt gemäß unserer <privacy>Datenschutzerklärung</privacy>.",
@@ -1320,7 +1318,6 @@
     "participant_chat": {
       "title": "Teilnehmenden-Chat",
       "button_open_element": "Zum Element-Raum",
-      "button_open_mattermost": "Zum Mattermost-Channel",
       "button_open_chat": "Zum Chat",
       "explanation": "Ein Matrix-Raum ist der Chat für dieses Angebot. Bestätigte Teilnehmende sehen auf der Seite des Angebots einen Button zum Raum und treten darüber bei. Die Leitung erhält im Raum automatisch Moderationsrechte; wer später zur Leitung hinzukommt, wird zusätzlich eingeladen.",
       "explanation_external": "Bestätigte Teilnehmende sehen auf der Seite des Angebots einen Button zu diesem Chat."
