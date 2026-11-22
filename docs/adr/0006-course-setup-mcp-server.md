@@ -23,8 +23,11 @@ course-setup rules.
    save a change in one step.
 3. **v1 operations:** course texts (German and English, also drafted from
    pasted notes), course settings, and Sessions. **Sessions can only be
-   changed while the Course has no Participants**; after that, organizers
-   change them by hand and send the Session Change Notification themselves.
+   changed while the Course has no Registrations in any state** (applied,
+   invited, waitlisted or confirmed); after that, organizers change them by
+   hand and send the Session Change Notification themselves. Creating a course
+   stays limited to Org Admins and Admins, as in Hasura today; instructors use
+   the Assistant to fill in a course they were assigned to.
    Actions on people (moving up, invitations, attendance) and emails are out of
    scope.
 
