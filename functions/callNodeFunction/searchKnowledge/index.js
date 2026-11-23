@@ -19,7 +19,10 @@ const MATCH_COUNT = 30;
 const MIN_QUERY_LENGTH = 3;
 const MAX_QUERY_LENGTH = 1000;
 // Cosine similarities of the providers live on different scales; fake ones are low for long texts.
-const DEFAULT_MIN_SIMILARITY = { vertex: 0.45, fake: 0.05 };
+// Vertex (gemini-embedding-001), tuned on real embeddings of the index: relevant passages scored
+// 0.69–0.80 at the top and stayed above 0.62 down to the eighth, while off-topic questions (weather,
+// poems, trivia) peaked at 0.51–0.60. 0.62 returns nothing for those and a full list for the rest.
+const DEFAULT_MIN_SIMILARITY = { vertex: 0.62, fake: 0.05 };
 
 const MATCH_KNOWLEDGE = `
   query MatchKnowledge(

@@ -1,14 +1,17 @@
 /**
  * Ranking of knowledge passages (issue #2195): by similarity to the question, weighted by source in
- * the epic's order, so the organization's rules and the manual come before glossary and on-screen
- * texts, and those before code. Weights multiply, so they work on any provider's similarity scale.
+ * the epic's order, so among passages about equally close the organization's rules and the manual
+ * come before glossary and on-screen texts, and those before code. Weights multiply, so they work on
+ * any provider's similarity scale. They are small on purpose: gemini-embedding-001 similarities of
+ * relevant passages lie close together (about 0.65–0.8), and larger weights let a loosely related
+ * rules page outrank the exact on-screen text of an error message (tuned with real embeddings).
  */
 
 export const SOURCE_WEIGHTS = {
-  ORGANIZATION_RULES: 1.2,
-  MANUAL: 1.15,
-  GLOSSARY: 1.08,
-  LOCALE: 1.08,
+  ORGANIZATION_RULES: 1.04,
+  MANUAL: 1.03,
+  GLOSSARY: 1.015,
+  LOCALE: 1.015,
   CODE: 1,
 };
 

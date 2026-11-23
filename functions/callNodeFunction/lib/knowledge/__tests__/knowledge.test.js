@@ -347,15 +347,21 @@ describe('ranking', () => {
     content: `passage ${id}`,
   });
 
-  it('puts rules and the manual before glossary, locales and code at similar similarity', () => {
+  it('puts rules and the manual before glossary, locales and code at about the same similarity', () => {
     const ranked = rankPassages([
-      match(1, 'CODE', 0.7),
-      match(2, 'LOCALE', 0.68),
-      match(3, 'MANUAL', 0.66),
-      match(4, 'ORGANIZATION_RULES', 0.65),
-      match(5, 'GLOSSARY', 0.67),
+      match(1, 'CODE', 0.705),
+      match(2, 'LOCALE', 0.7),
+      match(3, 'MANUAL', 0.695),
+      match(4, 'ORGANIZATION_RULES', 0.69),
+      match(5, 'GLOSSARY', 0.699),
     ]);
     expect(ranked.map((p) => p.sourceType)).toEqual(['ORGANIZATION_RULES', 'MANUAL', 'LOCALE', 'GLOSSARY', 'CODE']);
+  });
+
+  it('keeps the exact on-screen text of an error above a loosely related rules page', () => {
+    // Real gemini-embedding-001 scores for a rate-limit message (tuning run, #2195).
+    const ranked = rankPassages([match(1, 'ORGANIZATION_RULES', 0.624), match(2, 'LOCALE', 0.692)]);
+    expect(ranked.map((p) => p.sourceType)).toEqual(['LOCALE', 'ORGANIZATION_RULES']);
   });
 
   it('shows rules stored for several organizations once', () => {

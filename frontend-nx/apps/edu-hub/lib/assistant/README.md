@@ -114,6 +114,10 @@ Sources, ranked in this order (similarity × a weight per source, `lib/knowledge
 | `LOCALE` | `locales/{de,en}.json` of edu-hub and StuJo, as `key.path: text` | GitHub at the release tag, with line |
 | `CODE` | frontend `components`, `pages`, `lib`, `hooks`, …; `functions/**`; Hasura tables, functions and actions metadata | GitHub at the release tag, with lines |
 
+Only passages at least `KNOWLEDGE_SEARCH_MIN_SIMILARITY` close to the question are returned
+(default 0.62 for Vertex, tuned on real embeddings so off-topic questions get nothing; 0.05 for
+`fake`). Source weights are small (×1.00–1.04) and only decide between passages about equally close.
+
 Docs are split by `#`/`##`/`###` heading (about 1,500 characters, 200 overlap), code by file and
 top-level declaration (about 2,000 characters). A code passage also lists the on-screen texts it
 shows (translation keys, also ALL_CAPS codes looked up as `errors.${code}`), so an error message
