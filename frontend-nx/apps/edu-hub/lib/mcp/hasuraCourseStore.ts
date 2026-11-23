@@ -36,7 +36,8 @@ const unverifiedClaims = (token: string): HasuraClaims => {
  */
 export const pickRole = (token: string, requested?: string | null): string => {
   if (requested) return requested;
-  const allowed = unverifiedClaims(token)['x-hasura-allowed-roles'] ?? [];
+  const claimed = unverifiedClaims(token)['x-hasura-allowed-roles'];
+  const allowed = Array.isArray(claimed) ? claimed : [];
   return MANAGING_ROLES.find((r) => allowed.includes(r)) ?? 'user';
 };
 
@@ -113,8 +114,8 @@ const LIST_QUERY = `
 `;
 
 const PROGRAM_QUERY = `
-  query McpCreatablePrograms($where: Program_bool_exp!) {
-    Program(where: $where, order_by: { id: desc }, limit: 200) {
+  query McpCreatablePrograms($where: Program_bool_exp!, $limit: Int!) {
+    Program(where: $where, order_by: { id: desc }, limit: $limit) {
       id title type defaultApplicationEnd
       Organization { name }
     }
@@ -252,14 +253,16 @@ export const createHasuraCourseStore = ({ url, token, role, fetchImpl = fetch }:
       }
     },
 
-    async listCreatablePrograms(caller) {
-      const data = await request<{ Program: any[] }>(PROGRAM_QUERY, { where: creatableProgramWhere(caller.role, caller.userId) });
+    async listCreatablePrograms(caller, { beforeId, limit }) {
+      const creatable = creatableProgramWhere(caller.role, caller.userId);
+      const where = beforeId === undefined ? creatable : { _and: [creatable, { id: { _lt: beforeId } }] };
+      const data = await request<{ Program: any[] }>(PROGRAM_QUERY, { where, limit });
       return data.Program.map(toProgram);
     },
 
     async getCreatableProgram(caller, programId) {
       const where = { _and: [{ id: { _eq: programId } }, creatableProgramWhere(caller.role, caller.userId)] };
-      const data = await request<{ Program: any[] }>(PROGRAM_QUERY, { where });
+      const data = await request<{ Program: any[] }>(PROGRAM_QUERY, { where, limit: 1 });
       return data.Program[0] ? toProgram(data.Program[0]) : null;
     },
 

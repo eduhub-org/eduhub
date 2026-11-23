@@ -141,7 +141,8 @@ export interface CourseStore {
   /** Saves Session changes in one transaction. */
   applySessionChanges(courseId: number, changes: SessionChanges): Promise<void>;
   /** Programs the caller may create courses in, as Hasura's Course insert rule allows. */
-  listCreatablePrograms(caller: Caller): Promise<ProgramSummary[]>;
+  /** Newest id first, with ids below `beforeId` when given; at most `limit`. */
+  listCreatablePrograms(caller: Caller, page: { beforeId?: number; limit: number }): Promise<ProgramSummary[]>;
   getCreatableProgram(caller: Caller, programId: number): Promise<ProgramSummary | null>;
   /** Course columns the caller's role may set when creating a course. */
   insertableCourseColumns(): Promise<Set<string>>;

@@ -363,7 +363,7 @@ describe('creating a course', () => {
   it('an admin can create courses in any program', async () => {
     const setup = setupFor(world, 'admin', 'admin');
     await expect(setup.proposeCreateCourse({ ...draft, programId: 20 })).resolves.toMatchObject({ status: 'PROPOSED' });
-    expect((await setup.listPrograms()).programs.map((p) => p.id)).toEqual([10, 20]);
+    expect((await setup.listPrograms()).programs.map((p) => p.id)).toEqual([20, 10]);
   });
 
   it('an instructor cannot create courses', async () => {
@@ -432,5 +432,30 @@ describe('listing courses', () => {
     expect(second.hasMore).toBe(false);
     expect(second).not.toHaveProperty('nextBeforeId');
     expect([...first.courses, ...second.courses].map((c) => c.id)).toHaveLength(151);
+  });
+});
+
+describe('smaller review fixes', () => {
+  it('refuses Session times without an offset', async () => {
+    const result = setupFor(world, 'ins-1', 'instructor').proposeSessions({
+      courseId: 1,
+      sessions: [{ ...newSession, startDateTime: '2027-01-26T18:00', endDateTime: '2027-01-26T19:30' }],
+    });
+    expect(await errorCode(result)).toBe('INVALID');
+  });
+
+  it('a failing metrics listener does not change the result of apply', async () => {
+    const off = onProposalMetric(() => {
+      throw new Error('listener broke');
+    });
+    jest.spyOn(console, 'error').mockImplementation(() => undefined);
+    try {
+      const setup = setupFor(world, 'ins-1', 'instructor');
+      const proposal = await setup.proposeCourseTexts({ courseId: 1, texts: { tagline: 'Neu' } });
+      await expect(setup.applyProposedChange(proposal)).resolves.toMatchObject({ status: 'APPLIED' });
+      expect(metrics.map((m) => m.event)).toEqual(['created', 'applied']);
+    } finally {
+      off();
+    }
   });
 });

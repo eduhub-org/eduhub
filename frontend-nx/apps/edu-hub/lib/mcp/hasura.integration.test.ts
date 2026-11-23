@@ -36,14 +36,34 @@ const SEEDED_WITH_REGISTRATIONS = 7001; // taught by instructor@example.com
 const ORG_9100_COURSE = 9002; // organization 9100, no Registrations
 const ORG_9100_PROGRAM = 9201; // organization 9100, COURSES
 
-/** Deletes a course as the Org Admin (cleanup only; not an MCP operation). */
-const deleteCourseAsOrgAdmin = async (id: number) => {
-  await fetch(url as string, {
+/** A raw Hasura call as the Org Admin, for cleanup only (not an MCP operation); fails loudly. */
+const asOrgAdmin = async <T>(query: string, variables: Record<string, unknown>): Promise<T> => {
+  const response = await fetch(url as string, {
     method: 'POST',
     headers: { authorization: `Bearer ${tokens.orgadmin}`, 'x-hasura-role': 'org_admin', 'content-type': 'application/json' },
-    body: JSON.stringify({ query: 'mutation ($id: Int!) { delete_Course_by_pk(id: $id) { id } }', variables: { id } }),
+    body: JSON.stringify({ query, variables }),
   });
+  const body = await response.json();
+  if (!response.ok || body.errors) throw new Error(`Cleanup failed: ${JSON.stringify(body.errors ?? response.status)}`);
+  return body.data as T;
 };
+
+const deleteCourseAsOrgAdmin = async (id: number) => {
+  const data = await asOrgAdmin<{ delete_Course_by_pk: { id: number } | null }>(
+    'mutation ($id: Int!) { delete_Course_by_pk(id: $id) { id } }',
+    { id }
+  );
+  if (data.delete_Course_by_pk?.id !== id) throw new Error(`Cleanup failed: course ${id} was not deleted`);
+};
+
+/** Removes this run's test Sessions by their unique title, even if an apply's response was lost. */
+const deleteSessionsTitled = (title: string) =>
+  asOrgAdmin('mutation ($courseId: Int!, $title: String!) { delete_Session(where: { courseId: { _eq: $courseId }, title: { _eq: $title } }) { affected_rows } }', {
+    courseId: ORG_9100_COURSE,
+    title,
+  });
+
+const RUN = Date.now();
 
 (enabled ? describe : describe.skip)('course setup against local Hasura', () => {
   beforeAll(() => jest.spyOn(console, 'info').mockImplementation(() => undefined));
@@ -103,29 +123,33 @@ const deleteCourseAsOrgAdmin = async (id: number) => {
       expect((await setup.getCourse({ courseId: ORG_9100_COURSE })).tagline).toBe('MCP test A');
       await expect(setup.applyProposedChange(second)).rejects.toMatchObject({ code: 'STALE' });
     } finally {
-      const revert = await setup.proposeCourseTexts({ courseId: ORG_9100_COURSE, texts: { tagline: original ?? '' } });
-      await setup.applyProposedChange(revert);
+      // Restore the exact value, null included (the text tools only take strings).
+      await asOrgAdmin('mutation ($id: Int!, $tagline: String) { update_Course_by_pk(pk_columns: { id: $id }, _set: { tagline: $tagline }) { id } }', {
+        id: ORG_9100_COURSE,
+        tagline: original,
+      });
     }
   });
 
   it('an Org Admin adds and deletes a Session while nobody has registered', async () => {
     const setup = setupFor(tokens.orgadmin, 'org_admin');
-    const before = await setup.getCourse({ courseId: ORG_9100_COURSE });
-    expect(before.registrationCount).toBe(0);
+    const title = `MCP test session ${RUN}`;
+    expect((await setup.getCourse({ courseId: ORG_9100_COURSE })).registrationCount).toBe(0);
+    try {
+      const add = await setup.proposeSessions({
+        courseId: ORG_9100_COURSE,
+        sessions: [{ title, startDateTime: '2030-01-08T18:00:00+01:00', endDateTime: '2030-01-08T19:30:00+01:00' }],
+      });
+      await setup.applyProposedChange(add);
+      const added = (await setup.getCourse({ courseId: ORG_9100_COURSE })).sessions.filter((s) => s.title === title);
+      expect(added).toHaveLength(1);
 
-    const add = await setup.proposeSessions({
-      courseId: ORG_9100_COURSE,
-      sessions: [{ title: 'MCP test session', startDateTime: '2030-01-08T18:00:00+01:00', endDateTime: '2030-01-08T19:30:00+01:00' }],
-    });
-    await setup.applyProposedChange(add);
-    const added = (await setup.getCourse({ courseId: ORG_9100_COURSE })).sessions.find(
-      (s) => s.title === 'MCP test session'
-    );
-    expect(added).toBeDefined();
-
-    const remove = await setup.proposeSessions({ courseId: ORG_9100_COURSE, deleteSessionIds: [added?.id as number] });
-    await setup.applyProposedChange(remove);
-    expect((await setup.getCourse({ courseId: ORG_9100_COURSE })).sessions).toHaveLength(before.sessions.length);
+      const remove = await setup.proposeSessions({ courseId: ORG_9100_COURSE, deleteSessionIds: [added[0].id] });
+      await setup.applyProposedChange(remove);
+      expect((await setup.getCourse({ courseId: ORG_9100_COURSE })).sessions.some((s) => s.title === title)).toBe(false);
+    } finally {
+      await deleteSessionsTitled(title);
+    }
   });
 
   it('an Org Admin creates a course in their program; an instructor and another org are refused', async () => {

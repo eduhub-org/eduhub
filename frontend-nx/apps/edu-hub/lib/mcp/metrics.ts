@@ -27,5 +27,12 @@ export const onProposalMetric = (listener: Listener): (() => void) => {
 export const countProposal = (event: ProposalEvent, kind: ProposalKind) => {
   const metric: ProposalMetric = { metric: 'mcp_proposal', event, kind };
   console.info(JSON.stringify(metric));
-  listeners.forEach((listener) => listener(metric));
+  // A failing listener must not change the operation's result (an apply is already saved here).
+  listeners.forEach((listener) => {
+    try {
+      listener(metric);
+    } catch (error) {
+      console.error('MCP proposal metric listener failed', error);
+    }
+  });
 };

@@ -111,8 +111,13 @@ export const createFakeCourseStore = (world: FakeWorld, userId: string, role: st
         c.sessions.push({ id: Math.max(0, ...c.sessions.map((x) => x.id)) + 1, updatedAt: null, ...s });
       });
     },
-    async listCreatablePrograms() {
-      return world.programs.filter(mayCreateIn).map(toSummary);
+    async listCreatablePrograms(_caller, { beforeId, limit }) {
+      return [...world.programs]
+        .filter(mayCreateIn)
+        .filter((p) => beforeId === undefined || p.id < beforeId)
+        .sort((a, b) => b.id - a.id)
+        .slice(0, limit)
+        .map(toSummary);
     },
     async getCreatableProgram(_caller, programId) {
       const p = world.programs.find((x) => x.id === programId);

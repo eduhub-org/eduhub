@@ -93,7 +93,7 @@ interface Options {
   now?: () => number;
 }
 
-const COURSE_PAGE_SIZE = 100;
+const PAGE_SIZE = 100;
 
 const PROPOSED_MESSAGE = 'Not saved yet. Show the Organizer before and after; only apply saves it.';
 
@@ -106,7 +106,9 @@ const upper = (value: unknown) => (typeof value === 'string' ? value.toUpperCase
 const normalizeTime = (value: unknown) =>
   typeof value === 'string' && /^\d{2}:\d{2}$/.test(value) ? `${value}:00` : value;
 
-const isIsoDateTime = (value: string) => /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(value) && !isNaN(Date.parse(value));
+/** An ISO 8601 date-time with `Z` or a numeric offset, so it never depends on the server's time zone. */
+const isIsoDateTime = (value: string) =>
+  /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}:\d{2})$/.test(value) && !isNaN(Date.parse(value));
 
 export const createCourseSetup = ({ store, secret, now = Date.now }: Options) => {
   if (!secret) throw new Error('A proposal signing secret is required.');
@@ -294,9 +296,9 @@ export const createCourseSetup = ({ store, secret, now = Date.now }: Options) =>
     /** Pages of 100, newest first; pass `nextBeforeId` back as `beforeId` for the next page. */
     async listCourses({ beforeId }: { beforeId?: number } = {}) {
       const who = await caller();
-      const rows = await store.listManagedCourses(who, { beforeId, limit: COURSE_PAGE_SIZE + 1 });
-      const courses = rows.slice(0, COURSE_PAGE_SIZE);
-      const hasMore = rows.length > COURSE_PAGE_SIZE;
+      const rows = await store.listManagedCourses(who, { beforeId, limit: PAGE_SIZE + 1 });
+      const courses = rows.slice(0, PAGE_SIZE);
+      const hasMore = rows.length > PAGE_SIZE;
       return { courses, hasMore, ...(hasMore && { nextBeforeId: courses[courses.length - 1].id }) };
     },
 
@@ -413,9 +415,13 @@ export const createCourseSetup = ({ store, secret, now = Date.now }: Options) =>
     },
 
     /** Programs the caller may create courses in (empty for instructors). */
-    async listPrograms() {
+    /** Pages of 100, newest first; pass `nextBeforeId` back as `beforeId` for the next page. */
+    async listPrograms({ beforeId }: { beforeId?: number } = {}) {
       const who = await caller();
-      return { programs: await store.listCreatablePrograms(who) };
+      const rows = await store.listCreatablePrograms(who, { beforeId, limit: PAGE_SIZE + 1 });
+      const programs = rows.slice(0, PAGE_SIZE);
+      const hasMore = rows.length > PAGE_SIZE;
+      return { programs, hasMore, ...(hasMore && { nextBeforeId: programs[programs.length - 1].id }) };
     },
 
     async proposeCreateCourse({ programId, title, language, texts = {}, settings = {}, locationOptions }: CreateCourseInput) {
@@ -503,7 +509,10 @@ export const createCourseSetup = ({ store, secret, now = Date.now }: Options) =>
       return { status: 'APPLIED', kind: proposal.kind, courseId: course.id };
     },
 
-    /** Proposals are not stored, so discarding just confirms that nothing will be saved. */
+    /**
+     * Proposals are not stored, so discarding can't revoke one: it only confirms that nothing was
+     * saved. The client must drop the proposedChangeId; it stays valid until it expires.
+     */
     async discardProposedChange({ proposedChangeId }: { proposedChangeId: string }) {
       await caller();
       try {
@@ -512,7 +521,10 @@ export const createCourseSetup = ({ store, secret, now = Date.now }: Options) =>
         // An expired proposal can't be applied anyway, so discarding it is fine.
         if (!(error instanceof OperationError && error.code === 'EXPIRED')) throw error;
       }
-      return { status: 'DISCARDED', message: 'Nothing was saved.' };
+      return {
+        status: 'DISCARDED',
+        message: 'Nothing was saved. Forget this proposedChangeId; the server does not revoke it.',
+      };
     },
   };
 };
