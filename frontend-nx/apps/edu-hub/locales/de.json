@@ -4030,7 +4030,7 @@
         "EXPIRED": "Dieser Vorschlag ist abgelaufen. Bitte um einen neuen.",
         "FORBIDDEN": "Du darfst diese Änderung nicht vornehmen.",
         "INVALID": "Die Änderung ist ungültig. Bitte um einen neuen Vorschlag.",
-        "ALREADY_APPLIED": "Diese Änderung wurde schon übernommen."
+        "TITLE_TAKEN": "In diesem Programm gibt es schon einen Kurs mit diesem Titel, deshalb wurde nichts gespeichert. Wähl einen anderen Titel."
       }
     }
   }

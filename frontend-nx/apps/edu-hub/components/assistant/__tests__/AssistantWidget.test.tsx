@@ -210,15 +210,18 @@ describe('AssistantWidget', () => {
       expect(within(card).queryByRole('button', { name: 'Apply' })).not.toBeInTheDocument();
     });
 
-    it('shows why applying failed and does not offer a stale proposal again', async () => {
-      mockDecideProposal.mockResolvedValue({ ok: false, error: { code: 'STALE', message: '' } });
+    it.each([
+      ['STALE', /The course has changed since this was proposed/],
+      ['TITLE_TAKEN', /A course with this title already exists in this program/],
+    ])('shows why applying failed (%s) and does not offer that proposal again', async (code, text) => {
+      mockDecideProposal.mockResolvedValue({ ok: false, error: { code, message: '' } });
       const card = await showProposal();
 
       await act(async () => {
         fireEvent.click(within(card).getByRole('button', { name: 'Apply' }));
       });
 
-      expect(within(card).getByText(/The course has changed since this was proposed/)).toBeInTheDocument();
+      expect(within(card).getByText(text)).toBeInTheDocument();
       expect(within(card).getByRole('button', { name: 'Apply' })).toBeDisabled();
       expect(within(card).getByRole('button', { name: 'Discard' })).toBeEnabled();
     });

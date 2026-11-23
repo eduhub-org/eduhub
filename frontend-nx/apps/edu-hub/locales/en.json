@@ -4045,7 +4045,7 @@
         "EXPIRED": "This proposal has expired. Ask for a new one.",
         "FORBIDDEN": "You are not allowed to make this change.",
         "INVALID": "The change is not valid. Ask for a new proposal.",
-        "ALREADY_APPLIED": "This change has already been applied."
+        "TITLE_TAKEN": "A course with this title already exists in this program, so nothing was saved. Choose another title."
       }
     }
   }

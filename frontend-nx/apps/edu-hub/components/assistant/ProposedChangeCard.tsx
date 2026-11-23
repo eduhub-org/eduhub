@@ -15,7 +15,7 @@ export interface ProposalState {
 }
 
 /** Errors after which applying again can't succeed; the Organizer has to ask for a new proposal. */
-export const FINAL_APPLY_ERRORS = ['ALREADY_APPLIED', 'STALE', 'EXPIRED', 'FORBIDDEN', 'INVALID', 'NOT_FOUND', 'REGISTRATIONS_EXIST'];
+export const FINAL_APPLY_ERRORS = ['TITLE_TAKEN', 'STALE', 'EXPIRED', 'FORBIDDEN', 'INVALID', 'NOT_FOUND', 'REGISTRATIONS_EXIST'];
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
