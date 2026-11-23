@@ -148,7 +148,8 @@ locals {
         STUJO_ADMIN_EMAIL            = var.stujo_admin_email
         STRIPE_TAX_RATE_ID           = var.stripe_tax_rate_id
         STUJO_SELLER_ORGANIZATION_ID = var.stujo_seller_organization_id
-        # Semantic expert search (ADR 0004); "" turns it off.
+        # Semantic expert search (ADR 0004) and the Assistant's knowledge
+        # search (#2195); "" turns both off.
         EMBEDDING_PROVIDER = var.embedding_provider
         EMBEDDING_LOCATION = var.embedding_location != "" ? var.embedding_location : var.region
       })

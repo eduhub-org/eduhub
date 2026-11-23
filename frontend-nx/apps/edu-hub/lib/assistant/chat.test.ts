@@ -66,7 +66,8 @@ describe('tool calls', () => {
       userTools(),
       3
     );
-    expect(provider.requests.map((r) => r.tools.length)).toEqual([3, 3, 0]);
+    const offered = userTools().definitions.length;
+    expect(provider.requests.map((r) => r.tools.length)).toEqual([offered, offered, 0]);
     expect(summary.outcome).toBe('ok');
   });
 
