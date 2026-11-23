@@ -1,5 +1,6 @@
 import { FC, useCallback, useMemo, useState } from 'react';
 import Link from 'next/link';
+import { coursePath, manageCoursePath } from '../../../../helpers/coursePath';
 import { useRouter } from 'next/router';
 import { useTranslations } from 'next-intl';
 import { MdOpenInNew, MdPublic } from 'react-icons/md';
@@ -79,7 +80,7 @@ const PublicEventSection: FC<Props> = ({ course, session }) => {
         });
         const eventId = data?.insert_Course_one?.id;
         if (!eventId) throw new Error(t('create_failed'));
-        await router.push(`/manage/course/${eventId}`);
+        await router.push(manageCoursePath(eventId, ProgramType.EVENTS));
       } catch (error) {
         setErrorMessage(error instanceof Error ? error.message : t('create_failed'));
       }
@@ -124,10 +125,10 @@ const PublicEventSection: FC<Props> = ({ course, session }) => {
             </span>
           </p>
           <div className="flex flex-wrap gap-2">
-            <Link href={`/manage/course/${event.id}`} className={OUTLINE_BUTTON}>
+            <Link href={manageCoursePath(event.id, ProgramType.EVENTS)} className={OUTLINE_BUTTON}>
               {t('open_event')}
             </Link>
-            <Link href={`/course/${event.id}`} className={OUTLINE_BUTTON} target="_blank" rel="noopener noreferrer">
+            <Link href={coursePath(event.id, ProgramType.EVENTS)} className={OUTLINE_BUTTON} target="_blank" rel="noopener noreferrer">
               <MdOpenInNew aria-hidden />
               {t('view_page')}
             </Link>

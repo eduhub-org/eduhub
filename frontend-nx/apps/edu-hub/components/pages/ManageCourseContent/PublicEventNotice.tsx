@@ -1,5 +1,7 @@
 import { FC, useState } from 'react';
 import Link from 'next/link';
+import { coursePath, manageCoursePath } from '../../../helpers/coursePath';
+import { ProgramType } from '../../../types/enums';
 import { useTranslations } from 'next-intl';
 import { MdOpenInNew, MdPublic } from 'react-icons/md';
 
@@ -59,7 +61,7 @@ export const PublicEventNotice: FC<{ course: ManagedCourse_Course_by_pk }> = ({ 
           {source.Course && (
             <>
               {' '}
-              <Link href={`/manage/course/${source.Course.id}`} className="underline">
+              <Link href={manageCoursePath(source.Course.id)} className="underline">
                 {t('to_course')}
               </Link>
             </>
@@ -68,7 +70,7 @@ export const PublicEventNotice: FC<{ course: ManagedCourse_Course_by_pk }> = ({ 
       </p>
       <p className="text-sm text-white/80">{course.published ? t('published') : t('draft')}</p>
       <div className="flex flex-wrap gap-3">
-        <Link href={`/course/${course.id}`} target="_blank" rel="noopener noreferrer" className={BUTTON}>
+        <Link href={coursePath(course.id, ProgramType.EVENTS)} target="_blank" rel="noopener noreferrer" className={BUTTON}>
           <MdOpenInNew aria-hidden />
           {course.published ? t('view_page') : t('preview_page')}
         </Link>

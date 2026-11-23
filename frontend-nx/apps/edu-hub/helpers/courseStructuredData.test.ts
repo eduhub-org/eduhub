@@ -45,7 +45,7 @@ describe('buildCourseStructuredData - events', () => {
 
     expect(data['@type']).toBe('Event');
     expect(data.name).toBe('Prototyping Week');
-    expect(data.url).toBe('https://edu.example/course/42');
+    expect(data.url).toBe('https://edu.example/event/42');
     expect(data.image).toBe('https://cdn.example/cover.png');
     expect(data.startDate).toBe('2025-09-12T08:00:00.000Z');
     expect(data.endDate).toBe('2025-09-14T12:00:00.000Z');
@@ -88,7 +88,7 @@ describe('buildCourseStructuredData - events', () => {
     expect(data.eventAttendanceMode).toBe('https://schema.org/MixedEventAttendanceMode');
     expect(data.location).toEqual([
       { '@type': 'Place', name: 'KIEL', address: 'KIEL' },
-      { '@type': 'VirtualLocation', url: 'https://edu.example/course/42' },
+      { '@type': 'VirtualLocation', url: 'https://edu.example/event/42' },
     ]);
   });
 
@@ -125,6 +125,7 @@ describe('buildCourseStructuredData - courses', () => {
       instructor: [{ '@type': 'Person', name: 'Grace Hopper' }],
     });
     expect(data.subEvent).toBeUndefined();
+    expect(data.url).toBe('https://edu.example/course/42');
   });
 
   it('defaults an unknown program type to Course', () => {
@@ -154,6 +155,7 @@ describe('buildCourseStructuredData - degrees', () => {
     expect(data.numberOfCredits).toBe(12.5);
     expect(data.maximumEnrollment).toBe(30);
     expect(data.applicationDeadline).toBe('2025-09-01T00:00:00.000Z');
+    expect(data.url).toBe('https://edu.example/degree/42');
     expect(data.hasCourse).toEqual([
       { '@type': 'Course', name: 'Published member', url: 'https://edu.example/course/7' },
     ]);
