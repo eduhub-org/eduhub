@@ -9,7 +9,7 @@ Welcome to the guide on how to contribute by adding a new Python backend functio
 ## **Prerequisites**
 
 1. Familiarity with Hasura, Python, and serverless functions.
-2. Ensure you have access to the necessary environment variables if you'll be interfacing with production instances of Mattermost, LimeSurvey, or ZoomClient.
+2. Ensure you have access to the necessary environment variables if you'll be interfacing with production instances of LimeSurvey or ZoomClient.
 
 ## **Step 1: Local Development Without Server Request**
 
@@ -30,7 +30,7 @@ Before integrating your function into the main server, start by testing your fun
      - Once verified, add your code as a new method to the `EduHubClient`.
      - Update the `EduHubClient` library (e.g., easiest is selecting the complete code in the file and executing it).
 
-3. **Note on External Services**: If you're using Mattermost, LimeSurvey, or ZoomClient, set the variables in the **repo root** `.env` (see `.env.example`, section *Python serverless functions*). Docker Compose passes them into `python_functions`. For host-only runs of `python dev.py`, the same file is loaded from `../.env`.
+3. **Note on External Services**: If you're using LimeSurvey or ZoomClient, set the variables in the **repo root** `.env` (see `.env.example`, section *Python serverless functions*). Docker Compose passes them into `python_functions`. For host-only runs of `python dev.py`, the same file is loaded from `../.env`.
 
 ## **Step 2: Local Testing of the Serverless Function**
 

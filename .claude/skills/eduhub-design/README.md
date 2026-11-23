@@ -5,7 +5,7 @@ A design system for **EduHub**, the community learning platform built by
 EduHub centralizes educational offerings: people apply to and get accepted into courses,
 organize course information, manage project results, and earn certificates and micro-degrees.
 Its current focus is on application & event-registration flows and on strengthening
-**learning communities** (including a Mattermost-based chat integration).
+**learning communities** (including a course chat integration).
 
 > Tagline in the product hero: **"Start Hacking — Your Life."**
 
