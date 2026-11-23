@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useApolloClient } from '@apollo/client';
 
 import {
   AssistantError,
@@ -24,6 +25,17 @@ export interface ConversationMessage {
 }
 
 const STORAGE_PREFIX = 'eduhub-assistant:';
+
+/** Removes every stored conversation, e.g. after logout, so none outlives its login on a shared computer. */
+export const clearStoredConversations = () => {
+  try {
+    Object.keys(window.sessionStorage)
+      .filter((key) => key.startsWith(STORAGE_PREFIX))
+      .forEach((key) => window.sessionStorage.removeItem(key));
+  } catch {
+    // Storage blocked: nothing was stored either.
+  }
+};
 
 let counter = 0;
 const newId = () => `${Date.now().toString(36)}-${(counter++).toString(36)}`;
@@ -81,6 +93,7 @@ export const useAssistantConversation = ({
   const [sending, setSending] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
   const deciding = useRef(new Set<string>());
+  const apollo = useApolloClient();
 
   useEffect(() => {
     setMessages(load(storageKey));
@@ -163,6 +176,8 @@ export const useAssistantConversation = ({
       updateProposal(key, (p) => ({ ...p, busy: true, error: undefined }));
       const outcome = await decideProposal(state.proposal.proposedChangeId, action, role);
       deciding.current.delete(key);
+      // The page behind the panel shows the course; reload its data so it shows the saved change.
+      if (outcome.ok && action === 'apply') apollo.refetchQueries({ include: 'active' }).catch(() => undefined);
       updateProposal(key, (p) => {
         if (!outcome.ok) return { ...p, busy: false, status: 'FAILED', error: outcome.error };
         if (action === 'apply') return { ...p, busy: false, status: 'APPLIED' };
@@ -171,7 +186,7 @@ export const useAssistantConversation = ({
         return { ...p, busy: false, status: 'DISCARDED', proposal: { ...p.proposal, proposedChangeId: '' } };
       });
     },
-    [messages, role]
+    [messages, role, apollo]
   );
 
   const reset = useCallback(() => {

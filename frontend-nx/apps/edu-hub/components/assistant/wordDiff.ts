@@ -49,5 +49,38 @@ export const wordDiff = (before: string, after: string): DiffPart[] => {
   }
   while (i < a.length) push(parts, a[i++], 'removed');
   while (j < b.length) push(parts, b[j++], 'added');
-  return parts;
+  return groupChanges(parts);
+};
+
+/**
+ * Within a stretch of changes, shows everything removed before everything added.
+ * Otherwise the spaces both texts share split a replaced sentence into
+ * alternating old and new words.
+ */
+const groupChanges = (parts: DiffPart[]): DiffPart[] => {
+  const grouped: DiffPart[] = [];
+  let removed = '';
+  let added = '';
+  const flush = () => {
+    if (removed) push(grouped, removed, 'removed');
+    if (added) push(grouped, added, 'added');
+    removed = '';
+    added = '';
+  };
+  parts.forEach((part, index) => {
+    const between =
+      part.type === 'same' &&
+      /^\s+$/.test(part.text) &&
+      (removed || added) &&
+      index + 1 < parts.length &&
+      parts[index + 1].type !== 'same';
+    if (part.type === 'removed' || between) removed += part.text;
+    if (part.type === 'added' || between) added += part.text;
+    if (part.type === 'same' && !between) {
+      flush();
+      push(grouped, part.text, 'same');
+    }
+  });
+  flush();
+  return grouped;
 };

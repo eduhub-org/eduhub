@@ -25,6 +25,9 @@ jest.mock('next-intl', () => {
   };
 });
 
+const mockRefetchQueries = jest.fn().mockResolvedValue([]);
+jest.mock('@apollo/client', () => ({ useApolloClient: () => ({ refetchQueries: mockRefetchQueries }) }));
+
 const mockSignIn = jest.fn();
 jest.mock('next-auth/react', () => ({ signIn: (...args: unknown[]) => mockSignIn(...args) }));
 
@@ -98,6 +101,7 @@ beforeEach(() => {
   mockLoggedIn = true;
   mockImpersonationTarget = null;
   mockSignIn.mockClear();
+  mockRefetchQueries.mockClear();
   mockStreamChat.mockReset();
   mockDecideProposal.mockReset();
   mockSendFeedback.mockReset().mockResolvedValue(true);
@@ -115,6 +119,16 @@ describe('AssistantWidget', () => {
     expect(screen.queryByLabelText('Your question')).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Log in' }));
     expect(mockSignIn).toHaveBeenCalledWith('keycloak');
+  });
+
+  it('clears stored conversations once nobody is logged in', () => {
+    window.sessionStorage.setItem('eduhub-assistant:user-1', '[]');
+    window.sessionStorage.setItem('unrelated', 'kept');
+    mockLoggedIn = false;
+    renderWidget();
+
+    expect(window.sessionStorage.getItem('eduhub-assistant:user-1')).toBeNull();
+    expect(window.sessionStorage.getItem('unrelated')).toBe('kept');
   });
 
   it('always says it is an AI and links to the privacy policy', () => {
@@ -239,8 +253,11 @@ describe('AssistantWidget', () => {
       await act(async () => resolveApply({ ok: true, result: { status: 'APPLIED' } }));
 
       expect(mockDecideProposal).toHaveBeenCalledTimes(1);
+      // The course page behind the panel reloads its data to show the saved change.
+      expect(mockRefetchQueries).toHaveBeenCalledWith({ include: 'active' });
       expect(mockDecideProposal).toHaveBeenCalledWith('signed-proposal-1', 'apply', 'instructor');
       expect(within(card).getByText('Applied and saved.')).toBeInTheDocument();
+      expect(within(card).queryByText(/Not saved yet/)).not.toBeInTheDocument();
       expect(within(card).queryByRole('button', { name: 'Apply' })).not.toBeInTheDocument();
     });
 
@@ -298,7 +315,7 @@ describe('AssistantWidget', () => {
         fireEvent.click(screen.getByRole('button', { name: 'Helpful' }));
       });
 
-      expect(mockSendFeedback).toHaveBeenCalledWith({ rating: 'up', consent: false }, 'instructor');
+      expect(mockSendFeedback).toHaveBeenCalledWith({ rating: 'up', consent: false, route: '/manage/course/[courseId]' }, 'instructor');
       expect(screen.getByText('Thanks for your feedback!')).toBeInTheDocument();
     });
 
@@ -316,6 +333,7 @@ describe('AssistantWidget', () => {
         {
           rating: 'down',
           consent: true,
+          route: '/manage/course/[courseId]',
           messages: [
             { role: 'user', content: 'A question' },
             { role: 'assistant', content: 'An answer.' },
@@ -332,7 +350,7 @@ describe('AssistantWidget', () => {
         fireEvent.click(screen.getByRole('button', { name: 'No, only send the rating' }));
       });
 
-      expect(mockSendFeedback).toHaveBeenCalledWith({ rating: 'down', consent: false }, 'instructor');
+      expect(mockSendFeedback).toHaveBeenCalledWith({ rating: 'down', consent: false, route: '/manage/course/[courseId]' }, 'instructor');
     });
   });
 

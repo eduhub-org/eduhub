@@ -192,6 +192,8 @@ export interface FeedbackRequest {
   consent: boolean;
   /** Only sent for 👎 with the user's consent. */
   messages?: ChatMessagePayload[];
+  /** The route pattern (e.g. `/course/[courseId]`), without IDs. */
+  route?: string;
 }
 
 export const sendFeedback = async (feedback: FeedbackRequest, role: string): Promise<boolean> => {

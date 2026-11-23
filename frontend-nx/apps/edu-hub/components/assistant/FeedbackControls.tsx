@@ -7,19 +7,21 @@ type Step = 'ask' | 'consent' | 'sending' | 'thanks' | 'failed';
 
 interface Props {
   role: string;
+  /** The route pattern the user is on, without IDs. */
+  route: string;
   /** The conversation, only sent for 👎 when the user agrees. */
   getMessages: () => ChatMessagePayload[];
 }
 
 /** 👍 / 👎 for the whole conversation. 👎 asks before the conversation is kept. */
-export const FeedbackControls: FC<Props> = ({ role, getMessages }) => {
+export const FeedbackControls: FC<Props> = ({ role, route, getMessages }) => {
   const t = useTranslations('assistant.feedback');
   const [step, setStep] = useState<Step>('ask');
 
   const submit = async (rating: 'up' | 'down', consent: boolean) => {
     setStep('sending');
     const ok = await sendFeedback(
-      { rating, consent, ...(rating === 'down' && consent && { messages: getMessages() }) },
+      { rating, consent, route, ...(rating === 'down' && consent && { messages: getMessages() }) },
       role
     );
     setStep(ok ? 'thanks' : 'failed');
@@ -33,7 +35,7 @@ export const FeedbackControls: FC<Props> = ({ role, getMessages }) => {
       <div className="rounded border border-border-primary p-2 text-xs" role="group" aria-label={t('consent_label')}>
         <p className="mb-2">{t('consent_question')}</p>
         <div className="flex flex-wrap gap-2">
-          <button type="button" className="rounded-full bg-cta px-3 py-1 text-cta-text" onClick={() => submit('down', true)}>
+          <button type="button" className="rounded-full bg-cta px-3 py-1 text-label-primary" onClick={() => submit('down', true)}>
             {t('consent_yes')}
           </button>
           <button
@@ -56,7 +58,7 @@ export const FeedbackControls: FC<Props> = ({ role, getMessages }) => {
         aria-label={t('helpful')}
         disabled={step === 'sending'}
         onClick={() => submit('up', false)}
-        className="rounded p-1 hover:bg-fill-secondary"
+        className="rounded p-1 hover:bg-bg-secondary"
       >
         👍
       </button>
@@ -65,7 +67,7 @@ export const FeedbackControls: FC<Props> = ({ role, getMessages }) => {
         aria-label={t('not_helpful')}
         disabled={step === 'sending'}
         onClick={() => setStep('consent')}
-        className="rounded p-1 hover:bg-fill-secondary"
+        className="rounded p-1 hover:bg-bg-secondary"
       >
         👎
       </button>

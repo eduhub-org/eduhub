@@ -20,7 +20,12 @@ import type { PageContext } from './api';
 import { FeedbackControls } from './FeedbackControls';
 import { buildPageContext } from './pageContext';
 import { ProposedChangeCard } from './ProposedChangeCard';
-import { ConversationMessage, toPayload, useAssistantConversation } from './useAssistantConversation';
+import {
+  clearStoredConversations,
+  ConversationMessage,
+  toPayload,
+  useAssistantConversation,
+} from './useAssistantConversation';
 
 export const ASSISTANT_CONTACT_HREF = 'mailto:edu@opencampus.sh';
 
@@ -147,7 +152,7 @@ const Chat: FC<{ userId: string | null; contactHref: string }> = ({ userId, cont
           message.role === 'user' ? (
             <div key={message.id} className="ml-auto max-w-[85%] min-w-0">
               <p className="sr-only">{t('you_wrote')}</p>
-              <p className="whitespace-pre-wrap break-words rounded-lg bg-fill-secondary px-3 py-2">{message.content}</p>
+              <p className="whitespace-pre-wrap break-words rounded-lg bg-bg-secondary px-3 py-2">{message.content}</p>
               {message.pageContext && <SentContext context={message.pageContext} />}
             </div>
           ) : (
@@ -185,7 +190,7 @@ const Chat: FC<{ userId: string | null; contactHref: string }> = ({ userId, cont
             <button
               type="submit"
               disabled={!draft.trim()}
-              className="rounded-full bg-cta px-4 py-1 text-cta-text hover:bg-cta-hover disabled:opacity-50"
+              className="rounded-full bg-cta px-4 py-1 text-label-primary hover:bg-cta-hover disabled:opacity-50"
             >
               {t('send')}
             </button>
@@ -195,7 +200,12 @@ const Chat: FC<{ userId: string | null; contactHref: string }> = ({ userId, cont
 
       <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border-primary pt-2">
         {hasReply ? (
-          <FeedbackControls key={messages[0]?.id} role={role} getMessages={() => toPayload(messages)} />
+          <FeedbackControls
+            key={messages[0]?.id}
+            role={role}
+            route={router.pathname}
+            getMessages={() => toPayload(messages)}
+          />
         ) : (
           <span />
         )}
@@ -227,6 +237,10 @@ export const AssistantWidget: FC<Props> = ({ privacyHref = '/privacy', contactHr
   const userId = useCurrentUserId();
   const buttonRef = useRef<HTMLButtonElement>(null);
 
+  useEffect(() => {
+    if (!isSessionLoading && !isLoggedIn) clearStoredConversations();
+  }, [isSessionLoading, isLoggedIn]);
+
   // The Assistant acts with the signed-in person's own token. While an admin views
   // the app as someone else, that would be the admin, not the person on screen.
   const viewingAsSomeone = Boolean(target) || impersonationLoading;
@@ -244,7 +258,7 @@ export const AssistantWidget: FC<Props> = ({ privacyHref = '/privacy', contactHr
         onClick={() => setOpen(true)}
         aria-haspopup="dialog"
         aria-label={t('open')}
-        className="fixed bottom-4 right-4 z-[1200] flex items-center gap-2 rounded-full bg-cta px-4 py-3 text-cta-text shadow-lg hover:bg-cta-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-label-primary"
+        className="light fixed bottom-4 right-4 z-[1200] flex items-center gap-2 rounded-full bg-cta px-4 py-3 text-label-primary shadow-lg hover:bg-cta-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-label-primary"
       >
         <MdOutlineChat className="text-xl" aria-hidden="true" />
         <span className="hidden sm:inline">{t('button')}</span>
@@ -257,7 +271,7 @@ export const AssistantWidget: FC<Props> = ({ privacyHref = '/privacy', contactHr
         ariaLabelledBy="assistant-title"
         fullScreenOnMobile
       >
-        <p className="mb-3 rounded bg-fill-secondary p-2 text-xs text-label-primary">
+        <p className="sticky top-0 z-10 mb-3 rounded bg-bg-secondary p-2 text-xs text-label-primary shadow-sm">
           {t('ai_notice')}{' '}
           <a href={privacyHref} className="underline" target="_blank" rel="noopener noreferrer">
             {t('privacy_link')}
@@ -270,7 +284,7 @@ export const AssistantWidget: FC<Props> = ({ privacyHref = '/privacy', contactHr
             <button
               type="button"
               onClick={() => signIn('keycloak')}
-              className="rounded-full bg-cta px-4 py-1 text-cta-text hover:bg-cta-hover"
+              className="rounded-full bg-cta px-4 py-1 text-label-primary hover:bg-cta-hover"
             >
               {t('login')}
             </button>

@@ -69,11 +69,11 @@ export const ProposedChangeCard: FC<Props> = ({ state, onApply, onDiscard }) => 
     return String(value);
   };
 
+  const finished = status === 'APPLIED' || status === 'DISCARDED';
   const before = isRecord(proposal.before) ? proposal.before : {};
   const after = isRecord(proposal.after) ? proposal.after : {};
   const keys = Array.from(new Set([...Object.keys(before), ...Object.keys(after)]));
 
-  const finished = status === 'APPLIED' || status === 'DISCARDED';
   const canApply = !finished && !busy && !(error && FINAL_APPLY_ERRORS.includes(error.code));
   const headingId = `proposal-${state.key}`;
 
@@ -86,7 +86,7 @@ export const ProposedChangeCard: FC<Props> = ({ state, onApply, onDiscard }) => 
       <h3 id={headingId} className="font-semibold">
         {t('title', { kind: kindLabel })}
       </h3>
-      <p className="mb-2 text-xs text-label-secondary">{t('not_saved_yet')}</p>
+      {!finished && <p className="mb-2 text-xs text-label-secondary">{t('not_saved_yet')}</p>}
 
       <dl className="space-y-2">
         {keys.map((key) => {
@@ -146,7 +146,7 @@ export const ProposedChangeCard: FC<Props> = ({ state, onApply, onDiscard }) => 
             type="button"
             onClick={onApply}
             disabled={!canApply}
-            className="rounded-full bg-cta px-4 py-1 text-cta-text hover:bg-cta-hover disabled:opacity-50"
+            className="rounded-full bg-cta px-4 py-1 text-label-primary hover:bg-cta-hover disabled:opacity-50"
           >
             {busy ? t('applying') : t('apply')}
           </button>
