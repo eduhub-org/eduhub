@@ -19,10 +19,15 @@ const MAX_CONTENT_CHARS = 1800;
 
 export const rankPassages = (matches, { limit = MAX_PASSAGES } = {}) => {
   const perPath = new Map();
+  // The same rules are stored once per organization they apply to.
+  const seen = new Set();
   return matches
     .map((match) => ({ ...match, score: match.similarity * (SOURCE_WEIGHTS[match.sourceType] ?? 1) }))
     .sort((a, b) => b.score - a.score || a.id - b.id)
     .filter((match) => {
+      const key = `${match.url}\n${match.content}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
       const count = perPath.get(match.path) ?? 0;
       perPath.set(match.path, count + 1);
       return count < MAX_PER_PATH;

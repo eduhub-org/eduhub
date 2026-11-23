@@ -343,8 +343,8 @@ describe('ranking', () => {
     similarity,
     path: file,
     title: file,
-    url: `/${file}`,
-    content: 'x',
+    url: `/${file}#${id}`,
+    content: `passage ${id}`,
   });
 
   it('puts rules and the manual before glossary, locales and code at similar similarity', () => {
@@ -358,6 +358,14 @@ describe('ranking', () => {
     expect(ranked.map((p) => p.sourceType)).toEqual(['ORGANIZATION_RULES', 'MANUAL', 'LOCALE', 'GLOSSARY', 'CODE']);
   });
 
+  it('shows rules stored for several organizations once', () => {
+    const rule = (id) => ({ ...match(id, 'ORGANIZATION_RULES', 0.7, 'readme/termine'), url: '/termine', content: 'Same' });
+    expect(rankPassages([rule(1), rule(2), match(3, 'CODE', 0.5)]).map((p) => p.sourceType)).toEqual([
+      'ORGANIZATION_RULES',
+      'CODE',
+    ]);
+  });
+
   it('still puts much closer code first and caps passages per file', () => {
     const ranked = rankPassages([
       match(1, 'MANUAL', 0.4),
@@ -366,7 +374,7 @@ describe('ranking', () => {
       match(4, 'CODE', 0.88, 'a.ts'),
     ]);
     expect(ranked.map((p) => p.sourceType)).toEqual(['CODE', 'CODE', 'MANUAL']);
-    expect(ranked[0]).toMatchObject({ url: '/a.ts', score: 0.9 });
+    expect(ranked[0]).toMatchObject({ url: '/a.ts#2', score: 0.9 });
   });
 });
 

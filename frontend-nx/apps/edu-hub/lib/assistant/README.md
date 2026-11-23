@@ -108,7 +108,7 @@ Sources, ranked in this order (similarity × a weight per source, `lib/knowledge
 
 | Source type | From | Link |
 |-------------|------|------|
-| `ORGANIZATION_RULES` | the opencampus GitBook (`llms.txt` + each page's Markdown), only for people in that organization or looking at one of its courses | GitBook page |
+| `ORGANIZATION_RULES` | the opencampus GitBook (`llms.txt` + each page's Markdown), stored for the Organizations `opencampus.sh` and `EduHub Default` (which still owns the live programs; `KNOWLEDGE_GITBOOK_ORGANIZATION`), only for people in one of them or looking at one of their courses | GitBook page |
 | `MANUAL` | `docs/manual/{de,en}/**/*.md` (#2196), picked up as pages appear | `/help/<slug>#<heading>`, `/en/help/…` |
 | `GLOSSARY` | `CONTEXT.md` | GitHub at the release tag |
 | `LOCALE` | `locales/{de,en}.json` of edu-hub and StuJo, as `key.path: text` | GitHub at the release tag, with line |

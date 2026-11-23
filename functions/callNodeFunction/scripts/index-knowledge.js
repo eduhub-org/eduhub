@@ -21,8 +21,10 @@
  *   --repo <dir>                    checkout to index (default: the repository this script is in)
  *   --release <tag>                 git tag of the checkout; used for source links (required)
  *   --gitbook-url <url|none>        GitBook space (default KNOWLEDGE_GITBOOK_URL or the opencampus FAQ)
- *   --gitbook-organization <name>   Organization the GitBook rules belong to, matched by name
- *                                   (default KNOWLEDGE_GITBOOK_ORGANIZATION or "opencampus")
+ *   --gitbook-organization <names>  Organizations the GitBook rules belong to, comma-separated,
+ *                                   each matched by name (default KNOWLEDGE_GITBOOK_ORGANIZATION or
+ *                                   "opencampus.sh,EduHub Default": in production the live courses
+ *                                   are still in programs of EduHub Default)
  *   --force                         replace the index even if the new one is much smaller
  *   --dry-run                       print the passage counts and exit
  */
@@ -35,7 +37,7 @@ import { buildKnowledgeIndex } from '../lib/knowledge/build.js';
 import { collectRepoPassages, fetchGitbookPassages } from '../lib/knowledge/sources.js';
 
 const DEFAULT_GITBOOK_URL = 'https://opencampus.gitbook.io/faq';
-const DEFAULT_GITBOOK_ORGANIZATION = 'opencampus';
+const DEFAULT_GITBOOK_ORGANIZATIONS = 'opencampus.sh,EduHub Default';
 
 const logger = {
   info: (message, data) => console.log(message, data ? JSON.stringify(data) : ''),
@@ -74,8 +76,12 @@ const main = async () => {
   if (!args.release) throw new Error('--release is required');
   const repo = path.resolve(args.repo ?? path.join(path.dirname(fileURLToPath(import.meta.url)), '../../..'));
   const gitbookUrl = args.gitbookUrl ?? process.env.KNOWLEDGE_GITBOOK_URL ?? DEFAULT_GITBOOK_URL;
-  const gitbookOrganization =
-    args.gitbookOrganization ?? process.env.KNOWLEDGE_GITBOOK_ORGANIZATION ?? DEFAULT_GITBOOK_ORGANIZATION;
+  const gitbookOrganizations = (
+    args.gitbookOrganization ?? process.env.KNOWLEDGE_GITBOOK_ORGANIZATION ?? DEFAULT_GITBOOK_ORGANIZATIONS
+  )
+    .split(',')
+    .map((name) => name.trim())
+    .filter(Boolean);
 
   const repoPassages = collectRepoPassages(repo, { release: args.release, logger });
   const count = (passages) =>
@@ -93,8 +99,11 @@ const main = async () => {
 
   let rules = [];
   if (gitbookUrl !== 'none') {
-    const organizationId = await rulesOrganizationId(gql, gitbookOrganization);
-    rules = await fetchGitbookPassages(gitbookUrl, { organizationId, logger });
+    // Fetched once, stored once per organization; the search drops the duplicates.
+    const organizationIds = [];
+    for (const name of gitbookOrganizations) organizationIds.push(await rulesOrganizationId(gql, name));
+    const pages = await fetchGitbookPassages(gitbookUrl, { organizationId: null, logger });
+    rules = organizationIds.flatMap((organizationId) => pages.map((page) => ({ ...page, organizationId })));
   }
 
   const runId = `${args.release}@${new Date().toISOString()}`;
