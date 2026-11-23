@@ -856,6 +856,19 @@ actions:
     permissions:
       - role: org_admin
     comment: Expert Role sources (courses, sessions, projects, achievement options) closest in meaning to a search, for the expert directory (ADR 0004). Admins and org admins.
+  - name: searchKnowledge
+    definition:
+      kind: ""
+      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      timeout: 30
+      headers:
+        - name: Function-Name
+          value: searchKnowledge
+        - name: Hasura-Secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+    permissions:
+      - role: user
+    comment: Passages of the Assistant's knowledge index (rules, manual, glossary, locales, released code) closest to a question, ranked docs before code (issue #2195). Organization rules only of the asker's organizations.
 custom_types:
   enums: []
   input_objects:
@@ -868,6 +881,8 @@ custom_types:
   objects:
     - name: SemanticExpertSearchResult
     - name: ExpertRoleMatchResult
+    - name: SearchKnowledgeResult
+    - name: KnowledgePassage
     - name: NotifySessionParticipantsResult
     - name: CreateUserResult
     - name: loadFileOutput

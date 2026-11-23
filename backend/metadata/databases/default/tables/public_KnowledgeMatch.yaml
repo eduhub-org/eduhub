@@ -1,0 +1,4 @@
+# Return type of match_knowledge; never holds rows. No role permissions.
+table:
+  name: KnowledgeMatch
+  schema: public
