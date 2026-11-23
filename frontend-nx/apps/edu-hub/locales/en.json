@@ -3968,12 +3968,7 @@
     "contact": "Contact the EduHub team",
     "errors": {
       "generic": "Something went wrong. Please try again later.",
-      "NETWORK": "The connection was lost. Please try again.",
-      "UNAUTHENTICATED": "Your login has expired. Please log in again.",
-      "RATE_LIMITED": "You have sent a lot of questions. Please wait a little before asking again.",
-      "SPENDING_CAP": "The Assistant is switched off for the rest of this month because its monthly budget is used up.",
-      "TOO_LONG": "This message or conversation is too long. Please start a new conversation.",
-      "PROVIDER": "The AI service is not responding right now. Please try again later."
+      "NETWORK": "The connection was lost. Please try again."
     },
     "context": {
       "summary": "Sent with your question",
@@ -4045,8 +4040,12 @@
         "EXPIRED": "This proposal has expired. Ask for a new one.",
         "FORBIDDEN": "You are not allowed to make this change.",
         "INVALID": "The change is not valid. Ask for a new proposal.",
-        "TITLE_TAKEN": "A course with this title already exists in this program, so nothing was saved. Choose another title."
+        "TITLE_TAKEN": "A course with this title already exists in this program, so nothing was saved. Choose another title.",
+        "REGISTRATIONS_EXIST": "People have already registered for this course, so its sessions can only be changed by hand. Nothing was saved.",
+        "NO_CHANGE": "This proposal changes nothing, so there is nothing to apply.",
+        "ROLE_NOT_ALLOWED": "You can't make this change with your current role."
       }
-    }
+    },
+    "looking_up": "Looking it up…"
   }
 }

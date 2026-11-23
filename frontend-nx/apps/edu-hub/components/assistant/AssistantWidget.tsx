@@ -82,7 +82,9 @@ const Reply: FC<{
           </ReactMarkdown>
         </div>
       )}
-      {message.streaming && !message.content && <p className="text-label-secondary">{t('thinking')}</p>}
+      {message.streaming && (message.lookingUp || !message.content) && (
+        <p className="text-label-secondary">{message.lookingUp ? t('looking_up') : t('thinking')}</p>
+      )}
       {message.proposals.map((state) => (
         <ProposedChangeCard
           key={state.key}
@@ -93,7 +95,9 @@ const Reply: FC<{
       ))}
       {message.error && (
         <p className="mt-1 text-error">
-          {t.has(`errors.${message.error.code}`) ? t(`errors.${message.error.code}`) : t('errors.generic')}{' '}
+          {/* The backend sends `message` already in the user's language. */}
+          {message.error.message ||
+            (t.has(`errors.${message.error.code}`) ? t(`errors.${message.error.code}`) : t('errors.generic'))}{' '}
           <a href={contactHref} className="underline">
             {t('contact')}
           </a>

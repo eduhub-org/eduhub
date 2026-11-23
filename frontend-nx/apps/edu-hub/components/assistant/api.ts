@@ -50,6 +50,7 @@ export interface AssistantError {
 export type ChatEvent =
   | { type: 'delta'; text: string }
   | { type: 'proposal'; proposal: ProposedChange }
+  | { type: 'tool'; name: string; status: 'running' | 'done' | 'failed' }
   | { type: 'error'; error: AssistantError }
   | { type: 'done' };
 
@@ -74,6 +75,10 @@ const toChatEvent = (block: string): ChatEvent | null => {
       return typeof body.text === 'string' ? { type: 'delta', text: body.text } : null;
     case 'proposal':
       return { type: 'proposal', proposal: body as unknown as ProposedChange };
+    case 'tool':
+      return typeof body.name === 'string' && ['running', 'done', 'failed'].includes(body.status as string)
+        ? { type: 'tool', name: body.name, status: body.status as 'running' | 'done' | 'failed' }
+        : null;
     case 'error':
       return { type: 'error', error: body as unknown as AssistantError };
     case 'done':
@@ -101,9 +106,9 @@ const jsonError = async (response: Response): Promise<AssistantError> => {
   } catch {
     // not JSON; fall through
   }
-  if (response.status === 401) return { code: 'UNAUTHENTICATED', message: '' };
-  if (response.status === 429) return { code: 'RATE_LIMITED', message: '' };
-  return { code: 'INTERNAL', message: `HTTP ${response.status}` };
+  if (response.status === 401) return { code: 'NOT_LOGGED_IN', message: '' };
+  if (response.status === 429) return { code: 'RATE_LIMITED_SHORT', message: '' };
+  return { code: 'UNAVAILABLE', message: '' };
 };
 
 const headers = (role: string) => ({ 'Content-Type': 'application/json', 'x-hasura-role': role });
@@ -123,9 +128,9 @@ export const streamChat = async (
       body: JSON.stringify(request),
       signal,
     });
-  } catch (error) {
+  } catch {
     if (signal?.aborted) return;
-    onEvent({ type: 'error', error: { code: 'NETWORK', message: String(error) } });
+    onEvent({ type: 'error', error: { code: 'NETWORK', message: '' } });
     return;
   }
   if (!response.ok || !response.body) {
@@ -152,8 +157,8 @@ export const streamChat = async (
         finished = true;
       }
     }
-  } catch (error) {
-    if (!signal?.aborted) onEvent({ type: 'error', error: { code: 'NETWORK', message: String(error) } });
+  } catch {
+    if (!signal?.aborted) onEvent({ type: 'error', error: { code: 'NETWORK', message: '' } });
   } finally {
     if (!finished) reader.cancel().catch(() => undefined);
   }
@@ -177,8 +182,8 @@ export const decideProposal = async (
     });
     if (!response.ok) return { ok: false, error: await jsonError(response) };
     return { ok: true, result: await response.json() };
-  } catch (error) {
-    return { ok: false, error: { code: 'NETWORK', message: String(error) } };
+  } catch {
+    return { ok: false, error: { code: 'NETWORK', message: '' } };
   }
 };
 

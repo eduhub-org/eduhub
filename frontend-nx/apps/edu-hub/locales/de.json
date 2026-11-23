@@ -3953,12 +3953,7 @@
     "contact": "Schreib dem EduHub-Team",
     "errors": {
       "generic": "Etwas ist schiefgelaufen. Bitte versuch es später noch einmal.",
-      "NETWORK": "Die Verbindung wurde unterbrochen. Bitte versuch es noch einmal.",
-      "UNAUTHENTICATED": "Deine Anmeldung ist abgelaufen. Bitte melde Dich neu an.",
-      "RATE_LIMITED": "Du hast viele Fragen geschickt. Bitte warte kurz, bevor Du weiterfragst.",
-      "SPENDING_CAP": "Der Assistent ist für den Rest des Monats ausgeschaltet, weil sein Monatsbudget aufgebraucht ist.",
-      "TOO_LONG": "Diese Nachricht oder Unterhaltung ist zu lang. Bitte starte eine neue Unterhaltung.",
-      "PROVIDER": "Der KI-Dienst antwortet gerade nicht. Bitte versuch es später noch einmal."
+      "NETWORK": "Die Verbindung wurde unterbrochen. Bitte versuch es noch einmal."
     },
     "context": {
       "summary": "Mit Deiner Frage gesendet",
@@ -4030,8 +4025,12 @@
         "EXPIRED": "Dieser Vorschlag ist abgelaufen. Bitte um einen neuen.",
         "FORBIDDEN": "Du darfst diese Änderung nicht vornehmen.",
         "INVALID": "Die Änderung ist ungültig. Bitte um einen neuen Vorschlag.",
-        "TITLE_TAKEN": "In diesem Programm gibt es schon einen Kurs mit diesem Titel, deshalb wurde nichts gespeichert. Wähl einen anderen Titel."
+        "TITLE_TAKEN": "In diesem Programm gibt es schon einen Kurs mit diesem Titel, deshalb wurde nichts gespeichert. Wähl einen anderen Titel.",
+        "REGISTRATIONS_EXIST": "Für diesen Kurs haben sich schon Personen angemeldet, deshalb kannst Du seine Termine nur von Hand ändern. Es wurde nichts gespeichert.",
+        "NO_CHANGE": "Dieser Vorschlag ändert nichts, es gibt also nichts zu übernehmen.",
+        "ROLE_NOT_ALLOWED": "Mit Deiner aktuellen Rolle kannst Du diese Änderung nicht vornehmen."
       }
-    }
+    },
+    "looking_up": "Schaut nach…"
   }
 }

@@ -19,6 +19,8 @@ export interface ConversationMessage {
   proposals: ProposalState[];
   error?: AssistantError;
   streaming?: boolean;
+  /** The backend is running a tool (looking up data) for this reply. */
+  lookingUp?: boolean;
 }
 
 const STORAGE_PREFIX = 'eduhub-assistant:';
@@ -35,6 +37,7 @@ const load = (key: string | null): ConversationMessage[] => {
     return (JSON.parse(stored) as ConversationMessage[]).map((message) => ({
       ...message,
       streaming: false,
+      lookingUp: false,
       proposals: message.proposals.map((p) => ({ ...p, busy: false })),
     }));
   } catch {
@@ -121,13 +124,15 @@ export const useAssistantConversation = ({
               ...m,
               proposals: [...m.proposals, { key: newId(), proposal: event.proposal, status: 'PROPOSED', busy: false }],
             }));
+          } else if (event.type === 'tool') {
+            updateMessage(reply.id, (m) => ({ ...m, lookingUp: event.status === 'running' }));
           } else if (event.type === 'error') {
             updateMessage(reply.id, (m) => ({ ...m, error: event.error }));
           }
         },
         controller.signal
       );
-      updateMessage(reply.id, (m) => ({ ...m, streaming: false }));
+      updateMessage(reply.id, (m) => ({ ...m, streaming: false, lookingUp: false }));
       setSending(false);
     },
     [messages, sending, locale, role]

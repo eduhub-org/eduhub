@@ -17,12 +17,14 @@ describe('parseSseBuffer', () => {
     const { events } = parseSseBuffer(
       `event: proposal\ndata: ${JSON.stringify(proposal)}\n\n` +
         'event: ping\ndata: {}\n\n' +
+        'event: tool\ndata: {"name":"search_catalogue","status":"running"}\n\n' +
         'event: delta\ndata: not json\n\n' +
         'event: error\r\ndata: {"code":"RATE_LIMITED","message":"slow down"}\r\n\r\n' +
         'event: done\ndata: {}\n\n'
     );
     expect(events).toEqual([
       { type: 'proposal', proposal },
+      { type: 'tool', name: 'search_catalogue', status: 'running' },
       { type: 'error', error: { code: 'RATE_LIMITED', message: 'slow down' } },
       { type: 'done' },
     ]);

@@ -15,7 +15,17 @@ export interface ProposalState {
 }
 
 /** Errors after which applying again can't succeed; the Organizer has to ask for a new proposal. */
-export const FINAL_APPLY_ERRORS = ['TITLE_TAKEN', 'STALE', 'EXPIRED', 'FORBIDDEN', 'INVALID', 'NOT_FOUND', 'REGISTRATIONS_EXIST'];
+export const FINAL_APPLY_ERRORS = [
+  'TITLE_TAKEN',
+  'STALE',
+  'EXPIRED',
+  'FORBIDDEN',
+  'ROLE_NOT_ALLOWED',
+  'INVALID',
+  'NO_CHANGE',
+  'NOT_FOUND',
+  'REGISTRATIONS_EXIST',
+];
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -124,8 +134,8 @@ export const ProposedChangeCard: FC<Props> = ({ state, onApply, onDiscard }) => 
         {status === 'DISCARDED' && <p className="mt-2 text-label-secondary">{t('discarded')}</p>}
         {error && (
           <p className="mt-2 text-error" role="status">
-            {t.has(`errors.${error.code}`) ? t(`errors.${error.code}`) : t('errors.generic')}
-            {error.message ? ` (${error.message})` : ''}
+            {/* The MCP server's messages are English, so translated codes come first. */}
+            {t.has(`errors.${error.code}`) ? t(`errors.${error.code}`) : error.message || t('errors.generic')}
           </p>
         )}
       </div>

@@ -156,17 +156,51 @@ describe('AssistantWidget', () => {
     expect(screen.getByText('Course ID: 7')).toBeInTheDocument();
   });
 
-  it('shows a translated error with a contact link when the Assistant cannot answer', async () => {
-    replyWith([{ type: 'error', error: { code: 'SPENDING_CAP', message: '' } }]);
+  it('shows the backend’s localized error with a contact link when the Assistant cannot answer', async () => {
+    replyWith([
+      { type: 'error', error: { code: 'SPENDING_CAP_REACHED', message: 'The Assistant is paused for this month.' } },
+    ]);
     renderWidget();
     openPanel();
     await ask('Hello?');
 
-    expect(await screen.findByText(/switched off for the rest of this month/)).toBeInTheDocument();
+    expect(await screen.findByText(/The Assistant is paused for this month\./)).toBeInTheDocument();
     expect(screen.getAllByRole('link', { name: 'Contact the EduHub team' })[0]).toHaveAttribute(
       'href',
       'mailto:edu@opencampus.sh'
     );
+  });
+
+  it('translates errors that have no message from the server, such as a lost connection', async () => {
+    replyWith([{ type: 'error', error: { code: 'NETWORK', message: '' } }]);
+    renderWidget();
+    openPanel();
+    await ask('Hello?');
+
+    expect(await screen.findByText(/The connection was lost/)).toBeInTheDocument();
+  });
+
+  it('says it is looking something up while a tool runs', async () => {
+    let send: (event: ChatEvent) => void = () => undefined;
+    let finish: () => void = () => undefined;
+    mockStreamChat.mockImplementationOnce(
+      (_request: ChatRequest, _role: string, onEvent: (event: ChatEvent) => void) =>
+        new Promise<void>((resolve) => {
+          send = onEvent;
+          finish = resolve;
+        })
+    );
+    renderWidget();
+    openPanel();
+    await ask('Am I on the waitlist?');
+
+    act(() => send({ type: 'tool', name: 'get_my_registrations', status: 'running' }));
+    expect(screen.getByText('Looking it up…')).toBeInTheDocument();
+    act(() => send({ type: 'tool', name: 'get_my_registrations', status: 'done' }));
+    act(() => send({ type: 'delta', text: 'Yes, place 3.' }));
+    expect(screen.queryByText('Looking it up…')).not.toBeInTheDocument();
+    await act(async () => finish());
+    expect(screen.getByText('Yes, place 3.')).toBeInTheDocument();
   });
 
   describe('Proposed Change', () => {

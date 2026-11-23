@@ -16,55 +16,23 @@ enabled in edu-hub for now.
 - The role sent as `x-hasura-role` is the normal role, except `org_admin` for
   org admins on `/manage` pages.
 
-## Backend contract (agreed with #2193)
+## Backend contract (#2193)
 
-## 1. Chat: `POST /api/assistant/chat`
-Auth: NextAuth session cookie (same origin). Header `x-hasura-role: <current role>` (same as /api/mcp).
-Request JSON:
-```json
-{
-  "locale": "de",
-  "messages": [
-    { "role": "user", "content": "..." },
-    { "role": "assistant", "content": "...",
-      "proposals": [{ "proposedChangeId": "...", "kind": "course_texts", "courseId": 12, "status": "PROPOSED|APPLIED|DISCARDED|FAILED" }] }
-  ],
-  "pageContext": {
-    "path": "/manage/course/12",       // asPath without query
-    "route": "/manage/course/[courseId]", // Next route pattern
-    "courseId": 12,                       // optional
-    "sessionId": 34,                      // optional
-    "errorMessage": "..."                 // optional, the visible error
-  }
-}
-```
-`proposals` on assistant messages tell the model what the Organizer did with earlier proposals.
+The backend's `lib/assistant/README.md` (PR #2200) is the spec. In short:
 
-Response: `text/event-stream`; each event is `event: <type>\ndata: <json>\n\n`:
-- `delta`    `{ "text": "..." }`  — append to the reply (Markdown, links allowed)
-- `proposal` `ProposedChangeResult` from lib/mcp/operations.ts as-is
-             `{ status:"PROPOSED", proposedChangeId, kind, courseId, before, after, expiresAt, message }`
-- `error`    `{ "code": "UNAUTHENTICATED|RATE_LIMITED|SPENDING_CAP|TOO_LONG|PROVIDER|INTERNAL", "message": "..." }`
-             then the stream ends. Widget shows a translated text per code, `message` as fallback.
-- `done`     `{}`
-Pre-stream failures (401/413/429 …) may instead return JSON `{ "error": { code, message } }` with that status.
+- `POST /api/assistant/chat` with `{ locale, messages: [{ role, content, proposals? }], pageContext }`
+  and `x-hasura-role`. Failures before the stream answer JSON `{ error: { code, message } }`;
+  otherwise SSE events `delta {text}`, `tool {name, status}`, `proposal` (the MCP
+  `ProposedChangeResult` as-is), `error {code, message}`, and `done` always last.
+- `POST /api/assistant/proposals` with `{ proposedChangeId, action: "apply" | "discard" }`. Only
+  the widget's buttons call it; the model never gets apply or discard. Both buttons are disabled
+  while a request is in flight and nothing retries (a duplicate apply of a stateless
+  `create_course` proposal could create two courses). After discard the widget forgets the id
+  (discard doesn't revoke it server-side), so later `proposals` entries omit it.
+- `POST /api/assistant/feedback` with `{ rating, consent, messages? }`; `messages` only for 👎
+  with consent.
 
-## 2. Apply / discard: `POST /api/assistant/proposals`
-The widget's buttons call this directly; NO LLM in the loop. The model must NOT get
-`apply_proposed_change` as a tool, so only the Organizer's click can save.
-Both buttons are disabled while a request is in flight and nothing retries
-automatically (a duplicate apply of a stateless create_course proposal could
-create two courses). After discard the widget forgets the proposedChangeId
-(discard doesn't revoke it server-side), so later `proposals` entries may omit it.
-Request `{ "proposedChangeId": "...", "action": "apply" | "discard" }` + same auth/role header.
-Response 200: result of applyProposedChange / discardProposedChange
-(`{ status:"APPLIED", kind, courseId }` / `{ status:"DISCARDED", message }`).
-Error 4xx/5xx: `{ "error": { "code": "<OperationError code: STALE|EXPIRED|FORBIDDEN|INVALID|…>", "message": "..." } }`.
-
-## 3. Feedback: `POST /api/assistant/feedback`
-`{ "rating": "up" | "down", "consent": boolean, "messages"?: [...same shape as chat...] }`
-`messages` is sent ONLY when rating=down AND consent=true; otherwise just an anonymous count.
-Response 204 (or `{ error }`).
-
-## Contact when it can't help
-Model puts a contact link in its text; the widget also shows a static "Contact" link in the panel footer.
+Error texts: the chat endpoint's `message` is already localized and shown as is; the texts for its
+codes live under `assistant.errors.<CODE>` on the backend branch. This branch only adds
+`assistant.errors.generic` and `NETWORK` (client-side). Apply errors come from the MCP server in
+English, so the widget translates their codes under `assistant.proposal.errors`.
