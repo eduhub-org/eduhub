@@ -1,0 +1,311 @@
+import React from 'react';
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import '@testing-library/jest-dom';
+import { AssistantWidget } from '../AssistantWidget';
+import type { ChatEvent, ChatRequest, ProposedChange } from '../api';
+
+// next-intl ships ESM only, which this Jest setup can't load. This stand-in reads
+// the real en.json, so a missing translation key still fails the test.
+jest.mock('next-intl', () => {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const messages = require('../../../locales/en.json');
+  const lookup = (path: string): unknown =>
+    path.split('.').reduce<unknown>((node, key) => (node as Record<string, unknown> | undefined)?.[key], messages);
+  return {
+    useLocale: () => 'en',
+    useTranslations: (namespace: string) => {
+      const t = (key: string, values: Record<string, unknown> = {}) => {
+        const text = lookup(`${namespace}.${key}`);
+        if (typeof text !== 'string') throw new Error(`Missing translation: ${namespace}.${key}`);
+        return text.replace(/\{(\w+)\}/g, (_match, name) => String(values[name]));
+      };
+      t.has = (key: string) => typeof lookup(`${namespace}.${key}`) === 'string';
+      return t;
+    },
+  };
+});
+
+const mockSignIn = jest.fn();
+jest.mock('next-auth/react', () => ({ signIn: (...args: unknown[]) => mockSignIn(...args) }));
+
+jest.mock('next/router', () => ({
+  useRouter: () => ({ pathname: '/manage/course/[courseId]', asPath: '/manage/course/7', query: { courseId: '7' } }),
+}));
+
+let mockLoggedIn = true;
+jest.mock('../../../hooks/authentication', () => ({
+  useIsLoggedIn: () => mockLoggedIn,
+  useIsSessionLoading: () => false,
+  useCurrentUserId: () => (mockLoggedIn ? 'user-1' : null),
+  useCurrentRole: () => (mockLoggedIn ? 'instructor' : 'anonymous'),
+  useIsOrgAdmin: () => false,
+}));
+
+let mockImpersonationTarget: object | null = null;
+jest.mock('../../../contexts/ImpersonationContext', () => ({
+  useImpersonation: () => ({ target: mockImpersonationTarget, loading: false }),
+}));
+
+jest.mock('react-markdown', () => ({
+  __esModule: true,
+  default: ({ children }: { children: string }) => <p>{children}</p>,
+}));
+jest.mock('remark-gfm', () => ({ __esModule: true, default: () => undefined }));
+
+// The mock backend: follows the contract in components/assistant/README.md.
+const mockStreamChat = jest.fn();
+const mockDecideProposal = jest.fn();
+const mockSendFeedback = jest.fn();
+jest.mock('../api', () => ({
+  ...jest.requireActual('../api'),
+  streamChat: (...args: unknown[]) => mockStreamChat(...args),
+  decideProposal: (...args: unknown[]) => mockDecideProposal(...args),
+  sendFeedback: (...args: unknown[]) => mockSendFeedback(...args),
+}));
+
+const proposal: ProposedChange = {
+  status: 'PROPOSED',
+  proposedChangeId: 'signed-proposal-1',
+  kind: 'course_texts',
+  courseId: 7,
+  before: { tagline: 'Learn Python fast', maxParticipants: 20 },
+  after: { tagline: 'Learn Rust fast', maxParticipants: 25 },
+  expiresAt: '2026-11-23T00:00:00Z',
+  message: 'Not saved yet.',
+};
+
+/** Makes the mocked backend stream these events for the next question. */
+const replyWith = (events: ChatEvent[]) =>
+  mockStreamChat.mockImplementationOnce(
+    async (_request: ChatRequest, _role: string, onEvent: (event: ChatEvent) => void) => {
+      events.forEach(onEvent);
+    }
+  );
+
+const renderWidget = () =>
+  render(<AssistantWidget />);
+
+const openPanel = () => fireEvent.click(screen.getByRole('button', { name: 'Open the AI Assistant' }));
+
+const ask = async (question: string) => {
+  fireEvent.change(screen.getByLabelText('Your question'), { target: { value: question } });
+  await act(async () => {
+    fireEvent.click(screen.getByRole('button', { name: 'Send' }));
+  });
+};
+
+beforeEach(() => {
+  mockLoggedIn = true;
+  mockImpersonationTarget = null;
+  mockSignIn.mockClear();
+  mockStreamChat.mockReset();
+  mockDecideProposal.mockReset();
+  mockSendFeedback.mockReset().mockResolvedValue(true);
+  window.sessionStorage.clear();
+  document.body.innerHTML = '';
+});
+
+describe('AssistantWidget', () => {
+  it('asks logged-out visitors to log in instead of opening the chat', () => {
+    mockLoggedIn = false;
+    renderWidget();
+    openPanel();
+
+    expect(screen.getByText(/Log in to ask the Assistant/)).toBeInTheDocument();
+    expect(screen.queryByLabelText('Your question')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Log in' }));
+    expect(mockSignIn).toHaveBeenCalledWith('keycloak');
+  });
+
+  it('always says it is an AI and links to the privacy policy', () => {
+    renderWidget();
+    openPanel();
+
+    expect(screen.getByText(/You are chatting with an AI, not a person/)).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Privacy policy' })).toHaveAttribute('href', '/privacy');
+  });
+
+  it('is not available while an admin views the app as someone else', () => {
+    mockImpersonationTarget = { id: 'someone-else' };
+    renderWidget();
+    openPanel();
+
+    expect(screen.getByText(/not available while you are viewing EduHub as someone else/)).toBeInTheDocument();
+    expect(screen.queryByLabelText('Your question')).not.toBeInTheDocument();
+  });
+
+  it('sends the question with the page context, shows what was sent and streams the reply', async () => {
+    replyWith([
+      { type: 'delta', text: 'Your course ' },
+      { type: 'delta', text: 'starts on Monday.' },
+      { type: 'done' },
+    ]);
+    renderWidget();
+    openPanel();
+    await ask('When does my course start?');
+
+    const [request, role] = mockStreamChat.mock.calls[0];
+    expect(role).toBe('instructor');
+    expect(request).toEqual({
+      locale: 'en',
+      messages: [{ role: 'user', content: 'When does my course start?' }],
+      pageContext: { path: '/manage/course/7', route: '/manage/course/[courseId]', courseId: 7 },
+    });
+    expect(await screen.findByText('Your course starts on Monday.')).toBeInTheDocument();
+    expect(screen.getByText('Sent with your question')).toBeInTheDocument();
+    expect(screen.getByText('Course ID: 7')).toBeInTheDocument();
+  });
+
+  it('shows a translated error with a contact link when the Assistant cannot answer', async () => {
+    replyWith([{ type: 'error', error: { code: 'SPENDING_CAP', message: '' } }]);
+    renderWidget();
+    openPanel();
+    await ask('Hello?');
+
+    expect(await screen.findByText(/switched off for the rest of this month/)).toBeInTheDocument();
+    expect(screen.getAllByRole('link', { name: 'Contact the EduHub team' })[0]).toHaveAttribute(
+      'href',
+      'mailto:edu@opencampus.sh'
+    );
+  });
+
+  describe('Proposed Change', () => {
+    const showProposal = async () => {
+      replyWith([{ type: 'delta', text: 'Here is my suggestion.' }, { type: 'proposal', proposal }, { type: 'done' }]);
+      renderWidget();
+      openPanel();
+      await ask('Make the tagline about Rust');
+      return screen.findByTestId('proposed-change');
+    };
+
+    it('shows before and after, with a text diff for texts', async () => {
+      const card = await showProposal();
+
+      expect(within(card).getByText('Proposed change: course texts')).toBeInTheDocument();
+      expect(within(card).getByText(/Not saved yet/)).toBeInTheDocument();
+      expect(within(card).getByText('Python').tagName).toBe('DEL');
+      expect(within(card).getByText('Rust').tagName).toBe('INS');
+      expect(within(card).getByText('Maximum participants')).toBeInTheDocument();
+      expect(within(card).getByText('20')).toBeInTheDocument();
+      expect(within(card).getByText('25')).toBeInTheDocument();
+    });
+
+    it('applies only on the Organizer’s click, and only once', async () => {
+      let resolveApply: (value: unknown) => void = () => undefined;
+      mockDecideProposal.mockImplementation(() => new Promise((resolve) => (resolveApply = resolve)));
+      const card = await showProposal();
+      expect(mockDecideProposal).not.toHaveBeenCalled();
+
+      const apply = within(card).getByRole('button', { name: 'Apply' });
+      fireEvent.click(apply);
+      fireEvent.click(apply);
+      expect(within(card).getByRole('button', { name: 'Applying…' })).toBeDisabled();
+      expect(within(card).getByRole('button', { name: 'Discard' })).toBeDisabled();
+
+      await act(async () => resolveApply({ ok: true, result: { status: 'APPLIED' } }));
+
+      expect(mockDecideProposal).toHaveBeenCalledTimes(1);
+      expect(mockDecideProposal).toHaveBeenCalledWith('signed-proposal-1', 'apply', 'instructor');
+      expect(within(card).getByText('Applied and saved.')).toBeInTheDocument();
+      expect(within(card).queryByRole('button', { name: 'Apply' })).not.toBeInTheDocument();
+    });
+
+    it('shows why applying failed and does not offer a stale proposal again', async () => {
+      mockDecideProposal.mockResolvedValue({ ok: false, error: { code: 'STALE', message: '' } });
+      const card = await showProposal();
+
+      await act(async () => {
+        fireEvent.click(within(card).getByRole('button', { name: 'Apply' }));
+      });
+
+      expect(within(card).getByText(/The course has changed since this was proposed/)).toBeInTheDocument();
+      expect(within(card).getByRole('button', { name: 'Apply' })).toBeDisabled();
+      expect(within(card).getByRole('button', { name: 'Discard' })).toBeEnabled();
+    });
+
+    it('can be discarded, forgets the signed id and tells the backend what happened to it', async () => {
+      mockDecideProposal.mockResolvedValue({ ok: true, result: { status: 'DISCARDED' } });
+      const card = await showProposal();
+
+      await act(async () => {
+        fireEvent.click(within(card).getByRole('button', { name: 'Discard' }));
+      });
+      expect(within(card).getByText('Discarded. Nothing was saved.')).toBeInTheDocument();
+      expect(mockDecideProposal).toHaveBeenCalledWith('signed-proposal-1', 'discard', 'instructor');
+
+      replyWith([{ type: 'done' }]);
+      await ask('Thanks');
+      const [request] = mockStreamChat.mock.calls[1];
+      expect(request.messages[1]).toEqual({
+        role: 'assistant',
+        content: 'Here is my suggestion.',
+        proposals: [{ kind: 'course_texts', courseId: 7, status: 'DISCARDED' }],
+      });
+      // Discard doesn't revoke the proposal on the server, so its id must not linger in this tab.
+      expect(window.sessionStorage.getItem('eduhub-assistant:user-1')).not.toContain('signed-proposal-1');
+    });
+  });
+
+  describe('feedback', () => {
+    const answerOnce = async () => {
+      replyWith([{ type: 'delta', text: 'An answer.' }, { type: 'done' }]);
+      renderWidget();
+      openPanel();
+      await ask('A question');
+      await screen.findByText('An answer.');
+    };
+
+    it('sends 👍 without the conversation', async () => {
+      await answerOnce();
+      await act(async () => {
+        fireEvent.click(screen.getByRole('button', { name: 'Helpful' }));
+      });
+
+      expect(mockSendFeedback).toHaveBeenCalledWith({ rating: 'up', consent: false }, 'instructor');
+      expect(screen.getByText('Thanks for your feedback!')).toBeInTheDocument();
+    });
+
+    it('asks for consent on 👎 and keeps the conversation only with it', async () => {
+      await answerOnce();
+      fireEvent.click(screen.getByRole('button', { name: 'Not helpful' }));
+
+      expect(mockSendFeedback).not.toHaveBeenCalled();
+      expect(screen.getByText(/May we keep this conversation for 30 days/)).toBeInTheDocument();
+      await act(async () => {
+        fireEvent.click(screen.getByRole('button', { name: 'Yes, keep it' }));
+      });
+
+      expect(mockSendFeedback).toHaveBeenCalledWith(
+        {
+          rating: 'down',
+          consent: true,
+          messages: [
+            { role: 'user', content: 'A question' },
+            { role: 'assistant', content: 'An answer.' },
+          ],
+        },
+        'instructor'
+      );
+    });
+
+    it('sends only the 👎 rating when consent is refused', async () => {
+      await answerOnce();
+      fireEvent.click(screen.getByRole('button', { name: 'Not helpful' }));
+      await act(async () => {
+        fireEvent.click(screen.getByRole('button', { name: 'No, only send the rating' }));
+      });
+
+      expect(mockSendFeedback).toHaveBeenCalledWith({ rating: 'down', consent: false }, 'instructor');
+    });
+  });
+
+  it('keeps the conversation in sessionStorage only', async () => {
+    replyWith([{ type: 'delta', text: 'Stored answer.' }, { type: 'done' }]);
+    renderWidget();
+    openPanel();
+    await ask('Remember me');
+
+    await waitFor(() => expect(window.sessionStorage.getItem('eduhub-assistant:user-1')).toContain('Stored answer.'));
+    expect(window.localStorage.getItem('eduhub-assistant:user-1')).toBeNull();
+  });
+});
