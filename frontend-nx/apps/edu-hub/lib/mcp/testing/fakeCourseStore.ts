@@ -8,6 +8,8 @@ import { CourseSnapshot, CourseStore, SETTING_FIELDS, SessionChanges, TEXT_FIELD
  */
 
 export interface FakeCourse extends Omit<CourseSnapshot, 'registrationCount'> {
+  /** Also part of the snapshot; repeated here for readability of the seed data. */
+  programId: number;
   organizationId: number;
   instructorIds: string[];
   registrations: number;
@@ -22,7 +24,7 @@ export interface FakeProgram {
 
 export interface FakeWorld {
   programs: FakeProgram[];
-  courses: (FakeCourse & { programId?: number; createdAt?: string })[];
+  courses: FakeCourse[];
   /** userId → roles the token allows (x-hasura-allowed-roles). */
   allowedRoles: Record<string, string[]>;
   /** userId → organizations they are an Org Admin of (with the matching capability). */
@@ -68,8 +70,13 @@ export const createFakeCourseStore = (world: FakeWorld, userId: string, role: st
       }
       return { userId, role };
     },
-    async listManagedCourses() {
-      return world.courses.filter(manages).map((c) => ({
+    async listManagedCourses(_caller, { beforeId, limit }) {
+      return [...world.courses]
+        .filter(manages)
+        .filter((c) => beforeId === undefined || c.id < beforeId)
+        .sort((a, b) => b.id - a.id)
+        .slice(0, limit)
+        .map((c) => ({
         id: c.id,
         title: String(c.fields.title),
         language: String(c.fields.language),
@@ -100,14 +107,19 @@ export const createFakeCourseStore = (world: FakeWorld, userId: string, role: st
       c.sessions = c.sessions.filter((s) => !changes.delete.includes(s.id));
       changes.update.forEach((u) => {
         const s = c.sessions.find((x) => x.id === u.sessionId);
-        if (s) Object.assign(s, u.set, u.locations ? { locations: u.locations } : {});
+        if (s) Object.assign(s, u.set, u.locations ? { locations: u.locations } : {}, { updatedAt: nextTimestamp() });
       });
       changes.create.forEach((s) => {
-        c.sessions.push({ id: Math.max(0, ...c.sessions.map((x) => x.id)) + 1, ...s });
+        c.sessions.push({ id: Math.max(0, ...c.sessions.map((x) => x.id)) + 1, updatedAt: null, ...s });
       });
     },
-    async listCreatablePrograms() {
-      return world.programs.filter(mayCreateIn).map(toSummary);
+    async listCreatablePrograms(_caller, { beforeId, limit }) {
+      return [...world.programs]
+        .filter(mayCreateIn)
+        .filter((p) => beforeId === undefined || p.id < beforeId)
+        .sort((a, b) => b.id - a.id)
+        .slice(0, limit)
+        .map(toSummary);
     },
     async getCreatableProgram(_caller, programId) {
       const p = world.programs.find((x) => x.id === programId);
@@ -121,10 +133,10 @@ export const createFakeCourseStore = (world: FakeWorld, userId: string, role: st
     async locationOptions() {
       return ['ONLINE', 'KIEL', 'HEIDE', 'HAMBURG'];
     },
-    async coursesCreatedSince(programId, title, since) {
+    async coursesTitled(programId, title) {
       return world.courses
-        .filter((c) => c.programId === programId && c.fields.title === title && (c.createdAt ?? '') >= since)
-        .map((c) => c.id);
+        .filter((c) => c.programId === programId && String(c.fields.title).toLowerCase() === title.toLowerCase())
+        .map((c) => ({ id: c.id, title: String(c.fields.title) }));
     },
     async createCourse({ programId, fields: set, locationOptions: options }) {
       const program = world.programs.find((x) => x.id === programId);
@@ -133,7 +145,6 @@ export const createFakeCourseStore = (world: FakeWorld, userId: string, role: st
       world.courses.push({
         id,
         programId,
-        createdAt: new Date().toISOString(),
         updatedAt: nextTimestamp(),
         programType: 'COURSES',
         organizationId: program.organizationId,
@@ -185,6 +196,7 @@ const session = (id: number, day: string) => ({
   description: '',
   startDateTime: `${day}T17:00:00+00:00`,
   endDateTime: `${day}T18:30:00+00:00`,
+  updatedAt: null as string | null,
   locations: [{ courseLocationId: null, address: 'https://zoom.example/j/1', locationAddressId: null }],
 });
 
@@ -200,6 +212,7 @@ export const createWorld = (): FakeWorld => ({
   courses: [
     {
       id: 1,
+      programId: 10,
       updatedAt: '2026-11-01T09:00:00+00:00',
       programType: 'COURSES',
       organizationId: 1,
@@ -211,6 +224,7 @@ export const createWorld = (): FakeWorld => ({
     },
     {
       id: 2,
+      programId: 10,
       updatedAt: '2026-11-01T09:00:00+00:00',
       programType: 'COURSES',
       organizationId: 1,
@@ -222,6 +236,7 @@ export const createWorld = (): FakeWorld => ({
     },
     {
       id: 3,
+      programId: 20,
       updatedAt: '2026-11-01T09:00:00+00:00',
       programType: 'COURSES',
       organizationId: 2,

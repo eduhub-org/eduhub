@@ -11,7 +11,10 @@ import type { CourseSetup } from './operations';
 
 const courseId = z.number().int().positive().describe('Course id');
 const language = z.enum(['de', 'en', 'DE', 'EN']);
-const isoDateTime = z.string().describe('ISO 8601 with offset, e.g. 2027-01-12T18:00:00+01:00 (Europe/Berlin)');
+const isoDateTime = z
+  .string()
+  .regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}:\d{2})$/)
+  .describe('ISO 8601 with offset, e.g. 2027-01-12T18:00:00+01:00 (Europe/Berlin)');
 const location = z
   .object({
     courseLocationId: z.number().int().describe('One of the course\'s location options (see get_course courseLocations)'),
@@ -69,8 +72,14 @@ export const createMcpServer = (setup: CourseSetup) => {
 
   server.registerTool(
     'list_courses',
-    { description: 'The courses the caller can manage, with their number of Registrations.', annotations: readOnly },
-    () => run(() => setup.listCourses())
+    {
+      description:
+        'The courses the caller can manage, newest first, with their number of Registrations. Returns up to 100; ' +
+        'when hasMore is true, call again with beforeId set to nextBeforeId for the next page.',
+      inputSchema: { beforeId: z.number().int().positive().optional() },
+      annotations: readOnly,
+    },
+    ({ beforeId }) => run(() => setup.listCourses({ beforeId }))
   );
 
   server.registerTool(
@@ -167,10 +176,13 @@ export const createMcpServer = (setup: CourseSetup) => {
   server.registerTool(
     'list_programs',
     {
-      description: 'The programs the caller can create courses in (Org Admins and Admins; empty for instructors).',
+      description:
+        'The programs the caller can create courses in (Org Admins and Admins; empty for instructors), newest ' +
+        'first. Returns up to 100; when hasMore is true, call again with beforeId set to nextBeforeId.',
+      inputSchema: { beforeId: z.number().int().positive().optional() },
       annotations: readOnly,
     },
-    () => run(() => setup.listPrograms())
+    ({ beforeId }) => run(() => setup.listPrograms({ beforeId }))
   );
 
   server.registerTool(
@@ -208,7 +220,9 @@ export const createMcpServer = (setup: CourseSetup) => {
   server.registerTool(
     'discard_proposed_change',
     {
-      description: 'Discard a Proposed Change. Nothing is saved.',
+      description:
+        'Discard a Proposed Change: nothing is saved. Proposals are not stored, so this does not revoke the ' +
+        'proposedChangeId; just stop using it.',
       inputSchema: { proposedChangeId: z.string() },
       annotations: readOnly,
     },

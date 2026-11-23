@@ -53,6 +53,8 @@ export interface CourseSession {
   description: string | null;
   startDateTime: string;
   endDateTime: string;
+  /** Set by a trigger on every update; null for Sessions never updated since the column was added. */
+  updatedAt: string | null;
   locations: SessionLocation[];
 }
 
@@ -67,6 +69,7 @@ export interface CourseLocationOption {
 export interface CourseSnapshot {
   id: number;
   updatedAt: string;
+  programId: number;
   programType: string | null;
   fields: CourseFields;
   sessions: CourseSession[];
@@ -128,7 +131,8 @@ export interface SessionChanges {
 export interface CourseStore {
   /** Proves the token to Hasura and returns the caller it identifies. */
   verifyCaller(): Promise<Caller>;
-  listManagedCourses(caller: Caller): Promise<CourseSummary[]>;
+  /** Managed courses, newest id first, with ids below `beforeId` when given; at most `limit`. */
+  listManagedCourses(caller: Caller, page: { beforeId?: number; limit: number }): Promise<CourseSummary[]>;
   /** The course if the caller manages it (as Hasura's update rules would allow), else null. */
   getManagedCourse(caller: Caller, courseId: number): Promise<CourseSnapshot | null>;
   /** Course columns the caller's role may update. */
@@ -138,14 +142,15 @@ export interface CourseStore {
   /** Saves Session changes in one transaction. */
   applySessionChanges(courseId: number, changes: SessionChanges): Promise<void>;
   /** Programs the caller may create courses in, as Hasura's Course insert rule allows. */
-  listCreatablePrograms(caller: Caller): Promise<ProgramSummary[]>;
+  /** Newest id first, with ids below `beforeId` when given; at most `limit`. */
+  listCreatablePrograms(caller: Caller, page: { beforeId?: number; limit: number }): Promise<ProgramSummary[]>;
   getCreatableProgram(caller: Caller, programId: number): Promise<ProgramSummary | null>;
   /** Course columns the caller's role may set when creating a course. */
   insertableCourseColumns(): Promise<Set<string>>;
   /** The location options that exist (LocationOption values). */
   locationOptions(): Promise<string[]>;
-  /** Ids of the program's courses with this title created at or after `since` (ISO). */
-  coursesCreatedSince(programId: number, title: string, since: string): Promise<number[]>;
+  /** The program's courses with this title, ignoring case (titles are unique per program). */
+  coursesTitled(programId: number, title: string): Promise<{ id: number; title: string }[]>;
   /** Creates the course with its location options; returns its id. */
   createCourse(course: NewCourse): Promise<number>;
 }

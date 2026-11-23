@@ -87,9 +87,9 @@ describe('who may use each operation', () => {
     const ids = async (userId: string, role: string) =>
       (await setupFor(world, userId, role).listCourses()).courses.map((c) => c.id);
     expect(await ids('ins-1', 'instructor')).toEqual([1]);
-    expect(await ids('oa-1', 'org_admin')).toEqual([1, 2]);
+    expect(await ids('oa-1', 'org_admin')).toEqual([2, 1]);
     expect(await ids('oa-2', 'org_admin')).toEqual([3]);
-    expect(await ids('admin', 'admin')).toEqual([1, 2, 3]);
+    expect(await ids('admin', 'admin')).toEqual([3, 2, 1]);
     expect(await errorCode(setupFor(world, 'u-1', 'user').listCourses())).toBe('FORBIDDEN');
   });
 
@@ -363,7 +363,7 @@ describe('creating a course', () => {
   it('an admin can create courses in any program', async () => {
     const setup = setupFor(world, 'admin', 'admin');
     await expect(setup.proposeCreateCourse({ ...draft, programId: 20 })).resolves.toMatchObject({ status: 'PROPOSED' });
-    expect((await setup.listPrograms()).programs.map((p) => p.id)).toEqual([10, 20]);
+    expect((await setup.listPrograms()).programs.map((p) => p.id)).toEqual([20, 10]);
   });
 
   it('an instructor cannot create courses', async () => {
@@ -399,10 +399,47 @@ describe('creating a course', () => {
     const proposal = await setup.proposeCreateCourse(draft);
     await setup.applyProposedChange(proposal);
     await expect(setup.applyProposedChange(proposal)).rejects.toMatchObject({
-      code: 'ALREADY_APPLIED',
-      message: expect.stringContaining('no second one was created'),
+      code: 'TITLE_TAKEN',
+      message: expect.stringContaining('that is the course it created'),
     });
     expect(world.courses).toHaveLength(4);
+  });
+
+  it('course titles are unique per program, ignoring case and spaces', async () => {
+    const setup = setupFor(world, 'oa-1', 'org_admin');
+    // Course 1 in program 10 is "Einführung in Machine Learning".
+    const taken = setup.proposeCreateCourse({ programId: 10, title: '  einführung in machine learning ' });
+    expect(await errorCode(taken)).toBe('TITLE_TAKEN');
+    // The same title in another program is fine (e.g. the same course next semester).
+    await expect(
+      setupFor(world, 'admin', 'admin').proposeCreateCourse({ programId: 20, title: 'Einführung in Machine Learning' })
+    ).resolves.toMatchObject({ status: 'PROPOSED' });
+  });
+
+  it('a course created by someone else after the proposal is reported as a title clash, not as applied', async () => {
+    const mine = await setupFor(world, 'oa-1', 'org_admin').proposeCreateCourse(draft);
+    const theirs = await setupFor(world, 'admin', 'admin').proposeCreateCourse({ ...draft, locationOptions: ['KIEL'] });
+    await setupFor(world, 'admin', 'admin').applyProposedChange(theirs);
+    await expect(setupFor(world, 'oa-1', 'org_admin').applyProposedChange(mine)).rejects.toMatchObject({
+      code: 'TITLE_TAKEN',
+      message: expect.stringContaining('already has a course named "Generative KI im Alltag"'),
+    });
+  });
+
+  it('renaming a course to a title used in its program is refused, at propose and apply', async () => {
+    const setup = setupFor(world, 'oa-1', 'org_admin');
+    expect(await errorCode(setup.proposeCourseTexts({ courseId: 2, texts: { title: 'Einführung in Machine Learning' } }))).toBe(
+      'TITLE_TAKEN'
+    );
+    // Keeping its own title (other case) is not a clash with itself.
+    await expect(
+      setup.proposeCourseTexts({ courseId: 1, texts: { title: 'Einführung in machine learning' } })
+    ).resolves.toMatchObject({ status: 'PROPOSED' });
+
+    const rename = await setup.proposeCourseTexts({ courseId: 2, texts: { title: 'Neuer Name' } });
+    world.courses.push({ ...structuredClone(world.courses[2]), id: 50, programId: 10, fields: { ...world.courses[2].fields, title: 'Neuer Name' } });
+    expect(await errorCode(setup.applyProposedChange(rename))).toBe('TITLE_TAKEN');
+    expect(world.courses[1].fields.title).toBe('Deep Learning with PyTorch');
   });
 
   it('refuses unknown location options and columns the role may not set on insert', async () => {
@@ -417,5 +454,45 @@ describe('creating a course', () => {
     world.programs[0].defaultApplicationEnd = '2026-01-31';
     const proposal = await setupFor(world, 'oa-1', 'org_admin', () => NOW).proposeCreateCourse(draft);
     expect(proposal.after).toMatchObject({ applicationEnd: '2026-11-22' });
+  });
+});
+
+describe('listing courses', () => {
+  it('list_courses pages through all managed courses', async () => {
+    const base = world.courses[0];
+    for (let id = 100; id < 250; id++) world.courses.push({ ...structuredClone(base), id });
+    const setup = setupFor(world, 'ins-1', 'instructor');
+    const first = await setup.listCourses();
+    expect(first).toMatchObject({ hasMore: true, nextBeforeId: 150 });
+    expect(first.courses).toHaveLength(100);
+    const second = await setup.listCourses({ beforeId: first.nextBeforeId });
+    expect(second.hasMore).toBe(false);
+    expect(second).not.toHaveProperty('nextBeforeId');
+    expect([...first.courses, ...second.courses].map((c) => c.id)).toHaveLength(151);
+  });
+});
+
+describe('smaller review fixes', () => {
+  it('refuses Session times without an offset', async () => {
+    const result = setupFor(world, 'ins-1', 'instructor').proposeSessions({
+      courseId: 1,
+      sessions: [{ ...newSession, startDateTime: '2027-01-26T18:00', endDateTime: '2027-01-26T19:30' }],
+    });
+    expect(await errorCode(result)).toBe('INVALID');
+  });
+
+  it('a failing metrics listener does not change the result of apply', async () => {
+    const off = onProposalMetric(() => {
+      throw new Error('listener broke');
+    });
+    jest.spyOn(console, 'error').mockImplementation(() => undefined);
+    try {
+      const setup = setupFor(world, 'ins-1', 'instructor');
+      const proposal = await setup.proposeCourseTexts({ courseId: 1, texts: { tagline: 'Neu' } });
+      await expect(setup.applyProposedChange(proposal)).resolves.toMatchObject({ status: 'APPLIED' });
+      expect(metrics.map((m) => m.event)).toEqual(['created', 'applied']);
+    } finally {
+      off();
+    }
   });
 });

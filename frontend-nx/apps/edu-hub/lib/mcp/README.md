@@ -27,9 +27,10 @@ checks the token and role on every call; the server adds no rights of its own.
   canManageSettings) and admins can create courses, in the programs
   `list_programs` returns. A new course gets the defaults of "add" on the manage
   courses page (empty tagline, DE, the program's application end or today, 2
-  missable Sessions, ONLINE). Applying the same create proposal twice is refused
-  (`ALREADY_APPLIED`): the server looks for a course with that title created in
-  the program since the proposal was made.
+  missable Sessions, ONLINE).
+- Course titles are unique within a program (ignoring case and surrounding
+  spaces), when creating a course and when renaming one, at propose and apply
+  (`TITLE_TAKEN`). This also stops a second apply of the same create proposal.
 - Sessions can only be proposed **and applied** while the course has no
   Registrations in any state.
 - Apply refuses a proposal whose part of the course (texts/settings, or the
@@ -72,3 +73,13 @@ trial with the real list:
 ## Not in v1
 
 - People actions, emails, OAuth for external clients (v2).
+
+## Accepted limits
+
+Apply re-reads the course, checks the rules and then writes in a separate
+request, so something that commits in those few milliseconds is not caught:
+another Organizer's edit to the same Session, a course's first Registration, a
+second apply of the same create proposal fired at the same instant (the widget
+disables Apply while a request runs), or a course created with the same title.
+These were judged too unlikely and too harmless to need database-level locking.
+

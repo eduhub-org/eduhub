@@ -36,7 +36,8 @@ const unverifiedClaims = (token: string): HasuraClaims => {
  */
 export const pickRole = (token: string, requested?: string | null): string => {
   if (requested) return requested;
-  const allowed = unverifiedClaims(token)['x-hasura-allowed-roles'] ?? [];
+  const claimed = unverifiedClaims(token)['x-hasura-allowed-roles'];
+  const allowed = Array.isArray(claimed) ? claimed : [];
   return MANAGING_ROLES.find((r) => allowed.includes(r)) ?? 'user';
 };
 
@@ -91,11 +92,12 @@ const COURSE_QUERY = `
       id
       updated_at
       ${COURSE_FIELDS}
+      programId
       Program { type }
       CourseEnrollments_aggregate { aggregate { count } }
       CourseLocations(order_by: { id: asc }) { id locationOption defaultSessionAddress defaultSessionAddressId }
       Sessions(order_by: { id: asc }) {
-        id title description startDateTime endDateTime
+        id title description startDateTime endDateTime updated_at
         SessionAddresses(order_by: { id: asc }) { courseLocationId address locationAddressId }
       }
     }
@@ -103,8 +105,8 @@ const COURSE_QUERY = `
 `;
 
 const LIST_QUERY = `
-  query McpManagedCourses($where: Course_bool_exp!) {
-    Course(where: $where, order_by: { id: desc }, limit: 200) {
+  query McpManagedCourses($where: Course_bool_exp!, $limit: Int!) {
+    Course(where: $where, order_by: { id: desc }, limit: $limit) {
       id title language status
       Program { type }
       CourseEnrollments_aggregate { aggregate { count } }
@@ -113,8 +115,8 @@ const LIST_QUERY = `
 `;
 
 const PROGRAM_QUERY = `
-  query McpCreatablePrograms($where: Program_bool_exp!) {
-    Program(where: $where, order_by: { id: desc }, limit: 200) {
+  query McpCreatablePrograms($where: Program_bool_exp!, $limit: Int!) {
+    Program(where: $where, order_by: { id: desc }, limit: $limit) {
       id title type defaultApplicationEnd
       Organization { name }
     }
@@ -176,8 +178,10 @@ export const createHasuraCourseStore = ({ url, token, role, fetchImpl = fetch }:
       return verified;
     },
 
-    async listManagedCourses(caller) {
-      const data = await request<{ Course: any[] }>(LIST_QUERY, { where: managedCourseWhere(caller.role, caller.userId) });
+    async listManagedCourses(caller, { beforeId, limit }) {
+      const managed = managedCourseWhere(caller.role, caller.userId);
+      const where = beforeId === undefined ? managed : { _and: [managed, { id: { _lt: beforeId } }] };
+      const data = await request<{ Course: any[] }>(LIST_QUERY, { where, limit });
       return data.Course.map(
         (c): CourseSummary => ({
           id: c.id,
@@ -201,6 +205,7 @@ export const createHasuraCourseStore = ({ url, token, role, fetchImpl = fetch }:
       return {
         id: c.id,
         updatedAt: c.updated_at,
+        programId: c.programId,
         programType: c.Program?.type ?? null,
         fields,
         registrationCount: c.CourseEnrollments_aggregate.aggregate.count,
@@ -211,6 +216,7 @@ export const createHasuraCourseStore = ({ url, token, role, fetchImpl = fetch }:
           description: s.description,
           startDateTime: s.startDateTime,
           endDateTime: s.endDateTime,
+          updatedAt: s.updated_at ?? null,
           locations: s.SessionAddresses,
         })),
       } satisfies CourseSnapshot;
@@ -249,14 +255,16 @@ export const createHasuraCourseStore = ({ url, token, role, fetchImpl = fetch }:
       }
     },
 
-    async listCreatablePrograms(caller) {
-      const data = await request<{ Program: any[] }>(PROGRAM_QUERY, { where: creatableProgramWhere(caller.role, caller.userId) });
+    async listCreatablePrograms(caller, { beforeId, limit }) {
+      const creatable = creatableProgramWhere(caller.role, caller.userId);
+      const where = beforeId === undefined ? creatable : { _and: [creatable, { id: { _lt: beforeId } }] };
+      const data = await request<{ Program: any[] }>(PROGRAM_QUERY, { where, limit });
       return data.Program.map(toProgram);
     },
 
     async getCreatableProgram(caller, programId) {
       const where = { _and: [{ id: { _eq: programId } }, creatableProgramWhere(caller.role, caller.userId)] };
-      const data = await request<{ Program: any[] }>(PROGRAM_QUERY, { where });
+      const data = await request<{ Program: any[] }>(PROGRAM_QUERY, { where, limit: 1 });
       return data.Program[0] ? toProgram(data.Program[0]) : null;
     },
 
@@ -271,14 +279,16 @@ export const createHasuraCourseStore = ({ url, token, role, fetchImpl = fetch }:
       return data.LocationOption.map((o) => o.value);
     },
 
-    async coursesCreatedSince(programId, title, since) {
-      const data = await request<{ Course: { id: number }[] }>(
-        `query McpRecentCourses($programId: Int!, $title: String!, $since: timestamptz!) {
-          Course(where: { programId: { _eq: $programId }, title: { _eq: $title }, created_at: { _gte: $since } }) { id }
+    async coursesTitled(programId, title) {
+      // _ilike without wildcards: an exact, case-insensitive match (LIKE wildcards escaped).
+      const pattern = title.replace(/[\\%_]/g, (c) => `\\${c}`);
+      const data = await request<{ Course: { id: number; title: string }[] }>(
+        `query McpCoursesTitled($programId: Int!, $pattern: String!) {
+          Course(where: { programId: { _eq: $programId }, title: { _ilike: $pattern } }) { id title }
         }`,
-        { programId, title, since }
+        { programId, pattern }
       );
-      return data.Course.map((c) => c.id);
+      return data.Course;
     },
 
     async createCourse({ programId, fields, locationOptions }) {
@@ -307,10 +317,12 @@ const addressRows = (locations: SessionLocation[], sessionId?: number) =>
   }));
 
 /** One mutation document for all Session changes, so Hasura saves them in one transaction. */
+/** One mutation document for all Session changes, so Hasura saves them in one transaction. */
 export const buildSessionMutation = (courseId: number, changes: SessionChanges) => {
   const params: string[] = [];
   const fields: string[] = [];
   const variables: Record<string, unknown> = {};
+
 
   changes.delete.forEach((id, i) => {
     params.push(`$d${i}: Int!`);

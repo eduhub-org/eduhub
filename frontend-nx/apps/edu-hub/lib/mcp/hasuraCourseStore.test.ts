@@ -59,6 +59,7 @@ describe('pickRole', () => {
     expect(pickRole(TOKEN)).toBe('org_admin');
     expect(pickRole(tokenWith({ 'x-hasura-allowed-roles': ['user'] }))).toBe('user');
     expect(pickRole('not-a-jwt')).toBe('user');
+    expect(pickRole(tokenWith({ 'x-hasura-allowed-roles': 'admin' }))).toBe('user');
   });
 });
 
