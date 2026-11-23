@@ -1233,6 +1233,7 @@
       "degrees": "Unbenanntes Degree"
     },
     "title": "Kurse verwalten",
+    "title_taken": "In diesem Programm gibt es schon „{title}“. Titel müssen innerhalb eines Programms eindeutig sein.",
     "all_programs": "Alle",
     "course_degree_title": {
       "label": "Teil der folgenden Degrees",
@@ -1477,6 +1478,11 @@
         "courses": "{count} Kurse erfolgreich in {programTitle} kopiert",
         "events": "{count} Events erfolgreich in {programTitle} kopiert",
         "degrees": "{count} Degrees erfolgreich in {programTitle} kopiert"
+      },
+      "copy_titles_taken": {
+        "courses": "Nicht kopiert, weil {programTitle} schon Kurse mit diesen Titeln hat: {titles}",
+        "events": "Nicht kopiert, weil {programTitle} schon Events mit diesen Titeln hat: {titles}",
+        "degrees": "Nicht kopiert, weil {programTitle} schon Degrees mit diesen Titeln hat: {titles}"
       }
     },
     "participants": {

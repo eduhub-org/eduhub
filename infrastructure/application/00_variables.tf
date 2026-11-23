@@ -444,6 +444,17 @@ variable "ghost_newsletter_credentials_encryption_key" {
   sensitive   = true
 }
 
+variable "mcp_proposal_secret" {
+  description = "HMAC key signing the EduHub MCP server's Proposed Changes between propose and apply"
+  type        = string
+  sensitive   = true
+
+  validation {
+    condition     = length(var.mcp_proposal_secret) >= 32
+    error_message = "mcp_proposal_secret must contain at least 32 characters."
+  }
+}
+
 variable "guest_token_secret" {
   description = "HMAC key signing guest self-service (manage) links; rotating it invalidates all links already sent"
   type        = string

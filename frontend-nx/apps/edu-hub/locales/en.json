@@ -1249,6 +1249,7 @@
       "degrees": "Untitled Degree"
     },
     "title": "Manage Courses",
+    "title_taken": "This program already has “{title}”. Titles must be unique within a program.",
     "all_programs": "All",
     "course_degree_title": {
       "label": "Part of the following degrees",
@@ -1495,6 +1496,11 @@
         "courses": "Successfully copied {count} courses to {programTitle}",
         "events": "Successfully copied {count} events to {programTitle}",
         "degrees": "Successfully copied {count} degrees to {programTitle}"
+      },
+      "copy_titles_taken": {
+        "courses": "Not copied because {programTitle} already has courses with these titles: {titles}",
+        "events": "Not copied because {programTitle} already has events with these titles: {titles}",
+        "degrees": "Not copied because {programTitle} already has degrees with these titles: {titles}"
       }
     },
     "participants": {

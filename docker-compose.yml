@@ -59,6 +59,9 @@ services:
       # impersonating (pages/api/impersonation). Mirrors GUEST_TOKEN_SECRET: a dev
       # default here, a real secret in production.
       IMPERSONATION_TOKEN_SECRET: ${IMPERSONATION_TOKEN_SECRET:-dev-impersonation-token-secret}
+      # Signs the Proposed Changes of the MCP server (pages/api/mcp) between propose
+      # and apply. A dev default here, a real secret in production.
+      MCP_PROPOSAL_SECRET: ${MCP_PROPOSAL_SECRET:-dev-mcp-proposal-secret}
       # Set to "true" to let impersonated sessions write as well as read. Off by
       # default and deliberately a single switch -- see the read-only gate in
       # pages/api/impersonation/graphql.ts.
