@@ -22,6 +22,7 @@ import { ErrorMessageDialog } from '../../../common/dialogs/ErrorMessageDialog';
 import { CourseEnrollmentStatus_enum } from '../../../../__generated__/globalTypes';
 import Card from '../../../common/Card';
 import { certificateActionErrorMessage } from '../../../../helpers/certificateMessages';
+import { useIsAdmin } from '../../../../hooks/authentication';
 
 interface DegreeParticipationsTabIProps {
   course: ManagedCourse_Course_by_pk;
@@ -282,19 +283,25 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
       };
     });
 
-  // Bulk actions for certificate management
+  // Bulk actions for certificate management. Only admins may run
+  // createCertificates (the Hasura action has no other role permissions), as
+  // on the course participations tab.
+  const isAdmin = useIsAdmin();
   const bulkActions: BulkAction[] = useMemo(
-    () => [
-      {
-        value: 'generate-achievement-certificates',
-        label: t('generate_achievement_certificates'),
-      },
-      {
-        value: 'delete-achievement-certificates',
-        label: t('delete_achievement_certificates'),
-      },
-    ],
-    [t]
+    () =>
+      isAdmin
+        ? [
+            {
+              value: 'generate-achievement-certificates',
+              label: t('generate_achievement_certificates'),
+            },
+            {
+              value: 'delete-achievement-certificates',
+              label: t('delete_achievement_certificates'),
+            },
+          ]
+        : [],
+    [isAdmin, t]
   );
 
   // Handle bulk actions
@@ -466,7 +473,7 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
         onSortingChange={setSorting}
         error={error}
         loading={loading}
-        showCheckbox={true}
+        showCheckbox={isAdmin}
         bulkActions={bulkActions}
         onBulkAction={handleBulkAction}
         expandableRowComponent={expandableDegreeParticipationRow}
