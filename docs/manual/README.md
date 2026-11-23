@@ -58,3 +58,9 @@ Only flat `key: value` and `key: [a, b]` lines are read.
   are linked from every page (`NEXT_PUBLIC_HELP_DOCS_URL`).
 - Changes show up after the next build. Locally the dev container reads
   `docs/manual` on each request.
+
+## Keeping it current
+
+Every PR into `develop` that changes what users see or can do updates the
+manual in both languages in the same PR. The `/update-manual` skill
+(`.claude/commands/update-manual.md`) walks through the check.
