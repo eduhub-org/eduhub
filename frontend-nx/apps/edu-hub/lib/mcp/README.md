@@ -28,9 +28,12 @@ checks the token and role on every call; the server adds no rights of its own.
   `list_programs` returns. A new course gets the defaults of "add" on the manage
   courses page (empty tagline, DE, the program's application end or today, 2
   missable Sessions, ONLINE).
-- Course titles are unique within a program (ignoring case and surrounding
-  spaces), when creating a course and when renaming one, at propose and apply
-  (`TITLE_TAKEN`). This also stops a second apply of the same create proposal.
+- Course titles are unique within a course or degree program (ignoring case and
+  surrounding spaces), when creating a course and when renaming one, at propose
+  and apply (`TITLE_TAKEN`). This also stops a second apply of the same create
+  proposal there. Event programs are exempt: the same event runs again each year
+  under its title. The manage courses page enforces the same rule
+  (`helpers/courseTitles.ts`).
 - Sessions can only be proposed **and applied** while the course has no
   Registrations in any state.
 - Apply refuses a proposal whose part of the course (texts/settings, or the

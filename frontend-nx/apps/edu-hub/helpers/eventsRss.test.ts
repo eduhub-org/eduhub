@@ -47,7 +47,7 @@ describe('selectCurrentEvents', () => {
 });
 
 describe('buildEventsRss', () => {
-  it('renders a valid channel with escaped items linking to the course page', () => {
+  it('renders a valid channel with escaped items linking to the event page', () => {
     const xml = buildEventsRss(
       [
         event(7, [{ startDateTime: '2026-10-01T08:00:00Z', endDateTime: '2026-10-01T15:30:00Z' }], {
@@ -61,7 +61,9 @@ describe('buildEventsRss', () => {
     expect(xml).toContain('<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"');
     expect(xml).toContain('<atom:link href="https://edu.example/events/rss.xml" rel="self"');
     expect(xml).toContain('<title>AI &amp; Society &lt;Kiel&gt;</title>');
-    expect(xml).toContain('<link>https://edu.example/course/7</link>');
+    expect(xml).toContain('<link>https://edu.example/event/7</link>');
+    // The GUID is item identity, so it stays on the pre-split URL: a reader that
+    // already has this event must not see it again as a new one.
     expect(xml).toContain('<guid isPermaLink="true">https://edu.example/course/7</guid>');
     expect(xml).toContain('<description>01.10.2026, 10:00 – 17:30 – Talks and workshops</description>');
     expect(xml).toContain('<pubDate>Sat, 01 Aug 2026 12:00:00 GMT</pubDate>');

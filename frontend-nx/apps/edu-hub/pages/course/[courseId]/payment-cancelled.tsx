@@ -1,4 +1,5 @@
 import { useRouter } from 'next/router';
+import { coursePath } from '../../../helpers/coursePath';
 import { useTranslations } from 'next-intl';
 import { Box, Typography, Button } from '@mui/material';
 import { Cancel } from '@mui/icons-material';
@@ -47,7 +48,7 @@ export default function PaymentCancelledPage() {
       <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
         <Button
           variant="contained"
-          onClick={() => router.push(`/course/${courseId}`)}
+          onClick={() => router.push(coursePath(Number(courseId)))}
         >
           {t('payment.try_again')}
         </Button>

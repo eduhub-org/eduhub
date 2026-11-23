@@ -49,6 +49,7 @@
     "menu": {
       "profile": "My Profile",
       "my_certificates": "My Certificates",
+      "manual": "Manual",
       "faq": "FAQ",
       "user": "User",
       "admin_users": "Admin Users",
@@ -1249,6 +1250,7 @@
       "degrees": "Untitled Degree"
     },
     "title": "Manage Courses",
+    "title_taken": "This program already has “{title}”. Titles must be unique within a program.",
     "all_programs": "All",
     "course_degree_title": {
       "label": "Part of the following degrees",
@@ -1495,6 +1497,11 @@
         "courses": "Successfully copied {count} courses to {programTitle}",
         "events": "Successfully copied {count} events to {programTitle}",
         "degrees": "Successfully copied {count} degrees to {programTitle}"
+      },
+      "copy_titles_taken": {
+        "courses": "Not copied because {programTitle} already has courses with these titles: {titles}",
+        "events": "Not copied because {programTitle} already has events with these titles: {titles}",
+        "degrees": "Not copied because {programTitle} already has degrees with these titles: {titles}"
       }
     },
     "participants": {
@@ -2181,6 +2188,7 @@
         "label": "Public event",
         "description": "Open this session to everyone: this creates a draft event that you can review and then publish. Anyone can register for it, without applying to the course.",
         "no_events_program": "This organization has no events program yet. Ask a platform admin to create one before opening sessions to the public.",
+        "course_not_published": "Publish the course first: only sessions of a published course can be opened to the public.",
         "create": "Create event",
         "creating": "Creating …",
         "create_failed": "The event could not be created.",
@@ -2401,7 +2409,8 @@
       "preview_page": "Preview page",
       "view_page": "View page",
       "publish": "Publish",
-      "unpublish": "Unpublish"
+      "unpublish": "Unpublish",
+      "requires_organizer": "The event needs at least one organizer before it can be published. Add one in the event list."
     },
     "rausgegangen": {
       "title": "Rausgegangen",
@@ -3593,6 +3602,7 @@
   "footer": {
     "imprint": "Imprint",
     "privacy": "Privacy",
+    "manual": "Manual",
     "faq": "FAQ",
     "newsletter": "Newsletter",
     "sponsored_by": "Sponsored by:",
@@ -3962,5 +3972,22 @@
       "TOOL_CALL_FAILED": "The Assistant couldn't look up the data it needed. Please rephrase your question or write to {contact}.",
       "FEEDBACK_CONSENT_REQUIRED": "Without your consent we don't store the conversation."
     }
+  },
+  "help": {
+    "title": "Manual",
+    "start": "Start",
+    "nav_label": "Contents",
+    "audience_label": "For",
+    "audience": {
+      "participant": "Participants",
+      "organizer": "Organizers",
+      "admin": "Admins"
+    },
+    "fallback_notice": "This page is not available in English yet. You are reading the German version.",
+    "org_rules_title": "Rules of your organization",
+    "org_rules_text": "Deadlines, certificate rules and other requirements are set by the organization that offers the course. They are not part of this manual.",
+    "org_rules_link": "Go to the rules and FAQ",
+    "version_release": "Manual as of release <release></release>, commit <commit></commit>",
+    "version_commit": "Manual as of commit <commit></commit> (not released yet)"
   }
 }

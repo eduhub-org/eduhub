@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
+import { coursePath } from '../../../helpers/coursePath';
 import { useTranslations } from 'next-intl';
 import { Box, Typography, CircularProgress, Button } from '@mui/material';
 import { CheckCircle, Error as ErrorIcon } from '@mui/icons-material';
@@ -97,7 +98,7 @@ export default function PaymentSuccessPage() {
         <Typography variant="body1" color="text.secondary">
           {error}
         </Typography>
-        <Button variant="contained" onClick={() => router.push(`/course/${courseId}`)}>
+        <Button variant="contained" onClick={() => router.push(coursePath(Number(courseId)))}>
           {t(isEvent ? 'modal.payment.back_to_course_event' : 'modal.payment.back_to_course')}
         </Button>
       </Box>
@@ -154,7 +155,7 @@ export default function PaymentSuccessPage() {
       <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
         <Button
           variant="contained"
-          onClick={() => router.push(`/course/${courseId}`)}
+          onClick={() => router.push(coursePath(Number(courseId)))}
         >
           {t(isEvent ? 'modal.payment.view_course_event' : 'modal.payment.view_course')}
         </Button>

@@ -12,6 +12,7 @@
  */
 
 import { getPublicImageUrl } from './filehandling';
+import { courseUrl } from './coursePath';
 import { firstSessionStart, lastSessionEnd, ScheduleSession } from './sessionSchedule';
 
 type SeoUser = { firstName: string | null; lastName: string | null } | null;
@@ -76,8 +77,6 @@ const compact = <T extends Record<string, any>>(object: T): Record<string, any> 
     Object.entries(object).filter(([, value]) => value != null && !(Array.isArray(value) && value.length === 0))
   );
 
-const courseUrl = (course: StructuredDataCourse, siteUrl: string) => `${siteUrl}/course/${course.id}`;
-
 const imageUrl = (course: StructuredDataCourse) => getPublicImageUrl(course.coverImage ?? null, 1280) ?? undefined;
 
 const description = (course: StructuredDataCourse) =>
@@ -117,7 +116,7 @@ const locations = (course: StructuredDataCourse, siteUrl: string) =>
     .map((location) => {
       if (!location?.locationOption) return null;
       if (location.locationOption === 'ONLINE') {
-        return { '@type': 'VirtualLocation', url: courseUrl(course, siteUrl) };
+        return { '@type': 'VirtualLocation', url: courseUrl(course.id, course.Program?.type, siteUrl) };
       }
       return compact({
         '@type': 'Place',
@@ -137,7 +136,7 @@ const offers = (course: StructuredDataCourse, siteUrl: string) => {
     '@type': 'Offer',
     price: (priceInCents / 100).toFixed(2),
     priceCurrency: course.currency || 'EUR',
-    url: courseUrl(course, siteUrl),
+    url: courseUrl(course.id, course.Program?.type, siteUrl),
     validThrough: toIsoString(course.applicationEnd),
   });
 };
@@ -174,7 +173,7 @@ const buildEvent = (course: StructuredDataCourse, siteUrl: string) => {
     '@type': 'Event',
     name: course.title,
     description: description(course),
-    url: courseUrl(course, siteUrl),
+    url: courseUrl(course.id, course.Program?.type, siteUrl),
     image: imageUrl(course),
     startDate,
     endDate,
@@ -205,7 +204,7 @@ const buildCourse = (course: StructuredDataCourse, siteUrl: string) => {
     '@type': 'Course',
     name: course.title,
     description: description(course),
-    url: courseUrl(course, siteUrl),
+    url: courseUrl(course.id, course.Program?.type, siteUrl),
     image: imageUrl(course),
     provider: provider(siteUrl),
     inLanguage: course.language ? course.language.toLowerCase() : undefined,
@@ -226,7 +225,7 @@ const buildDegree = (course: StructuredDataCourse, siteUrl: string) => {
     .map((member) => ({
       '@type': 'Course',
       name: member!.title,
-      url: `${siteUrl}/course/${member!.id}`,
+      url: courseUrl(member!.id, undefined, siteUrl),
     }));
 
   return compact({
@@ -234,7 +233,7 @@ const buildDegree = (course: StructuredDataCourse, siteUrl: string) => {
     '@type': 'EducationalOccupationalProgram',
     name: course.title,
     description: description(course),
-    url: courseUrl(course, siteUrl),
+    url: courseUrl(course.id, course.Program?.type, siteUrl),
     image: imageUrl(course),
     provider: provider(siteUrl),
     numberOfCredits: course.requiredEcts != null ? Number(course.requiredEcts) : undefined,

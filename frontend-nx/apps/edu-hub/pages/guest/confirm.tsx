@@ -1,4 +1,5 @@
 import Head from 'next/head';
+import { coursePath } from '../../helpers/coursePath';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { FC, useEffect, useRef, useState } from 'react';
@@ -94,7 +95,7 @@ const GuestConfirm: FC = () => {
               <div className="flex flex-col gap-3 pt-4">
                 {courseId != null && (
                   <Link
-                    href={`/course/${courseId}`}
+                    href={coursePath(courseId)}
                     className="text-brand hover:underline inline-flex items-center min-h-[44px] py-2 touch-manipulation"
                   >
                     {t('confirm.to_event')}

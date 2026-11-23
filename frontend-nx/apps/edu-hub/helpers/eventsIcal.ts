@@ -15,6 +15,8 @@
 import { getPublicImageUrl } from './filehandling';
 import { generateICalString } from './icalExport';
 import { RssEvent, selectCurrentEvents } from './eventsRss';
+import { courseUrl } from './coursePath';
+import { ProgramType } from '../types/enums';
 import { blockSchedule, contiguousBlocks, TimedSession } from './sessionSchedule';
 import {
   AddressMap,
@@ -213,7 +215,7 @@ export const buildEventsIcal = (events: IcalFeedEvent[], options: EventsIcalOpti
 
   const entries = selectCurrentEvents(events, now).flatMap((event) => {
     const sessions = event.Sessions ?? [];
-    const link = `${options.baseUrl}/course/${event.id}`;
+    const link = courseUrl(event.id, ProgramType.EVENTS, options.baseUrl);
     const imageUrl = getPublicImageUrl(event.coverImage ?? null, 1280) ?? undefined;
     const lastModified = toDate(event.updated_at)?.toISOString();
     const extraProperties = { 'X-EDUHUB-REGISTRATION': registrationKind(event.registrationType) };
