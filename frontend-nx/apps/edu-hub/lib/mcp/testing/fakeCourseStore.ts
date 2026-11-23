@@ -8,6 +8,8 @@ import { CourseSnapshot, CourseStore, SETTING_FIELDS, SessionChanges, TEXT_FIELD
  */
 
 export interface FakeCourse extends Omit<CourseSnapshot, 'registrationCount'> {
+  /** Also part of the snapshot; repeated here for readability of the seed data. */
+  programId: number;
   organizationId: number;
   instructorIds: string[];
   registrations: number;
@@ -22,7 +24,7 @@ export interface FakeProgram {
 
 export interface FakeWorld {
   programs: FakeProgram[];
-  courses: (FakeCourse & { programId?: number; createdAt?: string })[];
+  courses: FakeCourse[];
   /** userId → roles the token allows (x-hasura-allowed-roles). */
   allowedRoles: Record<string, string[]>;
   /** userId → organizations they are an Org Admin of (with the matching capability). */
@@ -131,10 +133,10 @@ export const createFakeCourseStore = (world: FakeWorld, userId: string, role: st
     async locationOptions() {
       return ['ONLINE', 'KIEL', 'HEIDE', 'HAMBURG'];
     },
-    async coursesCreatedSince(programId, title, since) {
+    async coursesTitled(programId, title) {
       return world.courses
-        .filter((c) => c.programId === programId && c.fields.title === title && (c.createdAt ?? '') >= since)
-        .map((c) => c.id);
+        .filter((c) => c.programId === programId && String(c.fields.title).toLowerCase() === title.toLowerCase())
+        .map((c) => ({ id: c.id, title: String(c.fields.title) }));
     },
     async createCourse({ programId, fields: set, locationOptions: options }) {
       const program = world.programs.find((x) => x.id === programId);
@@ -143,7 +145,6 @@ export const createFakeCourseStore = (world: FakeWorld, userId: string, role: st
       world.courses.push({
         id,
         programId,
-        createdAt: new Date().toISOString(),
         updatedAt: nextTimestamp(),
         programType: 'COURSES',
         organizationId: program.organizationId,
@@ -211,6 +212,7 @@ export const createWorld = (): FakeWorld => ({
   courses: [
     {
       id: 1,
+      programId: 10,
       updatedAt: '2026-11-01T09:00:00+00:00',
       programType: 'COURSES',
       organizationId: 1,
@@ -222,6 +224,7 @@ export const createWorld = (): FakeWorld => ({
     },
     {
       id: 2,
+      programId: 10,
       updatedAt: '2026-11-01T09:00:00+00:00',
       programType: 'COURSES',
       organizationId: 1,
@@ -233,6 +236,7 @@ export const createWorld = (): FakeWorld => ({
     },
     {
       id: 3,
+      programId: 20,
       updatedAt: '2026-11-01T09:00:00+00:00',
       programType: 'COURSES',
       organizationId: 2,

@@ -10,7 +10,7 @@ export type OperationErrorCode =
   | 'NO_CHANGE'
   | 'REGISTRATIONS_EXIST'
   | 'STALE'
-  | 'ALREADY_APPLIED'
+  | 'TITLE_TAKEN'
   | 'EXPIRED'
   | 'HASURA_ERROR';
 

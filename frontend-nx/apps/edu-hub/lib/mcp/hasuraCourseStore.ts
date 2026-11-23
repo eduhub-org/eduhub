@@ -92,6 +92,7 @@ const COURSE_QUERY = `
       id
       updated_at
       ${COURSE_FIELDS}
+      programId
       Program { type }
       CourseEnrollments_aggregate { aggregate { count } }
       CourseLocations(order_by: { id: asc }) { id locationOption defaultSessionAddress defaultSessionAddressId }
@@ -204,6 +205,7 @@ export const createHasuraCourseStore = ({ url, token, role, fetchImpl = fetch }:
       return {
         id: c.id,
         updatedAt: c.updated_at,
+        programId: c.programId,
         programType: c.Program?.type ?? null,
         fields,
         registrationCount: c.CourseEnrollments_aggregate.aggregate.count,
@@ -277,14 +279,16 @@ export const createHasuraCourseStore = ({ url, token, role, fetchImpl = fetch }:
       return data.LocationOption.map((o) => o.value);
     },
 
-    async coursesCreatedSince(programId, title, since) {
-      const data = await request<{ Course: { id: number }[] }>(
-        `query McpRecentCourses($programId: Int!, $title: String!, $since: timestamptz!) {
-          Course(where: { programId: { _eq: $programId }, title: { _eq: $title }, created_at: { _gte: $since } }) { id }
+    async coursesTitled(programId, title) {
+      // _ilike without wildcards: an exact, case-insensitive match (LIKE wildcards escaped).
+      const pattern = title.replace(/[\\%_]/g, (c) => `\\${c}`);
+      const data = await request<{ Course: { id: number; title: string }[] }>(
+        `query McpCoursesTitled($programId: Int!, $pattern: String!) {
+          Course(where: { programId: { _eq: $programId }, title: { _ilike: $pattern } }) { id title }
         }`,
-        { programId, title, since }
+        { programId, pattern }
       );
-      return data.Course.map((c) => c.id);
+      return data.Course;
     },
 
     async createCourse({ programId, fields, locationOptions }) {

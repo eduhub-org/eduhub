@@ -162,6 +162,11 @@ const RUN = Date.now();
 
     const setup = setupFor(tokens.orgadmin, 'org_admin');
     expect((await setup.listPrograms()).programs.map((p) => p.id)).toContain(ORG_9100_PROGRAM);
+    // Course 9002 is in this program, so its title (in other case) is taken.
+    const takenTitle = String((await setup.getCourse({ courseId: ORG_9100_COURSE })).title).toUpperCase();
+    await expect(setup.proposeCreateCourse({ programId: ORG_9100_PROGRAM, title: takenTitle })).rejects.toMatchObject({
+      code: 'TITLE_TAKEN',
+    });
     const proposal = await setup.proposeCreateCourse({
       programId: ORG_9100_PROGRAM,
       title: `MCP test course ${Date.now()}`,
@@ -173,7 +178,7 @@ const RUN = Date.now();
       const course = await setup.getCourse({ courseId: applied.courseId });
       expect(course).toMatchObject({ tagline: 'Created by the integration test', maxMissedSessions: 2, language: 'DE' });
       expect(course.courseLocations.map((l) => l.locationOption)).toEqual(['ONLINE', 'KIEL']);
-      await expect(setup.applyProposedChange(proposal)).rejects.toMatchObject({ code: 'ALREADY_APPLIED' });
+      await expect(setup.applyProposedChange(proposal)).rejects.toMatchObject({ code: 'TITLE_TAKEN' });
     } finally {
       await deleteCourseAsOrgAdmin(applied.courseId);
     }

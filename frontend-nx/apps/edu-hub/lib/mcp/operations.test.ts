@@ -399,10 +399,47 @@ describe('creating a course', () => {
     const proposal = await setup.proposeCreateCourse(draft);
     await setup.applyProposedChange(proposal);
     await expect(setup.applyProposedChange(proposal)).rejects.toMatchObject({
-      code: 'ALREADY_APPLIED',
-      message: expect.stringContaining('no second one was created'),
+      code: 'TITLE_TAKEN',
+      message: expect.stringContaining('that is the course it created'),
     });
     expect(world.courses).toHaveLength(4);
+  });
+
+  it('course titles are unique per program, ignoring case and spaces', async () => {
+    const setup = setupFor(world, 'oa-1', 'org_admin');
+    // Course 1 in program 10 is "Einführung in Machine Learning".
+    const taken = setup.proposeCreateCourse({ programId: 10, title: '  einführung in machine learning ' });
+    expect(await errorCode(taken)).toBe('TITLE_TAKEN');
+    // The same title in another program is fine (e.g. the same course next semester).
+    await expect(
+      setupFor(world, 'admin', 'admin').proposeCreateCourse({ programId: 20, title: 'Einführung in Machine Learning' })
+    ).resolves.toMatchObject({ status: 'PROPOSED' });
+  });
+
+  it('a course created by someone else after the proposal is reported as a title clash, not as applied', async () => {
+    const mine = await setupFor(world, 'oa-1', 'org_admin').proposeCreateCourse(draft);
+    const theirs = await setupFor(world, 'admin', 'admin').proposeCreateCourse({ ...draft, locationOptions: ['KIEL'] });
+    await setupFor(world, 'admin', 'admin').applyProposedChange(theirs);
+    await expect(setupFor(world, 'oa-1', 'org_admin').applyProposedChange(mine)).rejects.toMatchObject({
+      code: 'TITLE_TAKEN',
+      message: expect.stringContaining('already has a course named "Generative KI im Alltag"'),
+    });
+  });
+
+  it('renaming a course to a title used in its program is refused, at propose and apply', async () => {
+    const setup = setupFor(world, 'oa-1', 'org_admin');
+    expect(await errorCode(setup.proposeCourseTexts({ courseId: 2, texts: { title: 'Einführung in Machine Learning' } }))).toBe(
+      'TITLE_TAKEN'
+    );
+    // Keeping its own title (other case) is not a clash with itself.
+    await expect(
+      setup.proposeCourseTexts({ courseId: 1, texts: { title: 'Einführung in machine learning' } })
+    ).resolves.toMatchObject({ status: 'PROPOSED' });
+
+    const rename = await setup.proposeCourseTexts({ courseId: 2, texts: { title: 'Neuer Name' } });
+    world.courses.push({ ...structuredClone(world.courses[2]), id: 50, programId: 10, fields: { ...world.courses[2].fields, title: 'Neuer Name' } });
+    expect(await errorCode(setup.applyProposedChange(rename))).toBe('TITLE_TAKEN');
+    expect(world.courses[1].fields.title).toBe('Deep Learning with PyTorch');
   });
 
   it('refuses unknown location options and columns the role may not set on insert', async () => {
