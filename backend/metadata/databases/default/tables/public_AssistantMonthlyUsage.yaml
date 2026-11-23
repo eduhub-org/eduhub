@@ -1,0 +1,4 @@
+table:
+  name: AssistantMonthlyUsage
+  schema: public
+# Admin only: the Assistant backend keeps these totals as its own bookkeeping (spending cap).

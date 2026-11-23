@@ -261,3 +261,19 @@
     - name: Hasura-Secret
       value_from_env: HASURA_CLOUD_FUNCTION_SECRET
   comment: Embeds new or changed course, session, project and achievement-option texts for the semantic expert search (ADR 0004)
+- name: delete_expired_assistant_feedback
+  webhook: '{{CLOUD_FUNCTION_LINK_CALL_PYTHON_FUNCTION}}'
+  schedule: 15 3 * * *
+  include_in_metadata: true
+  payload: {}
+  retry_conf:
+    num_retries: 0
+    retry_interval_seconds: 10
+    timeout_seconds: 3699
+    tolerance_seconds: 21600
+  headers:
+    - name: Function-Name
+      value: delete_expired_assistant_feedback
+    - name: Hasura-Secret
+      value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+  comment: Deletes Assistant conversations rated thumbs-down after 30 days (issue 2193)
