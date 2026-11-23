@@ -49,7 +49,9 @@ jobs:
           ref: production
           fetch-depth: 0
 
-      - name: Check out the released tag
+      # The indexer itself runs from production (trusted, current); the release it indexes is checked
+      # out on its own, so an older tag without the indexer can still be indexed.
+      - name: Check out the released tag next to it
         id: tag
         env:
           INPUT_TAG: ${{ inputs.tag }}
@@ -63,8 +65,10 @@ jobs:
             echo "::error::No release tag to index (got '$tag')."
             exit 1
           fi
-          git checkout --quiet "refs/tags/$tag"
+          release_dir="$RUNNER_TEMP/release"
+          git worktree add --detach --quiet "$release_dir" "refs/tags/$tag"
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "dir=$release_dir" >> "$GITHUB_OUTPUT"
 
       - name: Use Node.js 22
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
@@ -103,5 +107,6 @@ jobs:
           # EU processing (ADR 0005): the same region as the expert embeddings.
           EMBEDDING_LOCATION: ${{ vars.EMBEDDING_LOCATION || 'europe-west1' }}
           TAG: ${{ steps.tag.outputs.tag }}
+          RELEASE_DIR: ${{ steps.tag.outputs.dir }}
           FORCE: ${{ inputs.force && '--force' || '' }}
-        run: node scripts/index-knowledge.js --repo "$GITHUB_WORKSPACE" --release "$TAG" $FORCE
+        run: node scripts/index-knowledge.js --repo "$RELEASE_DIR" --release "$TAG" $FORCE

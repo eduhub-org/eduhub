@@ -11,11 +11,13 @@ import { rankPassages } from "../lib/knowledge/rank.js";
  * The index only holds public content (docs, locale texts, released code; never database rows), so
  * every logged-in person may search it. Organization rules are the exception: only those of the
  * asker's organizations (their own, those they administer, those of courses they registered for)
- * and of the course they are looking at are returned.
+ * and of the published course they are looking at are returned.
  */
 
-// Candidates before ranking; ranking by source and per-file limits then picks the passages.
-const MATCH_COUNT = 30;
+// Candidates before ranking. Ranking keeps at most two per file and drops duplicates, so the pool
+// is well above the eight passages returned: one file's sections can't crowd out the rest. The
+// similarity floor still keeps unrelated passages out. An exact scan of a few thousand vectors.
+const MATCH_COUNT = 80;
 const MIN_QUERY_LENGTH = 3;
 const MAX_QUERY_LENGTH = 1000;
 // Cosine similarities of the providers live on different scales; fake ones are low for long texts.
@@ -58,7 +60,12 @@ const ASKER_ORGANIZATIONS = `
     User_by_pk(id: $userId) { organizationId }
     OrganizationAdmin(where: { userId: { _eq: $userId } }) { organizationId }
     CourseEnrollment(where: { userId: { _eq: $userId } }) { Course { Program { organizationId } } }
-    Course_by_pk(id: $courseId) @include(if: $withCourse) { Program { organizationId } }
+    PageCourse: Course(
+      where: { id: { _eq: $courseId }, published: { _eq: true }, Program: { published: { _eq: true } } }
+      limit: 1
+    ) @include(if: $withCourse) {
+      Program { organizationId }
+    }
   }
 `;
 
@@ -72,7 +79,8 @@ const organizationIdsOf = (data) =>
     data.User_by_pk?.organizationId,
     ...data.OrganizationAdmin.map((grant) => grant.organizationId),
     ...data.CourseEnrollment.map((enrollment) => enrollment.Course?.Program?.organizationId),
-    data.Course_by_pk?.Program?.organizationId,
+    // Only a course anyone may see: an unpublished course id must not unlock its organization.
+    ...(data.PageCourse ?? []).map((course) => course.Program?.organizationId),
   ].filter((id) => Number.isInteger(id));
 
 export default async function searchKnowledge(req, logger, { gql, read = env, fetchImpl } = {}) {

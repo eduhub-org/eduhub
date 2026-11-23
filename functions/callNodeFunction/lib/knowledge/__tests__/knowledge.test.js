@@ -5,9 +5,16 @@ import { fileURLToPath } from 'node:url';
 import { afterAll, beforeAll, describe, expect, it, jest } from '@jest/globals';
 import { chunkCode, chunkMarkdown, headingId, parseFrontMatter } from '../chunk.js';
 import { DENIED_PATHS, SECRET_PATTERNS, findSecrets, redactEmails, sourceTypeOf } from '../safety.js';
-import { collectRepoPassages, fetchGitbookPassages, listFiles, manualUrl, resolveManualLinks } from '../sources.js';
+import {
+  collectRepoPassages,
+  fetchGitbookPassages,
+  listFiles,
+  manualUrl,
+  resolveManualLinks,
+  sanitizePassages,
+} from '../sources.js';
 import { rankPassages } from '../rank.js';
-import { buildKnowledgeIndex } from '../build.js';
+import { STALE_RUN_MS, buildKnowledgeIndex } from '../build.js';
 import { embeddingConfig } from '../../expertEmbeddings.js';
 import searchKnowledge from '../../../searchKnowledge/index.js';
 
@@ -52,6 +59,12 @@ const writeFixtureRepo = () => {
     ].join('\n'),
     'frontend-nx/apps/edu-hub/lib/payment.ts': `export const stripeKey = '${STRIPE_KEY}';\n`,
     'functions/callNodeFunction/sendMail/index.js': 'export const send = () => "sent";\n',
+    // The same key means different texts in edu-hub and StuJo.
+    'frontend-nx/apps/stujo/locales/de.json': JSON.stringify({ course: { apply: 'Stelle ansehen' } }),
+    'frontend-nx/apps/stujo/locales/en.json': JSON.stringify({ course: { apply: 'View job' } }),
+    'frontend-nx/apps/stujo/components/JobButton.tsx':
+      "const t = useTranslations('course');\nexport const JobButton = () => <button>{t('apply')}</button>;\n",
+    'functions/callNodeFunction/notify/index.js': "export const label = 'course.apply';\n",
     'frontend-nx/apps/edu-hub/lib/assistant/limits.ts':
       "export const check = (count: number) => (count > 20 ? { code: 'RATE_LIMITED_SHORT' } : null);\n",
     'backend/metadata/databases/default/tables/public_Course.yaml':
@@ -98,7 +111,9 @@ const writeFixtureRepo = () => {
 
 /** Hasura over the knowledge tables, with match_knowledge as Postgres computes it. */
 const createKnowledgeStore = ({ failInsertAfter = Infinity } = {}) => {
-  const state = { chunks: [], indexes: [], nextId: 1, inserts: 0 };
+  // `clock` stands in for Postgres now(); builds get `now: () => state.clock`.
+  const state = { chunks: [], indexes: [], nextId: 1, inserts: 0, clock: Date.now() };
+  const before = (iso) => (c) => Date.parse(c.created_at) < Date.parse(iso);
   const vector = (literal) => JSON.parse(literal);
   const cosine = (a, b) => a.reduce((sum, value, i) => sum + value * b[i], 0);
   const request = jest.fn(async (query, variables = {}) => {
@@ -107,9 +122,10 @@ const createKnowledgeStore = ({ failInsertAfter = Infinity } = {}) => {
       case 'KnowledgeIndexState':
         return { KnowledgeIndex: state.indexes };
       case 'DeleteUnfinishedKnowledgeRuns': {
-        const before = state.chunks.length;
-        state.chunks = state.chunks.filter((c) => variables.activeIds.includes(c.indexRunId));
-        return { delete_KnowledgeChunk: { affected_rows: before - state.chunks.length } };
+        const count = state.chunks.length;
+        const stale = before(variables.staleBefore);
+        state.chunks = state.chunks.filter((c) => variables.activeIds.includes(c.indexRunId) || !stale(c));
+        return { delete_KnowledgeChunk: { affected_rows: count - state.chunks.length } };
       }
       case 'ExistingKnowledgeEmbeddings': {
         const seen = new Map();
@@ -121,14 +137,20 @@ const createKnowledgeStore = ({ failInsertAfter = Infinity } = {}) => {
       case 'InsertKnowledgeChunks':
         state.inserts += 1;
         if (state.inserts > failInsertAfter) throw new Error('connection reset');
-        variables.objects.forEach((object) => state.chunks.push({ id: state.nextId++, ...object }));
+        variables.objects.forEach((object) =>
+          state.chunks.push({ id: state.nextId++, created_at: new Date(state.clock).toISOString(), ...object })
+        );
         return { insert_KnowledgeChunk: { affected_rows: variables.objects.length } };
-      case 'ActivateKnowledgeIndex':
+      case 'ActivateKnowledgeIndex': {
         state.indexes = [variables.index];
-        state.chunks = state.chunks.filter((c) => c.indexRunId === variables.runId);
+        const stale = before(variables.staleBefore);
+        state.chunks = state.chunks.filter(
+          (c) => c.indexRunId === variables.runId || !(variables.previousIds.includes(c.indexRunId) || stale(c))
+        );
         return {};
+      }
       case 'KnowledgeAskerOrganizations':
-        return state.asker ?? { User_by_pk: null, OrganizationAdmin: [], CourseEnrollment: [], Course_by_pk: null };
+        return state.asker ?? { User_by_pk: null, OrganizationAdmin: [], CourseEnrollment: [], PageCourse: [] };
       case 'MatchKnowledge': {
         const query = vector(variables.embedding);
         const organizations = variables.organizationIds.replace(/[{}]/g, '').split(',').filter(Boolean).map(Number);
@@ -232,6 +254,23 @@ describe('what may be indexed', () => {
     'README.md',
   ])('never indexes %s', (file) => expect(sourceTypeOf(file)).toBeNull());
 
+  it('checks every stored and embedded field, and never logs the value', () => {
+    const warn = jest.fn();
+    const base = { sourceType: 'ORGANIZATION_RULES', title: 'FAQ', path: 'faq', url: 'https://x.example/faq', content: 'Text' };
+    const kept = sanitizePassages(
+      [
+        { ...base, title: `Key ${STRIPE_KEY}` },
+        { ...base, url: 'https://x.example/faq/maria.mustermann@gmail.com' },
+        { ...base, title: 'Mail maria@gmail.com', content: 'ok' },
+      ],
+      { warn }
+    );
+    expect(kept).toEqual([{ ...base, title: 'Mail [email]', content: 'ok' }]);
+    expect(warn.mock.calls.map(([, data]) => data.findings)).toEqual([['title: Stripe key'], ['url: e-mail address']]);
+    expect(warn.mock.calls[1][1]).not.toHaveProperty('path');
+    expect(JSON.stringify(warn.mock.calls)).not.toMatch(new RegExp(`${STRIPE_KEY}|maria`));
+  });
+
   it('recognizes secrets and replaces personal e-mail addresses', () => {
     expect(findSecrets(`key = '${STRIPE_KEY}'`)).toEqual(['Stripe key']);
     expect(findSecrets(PRIVATE_KEY)).toEqual(['private key']);
@@ -263,6 +302,10 @@ describe('collecting passages from a checkout', () => {
       'frontend-nx/apps/edu-hub/lib/assistant/limits.ts',
       'frontend-nx/apps/edu-hub/locales/de.json',
       'frontend-nx/apps/edu-hub/locales/en.json',
+      'frontend-nx/apps/stujo/components/JobButton.tsx',
+      'frontend-nx/apps/stujo/locales/de.json',
+      'frontend-nx/apps/stujo/locales/en.json',
+      'functions/callNodeFunction/notify/index.js',
       'functions/callNodeFunction/sendMail/index.js',
     ]);
     expect(listFiles(root)).not.toContain('functions/callNodeFunction/node_modules/pkg/index.js');
@@ -271,10 +314,21 @@ describe('collecting passages from a checkout', () => {
   it('drops a passage holding a secret and reports only its path', () => {
     expect(passages.some((p) => p.content.includes(STRIPE_KEY))).toBe(false);
     expect(logger.warn).toHaveBeenCalledWith(expect.any(String), {
+      sourceType: 'CODE',
       path: 'frontend-nx/apps/edu-hub/lib/payment.ts',
-      secrets: ['Stripe key'],
+      findings: ['content: Stripe key'],
     });
     expect(JSON.stringify(logger.warn.mock.calls)).not.toContain(STRIPE_KEY);
+  });
+
+  it('links code to the texts of its own app, and shared code to every app\'s', () => {
+    const content = (file) => passages.find((p) => p.path === file).content;
+    expect(content('frontend-nx/apps/edu-hub/components/ApplyButton.tsx')).toContain('course.apply: Jetzt bewerben / Apply now');
+    expect(content('frontend-nx/apps/stujo/components/JobButton.tsx')).toContain('course.apply: Stelle ansehen / View job');
+    expect(content('frontend-nx/apps/stujo/components/JobButton.tsx')).not.toContain('Jetzt bewerben');
+    expect(content('functions/callNodeFunction/notify/index.js')).toContain(
+      'course.apply: edu-hub: Jetzt bewerben / Apply now | stujo: Stelle ansehen / View job'
+    );
   });
 
   it('replaces personal e-mail addresses but keeps the platform contact', () => {
@@ -430,6 +484,37 @@ describe('building the index', () => {
     expect(result.passages.map((p) => p.url)).toEqual(['/file1']);
   });
 
+  it('never removes the rows of a run that is still staging, only stale ones', async () => {
+    const { state, gql } = createKnowledgeStore();
+    const now = () => state.clock;
+    const build = (passages, runId) => buildKnowledgeIndex({ passages, gql, config: fakeConfig, release: runId, runId, logger, now });
+    await build([passage(1)], 'v1@a');
+    // Another run (e.g. started by hand) has stored its rows but not switched yet.
+    await gql.request('mutation InsertKnowledgeChunks', {
+      objects: [{ ...state.chunks[0], id: undefined, indexRunId: 'v3@staging' }],
+    });
+    await build([passage(1), passage(2)], 'v2@b');
+    expect(state.indexes.map((index) => index.id)).toEqual(['v2@b']);
+    expect(state.chunks.filter((c) => c.indexRunId === 'v3@staging')).toHaveLength(1);
+
+    state.clock += STALE_RUN_MS + 1;
+    await build([passage(1), passage(2)], 'v4@c');
+    expect(new Set(state.chunks.map((c) => c.indexRunId))).toEqual(new Set(['v4@c']));
+  });
+
+  it('checks the size again after dropping passages that cannot be found', async () => {
+    const { state, gql } = createKnowledgeStore();
+    const many = Array.from({ length: 10 }, (_, i) => passage(i));
+    await buildKnowledgeIndex({ passages: many, gql, config: fakeConfig, release: 'v1', runId: 'v1@a', logger });
+    // Six candidates pass the early check, but two have only short words and no embedding direction.
+    const directionless = (n) => ({ ...passage(n), title: 'ab', content: `x ${n}` });
+    const next = [passage(1), passage(2), passage(3), passage(4), directionless(5), directionless(6)];
+    await expect(
+      buildKnowledgeIndex({ passages: next, gql, config: fakeConfig, release: 'v2', runId: 'v2@b', logger })
+    ).rejects.toThrow('Only 4 passages, the live index has 10');
+    expect(state.indexes[0].id).toBe('v1@a');
+  });
+
   it('refuses a build far smaller than the live one unless forced', async () => {
     const { state, gql } = createKnowledgeStore();
     const many = Array.from({ length: 10 }, (_, i) => passage(i));
@@ -525,14 +610,25 @@ describe('searchKnowledge', () => {
       User_by_pk: { organizationId: null },
       OrganizationAdmin: [],
       CourseEnrollment: [{ Course: { Program: { organizationId: 7 } } }],
-      Course_by_pk: null,
+      PageCourse: [],
     };
     const member = await searchKnowledge(question, logger, { gql: store.gql, read });
     expect(member.passages[0]).toMatchObject({ sourceType: 'ORGANIZATION_RULES', title: 'Warteliste' });
     delete store.state.asker;
   });
 
-  it('asks Hasura for the course\'s organization only when a course is given', async () => {
+  it('lets a published course on the page unlock its organization\'s rules', async () => {
+    const question = asUser({ query: 'Kurs voll belegt Warteliste nachrücken', courseId: 12 });
+    store.state.asker = { User_by_pk: null, OrganizationAdmin: [], CourseEnrollment: [], PageCourse: [] };
+    const unpublished = await searchKnowledge(question, logger, { gql: store.gql, read });
+    expect(unpublished.passages.map((p) => p.sourceType)).not.toContain('ORGANIZATION_RULES');
+    store.state.asker.PageCourse = [{ Program: { organizationId: 7 } }];
+    const published = await searchKnowledge(question, logger, { gql: store.gql, read });
+    expect(published.passages[0].sourceType).toBe('ORGANIZATION_RULES');
+    delete store.state.asker;
+  });
+
+  it('asks Hasura for the course\'s organization only when a course is given, and only if published', async () => {
     store.gql.request.mockClear();
     await searchKnowledge(asUser({ query: 'Warteliste', courseId: 12 }), logger, { gql: store.gql, read });
     expect(store.gql.request).toHaveBeenCalledWith(expect.stringContaining('KnowledgeAskerOrganizations'), {
@@ -540,6 +636,8 @@ describe('searchKnowledge', () => {
       courseId: 12,
       withCourse: true,
     });
+    const [query] = store.gql.request.mock.calls.find(([q]) => q.includes('KnowledgeAskerOrganizations'));
+    expect(query).toMatch(/published: \{ _eq: true \}, Program: \{ published: \{ _eq: true \} \}/);
   });
 
   it('is off without a provider, refuses anonymous callers and reports failures', async () => {

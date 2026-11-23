@@ -111,33 +111,50 @@ const NAMESPACE = /(?:useTranslations|getTranslations)\(\s*(?:\{\s*namespace:\s*
 const CODE_LITERAL = /^[A-Z][A-Z0-9_]{4,}$/;
 const MAX_KEYS_PER_CODE_LITERAL = 3;
 
+const textOf = ({ de, en }) => [de, en].filter(Boolean).join(' / ');
+
 /**
  * The locale texts a code passage refers to: literal keys, keys relative to the file's namespaces,
- * and ALL_CAPS codes.
+ * and ALL_CAPS codes. `apps` are the locale sets that code can show (its own app's, or every app's
+ * for shared backend code); a key whose text differs between them lists each app's text.
  */
-const messagesFor = (code, namespaces, messages) => {
+const messagesFor = (code, namespaces, apps) => {
   const found = new Map();
   for (const [, , literal] of code.matchAll(STRING_LITERAL)) {
-    const keys = ['', ...namespaces].map((prefix) => (prefix ? `${prefix}.${literal}` : literal));
-    if (CODE_LITERAL.test(literal)) {
-      const byCode = messages.byLeaf.get(literal) ?? [];
-      if (byCode.length <= MAX_KEYS_PER_CODE_LITERAL) keys.push(...byCode);
-    }
-    keys.forEach((key) => {
-      if (messages.has(key) && !found.has(key)) found.set(key, messages.get(key));
+    apps.forEach(([app, messages]) => {
+      const keys = ['', ...namespaces].map((prefix) => (prefix ? `${prefix}.${literal}` : literal));
+      if (CODE_LITERAL.test(literal)) {
+        const byCode = messages.byLeaf.get(literal) ?? [];
+        if (byCode.length <= MAX_KEYS_PER_CODE_LITERAL) keys.push(...byCode);
+      }
+      keys.forEach((key) => {
+        if (!messages.has(key)) return;
+        if (!found.has(key) && found.size >= MAX_MESSAGES_PER_CODE_CHUNK) return;
+        found.set(key, new Map([...(found.get(key) ?? []), [app, textOf(messages.get(key))]]));
+      });
     });
     if (found.size >= MAX_MESSAGES_PER_CODE_CHUNK) break;
   }
-  return [...found.entries()].slice(0, MAX_MESSAGES_PER_CODE_CHUNK);
+  return [...found.entries()].map(([key, byApp]) => {
+    const texts = [...new Set(byApp.values())];
+    return [key, texts.length === 1 ? texts[0] : [...byApp].map(([app, message]) => `${app}: ${message}`).join(' | ')];
+  });
 };
 
-const codePassages = (file, text, release, messages) => {
+/** The apps whose texts a file can show: its own, or all of them for shared code. */
+const appsOf = (file, messagesByApp) => {
+  const own = /^frontend-nx\/apps\/([^/]+)\//.exec(file)?.[1];
+  return own && messagesByApp.has(own) ? [[own, messagesByApp.get(own)]] : [...messagesByApp];
+};
+
+const codePassages = (file, text, release, messagesByApp) => {
   const namespaces = [...new Set([...text.matchAll(NAMESPACE)].map((match) => match[1]))];
+  const apps = appsOf(file, messagesByApp);
   return chunkCode(text, file).map((chunk) => {
-    const shown = messagesFor(chunk.text, namespaces, messages);
+    const shown = messagesFor(chunk.text, namespaces, apps);
     const shows = shown.length
       ? `\n\nTexts shown by this code:\n${shown
-          .map(([key, { de, en }]) => `${key}: ${[de, en].filter(Boolean).join(' / ')}`.slice(0, MAX_MESSAGE_CHARS))
+          .map(([key, message]) => `${key}: ${message}`.slice(0, MAX_MESSAGE_CHARS))
           .join('\n')}`.slice(0, MAX_MESSAGES_CHARS)
       : '';
     return {
@@ -152,16 +169,17 @@ const codePassages = (file, text, release, messages) => {
 };
 
 /**
- * key → { de, en } over all locale files, for linking code to the texts it shows; `byLeaf` finds the
- * keys of an ALL_CAPS code.
+ * Per app (edu-hub, stujo): key → { de, en }, for linking code to the texts it shows; `byLeaf`
+ * finds the keys of an ALL_CAPS code. Apps are kept apart: the same key can mean different texts.
  */
 const localeMessages = (root, files) => {
-  const messages = new Map();
-  messages.byLeaf = new Map();
+  const byApp = new Map();
   files
     .filter((file) => sourceTypeOf(file) === 'LOCALE')
     .forEach((file) => {
-      const language = /\/(de|en)\.json$/.exec(file)[1];
+      const [, app, language] = /apps\/([^/]+)\/locales\/(de|en)\.json$/.exec(file);
+      if (!byApp.has(app)) byApp.set(app, Object.assign(new Map(), { byLeaf: new Map() }));
+      const messages = byApp.get(app);
       flattenLocale(JSON.parse(fs.readFileSync(path.join(root, file), 'utf8'))).forEach(([key, message]) => {
         if (!messages.has(key)) {
           const leaf = key.slice(key.lastIndexOf('.') + 1);
@@ -170,18 +188,33 @@ const localeMessages = (root, files) => {
         messages.set(key, { ...messages.get(key), [language]: message });
       });
     });
-  return messages;
+  return byApp;
 };
 
+const EMAIL = /[\w.+-]+@[\w-]+(\.[\w-]+)+/;
+
 /**
- * Drops passages with anything that looks like a secret (whole passage, reported by path only) and
- * replaces personal e-mail addresses.
+ * Drops passages with anything that looks like a secret in any stored or embedded field (title,
+ * path, url, content), and replaces personal e-mail addresses in title and content. A path or url
+ * holding a personal address can't be redacted without breaking the link, so that passage is
+ * dropped. Logs name the field and kind of finding, never the value.
  */
 export const sanitizePassages = (passages, logger) =>
   passages.flatMap((passage) => {
-    const secrets = findSecrets(passage.content);
-    if (secrets.length) {
-      logger?.warn('Skipped a knowledge passage that looks like it holds a secret', { path: passage.path, secrets });
+    const fields = ['title', 'path', 'url', 'content'];
+    const secrets = fields.flatMap((field) => findSecrets(String(passage[field] ?? '')).map((kind) => `${field}: ${kind}`));
+    const personalLink = ['path', 'url'].filter((field) => {
+      const value = String(passage[field] ?? '');
+      return EMAIL.test(value) && redactEmails(value) !== value;
+    });
+    if (secrets.length || personalLink.length) {
+      const findings = [...secrets, ...personalLink.map((field) => `${field}: e-mail address`)];
+      const linkFlagged = findings.some((finding) => /^(path|url):/.test(finding));
+      logger?.warn('Skipped a knowledge passage that looks like it holds a secret or personal data', {
+        sourceType: passage.sourceType,
+        ...(linkFlagged ? {} : { path: passage.path }),
+        findings,
+      });
       return [];
     }
     return [{ ...passage, title: redactEmails(passage.title), content: redactEmails(passage.content) }];
@@ -190,7 +223,7 @@ export const sanitizePassages = (passages, logger) =>
 /** All passages of a checkout of `release` (a git tag). */
 export const collectRepoPassages = (root, { release, logger } = {}) => {
   const files = listFiles(root).filter((file) => sourceTypeOf(file));
-  const messages = localeMessages(root, files);
+  const messagesByApp = localeMessages(root, files);
   const passages = files.flatMap((file) => {
     const text = fs.readFileSync(path.join(root, file), 'utf8');
     if (!text.trim()) return [];
@@ -202,7 +235,7 @@ export const collectRepoPassages = (root, { release, logger } = {}) => {
       case 'LOCALE':
         return localePassages(file, text, release);
       default:
-        return codePassages(file, text, release, messages);
+        return codePassages(file, text, release, messagesByApp);
     }
   });
   return sanitizePassages(passages, logger);
