@@ -49,6 +49,7 @@
     "menu": {
       "profile": "Mein Profil",
       "my_certificates": "Meine Zertifikate",
+      "manual": "Handbuch",
       "faq": "FAQ",
       "user": "Benutzer",
       "admin_users": "Admin-Benutzer",
@@ -3586,6 +3587,7 @@
   "footer": {
     "imprint": "Impressum",
     "privacy": "Datenschutz",
+    "manual": "Handbuch",
     "faq": "FAQ",
     "newsletter": "Newsletter",
     "sponsored_by": "Gefördert durch:",
@@ -3937,5 +3939,22 @@
     "nothing_to_do": "Du musst nichts unternehmen. Wir möchten dich lediglich darüber informieren, wie wir mit deinen Daten umgehen.",
     "more": "Alle Änderungen findest du in unserer <privacy>Datenschutzerklärung</privacy>.",
     "dismiss": "Hinweis schließen"
+  },
+  "help": {
+    "title": "Handbuch",
+    "start": "Start",
+    "nav_label": "Inhalt",
+    "audience_label": "Für",
+    "audience": {
+      "participant": "Teilnehmende",
+      "organizer": "Organisator:innen",
+      "admin": "Admins"
+    },
+    "fallback_notice": "Diese Seite gibt es noch nicht auf Deutsch. Du siehst die englische Fassung.",
+    "org_rules_title": "Regeln Deiner Organisation",
+    "org_rules_text": "Fristen, Zertifikatsregeln und andere Vorgaben legt die Organisation fest, die den Kurs anbietet. Sie stehen nicht in diesem Handbuch.",
+    "org_rules_link": "Zu den Regeln und FAQ",
+    "version_release": "Stand des Handbuchs: Release <release></release>, Commit <commit></commit>",
+    "version_commit": "Stand des Handbuchs: Commit <commit></commit> (noch kein Release)"
   }
 }
