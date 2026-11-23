@@ -3944,5 +3944,23 @@
     "nothing_to_do": "You do not need to do anything. We simply want to let you know how we handle your data.",
     "more": "All changes are listed in our <privacy>privacy policy</privacy>.",
     "dismiss": "Close notice"
+  },
+  "assistant": {
+    "errors": {
+      "NOT_LOGGED_IN": "Please log in to ask the Assistant.",
+      "OFF": "The Assistant is not available right now.",
+      "SPENDING_CAP_REACHED": "The Assistant is paused for this month because its monthly budget is used up. It will be back on the 1st of next month. For questions, write to {contact}.",
+      "RATE_LIMITED_SHORT": "You have asked a lot of questions in a short time. Please wait about {minutes} minutes and then continue.",
+      "RATE_LIMITED_DAILY": "You have reached the maximum number of questions for today. You can ask again tomorrow.",
+      "MESSAGE_TOO_LONG": "Your message is too long. Please shorten it to at most {max} characters.",
+      "CONVERSATION_TOO_LONG": "This conversation has become too long. Please start a new one.",
+      "INVALID_REQUEST": "The request could not be read. Please reload the page.",
+      "IMPERSONATING": "The Assistant is not available while you view the platform as someone else.",
+      "ROLE_NOT_ALLOWED": "You can't use this role with the Assistant.",
+      "BUSY": "The Assistant is busy right now. Please try again in a minute.",
+      "UNAVAILABLE": "The Assistant couldn't answer right now. Please try again later or write to {contact}.",
+      "TOOL_CALL_FAILED": "The Assistant couldn't look up the data it needed. Please rephrase your question or write to {contact}.",
+      "FEEDBACK_CONSENT_REQUIRED": "Without your consent we don't store the conversation."
+    }
   }
 }

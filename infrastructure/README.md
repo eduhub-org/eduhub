@@ -50,6 +50,11 @@ project (staging and production), with an account that has `roles/aiplatform.adm
   P=eduhub-staging-new; M=gemini-3.8-flash; curl -s -o /dev/null -w '%{http_code}\n' -H "Authorization: Bearer $(gcloud auth print-access-token)" "https://aiplatform.eu.rep.googleapis.com/v1beta1/projects/$P/locations/eu/publishers/google/models/$M:fetchPublisherModelConfig"
   ```
 
+To turn the Assistant on, set `assistant_llm_provider = "vertex"` and the model's prices
+`assistant_llm_price_input_eur_per_mtok` / `assistant_llm_price_output_eur_per_mtok` (EUR per
+million tokens, from the Vertex AI price list for the model and location). The monthly spending
+cap (`assistant_monthly_spend_cap_eur`) is measured with them; without prices the Assistant stays off.
+
 To deny the global endpoint, the Terraform service account needs `roles/orgpolicy.policyAdmin`
 on the organization. Then set `vertex_global_endpoint_policy` to `dry_run`, check the audit
 logs for denied requests, and switch to `enforce`.

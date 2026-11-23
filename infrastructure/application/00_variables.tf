@@ -586,6 +586,16 @@ variable "assistant_monthly_spend_cap_eur" {
   type        = number
   default     = 50
 }
+variable "assistant_llm_price_input_eur_per_mtok" {
+  description = "Price of the Assistant's model per million input tokens in EUR, from the Vertex AI price list for the chosen model and location. The spending cap multiplies it with the tokens the API reports; without it the Assistant stays off."
+  type        = number
+  default     = null
+}
+variable "assistant_llm_price_output_eur_per_mtok" {
+  description = "Price of the Assistant's model per million output tokens (including reasoning) in EUR, from the Vertex AI price list; without it the Assistant stays off"
+  type        = number
+  default     = null
+}
 variable "vertex_global_endpoint_policy" {
   description = "Organization policy constraints/gcp.restrictEndpointUsage denying the global Vertex AI endpoint in this project: empty (not managed), dry_run (violations are only logged) or enforce. Needs roles/orgpolicy.policyAdmin, which can only be granted at the organization, for the Terraform service account."
   type        = string

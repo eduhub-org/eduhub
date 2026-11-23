@@ -157,6 +157,14 @@ resource "google_cloud_run_service" "eduhub" {
           name  = "ASSISTANT_MONTHLY_SPEND_CAP_EUR"
           value = tostring(var.assistant_monthly_spend_cap_eur)
         }
+        env {
+          name  = "ASSISTANT_LLM_PRICE_INPUT_EUR_PER_MTOK"
+          value = var.assistant_llm_price_input_eur_per_mtok == null ? "" : tostring(var.assistant_llm_price_input_eur_per_mtok)
+        }
+        env {
+          name  = "ASSISTANT_LLM_PRICE_OUTPUT_EUR_PER_MTOK"
+          value = var.assistant_llm_price_output_eur_per_mtok == null ? "" : tostring(var.assistant_llm_price_output_eur_per_mtok)
+        }
       }
     }
 
