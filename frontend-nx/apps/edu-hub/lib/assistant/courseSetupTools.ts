@@ -10,7 +10,7 @@ import { cleanSchema, invalidArguments, parseArguments, ProposalEvent, ToolSet, 
  * get. The CourseSetup is built with the asker's token and role (never admin).
  *
  * The model can read and propose, but never apply or discard: a Proposed Change is streamed to
- * the widget, whose Apply button calls /api/mcp itself. The model also never sees the signed
+ * the widget, whose Apply button calls /api/assistant/proposals itself. The model also never sees the signed
  * proposedChangeId, so it could not hand one to anything.
  */
 
@@ -83,19 +83,13 @@ export const createCourseSetupTools = async (
         return { status: 'error', errorCode: body.error.code, content: text };
       }
       if (name.startsWith('propose_')) {
-        const proposal = JSON.parse(text) as ProposalEvent & { message?: string };
+        const proposal = JSON.parse(text) as ProposalEvent;
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { proposedChangeId, ...forModel } = proposal;
         return {
           status: 'ok',
           content: JSON.stringify({ ...forModel, message: PROPOSED_FOR_MODEL }),
-          proposal: {
-            proposedChangeId,
-            kind: proposal.kind,
-            courseId: proposal.courseId,
-            before: proposal.before,
-            after: proposal.after,
-            expiresAt: proposal.expiresAt,
-          },
+          proposal,
         };
       }
       return { status: 'ok', content: text };

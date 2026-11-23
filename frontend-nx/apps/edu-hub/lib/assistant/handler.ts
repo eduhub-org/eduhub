@@ -14,15 +14,16 @@ import type { ToolSet } from './tools';
  * The Assistant's chat endpoint (issue #2193): POST the conversation and the page context, get the
  * reply as Server-Sent Events. Login required; the server keeps no conversation.
  *
- * Request body: `{ messages: [{ role: 'user' | 'assistant', content }], page: { route, courseId?,
- * sessionId?, error? }, role?: 'user' | 'instructor' | 'org_admin' | 'admin', locale?: 'de' | 'en' }`
+ * Request body: `{ messages: [{ role: 'user' | 'assistant', content, proposals? }], pageContext:
+ * { path?, route?, courseId?, sessionId?, errorMessage? }, locale?: 'de' | 'en' }`, with the role in
+ * use in the `x-hasura-role` header ('user', 'instructor', 'org_admin', 'admin'; default 'user').
  *
  * Refusals before the stream starts are JSON `{ error: { code, message } }` with status 400, 401,
  * 403, 429 (with Retry-After) or 503. The stream sends these events, each `data` being JSON:
- * - `text` `{ delta }`: a piece of the reply
+ * - `delta` `{ text }`: a piece of the reply
  * - `tool` `{ name, status: 'running' | 'done' | 'failed' }`
- * - `proposal` `{ proposedChangeId, kind, courseId, before, after, expiresAt }`: a Proposed Change
- *   for the widget to show with Apply/Discard buttons, which call /api/mcp themselves
+ * - `proposal` the MCP server's ProposedChangeResult as-is: a Proposed Change for the widget to
+ *   show with Apply/Discard buttons, which call /api/assistant/proposals themselves
  * - `error` `{ code, message }`
  * - `done` `{}`
  *
@@ -52,9 +53,17 @@ const ASSISTANT_ROLES = ['user', ...COURSE_SETUP_ROLES];
 const sanitizePage = (input: unknown): PageContext => {
   const page = (input && typeof input === 'object' ? input : {}) as Record<string, unknown>;
   const id = (v: unknown) => (typeof v === 'number' && Number.isInteger(v) && v > 0 ? v : undefined);
-  const route = typeof page.route === 'string' && page.route.startsWith('/') ? page.route.slice(0, 300) : undefined;
-  const error = typeof page.error === 'string' && page.error.trim() ? page.error.trim().slice(0, 500) : undefined;
-  return { route, courseId: id(page.courseId), sessionId: id(page.sessionId), error };
+  const routeLike = (v: unknown) => (typeof v === 'string' && v.startsWith('/') ? v.slice(0, 300) : undefined);
+  const error =
+    typeof page.errorMessage === 'string' && page.errorMessage.trim() ? page.errorMessage.trim().slice(0, 500) : undefined;
+  return { path: routeLike(page.path), route: routeLike(page.route), courseId: id(page.courseId), sessionId: id(page.sessionId), error };
+};
+
+/** The role in use, from the `x-hasura-role` header as for /api/mcp; `user` without one. */
+export const requestedRole = (req: NextApiRequest) => {
+  const header = req.headers?.['x-hasura-role'];
+  const value = Array.isArray(header) ? header[0] : header;
+  return typeof value === 'string' && value ? value : 'user';
 };
 
 export const refuse = (
@@ -103,7 +112,7 @@ export const createChatHandler = (deps: ChatHandlerDeps) => async (req: NextApiR
   const session = await authenticate(req, res, deps.getSession, locale);
   if (!session) return;
 
-  const role = typeof body.role === 'string' ? body.role : 'user';
+  const role = requestedRole(req);
   if (!ASSISTANT_ROLES.includes(role) || (role !== 'user' && !session.allowedRoles.includes(role))) {
     return refuse(res, 403, 'ROLE_NOT_ALLOWED', locale);
   }
@@ -158,7 +167,7 @@ export const createChatHandler = (deps: ChatHandlerDeps) => async (req: NextApiR
     (res as unknown as { flush?: () => void }).flush?.();
   };
   const emit = (event: ChatEvent) => {
-    if (event.type === 'text') send('text', { delta: event.delta });
+    if (event.type === 'text') send('delta', { text: event.delta });
     else if (event.type === 'tool') send('tool', { name: event.name, status: event.status });
     else if (event.type === 'proposal') send('proposal', event.proposal);
     else send('error', { code: event.code, message: errorMessage(event.code, locale, { contact }) });
@@ -171,7 +180,7 @@ export const createChatHandler = (deps: ChatHandlerDeps) => async (req: NextApiR
     const summary = await runChat({
       provider: deps.provider(),
       tools,
-      system: buildSystemPrompt({ role, page: sanitizePage(body.page), canSetUpCourses, contact }),
+      system: buildSystemPrompt({ role, page: sanitizePage(body.pageContext), canSetUpCourses, contact }),
       messages: conversation.messages,
       maxToolRounds: config.limits.maxToolRounds,
       emit,

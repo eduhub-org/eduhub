@@ -88,7 +88,7 @@ describe('the chat endpoint', () => {
   });
 
   it('only offers course-setup tools for a role the asker\'s token allows', async () => {
-    const http = mockHttp({ messages: [{ role: 'user', content: 'hi' }], role: 'admin' });
+    const http = mockHttp({ messages: [{ role: 'user', content: 'hi' }] }, { 'x-hasura-role': 'admin' });
     await createChatHandler(testDeps({ getSession: async () => session({ allowedRoles: ['user', 'instructor'] }) }))(
       http.req,
       http.res
@@ -166,7 +166,7 @@ describe('course-setup tools for Organizers', () => {
         ? { toolCalls: [call('propose_course_texts', { courseId: own?.id, texts: { tagline: 'Neu' } })] }
         : { text: 'Hier ist der Vorschlag.' }
     );
-    const http = mockHttp({ messages: [{ role: 'user', content: 'Neue Tagline bitte' }], role: 'instructor' });
+    const http = mockHttp({ messages: [{ role: 'user', content: 'Neue Tagline bitte' }] }, { 'x-hasura-role': 'instructor' });
     await createChatHandler(
       testDeps({
         provider,
@@ -185,7 +185,10 @@ describe('course-setup tools for Organizers', () => {
 
     const events = http.events();
     const proposal = events.find((e) => e.event === 'proposal');
-    expect(proposal?.data).toEqual(expect.objectContaining({ kind: 'course_texts', courseId: own?.id }));
+    expect(proposal?.data).toEqual(
+      expect.objectContaining({ status: 'PROPOSED', kind: 'course_texts', courseId: own?.id, proposedChangeId: expect.stringMatching(/^v1\./) })
+    );
+    expect(events.filter((e) => e.event === 'delta').map((e) => e.data.text).join('')).toBe('Hier ist der Vorschlag.');
     expect(events[events.length - 1].event).toBe('done');
   });
 });

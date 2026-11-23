@@ -17,26 +17,35 @@ person chatting.
 | `spending.ts` | Monthly spending cap (`AssistantMonthlyUsage`) |
 | `metrics.ts` | Anonymous metrics, one JSON log line per request |
 | `handler.ts` | `POST /api/assistant/chat` (SSE) |
-| `feedback.ts` | `POST /api/assistant/feedback` (👎 with consent, `AssistantFeedback`) |
+| `proposals.ts` | `POST /api/assistant/proposals` (apply/discard from the widget) |
+| `feedback.ts` | `POST /api/assistant/feedback` (👍/👎; 👎 conversation with consent) |
 | `server.ts` | Production wiring (session, Hasura URL, singletons) |
 
 ## Endpoints
 
+Agreed with the widget (#2194). All three need a NextAuth session (same-origin cookie) and take
+the role in use from the `x-hasura-role` header, as `/api/mcp` does (`user` without one).
+
 ### `POST /api/assistant/chat`
 
-Requires a NextAuth session. The server keeps no conversation, so the browser sends it each time:
+The server keeps no conversation, so the browser sends it each time:
 
 ```json
 {
-  "messages": [{ "role": "user", "content": "Bis wann muss ich die Einladung annehmen?" }],
-  "page": { "route": "/course/42", "courseId": 42, "sessionId": null, "error": "…shown error…" },
-  "role": "user",
-  "locale": "de"
+  "locale": "de",
+  "messages": [
+    { "role": "user", "content": "Bitte neue Termine" },
+    { "role": "assistant", "content": "…", "proposals": [{ "kind": "sessions", "courseId": 12, "status": "APPLIED" }] },
+    { "role": "user", "content": "Danke! Und die Beschreibung?" }
+  ],
+  "pageContext": { "path": "/manage/course/12", "route": "/manage/course/[courseId]", "courseId": 12, "sessionId": 34, "errorMessage": "…" }
 }
 ```
 
-`role` is the role the person is using (`user`, `instructor`, `org_admin`, `admin`); it must be
-one their token allows. Course-setup tools are offered for the last three.
+`proposals` on assistant messages (status `PROPOSED`, `APPLIED`, `DISCARDED` or `FAILED`) tell the
+model what the Organizer did; it gets them as a note in the text, never the signed id.
+Course-setup tools are offered for `instructor`, `org_admin` and `admin`, if the token allows the
+role.
 
 Refusals before streaming are JSON `{ "error": { "code", "message" } }`, the message in `locale`
 (texts in `locales/*.json` under `assistant.errors`):
@@ -53,23 +62,29 @@ Otherwise the reply streams as Server-Sent Events, `data` always JSON:
 
 | Event | Data |
 |-------|------|
-| `text` | `{ "delta" }`, a piece of the reply |
-| `tool` | `{ "name", "status": "running" \| "done" \| "failed" }` |
-| `proposal` | `{ "proposedChangeId", "kind", "courseId", "before", "after", "expiresAt" }` |
+| `delta` | `{ "text" }`, a piece of the reply (Markdown) |
+| `tool` | `{ "name", "status": "running" \| "done" \| "failed" }` (optional to show) |
+| `proposal` | the MCP `ProposedChangeResult` as-is: `{ status, proposedChangeId, kind, courseId, before, after, expiresAt, message }` |
 | `error` | `{ "code": "TOOL_CALL_FAILED" \| "BUSY" \| "UNAVAILABLE", "message" }` |
 | `done` | `{}`, always last |
 
-A **Proposed Change** is shown by the widget with Apply and Discard buttons, which call
-`/api/mcp` (`apply_proposed_change` / `discard_proposed_change`) with the user's token. The model
-is never offered those two tools and never sees the signed `proposedChangeId`, so it can't save
-anything.
+### `POST /api/assistant/proposals`
+
+`{ "proposedChangeId", "action": "apply" | "discard" }` from the widget's buttons. Only this saves a
+Proposed Change: the model is never offered `apply_proposed_change` or `discard_proposed_change`
+and never sees the signed id. It runs the MCP operations with the user's token and role. 200 with
+the result (`{ status: "APPLIED", kind, courseId, … }` / `{ status: "DISCARDED", … }`), or
+`{ "error": { "code", "message" } }` with the OperationError code: 400 `INVALID`/`NO_CHANGE`,
+401, 403 `FORBIDDEN`/`ROLE_NOT_ALLOWED`, 404, 409 `STALE`/`ALREADY_APPLIED`/`REGISTRATIONS_EXIST`,
+410 `EXPIRED`, 502 `HASURA_ERROR`.
 
 ### `POST /api/assistant/feedback`
 
-`{ "consent": true, "messages": [...], "comment": "…", "route": "/…", "locale": "de" }` stores a
-conversation rated 👎 in `AssistantFeedback`, without a user id, with the user's own token (the
-`user` role may insert, nobody but admin may read). The `delete_expired_assistant_feedback` cron
-deletes rows after 30 days. Answers 201, or 400 `FEEDBACK_CONSENT_REQUIRED` without consent.
+`{ "rating": "up" | "down", "consent": boolean, "messages"?: [...], "comment"?, "route"?, "locale"? }`.
+A rating alone is only counted. With `rating: "down"` and `messages`, the conversation (text only)
+is stored in `AssistantFeedback` without a user id, and only with `consent: true` (else 400
+`FEEDBACK_CONSENT_REQUIRED`). The `user` role may insert, nobody but admin may read; the
+`delete_expired_assistant_feedback` cron deletes rows after 30 days. Answers 204.
 
 ## Acting as the asker
 

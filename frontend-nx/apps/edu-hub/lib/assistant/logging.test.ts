@@ -83,9 +83,8 @@ it('logs only anonymous metrics for a conversation with tools and proposals', as
   });
   const http = mockHttp({
     messages: [{ role: 'user', content: `Frage ${MARKERS.prompt}` }],
-    page: { route: '/course/1', courseId: 1, error: MARKERS.pageError },
-    role: 'instructor',
-  });
+    pageContext: { path: '/manage/course/1', route: '/manage/course/[courseId]', courseId: 1, errorMessage: MARKERS.pageError },
+  }, { 'x-hasura-role': 'instructor' });
 
   await createChatHandler(organizerDeps(provider))(http.req, http.res);
   unsubscribe();
@@ -131,7 +130,7 @@ it('logs no content when a tool name the model invents is not offered', async ()
 
 it('logs no feedback content', async () => {
   const hasura = fakeHasura([]);
-  const http = mockHttp({ consent: true, messages: [{ role: 'user', content: MARKERS.feedback }], comment: MARKERS.feedback });
+  const http = mockHttp({ rating: 'down', consent: true, messages: [{ role: 'user', content: MARKERS.feedback }], comment: MARKERS.feedback });
   await createFeedbackHandler({
     config: fakeConfig(),
     getSession: async () => session(),
@@ -140,6 +139,6 @@ it('logs no feedback content', async () => {
     contact: 'c',
     fetchImpl: hasura.fetchImpl,
   })(http.req, http.res);
-  expect(http.status).toBe(201);
+  expect(http.status).toBe(204);
   expectNoContentLogged();
 });

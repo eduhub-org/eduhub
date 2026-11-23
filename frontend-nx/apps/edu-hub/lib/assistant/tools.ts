@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { ProposedChangeResult } from '../mcp/operations';
 import type { ToolDefinition } from './provider';
 
 /**
@@ -7,14 +8,8 @@ import type { ToolDefinition } from './provider';
  * model retry once (issue #2193).
  */
 
-export interface ProposalEvent {
-  proposedChangeId: string;
-  kind: string;
-  courseId: number;
-  before: unknown;
-  after: unknown;
-  expiresAt: string;
-}
+/** The MCP server's ProposedChangeResult, streamed to the widget as-is. */
+export type ProposalEvent = ProposedChangeResult;
 
 export type ToolResult =
   | { status: 'ok'; content: string; proposal?: ProposalEvent }

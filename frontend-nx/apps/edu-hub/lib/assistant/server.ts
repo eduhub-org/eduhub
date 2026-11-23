@@ -6,6 +6,7 @@ import { createCourseSetup } from '../mcp/operations';
 import { readAssistantConfig } from './config';
 import { COURSE_SETUP_ROLES, createCourseSetupTools } from './courseSetupTools';
 import type { FeedbackHandlerDeps } from './feedback';
+import type { ProposalsHandlerDeps } from './proposals';
 import type { AssistantSession, ChatHandlerDeps } from './handler';
 import { createRateLimiter } from './limits';
 import { DEFAULT_CONTACT } from './prompt';
@@ -100,4 +101,17 @@ export const feedbackDeps = (): FeedbackHandlerDeps => {
     rateLimiter: createRateLimiter({ rateShortMax: 10, rateShortWindowMs: 10 * 60_000, rateDailyMax: 30 }),
   };
   return feedback;
+};
+
+export const proposalsDeps: ProposalsHandlerDeps = {
+  getSession: getAssistantSession,
+  courseSetup: (session, role) => {
+    const secret = process.env.MCP_PROPOSAL_SECRET;
+    if (!secret || !HASURA_URL) return null;
+    // As the user, with their token and role; never the admin secret.
+    return createCourseSetup({
+      store: createHasuraCourseStore({ url: HASURA_URL, token: session.accessToken, role }),
+      secret,
+    });
+  },
 };

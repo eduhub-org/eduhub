@@ -49,6 +49,25 @@ export interface IncomingMessage {
   content: string;
 }
 
+const PROPOSAL_STATUSES = ['PROPOSED', 'APPLIED', 'DISCARDED', 'FAILED'];
+
+/**
+ * The widget lists, on an assistant message, what the Organizer did with its Proposed Changes.
+ * The model gets that as a note in the message text, without the signed ids.
+ */
+const proposalNotes = (input: unknown): string | null => {
+  if (input === undefined) return '';
+  if (!Array.isArray(input) || input.length > 20) return null;
+  const notes: string[] = [];
+  for (const p of input) {
+    const { kind, courseId, status } = (p && typeof p === 'object' ? p : {}) as Record<string, unknown>;
+    if (typeof kind !== 'string' || !/^[a-z_]{1,40}$/.test(kind) || !PROPOSAL_STATUSES.includes(status as string)) return null;
+    const course = typeof courseId === 'number' && Number.isInteger(courseId) && courseId > 0 ? ` for course ${courseId}` : '';
+    notes.push(`[Proposed Change ${kind}${course}: ${status}]`);
+  }
+  return notes.length ? `\n\n${notes.join('\n')}` : '';
+};
+
 export type ConversationCheck =
   | { ok: true; messages: IncomingMessage[] }
   | { ok: false; code: 'INVALID_REQUEST' | 'MESSAGE_TOO_LONG' | 'CONVERSATION_TOO_LONG' };
@@ -62,9 +81,11 @@ export const checkConversation = (input: unknown, limits: AssistantLimits): Conv
   const messages: IncomingMessage[] = [];
   for (const m of input) {
     if (!m || typeof m !== 'object') return { ok: false, code: 'INVALID_REQUEST' };
-    const { role, content } = m as Record<string, unknown>;
+    const { role, content, proposals } = m as Record<string, unknown>;
     if ((role !== 'user' && role !== 'assistant') || typeof content !== 'string') return { ok: false, code: 'INVALID_REQUEST' };
-    messages.push({ role, content });
+    const notes = role === 'assistant' ? proposalNotes(proposals) : proposals === undefined ? '' : null;
+    if (notes === null) return { ok: false, code: 'INVALID_REQUEST' };
+    messages.push({ role, content: content + notes });
   }
   const last = messages[messages.length - 1];
   if (last.role !== 'user' || !last.content.trim()) return { ok: false, code: 'INVALID_REQUEST' };

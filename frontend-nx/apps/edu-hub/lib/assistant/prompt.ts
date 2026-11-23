@@ -5,7 +5,9 @@
  */
 
 export interface PageContext {
-  /** The route shown, e.g. /course/42. */
+  /** The path shown, e.g. /manage/course/42. */
+  path?: string;
+  /** The Next.js route pattern, e.g. /manage/course/[courseId]. */
   route?: string;
   courseId?: number;
   sessionId?: number;
@@ -59,7 +61,7 @@ export const buildSystemPrompt = ({
     `- Keep answers short. Today is ${today(now)}. Times are Europe/Berlin.`,
     '',
     `The user's role: ${ROLE_NAMES[role] ?? role}`,
-    `Current page: ${page.route || 'unknown'}${page.courseId ? ` (course ${page.courseId})` : ''}${page.sessionId ? ` (session ${page.sessionId})` : ''}`
+    `Current page: ${page.path || page.route || 'unknown'}${page.path && page.route ? ` (${page.route})` : ''}${page.courseId ? ` (course ${page.courseId})` : ''}${page.sessionId ? ` (session ${page.sessionId})` : ''}`
   );
   if (page.error) {
     lines.push(

@@ -8,7 +8,7 @@ import type { ToolSet } from '../tools';
 
 /** Test doubles for the Assistant's endpoints. */
 
-export const mockHttp = (body: unknown, method = 'POST') => {
+export const mockHttp = (body: unknown, requestHeaders: Record<string, string> = {}, method = 'POST') => {
   const headers: Record<string, string> = {};
   const chunks: string[] = [];
   const listeners: Record<string, (() => void)[]> = {};
@@ -26,6 +26,7 @@ export const mockHttp = (body: unknown, method = 'POST') => {
       state.ended = true;
       return res;
     },
+
     setHeader(name: string, value: string) {
       headers[name.toLowerCase()] = value;
       return res;
@@ -49,7 +50,7 @@ export const mockHttp = (body: unknown, method = 'POST') => {
       return res;
     },
   };
-  const req = { method, body, headers: {}, query: {} };
+  const req = { method, body, headers: requestHeaders, query: {} };
   return {
     req: req as unknown as NextApiRequest,
     res: res as unknown as NextApiResponse,
