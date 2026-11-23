@@ -49,6 +49,7 @@
     "menu": {
       "profile": "Mein Profil",
       "my_certificates": "Meine Zertifikate",
+      "manual": "Handbuch",
       "faq": "FAQ",
       "user": "Benutzer",
       "admin_users": "Admin-Benutzer",
@@ -1233,6 +1234,7 @@
       "degrees": "Unbenanntes Degree"
     },
     "title": "Kurse verwalten",
+    "title_taken": "In diesem Programm gibt es schon „{title}“. Titel müssen innerhalb eines Programms eindeutig sein.",
     "all_programs": "Alle",
     "course_degree_title": {
       "label": "Teil der folgenden Degrees",
@@ -1477,6 +1479,11 @@
         "courses": "{count} Kurse erfolgreich in {programTitle} kopiert",
         "events": "{count} Events erfolgreich in {programTitle} kopiert",
         "degrees": "{count} Degrees erfolgreich in {programTitle} kopiert"
+      },
+      "copy_titles_taken": {
+        "courses": "Nicht kopiert, weil {programTitle} schon Kurse mit diesen Titeln hat: {titles}",
+        "events": "Nicht kopiert, weil {programTitle} schon Events mit diesen Titeln hat: {titles}",
+        "degrees": "Nicht kopiert, weil {programTitle} schon Degrees mit diesen Titeln hat: {titles}"
       }
     },
     "participants": {
@@ -2163,6 +2170,7 @@
         "label": "Öffentliche Veranstaltung",
         "description": "Öffne diese Session für alle: Es entsteht ein Entwurf in den Veranstaltungen, den Du prüfen und dann veröffentlichen kannst. Anmelden kann sich dort jede Person, auch ohne Bewerbung für den Kurs.",
         "no_events_program": "Für diese Organisation gibt es noch kein Veranstaltungsprogramm. Bitte das Plattform-Team, eins anzulegen, damit Du Sessions öffentlich machen kannst.",
+        "course_not_published": "Veröffentliche zuerst den Kurs: Nur Sessions eines veröffentlichten Kurses können öffentlich gemacht werden.",
         "create": "Als Veranstaltung anlegen",
         "creating": "Wird angelegt …",
         "create_failed": "Die Veranstaltung konnte nicht angelegt werden.",
@@ -2386,7 +2394,8 @@
       "preview_page": "Vorschau der Seite",
       "view_page": "Seite ansehen",
       "publish": "Veröffentlichen",
-      "unpublish": "Veröffentlichung zurückziehen"
+      "unpublish": "Veröffentlichung zurückziehen",
+      "requires_organizer": "Die Veranstaltung braucht mindestens eine Organisator:in, bevor sie veröffentlicht werden kann. Füge zuerst eine Organisator:in in der Veranstaltungsliste hinzu."
     },
     "rausgegangen": {
       "title": "Rausgegangen",
@@ -3578,6 +3587,7 @@
   "footer": {
     "imprint": "Impressum",
     "privacy": "Datenschutz",
+    "manual": "Handbuch",
     "faq": "FAQ",
     "newsletter": "Newsletter",
     "sponsored_by": "Gefördert durch:",
@@ -3929,6 +3939,23 @@
     "nothing_to_do": "Du musst nichts unternehmen. Wir möchten dich lediglich darüber informieren, wie wir mit deinen Daten umgehen.",
     "more": "Alle Änderungen findest du in unserer <privacy>Datenschutzerklärung</privacy>.",
     "dismiss": "Hinweis schließen"
+  },
+  "help": {
+    "title": "Handbuch",
+    "start": "Start",
+    "nav_label": "Inhalt",
+    "audience_label": "Für",
+    "audience": {
+      "participant": "Teilnehmende",
+      "organizer": "Organisator:innen",
+      "admin": "Admins"
+    },
+    "fallback_notice": "Diese Seite gibt es noch nicht auf Deutsch. Du siehst die englische Fassung.",
+    "org_rules_title": "Regeln Deiner Organisation",
+    "org_rules_text": "Fristen, Zertifikatsregeln und andere Vorgaben legt die Organisation fest, die den Kurs anbietet. Sie stehen nicht in diesem Handbuch.",
+    "org_rules_link": "Zu den Regeln und FAQ",
+    "version_release": "Stand des Handbuchs: Release <release></release>, Commit <commit></commit>",
+    "version_commit": "Stand des Handbuchs: Commit <commit></commit> (noch kein Release)"
   },
   "assistant": {
     "button": "Frag den Assistenten",

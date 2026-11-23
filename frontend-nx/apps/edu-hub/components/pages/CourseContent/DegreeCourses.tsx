@@ -9,6 +9,7 @@ import {
   CompletedDegreeEnrollmentsVariables,
 } from '../../../queries/__generated__/CompletedDegreeEnrollments';
 import { useRoleQuery } from '../../../hooks/authedQuery';
+import { coursePath } from '../../../helpers/coursePath';
 import { Course_Course_by_pk_DegreeCourses } from '../../../queries/__generated__/Course';
 
 const isPublished = (degreeCourse: Course_Course_by_pk_DegreeCourses) => degreeCourse?.Course?.published && degreeCourse?.Course?.Program?.published;
@@ -27,7 +28,7 @@ export const CurrentDegreeCourses: FC<{
           <ul className="list-disc pb-12">
             {currentDegreeCourses.map((degreeCourse) => (
               <li className="dot-before" key={degreeCourse?.Course?.id}>
-                <NextLink href={`/course/${degreeCourse?.Course?.id}`} passHref>
+                <NextLink href={coursePath(degreeCourse!.Course!.id)} passHref>
                   <MuiLink className="text-label-secondary">{degreeCourse?.Course?.title}</MuiLink>
                 </NextLink>
               </li>
@@ -65,7 +66,7 @@ export const CompletedDegreeCourses: FC<{ degreeCourseId: number }> = ({ degreeC
           <ul className="list-disc pb-12">
             {completedDegreeEnrollments.map((degreeEnrollment) => (
               <li key={degreeEnrollment?.Course?.id}>
-                <NextLink href={`/course/${degreeEnrollment?.Course?.id}`} passHref>
+                <NextLink href={coursePath(degreeEnrollment!.Course!.id, degreeEnrollment?.Course?.Program?.type)} passHref>
                   <MuiLink className="text-label-secondary">
                     {degreeEnrollment?.Course?.title} -{' '}
                     {degreeEnrollment?.Course?.Program?.type !== 'EVENTS'

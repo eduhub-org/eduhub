@@ -1,4 +1,5 @@
 import Head from 'next/head';
+import { coursePath } from '../../helpers/coursePath';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { FC, useCallback, useEffect, useState } from 'react';
@@ -150,7 +151,7 @@ const GuestManage: FC = () => {
                         className="flex flex-wrap items-center justify-between gap-3 border border-gray-200 rounded p-4"
                       >
                         <div>
-                          <Link href={`/course/${registration.courseId}`} className="text-brand hover:underline">
+                          <Link href={coursePath(registration.courseId)} className="text-brand hover:underline">
                             {registration.courseTitle}
                           </Link>
                           {registration.startTime && (

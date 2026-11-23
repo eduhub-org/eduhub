@@ -107,13 +107,15 @@ resource "google_cloud_run_service" "eduhub" {
             }
           }
         }
-        # Signs the Proposed Changes of the MCP server (pages/api/mcp).
+        # Signs the Proposed Changes of the MCP server (pages/api/mcp). Pinned to the
+        # version Terraform created, not "latest", so rotating the secret changes this
+        # template and rolls out a revision that uses the new key.
         env {
           name = "MCP_PROPOSAL_SECRET"
           value_from {
             secret_key_ref {
               name = google_secret_manager_secret.mcp_proposal_secret.secret_id
-              key  = "latest"
+              key  = google_secret_manager_secret_version.mcp_proposal_secret.version
             }
           }
         }

@@ -12,6 +12,7 @@ import { TileBase } from './TileBase';
 import { shouldShowExtendedApplicationBanner } from './extendedApplicationBanner';
 import { useEventTileMeta } from './eventTileMeta';
 import { getWidgetBaseUrl } from './widgetBaseUrl';
+import { courseUrl } from '../../../helpers/coursePath';
 
 type CourseType = CourseList_Course | CoursesEnrolledByUser_Course | CourseTiles_Course;
 
@@ -37,10 +38,10 @@ const TileWidgetComponent: FC<TileWidgetProps> = ({ course }) => {
     ? getWeekdayStartAndEndString(course, t)
     : null;
 
-  const courseUrl = `${getWidgetBaseUrl()}/course/${course.id}`;
+  const href = courseUrl(course.id, course.Program?.type, getWidgetBaseUrl());
 
   return (
-    <a href={courseUrl} target="_blank" rel="noopener noreferrer" style={{ display: 'block' }}>
+    <a href={href} target="_blank" rel="noopener noreferrer" style={{ display: 'block' }}>
       <TileBase 
         coverImage={course?.coverImage ?? null} 
         title={course.title} 

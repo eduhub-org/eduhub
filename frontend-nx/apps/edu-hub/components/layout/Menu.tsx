@@ -251,6 +251,12 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
         </MenuItem>
       )}
 
+      {isInstructorOrAdmin && (
+        <MenuItem component={Link} href="/help" onClick={closeMenu} selected={router.pathname.startsWith('/help')}>
+          {t('menu.manual')}
+        </MenuItem>
+      )}
+
       <MenuItem
         component={Link}
         href="https://opencampus.gitbook.io/faq/"

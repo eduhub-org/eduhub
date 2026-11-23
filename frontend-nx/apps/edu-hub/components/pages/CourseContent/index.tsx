@@ -36,6 +36,7 @@ import {
   submissionDeadlineToIsoString,
 } from './Projects/projectEffectiveSubmissionDeadline';
 import { useIsCourseWithEnrollment } from '../../../hooks/course';
+import { coursePath } from '../../../helpers/coursePath';
 import NotificationSnackbar from '../../common/dialogs/NotificationSnackbar';
 import { useDeclareParticipantPreview } from '../../../contexts/ParticipantPreviewContext';
 
@@ -340,7 +341,7 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                     {course.SourceSession?.Course?.published && (
                       <span className="mt-3 text-sm sm:text-base">
                         {tCoursePage('part_of_course', { course: course.SourceSession.Course.title })}{' '}
-                        <Link href={`/course/${course.SourceSession.Course.id}`} className="underline font-semibold">
+                        <Link href={coursePath(course.SourceSession.Course.id)} className="underline font-semibold">
                           {tCoursePage('to_course')}
                         </Link>
                       </span>

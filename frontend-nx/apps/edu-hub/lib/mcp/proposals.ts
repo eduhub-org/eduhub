@@ -21,8 +21,6 @@ export interface ProposalPayload {
   /** Fingerprint of the touched part of the course when the change was proposed. */
   fingerprint: string;
   changes: Partial<CourseFields> | SessionChanges | NewCourse;
-  /** Issued at, seconds since the epoch. */
-  iat: number;
   /** Expiry, seconds since the epoch. */
   exp: number;
 }
