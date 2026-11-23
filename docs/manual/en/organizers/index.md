@@ -22,4 +22,4 @@ You manage courses in two places:
 
 Instructors confirm a confidentiality notice the first time they open the manage page of a course.
 
-The rules of your organization (for example deadlines or certificate requirements) are not part of this manual. You find them through the link at the bottom of the page.
+The rules of your organization (for example deadlines or certificate requirements) are not part of this manual. If your organization publishes them online, a link to them appears at the bottom of every manual page.

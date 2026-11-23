@@ -21,7 +21,7 @@ A Session takes place at all locations of the course, unless you remove one for 
 
 ## Mandatory and optional Sessions
 
-Sessions are mandatory by default. Mark a Session as **Optional** if missing it should not count. Only mandatory Sessions count towards attendance and certificates. At least one Session must stay mandatory.
+Sessions are mandatory by default. To make a Session optional, turn off its **Mandatory** switch; the row then shows **Optional**. Missing an optional Session does not count. Only mandatory Sessions count towards attendance and certificates. At least one Session must stay mandatory.
 
 ## Deleting Sessions
 
@@ -31,7 +31,7 @@ You can delete Sessions until the last Session of the course has ended. After th
 
 When you change the time or the locations of a Session and people are registered, EduHub asks **Inform participants?** after saving. Click **Inform** to send the Session change notification: an email that says what changed and what the Session was before. **Don't inform** sends nothing. The email is never sent automatically.
 
-Separately, every participant gets one Session reminder before the first Session, at the time set in the course's email templates. It is sent only once, even if you move the first Session later.
+Separately, every participant gets one Session reminder before the first Session, at the time set in the course's email templates, unless that setting is **Off**. It is sent only once, even if you move the first Session later.
 
 ## Turning a Session into a public event
 

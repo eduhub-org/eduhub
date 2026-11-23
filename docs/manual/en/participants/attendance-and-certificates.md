@@ -13,7 +13,7 @@ Once your registration is confirmed, the course page shows the section **Attenda
 
 - **Attended** (green): your attendance was recorded.
 - **Missed** (red): you were not recorded as attending.
-- **Review Pending** (grey): the Session has not been checked yet. This never counts as missed.
+- **Review Pending** (grey): the Session has not been checked yet. It is not recorded as missed, but until it is checked it still counts against the number of Sessions you may miss.
 
 Above the tiles you see how many Sessions you may miss at most. Optional Sessions are not shown and do not count.
 
@@ -38,6 +38,6 @@ A course can award two kinds of certificate:
 - **Attendance Certificate**: confirms that you attended the course. You get it if you did not miss more mandatory Sessions than allowed.
 - **Achievement Certificate**: additionally confirms an achievement, usually a project. You get it if your attendance is sufficient and your project was rated as passed.
 
-Which certificates a course awards, how many Sessions you may miss and whether there are ECTS credits is set for each course. The exact requirements of your organization are in its rules (see the link at the bottom of this page).
+Which certificates a course awards, how many Sessions you may miss and whether there are ECTS credits is set for each course. The exact requirements are set by your organization: see its rules, linked at the bottom of this page if it publishes them online, or ask the Organizers of your course.
 
 Certificates are issued after the course. When one is ready, you get an email. You find all your certificates under **My Certificates** in the menu, and on the course page under **Go to my certificates**. From there you can download them and share them on LinkedIn.

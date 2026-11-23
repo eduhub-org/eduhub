@@ -8,7 +8,7 @@ summary: Wie EduHub für Teilnehmende, Organisator:innen und Admins funktioniert
 
 In EduHub findest Du Kurse, Events und Degrees, meldest Dich dafür an und nimmst teil. Organisator:innen richten hier ihre Kurse ein und bearbeiten die Anmeldungen.
 
-Dieses Handbuch erklärt, wie die Plattform funktioniert. Die Regeln der Organisation, die einen Kurs anbietet, etwa ihre Fristen oder Zertifikatsbedingungen, stehen nicht darin. Du findest sie über den Link unten auf jeder Handbuchseite.
+Dieses Handbuch erklärt, wie die Plattform funktioniert. Die Regeln der Organisation, die einen Kurs anbietet, etwa ihre Fristen oder Zertifikatsbedingungen, stehen nicht darin. Veröffentlicht Deine Organisation sie online, findest Du unten auf jeder Handbuchseite einen Link dorthin; sonst frag bei der Organisation nach.
 
 ## Für Teilnehmende
 

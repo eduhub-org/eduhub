@@ -1,6 +1,8 @@
 /**
  * @jest-environment node
  */
+import { execSync } from 'child_process';
+
 import { getManualVersion } from '../version';
 
 const SHA = '691b4b179d2a7c0f3b1c2d4e5f60718293a4b5c6';
@@ -18,7 +20,15 @@ describe('getManualVersion', () => {
     expect(getManualVersion({ GIT_COMMIT: 'not a sha', GIT_REF: 'develop' }).commit).toBeNull();
   });
 
-  it('falls back to git in a local checkout', () => {
-    expect(getManualVersion({}).commit).toMatch(/^[0-9a-f]{40}$/);
+  it('falls back to git, and to no commit where git is unavailable', () => {
+    // The dev container has neither git nor the repo's .git, so expect
+    // whatever git itself reports here.
+    let head: string | null = null;
+    try {
+      head = execSync('git rev-parse HEAD', { stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim();
+    } catch {
+      head = null;
+    }
+    expect(getManualVersion({}).commit).toBe(head);
   });
 });

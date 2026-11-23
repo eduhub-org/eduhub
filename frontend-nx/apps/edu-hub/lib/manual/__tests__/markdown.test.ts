@@ -31,6 +31,18 @@ describe('parseManualPage', () => {
     expect(meta.order).toBe(100);
   });
 
+  it('ignores YAML comments after unquoted values', () => {
+    const { meta } = parseManualPage(
+      page(
+        valid
+          .replace('language: en', 'language: en   # de or en')
+          .replace('[participant, organizer]', '[participant, organizer] # who it is for')
+          .replace('order: 10', 'order: 10 # position')
+      )
+    );
+    expect(meta).toMatchObject({ language: 'en', audience: ['participant', 'organizer'], order: 10 });
+  });
+
   it('accepts quoted values', () => {
     const { meta } = parseManualPage(page(valid.replace('title: Registering and applying', 'title: "Why: this"')));
     expect(meta.title).toBe('Why: this');

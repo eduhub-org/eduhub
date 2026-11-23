@@ -22,7 +22,7 @@ const FRONT_MATTER = /^---\r?\n([\s\S]*?)\r?\n---\r?\n?/;
 
 /**
  * Reads the YAML front matter of a manual page. Only the flat subset the
- * manual uses is supported: `key: value` and `key: [a, b]`. Throws on
+ * manual uses is supported: `key: value` and `key: [a, b]`, with `# comments`. Throws on
  * anything missing or invalid, so a broken page fails the build and the
  * tests instead of rendering half a page.
  */
@@ -35,7 +35,8 @@ export const parseManualPage = (source: string, file = 'page'): { meta: ManualFr
     if (!line.trim() || line.trim().startsWith('#')) continue;
     const pair = /^([a-zA-Z]+):\s*(.*)$/.exec(line);
     if (!pair) throw new Error(`${file}: cannot read front matter line "${line}"`);
-    const value = pair[2].trim();
+    // A " #" after an unquoted value starts a YAML comment.
+    const value = /^['"]/.test(pair[2].trim()) ? pair[2].trim() : pair[2].replace(/\s+#.*$/, '').trim();
     raw[pair[1]] = value.startsWith('[')
       ? value
           .replace(/^\[|\]$/g, '')

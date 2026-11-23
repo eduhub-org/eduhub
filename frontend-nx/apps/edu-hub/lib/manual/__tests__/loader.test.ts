@@ -76,6 +76,12 @@ describe('loadManual', () => {
     ).toThrow('en/a/index.md is missing');
   });
 
+  it('rejects pages outside a section folder', () => {
+    // topics.md would clash with topics/index.md and resolve its links wrongly.
+    const dir = writeManual({ 'en/index.md': front('', 'Manual'), 'en/topics.md': front('topics', 'Topics') });
+    expect(() => loadManual('en', dir)).toThrow('docs/manual/en/topics.md: put the page in a section folder');
+  });
+
   it('rejects pages nested more than one folder deep', () => {
     const dir = writeManual({ 'en/index.md': front('', 'Manual'), 'en/a/b/c.md': front('a/b/c', 'C') });
     expect(() => loadManual('en', dir)).toThrow('at most one folder deep');

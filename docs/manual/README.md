@@ -19,7 +19,8 @@ docs/manual/
   en/                      # → /en/help/...
 ```
 
-- Pages are at most one folder deep. Every folder needs an `index.md`.
+- Every page lives in a section folder, at most one folder deep; only the
+  start page `index.md` sits at the top. Every folder needs an `index.md`.
 - A page has the same path in every language; its slug is that path without
   the language and `.md`. Renaming a file breaks links: don't, or keep the old
   slug.
@@ -37,7 +38,8 @@ summary: One sentence on what the page answers.
 ---
 ```
 
-Only flat `key: value` and `key: [a, b]` lines are read.
+Only flat `key: value` and `key: [a, b]` lines are read; `# comments` after a
+value are ignored, as in YAML, so the example above can be copied as is.
 
 ## Links and anchors
 

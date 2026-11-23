@@ -22,4 +22,4 @@ Kurse verwaltest Du an zwei Stellen:
 
 Kursleitungen bestätigen beim ersten Öffnen der Verwaltungsseite eines Kurses einen Hinweis zur Vertraulichkeit.
 
-Die Regeln Deiner Organisation (zum Beispiel Fristen oder Zertifikatsbedingungen) stehen nicht in diesem Handbuch. Du findest sie über den Link unten auf der Seite.
+Die Regeln Deiner Organisation (zum Beispiel Fristen oder Zertifikatsbedingungen) stehen nicht in diesem Handbuch. Veröffentlicht Deine Organisation sie online, findest Du unten auf jeder Handbuchseite einen Link dorthin.

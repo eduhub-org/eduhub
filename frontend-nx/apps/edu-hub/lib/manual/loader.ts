@@ -77,7 +77,11 @@ export const loadManual = (language: ManualLanguage, manualDir = findManualDir()
 
   for (const file of listMarkdown(root)) {
     const location = `docs/manual/${language}/${file}`;
-    if (file.split('/').length > 2) throw new Error(`${location}: pages are at most one folder deep`);
+    const depth = file.split('/').length;
+    if (depth > 2) throw new Error(`${location}: pages are at most one folder deep`);
+    // Pages live in a section folder; only the start page sits at the top. This
+    // keeps every slug unique and every page's links relative to its folder.
+    if (depth === 1 && file !== 'index.md') throw new Error(`${location}: put the page in a section folder`);
     const { meta, body } = parseManualPage(fs.readFileSync(path.join(root, file), 'utf8'), location);
     const slug = slugFromFile(file);
     if (meta.slug !== slug) throw new Error(`${location}: slug "${meta.slug}" must be "${slug}"`);

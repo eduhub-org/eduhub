@@ -9,9 +9,11 @@ It is written for **administrators**, who:
 - configure the HTML templates and background images, and understand how a
   certificate resolves its template;
 - trigger certificate generation for the participants of a course.
-  Instructors and org admins can't: the generate buttons are shown to admins
-  only, and the `createCertificates` action has no permissions for other
-  roles.
+  Instructors and org admins can't: the `createCertificates` action has no
+  permissions for other roles. On an ordinary course the generate buttons are
+  shown to admins only; the Degree Participations tab still shows its
+  generate action to instructors and org admins, but the call is refused for
+  them.
 
 Participants only ever *download* certificates, so there is no participant-facing
 configuration in this document.

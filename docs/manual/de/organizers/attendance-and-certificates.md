@@ -29,7 +29,7 @@ Klicke auf den Punkt einer Person für einen Termin, um die Anwesenheit von Hand
 
 Welche Zertifikate ein Kurs vergibt, die ECTS-Punkte und die **Maximal verpassten Sitzungen** legst Du unter **Bescheinigungen vergeben** in der Kursliste fest (siehe [Einen Kurs einrichten](course-setup.md#einstellungen-in-der-kursliste)).
 
-- **Teilnahmebescheinigung:** für Teilnehmende, die nicht mehr Pflichttermine verpasst haben als erlaubt und bei denen kein Termin mehr ungeprüft ist.
+- **Teilnahmebescheinigung:** für Teilnehmende, deren verpasste Pflichttermine zusammen mit den noch nicht geprüften im erlaubten Rahmen bleiben (**Anwesenheitsanforderung erfüllt**).
 - **Leistungsnachweis:** setzt zusätzlich ein abgeschlossenes, als bestanden bewertetes Projekt voraus.
 
 Zertifikate stellen Admins aus, auf dem Reiter **Teilnahmen** mit **Teilnahmebescheinigungen generieren** oder **Leistungsnachweise generieren**. Wer die Bedingungen nicht erfüllt, wird übersprungen. Alle bekommen eine E-Mail, sobald ein Zertifikat fertig ist, und finden es unter **Meine Zertifikate**.

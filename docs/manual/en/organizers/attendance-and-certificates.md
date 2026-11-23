@@ -29,7 +29,7 @@ Click a participant's dot for a Session to set the attendance by hand. A manual 
 
 Which certificates a course awards, the ECTS credits and the **Maximum Missed Sessions** are set under **Award certificates** in the course list (see [Setting up a course](course-setup.md#settings-in-the-course-list)).
 
-- **Attendance Certificate:** for participants who did not miss more mandatory Sessions than allowed, with no Session left unchecked.
+- **Attendance Certificate:** for participants whose missed mandatory Sessions, together with those not checked yet, stay within the allowed number (**Attendance requirement met**).
 - **Achievement Certificate:** additionally requires a completed project rated as passed.
 
 Certificates are issued by Admins, on the **Participations** tab with **Generate Attendance Certificates** or **Generate Achievement Certificates**. Participants who don't meet the requirements are skipped. Each participant gets an email when a certificate is ready and finds it under **My Certificates**.

@@ -41,4 +41,4 @@ As long as you have not paid anything, you can cancel your registration yourself
 - **Once the course has started:** click **Abort participation**. This can't be undone.
 - **After the course has ended** you can no longer cancel.
 
-On a **paid course** you can't cancel yourself. Click **Request cancellation** and, if you like, give a reason. The Organizers decide on the cancellation and any refund. You can send this request only once.
+Once you have **paid** for a course, you can't cancel yourself. Click **Request cancellation** and, if you like, give a reason. A place on the waitlist of a paid course costs nothing yet, so you cancel it with **Cancel registration** as above. The Organizers decide on the cancellation and any refund. You can send this request only once.

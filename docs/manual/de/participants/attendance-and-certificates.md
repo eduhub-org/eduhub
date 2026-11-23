@@ -13,7 +13,7 @@ Sobald Deine Anmeldung bestätigt ist, zeigt die Kursseite bei Kursen mit Zertif
 
 - **Teilgenommen** (grün): Deine Anwesenheit wurde erfasst.
 - **Nicht teilgenommen** (rot): Du wurdest nicht als anwesend erfasst.
-- **Überprüfung ausstehend** (grau): Der Termin wurde noch nicht geprüft. Das zählt nie als verpasst.
+- **Überprüfung ausstehend** (grau): Der Termin wurde noch nicht geprüft. Er gilt nicht als verpasst, zählt aber bis zur Prüfung noch gegen die Zahl der Termine, die Du verpassen darfst.
 
 Über den Kacheln steht, an wie vielen Terminen Du höchstens fehlen darfst. Optionale Termine werden nicht angezeigt und zählen nicht.
 
@@ -38,6 +38,6 @@ Ein Kurs kann zwei Arten von Zertifikaten vergeben:
 - **Teilnahmebescheinigung**: bestätigt, dass Du am Kurs teilgenommen hast. Du bekommst sie, wenn Du nicht mehr Pflichttermine verpasst hast als erlaubt.
 - **Leistungsnachweis**: bestätigt zusätzlich eine Leistung, meist ein Projekt. Du bekommst ihn, wenn Deine Anwesenheit reicht und Dein Projekt als bestanden bewertet wurde.
 
-Welche Zertifikate ein Kurs vergibt, wie viele Termine Du verpassen darfst und ob es ECTS-Punkte gibt, ist für jeden Kurs festgelegt. Die genauen Bedingungen Deiner Organisation stehen in ihren Regeln (siehe Link unten auf dieser Seite).
+Welche Zertifikate ein Kurs vergibt, wie viele Termine Du verpassen darfst und ob es ECTS-Punkte gibt, ist für jeden Kurs festgelegt. Die genauen Bedingungen legt Deine Organisation fest: Sie stehen in ihren Regeln, die unten auf dieser Seite verlinkt sind, wenn sie online veröffentlicht werden, oder Du fragst die Organisator:innen Deines Kurses.
 
 Zertifikate werden nach dem Kurs ausgestellt. Ist eines fertig, bekommst Du eine E-Mail. Alle Deine Zertifikate findest Du im Menü unter **Meine Zertifikate** und auf der Kursseite unter **Zu meinen Zertifikaten**. Dort kannst Du sie herunterladen und auf LinkedIn teilen.

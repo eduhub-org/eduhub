@@ -41,4 +41,4 @@ Solange Du nichts bezahlt hast, kannst Du Deine Anmeldung auf der Kursseite selb
 - **Nach Kursbeginn:** Klicke auf **Teilnahme abbrechen**. Das lässt sich nicht rückgängig machen.
 - **Nach dem Ende des Kurses** kannst Du nicht mehr stornieren.
 
-Bei einem **kostenpflichtigen Kurs** kannst Du nicht selbst stornieren. Klicke auf **Stornierung anfragen** und gib, wenn Du möchtest, einen Grund an. Die Organisator:innen entscheiden über die Stornierung und eine mögliche Erstattung. Diese Anfrage kannst Du nur einmal senden.
+Hast Du für einen Kurs **bezahlt**, kannst Du nicht selbst stornieren. Klicke auf **Stornierung anfragen** und gib, wenn Du möchtest, einen Grund an. Ein Platz auf der Warteliste eines kostenpflichtigen Kurses kostet noch nichts; ihn stornierst Du wie oben mit **Anmeldung stornieren**. Die Organisator:innen entscheiden über die Stornierung und eine mögliche Erstattung. Diese Anfrage kannst Du nur einmal senden.

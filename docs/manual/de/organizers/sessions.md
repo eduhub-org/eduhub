@@ -21,7 +21,7 @@ Ein Termin findet an allen Orten des Kurses statt, außer Du entfernst einen fü
 
 ## Pflichttermine und optionale Termine
 
-Termine sind standardmäßig Pflicht. Markiere einen Termin als **Optional**, wenn sein Verpassen nicht zählen soll. Nur Pflichttermine zählen für Anwesenheit und Zertifikate. Mindestens ein Termin muss Pflicht bleiben.
+Termine sind standardmäßig Pflicht. Um einen Termin optional zu machen, schalte seinen Schalter **Pflicht** aus; die Zeile zeigt dann **Optional**. Wer einen optionalen Termin verpasst, dem wird das nicht angerechnet. Nur Pflichttermine zählen für Anwesenheit und Zertifikate. Mindestens ein Termin muss Pflicht bleiben.
 
 ## Termine löschen
 
@@ -31,7 +31,7 @@ Du kannst Termine löschen, bis der letzte Termin des Kurses vorbei ist. Danach 
 
 Wenn Du Uhrzeit oder Orte eines Termins änderst und schon Leute angemeldet sind, fragt EduHub nach dem Speichern **Teilnehmende informieren?**. Mit **Informieren** verschickst Du die Terminänderungsmitteilung: eine E-Mail, die sagt, was sich geändert hat und wie der Termin vorher war. **Nicht informieren** verschickt nichts. Die E-Mail wird nie automatisch verschickt.
 
-Unabhängig davon bekommt jede:r Teilnehmende eine Terminerinnerung vor dem ersten Termin, zu der Zeit, die in den E-Mail-Vorlagen des Kurses eingestellt ist. Sie wird nur einmal verschickt, auch wenn Du den ersten Termin später verschiebst.
+Unabhängig davon bekommt jede:r Teilnehmende eine Terminerinnerung vor dem ersten Termin, zu der Zeit, die in den E-Mail-Vorlagen des Kurses eingestellt ist, außer diese Einstellung steht auf **Aus**. Sie wird nur einmal verschickt, auch wenn Du den ersten Termin später verschiebst.
 
 ## Einen Termin zur öffentlichen Veranstaltung machen
 

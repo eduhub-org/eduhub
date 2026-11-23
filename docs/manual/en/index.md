@@ -8,7 +8,7 @@ summary: How EduHub works for participants, Organizers and admins, and where to 
 
 EduHub is where you find courses, events and degrees, register for them and take part. Organizers use it to set up their courses and handle registrations.
 
-This manual explains how the platform works. It does not contain the rules of the organization that offers a course, such as its deadlines or certificate requirements. You find those through the link at the bottom of every manual page.
+This manual explains how the platform works. It does not contain the rules of the organization that offers a course, such as its deadlines or certificate requirements. If your organization publishes them online, a link to them appears at the bottom of every manual page; otherwise ask the organization.
 
 ## For participants
 
