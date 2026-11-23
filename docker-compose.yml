@@ -13,6 +13,8 @@ services:
     # command: tail -F anything
     volumes:
       - ./frontend-nx:/opt/app
+      # The manual shown at /help (found at /opt/docs/manual).
+      - ./docs/manual:/opt/docs/manual:ro
     depends_on:
       - hasura
       - keycloak

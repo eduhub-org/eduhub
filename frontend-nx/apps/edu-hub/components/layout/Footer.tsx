@@ -77,6 +77,9 @@ export const Footer: FC = () => {
                 <Link href="/privacy">{t('privacy')}</Link>
               </p>
               <p>
+                <Link href="/help">{t('manual')}</Link>
+              </p>
+              <p>
                 <a href="https://opencampus.gitbook.io/faq/" target="_blank" rel="noopener noreferrer">
                   {t('faq')}
                 </a>

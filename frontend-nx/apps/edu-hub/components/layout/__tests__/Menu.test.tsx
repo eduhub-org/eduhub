@@ -118,4 +118,10 @@ describe('account Menu', () => {
     expect(screen.getByRole('menuitem', { name: 'menu.statistics' })).toHaveAttribute('href', '/statistics');
     expect(screen.getByText('menu.section_management')).toBeInTheDocument();
   });
+
+  it('links the in-app manual for everyone', async () => {
+    await renderMenu();
+
+    expect(screen.getByRole('menuitem', { name: 'menu.manual' })).toHaveAttribute('href', '/help');
+  });
 });

@@ -21,6 +21,9 @@ WORKDIR /opt/app
 
 COPY --from=deps /opt/app/node_modules ./node_modules
 COPY . .
+# The manual (docs/manual, outside this build context) for /help. CI passes it
+# as a named context: docker build --build-context manual=./docs/manual ...
+COPY --from=manual . /opt/docs/manual
 
 ARG NEXT_PUBLIC_AUTH_URL
 ENV NEXT_PUBLIC_AUTH_URL=${NEXT_PUBLIC_AUTH_URL}

@@ -49,6 +49,7 @@
     "menu": {
       "profile": "My Profile",
       "my_certificates": "My Certificates",
+      "manual": "Manual",
       "faq": "FAQ",
       "user": "User",
       "admin_users": "Admin Users",
@@ -3599,6 +3600,7 @@
   "footer": {
     "imprint": "Imprint",
     "privacy": "Privacy",
+    "manual": "Manual",
     "faq": "FAQ",
     "newsletter": "Newsletter",
     "sponsored_by": "Sponsored by:",
@@ -3950,5 +3952,20 @@
     "nothing_to_do": "You do not need to do anything. We simply want to let you know how we handle your data.",
     "more": "All changes are listed in our <privacy>privacy policy</privacy>.",
     "dismiss": "Close notice"
+  },
+  "help": {
+    "title": "Manual",
+    "start": "Start",
+    "nav_label": "Contents",
+    "audience_label": "For",
+    "audience": {
+      "participant": "Participants",
+      "organizer": "Organizers",
+      "admin": "Admins"
+    },
+    "fallback_notice": "This page is not available in English yet. You are reading the German version.",
+    "org_rules_title": "Rules of your organization",
+    "org_rules_text": "Deadlines, certificate rules and other requirements are set by the organization that offers the course. They are not part of this manual.",
+    "org_rules_link": "Go to the rules and FAQ"
   }
 }

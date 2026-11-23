@@ -89,6 +89,7 @@ jobs:
           set -euo pipefail
           docker build "./${DOCKERFILE_FOLDER}" \
             --file "./${DOCKERFILE_FOLDER}/${DOCKERFILE_NAME}" \
+            --build-context manual=./docs/manual \
             --tag "${IMAGE_NAME}" \
             --label "runnumber=${GITHUB_RUN_ID}" \
             --build-arg "NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}" \
