@@ -1274,8 +1274,8 @@
       "add_event": "Organisator:in hinzufügen",
       "help_text": "Die Leitung kann das Angebot verwalten und wird auf seiner Seite genannt.",
       "help_text_event": "Organisator:innen können das Event verwalten und werden auf seiner Seite genannt.",
-      "last_required": "Ein veröffentlichter Kurs braucht mindestens eine Kursleitung. Füge zuerst eine weitere Kursleitung hinzu oder nimm den Kurs offline.",
-      "last_required_event": "Ein veröffentlichtes Event braucht mindestens eine Organisator:in. Füge zuerst eine weitere Organisator:in hinzu oder nimm das Event offline."
+      "last_required": "Ein veröffentlichtes Angebot braucht mindestens eine Leitung. Füge zuerst eine weitere Leitung hinzu oder nimm das Angebot offline.",
+      "last_required_event": "Ein veröffentlichtes Angebot braucht mindestens eine Organisator:in. Füge zuerst eine weitere Organisator:in hinzu oder nimm das Angebot offline."
     },
     "funding_organizations": {
       "label": "Förderorganisationen",
@@ -2170,7 +2170,7 @@
         "label": "Öffentliche Veranstaltung",
         "description": "Öffne diese Session für alle: Es entsteht ein Entwurf in den Veranstaltungen, den Du prüfen und dann veröffentlichen kannst. Anmelden kann sich dort jede Person, auch ohne Bewerbung für den Kurs.",
         "no_events_program": "Für diese Organisation gibt es noch kein Veranstaltungsprogramm. Bitte das Plattform-Team, eins anzulegen, damit Du Sessions öffentlich machen kannst.",
-        "course_not_published": "Veröffentliche zuerst den Kurs: Nur Sessions eines veröffentlichten Kurses können öffentlich gemacht werden.",
+        "course_not_published": "Veröffentliche zuerst das Angebot: Nur Sessions eines veröffentlichten Angebots können öffentlich gemacht werden.",
         "create": "Als Veranstaltung anlegen",
         "creating": "Wird angelegt …",
         "create_failed": "Die Veranstaltung konnte nicht angelegt werden.",
@@ -2395,7 +2395,7 @@
       "view_page": "Seite ansehen",
       "publish": "Veröffentlichen",
       "unpublish": "Veröffentlichung zurückziehen",
-      "requires_organizer": "Die Veranstaltung braucht mindestens eine Organisator:in, bevor sie veröffentlicht werden kann. Füge zuerst eine Organisator:in in der Veranstaltungsliste hinzu."
+      "requires_organizer": "Das Angebot braucht mindestens eine Organisator:in, bevor es veröffentlicht werden kann. Füge zuerst eine Organisator:in hinzu."
     },
     "rausgegangen": {
       "title": "Rausgegangen",
