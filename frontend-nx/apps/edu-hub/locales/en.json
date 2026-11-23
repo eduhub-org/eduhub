@@ -3968,7 +3968,8 @@
     "contact": "Contact the EduHub team",
     "errors": {
       "generic": "Something went wrong. Please try again later.",
-      "NETWORK": "The connection was lost. Please try again."
+      "NETWORK": "The connection was lost. Please try again.",
+      "INTERRUPTED": "The reply was cut off. Please ask again."
     },
     "context": {
       "summary": "Sent with your question",
@@ -4035,7 +4036,7 @@
       },
       "errors": {
         "generic": "The change could not be applied.",
-        "NETWORK": "The connection was lost. Nothing was saved; please try again.",
+        "NETWORK": "The connection was lost. It is unknown whether the change was saved. Check the course before you try again.",
         "STALE": "The course has changed since this was proposed, so nothing was saved. Ask for a new proposal.",
         "EXPIRED": "This proposal has expired. Ask for a new one.",
         "FORBIDDEN": "You are not allowed to make this change.",

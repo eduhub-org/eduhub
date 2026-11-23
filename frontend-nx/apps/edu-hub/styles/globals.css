@@ -107,6 +107,12 @@
   --eduhub-status-current: #A2EBA0;
   --eduhub-status-missed: #F2991D66;
 
+  /* Diff surfaces (Assistant Proposed Change card): what a change removes and
+     adds. Light tints for the always-light card, so the text on them keeps
+     its contrast; StuJo can retint them like any other token. */
+  --eduhub-diff-removed: #FBE3E3;
+  --eduhub-diff-added: #DDF4DC;
+
   /* TableGrid: row dividers on the white rows, and the grey expand strip that
      closes each row. Same in both scopes, since rows are always light. */
   --eduhub-table-divider: #C4C4C4;

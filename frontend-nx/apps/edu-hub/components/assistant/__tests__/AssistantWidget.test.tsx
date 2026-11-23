@@ -1,5 +1,5 @@
 import React from 'react';
-import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { AssistantWidget } from '../AssistantWidget';
 import type { ChatEvent, ChatRequest, ProposedChange } from '../api';
@@ -89,6 +89,12 @@ const renderWidget = () =>
   render(<AssistantWidget />);
 
 const openPanel = () => fireEvent.click(screen.getByRole('button', { name: 'Open the AI Assistant' }));
+
+/** Closes the panel and waits until MUI has removed it, so the page is accessible again. */
+const closePanel = async () => {
+  fireEvent.click(screen.getByRole('button', { name: 'Close' }));
+  await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+};
 
 const ask = async (question: string) => {
   fireEvent.change(screen.getByLabelText('Your question'), { target: { value: question } });
@@ -185,6 +191,16 @@ describe('AssistantWidget', () => {
     );
   });
 
+  it('does not send while Enter confirms an IME candidate', () => {
+    renderWidget();
+    openPanel();
+    const input = screen.getByLabelText('Your question');
+    fireEvent.change(input, { target: { value: 'にほんご' } });
+    fireEvent.keyDown(input, { key: 'Enter', isComposing: true });
+    expect(mockStreamChat).not.toHaveBeenCalled();
+    expect(input).toHaveValue('にほんご');
+  });
+
   it('translates errors that have no message from the server, such as a lost connection', async () => {
     replyWith([{ type: 'error', error: { code: 'NETWORK', message: '' } }]);
     renderWidget();
@@ -259,6 +275,54 @@ describe('AssistantWidget', () => {
       expect(within(card).getByText('Applied and saved.')).toBeInTheDocument();
       expect(within(card).queryByText(/Not saved yet/)).not.toBeInTheDocument();
       expect(within(card).queryByRole('button', { name: 'Apply' })).not.toBeInTheDocument();
+    });
+
+    it('keeps an apply on its way, and its outcome, when the panel is closed and reopened', async () => {
+      let resolveApply: (value: unknown) => void = () => undefined;
+      mockDecideProposal.mockImplementation(() => new Promise((resolve) => (resolveApply = resolve)));
+      const card = await showProposal();
+      fireEvent.click(within(card).getByRole('button', { name: 'Apply' }));
+
+      await closePanel();
+      openPanel();
+      expect(within(await screen.findByTestId('proposed-change')).getByRole('button', { name: 'Applying…' })).toBeDisabled();
+
+      await closePanel();
+      await act(async () => resolveApply({ ok: true, result: { status: 'APPLIED' } }));
+      openPanel();
+      expect(within(await screen.findByTestId('proposed-change')).getByText('Applied and saved.')).toBeInTheDocument();
+      expect(mockDecideProposal).toHaveBeenCalledTimes(1);
+    });
+
+    it('keeps an apply on its way across a remount (navigating to another page)', async () => {
+      let resolveApply: (value: unknown) => void = () => undefined;
+      mockDecideProposal.mockImplementation(() => new Promise((resolve) => (resolveApply = resolve)));
+      const card = await showProposal();
+      fireEvent.click(within(card).getByRole('button', { name: 'Apply' }));
+
+      cleanup();
+      renderWidget();
+      openPanel();
+      const remounted = await screen.findByTestId('proposed-change');
+      expect(within(remounted).getByRole('button', { name: 'Applying…' })).toBeDisabled();
+
+      await act(async () => resolveApply({ ok: true, result: { status: 'APPLIED' } }));
+      expect(within(screen.getByTestId('proposed-change')).getByText('Applied and saved.')).toBeInTheDocument();
+      expect(mockDecideProposal).toHaveBeenCalledTimes(1);
+    });
+
+    it('says the outcome is unknown when a reload cut off an apply', async () => {
+      window.sessionStorage.setItem(
+        'eduhub-assistant:user-1',
+        JSON.stringify([
+          { id: 'm1', role: 'assistant', content: '', proposals: [{ key: 'gone', proposal, status: 'PROPOSED', busy: true }] },
+        ])
+      );
+      renderWidget();
+      openPanel();
+
+      const card = await screen.findByTestId('proposed-change');
+      expect(within(card).getByText(/It is unknown whether the change was saved/)).toBeInTheDocument();
     });
 
     it.each([

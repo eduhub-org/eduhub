@@ -112,12 +112,16 @@ const Reply: FC<{
   );
 };
 
-const Chat: FC<{ userId: string | null; contactHref: string }> = ({ userId, contactHref }) => {
+type Conversation = ReturnType<typeof useAssistantConversation>;
+
+const Chat: FC<{ conversation: Conversation; role: string; contactHref: string }> = ({
+  conversation,
+  role,
+  contactHref,
+}) => {
   const t = useTranslations('assistant');
   const router = useRouter();
-  const locale = useLocale();
-  const role = useAssistantRole(router.asPath);
-  const { messages, sending, send, stop, decide, reset } = useAssistantConversation({ userId, role, locale });
+  const { messages, sending, send, stop, decide, reset } = conversation;
   const [draft, setDraft] = useState('');
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
@@ -139,7 +143,8 @@ const Chat: FC<{ userId: string | null; contactHref: string }> = ({ userId, cont
   };
 
   const onKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (event.key === 'Enter' && !event.shiftKey) submit(event);
+    // Enter that confirms an IME candidate (e.g. Japanese input) must not send the draft.
+    if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing) submit(event);
   };
 
   const hasReply = messages.some((m) => m.role === 'assistant' && !m.streaming && (m.content || m.proposals.length));
@@ -235,6 +240,9 @@ export const AssistantWidget: FC<Props> = ({ privacyHref = '/privacy', contactHr
   const isSessionLoading = useIsSessionLoading();
   const { target, loading: impersonationLoading } = useImpersonation();
   const userId = useCurrentUserId();
+  const router = useRouter();
+  const locale = useLocale();
+  const role = useAssistantRole(router.asPath);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -244,6 +252,11 @@ export const AssistantWidget: FC<Props> = ({ privacyHref = '/privacy', contactHr
   // The Assistant acts with the signed-in person's own token. While an admin views
   // the app as someone else, that would be the admin, not the person on screen.
   const viewingAsSomeone = Boolean(target) || impersonationLoading;
+  const canChat = isLoggedIn && !viewingAsSomeone;
+
+  // Held here, not in the panel: closing the panel unmounts its content, and a
+  // reply or an apply still on its way must keep its state and its outcome.
+  const conversation = useAssistantConversation({ userId: canChat ? userId : null, role, locale });
 
   const close = () => {
     setOpen(false);
@@ -292,7 +305,7 @@ export const AssistantWidget: FC<Props> = ({ privacyHref = '/privacy', contactHr
         ) : viewingAsSomeone ? (
           <p>{t('unavailable_viewing_as')}</p>
         ) : (
-          <Chat userId={userId} contactHref={contactHref} />
+          <Chat conversation={conversation} role={role} contactHref={contactHref} />
         )}
       </DialogShell>
     </>

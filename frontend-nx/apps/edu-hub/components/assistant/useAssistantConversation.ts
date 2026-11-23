@@ -7,6 +7,7 @@ import {
   decideProposal,
   PageContext,
   ProposalDecision,
+  ProposalOutcome,
   streamChat,
 } from './api';
 import type { ProposalState } from './ProposedChangeCard';
@@ -37,6 +38,22 @@ export const clearStoredConversations = () => {
   }
 };
 
+/**
+ * Apply or discard requests on their way, by proposal key. Module scope, so they
+ * outlive the component: navigating to another page remounts the widget, and
+ * the new one must neither offer Apply again nor miss the outcome. A full page
+ * reload clears this, as it also cancels the requests.
+ */
+const pending = new Map<string, { action: ProposalDecision; outcome: Promise<ProposalOutcome> }>();
+
+const settle = (p: ProposalState, action: ProposalDecision, outcome: ProposalOutcome): ProposalState => {
+  if (!outcome.ok) return { ...p, busy: false, status: 'FAILED', error: outcome.error };
+  if (action === 'apply') return { ...p, busy: false, status: 'APPLIED' };
+  // Discarding doesn't revoke the signed proposal on the server, so forget
+  // its id: nothing in this tab can apply it afterwards.
+  return { ...p, busy: false, status: 'DISCARDED', proposal: { ...p.proposal, proposedChangeId: '' } };
+};
+
 let counter = 0;
 const newId = () => `${Date.now().toString(36)}-${(counter++).toString(36)}`;
 
@@ -45,12 +62,18 @@ const load = (key: string | null): ConversationMessage[] => {
   try {
     const stored = window.sessionStorage.getItem(key);
     if (!stored) return [];
-    // A reload mid-stream or mid-apply leaves nothing in flight.
+    // A stream doesn't survive a remount. An apply does (see `pending`); one that
+    // a reload cut off may or may not have been saved, so say exactly that.
     return (JSON.parse(stored) as ConversationMessage[]).map((message) => ({
       ...message,
       streaming: false,
       lookingUp: false,
-      proposals: message.proposals.map((p) => ({ ...p, busy: false })),
+      proposals: message.proposals.map(
+        (p): ProposalState =>
+          p.busy && !pending.has(p.key)
+            ? { ...p, busy: false, status: 'FAILED', error: { code: 'NETWORK', message: '' } }
+            : p
+      ),
     }));
   } catch {
     return [];
@@ -92,11 +115,26 @@ export const useAssistantConversation = ({
   const [messages, setMessages] = useState<ConversationMessage[]>([]);
   const [sending, setSending] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
-  const deciding = useRef(new Set<string>());
   const apollo = useApolloClient();
+  const mounted = useRef(true);
+  useEffect(
+    () => () => {
+      mounted.current = false;
+    },
+    []
+  );
 
   useEffect(() => {
-    setMessages(load(storageKey));
+    const loaded = load(storageKey);
+    setMessages(loaded);
+    // Pick up the outcome of an apply that an earlier mount started.
+    loaded
+      .flatMap((m) => m.proposals)
+      .forEach(({ key }) => {
+        const request = pending.get(key);
+        request?.outcome.then((outcome) => updateProposal(key, (p) => settle(p, request.action, outcome)));
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- runs once per stored conversation
   }, [storageKey]);
 
   useEffect(() => {
@@ -119,7 +157,13 @@ export const useAssistantConversation = ({
       const content = text.trim();
       if (!content || sending) return;
       const userMessage: ConversationMessage = { id: newId(), role: 'user', content, pageContext, proposals: [] };
-      const reply: ConversationMessage = { id: newId(), role: 'assistant', content: '', proposals: [], streaming: true };
+      const reply: ConversationMessage = {
+        id: newId(),
+        role: 'assistant',
+        content: '',
+        proposals: [],
+        streaming: true,
+      };
       const history = [...messages, userMessage];
       setMessages([...history, reply]);
       setSending(true);
@@ -153,14 +197,30 @@ export const useAssistantConversation = ({
 
   const stop = useCallback(() => abortRef.current?.abort(), []);
 
-  const updateProposal = (key: string, update: (state: ProposalState) => ProposalState) =>
-    setMessages((current) =>
-      current.map((message) =>
-        message.proposals.some((p) => p.key === key)
-          ? { ...message, proposals: message.proposals.map((p) => (p.key === key ? update(p) : p)) }
-          : message
-      )
-    );
+  const updateProposal = useCallback(
+    (key: string, update: (state: ProposalState) => ProposalState) => {
+      const apply = (current: ConversationMessage[]) =>
+        current.map((message) =>
+          message.proposals.some((p) => p.key === key)
+            ? { ...message, proposals: message.proposals.map((p) => (p.key === key ? update(p) : p)) }
+            : message
+        );
+      if (mounted.current) {
+        setMessages(apply);
+        return;
+      }
+      // The user left the page while the apply was on its way: record the outcome
+      // in the stored conversation, so the card doesn't offer Apply again.
+      if (!storageKey) return;
+      try {
+        const stored = window.sessionStorage.getItem(storageKey);
+        if (stored) window.sessionStorage.setItem(storageKey, JSON.stringify(apply(JSON.parse(stored))));
+      } catch {
+        // Storage blocked: nothing was stored to correct.
+      }
+    },
+    [storageKey]
+  );
 
   const decide = useCallback(
     async (key: string, action: ProposalDecision) => {
@@ -168,25 +228,20 @@ export const useAssistantConversation = ({
       // within milliseconds could create two courses. So a double click, or a
       // click while the first request is on its way, is dropped, and nothing
       // retries on its own.
-      if (deciding.current.has(key)) return;
+      if (pending.has(key)) return;
       const state = messages.flatMap((m) => m.proposals).find((p) => p.key === key);
       if (!state || state.status === 'APPLIED' || state.status === 'DISCARDED') return;
 
-      deciding.current.add(key);
+      const request = { action, outcome: decideProposal(state.proposal.proposedChangeId, action, role) };
+      pending.set(key, request);
       updateProposal(key, (p) => ({ ...p, busy: true, error: undefined }));
-      const outcome = await decideProposal(state.proposal.proposedChangeId, action, role);
-      deciding.current.delete(key);
+      const outcome = await request.outcome;
+      pending.delete(key);
       // The page behind the panel shows the course; reload its data so it shows the saved change.
       if (outcome.ok && action === 'apply') apollo.refetchQueries({ include: 'active' }).catch(() => undefined);
-      updateProposal(key, (p) => {
-        if (!outcome.ok) return { ...p, busy: false, status: 'FAILED', error: outcome.error };
-        if (action === 'apply') return { ...p, busy: false, status: 'APPLIED' };
-        // Discarding doesn't revoke the signed proposal on the server, so forget
-        // its id: nothing in this tab can apply it afterwards.
-        return { ...p, busy: false, status: 'DISCARDED', proposal: { ...p.proposal, proposedChangeId: '' } };
-      });
+      updateProposal(key, (p) => settle(p, action, outcome));
     },
-    [messages, role, apollo]
+    [messages, role, apollo, updateProposal]
   );
 
   const reset = useCallback(() => {

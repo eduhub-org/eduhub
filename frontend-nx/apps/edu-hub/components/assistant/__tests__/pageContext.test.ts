@@ -43,6 +43,14 @@ describe('readVisibleError', () => {
     expect(readVisibleError()).toBe('Upload failed');
   });
 
+  it('skips errors hidden by CSS on the element or an ancestor', () => {
+    document.body.innerHTML =
+      '<div style="display:none"><p role="alert">hidden by display</p></div>' +
+      '<div style="visibility:hidden"><span><p role="alert">hidden by visibility</p></span></div>' +
+      '<p role="alert">Shown error</p>';
+    expect(readVisibleError()).toBe('Shown error');
+  });
+
   it('returns undefined when no error is shown', () => {
     expect(readVisibleError()).toBeUndefined();
   });

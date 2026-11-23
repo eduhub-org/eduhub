@@ -1,4 +1,7 @@
-import { parseSseBuffer } from '../api';
+/**
+ * @jest-environment node
+ */
+import { ChatEvent, parseSseBuffer, streamChat } from '../api';
 
 describe('parseSseBuffer', () => {
   it('returns complete events and keeps the unfinished rest', () => {
@@ -27,6 +30,42 @@ describe('parseSseBuffer', () => {
       { type: 'tool', name: 'search_catalogue', status: 'running' },
       { type: 'error', error: { code: 'RATE_LIMITED', message: 'slow down' } },
       { type: 'done' },
+    ]);
+  });
+});
+
+describe('streamChat', () => {
+  const streamOf = (chunks: string[]) => {
+    const encoded = chunks.map((chunk) => new TextEncoder().encode(chunk));
+    return {
+      ok: true,
+      body: {
+        getReader: () => ({
+          read: async () => (encoded.length ? { value: encoded.shift(), done: false } : { value: undefined, done: true }),
+          cancel: async () => undefined,
+        }),
+      },
+    };
+  };
+
+  const run = async (chunks: string[]) => {
+    global.fetch = jest.fn().mockResolvedValue(streamOf(chunks)) as unknown as typeof fetch;
+    const events: ChatEvent[] = [];
+    await streamChat({ locale: 'en', messages: [], pageContext: { path: '/', route: '/' } }, 'user', (e) => events.push(e));
+    return events;
+  };
+
+  it('ends normally on `done`', async () => {
+    expect(await run(['event: delta\ndata: {"text":"Hi"}\n\n', 'event: done\ndata: {}\n\n'])).toEqual([
+      { type: 'delta', text: 'Hi' },
+      { type: 'done' },
+    ]);
+  });
+
+  it('reports an interruption when the stream closes without `done`', async () => {
+    expect(await run(['event: delta\ndata: {"text":"Half a"}\n\n'])).toEqual([
+      { type: 'delta', text: 'Half a' },
+      { type: 'error', error: { code: 'INTERRUPTED', message: '' } },
     ]);
   });
 });

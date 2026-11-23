@@ -6,9 +6,15 @@ const toId = (value: unknown): number | undefined => {
   return Number.isInteger(id) && id > 0 ? id : undefined;
 };
 
-const isHidden = (element: Element): boolean =>
-  Boolean(element.closest('[aria-hidden="true"], [hidden]')) ||
-  (element instanceof HTMLElement && element.style.visibility === 'hidden');
+/** Hidden by attribute or by CSS, on the element or any ancestor. */
+const isHidden = (element: Element): boolean => {
+  if (element.closest('[aria-hidden="true"], [hidden]')) return true;
+  for (let node: Element | null = element; node; node = node.parentElement) {
+    const style = window.getComputedStyle(node);
+    if (style.display === 'none' || style.visibility === 'hidden') return true;
+  }
+  return false;
+};
 
 /** Selectors for error messages users see: the ErrorMessageDialog body and any ARIA alert. */
 const ERROR_SELECTORS = ['#error-dialog-description', '[role="alert"]'];

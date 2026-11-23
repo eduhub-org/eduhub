@@ -153,7 +153,8 @@ export const streamChat = async (
         if (event.type === 'done' || event.type === 'error') finished = true;
       }
       if (done && !finished) {
-        onEvent({ type: 'done' });
+        // The backend always ends with `done` or `error`; without one the reply was cut off.
+        onEvent({ type: 'error', error: { code: 'INTERRUPTED', message: '' } });
         finished = true;
       }
     }

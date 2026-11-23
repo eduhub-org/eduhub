@@ -102,11 +102,11 @@ export const ProposedChangeCard: FC<Props> = ({ state, onApply, onDiscard }) => 
                     part.type === 'same' ? (
                       <span key={index}>{part.text}</span>
                     ) : part.type === 'added' ? (
-                      <ins key={index} className="bg-green-100 no-underline" title={t('added')}>
+                      <ins key={index} className="bg-diff-added no-underline" title={t('added')}>
                         {part.text}
                       </ins>
                     ) : (
-                      <del key={index} className="bg-red-100" title={t('removed')}>
+                      <del key={index} className="bg-diff-removed" title={t('removed')}>
                         {part.text}
                       </del>
                     )
@@ -114,11 +114,11 @@ export const ProposedChangeCard: FC<Props> = ({ state, onApply, onDiscard }) => 
                 </dd>
               ) : (
                 <dd className="grid grid-cols-1 gap-1 sm:grid-cols-2">
-                  <div className="min-w-0 break-words rounded bg-red-50 p-1">
+                  <div className="min-w-0 break-words rounded bg-diff-removed p-1">
                     <span className="block text-xs text-label-secondary">{t('before')}</span>
                     {key in before ? formatValue(old) : <span className="italic">{t('none')}</span>}
                   </div>
-                  <div className="min-w-0 break-words rounded bg-green-50 p-1">
+                  <div className="min-w-0 break-words rounded bg-diff-added p-1">
                     <span className="block text-xs text-label-secondary">{t('after')}</span>
                     {key in after ? formatValue(next) : <span className="italic">{t('none')}</span>}
                   </div>

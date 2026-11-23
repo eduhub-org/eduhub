@@ -3953,7 +3953,8 @@
     "contact": "Schreib dem EduHub-Team",
     "errors": {
       "generic": "Etwas ist schiefgelaufen. Bitte versuch es später noch einmal.",
-      "NETWORK": "Die Verbindung wurde unterbrochen. Bitte versuch es noch einmal."
+      "NETWORK": "Die Verbindung wurde unterbrochen. Bitte versuch es noch einmal.",
+      "INTERRUPTED": "Die Antwort wurde abgebrochen. Bitte frag noch einmal."
     },
     "context": {
       "summary": "Mit Deiner Frage gesendet",
@@ -4020,7 +4021,7 @@
       },
       "errors": {
         "generic": "Die Änderung konnte nicht übernommen werden.",
-        "NETWORK": "Die Verbindung wurde unterbrochen. Es wurde nichts gespeichert; bitte versuch es noch einmal.",
+        "NETWORK": "Die Verbindung wurde unterbrochen. Es ist unklar, ob die Änderung gespeichert wurde. Prüf den Kurs, bevor Du es noch einmal versuchst.",
         "STALE": "Der Kurs hat sich seit dem Vorschlag geändert, deshalb wurde nichts gespeichert. Bitte um einen neuen Vorschlag.",
         "EXPIRED": "Dieser Vorschlag ist abgelaufen. Bitte um einen neuen.",
         "FORBIDDEN": "Du darfst diese Änderung nicht vornehmen.",
