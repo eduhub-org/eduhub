@@ -24,7 +24,7 @@ const STATUS: Record<OperationErrorCode, number> = {
   NO_CHANGE: 400,
   REGISTRATIONS_EXIST: 409,
   STALE: 409,
-  ALREADY_APPLIED: 409,
+  TITLE_TAKEN: 409,
   EXPIRED: 410,
   HASURA_ERROR: 502,
 };

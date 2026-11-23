@@ -75,7 +75,7 @@ Proposed Change: the model is never offered `apply_proposed_change` or `discard_
 and never sees the signed id. It runs the MCP operations with the user's token and role. 200 with
 the result (`{ status: "APPLIED", kind, courseId, … }` / `{ status: "DISCARDED", … }`), or
 `{ "error": { "code", "message" } }` with the OperationError code: 400 `INVALID`/`NO_CHANGE`,
-401, 403 `FORBIDDEN`/`ROLE_NOT_ALLOWED`, 404, 409 `STALE`/`ALREADY_APPLIED`/`REGISTRATIONS_EXIST`,
+401, 403 `FORBIDDEN`/`ROLE_NOT_ALLOWED`, 404, 409 `STALE`/`TITLE_TAKEN`/`REGISTRATIONS_EXIST`,
 410 `EXPIRED`, 502 `HASURA_ERROR`.
 
 ### `POST /api/assistant/feedback`
