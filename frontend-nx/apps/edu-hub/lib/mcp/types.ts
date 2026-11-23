@@ -53,6 +53,8 @@ export interface CourseSession {
   description: string | null;
   startDateTime: string;
   endDateTime: string;
+  /** Set by a trigger on every update; null for Sessions never updated since the column was added. */
+  updatedAt: string | null;
   locations: SessionLocation[];
 }
 
@@ -128,7 +130,8 @@ export interface SessionChanges {
 export interface CourseStore {
   /** Proves the token to Hasura and returns the caller it identifies. */
   verifyCaller(): Promise<Caller>;
-  listManagedCourses(caller: Caller): Promise<CourseSummary[]>;
+  /** Managed courses, newest id first, with ids below `beforeId` when given; at most `limit`. */
+  listManagedCourses(caller: Caller, page: { beforeId?: number; limit: number }): Promise<CourseSummary[]>;
   /** The course if the caller manages it (as Hasura's update rules would allow), else null. */
   getManagedCourse(caller: Caller, courseId: number): Promise<CourseSnapshot | null>;
   /** Course columns the caller's role may update. */

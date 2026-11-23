@@ -95,7 +95,7 @@ const COURSE_QUERY = `
       CourseEnrollments_aggregate { aggregate { count } }
       CourseLocations(order_by: { id: asc }) { id locationOption defaultSessionAddress defaultSessionAddressId }
       Sessions(order_by: { id: asc }) {
-        id title description startDateTime endDateTime
+        id title description startDateTime endDateTime updated_at
         SessionAddresses(order_by: { id: asc }) { courseLocationId address locationAddressId }
       }
     }
@@ -103,8 +103,8 @@ const COURSE_QUERY = `
 `;
 
 const LIST_QUERY = `
-  query McpManagedCourses($where: Course_bool_exp!) {
-    Course(where: $where, order_by: { id: desc }, limit: 200) {
+  query McpManagedCourses($where: Course_bool_exp!, $limit: Int!) {
+    Course(where: $where, order_by: { id: desc }, limit: $limit) {
       id title language status
       Program { type }
       CourseEnrollments_aggregate { aggregate { count } }
@@ -176,8 +176,10 @@ export const createHasuraCourseStore = ({ url, token, role, fetchImpl = fetch }:
       return verified;
     },
 
-    async listManagedCourses(caller) {
-      const data = await request<{ Course: any[] }>(LIST_QUERY, { where: managedCourseWhere(caller.role, caller.userId) });
+    async listManagedCourses(caller, { beforeId, limit }) {
+      const managed = managedCourseWhere(caller.role, caller.userId);
+      const where = beforeId === undefined ? managed : { _and: [managed, { id: { _lt: beforeId } }] };
+      const data = await request<{ Course: any[] }>(LIST_QUERY, { where, limit });
       return data.Course.map(
         (c): CourseSummary => ({
           id: c.id,
@@ -211,6 +213,7 @@ export const createHasuraCourseStore = ({ url, token, role, fetchImpl = fetch }:
           description: s.description,
           startDateTime: s.startDateTime,
           endDateTime: s.endDateTime,
+          updatedAt: s.updated_at ?? null,
           locations: s.SessionAddresses,
         })),
       } satisfies CourseSnapshot;
@@ -307,10 +310,12 @@ const addressRows = (locations: SessionLocation[], sessionId?: number) =>
   }));
 
 /** One mutation document for all Session changes, so Hasura saves them in one transaction. */
+/** One mutation document for all Session changes, so Hasura saves them in one transaction. */
 export const buildSessionMutation = (courseId: number, changes: SessionChanges) => {
   const params: string[] = [];
   const fields: string[] = [];
   const variables: Record<string, unknown> = {};
+
 
   changes.delete.forEach((id, i) => {
     params.push(`$d${i}: Int!`);

@@ -93,6 +93,8 @@ interface Options {
   now?: () => number;
 }
 
+const COURSE_PAGE_SIZE = 100;
+
 const PROPOSED_MESSAGE = 'Not saved yet. Show the Organizer before and after; only apply saves it.';
 
 const pick = <T extends keyof CourseFields>(fields: CourseFields, keys: readonly T[]) =>
@@ -289,9 +291,13 @@ export const createCourseSetup = ({ store, secret, now = Date.now }: Options) =>
   };
 
   return {
-    async listCourses() {
+    /** Pages of 100, newest first; pass `nextBeforeId` back as `beforeId` for the next page. */
+    async listCourses({ beforeId }: { beforeId?: number } = {}) {
       const who = await caller();
-      return { courses: await store.listManagedCourses(who) };
+      const rows = await store.listManagedCourses(who, { beforeId, limit: COURSE_PAGE_SIZE + 1 });
+      const courses = rows.slice(0, COURSE_PAGE_SIZE);
+      const hasMore = rows.length > COURSE_PAGE_SIZE;
+      return { courses, hasMore, ...(hasMore && { nextBeforeId: courses[courses.length - 1].id }) };
     },
 
     async getCourse({ courseId }: { courseId: number }) {
@@ -474,7 +480,14 @@ export const createCourseSetup = ({ store, secret, now = Date.now }: Options) =>
 
       if (proposal.kind === 'sessions') {
         assertNoRegistrations(course);
-        await store.applySessionChanges(course.id, proposal.changes as SessionChanges);
+        const changes = proposal.changes as SessionChanges;
+        const current = new Map(course.sessions.map((s) => [s.id, s]));
+        // Check the times again against the Sessions as they are now.
+        changes.update.forEach((u) => {
+          const s = current.get(u.sessionId) as CourseSession;
+          checkTimes(`Session ${u.sessionId}`, u.set.startDateTime ?? s.startDateTime, u.set.endDateTime ?? s.endDateTime);
+        });
+        await store.applySessionChanges(course.id, changes);
       } else {
         const set = proposal.changes as Partial<CourseFields>;
         await assertSettable(who, Object.keys(set));

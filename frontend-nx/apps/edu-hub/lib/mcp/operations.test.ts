@@ -87,9 +87,9 @@ describe('who may use each operation', () => {
     const ids = async (userId: string, role: string) =>
       (await setupFor(world, userId, role).listCourses()).courses.map((c) => c.id);
     expect(await ids('ins-1', 'instructor')).toEqual([1]);
-    expect(await ids('oa-1', 'org_admin')).toEqual([1, 2]);
+    expect(await ids('oa-1', 'org_admin')).toEqual([2, 1]);
     expect(await ids('oa-2', 'org_admin')).toEqual([3]);
-    expect(await ids('admin', 'admin')).toEqual([1, 2, 3]);
+    expect(await ids('admin', 'admin')).toEqual([3, 2, 1]);
     expect(await errorCode(setupFor(world, 'u-1', 'user').listCourses())).toBe('FORBIDDEN');
   });
 
@@ -417,5 +417,20 @@ describe('creating a course', () => {
     world.programs[0].defaultApplicationEnd = '2026-01-31';
     const proposal = await setupFor(world, 'oa-1', 'org_admin', () => NOW).proposeCreateCourse(draft);
     expect(proposal.after).toMatchObject({ applicationEnd: '2026-11-22' });
+  });
+});
+
+describe('listing courses', () => {
+  it('list_courses pages through all managed courses', async () => {
+    const base = world.courses[0];
+    for (let id = 100; id < 250; id++) world.courses.push({ ...structuredClone(base), id });
+    const setup = setupFor(world, 'ins-1', 'instructor');
+    const first = await setup.listCourses();
+    expect(first).toMatchObject({ hasMore: true, nextBeforeId: 150 });
+    expect(first.courses).toHaveLength(100);
+    const second = await setup.listCourses({ beforeId: first.nextBeforeId });
+    expect(second.hasMore).toBe(false);
+    expect(second).not.toHaveProperty('nextBeforeId');
+    expect([...first.courses, ...second.courses].map((c) => c.id)).toHaveLength(151);
   });
 });

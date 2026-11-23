@@ -68,8 +68,13 @@ export const createFakeCourseStore = (world: FakeWorld, userId: string, role: st
       }
       return { userId, role };
     },
-    async listManagedCourses() {
-      return world.courses.filter(manages).map((c) => ({
+    async listManagedCourses(_caller, { beforeId, limit }) {
+      return [...world.courses]
+        .filter(manages)
+        .filter((c) => beforeId === undefined || c.id < beforeId)
+        .sort((a, b) => b.id - a.id)
+        .slice(0, limit)
+        .map((c) => ({
         id: c.id,
         title: String(c.fields.title),
         language: String(c.fields.language),
@@ -100,10 +105,10 @@ export const createFakeCourseStore = (world: FakeWorld, userId: string, role: st
       c.sessions = c.sessions.filter((s) => !changes.delete.includes(s.id));
       changes.update.forEach((u) => {
         const s = c.sessions.find((x) => x.id === u.sessionId);
-        if (s) Object.assign(s, u.set, u.locations ? { locations: u.locations } : {});
+        if (s) Object.assign(s, u.set, u.locations ? { locations: u.locations } : {}, { updatedAt: nextTimestamp() });
       });
       changes.create.forEach((s) => {
-        c.sessions.push({ id: Math.max(0, ...c.sessions.map((x) => x.id)) + 1, ...s });
+        c.sessions.push({ id: Math.max(0, ...c.sessions.map((x) => x.id)) + 1, updatedAt: null, ...s });
       });
     },
     async listCreatablePrograms() {
@@ -185,6 +190,7 @@ const session = (id: number, day: string) => ({
   description: '',
   startDateTime: `${day}T17:00:00+00:00`,
   endDateTime: `${day}T18:30:00+00:00`,
+  updatedAt: null as string | null,
   locations: [{ courseLocationId: null, address: 'https://zoom.example/j/1', locationAddressId: null }],
 });
 

@@ -69,8 +69,14 @@ export const createMcpServer = (setup: CourseSetup) => {
 
   server.registerTool(
     'list_courses',
-    { description: 'The courses the caller can manage, with their number of Registrations.', annotations: readOnly },
-    () => run(() => setup.listCourses())
+    {
+      description:
+        'The courses the caller can manage, newest first, with their number of Registrations. Returns up to 100; ' +
+        'when hasMore is true, call again with beforeId set to nextBeforeId for the next page.',
+      inputSchema: { beforeId: z.number().int().positive().optional() },
+      annotations: readOnly,
+    },
+    ({ beforeId }) => run(() => setup.listCourses({ beforeId }))
   );
 
   server.registerTool(
