@@ -514,9 +514,10 @@ export default async function createMatrixRoom(req, logger) {
       token: matrixConfig.token,
       signal: controller.signal,
     });
+    // The bot goes last, so an instructor mapped to the bot's id cannot lower it to 50.
     const powerLevelUsers = {
-      [matrixConfig.adminUserId]: 100,
       ...instructorUsers,
+      [matrixConfig.adminUserId]: 100,
     };
     // The bot creates the room, so from room version 12 on its power is implicit.
     if (creatorsHaveImplicitPower(roomVersion)) {

@@ -18,11 +18,22 @@ describe('isValidMatrixRoomId', () => {
     expect(isValidMatrixRoomId('!')).toBe(false);
     expect(isValidMatrixRoomId('   ')).toBe(false);
   });
+
+  it('rejects ports the backend would reject', () => {
+    expect(isValidMatrixRoomId('!abc:example.org:65536')).toBe(false);
+    expect(isValidMatrixRoomId('!abc:example.org:0')).toBe(false);
+  });
 });
 
 describe('normalizeMatrixRoomId', () => {
   it('reads a room version 12 id from a matrix.to link', () => {
     expect(normalizeMatrixRoomId('https://matrix.to/#/!localopaque123?via=example.org')).toBe('!localopaque123');
+  });
+
+  it('reads a room version 12 id from a matrix.to link to a message', () => {
+    expect(normalizeMatrixRoomId('https://matrix.to/#/!localopaque123/$event?via=example.org')).toBe(
+      '!localopaque123'
+    );
   });
 
   it('reads a room id from an Element link', () => {

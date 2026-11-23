@@ -19,7 +19,7 @@ export function normalizeMatrixRoomId(input: string | null | undefined): string 
         }
       }
       // matrix.to: https://matrix.to/#/!room:server?via=… (room version 12 ids have no :server)
-      const matrixToRoom = hashNoQuery.match(/^#\/?(![^:#?]+(?::[^?#/]+)?)/);
+      const matrixToRoom = hashNoQuery.match(/^#\/?(![^:/#?]+(?::[^?#/]+)?)/);
       if (matrixToRoom) {
         try {
           return decodeURIComponent(matrixToRoom[1]);
@@ -66,5 +66,9 @@ export function normalizeMatrixRoomId(input: string | null | undefined): string 
  */
 export function isValidMatrixRoomId(roomId: string | null | undefined): boolean {
   if (!roomId?.trim()) return false;
-  return /^![^\s:#/?]+(?::[^\s#/?]+)?$/.test(roomId.trim());
+  const match = /^![^\s:#/?]+(?::([^\s#/?]+))?$/.exec(roomId.trim());
+  if (!match) return false;
+  // Like the backend, a port must be between 1 and 65535.
+  const port = match[1]?.match(/:(\d+)$/)?.[1];
+  return port === undefined || (Number(port) >= 1 && Number(port) <= 65535);
 }

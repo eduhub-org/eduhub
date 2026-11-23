@@ -97,6 +97,19 @@ it('keeps the bot at power level 100 in room versions before 12', async () => {
   expect(powerLevelUsers(body)).toEqual({ '@bot:test': 100, '@ina.lehr.abc123:test': 50 });
 });
 
+it('keeps the bot at power level 100 when an instructor maps to the bot account', async () => {
+  mockHomeserver('11');
+  hasuraResponses.GetCourseInstructors.CourseInstructor.push({ User: { matrixUserHandle: 'bot' } });
+
+  try {
+    await createMatrixRoom(req, logger);
+  } finally {
+    hasuraResponses.GetCourseInstructors.CourseInstructor.pop();
+  }
+
+  expect(powerLevelUsers(createRoomBody())['@bot:test']).toBe(100);
+});
+
 it('lets only the bot change the settings that would break or open up the room', async () => {
   mockHomeserver('12');
 
