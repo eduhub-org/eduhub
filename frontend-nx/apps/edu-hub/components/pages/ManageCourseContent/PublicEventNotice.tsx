@@ -43,7 +43,9 @@ export const PublicEventNotice: FC<{ course: ManagedCourse_Course_by_pk }> = ({ 
     try {
       await updateCourse({ variables: { id: course.id, changes: { published } } });
     } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
+      const message = e instanceof Error ? e.message : String(e);
+      // Organizers come from the course, but can have been removed since.
+      setError(message.includes('course_publish_requires_instructor') ? t('requires_organizer') : message);
     }
   };
 
