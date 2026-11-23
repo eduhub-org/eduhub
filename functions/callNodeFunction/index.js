@@ -57,6 +57,7 @@ import removeKeycloakRole from "./removeKeycloakRole/index.js";
 import sendQuestionaires from "./sendQuestionaires/index.js";
 import syncExpertEmbeddings from "./syncExpertEmbeddings/index.js";
 import semanticExpertSearch from "./semanticExpertSearch/index.js";
+import searchKnowledge from "./searchKnowledge/index.js";
 import { createDispatcher } from "./lib/dispatcher.js";
 
 // Handlers by the `Function-Name` (legacy: `name`) header Hasura sends, one map
@@ -160,6 +161,7 @@ export const callNodeFunctionHandlers = {
   sendQuestionaires,
   syncExpertEmbeddings,
   semanticExpertSearch,
+  searchKnowledge,
 };
 
 /**

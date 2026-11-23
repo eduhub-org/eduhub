@@ -1,0 +1,107 @@
+name: Index Assistant knowledge
+
+# Rebuilds the Assistant's knowledge index (issue #2195) from the released tag, never develop:
+# after every successful production deployment, or by hand for a given tag. The indexer reuses
+# embeddings of unchanged passages and switches to the new index in one transaction, so a failed
+# run keeps the previous index live.
+
+on:
+  workflow_run:
+    workflows: ["Setup Environment"]
+    types: [completed]
+    branches: [production]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to index (e.g. v2.20.0); empty = latest release on production"
+        required: false
+      force:
+        description: "Replace the index even if the new one is much smaller"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: index-assistant-knowledge
+  cancel-in-progress: false
+
+jobs:
+  index:
+    name: Build the knowledge index
+    # Only after a deployment that succeeded (a push to production, not a pull request).
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: production
+    steps:
+      - name: Harden the runner
+        uses: step-security/harden-runner@1d88384fd173af6ecb012dfd0264a306b711241a # v2.22.4
+        with:
+          egress-policy: audit
+
+      - name: Checkout production with tags
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: production
+          fetch-depth: 0
+
+      - name: Check out the released tag
+        id: tag
+        env:
+          INPUT_TAG: ${{ inputs.tag }}
+        run: |
+          set -euo pipefail
+          tag="${INPUT_TAG:-}"
+          if [ -z "$tag" ]; then
+            tag="$(git tag --merged HEAD --list 'v*' --sort=-v:refname | head -n 1)"
+          fi
+          if ! printf '%s' "$tag" | grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "::error::No release tag to index (got '$tag')."
+            exit 1
+          fi
+          git checkout --quiet "refs/tags/$tag"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22.x
+
+      - name: Install the indexer's dependencies
+        working-directory: functions/callNodeFunction
+        run: npm ci --ignore-scripts
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
+        with:
+          credentials_json: ${{ secrets.GCP_EDUHUB_PRODUCTION_KEY }}
+
+      - name: Read the Hasura admin secret and a Vertex AI token
+        env:
+          PROJECT_ID: ${{ vars.PROJECT_ID }}
+        run: |
+          set -euo pipefail
+          admin_secret="$(gcloud secrets versions access latest --secret=hasura-graphql-admin-key --project="$PROJECT_ID")"
+          token="$(gcloud auth print-access-token)"
+          echo "::add-mask::$admin_secret"
+          echo "::add-mask::$token"
+          {
+            echo "HASURA_ADMIN_SECRET=$admin_secret"
+            echo "EMBEDDING_ACCESS_TOKEN=$token"
+          } >> "$GITHUB_ENV"
+
+      - name: Build the index
+        working-directory: functions/callNodeFunction
+        env:
+          HASURA_ENDPOINT: ${{ vars.NEXT_PUBLIC_API_URL }}
+          EMBEDDING_PROVIDER: vertex
+          EMBEDDING_PROJECT_ID: ${{ vars.PROJECT_ID }}
+          # EU processing (ADR 0005): the same region as the expert embeddings.
+          EMBEDDING_LOCATION: ${{ vars.EMBEDDING_LOCATION || 'europe-west1' }}
+          TAG: ${{ steps.tag.outputs.tag }}
+          FORCE: ${{ inputs.force && '--force' || '' }}
+        run: node scripts/index-knowledge.js --repo "$GITHUB_WORKSPACE" --release "$TAG" $FORCE
