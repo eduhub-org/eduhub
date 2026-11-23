@@ -3,6 +3,7 @@ import { GetStaticPaths, GetStaticProps } from 'next';
 import { HelpContent, HelpContentProps } from '../../components/pages/HelpContent';
 import { loadManual } from '../../lib/manual/loader';
 import { MANUAL_LANGUAGES, ManualLanguage } from '../../lib/manual/markdown';
+import { getManualVersion } from '../../lib/manual/version';
 
 /**
  * The EduHub manual (docs/manual), rendered at build time. A page is shown in
@@ -35,6 +36,7 @@ export const getStaticProps: GetStaticProps<HelpContentProps> = async ({ params,
       page: { slug, title, summary, audience, body },
       sections: own.sections,
       isFallback: found.language !== language,
+      version: getManualVersion(),
     },
   };
 };

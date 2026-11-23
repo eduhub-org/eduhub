@@ -5,7 +5,19 @@ import '@testing-library/jest-dom';
 import { HelpContent, HelpContentProps, manualComponents } from '..';
 
 jest.mock('next-intl', () => ({
-  useTranslations: () => (key: string) => key,
+  useTranslations: () => {
+    const t = (key: string) => key;
+    // Render each rich-text tag so the version links can be checked.
+    t.rich = (key: string, tags: Record<string, () => React.ReactNode>) => (
+      <>
+        {key}
+        {Object.entries(tags).map(([name, tag]) => (
+          <React.Fragment key={name}>{tag()}</React.Fragment>
+        ))}
+      </>
+    );
+    return t;
+  },
 }));
 
 jest.mock('../../../layout/Page', () => ({
@@ -40,7 +52,10 @@ const props: HelpContentProps = {
     },
   ],
   isFallback: false,
+  version: { release: null, commit: null },
 };
+
+const SHA = '691b4b179d2a7c0f3b1c2d4e5f60718293a4b5c6';
 
 describe('HelpContent', () => {
   const originalRulesUrl = process.env.NEXT_PUBLIC_HELP_DOCS_URL;
@@ -87,6 +102,35 @@ describe('HelpContent', () => {
     process.env.NEXT_PUBLIC_HELP_DOCS_URL = 'https://rules.example.org/faq/';
     render(<HelpContent {...props} />);
     expect(screen.getByRole('link', { name: 'org_rules_link' })).toHaveAttribute('href', 'https://rules.example.org/faq/');
+  });
+});
+
+describe('HelpContent version note', () => {
+  it('links the release and the commit of a release build', () => {
+    render(<HelpContent {...props} version={{ release: 'v2.44.0', commit: SHA }} />);
+
+    expect(screen.getByText(/version_release/)).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'v2.44.0' })).toHaveAttribute(
+      'href',
+      'https://github.com/eduhub-org/eduhub/releases/tag/v2.44.0'
+    );
+    expect(screen.getByRole('link', { name: '691b4b1' })).toHaveAttribute(
+      'href',
+      `https://github.com/eduhub-org/eduhub/commit/${SHA}`
+    );
+  });
+
+  it('shows only the commit on staging and develop builds', () => {
+    render(<HelpContent {...props} version={{ release: null, commit: SHA }} />);
+
+    expect(screen.getByText(/version_commit/)).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: '691b4b1' })).toBeInTheDocument();
+  });
+
+  it('shows nothing when the build does not know its commit', () => {
+    render(<HelpContent {...props} />);
+
+    expect(screen.queryByText(/version_/)).not.toBeInTheDocument();
   });
 });
 

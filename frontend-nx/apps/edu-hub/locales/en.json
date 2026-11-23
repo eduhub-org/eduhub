@@ -3966,6 +3966,8 @@
     "fallback_notice": "This page is not available in English yet. You are reading the German version.",
     "org_rules_title": "Rules of your organization",
     "org_rules_text": "Deadlines, certificate rules and other requirements are set by the organization that offers the course. They are not part of this manual.",
-    "org_rules_link": "Go to the rules and FAQ"
+    "org_rules_link": "Go to the rules and FAQ",
+    "version_release": "Manual as of release <release></release>, commit <commit></commit>",
+    "version_commit": "Manual as of commit <commit></commit> (not released yet)"
   }
 }

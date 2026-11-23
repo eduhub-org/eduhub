@@ -3951,6 +3951,8 @@
     "fallback_notice": "Diese Seite gibt es noch nicht auf Deutsch. Du siehst die englische Fassung.",
     "org_rules_title": "Regeln Deiner Organisation",
     "org_rules_text": "Fristen, Zertifikatsregeln und andere Vorgaben legt die Organisation fest, die den Kurs anbietet. Sie stehen nicht in diesem Handbuch.",
-    "org_rules_link": "Zu den Regeln und FAQ"
+    "org_rules_link": "Zu den Regeln und FAQ",
+    "version_release": "Stand des Handbuchs: Release <release></release>, Commit <commit></commit>",
+    "version_commit": "Stand des Handbuchs: Commit <commit></commit> (noch kein Release)"
   }
 }

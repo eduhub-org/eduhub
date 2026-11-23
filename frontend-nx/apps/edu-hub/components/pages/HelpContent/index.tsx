@@ -7,6 +7,9 @@ import remarkGfm from 'remark-gfm';
 
 import { Page } from '../../layout/Page';
 import { ManualAudience, headingId, manualHref, resolveManualLink } from '../../../lib/manual/markdown';
+import type { ManualVersion } from '../../../lib/manual/version';
+
+const SOURCE_URL = 'https://github.com/eduhub-org/eduhub';
 
 export interface HelpPageData {
   slug: string;
@@ -27,6 +30,8 @@ export interface HelpContentProps {
   sections: HelpNavSection[];
   /** The page is shown in the other language because it is not translated yet. */
   isFallback: boolean;
+  /** The release and commit the manual was built from. */
+  version: ManualVersion;
 }
 
 const textOf = (children: ReactNode): string =>
@@ -52,6 +57,30 @@ export const manualComponents = (slug: string): Components => ({
     );
   },
 });
+
+const VersionNote: FC<{ version: ManualVersion }> = ({ version: { release, commit } }) => {
+  const t = useTranslations('help');
+  if (!commit) return null;
+  const commitLink = (
+    <a href={`${SOURCE_URL}/commit/${commit}`} target="_blank" rel="noopener noreferrer" className="font-mono">
+      {commit.slice(0, 7)}
+    </a>
+  );
+  return (
+    <p className="mt-6 text-xs text-label-secondary">
+      {release
+        ? t.rich('version_release', {
+            release: () => (
+              <a href={`${SOURCE_URL}/releases/tag/${release}`} target="_blank" rel="noopener noreferrer">
+                {release}
+              </a>
+            ),
+            commit: () => commitLink,
+          })
+        : t.rich('version_commit', { commit: () => commitLink })}
+    </p>
+  );
+};
 
 const ManualNav: FC<{ sections: HelpNavSection[]; currentSlug: string }> = ({ sections, currentSlug }) => {
   const t = useTranslations('help');
@@ -87,7 +116,7 @@ const ManualNav: FC<{ sections: HelpNavSection[]; currentSlug: string }> = ({ se
   );
 };
 
-export const HelpContent: FC<HelpContentProps> = ({ page, sections, isFallback }) => {
+export const HelpContent: FC<HelpContentProps> = ({ page, sections, isFallback, version }) => {
   const t = useTranslations('help');
   const rulesUrl = process.env.NEXT_PUBLIC_HELP_DOCS_URL;
 
@@ -136,6 +165,7 @@ export const HelpContent: FC<HelpContentProps> = ({ page, sections, isFallback }
                 </a>
               </div>
             )}
+            <VersionNote version={version} />
           </article>
         </div>
       </Page>

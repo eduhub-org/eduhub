@@ -24,6 +24,11 @@ COPY . .
 # The manual (docs/manual, outside this build context) for /help. CI passes it
 # as a named context: docker build --build-context manual=./docs/manual ...
 COPY --from=manual . /opt/docs/manual
+# The commit and ref the image is built from; /help shows them as the manual's version.
+ARG GIT_COMMIT
+ENV GIT_COMMIT=${GIT_COMMIT}
+ARG GIT_REF
+ENV GIT_REF=${GIT_REF}
 
 ARG NEXT_PUBLIC_AUTH_URL
 ENV NEXT_PUBLIC_AUTH_URL=${NEXT_PUBLIC_AUTH_URL}
