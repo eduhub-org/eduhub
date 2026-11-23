@@ -13,15 +13,15 @@ plan; every stage is revertable with a plain `git revert`.
 
 ---
 
-## 1. Current state (assessed 2026-07)
+## 1. Current state (assessed 2026-07, refreshed 2026-11)
 
 | Aspect | State |
 |--------|-------|
 | Workspace | Yarn 3.4.1 workspace `frontend-nx/` with two Next.js apps sharing ONE `package.json`: `apps/edu-hub` (main) and `apps/stujo` |
-| Next.js | `^15.5.18`, Pages Router, `output: 'standalone'`, built-in `i18n` config (`de` default, `en`) |
-| React | `18.3.1` (+ `@types/react` 18.3.5) |
+| Next.js | `^16.4.5` (Stages A and B landed; was `^15.5.18` at assessment), Pages Router, `output: 'standalone'`, built-in `i18n` config (`de` default, `en`) |
+| React | `~19.2.9` (Stage A landed; was `18.3.1` at assessment) |
 | Routing surface | ~45 pages in `apps/edu-hub/pages/`, 7 API routes under `pages/api/` |
-| Data fetching | Client-side only via Apollo (`config/apollo.ts`); **no SSR data fetching**. Only 3 pages export `getServerSideProps`: `course/[courseId]` (`withAuthRedirect` for `?force_login`), `manage/admin-users`, `manage/programs` (both return empty props, i.e. only used to force dynamic rendering) |
+| Data fetching | Mostly client-side via Apollo (`config/apollo.ts`). **No longer true that there is no SSR data fetching**: the public course page (`CourseContent/courseRoute.tsx`, shared by `course`, `event` and `degree`) runs a server Apollo query for its `<head>` — title, OG tags, `rel=canonical` and JSON-LD — and issues the program-type redirect from ADR 0005. Porting it is a real `generateMetadata` job, not a `<Head>` swap, and the JSON-LD `<` escaping must survive. Other `getServerSideProps` exports return empty props to force dynamic rendering. |
 | Auth | `next-auth` v4 (Keycloak provider) + client-side token store (`AuthStoreUpdater`, `config/authStore.ts`); API routes for refresh + logout |
 | i18n | `next-intl` v4 in **Pages Router mode**: `NextIntlClientProvider` in `_app.tsx` with full `locales/{de,en}.json` (~2 700 lines each) bundled client-side; locale comes from Next's built-in i18n routing (`router.locale`); 151 files use `useTranslations` |
 | MUI | v6 + `@mui/material-nextjs` v7 with the `v15-pagesRouter` Emotion cache adapter in `_app`/`_document` |
@@ -249,11 +249,13 @@ Route batches (each one PR, each independently testable on staging):
 1. **Foundation** (no user-visible change yet): `app/` scaffold, providers,
    `proxy.ts`, fonts, `not-found`, plus the static pages as pilot —
    `imprint`, `privacy`, `terms`, `help`, `404`
-2. **Public/core**: `index`, `auth/signin`, `course/[courseId]` (+
-   `payment-success`, `payment-cancelled`, `project/[id]`), `project/[id]`,
-   `profile`, `my-certificates`, `statistics`
-3. **Manage (part 1)**: `manage/courses`, `manage/course/[courseId]` (+
-   email-templates), `manage/users`, `manage/admin-users`
+2. **Public/core**: `index`, `auth/signin`, the three course segments
+   `{course,event,degree}/[courseId]` (one shared module, see ADR 0005; plus
+   `course/[courseId]`'s `payment-success`, `payment-cancelled`,
+   `project/[id]`), `project/[id]`, `profile`, `my-certificates`, `statistics`
+3. **Manage (part 1)**: `manage/courses`, the three organizer segments
+   `manage/{course,event,degree}/[courseId]` (one shared module),
+   `manage/users`, `manage/admin-users`
 4. **Manage (part 2)**: remaining `manage/*` incl. the ~16
    `manage/settings/*` pages (they share `SettingsLayout` — becomes a real
    App Router `layout.tsx`, a genuine win)

@@ -75,7 +75,7 @@ describe('buildEventsIcal', () => {
     expect(result).toContain('DTSTART:20261002T080000Z');
     expect(result).toContain('DTEND:20261002T080000Z');
     expect(result).toContain('SUMMARY:Event 1 – Session 3');
-    expect(result).toContain('URL:https://edu.example/course/1');
+    expect(result).toContain('URL:https://edu.example/event/1');
     expect(result).toContain('X-WR-TIMEZONE:Europe/Berlin');
     expect(result).toContain('DTSTAMP:20260928T100000Z');
   });
@@ -110,7 +110,7 @@ describe('buildEventsIcal', () => {
       OPTIONS
     );
     expect(lines(ics)).toContain(
-      'DESCRIPTION:Talks\\, workshops\\n\\nWorum geht es?\\nAlles über KI\\n\\nhttps://edu.example/course/1'
+      'DESCRIPTION:Talks\\, workshops\\n\\nWorum geht es?\\nAlles über KI\\n\\nhttps://edu.example/event/1'
     );
   });
 
@@ -204,7 +204,7 @@ describe('buildEventsIcal', () => {
         'SUMMARY:Event 1',
         'DTSTART:20261001T120000Z',
         'DTEND:20261001T150000Z',
-        'DESCRIPTION:14:00–15:30 Podiumsdiskussion\\n15:30–17:00 Austausch\\n\\nhttps://edu.example/course/1',
+        'DESCRIPTION:14:00–15:30 Podiumsdiskussion\\n15:30–17:00 Austausch\\n\\nhttps://edu.example/event/1',
       ])
     );
     expect(entries[1]).toEqual(expect.arrayContaining(['UID:session-3@eduhub', 'SUMMARY:Event 1 – Workshop']));

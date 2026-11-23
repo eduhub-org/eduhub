@@ -406,14 +406,6 @@ variable "lms_attendance_survey_id" {
   description = "ID of the survey which is used to collect the attendance data"
   type        = string
 }
-variable "mm_url" {
-  description = "URL of the Opencampus Mattermost Server"
-  type        = string
-}
-variable "mm_token" {
-  description = "The Admin Token from the Opencampus Mattermost Server"
-  type        = string
-}
 
 # Formbricks Integration
 variable "formbricks_api_url" {
@@ -450,6 +442,17 @@ variable "ghost_newsletter_credentials_encryption_key" {
   description = "AES-256 key used to encrypt/decrypt Ghost newsletter API credentials at rest"
   type        = string
   sensitive   = true
+}
+
+variable "mcp_proposal_secret" {
+  description = "HMAC key signing the EduHub MCP server's Proposed Changes between propose and apply"
+  type        = string
+  sensitive   = true
+
+  validation {
+    condition     = length(var.mcp_proposal_secret) >= 32
+    error_message = "mcp_proposal_secret must contain at least 32 characters."
+  }
 }
 
 variable "guest_token_secret" {

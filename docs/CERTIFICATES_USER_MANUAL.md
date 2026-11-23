@@ -4,12 +4,14 @@ This manual covers how EduHub produces certificates: the end-to-end creation
 flow, the two certificate variants, and — most importantly — **where the HTML
 templates and the background images are configured**.
 
-It is written for two audiences:
+It is written for **administrators**, who:
 
-- **Administrators** — configure the HTML templates and background images, and
-  understand how a certificate resolves its template.
-- **Instructors** — trigger certificate generation for the participants of a
-  course.
+- configure the HTML templates and background images, and understand how a
+  certificate resolves its template;
+- trigger certificate generation for the participants of a course.
+  Instructors and org admins can't: the `createCertificates` action has no
+  permissions for other roles, and the generate buttons (on the Participations
+  and the Degree Participations tab) are shown to admins only.
 
 Participants only ever *download* certificates, so there is no participant-facing
 configuration in this document.
@@ -68,7 +70,7 @@ template.
             └─────────────────────────────────────────────────────────────┘
                                        │
                                        ▼
-   INSTRUCTOR, in Manage Course → Participations tab:
+   ADMIN, in Manage Course → Participations tab:
      selects participants → clicks "Generate attendance / achievement certificates"
                                        │
                                        ▼  (createCertificates mutation,
@@ -89,7 +91,7 @@ template.
 
 Notes:
 
-- Generation is **batch, per course**: the instructor selects users on the
+- Generation is **batch, per course**: an admin selects users on the
   Participations tab and runs it for the whole selection.
 - The generated PDF is stored in GCS at
   `{userId}/{courseId}/{attendance|achievement}_certificate.pdf`. The **storage
@@ -268,7 +270,7 @@ Names are rendered upper-cased. ECTS formatting is handled server-side.
 | Set a **degree's** unique wording | (DB for now) | the degree `Course.achievementCertificateTemplateId` |
 | Change **how much a degree requires** (ECTS / events) | Manage Degrees → expand the degree → "Degree requirements" | `Course.requiredEcts`, `Course.requiredEventCount` |
 | **Edit the HTML** of a template | (DB for now; dedicated page coming soon) | `CertificateTemplate.html` |
-| **Generate** certificates | Manage Course → Participations tab → generate buttons | — |
+| **Generate** certificates (admins only) | Manage Course → Participations tab → generate buttons | — |
 
 ---
 
