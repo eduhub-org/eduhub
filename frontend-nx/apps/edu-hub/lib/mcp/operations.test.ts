@@ -363,7 +363,7 @@ describe('creating a course', () => {
   it('an admin can create courses in any program', async () => {
     const setup = setupFor(world, 'admin', 'admin');
     await expect(setup.proposeCreateCourse({ ...draft, programId: 20 })).resolves.toMatchObject({ status: 'PROPOSED' });
-    expect((await setup.listPrograms()).programs.map((p) => p.id)).toEqual([20, 10]);
+    expect((await setup.listPrograms()).programs.map((p) => p.id)).toEqual([30, 20, 10]);
   });
 
   it('an instructor cannot create courses', async () => {
@@ -424,6 +424,14 @@ describe('creating a course', () => {
       code: 'TITLE_TAKEN',
       message: expect.stringContaining('already has a course named "Generative KI im Alltag"'),
     });
+  });
+
+  it('event programs are exempt: the same event can run again under its title', async () => {
+    const setup = setupFor(world, 'oa-1', 'org_admin');
+    const first = await setup.proposeCreateCourse({ programId: 30, title: 'Prototyping Days' });
+    await setup.applyProposedChange(first);
+    const again = await setup.proposeCreateCourse({ programId: 30, title: 'Prototyping Days' });
+    await expect(setup.applyProposedChange(again)).resolves.toMatchObject({ status: 'APPLIED' });
   });
 
   it('renaming a course to a title used in its program is refused, at propose and apply', async () => {

@@ -1014,3 +1014,14 @@ export const MANAGED_COURSE_PARTICIPANT_EXPORT = gql`
     }
   }
 `;
+
+/** Course titles of programs, to keep titles unique per course/degree program (helpers/courseTitles). */
+export const COURSE_TITLES_IN_PROGRAMS = gql`
+  query CourseTitlesInPrograms($programIds: [Int!]!) {
+    Course(where: { programId: { _in: $programIds } }) {
+      id
+      title
+      programId
+    }
+  }
+`;
