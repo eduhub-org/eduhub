@@ -2169,6 +2169,7 @@
         "label": "Öffentliche Veranstaltung",
         "description": "Öffne diese Session für alle: Es entsteht ein Entwurf in den Veranstaltungen, den Du prüfen und dann veröffentlichen kannst. Anmelden kann sich dort jede Person, auch ohne Bewerbung für den Kurs.",
         "no_events_program": "Für diese Organisation gibt es noch kein Veranstaltungsprogramm. Bitte das Plattform-Team, eins anzulegen, damit Du Sessions öffentlich machen kannst.",
+        "course_not_published": "Veröffentliche zuerst den Kurs: Nur Sessions eines veröffentlichten Kurses können öffentlich gemacht werden.",
         "create": "Als Veranstaltung anlegen",
         "creating": "Wird angelegt …",
         "create_failed": "Die Veranstaltung konnte nicht angelegt werden.",
@@ -2392,7 +2393,8 @@
       "preview_page": "Vorschau der Seite",
       "view_page": "Seite ansehen",
       "publish": "Veröffentlichen",
-      "unpublish": "Veröffentlichung zurückziehen"
+      "unpublish": "Veröffentlichung zurückziehen",
+      "requires_organizer": "Die Veranstaltung braucht mindestens eine Organisator:in, bevor sie veröffentlicht werden kann. Füge zuerst eine Organisator:in in der Veranstaltungsliste hinzu."
     },
     "rausgegangen": {
       "title": "Rausgegangen",

@@ -2187,6 +2187,7 @@
         "label": "Public event",
         "description": "Open this session to everyone: this creates a draft event that you can review and then publish. Anyone can register for it, without applying to the course.",
         "no_events_program": "This organization has no events program yet. Ask a platform admin to create one before opening sessions to the public.",
+        "course_not_published": "Publish the course first: only sessions of a published course can be opened to the public.",
         "create": "Create event",
         "creating": "Creating …",
         "create_failed": "The event could not be created.",
@@ -2407,7 +2408,8 @@
       "preview_page": "Preview page",
       "view_page": "View page",
       "publish": "Publish",
-      "unpublish": "Unpublish"
+      "unpublish": "Unpublish",
+      "requires_organizer": "The event needs at least one organizer before it can be published. Add one in the event list."
     },
     "rausgegangen": {
       "title": "Rausgegangen",
