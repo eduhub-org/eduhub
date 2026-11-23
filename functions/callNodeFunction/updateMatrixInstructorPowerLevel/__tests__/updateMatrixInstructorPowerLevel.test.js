@@ -4,7 +4,7 @@ const request = jest.fn();
 jest.unstable_mockModule('graphql-request', () => ({
   GraphQLClient: jest.fn(() => ({ request })),
 }));
-const { default: updateMatrixInstructorPowerLevel } = await import('../updateMatrixInstructorPowerLevel/index.js');
+const { default: updateMatrixInstructorPowerLevel } = await import('../index.js');
 
 const realFetch = global.fetch;
 const realEnv = { ...process.env };
