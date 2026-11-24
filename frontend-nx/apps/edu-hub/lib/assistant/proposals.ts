@@ -3,7 +3,8 @@ import { OperationError, OperationErrorCode } from '../mcp/errors';
 import type { CourseSetup } from '../mcp/operations';
 import { COURSE_SETUP_ROLES } from './courseSetupTools';
 import { AssistantSession, authenticate, refuse, requestedRole } from './handler';
-import { toLocale } from './messages';
+import { errorMessage, toLocale } from './messages';
+import { DEFAULT_CONTACT } from './prompt';
 
 /**
  * Apply or discard a Proposed Change from the widget's buttons (issue #2193/#2194):
@@ -13,7 +14,9 @@ import { toLocale } from './messages';
  * Organizer's click can. It runs the MCP operations with the user's own token and role, which
  * check the signature, the proposing user and role, expiry and staleness again.
  *
- * 200 with the operation's result, or `{ error: { code, message } }` with the OperationError code.
+ * 200 with the operation's result, or `{ error: { code, message } }` with the OperationError code
+ * and a message from `assistant.errors` in the asker's locale. The operation's own message is
+ * never passed on: it can carry Hasura's raw error text.
  */
 
 const STATUS: Record<OperationErrorCode, number> = {
@@ -33,6 +36,8 @@ export interface ProposalsHandlerDeps {
   getSession(req: NextApiRequest): Promise<AssistantSession | null>;
   /** The course-setup operations as this user and role, or null when the MCP server isn't configured. */
   courseSetup(session: AssistantSession, role: string): CourseSetup | null;
+  /** Where people can write when saving fails. */
+  contact?: string;
 }
 
 export const createProposalsHandler = (deps: ProposalsHandlerDeps) => async (req: NextApiRequest, res: NextApiResponse) => {
@@ -62,10 +67,12 @@ export const createProposalsHandler = (deps: ProposalsHandlerDeps) => async (req
         : await setup.discardProposedChange({ proposedChangeId });
     return res.status(200).json(result);
   } catch (error) {
-    if (error instanceof OperationError) {
-      return res.status(STATUS[error.code] ?? 400).json({ error: { code: error.code, message: error.message } });
+    const params = { contact: deps.contact ?? DEFAULT_CONTACT };
+    if (error instanceof OperationError && STATUS[error.code]) {
+      const message = errorMessage(`PROPOSAL_${error.code}`, locale, params);
+      return res.status(STATUS[error.code]).json({ error: { code: error.code, message } });
     }
     console.error('Assistant: applying or discarding a Proposed Change failed');
-    return res.status(500).json({ error: { code: 'INTERNAL', message: 'Something went wrong.' } });
+    return res.status(500).json({ error: { code: 'INTERNAL', message: errorMessage('PROPOSAL_FAILED', locale, params) } });
   }
 };

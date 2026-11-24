@@ -49,6 +49,7 @@
     "menu": {
       "profile": "My Profile",
       "my_certificates": "My Certificates",
+      "manual": "Manual",
       "faq": "FAQ",
       "user": "User",
       "admin_users": "Admin Users",
@@ -1249,6 +1250,7 @@
       "degrees": "Untitled Degree"
     },
     "title": "Manage Courses",
+    "title_taken": "This program already has “{title}”. Titles must be unique within a program.",
     "all_programs": "All",
     "course_degree_title": {
       "label": "Part of the following degrees",
@@ -1288,8 +1290,8 @@
       "add_event": "Add organizer",
       "help_text": "Instructors can manage the offering and are named on its page.",
       "help_text_event": "Organizers can manage the event and are named on its page.",
-      "last_required": "A published course needs at least one instructor. Add another instructor first or unpublish the course.",
-      "last_required_event": "A published event needs at least one organizer. Add another organizer first or unpublish the event."
+      "last_required": "A published offering needs at least one instructor. Add another instructor first or unpublish the offering.",
+      "last_required_event": "A published offering needs at least one organizer. Add another organizer first or unpublish the offering."
     },
     "funding_organizations": {
       "label": "Funding Organizations",
@@ -1495,6 +1497,11 @@
         "courses": "Successfully copied {count} courses to {programTitle}",
         "events": "Successfully copied {count} events to {programTitle}",
         "degrees": "Successfully copied {count} degrees to {programTitle}"
+      },
+      "copy_titles_taken": {
+        "courses": "Not copied because {programTitle} already has courses with these titles: {titles}",
+        "events": "Not copied because {programTitle} already has events with these titles: {titles}",
+        "degrees": "Not copied because {programTitle} already has degrees with these titles: {titles}"
       }
     },
     "participants": {
@@ -2181,6 +2188,7 @@
         "label": "Public event",
         "description": "Open this session to everyone: this creates a draft event that you can review and then publish. Anyone can register for it, without applying to the course.",
         "no_events_program": "This organization has no events program yet. Ask a platform admin to create one before opening sessions to the public.",
+        "course_not_published": "Publish the offering first: only sessions of a published offering can be opened to the public.",
         "create": "Create event",
         "creating": "Creating …",
         "create_failed": "The event could not be created.",
@@ -2401,7 +2409,8 @@
       "preview_page": "Preview page",
       "view_page": "View page",
       "publish": "Publish",
-      "unpublish": "Unpublish"
+      "unpublish": "Unpublish",
+      "requires_organizer": "The offering needs at least one organizer before it can be published. Add an organizer first."
     },
     "rausgegangen": {
       "title": "Rausgegangen",
@@ -3593,6 +3602,7 @@
   "footer": {
     "imprint": "Imprint",
     "privacy": "Privacy",
+    "manual": "Manual",
     "faq": "FAQ",
     "newsletter": "Newsletter",
     "sponsored_by": "Sponsored by:",
@@ -3960,7 +3970,35 @@
       "BUSY": "The Assistant is busy right now. Please try again in a minute.",
       "UNAVAILABLE": "The Assistant couldn't answer right now. Please try again later or write to {contact}.",
       "TOOL_CALL_FAILED": "The Assistant couldn't look up the data it needed. Please rephrase your question or write to {contact}.",
-      "FEEDBACK_CONSENT_REQUIRED": "Without your consent we don't store the conversation."
+      "FEEDBACK_CONSENT_REQUIRED": "Without your consent we don't store the conversation.",
+      "PROPOSAL_UNAUTHENTICATED": "Your login has expired. Please log in again and then apply the change.",
+      "PROPOSAL_FORBIDDEN": "You can't change this course with your current role.",
+      "PROPOSAL_NOT_FOUND": "The course or entry for this change no longer exists.",
+      "PROPOSAL_INVALID": "This change can't be applied. Please ask the Assistant for a new proposal.",
+      "PROPOSAL_NO_CHANGE": "This change contains nothing new for the course.",
+      "PROPOSAL_REGISTRATIONS_EXIST": "This change can't be applied because people have already registered.",
+      "PROPOSAL_STALE": "The course was changed after this proposal. Please ask the Assistant for a new proposal.",
+      "PROPOSAL_TITLE_TAKEN": "Another course in this program already has this title. Please choose a different title.",
+      "PROPOSAL_EXPIRED": "This proposal has expired. Please ask the Assistant for a new one.",
+      "PROPOSAL_HASURA_ERROR": "The change couldn't be saved. Please try again later or write to {contact}.",
+      "PROPOSAL_FAILED": "Something went wrong while saving the change. Please try again later or write to {contact}."
     }
+  },
+  "help": {
+    "title": "Manual",
+    "start": "Start",
+    "nav_label": "Contents",
+    "audience_label": "For",
+    "audience": {
+      "participant": "Participants",
+      "organizer": "Organizers",
+      "admin": "Admins"
+    },
+    "fallback_notice": "This page is not available in English yet. You are reading the German version.",
+    "org_rules_title": "Rules of your organization",
+    "org_rules_text": "Deadlines, certificate rules and other requirements are set by the organization that offers the course. They are not part of this manual.",
+    "org_rules_link": "Go to the rules and FAQ",
+    "version_release": "Manual as of release <release></release>, commit <commit></commit>",
+    "version_commit": "Manual as of commit <commit></commit> (not released yet)"
   }
 }

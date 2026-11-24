@@ -12,6 +12,7 @@ import React from 'react';
 import { TileBase } from './TileBase';
 import { shouldShowExtendedApplicationBanner } from './extendedApplicationBanner';
 import { useEventTileMeta } from './eventTileMeta';
+import { coursePath, manageCoursePath } from '../../../helpers/coursePath';
 
 type CourseType = CourseList_Course | CoursesEnrolledByUser_Course | CourseTiles_Course;
 
@@ -39,7 +40,7 @@ const TileComponent: FC<TileProps> = ({ course, isManage }) => {
   );
 
   return (
-    <Link href={isManage ? `/manage/course/${course.id}` : `/course/${course.id}`}>
+    <Link href={isManage ? manageCoursePath(course.id, course.Program?.type) : coursePath(course.id, course.Program?.type)}>
       <TileBase
         coverImage={course?.coverImage ?? null}
         title={course.title}

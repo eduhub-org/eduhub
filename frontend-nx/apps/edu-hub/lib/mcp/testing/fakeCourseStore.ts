@@ -20,6 +20,7 @@ export interface FakeProgram {
   title: string;
   organizationId: number;
   defaultApplicationEnd: string | null;
+  type?: string;
 }
 
 export interface FakeWorld {
@@ -58,7 +59,7 @@ export const createFakeCourseStore = (world: FakeWorld, userId: string, role: st
   const toSummary = (p: FakeProgram) => ({
     id: p.id,
     title: p.title,
-    type: 'COURSES',
+    type: p.type ?? 'COURSES',
     organization: `Org ${p.organizationId}`,
     defaultApplicationEnd: p.defaultApplicationEnd,
   });
@@ -146,7 +147,7 @@ export const createFakeCourseStore = (world: FakeWorld, userId: string, role: st
         id,
         programId,
         updatedAt: nextTimestamp(),
-        programType: 'COURSES',
+        programType: program.type ?? 'COURSES',
         organizationId: program.organizationId,
         instructorIds: [],
         registrations: 0,
@@ -208,6 +209,7 @@ export const createWorld = (): FakeWorld => ({
   programs: [
     { id: 10, title: 'Wintersemester', organizationId: 1, defaultApplicationEnd: '2027-01-31' },
     { id: 20, title: 'Andere Organisation', organizationId: 2, defaultApplicationEnd: null },
+    { id: 30, title: 'Events', organizationId: 1, defaultApplicationEnd: null, type: 'EVENTS' },
   ],
   courses: [
     {

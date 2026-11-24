@@ -49,6 +49,7 @@
     "menu": {
       "profile": "Mein Profil",
       "my_certificates": "Meine Zertifikate",
+      "manual": "Handbuch",
       "faq": "FAQ",
       "user": "Benutzer",
       "admin_users": "Admin-Benutzer",
@@ -1233,6 +1234,7 @@
       "degrees": "Unbenanntes Degree"
     },
     "title": "Kurse verwalten",
+    "title_taken": "In diesem Programm gibt es schon „{title}“. Titel müssen innerhalb eines Programms eindeutig sein.",
     "all_programs": "Alle",
     "course_degree_title": {
       "label": "Teil der folgenden Degrees",
@@ -1272,8 +1274,8 @@
       "add_event": "Organisator:in hinzufügen",
       "help_text": "Die Leitung kann das Angebot verwalten und wird auf seiner Seite genannt.",
       "help_text_event": "Organisator:innen können das Event verwalten und werden auf seiner Seite genannt.",
-      "last_required": "Ein veröffentlichter Kurs braucht mindestens eine Kursleitung. Füge zuerst eine weitere Kursleitung hinzu oder nimm den Kurs offline.",
-      "last_required_event": "Ein veröffentlichtes Event braucht mindestens eine Organisator:in. Füge zuerst eine weitere Organisator:in hinzu oder nimm das Event offline."
+      "last_required": "Ein veröffentlichtes Angebot braucht mindestens eine Leitung. Füge zuerst eine weitere Leitung hinzu oder nimm das Angebot offline.",
+      "last_required_event": "Ein veröffentlichtes Angebot braucht mindestens eine Organisator:in. Füge zuerst eine weitere Organisator:in hinzu oder nimm das Angebot offline."
     },
     "funding_organizations": {
       "label": "Förderorganisationen",
@@ -1477,6 +1479,11 @@
         "courses": "{count} Kurse erfolgreich in {programTitle} kopiert",
         "events": "{count} Events erfolgreich in {programTitle} kopiert",
         "degrees": "{count} Degrees erfolgreich in {programTitle} kopiert"
+      },
+      "copy_titles_taken": {
+        "courses": "Nicht kopiert, weil {programTitle} schon Kurse mit diesen Titeln hat: {titles}",
+        "events": "Nicht kopiert, weil {programTitle} schon Events mit diesen Titeln hat: {titles}",
+        "degrees": "Nicht kopiert, weil {programTitle} schon Degrees mit diesen Titeln hat: {titles}"
       }
     },
     "participants": {
@@ -2163,6 +2170,7 @@
         "label": "Öffentliche Veranstaltung",
         "description": "Öffne diese Session für alle: Es entsteht ein Entwurf in den Veranstaltungen, den Du prüfen und dann veröffentlichen kannst. Anmelden kann sich dort jede Person, auch ohne Bewerbung für den Kurs.",
         "no_events_program": "Für diese Organisation gibt es noch kein Veranstaltungsprogramm. Bitte das Plattform-Team, eins anzulegen, damit Du Sessions öffentlich machen kannst.",
+        "course_not_published": "Veröffentliche zuerst das Angebot: Nur Sessions eines veröffentlichten Angebots können öffentlich gemacht werden.",
         "create": "Als Veranstaltung anlegen",
         "creating": "Wird angelegt …",
         "create_failed": "Die Veranstaltung konnte nicht angelegt werden.",
@@ -2386,7 +2394,8 @@
       "preview_page": "Vorschau der Seite",
       "view_page": "Seite ansehen",
       "publish": "Veröffentlichen",
-      "unpublish": "Veröffentlichung zurückziehen"
+      "unpublish": "Veröffentlichung zurückziehen",
+      "requires_organizer": "Das Angebot braucht mindestens eine Organisator:in, bevor es veröffentlicht werden kann. Füge zuerst eine Organisator:in hinzu."
     },
     "rausgegangen": {
       "title": "Rausgegangen",
@@ -3578,6 +3587,7 @@
   "footer": {
     "imprint": "Impressum",
     "privacy": "Datenschutz",
+    "manual": "Handbuch",
     "faq": "FAQ",
     "newsletter": "Newsletter",
     "sponsored_by": "Gefördert durch:",
@@ -3945,7 +3955,35 @@
       "BUSY": "Der Assistent ist gerade ausgelastet. Bitte versuch es in einer Minute noch einmal.",
       "UNAVAILABLE": "Der Assistent konnte gerade nicht antworten. Bitte versuch es später noch einmal oder schreib an {contact}.",
       "TOOL_CALL_FAILED": "Der Assistent konnte die nötigen Daten nicht abrufen. Bitte formuliere Deine Frage anders oder schreib an {contact}.",
-      "FEEDBACK_CONSENT_REQUIRED": "Ohne Deine Einwilligung speichern wir das Gespräch nicht."
+      "FEEDBACK_CONSENT_REQUIRED": "Ohne Deine Einwilligung speichern wir das Gespräch nicht.",
+      "PROPOSAL_UNAUTHENTICATED": "Deine Anmeldung ist abgelaufen. Bitte melde Dich neu an und übernimm die Änderung dann noch einmal.",
+      "PROPOSAL_FORBIDDEN": "Mit Deiner aktuellen Rolle kannst Du diesen Kurs nicht ändern.",
+      "PROPOSAL_NOT_FOUND": "Den Kurs oder Eintrag zu dieser Änderung gibt es nicht mehr.",
+      "PROPOSAL_INVALID": "Diese Änderung kann nicht übernommen werden. Bitte den Assistant um einen neuen Vorschlag.",
+      "PROPOSAL_NO_CHANGE": "Diese Änderung enthält nichts Neues für den Kurs.",
+      "PROPOSAL_REGISTRATIONS_EXIST": "Diese Änderung kann nicht übernommen werden, weil sich schon Personen angemeldet haben.",
+      "PROPOSAL_STALE": "Der Kurs wurde nach diesem Vorschlag geändert. Bitte den Assistant um einen neuen Vorschlag.",
+      "PROPOSAL_TITLE_TAKEN": "Ein anderer Kurs in diesem Programm hat schon diesen Titel. Bitte wähle einen anderen Titel.",
+      "PROPOSAL_EXPIRED": "Dieser Vorschlag ist abgelaufen. Bitte den Assistant um einen neuen.",
+      "PROPOSAL_HASURA_ERROR": "Die Änderung konnte nicht gespeichert werden. Bitte versuch es später noch einmal oder schreib an {contact}.",
+      "PROPOSAL_FAILED": "Beim Speichern der Änderung ist etwas schiefgegangen. Bitte versuch es später noch einmal oder schreib an {contact}."
     }
+  },
+  "help": {
+    "title": "Handbuch",
+    "start": "Start",
+    "nav_label": "Inhalt",
+    "audience_label": "Für",
+    "audience": {
+      "participant": "Teilnehmende",
+      "organizer": "Organisator:innen",
+      "admin": "Admins"
+    },
+    "fallback_notice": "Diese Seite gibt es noch nicht auf Deutsch. Du siehst die englische Fassung.",
+    "org_rules_title": "Regeln Deiner Organisation",
+    "org_rules_text": "Fristen, Zertifikatsregeln und andere Vorgaben legt die Organisation fest, die den Kurs anbietet. Sie stehen nicht in diesem Handbuch.",
+    "org_rules_link": "Zu den Regeln und FAQ",
+    "version_release": "Stand des Handbuchs: Release <release></release>, Commit <commit></commit>",
+    "version_commit": "Stand des Handbuchs: Commit <commit></commit> (noch kein Release)"
   }
 }

@@ -44,6 +44,8 @@ const DELAY_BETWEEN_USERS_MS = 100;
 const DELAY_BETWEEN_BATCHES_MS = 500;
 const MAX_RETRIES = 3;
 const REAUTH_EVERY_N_USERS = 100;
+// Master-realm admin tokens expire after about a minute.
+const REAUTH_AFTER_MS = 30_000;
 const AUTH_RETRY_ATTEMPTS = 3;
 const AUTH_RETRY_DELAY_MS = 2000;
 
@@ -159,6 +161,7 @@ async function main() {
   });
 
   await keycloakAuth(kcAdminClient);
+  let lastAuth = Date.now();
 
   // 3. Iterate all Keycloak users
   const PAGE_SIZE = 100;
@@ -174,6 +177,12 @@ async function main() {
 
     for (const user of users) {
       totalProcessed++;
+
+      // Disabled accounts (e.g. spam) cannot log in and need no handle.
+      if (user.enabled === false) {
+        totalSkipped++;
+        continue;
+      }
 
       const existingHandle = user.attributes?.matrix_user_handle?.[0];
       const existingPicture = user.attributes?.picture?.[0];
@@ -197,6 +206,10 @@ async function main() {
       console.log(`[${totalProcessed}] ${user.id} (${user.firstName} ${user.lastName}) -> ${changes.join(', ')}`);
 
       if (!DRY_RUN) {
+        if (Date.now() - lastAuth > REAUTH_AFTER_MS) {
+          await keycloakAuth(kcAdminClient);
+          lastAuth = Date.now();
+        }
         let attempt = 0;
         while (attempt < MAX_RETRIES) {
           try {
@@ -246,6 +259,7 @@ async function main() {
     if (offset > 0 && offset % REAUTH_EVERY_N_USERS === 0) {
       console.log(`  Re-authenticating with Keycloak (processed ${totalProcessed} users)...`);
       await keycloakAuth(kcAdminClient);
+      lastAuth = Date.now();
     }
   }
 

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { berlinDate } from './prompt';
 import { ToolSet, ZodTool, zodToolSet } from './tools';
 
 /**
@@ -25,6 +26,8 @@ export interface HasuraCaller {
   /** The asker's user id, from their NextAuth session. */
   userId: string;
   fetchImpl?: typeof fetch;
+  /** For tests; deadlines compare against today's date in Europe/Berlin. */
+  now?: () => Date;
 }
 
 /** The role for the asker's own data: every logged-in person has it; org_admin lacks user_access. */
@@ -101,6 +104,7 @@ const courseIdArg = z.number().int().positive().optional().describe('Only this c
 const escapeLike = (text: string) => text.replace(/[\\%_]/g, (c) => `\\${c}`);
 
 export const createUserTools = (caller: HasuraCaller, stripSchemaKeys: string[] = []): ToolSet => {
+  const now = caller.now ?? (() => new Date());
   const request = hasuraAsUser(caller, OWN_DATA_ROLE);
   const own = { userId: { _eq: caller.userId } };
 
@@ -172,7 +176,7 @@ export const createUserTools = (caller: HasuraCaller, stripSchemaKeys: string[] 
               _or: [{ title: { _ilike: `%${escapeLike(w)}%` } }, { tagline: { _ilike: `%${escapeLike(w)}%` } }],
             })),
             ...(language ? [{ language: { _eq: language.toUpperCase() } }] : []),
-            ...(openForApplications ? [{ applicationEnd: { _gte: new Date().toISOString().slice(0, 10) } }] : []),
+            ...(openForApplications ? [{ applicationEnd: { _gte: berlinDate(now()) } }] : []),
           ],
         };
         const data = await request<{ Course: any[] }>(SEARCH_COURSES, { where });

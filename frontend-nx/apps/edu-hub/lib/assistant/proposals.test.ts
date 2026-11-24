@@ -1,6 +1,7 @@
 /**
  * @jest-environment node
  */
+import { OperationError } from '../mcp/errors';
 import { createCourseSetup } from '../mcp/operations';
 import { createFakeCourseStore, createWorld, FakeWorld } from '../mcp/testing/fakeCourseStore';
 import { createProposalsHandler } from './proposals';
@@ -76,4 +77,31 @@ it('answers STALE with 409 when the course changed since the proposal', async ()
   const http = await post(world, { proposedChangeId, action: 'apply' });
   expect(http.status).toBe(409);
   expect(http.json.error?.code).toBe('STALE');
+});
+
+it('answers in the asker\'s locale and never passes on the operation\'s own message', async () => {
+  const failing = (error: Error) =>
+    createProposalsHandler({
+      getSession: async () => session({ userId: 'ins-1', allowedRoles: ['user', 'instructor'] }),
+      courseSetup: () =>
+        ({
+          applyProposedChange: async () => {
+            throw error;
+          },
+        } as unknown as ReturnType<typeof createCourseSetup>),
+    });
+  const raw = 'check constraint of an insert/update permission has failed';
+
+  const hasura = mockHttp({ proposedChangeId: 'p', action: 'apply', locale: 'de' }, { 'x-hasura-role': 'instructor' });
+  await failing(new OperationError('HASURA_ERROR', raw))(hasura.req, hasura.res);
+  expect(hasura.status).toBe(502);
+  expect(hasura.json.error?.code).toBe('HASURA_ERROR');
+  expect(hasura.json.error?.message).toContain('Die Änderung konnte nicht gespeichert werden');
+  expect(hasura.json.error?.message).not.toContain(raw);
+
+  const crash = mockHttp({ proposedChangeId: 'p', action: 'apply', locale: 'en' }, { 'x-hasura-role': 'instructor' });
+  await failing(new Error(raw))(crash.req, crash.res);
+  expect(crash.status).toBe(500);
+  expect(crash.json.error).toEqual({ code: 'INTERNAL', message: expect.stringContaining('Something went wrong while saving') });
+  expect(crash.json.error?.message).not.toContain(raw);
 });

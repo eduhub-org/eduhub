@@ -1,3 +1,4 @@
+import { titlesMustBeUnique } from '../../helpers/courseTitles';
 import { OperationError } from './errors';
 import { countProposal } from './metrics';
 import {
@@ -217,14 +218,23 @@ export const createCourseSetup = ({ store, secret, now = Date.now }: Options) =>
     }
   };
 
-  /** Titles are unique per program, ignoring case and surrounding spaces. */
-  const assertTitleFree = async (programId: number, title: string, exceptCourseId?: number) => {
+  /**
+   * Titles are unique per course or degree program, ignoring case and surrounding spaces. Event
+   * programs are exempt (see helpers/courseTitles.ts).
+   */
+  const assertTitleFree = async (
+    programType: string | null,
+    programId: number,
+    title: string,
+    exceptCourseId?: number
+  ) => {
+    if (!titlesMustBeUnique(programType)) return;
     const taken = (await store.coursesTitled(programId, title.trim())).filter((c) => c.id !== exceptCourseId);
     if (taken.length) {
       throw new OperationError(
         'TITLE_TAKEN',
         `Program ${programId} already has a course named "${taken[0].title}" (course ${taken[0].id}). ` +
-          'Course titles must be unique within a program; choose another title. If you just applied this ' +
+          'Course titles must be unique within a course or degree program; choose another title. If you just applied this ' +
           'proposal, that is the course it created.'
       );
     }
@@ -287,7 +297,7 @@ export const createCourseSetup = ({ store, secret, now = Date.now }: Options) =>
     const program = await creatableProgram(who, course.programId);
     // Titles are unique per program. This also stops a second apply of the same proposal, which
     // would find the course the first one created.
-    await assertTitleFree(program.id, String(course.fields.title));
+    await assertTitleFree(program.type, program.id, String(course.fields.title));
     await assertInsertable(who, Object.keys(course.fields));
     const courseId = await store.createCourse(course);
     countProposal('applied', 'create_course');
@@ -349,7 +359,7 @@ export const createCourseSetup = ({ store, secret, now = Date.now }: Options) =>
         ...(texts.title !== undefined && { title: texts.title.trim() }),
       });
       await assertSettable(who, changed);
-      if (typeof after.title === 'string') await assertTitleFree(course.programId, after.title, course.id);
+      if (typeof after.title === 'string') await assertTitleFree(course.programType, course.programId, after.title, course.id);
       return propose(who, course, 'course_texts', after, before, after);
     },
 
@@ -436,7 +446,7 @@ export const createCourseSetup = ({ store, secret, now = Date.now }: Options) =>
       const program = await creatableProgram(who, programId);
       title = title.trim();
       if (!title) throw new OperationError('INVALID', 'A new course needs a title.');
-      await assertTitleFree(programId, title);
+      await assertTitleFree(program.type, programId, title);
       unknownKeys(texts, TEXT_FIELDS.filter((f) => f !== 'title'), 'text fields');
       unknownKeys(settings, SETTING_FIELDS.filter((f) => f !== 'language'), 'settings');
 
@@ -505,7 +515,7 @@ export const createCourseSetup = ({ store, secret, now = Date.now }: Options) =>
       } else {
         const set = proposal.changes as Partial<CourseFields>;
         await assertSettable(who, Object.keys(set));
-        if (typeof set.title === 'string') await assertTitleFree(course.programId, set.title, course.id);
+        if (typeof set.title === 'string') await assertTitleFree(course.programType, course.programId, set.title, course.id);
         const saved = await store.updateCourse(course.id, course.updatedAt, set);
         if (!saved) {
           throw new OperationError(
