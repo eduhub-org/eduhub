@@ -77,10 +77,12 @@ upstream_oauth2:
       pkce_method: always
       # Keycloak calls back (client "matrix-authentication-service", backchannel
       # logout URL) when its session ends, e.g. on EduHub logout. MAS then ends
-      # its own browser session and every Matrix session started from that
-      # Keycloak login, so the next person on a shared computer can't continue
-      # as the previous one.
-      on_backchannel_logout: logout_all
+      # only its own browser session, so the next person on a shared computer
+      # can't continue as the previous one. Matrix sessions stay: Element Web and
+      # Desktop often share the Keycloak login with EduHub and would otherwise be
+      # logged out on every EduHub logout; EduHub revokes its own chat session
+      # itself. Same setting as recommended for production.
+      on_backchannel_logout: logout_browser_only
       claims_imports:
         # No "confirm your new account" page; needs localpart=require and the
         # other attributes force/require/ignore.
