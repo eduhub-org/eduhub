@@ -175,20 +175,6 @@ resource "google_secret_manager_secret_version" "lms_password" {
   secret_data = var.lms_password
 }
 
-resource "google_secret_manager_secret" "mm_token" {
-  provider  = google-beta
-  secret_id = "mm-token"
-  replication {
-    auto {}
-  }
-}
-
-resource "google_secret_manager_secret_version" "mm_token" {
-  provider    = google-beta
-  secret      = google_secret_manager_secret.mm_token.name
-  secret_data = var.mm_token
-}
-
 # ===== Hasura Mail Password =====
 resource "google_secret_manager_secret" "hasura_mail_pw" {
   provider  = google-beta
@@ -264,6 +250,23 @@ resource "google_secret_manager_secret_version" "guest_token_secret" {
   provider    = google-beta
   secret      = google_secret_manager_secret.guest_token_secret.name
   secret_data = var.guest_token_secret
+}
+
+# ===== MCP Proposal Secret =====
+# Signs the Proposed Changes of the EduHub MCP server (pages/api/mcp, ADR 0006)
+# between propose and apply. Rotating it only invalidates proposals not yet applied.
+resource "google_secret_manager_secret" "mcp_proposal_secret" {
+  provider  = google-beta
+  secret_id = "mcp-proposal-secret"
+  replication {
+    auto {}
+  }
+}
+
+resource "google_secret_manager_secret_version" "mcp_proposal_secret" {
+  provider    = google-beta
+  secret      = google_secret_manager_secret.mcp_proposal_secret.name
+  secret_data = var.mcp_proposal_secret
 }
 
 # ===== Stripe Secret Key =====
@@ -429,4 +432,11 @@ resource "google_secret_manager_secret_iam_member" "stripe_webhook_secret_eduhub
   role       = "roles/secretmanager.secretAccessor"
   member     = "serviceAccount:${data.google_project.eduhub.number}-compute@developer.gserviceaccount.com"
   depends_on = [google_secret_manager_secret.stripe_webhook_secret]
+}
+
+resource "google_secret_manager_secret_iam_member" "mcp_proposal_secret" {
+  secret_id  = google_secret_manager_secret.mcp_proposal_secret.id
+  role       = "roles/secretmanager.secretAccessor"
+  member     = "serviceAccount:${data.google_project.eduhub.number}-compute@developer.gserviceaccount.com"
+  depends_on = [google_secret_manager_secret.mcp_proposal_secret]
 }

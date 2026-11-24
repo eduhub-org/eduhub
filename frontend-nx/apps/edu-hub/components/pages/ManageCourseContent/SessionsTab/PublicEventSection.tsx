@@ -1,5 +1,6 @@
 import { FC, useCallback, useMemo, useState } from 'react';
 import Link from 'next/link';
+import { coursePath, manageCoursePath } from '../../../../helpers/coursePath';
 import { useRouter } from 'next/router';
 import { useTranslations } from 'next-intl';
 import { MdOpenInNew, MdPublic } from 'react-icons/md';
@@ -36,7 +37,9 @@ interface Props {
 /**
  * Opens a single course session to the public as an event. Creating it only
  * makes an unpublished draft and takes the admin to it, so the generated texts
- * can be reviewed and the event published from its own page.
+ * can be reviewed and the event published from its own page. Only offered for
+ * a published course; the database copies the course's instructors to the
+ * event as its organizers.
  */
 const PublicEventSection: FC<Props> = ({ course, session }) => {
   const t = useTranslations('manageCourse.SessionsTab.public_event');
@@ -79,9 +82,15 @@ const PublicEventSection: FC<Props> = ({ course, session }) => {
         });
         const eventId = data?.insert_Course_one?.id;
         if (!eventId) throw new Error(t('create_failed'));
-        await router.push(`/manage/course/${eventId}`);
+        await router.push(manageCoursePath(eventId, ProgramType.EVENTS));
       } catch (error) {
-        setErrorMessage(error instanceof Error ? error.message : t('create_failed'));
+        const message = error instanceof Error ? error.message : '';
+        // The database refuses it too if the course was unpublished meanwhile.
+        if (message.includes('session_event_requires_published_course')) {
+          setErrorMessage(t('course_not_published'));
+        } else {
+          setErrorMessage(message || t('create_failed'));
+        }
       }
     },
     [createEvent, course, session, t, router, timeZone]
@@ -124,10 +133,10 @@ const PublicEventSection: FC<Props> = ({ course, session }) => {
             </span>
           </p>
           <div className="flex flex-wrap gap-2">
-            <Link href={`/manage/course/${event.id}`} className={OUTLINE_BUTTON}>
+            <Link href={manageCoursePath(event.id, ProgramType.EVENTS)} className={OUTLINE_BUTTON}>
               {t('open_event')}
             </Link>
-            <Link href={`/course/${event.id}`} className={OUTLINE_BUTTON} target="_blank" rel="noopener noreferrer">
+            <Link href={coursePath(event.id, ProgramType.EVENTS)} className={OUTLINE_BUTTON} target="_blank" rel="noopener noreferrer">
               <MdOpenInNew aria-hidden />
               {t('view_page')}
             </Link>
@@ -136,13 +145,17 @@ const PublicEventSection: FC<Props> = ({ course, session }) => {
       ) : (
         <div className="flex flex-col gap-3">
           <p className="text-sm text-label-secondary">
-            {!programsLoading && eventPrograms.length === 0 ? t('no_events_program') : t('description')}
+            {!course.published
+              ? t('course_not_published')
+              : !programsLoading && eventPrograms.length === 0
+              ? t('no_events_program')
+              : t('description')}
           </p>
           <div>
             <button
               type="button"
               onClick={handleCreateClick}
-              disabled={creating || programsLoading || eventPrograms.length === 0}
+              disabled={!course.published || creating || programsLoading || eventPrograms.length === 0}
               className={OUTLINE_BUTTON}
             >
               <MdPublic aria-hidden />

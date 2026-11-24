@@ -8,6 +8,8 @@
 
 import { formatInTimeZone, fromZonedTime } from 'date-fns-tz';
 import { compareByUpcoming, formatSessionDateSpan, lastSessionEnd, ScheduleSession } from './sessionSchedule';
+import { courseUrl } from './coursePath';
+import { ProgramType } from '../types/enums';
 
 const TIME_ZONE = 'Europe/Berlin';
 
@@ -100,7 +102,12 @@ export const renderDescriptionFields = (
 };
 
 const renderItem = (event: RssEvent, baseUrl: string, renderMarkdown: (markdown: string) => string): string => {
-  const link = `${baseUrl}/course/${event.id}`;
+  const link = courseUrl(event.id, ProgramType.EVENTS, baseUrl);
+  // RSS defines the GUID as the item's identity, separate from its link. Events
+  // were syndicated under /course/:id before the program type moved into the path,
+  // so the GUID stays there: changing it would make every event a reader already
+  // has look like a new item.
+  const guid = courseUrl(event.id, ProgramType.COURSES, baseUrl);
   const description = [formatSessionDateSpan(event.Sessions ?? [], TIME_ZONE), event.tagline?.trim()]
     .filter(Boolean)
     .join(' – ');
@@ -110,7 +117,7 @@ const renderItem = (event: RssEvent, baseUrl: string, renderMarkdown: (markdown:
     '    <item>',
     `      <title>${escapeXml(event.title)}</title>`,
     `      <link>${escapeXml(link)}</link>`,
-    `      <guid isPermaLink="true">${escapeXml(link)}</guid>`,
+    `      <guid isPermaLink="true">${escapeXml(guid)}</guid>`,
     description ? `      <description>${escapeXml(description)}</description>` : null,
     content ? `      <content:encoded>${cdata(content)}</content:encoded>` : null,
     `      <pubDate>${rssDate(event.created_at)}</pubDate>`,

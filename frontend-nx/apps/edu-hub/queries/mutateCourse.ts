@@ -85,6 +85,16 @@ export const UPDATE_COURSE_PROPERTY = gql`
   }
 `;
 
+// Publishes several courses in one statement, so they all go public or none do
+// (e.g. when the database refuses one that has no instructor).
+export const PUBLISH_COURSES = gql`
+  mutation PublishCourses($ids: [Int!]!) {
+    update_Course(where: { id: { _in: $ids } }, _set: { published: true }) {
+      affected_rows
+    }
+  }
+`;
+
 export const UPDATE_COURSE_COVER_IMAGE_CREDITS = gql`
   mutation UpdateCourseCoverImageCredits($itemId: Int!, $text: String) {
     update_Course_by_pk(pk_columns: { id: $itemId }, _set: { coverImageCredits: $text }) {

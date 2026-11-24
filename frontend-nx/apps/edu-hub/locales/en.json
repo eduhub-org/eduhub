@@ -49,6 +49,7 @@
     "menu": {
       "profile": "My Profile",
       "my_certificates": "My Certificates",
+      "manual": "Manual",
       "faq": "FAQ",
       "user": "User",
       "admin_users": "Admin Users",
@@ -758,8 +759,6 @@
       "form_intro": "Please update your current employment status:",
       "confirm_sufficient_time": "Finally, confirm your course participation only if you have the time to fully attend the course until the end.",
       "important": "IMPORTANT: CONFIRM COURSE INVITATION!",
-      "mattermost_info_1": "After confirmation, please click directly on the button to go to the course chat.",
-      "mattermost_info_2": "If you don't have an account in our chat yet, you will need to sign up there first. The course chat is our central communication tool for the courses.",
       "newsletter_title": "Subscribe to updates from {organization}",
       "newsletter_description": "Receive news on upcoming courses, learning opportunities, and program updates from {organization}.",
       "newsletter_legal": "You can revoke your consent at any time in your profile. Processing is based on our <privacy>Privacy Policy</privacy>.",
@@ -1251,6 +1250,7 @@
       "degrees": "Untitled Degree"
     },
     "title": "Manage Courses",
+    "title_taken": "This program already has “{title}”. Titles must be unique within a program.",
     "all_programs": "All",
     "course_degree_title": {
       "label": "Part of the following degrees",
@@ -1289,7 +1289,9 @@
       "add": "Add Instructor",
       "add_event": "Add organizer",
       "help_text": "Instructors can manage the offering and are named on its page.",
-      "help_text_event": "Organizers can manage the event and are named on its page."
+      "help_text_event": "Organizers can manage the event and are named on its page.",
+      "last_required": "A published offering needs at least one instructor. Add another instructor first or unpublish the offering.",
+      "last_required_event": "A published offering needs at least one organizer. Add another organizer first or unpublish the offering."
     },
     "funding_organizations": {
       "label": "Funding Organizations",
@@ -1336,7 +1338,6 @@
     "participant_chat": {
       "title": "Participant chat",
       "button_open_element": "To Element room",
-      "button_open_mattermost": "To Mattermost channel",
       "button_open_chat": "Open chat",
       "explanation": "A Matrix room is the chat for this offering. Confirmed participants see a button to the room on the offering's page and join it from there. Instructors automatically get moderator rights in the room; instructors added later are also invited.",
       "explanation_external": "Confirmed participants see a button to this chat on the offering's page."
@@ -1474,6 +1475,11 @@
         "events": "Successfully unpublished {count} events",
         "degrees": "Successfully unpublished {count} degrees"
       },
+      "publish_requires_instructor": {
+        "courses": "These courses have no instructor yet and cannot be published: {titles}. Add an instructor first.",
+        "events": "These events have no organizer yet and cannot be published: {titles}. Add an organizer first.",
+        "degrees": "These degrees cannot be published: {titles}."
+      },
       "bulk_action_failed": {
         "courses": "The bulk action on the selected courses failed. Please try again.",
         "events": "The bulk action on the selected events failed. Please try again.",
@@ -1491,6 +1497,11 @@
         "courses": "Successfully copied {count} courses to {programTitle}",
         "events": "Successfully copied {count} events to {programTitle}",
         "degrees": "Successfully copied {count} degrees to {programTitle}"
+      },
+      "copy_titles_taken": {
+        "courses": "Not copied because {programTitle} already has courses with these titles: {titles}",
+        "events": "Not copied because {programTitle} already has events with these titles: {titles}",
+        "degrees": "Not copied because {programTitle} already has degrees with these titles: {titles}"
       }
     },
     "participants": {
@@ -2177,6 +2188,7 @@
         "label": "Public event",
         "description": "Open this session to everyone: this creates a draft event that you can review and then publish. Anyone can register for it, without applying to the course.",
         "no_events_program": "This organization has no events program yet. Ask a platform admin to create one before opening sessions to the public.",
+        "course_not_published": "Publish the offering first: only sessions of a published offering can be opened to the public.",
         "create": "Create event",
         "creating": "Creating …",
         "create_failed": "The event could not be created.",
@@ -2397,7 +2409,8 @@
       "preview_page": "Preview page",
       "view_page": "View page",
       "publish": "Publish",
-      "unpublish": "Unpublish"
+      "unpublish": "Unpublish",
+      "requires_organizer": "The offering needs at least one organizer before it can be published. Add an organizer first."
     },
     "rausgegangen": {
       "title": "Rausgegangen",
@@ -3589,6 +3602,7 @@
   "footer": {
     "imprint": "Imprint",
     "privacy": "Privacy",
+    "manual": "Manual",
     "faq": "FAQ",
     "newsletter": "Newsletter",
     "sponsored_by": "Sponsored by:",
@@ -3940,5 +3954,51 @@
     "nothing_to_do": "You do not need to do anything. We simply want to let you know how we handle your data.",
     "more": "All changes are listed in our <privacy>privacy policy</privacy>.",
     "dismiss": "Close notice"
+  },
+  "assistant": {
+    "errors": {
+      "NOT_LOGGED_IN": "Please log in to ask the Assistant.",
+      "OFF": "The Assistant is not available right now.",
+      "SPENDING_CAP_REACHED": "The Assistant is paused for this month because its monthly budget is used up. It will be back on the 1st of next month. For questions, write to {contact}.",
+      "RATE_LIMITED_SHORT": "You have asked a lot of questions in a short time. Please wait about {minutes} minutes and then continue.",
+      "RATE_LIMITED_DAILY": "You have reached the maximum number of questions for today. You can ask again tomorrow.",
+      "MESSAGE_TOO_LONG": "Your message is too long. Please shorten it to at most {max} characters.",
+      "CONVERSATION_TOO_LONG": "This conversation has become too long. Please start a new one.",
+      "INVALID_REQUEST": "The request could not be read. Please reload the page.",
+      "IMPERSONATING": "The Assistant is not available while you view the platform as someone else.",
+      "ROLE_NOT_ALLOWED": "You can't use this role with the Assistant.",
+      "BUSY": "The Assistant is busy right now. Please try again in a minute.",
+      "UNAVAILABLE": "The Assistant couldn't answer right now. Please try again later or write to {contact}.",
+      "TOOL_CALL_FAILED": "The Assistant couldn't look up the data it needed. Please rephrase your question or write to {contact}.",
+      "FEEDBACK_CONSENT_REQUIRED": "Without your consent we don't store the conversation.",
+      "PROPOSAL_UNAUTHENTICATED": "Your login has expired. Please log in again and then apply the change.",
+      "PROPOSAL_FORBIDDEN": "You can't change this course with your current role.",
+      "PROPOSAL_NOT_FOUND": "The course or entry for this change no longer exists.",
+      "PROPOSAL_INVALID": "This change can't be applied. Please ask the Assistant for a new proposal.",
+      "PROPOSAL_NO_CHANGE": "This change contains nothing new for the course.",
+      "PROPOSAL_REGISTRATIONS_EXIST": "This change can't be applied because people have already registered.",
+      "PROPOSAL_STALE": "The course was changed after this proposal. Please ask the Assistant for a new proposal.",
+      "PROPOSAL_TITLE_TAKEN": "Another course in this program already has this title. Please choose a different title.",
+      "PROPOSAL_EXPIRED": "This proposal has expired. Please ask the Assistant for a new one.",
+      "PROPOSAL_HASURA_ERROR": "The change couldn't be saved. Please try again later or write to {contact}.",
+      "PROPOSAL_FAILED": "Something went wrong while saving the change. Please try again later or write to {contact}."
+    }
+  },
+  "help": {
+    "title": "Manual",
+    "start": "Start",
+    "nav_label": "Contents",
+    "audience_label": "For",
+    "audience": {
+      "participant": "Participants",
+      "organizer": "Organizers",
+      "admin": "Admins"
+    },
+    "fallback_notice": "This page is not available in English yet. You are reading the German version.",
+    "org_rules_title": "Rules of your organization",
+    "org_rules_text": "Deadlines, certificate rules and other requirements are set by the organization that offers the course. They are not part of this manual.",
+    "org_rules_link": "Go to the rules and FAQ",
+    "version_release": "Manual as of release <release></release>, commit <commit></commit>",
+    "version_commit": "Manual as of commit <commit></commit> (not released yet)"
   }
 }

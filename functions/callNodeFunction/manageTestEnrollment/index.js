@@ -8,8 +8,7 @@ import { createHasuraClient } from "../lib/hasura.js";
  * requesting user to hold a CONFIRMED enrollment. So the only way to show an
  * instructor what their participants see is to give them a real enrollment, and
  * mark it `isTest` so nothing else in the system treats it as participation
- * (see migration 1789646311423 and the guards in sendEnrollmentEmail /
- * add_confirmed_user_to_mm).
+ * (see migration 1789646311423 and the guard in sendEnrollmentEmail).
  *
  * This lives in an action rather than in Hasura permissions on CourseEnrollment
  * deliberately. `instructor` is an inherited role (instructor_access +
