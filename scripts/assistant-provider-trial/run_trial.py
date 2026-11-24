@@ -220,7 +220,7 @@ def post_stream(target, body, rate_limit_hits):
 
 def read_stream(resp, start):
     content, reasoning = [], []
-    calls = {}
+    calls, by_index, by_id = [], {}, {}
     usage = None
     first_token = first_content = None
     chunks = 0
@@ -248,10 +248,20 @@ def read_stream(resp, start):
                         reasoning.append(delta[k])
                         got = True
                 for tc in delta.get("tool_calls") or []:
-                    slot = calls.setdefault(tc.get("index", 0), {"id": None, "name": "", "arguments": ""})
-                    slot["id"] = tc.get("id") or slot["id"]
+                    # Gemini with stream_function_call_arguments spreads one call over several
+                    # indices under the same id, repeating the name: a known id joins its call.
+                    index, call_id = tc.get("index", 0), tc.get("id")
+                    slot = by_index.get(index) or (by_id.get(call_id) if call_id else None)
+                    if slot is None:
+                        slot = {"id": None, "name": "", "arguments": ""}
+                        calls.append(slot)
+                    by_index[index] = slot
+                    if call_id:
+                        slot["id"] = call_id
+                        by_id[call_id] = slot
                     fn = tc.get("function") or {}
-                    slot["name"] += fn.get("name") or ""
+                    if fn.get("name") and fn["name"] != slot["name"]:
+                        slot["name"] += fn["name"]
                     slot["arguments"] += fn.get("arguments") or ""
                     # Gemini's thought_signature; it must be sent back with the call.
                     if "extra_content" in tc:
@@ -264,7 +274,7 @@ def read_stream(resp, start):
     return {
         "content": "".join(content),
         "reasoning": "".join(reasoning),
-        "tool_calls": [calls[i] for i in sorted(calls)],
+        "tool_calls": calls,
         "usage": usage,
         "ttft": first_token,
         "ttfc": first_content,

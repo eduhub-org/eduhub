@@ -94,7 +94,12 @@ const readStream = async (
 ): Promise<{ text: string; toolCalls: ToolCall[]; usage: Usage | null }> => {
   const decoder = new TextDecoder();
   const reader = body.getReader();
-  const calls: { id: string; name: string; arguments: string; extraContent?: unknown }[] = [];
+  type Slot = { id: string; name: string; arguments: string; extraContent?: unknown };
+  const calls: Slot[] = [];
+  // Gemini with `stream_function_call_arguments` spreads one call over several indices under
+  // the same id (signature first, arguments later), so a known id joins its existing call.
+  const byIndex = new Map<number, Slot>();
+  const byId = new Map<string, Slot>();
   let text = '';
   let usage: Usage | null = null;
   let buffer = '';
@@ -117,10 +122,19 @@ const readStream = async (
       onText(delta.content);
     }
     for (const call of delta.tool_calls ?? []) {
-      const index = typeof call.index === 'number' ? call.index : calls.length;
-      const slot = (calls[index] ??= { id: '', name: '', arguments: '' });
-      if (call.id) slot.id = call.id;
-      if (call.function?.name) slot.name += call.function.name;
+      const index = typeof call.index === 'number' ? call.index : undefined;
+      let slot = (index !== undefined ? byIndex.get(index) : undefined) ?? (call.id ? byId.get(call.id) : undefined);
+      if (!slot) {
+        slot = { id: '', name: '', arguments: '' };
+        calls.push(slot);
+      }
+      if (index !== undefined) byIndex.set(index, slot);
+      if (call.id) {
+        slot.id = call.id;
+        byId.set(call.id, slot);
+      }
+      // A split call repeats its full name on every piece.
+      if (call.function?.name && call.function.name !== slot.name) slot.name += call.function.name;
       if (call.function?.arguments) slot.arguments += call.function.arguments;
       if (call.extra_content !== undefined) slot.extraContent = call.extra_content;
     }
@@ -139,14 +153,12 @@ const readStream = async (
   }
   if (buffer.trim().startsWith('data:')) handle(buffer.trim().slice(5).trim());
 
-  const toolCalls = calls
-    .filter(Boolean)
-    .map((c, i) => ({
-      id: c.id || `call_${i}`,
-      name: c.name,
-      arguments: c.arguments || '{}',
-      ...(c.extraContent !== undefined ? { extraContent: c.extraContent } : {}),
-    }));
+  const toolCalls = calls.map((c, i) => ({
+    id: c.id || `call_${i}`,
+    name: c.name,
+    arguments: c.arguments || '{}',
+    ...(c.extraContent !== undefined ? { extraContent: c.extraContent } : {}),
+  }));
   return { text, toolCalls, usage };
 };
 

@@ -109,6 +109,31 @@ describe('OpenAI-compatible provider', () => {
     ]);
   });
 
+  it('joins a call that Gemini spreads over several indices under one id', async () => {
+    // As sent with extra_body.google.stream_function_call_arguments: the signature on the first
+    // piece, the arguments on later ones, the name repeated on each.
+    const signature = { google: { thought_signature: 'sig==' } };
+    const piece = (index: number, id: string, name: string, args: string, extra?: unknown) => ({
+      choices: [{ delta: { tool_calls: [{ index, id, ...(extra ? { extra_content: extra } : {}), function: { name, arguments: args } }] } }],
+    });
+    const fetchImpl = (async () =>
+      sse([
+        piece(0, 'A', 'save_text', '', signature),
+        piece(1, 'A', 'save_text', '{"text":'),
+        piece(2, 'A', 'save_text', '"Hallo"}'),
+        piece(3, 'B', 'get_weather', '{"city":"Kiel"}'),
+        '[DONE]',
+      ])) as unknown as typeof fetch;
+    const provider = createOpenAiCompatibleProvider({ baseUrl: VERTEX_EU, model: 'm', extraBody: {} }, staticApiKey('tok'), fetchImpl);
+
+    const turn = await provider.complete({ messages: [{ role: 'user', content: 'hi' }], tools: [], onText: () => undefined });
+
+    expect(turn.toolCalls).toEqual([
+      { id: 'A', name: 'save_text', arguments: '{"text":"Hallo"}', extraContent: signature },
+      { id: 'B', name: 'get_weather', arguments: '{"city":"Kiel"}' },
+    ]);
+  });
+
   it('refreshes an expired token once on 401', async () => {
     let calls = 0;
     const keys = ['old', 'new'];
