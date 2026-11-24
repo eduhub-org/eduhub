@@ -142,6 +142,31 @@ resource "google_cloud_run_service" "eduhub" {
             }
           }
         }
+        # Assistant (ADR 0005, 11_assistant.tf). An empty provider turns it off.
+        env {
+          name  = "ASSISTANT_LLM_PROVIDER"
+          value = var.assistant_llm_provider
+        }
+        env {
+          name  = "ASSISTANT_LLM_BASE_URL"
+          value = local.assistant_llm_base_url
+        }
+        env {
+          name  = "ASSISTANT_LLM_MODEL"
+          value = var.assistant_llm_model
+        }
+        env {
+          name  = "ASSISTANT_MONTHLY_SPEND_CAP_EUR"
+          value = tostring(var.assistant_monthly_spend_cap_eur)
+        }
+        env {
+          name  = "ASSISTANT_LLM_PRICE_INPUT_EUR_PER_MTOK"
+          value = var.assistant_llm_price_input_eur_per_mtok == null ? "" : tostring(var.assistant_llm_price_input_eur_per_mtok)
+        }
+        env {
+          name  = "ASSISTANT_LLM_PRICE_OUTPUT_EUR_PER_MTOK"
+          value = var.assistant_llm_price_output_eur_per_mtok == null ? "" : tostring(var.assistant_llm_price_output_eur_per_mtok)
+        }
       }
     }
 
