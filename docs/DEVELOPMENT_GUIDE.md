@@ -112,8 +112,11 @@ EduHub user (e.g. `admin@example.com` / `dev`) can log in to Element.
 The course chat registers EduHub as an OAuth client in MAS on its own, once per
 browser, so MAS asks for consent on login. A deployment where EduHub is
 registered in MAS up front sets `NEXT_PUBLIC_MATRIX_OAUTH_CLIENT_ID` instead
-(build time). That id is then always used, without falling back to
-registration: a wrong id makes the chat login fail. Leave it empty locally.
+(build time), so MAS does not collect one EduHub client per browser; the
+consent screen stays (MAS cannot skip it yet, see
+element-hq/matrix-authentication-service#6199). That id is then always used,
+without falling back to registration: a wrong id makes the chat login fail.
+Leave it empty locally.
 
 ## 🌱 Seeds
 

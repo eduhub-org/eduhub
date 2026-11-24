@@ -10,8 +10,10 @@ export const getMatrixHomeserverUrl = (): string | null => {
 
 /**
  * OAuth client id of EduHub when it is registered in the auth server (MAS) up
- * front, or null to register dynamically in each browser. A fixed client can be
- * marked as trusted in MAS, so people are not asked for consent on every login.
+ * front, or null to register dynamically in each browser. A fixed client keeps
+ * MAS from collecting one EduHub client per browser. It does not skip the
+ * consent screen: MAS cannot do that for any client yet
+ * (element-hq/matrix-authentication-service#6199).
  */
 export const getMatrixOAuthClientId = (): string | null => process.env.NEXT_PUBLIC_MATRIX_OAUTH_CLIENT_ID?.trim() || null;
 
