@@ -1,0 +1,23 @@
+{
+  "_comment": "Copy to providers.json (git-ignored) and replace PROJECT_ID (use the staging project). Check the model ids on the Vertex AI model pages. Prices per 1M tokens from the Vertex AI price list. The global endpoint is refused.",
+  "targets": [
+    {
+      "name": "gemini-3.8-flash-eu",
+      "base_url": "https://aiplatform.eu.rep.googleapis.com/v1/projects/PROJECT_ID/locations/eu/endpoints/openapi",
+      "api_key_command": "gcloud auth print-access-token",
+      "model": "google/gemini-3.8-flash",
+      "currency": "USD",
+      "price_per_mtok": { "input": null, "output": null },
+      "extra_body": {}
+    },
+    {
+      "name": "gemini-2.5-flash-europe-west1",
+      "base_url": "https://europe-west1-aiplatform.googleapis.com/v1/projects/PROJECT_ID/locations/europe-west1/endpoints/openapi",
+      "api_key_command": "gcloud auth print-access-token",
+      "model": "google/gemini-2.5-flash",
+      "currency": "USD",
+      "price_per_mtok": { "input": null, "output": null },
+      "extra_body": {}
+    }
+  ]
+}
