@@ -70,6 +70,12 @@ jobs:
               sleep 30
               git fetch --quiet --tags origin
             done
+            if [ -z "$tag" ]; then
+              # A deployment of only docs/ci/chore commits gets no release: the live release is
+              # still the latest one it contains (re-indexing it reuses every embedding).
+              tag="$(git tag --merged "$DEPLOYED_SHA" --list 'v*' --sort=-v:refname | head -n 1)"
+              echo "::notice::No release tag contains $DEPLOYED_SHA; indexing $tag, the latest release it contains."
+            fi
           elif [ -z "$tag" ]; then
             tag="$(git tag --merged HEAD --list 'v*' --sort=-v:refname | head -n 1)"
           fi
