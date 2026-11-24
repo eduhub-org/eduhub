@@ -164,11 +164,19 @@ def api_key(target, refresh=False):
 
 def check_endpoint(target):
     """Refuse Vertex AI's global endpoint: it gives no control over where a
-    request is processed (ADR 0005)."""
+    request is processed (ADR 0005). A target may opt in with
+    "allow_global_endpoint": true to compare models only offered there. That is
+    fine for this trial, whose cases and tool results are fictional, but such a
+    model can't serve the Assistant. Its name must contain "global", so every
+    result table says so."""
     url = target["base_url"]
     host = urlparse(url).hostname or ""
     if "/locations/global/" in url + "/" or host == "aiplatform.googleapis.com":
-        sys.exit(f"{target['name']}: the global Vertex AI endpoint is not allowed; use a regional or eu endpoint")
+        if target.get("allow_global_endpoint") is not True:
+            sys.exit(f"{target['name']}: the global Vertex AI endpoint is not allowed; use a regional or eu endpoint")
+        if "global" not in target["name"]:
+            sys.exit(f"{target['name']}: a target on the global endpoint must have \"global\" in its name")
+        print(f"[{target['name']}] global endpoint: synthetic trial data only, not usable for the Assistant", file=sys.stderr)
 
 
 def strip_keys(schema, keys):
