@@ -3941,6 +3941,26 @@
     "dismiss": "Hinweis schließen"
   },
   "assistant": {
+    "button": "Frag den Assistenten",
+    "open": "KI-Assistenten öffnen",
+    "title": "KI-Assistent",
+    "ai_notice": "Du schreibst mit einer KI, nicht mit einem Menschen. Sie kann Fehler machen, prüfe also wichtige Antworten.",
+    "privacy_link": "Datenschutzerklärung",
+    "login_prompt": "Melde Dich an, um dem Assistenten Fragen zu EduHub, den Kursen und Deinen Anmeldungen zu stellen.",
+    "login": "Anmelden",
+    "unavailable_viewing_as": "Der Assistent ist nicht verfügbar, während Du EduHub als eine andere Person ansiehst.",
+    "intro": "Frag mich zu EduHub, den Kursen oder Deinen Anmeldungen. Wenn Du einen Kurs verwaltest, entwerfe ich Änderungen, die Du prüfst und selbst übernimmst.",
+    "conversation": "Unterhaltung mit dem Assistenten",
+    "you_wrote": "Du:",
+    "assistant_wrote": "Assistent:",
+    "thinking": "Schreibt…",
+    "input_label": "Deine Frage",
+    "input_placeholder": "Schreib Deine Frage…",
+    "context_note": "Mit Deiner Frage werden die aktuelle Seite und eine dort angezeigte Fehlermeldung gesendet.",
+    "send": "Senden",
+    "stop": "Stopp",
+    "new_conversation": "Neue Unterhaltung",
+    "contact": "Schreib dem EduHub-Team",
     "errors": {
       "NOT_LOGGED_IN": "Bitte melde Dich an, um den Assistenten zu fragen.",
       "OFF": "Der Assistent ist gerade nicht verfügbar.",
@@ -3966,48 +3986,7 @@
       "PROPOSAL_TITLE_TAKEN": "Ein anderer Kurs in diesem Programm hat schon diesen Titel. Bitte wähle einen anderen Titel.",
       "PROPOSAL_EXPIRED": "Dieser Vorschlag ist abgelaufen. Bitte den Assistant um einen neuen.",
       "PROPOSAL_HASURA_ERROR": "Die Änderung konnte nicht gespeichert werden. Bitte versuch es später noch einmal oder schreib an {contact}.",
-      "PROPOSAL_FAILED": "Beim Speichern der Änderung ist etwas schiefgegangen. Bitte versuch es später noch einmal oder schreib an {contact}."
-    }
-  },
-  "help": {
-    "title": "Handbuch",
-    "start": "Start",
-    "nav_label": "Inhalt",
-    "audience_label": "Für",
-    "audience": {
-      "participant": "Teilnehmende",
-      "organizer": "Organisator:innen",
-      "admin": "Admins"
-    },
-    "fallback_notice": "Diese Seite gibt es noch nicht auf Deutsch. Du siehst die englische Fassung.",
-    "org_rules_title": "Regeln Deiner Organisation",
-    "org_rules_text": "Fristen, Zertifikatsregeln und andere Vorgaben legt die Organisation fest, die den Kurs anbietet. Sie stehen nicht in diesem Handbuch.",
-    "org_rules_link": "Zu den Regeln und FAQ",
-    "version_release": "Stand des Handbuchs: Release <release></release>, Commit <commit></commit>",
-    "version_commit": "Stand des Handbuchs: Commit <commit></commit> (noch kein Release)"
-  },
-  "assistant": {
-    "button": "Frag den Assistenten",
-    "open": "KI-Assistenten öffnen",
-    "title": "KI-Assistent",
-    "ai_notice": "Du schreibst mit einer KI, nicht mit einem Menschen. Sie kann Fehler machen, prüfe also wichtige Antworten.",
-    "privacy_link": "Datenschutzerklärung",
-    "login_prompt": "Melde Dich an, um dem Assistenten Fragen zu EduHub, den Kursen und Deinen Anmeldungen zu stellen.",
-    "login": "Anmelden",
-    "unavailable_viewing_as": "Der Assistent ist nicht verfügbar, während Du EduHub als eine andere Person ansiehst.",
-    "intro": "Frag mich zu EduHub, den Kursen oder Deinen Anmeldungen. Wenn Du einen Kurs verwaltest, entwerfe ich Änderungen, die Du prüfst und selbst übernimmst.",
-    "conversation": "Unterhaltung mit dem Assistenten",
-    "you_wrote": "Du:",
-    "assistant_wrote": "Assistent:",
-    "thinking": "Schreibt…",
-    "input_label": "Deine Frage",
-    "input_placeholder": "Schreib Deine Frage…",
-    "context_note": "Mit Deiner Frage werden die aktuelle Seite und eine dort angezeigte Fehlermeldung gesendet.",
-    "send": "Senden",
-    "stop": "Stopp",
-    "new_conversation": "Neue Unterhaltung",
-    "contact": "Schreib dem EduHub-Team",
-    "errors": {
+      "PROPOSAL_FAILED": "Beim Speichern der Änderung ist etwas schiefgegangen. Bitte versuch es später noch einmal oder schreib an {contact}.",
       "generic": "Etwas ist schiefgelaufen. Bitte versuch es später noch einmal.",
       "NETWORK": "Die Verbindung wurde unterbrochen. Bitte versuch es noch einmal.",
       "INTERRUPTED": "Die Antwort wurde abgebrochen. Bitte frag noch einmal."
@@ -4089,5 +4068,22 @@
       }
     },
     "looking_up": "Schaut nach…"
+  },
+  "help": {
+    "title": "Handbuch",
+    "start": "Start",
+    "nav_label": "Inhalt",
+    "audience_label": "Für",
+    "audience": {
+      "participant": "Teilnehmende",
+      "organizer": "Organisator:innen",
+      "admin": "Admins"
+    },
+    "fallback_notice": "Diese Seite gibt es noch nicht auf Deutsch. Du siehst die englische Fassung.",
+    "org_rules_title": "Regeln Deiner Organisation",
+    "org_rules_text": "Fristen, Zertifikatsregeln und andere Vorgaben legt die Organisation fest, die den Kurs anbietet. Sie stehen nicht in diesem Handbuch.",
+    "org_rules_link": "Zu den Regeln und FAQ",
+    "version_release": "Stand des Handbuchs: Release <release></release>, Commit <commit></commit>",
+    "version_commit": "Stand des Handbuchs: Commit <commit></commit> (noch kein Release)"
   }
 }

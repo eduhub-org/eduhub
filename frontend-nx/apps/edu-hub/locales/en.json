@@ -3956,6 +3956,26 @@
     "dismiss": "Close notice"
   },
   "assistant": {
+    "button": "Ask the Assistant",
+    "open": "Open the AI Assistant",
+    "title": "AI Assistant",
+    "ai_notice": "You are chatting with an AI, not a person. It can make mistakes, so check important answers.",
+    "privacy_link": "Privacy policy",
+    "login_prompt": "Log in to ask the Assistant about EduHub, the courses and your own registrations.",
+    "login": "Log in",
+    "unavailable_viewing_as": "The Assistant is not available while you are viewing EduHub as someone else.",
+    "intro": "Ask me about EduHub, the courses or your registrations. If you manage a course, I can draft changes for you to check and apply.",
+    "conversation": "Conversation with the Assistant",
+    "you_wrote": "You:",
+    "assistant_wrote": "Assistant:",
+    "thinking": "Writing…",
+    "input_label": "Your question",
+    "input_placeholder": "Type your question…",
+    "context_note": "Your question is sent with the page you are on and any error shown on it.",
+    "send": "Send",
+    "stop": "Stop",
+    "new_conversation": "New conversation",
+    "contact": "Contact the EduHub team",
     "errors": {
       "NOT_LOGGED_IN": "Please log in to ask the Assistant.",
       "OFF": "The Assistant is not available right now.",
@@ -3981,48 +4001,7 @@
       "PROPOSAL_TITLE_TAKEN": "Another course in this program already has this title. Please choose a different title.",
       "PROPOSAL_EXPIRED": "This proposal has expired. Please ask the Assistant for a new one.",
       "PROPOSAL_HASURA_ERROR": "The change couldn't be saved. Please try again later or write to {contact}.",
-      "PROPOSAL_FAILED": "Something went wrong while saving the change. Please try again later or write to {contact}."
-    }
-  },
-  "help": {
-    "title": "Manual",
-    "start": "Start",
-    "nav_label": "Contents",
-    "audience_label": "For",
-    "audience": {
-      "participant": "Participants",
-      "organizer": "Organizers",
-      "admin": "Admins"
-    },
-    "fallback_notice": "This page is not available in English yet. You are reading the German version.",
-    "org_rules_title": "Rules of your organization",
-    "org_rules_text": "Deadlines, certificate rules and other requirements are set by the organization that offers the course. They are not part of this manual.",
-    "org_rules_link": "Go to the rules and FAQ",
-    "version_release": "Manual as of release <release></release>, commit <commit></commit>",
-    "version_commit": "Manual as of commit <commit></commit> (not released yet)"
-  },
-  "assistant": {
-    "button": "Ask the Assistant",
-    "open": "Open the AI Assistant",
-    "title": "AI Assistant",
-    "ai_notice": "You are chatting with an AI, not a person. It can make mistakes, so check important answers.",
-    "privacy_link": "Privacy policy",
-    "login_prompt": "Log in to ask the Assistant about EduHub, the courses and your own registrations.",
-    "login": "Log in",
-    "unavailable_viewing_as": "The Assistant is not available while you are viewing EduHub as someone else.",
-    "intro": "Ask me about EduHub, the courses or your registrations. If you manage a course, I can draft changes for you to check and apply.",
-    "conversation": "Conversation with the Assistant",
-    "you_wrote": "You:",
-    "assistant_wrote": "Assistant:",
-    "thinking": "Writing…",
-    "input_label": "Your question",
-    "input_placeholder": "Type your question…",
-    "context_note": "Your question is sent with the page you are on and any error shown on it.",
-    "send": "Send",
-    "stop": "Stop",
-    "new_conversation": "New conversation",
-    "contact": "Contact the EduHub team",
-    "errors": {
+      "PROPOSAL_FAILED": "Something went wrong while saving the change. Please try again later or write to {contact}.",
       "generic": "Something went wrong. Please try again later.",
       "NETWORK": "The connection was lost. Please try again.",
       "INTERRUPTED": "The reply was cut off. Please ask again."
@@ -4104,5 +4083,22 @@
       }
     },
     "looking_up": "Looking it up…"
+  },
+  "help": {
+    "title": "Manual",
+    "start": "Start",
+    "nav_label": "Contents",
+    "audience_label": "For",
+    "audience": {
+      "participant": "Participants",
+      "organizer": "Organizers",
+      "admin": "Admins"
+    },
+    "fallback_notice": "This page is not available in English yet. You are reading the German version.",
+    "org_rules_title": "Rules of your organization",
+    "org_rules_text": "Deadlines, certificate rules and other requirements are set by the organization that offers the course. They are not part of this manual.",
+    "org_rules_link": "Go to the rules and FAQ",
+    "version_release": "Manual as of release <release></release>, commit <commit></commit>",
+    "version_commit": "Manual as of commit <commit></commit> (not released yet)"
   }
 }
