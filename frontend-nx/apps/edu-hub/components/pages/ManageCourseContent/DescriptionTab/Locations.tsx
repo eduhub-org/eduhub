@@ -7,10 +7,10 @@ import { LocationOptions } from '../../../../queries/__generated__/LocationOptio
 import {
   LOCATION_OPTIONS,
   UPDATE_COURSE_LOCATION,
-  UPDATE_COURSE_SESSION_DEFAULT_ADDRESS,
   UPDATE_COURSE_DEFAULT_SESSION_ADDRESS_ID,
 } from '../../../../queries/course';
 import { LOCATION_ADDRESS_BY_LOCATION_OPTION, CREATE_LOCATION_ADDRESS } from '../../../../queries/locationAddress';
+import { UPSERT_COURSE_LOCATION_ONLINE_LINK } from '../../../../queries/onlineMeetingLink';
 import {
   LocationAddressByLocationOption,
   LocationAddressByLocationOptionVariables,
@@ -112,11 +112,11 @@ export const Locations: FC<LocationsIProps> = ({ location, onDelete }) => {
             <InputField
               variant="eduhub"
               type="link"
-              updateValueMutation={UPDATE_COURSE_SESSION_DEFAULT_ADDRESS}
+              updateValueMutation={UPSERT_COURSE_LOCATION_ONLINE_LINK}
               refetchQueries={['ManagedCourse']}
               itemId={location.id}
               placeholder={address_placeholder}
-              value={location?.defaultSessionAddress || ''}
+              value={location?.OnlineMeetingLink?.url || ''}
               className="mb-5"
               showCharacterCount={false}
             />

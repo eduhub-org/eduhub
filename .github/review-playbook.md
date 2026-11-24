@@ -90,7 +90,7 @@ findings in them.
   (#1746).
 - **Other surfaces**: ICS feeds, exports, SSR pages and MCP tools apply the same
   role checks as the UI. Online meeting links in particular reach only
-  participants, instructors and admins (#1936, §5).
+  participants, instructors, managing org admins and admins (§5).
 
 ### 2.2 Multi-step writes, races and idempotency (about 50, mostly Major)
 
@@ -406,17 +406,18 @@ changed, citing the PR.
 - `instructor_access` keeps its broad read on `User`, because instructors
   search for and add external speakers. `filter: {}` on `Course` and
   `CourseEnrollment` for instructors is accepted (#2000).
-- Online meeting links are meant for participants, instructors and admins
-  only. Today this is enforced only in the UI and the `.ics` export, not in
-  the API. `SessionAddress.address` and `CourseLocation.defaultSessionAddress`
-  hold both public venue addresses and online links, and `anonymous` can read
-  them, so any API client can fetch the links. `user` and `instructor` inherit
-  `anonymous`, so a permission tweak can't fix this. Only a data-model change
-  can: online links in their own restricted field or table (#1936). This is a
-  known gap, not intended behaviour. Don't re-flag the existing grant in
-  unrelated PRs, but do flag any new code that adds a path for online links to
-  reach non-participants. If a PR touches session addresses, point to the gap
-  in the summary.
+- Online meeting links live only in `OnlineMeetingLink` (one row per ONLINE
+  `CourseLocation` as the default, or per `SessionAddress`). It has no
+  `anonymous` rule: `user_access` reads a link with a CONFIRMED, COMPLETED or
+  REGISTERED enrollment in the course (for a program session, in any course of
+  the program), `instructor_access` as the course's instructor, and
+  `org_admin_access` with the program-type grant. `SessionAddress.address` and
+  `CourseLocation.defaultSessionAddress` stay public and hold venue text only;
+  a trigger moves a link written there into `OnlineMeetingLink`. Flag a link
+  copied back into a public column, a query that runs as `anonymous` selecting
+  `OnlineMeetingLink`, or a mail or export that sends a link to anyone but those
+  roles. UI and `.ics` gating (`canSeeOnlineLink`) is still wanted on top, but
+  is no longer the only boundary (#1936).
 - Users are anonymised (`anonymizeUser`), not hard-deleted (#1962). The
   anonymised `User` row keeps no personal data. The Matrix account is
   deactivated with `erase: true`, and `matrixUserHandle`

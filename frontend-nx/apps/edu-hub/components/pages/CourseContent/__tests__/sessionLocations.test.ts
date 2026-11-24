@@ -68,3 +68,59 @@ describe('buildCourseIcalEvents', () => {
     expect(entries[0].description).toBe('Früh');
   });
 });
+
+describe('buildCourseIcalEvents for online sessions', () => {
+  const ONLINE = {
+    __typename: 'CourseLocation',
+    id: 2,
+    locationOption: LocationOption_enum.ONLINE,
+    defaultSessionAddress: null,
+    defaultSessionAddressId: null,
+  } as Course_Course_by_pk_CourseLocations;
+
+  // The link arrives only through OnlineMeetingLink, which Hasura returns to
+  // entitled roles; the public address column never carries it.
+  const onlineSession = (sessionLink: string | null, defaultLink: string | null, address = '') =>
+    ({
+      __typename: 'Session',
+      id: 1,
+      courseId: 1,
+      title: 'Kick-off',
+      description: '',
+      startDateTime: '2026-10-01T16:00:00Z',
+      endDateTime: '2026-10-01T17:00:00Z',
+      isMandatory: true,
+      programId: null,
+      SessionSpeakers: [],
+      SessionAddresses: [
+        {
+          __typename: 'SessionAddress',
+          id: 10,
+          address,
+          locationAddressId: null,
+          locationOption: null,
+          OnlineMeetingLink: sessionLink ? { url: sessionLink } : null,
+          CourseLocation: { ...ONLINE, OnlineMeetingLink: defaultLink ? { url: defaultLink } : null },
+        },
+      ],
+    } as unknown as Course_Course_by_pk_Sessions);
+
+  const locationOf = (session: Course_Course_by_pk_Sessions, canSeeOnlineLink = true) =>
+    buildCourseIcalEvents({
+      sessions: [session],
+      courseLocations: [ONLINE],
+      addressMap: new Map(),
+      canSeeOnlineLink,
+      calendarName: 'KI-Abend',
+    })[0].location;
+
+  it("uses the session's own link, else the course location's default", () => {
+    expect(locationOf(onlineSession('https://zoom.example/j/1', 'https://zoom.example/j/2'))).toBe('https://zoom.example/j/1');
+    expect(locationOf(onlineSession(null, 'https://zoom.example/j/2'))).toBe('https://zoom.example/j/2');
+  });
+
+  it('says only ONLINE without a visible link, whatever the address column holds', () => {
+    expect(locationOf(onlineSession(null, null, 'https://stale.example'))).toBe('ONLINE');
+    expect(locationOf(onlineSession('https://zoom.example/j/1', null), false)).toBe('ONLINE');
+  });
+});

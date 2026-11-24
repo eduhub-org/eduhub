@@ -20,6 +20,10 @@ export const PROGRAM_SESSIONS = gql`
         address
         locationOption
         locationAddressId
+        OnlineMeetingLink {
+          id
+          url
+        }
       }
     }
   }
@@ -57,11 +61,5 @@ export const UPDATE_PROGRAM_SESSION_LOCATION_OPTION = gql`
   }
 `;
 
-export const UPDATE_PROGRAM_SESSION_ONLINE_LINK = gql`
-  mutation UpdateProgramSessionOnlineLink($itemId: Int!, $text: String!) {
-    update_SessionAddress_by_pk(pk_columns: { id: $itemId }, _set: { address: $text }) {
-      id
-      address
-    }
-  }
-`;
+// The online link itself is written with UPSERT_SESSION_ADDRESS_ONLINE_LINK
+// (queries/onlineMeetingLink.ts); the address column is public.

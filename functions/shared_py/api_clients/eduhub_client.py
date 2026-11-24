@@ -119,11 +119,20 @@ class EduHubClient:
                     CourseLocations {
                         locationOption
                         defaultSessionAddress
+                        OnlineMeetingLink {
+                            url
+                        }
                     }
                 }
                 SessionAddresses {
                     address
                     locationOption
+                    OnlineMeetingLink {
+                        url
+                    }
+                    CourseLocation {
+                        locationOption
+                    }
                     LocationAddress {
                         address
                     }

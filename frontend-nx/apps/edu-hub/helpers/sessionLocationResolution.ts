@@ -7,11 +7,15 @@
  * whatever its generated type is called.
  */
 
+/** A row of the restricted OnlineMeetingLink table; absent when the caller may not see it. */
+type ResolvableOnlineMeetingLink = { url: string } | null;
+
 type ResolvableCourseLocation = {
   id: number;
   locationOption: string | null;
   defaultSessionAddress?: string | null;
   defaultSessionAddressId?: number | null;
+  OnlineMeetingLink?: ResolvableOnlineMeetingLink;
 };
 
 export type ResolvableSession = {
@@ -21,9 +25,25 @@ export type ResolvableSession = {
     address: string | null;
     locationAddressId?: number | null;
     locationOption?: string | null;
+    OnlineMeetingLink?: ResolvableOnlineMeetingLink;
     CourseLocation?: ResolvableCourseLocation | null;
   }[];
 };
+
+/**
+ * The meeting link of an online session address: its own link, else its course
+ * location's default. Empty when the caller may not see the link: the links
+ * live in OnlineMeetingLink, never in the public address columns.
+ */
+export const onlineMeetingUrl = (
+  sessionAddress:
+    | { OnlineMeetingLink?: ResolvableOnlineMeetingLink; CourseLocation?: ResolvableCourseLocation | null }
+    | null
+    | undefined
+): string =>
+  sessionAddress?.OnlineMeetingLink?.url?.trim() ||
+  sessionAddress?.CourseLocation?.OnlineMeetingLink?.url?.trim() ||
+  '';
 
 /** One location of one session, with its address already resolved for display. */
 export interface ResolvedLocation {
@@ -98,15 +118,17 @@ export const resolveSessionLocations = (
 
 /**
  * Program sessions have no CourseLocation: each SessionAddress carries its own
- * location option and either a LocationAddress or a free-text address (the
- * meeting link for online sessions).
+ * location option and either a LocationAddress or a free-text address; online
+ * ones have their meeting link instead.
  */
 const resolveProgramSessionLocations = (session: ResolvableSession, addressMap: AddressMap): ResolvedLocation[] =>
   session.SessionAddresses.filter((sa) => sa.locationOption).map((sa) => ({
     key: `sa-${sa.id}`,
     locationOption: sa.locationOption ?? null,
     displayAddress:
-      sa.locationAddressId && addressMap.has(sa.locationAddressId)
+      sa.locationOption === 'ONLINE'
+        ? onlineMeetingUrl(sa)
+        : sa.locationAddressId && addressMap.has(sa.locationAddressId)
         ? addressMap.get(sa.locationAddressId)!.address
         : sa.address ?? '',
     label: labelOf(addressMap, sa.locationAddressId),
@@ -126,7 +148,9 @@ const resolveCourseSessionLocations = (
     const effectiveAddressId = sessionAddress.locationAddressId || CourseLocation?.defaultSessionAddressId;
 
     const displayAddress =
-      effectiveAddressId && addressMap.has(effectiveAddressId)
+      CourseLocation?.locationOption === 'ONLINE'
+        ? onlineMeetingUrl(sessionAddress)
+        : effectiveAddressId && addressMap.has(effectiveAddressId)
         ? addressMap.get(effectiveAddressId)!.address
         : address && address.trim() !== ''
         ? address

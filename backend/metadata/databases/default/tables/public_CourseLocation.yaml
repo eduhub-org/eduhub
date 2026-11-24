@@ -17,6 +17,13 @@ object_relationships:
         remote_table:
           name: LocationOption
           schema: public
+  - name: OnlineMeetingLink
+    using:
+      foreign_key_constraint_on:
+        column: courseLocationId
+        table:
+          name: OnlineMeetingLink
+          schema: public
 insert_permissions:
   - role: instructor_access
     permission:

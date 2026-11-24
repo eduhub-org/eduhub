@@ -225,20 +225,46 @@ def check_attendance(arguments):
 # Helper functions
 
 
+def _meeting_link(row):
+    return ((row.get("OnlineMeetingLink") or {}).get("url") or "").strip() or None
+
+
 def session_locations(session):
     """Where a session takes place, as {locationOption, defaultSessionAddress}.
 
-    Course sessions use their course's locations. Program sessions have no
-    course, so each SessionAddress carries its own location option and the
-    address (the meeting link for ONLINE) directly.
+    Course sessions use their course's locations, with an ONLINE session's own
+    link taking precedence over the course default. Program sessions have no
+    course, so each SessionAddress carries its own location option and address
+    directly. For ONLINE the address is the meeting link, which lives in
+    OnlineMeetingLink rather than in the public address columns.
     """
     if session.get("programId") is None:
-        return session["Course"]["CourseLocations"]
+        # A course session's own link wins over its course location's default,
+        # the same order the reminder mail and the course page use.
+        own_link = next(
+            (
+                _meeting_link(sa)
+                for sa in session.get("SessionAddresses", [])
+                if (sa.get("CourseLocation") or {}).get("locationOption") == "ONLINE"
+                and _meeting_link(sa)
+            ),
+            None,
+        )
+        return [
+            {
+                "locationOption": cl["locationOption"],
+                "defaultSessionAddress": (own_link or _meeting_link(cl))
+                if cl["locationOption"] == "ONLINE"
+                else cl.get("defaultSessionAddress"),
+            }
+            for cl in session["Course"]["CourseLocations"]
+        ]
     return [
         {
             "locationOption": sa["locationOption"],
-            "defaultSessionAddress": (sa.get("LocationAddress") or {}).get("address")
-            or sa.get("address"),
+            "defaultSessionAddress": _meeting_link(sa)
+            if sa["locationOption"] == "ONLINE"
+            else (sa.get("LocationAddress") or {}).get("address") or sa.get("address"),
         }
         for sa in session.get("SessionAddresses", [])
         if sa.get("locationOption")
