@@ -232,16 +232,28 @@ def _meeting_link(row):
 def session_locations(session):
     """Where a session takes place, as {locationOption, defaultSessionAddress}.
 
-    Course sessions use their course's locations. Program sessions have no
+    Course sessions use their course's locations, with an ONLINE session's own
+    link taking precedence over the course default. Program sessions have no
     course, so each SessionAddress carries its own location option and address
     directly. For ONLINE the address is the meeting link, which lives in
     OnlineMeetingLink rather than in the public address columns.
     """
     if session.get("programId") is None:
+        # A course session's own link wins over its course location's default,
+        # the same order the reminder mail and the course page use.
+        own_link = next(
+            (
+                _meeting_link(sa)
+                for sa in session.get("SessionAddresses", [])
+                if (sa.get("CourseLocation") or {}).get("locationOption") == "ONLINE"
+                and _meeting_link(sa)
+            ),
+            None,
+        )
         return [
             {
                 "locationOption": cl["locationOption"],
-                "defaultSessionAddress": _meeting_link(cl)
+                "defaultSessionAddress": (own_link or _meeting_link(cl))
                 if cl["locationOption"] == "ONLINE"
                 else cl.get("defaultSessionAddress"),
             }

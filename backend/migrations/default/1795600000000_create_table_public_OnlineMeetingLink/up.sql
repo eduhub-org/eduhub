@@ -68,12 +68,15 @@ ALTER TABLE "public"."SessionAddress" ENABLE TRIGGER "sync_SessionAddress_to_pub
 
 -- Keep links out of the public columns from now on. Whoever still writes a link
 -- into them (an older client, the MCP course tools, a copy) has it moved into
--- OnlineMeetingLink in the same transaction. Text on a location that only now
--- switches to ONLINE is a legacy street address, not a link, and is dropped.
+-- OnlineMeetingLink in the same transaction. Text a location carries over
+-- unchanged while it switches to ONLINE is a legacy street address, not a
+-- link, and is dropped; text written in that same update is a link and moves.
 CREATE OR REPLACE FUNCTION "public"."move_CourseLocation_online_address"()
 RETURNS TRIGGER AS $$
 BEGIN
-  IF TG_OP = 'INSERT' OR OLD."locationOption" IS NOT DISTINCT FROM 'ONLINE' THEN
+  IF TG_OP = 'INSERT'
+     OR OLD."locationOption" IS NOT DISTINCT FROM 'ONLINE'
+     OR NEW."defaultSessionAddress" IS DISTINCT FROM OLD."defaultSessionAddress" THEN
     INSERT INTO "public"."OnlineMeetingLink" ("courseLocationId", "url")
     VALUES (NEW."id", btrim(NEW."defaultSessionAddress"))
     ON CONFLICT ("courseLocationId") DO UPDATE SET "url" = EXCLUDED."url";
@@ -101,10 +104,12 @@ BEGIN
     RETURN NULL;
   END IF;
 
-  -- A program session address switching to ONLINE keeps no legacy text.
+  -- A program session address switching to ONLINE keeps no legacy text,
+  -- unless the same update wrote new text: that is the link.
   IF TG_OP = 'INSERT'
      OR NEW."courseLocationId" IS NOT NULL
-     OR OLD."locationOption" IS NOT DISTINCT FROM 'ONLINE' THEN
+     OR OLD."locationOption" IS NOT DISTINCT FROM 'ONLINE'
+     OR NEW."address" IS DISTINCT FROM OLD."address" THEN
     INSERT INTO "public"."OnlineMeetingLink" ("sessionAddressId", "url")
     VALUES (NEW."id", btrim(NEW."address"))
     ON CONFLICT ("sessionAddressId") DO UPDATE SET "url" = EXCLUDED."url";

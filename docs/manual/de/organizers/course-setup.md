@@ -26,7 +26,7 @@ Auf dem Reiter **Beschreibung** der Verwaltungsseite füllst Du aus:
 - **Wochentag**, **Startzeit** und **Endzeit**, wenn der Kurs regelmäßig stattfindet.
 - **Sprache** des Kurses.
 - **Max. Teilnehmendenanzahl**. Leer lassen heißt: keine Begrenzung. Ist der Kurs voll, können sich Interessierte nur noch auf die Warteliste setzen.
-- **Veranstaltungsort**: Füge mit **Ort hinzufügen** pro Ort einen **Link oder Adresse** hinzu, zum Beispiel ein Online-Meeting oder einen Raum. Den Link zu einem Online-Meeting sehen nur bestätigte Teilnehmende, die Kursleitung, Org-Admins und Admins; alle anderen sehen nur „Online“.
+- **Veranstaltungsort**: Füge mit **Ort hinzufügen** pro Ort einen **Link oder Adresse** hinzu, zum Beispiel ein Online-Meeting oder einen Raum. Den Link zu einem Online-Meeting sehen nur die Teilnehmenden des Kurses (bestätigt, angemeldet oder abgeschlossen), die Kursleitung, Org-Admins mit Berechtigung für das Programm und Admins; alle anderen sehen nur „Online“.
 
 **Lernziele** werden nur bei Kursen mit Leistungsnachweis angezeigt.
 

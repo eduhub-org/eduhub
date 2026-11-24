@@ -774,6 +774,30 @@ class TestCheckAttendanceOrchestration:
 
 
 class TestProgramSessions:
+    def test_course_session_prefers_its_own_online_link(self):
+        from pythonFunctions.check_attendance import session_locations
+
+        course = {
+            "CourseLocations": [
+                {"locationOption": "ONLINE", "OnlineMeetingLink": {"url": "https://zoom.us/j/course"}},
+                {"locationOption": "KIEL", "defaultSessionAddress": None},
+            ]
+        }
+        own = {
+            "locationOption": None,
+            "address": "",
+            "OnlineMeetingLink": {"url": "https://zoom.us/j/session"},
+            "CourseLocation": {"locationOption": "ONLINE"},
+        }
+        without_own = {**own, "OnlineMeetingLink": None}
+
+        with_link = session_locations({"programId": None, "Course": course, "SessionAddresses": [own]})
+        fallback = session_locations({"programId": None, "Course": course, "SessionAddresses": [without_own]})
+
+        assert with_link[0] == {"locationOption": "ONLINE", "defaultSessionAddress": "https://zoom.us/j/session"}
+        assert fallback[0] == {"locationOption": "ONLINE", "defaultSessionAddress": "https://zoom.us/j/course"}
+        assert with_link[1] == {"locationOption": "KIEL", "defaultSessionAddress": None}
+
     def test_session_locations_come_from_session_addresses(self):
         from pythonFunctions.check_attendance import session_locations
 

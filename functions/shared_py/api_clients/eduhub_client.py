@@ -130,6 +130,9 @@ class EduHubClient:
                     OnlineMeetingLink {
                         url
                     }
+                    CourseLocation {
+                        locationOption
+                    }
                     LocationAddress {
                         address
                     }
