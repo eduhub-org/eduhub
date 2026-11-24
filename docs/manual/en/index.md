@@ -15,6 +15,7 @@ This manual explains how the platform works. It does not contain the rules of th
 - [Registering and applying](participants/registration.md): direct registration, applications, paid courses and registering as a guest.
 - [Invitations and the waitlist](participants/invitations-and-waitlist.md): what happens when a course is full, how to accept or decline an invitation, and how to cancel.
 - [Attendance and certificates](participants/attendance-and-certificates.md): how your attendance is recorded and where you get your certificates.
+- [The course chat](participants/course-chat.md): connecting to the chat on the course page, writing in it and opening it in the Element app.
 
 ## For Organizers
 
@@ -25,6 +26,7 @@ Organizers are the instructors of a course and the Org Admins of the organizatio
 - [Handling registrations](organizers/registrations.md): applications, invitations, the waitlist and participants.
 - [Attendance and certificates](organizers/attendance-and-certificates.md): checking attendance and getting certificates issued.
 - [Setting up courses with the Assistant](organizers/assistant.md): letting the Assistant draft texts, settings and Sessions for you.
+- [Moderating the course chat](organizers/course-chat.md): pinning and deleting messages, switching the chat on for course pages.
 
 ## The Assistant
 
