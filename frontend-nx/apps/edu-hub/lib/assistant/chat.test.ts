@@ -71,6 +71,21 @@ describe('tool calls', () => {
     expect(summary.outcome).toBe('ok');
   });
 
+  it("sends a call's extra_content back unchanged, as Gemini requires for its thought_signature", async () => {
+    const signature = { google: { thought_signature: 'sig==' } };
+    const { provider, summary } = await run((_r, round) =>
+      round === 0
+        ? { toolCalls: [{ ...call('get_my_attendance', {}, 'abc'), extraContent: signature }, call('get_my_registrations', {})] }
+        : { text: 'ok' }
+    );
+    const echoed = provider.requests[1].messages.find((m) => m.role === 'assistant');
+    expect(echoed?.role === 'assistant' && echoed.tool_calls).toEqual([
+      { id: 'abc', type: 'function', function: { name: 'get_my_attendance', arguments: '{}' }, extra_content: signature },
+      { id: 'call_get_my_registrations', type: 'function', function: { name: 'get_my_registrations', arguments: '{}' } },
+    ]);
+    expect(summary.outcome).toBe('ok');
+  });
+
   it('passes tool results back with the call id', async () => {
     const { provider } = await run((_r, round) =>
       round === 0 ? { toolCalls: [call('get_my_attendance', {}, 'abc')] } : { text: 'ok' }

@@ -253,6 +253,9 @@ def read_stream(resp, start):
                     fn = tc.get("function") or {}
                     slot["name"] += fn.get("name") or ""
                     slot["arguments"] += fn.get("arguments") or ""
+                    # Gemini's thought_signature; it must be sent back with the call.
+                    if "extra_content" in tc:
+                        slot["extra_content"] = tc["extra_content"]
                     first_content = first_content or now
                     got = True
                 if got:
@@ -390,7 +393,8 @@ def run_case(target, case, tools, system_prompt):
                 "content": out["content"] or None,
                 "tool_calls": [
                     {"id": c["id"] or f"call_{i}", "type": "function",
-                     "function": {"name": c["name"], "arguments": c["arguments"]}}
+                     "function": {"name": c["name"], "arguments": c["arguments"]},
+                     **({"extra_content": c["extra_content"]} if "extra_content" in c else {})}
                     for i, c in enumerate(out["tool_calls"])
                 ],
             })

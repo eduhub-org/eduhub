@@ -91,6 +91,24 @@ describe('OpenAI-compatible provider', () => {
     expect(JSON.stringify(sent[0].body)).not.toMatch(/grounding|google_search|googleSearch/i);
   });
 
+  it("keeps a tool call's extra_content (Gemini's thought_signature) and nothing else", async () => {
+    const signature = { google: { thought_signature: 'sig==' } };
+    const fetchImpl = (async () =>
+      sse([
+        { choices: [{ delta: { tool_calls: [{ index: 0, id: 'c1', extra_content: signature, function: { name: 'get_weather', arguments: '{}' } }] } }] },
+        { choices: [{ delta: { tool_calls: [{ index: 1, id: 'c2', function: { name: 'get_weather', arguments: '{}' } }] } }] },
+        '[DONE]',
+      ])) as unknown as typeof fetch;
+    const provider = createOpenAiCompatibleProvider({ baseUrl: VERTEX_EU, model: 'm', extraBody: {} }, staticApiKey('tok'), fetchImpl);
+
+    const turn = await provider.complete({ messages: [{ role: 'user', content: 'hi' }], tools: [], onText: () => undefined });
+
+    expect(turn.toolCalls).toEqual([
+      { id: 'c1', name: 'get_weather', arguments: '{}', extraContent: signature },
+      { id: 'c2', name: 'get_weather', arguments: '{}' },
+    ]);
+  });
+
   it('refreshes an expired token once on 401', async () => {
     let calls = 0;
     const keys = ['old', 'new'];

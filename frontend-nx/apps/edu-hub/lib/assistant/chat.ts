@@ -77,6 +77,7 @@ export const runChat = async ({
           id: c.id,
           type: 'function' as const,
           function: { name: c.name, arguments: c.arguments },
+          ...(c.extraContent !== undefined ? { extra_content: c.extraContent } : {}),
         })),
       });
       for (const call of turn.toolCalls) {
