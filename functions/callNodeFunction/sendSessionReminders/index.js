@@ -72,8 +72,8 @@ function formatDuration(start, end) {
 
 /**
  * Where the session takes place, as display strings: a linked venue as
- * "Label (Address)", else the free-text address, which for online sessions is
- * the meeting link. A session without its own venue or address uses its course
+ * "Label (Address)", else the free-text address; online sessions show their
+ * meeting link. A session without its own venue or address uses its course
  * location's default, as the course page does. Online without a link yet just
  * says "Online".
  */
@@ -89,9 +89,13 @@ export function resolveSessionLocations(sessionAddresses = []) {
     }
     // A venue with a name but no address still says where (frontend does too).
     if (label) return label;
-    const address = sa.address?.trim() || courseLocation?.defaultSessionAddress?.trim();
+    const isOnline = (courseLocation?.locationOption ?? sa.locationOption) === 'ONLINE';
+    // Meeting links live in OnlineMeetingLink, not in the public address columns.
+    const address = isOnline
+      ? sa.OnlineMeetingLink?.url?.trim() || courseLocation?.OnlineMeetingLink?.url?.trim()
+      : sa.address?.trim() || courseLocation?.defaultSessionAddress?.trim();
     if (address) return address;
-    return (courseLocation?.locationOption ?? sa.locationOption) === 'ONLINE' ? 'Online' : '';
+    return isOnline ? 'Online' : '';
   });
   return [...new Set(locations.filter(Boolean))];
 }
@@ -121,9 +125,15 @@ const GET_REMINDER_CANDIDATES = gql`
         SessionAddresses(order_by: { id: asc }) {
           address
           locationOption
+          OnlineMeetingLink {
+            url
+          }
           CourseLocation {
             locationOption
             defaultSessionAddress
+            OnlineMeetingLink {
+              url
+            }
             DefaultSessionAddress {
               shortLabel
               address

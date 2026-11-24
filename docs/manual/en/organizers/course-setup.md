@@ -26,7 +26,7 @@ On the **Description** tab of the course's manage page you fill in:
 - **Weekday**, **Start Time** and **End Time**, if the course takes place regularly.
 - **Language** of the course.
 - **Maximum number of participants**. Leave it empty for no limit. When the course is full, people can only join the waitlist.
-- **Location**: add a **Link or Address** per location with **Add location**, for example an online meeting or a room.
+- **Location**: add a **Link or Address** per location with **Add location**, for example an online meeting or a room. An online meeting link is shown only to confirmed participants, the course's instructors, Org Admins and Admins; everyone else sees just "Online".
 
 **Learning Goals** are only shown for courses with an Achievement Certificate.
 

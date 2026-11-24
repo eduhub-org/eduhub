@@ -51,6 +51,45 @@ describe('createHasuraCourseStore', () => {
     await expect(store.updateCourse(7, '2026-11-01T09:00:00+00:00', { tagline: 'x' })).resolves.toBe(false);
     expect(calls[0].body.variables).toEqual({ id: 7, updatedAt: '2026-11-01T09:00:00+00:00', set: { tagline: 'x' } });
   });
+  it('reports the online meeting link as the address of the online location', async () => {
+    const course = {
+      id: 7,
+      updated_at: '2026-11-01T09:00:00+00:00',
+      programId: 1,
+      Program: { type: 'COURSES' },
+      CourseEnrollments_aggregate: { aggregate: { count: 0 } },
+      CourseLocations: [
+        { id: 70, locationOption: 'ONLINE', defaultSessionAddress: null, defaultSessionAddressId: null, OnlineMeetingLink: { url: 'https://zoom.example/j/1' } },
+        { id: 71, locationOption: 'KIEL', defaultSessionAddress: 'Wall 47', defaultSessionAddressId: 1, OnlineMeetingLink: null },
+      ],
+      Sessions: [
+        {
+          id: 1,
+          title: 'Kick-off',
+          description: null,
+          startDateTime: '2026-11-02T09:00:00+00:00',
+          endDateTime: '2026-11-02T10:00:00+00:00',
+          updated_at: null,
+          SessionAddresses: [
+            { courseLocationId: 70, address: '', locationAddressId: null, OnlineMeetingLink: { url: 'https://zoom.example/j/2' } },
+            { courseLocationId: 71, address: 'Wall 47', locationAddressId: 1, OnlineMeetingLink: null },
+          ],
+        },
+      ],
+    };
+    const { fetchImpl } = fakeFetch([{ data: { Course: [course] } }]);
+    const store = createHasuraCourseStore({ url: 'http://hasura', token: TOKEN, role: 'instructor', fetchImpl });
+    const snapshot = await store.getManagedCourse({ userId: 'user-1', role: 'instructor' }, 7);
+
+    expect(snapshot?.courseLocations).toEqual([
+      { id: 70, locationOption: 'ONLINE', defaultSessionAddress: 'https://zoom.example/j/1', defaultSessionAddressId: null },
+      { id: 71, locationOption: 'KIEL', defaultSessionAddress: 'Wall 47', defaultSessionAddressId: 1 },
+    ]);
+    expect(snapshot?.sessions[0].locations).toEqual([
+      { courseLocationId: 70, address: 'https://zoom.example/j/2', locationAddressId: null },
+      { courseLocationId: 71, address: 'Wall 47', locationAddressId: 1 },
+    ]);
+  });
 });
 
 describe('pickRole', () => {

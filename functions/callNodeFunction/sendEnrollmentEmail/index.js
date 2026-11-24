@@ -91,8 +91,16 @@ export default async function sendEnrollmentEmail(req, logger) {
               endDateTime
               SessionAddresses(order_by: { id: asc }) {
                 address
+                # The meeting link goes only into the calendar of the
+                # confirmation mails (CALENDAR_TEMPLATE_TYPES), never into text.
+                OnlineMeetingLink {
+                  url
+                }
                 CourseLocation {
                   locationOption
+                  OnlineMeetingLink {
+                    url
+                  }
                 }
                 LocationAddress {
                   shortLabel

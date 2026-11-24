@@ -67,6 +67,7 @@
 - "!include public_MailTemplateType.yaml"
 - "!include public_MotivationRating.yaml"
 - "!include public_OnboardingText.yaml"
+- "!include public_OnlineMeetingLink.yaml"
 - "!include public_Organization.yaml"
 - "!include public_OrganizationAdmin.yaml"
 - "!include public_OrganizationAdminClaimVerification.yaml"

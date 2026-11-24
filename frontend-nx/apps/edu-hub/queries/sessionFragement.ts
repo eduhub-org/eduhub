@@ -1,5 +1,6 @@
 import { gql } from '@apollo/client';
 import { USER_FRAGMENT } from './userFragment';
+import { SESSION_ONLINE_LINKS_FRAGMENT } from './onlineMeetingLink';
 
 export const SESSION_FRAGMENT = gql`
   ${USER_FRAGMENT}
@@ -38,12 +39,14 @@ export const SESSION_FRAGMENT = gql`
 `;
 
 // Instructor/admin-only fields. The `attendanceData` column is restricted to
-// the `instructor_access` Hasura role, so it must NOT be embedded in fragments
+// the `instructor_access` Hasura role (the meeting links to logged-in roles), so it must NOT be embedded in fragments
 // consumed by anonymous or user-role queries (see backend Session permissions).
 export const SESSION_INSTRUCTOR_FRAGMENT = gql`
+  ${SESSION_ONLINE_LINKS_FRAGMENT}
   fragment SessionInstructorFragment on Session {
     id
     attendanceData
+    ...SessionOnlineLinksFragment
   }
 `;
 
