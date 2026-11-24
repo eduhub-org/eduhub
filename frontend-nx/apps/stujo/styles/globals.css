@@ -72,6 +72,10 @@
   --eduhub-badge: #e7b24c;
   --eduhub-badge-contrast: #4a3500;
 
+  /* Assistant Proposed Change diff (shared edu-hub component). */
+  --eduhub-diff-removed: #fbe3e3;
+  --eduhub-diff-added: #ddf4dc;
+
   --eduhub-status-confirmed: var(--stujo-secondary);
   --eduhub-status-invited: #f2991d;
   --eduhub-status-current: var(--stujo-secondary);

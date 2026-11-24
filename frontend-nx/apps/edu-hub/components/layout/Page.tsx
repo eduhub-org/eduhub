@@ -12,6 +12,7 @@ import { Header } from './Header';
 import { ImpersonationBanner } from './ImpersonationBanner';
 import { ParticipantPreviewNotice } from './ParticipantPreviewNotice';
 import { PrivacyUpdateNotice } from './PrivacyUpdateNotice';
+import { AssistantWidget } from '../assistant/AssistantWidget';
 import { useAppSettings } from '../../contexts/AppSettingsContext';
 
 type PageProps = {
@@ -107,6 +108,7 @@ export const Page: FC<PageProps> = ({ children, className }) => {
         <main>{children}</main>
         <Footer />
       </div>
+      <AssistantWidget />
     </>
   );
 };
