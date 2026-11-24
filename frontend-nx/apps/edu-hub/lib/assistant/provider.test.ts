@@ -3,7 +3,7 @@
  */
 import { isGlobalVertexEndpoint, readAssistantConfig } from './config';
 import { metadataServerToken, staticApiKey } from './credentials';
-import { createFakeProvider, createOpenAiCompatibleProvider, ProviderError } from './provider';
+import { createFakeProvider, createOpenAiCompatibleProvider, ProviderError, readUsage } from './provider';
 
 const sse = (chunks: unknown[]) =>
   new Response(chunks.map((c) => `data: ${typeof c === 'string' ? c : JSON.stringify(c)}\n\n`).join(''), {
@@ -132,6 +132,16 @@ describe('OpenAI-compatible provider', () => {
       { id: 'A', name: 'save_text', arguments: '{"text":"Hallo"}', extraContent: signature },
       { id: 'B', name: 'get_weather', arguments: '{"city":"Kiel"}' },
     ]);
+  });
+
+  it("counts Gemini's reasoning tokens as output, which completion_tokens leaves out", () => {
+    // As reported by Vertex for gemini-3.8-flash: 13 + 71 + 415 reasoning = 499.
+    expect(
+      readUsage({ prompt_tokens: 13, completion_tokens: 71, total_tokens: 499 })
+    ).toEqual({ inputTokens: 13, outputTokens: 486 });
+    // OpenAI already counts reasoning in completion_tokens: nothing is added twice.
+    expect(readUsage({ prompt_tokens: 10, completion_tokens: 50, total_tokens: 60 })).toEqual({ inputTokens: 10, outputTokens: 50 });
+    expect(readUsage({ prompt_tokens: 10, completion_tokens: 50 })).toEqual({ inputTokens: 10, outputTokens: 50 });
   });
 
   it('refreshes an expired token once on 401', async () => {

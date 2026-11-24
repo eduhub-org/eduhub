@@ -394,7 +394,11 @@ def run_case(target, case, tools, system_prompt):
                 rec["ttft"], rec["ttfc"] = out["ttft"], out["ttfc"]
             if out["usage"]:
                 rec["prompt_tokens"] += out["usage"].get("prompt_tokens", 0)
-                rec["completion_tokens"] += out["usage"].get("completion_tokens", 0)
+                # Billed output includes reasoning, which Gemini leaves out of completion_tokens
+                # but counts in total_tokens (OpenAI counts it in both).
+                u = out["usage"]
+                from_total = u["total_tokens"] - u.get("prompt_tokens", 0) if "total_tokens" in u else 0
+                rec["completion_tokens"] += max(u.get("completion_tokens", 0), from_total)
             else:
                 rec["usage_reported"] = False
             if "<tool_call>" in out["content"]:
