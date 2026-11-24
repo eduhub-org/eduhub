@@ -271,7 +271,7 @@ describe('AssistantWidget', () => {
       expect(mockDecideProposal).toHaveBeenCalledTimes(1);
       // The course page behind the panel reloads its data to show the saved change.
       expect(mockRefetchQueries).toHaveBeenCalledWith({ include: 'active' });
-      expect(mockDecideProposal).toHaveBeenCalledWith('signed-proposal-1', 'apply', 'instructor');
+      expect(mockDecideProposal).toHaveBeenCalledWith('signed-proposal-1', 'apply', 'instructor', 'en');
       expect(within(card).getByText('Applied and saved.')).toBeInTheDocument();
       expect(within(card).queryByText(/Not saved yet/)).not.toBeInTheDocument();
       expect(within(card).queryByRole('button', { name: 'Apply' })).not.toBeInTheDocument();
@@ -349,7 +349,7 @@ describe('AssistantWidget', () => {
         fireEvent.click(within(card).getByRole('button', { name: 'Discard' }));
       });
       expect(within(card).getByText('Discarded. Nothing was saved.')).toBeInTheDocument();
-      expect(mockDecideProposal).toHaveBeenCalledWith('signed-proposal-1', 'discard', 'instructor');
+      expect(mockDecideProposal).toHaveBeenCalledWith('signed-proposal-1', 'discard', 'instructor', 'en');
 
       replyWith([{ type: 'done' }]);
       await ask('Thanks');

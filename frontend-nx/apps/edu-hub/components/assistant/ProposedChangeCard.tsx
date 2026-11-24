@@ -134,7 +134,7 @@ export const ProposedChangeCard: FC<Props> = ({ state, onApply, onDiscard }) => 
         {status === 'DISCARDED' && <p className="mt-2 text-label-secondary">{t('discarded')}</p>}
         {error && (
           <p className="mt-2 text-error" role="status">
-            {/* The MCP server's messages are English, so translated codes come first. */}
+            {/* The widget's own texts fit the card best; the server's localized message covers the other codes. */}
             {t.has(`errors.${error.code}`) ? t(`errors.${error.code}`) : error.message || t('errors.generic')}
           </p>
         )}

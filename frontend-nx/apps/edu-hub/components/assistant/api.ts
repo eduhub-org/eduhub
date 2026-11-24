@@ -173,13 +173,14 @@ export type ProposalOutcome = { ok: true; result: Record<string, unknown> } | { 
 export const decideProposal = async (
   proposedChangeId: string,
   action: ProposalDecision,
-  role: string
+  role: string,
+  locale: string
 ): Promise<ProposalOutcome> => {
   try {
     const response = await fetch(`${ASSISTANT_API_BASE}/proposals`, {
       method: 'POST',
       headers: headers(role),
-      body: JSON.stringify({ proposedChangeId, action }),
+      body: JSON.stringify({ proposedChangeId, action, locale }),
     });
     if (!response.ok) return { ok: false, error: await jsonError(response) };
     return { ok: true, result: await response.json() };

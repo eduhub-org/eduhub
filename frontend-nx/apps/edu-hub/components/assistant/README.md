@@ -34,5 +34,6 @@ The backend's `lib/assistant/README.md` (PR #2200) is the spec. In short:
 
 Error texts: the chat endpoint's `message` is already localized and shown as is; the texts for its
 codes live under `assistant.errors.<CODE>` on the backend branch. This branch only adds
-`assistant.errors.generic`, `NETWORK` and `INTERRUPTED` (a stream that closed without `done`), all client-side. Apply errors come from the MCP server in
-English, so the widget translates their codes under `assistant.proposal.errors`.
+`assistant.errors.generic`, `NETWORK` and `INTERRUPTED` (a stream that closed without `done`), all client-side. Apply errors: the widget sends
+its `locale`, so the server's `message` is localized too. The card prefers its own texts under
+`assistant.proposal.errors.<CODE>` and shows the server's message for any other code.

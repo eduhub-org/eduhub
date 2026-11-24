@@ -232,7 +232,7 @@ export const useAssistantConversation = ({
       const state = messages.flatMap((m) => m.proposals).find((p) => p.key === key);
       if (!state || state.status === 'APPLIED' || state.status === 'DISCARDED') return;
 
-      const request = { action, outcome: decideProposal(state.proposal.proposedChangeId, action, role) };
+      const request = { action, outcome: decideProposal(state.proposal.proposedChangeId, action, role, locale) };
       pending.set(key, request);
       updateProposal(key, (p) => ({ ...p, busy: true, error: undefined }));
       const outcome = await request.outcome;
@@ -241,7 +241,7 @@ export const useAssistantConversation = ({
       if (outcome.ok && action === 'apply') apollo.refetchQueries({ include: 'active' }).catch(() => undefined);
       updateProposal(key, (p) => settle(p, action, outcome));
     },
-    [messages, role, apollo, updateProposal]
+    [messages, role, locale, apollo, updateProposal]
   );
 
   const reset = useCallback(() => {
