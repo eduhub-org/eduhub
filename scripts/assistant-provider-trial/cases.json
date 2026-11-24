@@ -7,7 +7,8 @@
       "category": "platform",
       "role": "user",
       "page": {
-        "path": "/"
+        "path": "/",
+        "route": "/"
       },
       "messages": [
         {
@@ -26,6 +27,7 @@
       "role": "user",
       "page": {
         "path": "/course/4711",
+        "route": "/course/[courseId]",
         "courseId": 4711
       },
       "messages": [
@@ -44,7 +46,8 @@
       "category": "platform",
       "role": "user",
       "page": {
-        "path": "/profile"
+        "path": "/profile",
+        "route": "/profile"
       },
       "messages": [
         {
@@ -62,7 +65,8 @@
       "category": "platform",
       "role": "user",
       "page": {
-        "path": "/"
+        "path": "/",
+        "route": "/"
       },
       "messages": [
         {
@@ -81,6 +85,7 @@
       "role": "user",
       "page": {
         "path": "/course/4711",
+        "route": "/course/[courseId]",
         "courseId": 4711,
         "error": "Die Bewerbungsfrist für diesen Kurs ist abgelaufen."
       },
@@ -106,6 +111,7 @@
       "role": "user",
       "page": {
         "path": "/course/4733",
+        "route": "/course/[courseId]",
         "courseId": 4733,
         "error": "Upload failed: file is larger than 10 MB."
       },
@@ -128,7 +134,8 @@
       "category": "catalogue",
       "role": "user",
       "page": {
-        "path": "/"
+        "path": "/",
+        "route": "/"
       },
       "messages": [
         {
@@ -150,7 +157,8 @@
       "category": "catalogue",
       "role": "user",
       "page": {
-        "path": "/"
+        "path": "/",
+        "route": "/"
       },
       "messages": [
         {
@@ -172,7 +180,8 @@
       "category": "my_data",
       "role": "user",
       "page": {
-        "path": "/"
+        "path": "/",
+        "route": "/"
       },
       "messages": [
         {
@@ -191,6 +200,7 @@
       "role": "user",
       "page": {
         "path": "/course/4711",
+        "route": "/course/[courseId]",
         "courseId": 4711
       },
       "messages": [
@@ -210,6 +220,7 @@
       "role": "user",
       "page": {
         "path": "/course/4711",
+        "route": "/course/[courseId]",
         "courseId": 4711
       },
       "messages": [
@@ -231,7 +242,8 @@
       "category": "my_data",
       "role": "user",
       "page": {
-        "path": "/profile"
+        "path": "/profile",
+        "route": "/profile"
       },
       "messages": [
         {
@@ -250,6 +262,7 @@
       "role": "user",
       "page": {
         "path": "/course/4733",
+        "route": "/course/[courseId]",
         "courseId": 4733
       },
       "messages": [
@@ -269,6 +282,7 @@
       "role": "user",
       "page": {
         "path": "/course/4711",
+        "route": "/course/[courseId]",
         "courseId": 4711
       },
       "messages": [
@@ -290,7 +304,8 @@
       "category": "my_data",
       "role": "user",
       "page": {
-        "path": "/"
+        "path": "/",
+        "route": "/"
       },
       "messages": [
         {
@@ -317,6 +332,7 @@
       "role": "instructor",
       "page": {
         "path": "/manage/course/4711",
+        "route": "/manage/course/[courseId]",
         "courseId": 4711
       },
       "messages": [
@@ -347,7 +363,8 @@
       "category": "out_of_scope",
       "role": "user",
       "page": {
-        "path": "/"
+        "path": "/",
+        "route": "/"
       },
       "messages": [
         {
@@ -369,6 +386,7 @@
       "role": "user",
       "page": {
         "path": "/course/4711",
+        "route": "/course/[courseId]",
         "courseId": 4711
       },
       "messages": [
@@ -391,6 +409,7 @@
       "role": "instructor",
       "page": {
         "path": "/manage/course/4711",
+        "route": "/manage/course/[courseId]",
         "courseId": 4711
       },
       "messages": [
@@ -417,6 +436,7 @@
       "role": "instructor",
       "page": {
         "path": "/manage/course/4733",
+        "route": "/manage/course/[courseId]",
         "courseId": 4733
       },
       "messages": [
@@ -480,6 +500,7 @@
       "role": "instructor",
       "page": {
         "path": "/manage/course/4711",
+        "route": "/manage/course/[courseId]",
         "courseId": 4711
       },
       "messages": [
@@ -506,6 +527,7 @@
       "role": "instructor",
       "page": {
         "path": "/manage/course/4711",
+        "route": "/manage/course/[courseId]",
         "courseId": 4711
       },
       "messages": [
@@ -532,6 +554,7 @@
       "role": "instructor",
       "page": {
         "path": "/manage/course/4711",
+        "route": "/manage/course/[courseId]",
         "courseId": 4711
       },
       "messages": [
@@ -559,6 +582,7 @@
       "role": "instructor",
       "page": {
         "path": "/manage/course/4711",
+        "route": "/manage/course/[courseId]",
         "courseId": 4711
       },
       "messages": [
@@ -581,6 +605,7 @@
       "role": "instructor",
       "page": {
         "path": "/manage/course/4711",
+        "route": "/manage/course/[courseId]",
         "courseId": 4711
       },
       "messages": [
@@ -603,6 +628,7 @@
       "role": "instructor",
       "page": {
         "path": "/manage/course/4711",
+        "route": "/manage/course/[courseId]",
         "courseId": 4711
       },
       "messages": [
@@ -685,6 +711,7 @@
       "role": "user",
       "page": {
         "path": "/course/4711",
+        "route": "/course/[courseId]",
         "courseId": 4711
       },
       "messages": [
@@ -707,6 +734,7 @@
       "role": "instructor",
       "page": {
         "path": "/manage/course/4711",
+        "route": "/manage/course/[courseId]",
         "courseId": 4711
       },
       "messages": [
@@ -740,6 +768,7 @@
       "role": "instructor",
       "page": {
         "path": "/manage/course/4711",
+        "route": "/manage/course/[courseId]",
         "courseId": 4711
       },
       "messages": [
@@ -841,7 +870,8 @@
       "category": "organizer",
       "role": "org_admin",
       "page": {
-        "path": "/manage/courses"
+        "path": "/manage/courses",
+        "route": "/manage/courses"
       },
       "messages": [
         {

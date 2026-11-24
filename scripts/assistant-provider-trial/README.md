@@ -53,7 +53,9 @@ python3 run_trial.py --repeat 3             # all targets, 3 runs per case
 Results go to `results/<timestamp>/` (git-ignored): `summary.md`, `answers.csv`, `raw.jsonl`.
 Auth: `api_key_command` (here `gcloud auth print-access-token`) is run once and
 again after 45 minutes or on a 401; `api_key_env` names an env var with a static
-key instead. Model options such as `reasoning_effort` go in `extra_body`. If the
+key instead. Model options such as `reasoning_effort` go in `extra_body`. Like the backend, a case gets at most 6 model turns and the last one is
+sent without tools; set `max_tool_rounds` on a target to match a different
+`ASSISTANT_MAX_TOOL_ROUNDS`. A timeout or broken stream fails that case only. If the
 endpoint rejects a JSON-schema keyword in the tool definitions, list it in
 `strip_schema_keys` (e.g. `["additionalProperties"]`); the harness still
 validates the model's arguments against the full schema.
