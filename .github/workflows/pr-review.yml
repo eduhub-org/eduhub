@@ -65,7 +65,6 @@ jobs:
       issues: read
     env:
       PR_NUMBER: ${{ github.event.pull_request.number || github.event.issue.number }}
-      GH_TOKEN: ${{ github.token }}
     steps:
       - name: Harden the runner
         uses: step-security/harden-runner@1d88384fd173af6ecb012dfd0264a306b711241a # v2.22.4
@@ -81,8 +80,11 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
+      # GH_TOKEN is set on the two trusted steps only, never on the agent's.
       - name: Collect review input
         id: input
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           dir="$RUNNER_TEMP/pr-review"
@@ -143,10 +145,14 @@ jobs:
           # Strict allowlist (sessions otherwise start in auto mode). The list
           # is quoted: claude_args is split on spaces, and an unquoted
           # "Bash(git diff:*)" breaks into fragments that match nothing.
+          # File writes are limited to the one output file (Edit rules cover
+          # every file-writing tool; "//" marks an absolute path). An unscoped
+          # Write could set e.g. diff.external in .git/config, which the next
+          # allowed git diff would execute, or write to $GITHUB_ENV.
           claude_args: >-
             --model claude-opus-5-5
             --permission-mode default
-            --allowed-tools "Read,Glob,Grep,Write,Bash(git diff:*),Bash(git log:*),Bash(git show:*)"
+            --allowed-tools "Read,Glob,Grep,Edit(/${{ runner.temp }}/pr-review/review.json),Bash(git diff:*),Bash(git log:*),Bash(git show:*)"
           prompt: |
             Review pull request #${{ env.PR_NUMBER }} in ${{ github.repository }}.
 
@@ -169,7 +175,8 @@ jobs:
 
             Steps:
             1. Read the context the playbook names in §1 from the checkout.
-            2. Review `git diff <range-from>..HEAD`. Read surrounding code in
+            2. Review `git diff --no-ext-diff --no-textconv <range-from>..HEAD`
+               (always pass both flags to `git diff`). Read surrounding code in
                the checkout. Compare with the base branch when you need to know
                whether a problem already existed.
             3. If `range-from.txt` is an earlier review of this job (a
@@ -200,6 +207,7 @@ jobs:
       - name: Post the review
         if: steps.input.outputs.skip != 'true'
         env:
+          GH_TOKEN: ${{ github.token }}
           HEAD_SHA: ${{ steps.input.outputs.head_sha }}
         run: |
           set -euo pipefail
