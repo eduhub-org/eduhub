@@ -105,6 +105,7 @@ export const feedbackDeps = (): FeedbackHandlerDeps => {
 
 export const proposalsDeps: ProposalsHandlerDeps = {
   getSession: getAssistantSession,
+  contact: process.env.ASSISTANT_CONTACT || DEFAULT_CONTACT,
   courseSetup: (session, role) => {
     const secret = process.env.MCP_PROPOSAL_SECRET;
     if (!secret || !HASURA_URL) return null;

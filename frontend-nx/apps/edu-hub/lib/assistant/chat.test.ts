@@ -113,3 +113,19 @@ describe('system prompt', () => {
     expect(prompt('instructor', true)).toContain('Proposed Changes');
   });
 });
+
+describe('search_courses', () => {
+  it('compares application deadlines with today in Europe/Berlin, not UTC', async () => {
+    const hasura = fakeHasura([]);
+    // 23:30 UTC on 15 Jan is already 00:30 on 16 Jan in Berlin.
+    const tools = createUserTools({
+      url: 'http://h',
+      token: 't',
+      userId: 'alice',
+      fetchImpl: hasura.fetchImpl,
+      now: () => new Date('2026-01-15T23:30:00Z'),
+    });
+    await tools.call('search_courses', JSON.stringify({ query: 'ML', openForApplications: true }));
+    expect(JSON.stringify(hasura.requests[0].variables.where)).toContain('{"applicationEnd":{"_gte":"2026-01-16"}}');
+  });
+});

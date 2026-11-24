@@ -24,7 +24,8 @@ const ROLE_NAMES: Record<string, string> = {
   admin: 'platform admin',
 };
 
-const today = (now: Date) =>
+/** Today's date as YYYY-MM-DD in Europe/Berlin, where deadlines are evaluated. */
+export const berlinDate = (now: Date) =>
   new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Berlin', year: 'numeric', month: '2-digit', day: '2-digit' }).format(now);
 
 export const buildSystemPrompt = ({
@@ -58,7 +59,7 @@ export const buildSystemPrompt = ({
   }
   lines.push(
     `- If you can't help, say so and point to the contact: ${contact}. There is no handover to a human in this chat.`,
-    `- Keep answers short. Today is ${today(now)}. Times are Europe/Berlin.`,
+    `- Keep answers short. Today is ${berlinDate(now)}. Times are Europe/Berlin.`,
     '',
     `The user's role: ${ROLE_NAMES[role] ?? role}`,
     `Current page: ${page.path || page.route || 'unknown'}${page.path && page.route ? ` (${page.route})` : ''}${page.courseId ? ` (course ${page.courseId})` : ''}${page.sessionId ? ` (session ${page.sessionId})` : ''}`

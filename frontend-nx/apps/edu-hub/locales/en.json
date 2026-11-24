@@ -3970,7 +3970,18 @@
       "BUSY": "The Assistant is busy right now. Please try again in a minute.",
       "UNAVAILABLE": "The Assistant couldn't answer right now. Please try again later or write to {contact}.",
       "TOOL_CALL_FAILED": "The Assistant couldn't look up the data it needed. Please rephrase your question or write to {contact}.",
-      "FEEDBACK_CONSENT_REQUIRED": "Without your consent we don't store the conversation."
+      "FEEDBACK_CONSENT_REQUIRED": "Without your consent we don't store the conversation.",
+      "PROPOSAL_UNAUTHENTICATED": "Your login has expired. Please log in again and then apply the change.",
+      "PROPOSAL_FORBIDDEN": "You can't change this course with your current role.",
+      "PROPOSAL_NOT_FOUND": "The course or entry for this change no longer exists.",
+      "PROPOSAL_INVALID": "This change can't be applied. Please ask the Assistant for a new proposal.",
+      "PROPOSAL_NO_CHANGE": "This change contains nothing new for the course.",
+      "PROPOSAL_REGISTRATIONS_EXIST": "This change can't be applied because people have already registered.",
+      "PROPOSAL_STALE": "The course was changed after this proposal. Please ask the Assistant for a new proposal.",
+      "PROPOSAL_TITLE_TAKEN": "Another course in this program already has this title. Please choose a different title.",
+      "PROPOSAL_EXPIRED": "This proposal has expired. Please ask the Assistant for a new one.",
+      "PROPOSAL_HASURA_ERROR": "The change couldn't be saved. Please try again later or write to {contact}.",
+      "PROPOSAL_FAILED": "Something went wrong while saving the change. Please try again later or write to {contact}."
     }
   },
   "help": {

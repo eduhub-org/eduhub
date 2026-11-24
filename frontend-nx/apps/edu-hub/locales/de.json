@@ -3955,7 +3955,18 @@
       "BUSY": "Der Assistent ist gerade ausgelastet. Bitte versuch es in einer Minute noch einmal.",
       "UNAVAILABLE": "Der Assistent konnte gerade nicht antworten. Bitte versuch es später noch einmal oder schreib an {contact}.",
       "TOOL_CALL_FAILED": "Der Assistent konnte die nötigen Daten nicht abrufen. Bitte formuliere Deine Frage anders oder schreib an {contact}.",
-      "FEEDBACK_CONSENT_REQUIRED": "Ohne Deine Einwilligung speichern wir das Gespräch nicht."
+      "FEEDBACK_CONSENT_REQUIRED": "Ohne Deine Einwilligung speichern wir das Gespräch nicht.",
+      "PROPOSAL_UNAUTHENTICATED": "Deine Anmeldung ist abgelaufen. Bitte melde Dich neu an und übernimm die Änderung dann noch einmal.",
+      "PROPOSAL_FORBIDDEN": "Mit Deiner aktuellen Rolle kannst Du diesen Kurs nicht ändern.",
+      "PROPOSAL_NOT_FOUND": "Den Kurs oder Eintrag zu dieser Änderung gibt es nicht mehr.",
+      "PROPOSAL_INVALID": "Diese Änderung kann nicht übernommen werden. Bitte den Assistant um einen neuen Vorschlag.",
+      "PROPOSAL_NO_CHANGE": "Diese Änderung enthält nichts Neues für den Kurs.",
+      "PROPOSAL_REGISTRATIONS_EXIST": "Diese Änderung kann nicht übernommen werden, weil sich schon Personen angemeldet haben.",
+      "PROPOSAL_STALE": "Der Kurs wurde nach diesem Vorschlag geändert. Bitte den Assistant um einen neuen Vorschlag.",
+      "PROPOSAL_TITLE_TAKEN": "Ein anderer Kurs in diesem Programm hat schon diesen Titel. Bitte wähle einen anderen Titel.",
+      "PROPOSAL_EXPIRED": "Dieser Vorschlag ist abgelaufen. Bitte den Assistant um einen neuen.",
+      "PROPOSAL_HASURA_ERROR": "Die Änderung konnte nicht gespeichert werden. Bitte versuch es später noch einmal oder schreib an {contact}.",
+      "PROPOSAL_FAILED": "Beim Speichern der Änderung ist etwas schiefgegangen. Bitte versuch es später noch einmal oder schreib an {contact}."
     }
   },
   "help": {
