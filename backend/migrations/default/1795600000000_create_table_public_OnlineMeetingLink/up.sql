@@ -161,9 +161,12 @@ FOR EACH ROW
 WHEN (OLD."locationOption" = 'ONLINE' AND NEW."locationOption" IS DISTINCT FROM 'ONLINE')
 EXECUTE PROCEDURE "public"."delete_SessionAddress_online_link"();
 
--- Session events copy their source session's locations. The ONLINE location's
--- link is copied as the event course location's default link: the session's
--- own link, else its course location's default.
+-- Session events copy their source session's locations. Only the session's own
+-- link is copied (as the event location's default link), never the source
+-- course's default: that one opens every session of the source course, while an
+-- event is open to anyone who registers for it. Address text of an ONLINE source
+-- is never copied, so a link that is still being moved out of a source
+-- address (the move trigger syncs events mid-way) cannot reach the event twice.
 CREATE OR REPLACE FUNCTION "public"."sync_event_session_locations"(p_event_course_id integer)
 RETURNS void AS $$
 DECLARE
@@ -183,12 +186,13 @@ BEGIN
   DELETE FROM "public"."CourseLocation" WHERE "courseId" = p_event_course_id;
 
   INSERT INTO "public"."CourseLocation" ("courseId", "locationOption", "defaultSessionAddress", "defaultSessionAddressId")
-  SELECT DISTINCT ON (a."opt") p_event_course_id, a."opt", a."address", a."locationAddressId"
+  SELECT DISTINCT ON (a."opt") p_event_course_id, a."opt",
+    CASE WHEN a."opt" = 'ONLINE' THEN NULL ELSE a."address" END, a."locationAddressId"
   FROM "public"."event_source_session_addresses"(v_source_session_id) a
   ORDER BY a."opt", a."sourceId";
 
   INSERT INTO "public"."SessionAddress" ("sessionId", "courseLocationId", "address", "locationAddressId")
-  SELECT s."id", cl."id", a."address", a."locationAddressId"
+  SELECT s."id", cl."id", CASE WHEN a."opt" = 'ONLINE' THEN '' ELSE a."address" END, a."locationAddressId"
   FROM "public"."Session" s
   JOIN "public"."CourseLocation" cl ON cl."courseId" = p_event_course_id
   JOIN "public"."event_source_session_addresses"(v_source_session_id) a ON a."opt" = cl."locationOption"
@@ -198,21 +202,22 @@ BEGIN
   SELECT cl."id", src."url"
   FROM "public"."CourseLocation" cl
   CROSS JOIN LATERAL (
-    SELECT COALESCE(NULLIF(btrim(sal."url"), ''), NULLIF(btrim(cll."url"), '')) AS "url"
+    SELECT btrim(sal."url") AS "url"
     FROM "public"."event_source_session_addresses"(v_source_session_id) a
     JOIN "public"."SessionAddress" sa ON sa."id" = a."sourceId"
-    LEFT JOIN "public"."OnlineMeetingLink" sal ON sal."sessionAddressId" = sa."id"
-    LEFT JOIN "public"."OnlineMeetingLink" cll ON cll."courseLocationId" = sa."courseLocationId"
+    JOIN "public"."OnlineMeetingLink" sal ON sal."sessionAddressId" = sa."id"
     WHERE a."opt" = 'ONLINE'
-      AND COALESCE(NULLIF(btrim(sal."url"), ''), NULLIF(btrim(cll."url"), '')) IS NOT NULL
+      AND btrim(sal."url") <> ''
     ORDER BY a."sourceId"
     LIMIT 1
   ) src
-  WHERE cl."courseId" = p_event_course_id AND cl."locationOption" = 'ONLINE';
+  WHERE cl."courseId" = p_event_course_id AND cl."locationOption" = 'ONLINE'
+  ON CONFLICT ("courseLocationId") DO UPDATE SET "url" = EXCLUDED."url";
 END;
 $$ LANGUAGE plpgsql;
 
--- A changed link of a source session reaches its session events too.
+-- A changed link of a source session reaches its session events too. Course
+-- default links never reach events (see above), so only session links count.
 CREATE OR REPLACE FUNCTION "public"."sync_OnlineMeetingLink_to_public_event"()
 RETURNS TRIGGER AS $$
 DECLARE
@@ -225,11 +230,8 @@ BEGIN
     FROM "public"."Course" c
     JOIN "public"."Session" s ON s."id" = c."sourceSessionId"
     WHERE s."id" IN (
-        SELECT sa."sessionId" FROM "public"."SessionAddress" sa WHERE sa."id" = v_row."sessionAddressId"
-      )
-      OR s."courseId" IN (
-        SELECT cl."courseId" FROM "public"."CourseLocation" cl WHERE cl."id" = v_row."courseLocationId"
-      )
+      SELECT sa."sessionId" FROM "public"."SessionAddress" sa WHERE sa."id" = v_row."sessionAddressId"
+    )
   LOOP
     PERFORM "public"."sync_event_session_locations"(v_event_course_id);
   END LOOP;
