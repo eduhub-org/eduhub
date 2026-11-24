@@ -46,19 +46,35 @@ const blobUrl = (release, file, startLine, endLine) =>
 export const manualUrl = (language, slug, anchor) =>
   `${language === 'en' ? '/en' : ''}/help/${slug.replace(/(^|\/)index$/, '')}`.replace(/\/$/, '') + (anchor ? `#${anchor}` : '');
 
-/** Relative links between manual pages (`../organizers/sessions.md#x`) as /help URLs. */
-export const resolveManualLinks = (markdown, language, relative) =>
+/**
+ * Relative links between manual pages (`../organizers/sessions.md#x`) as /help URLs, at the target
+ * page's own slug when it declares one (slugs: "<language>/<path without .md>" → slug).
+ */
+export const resolveManualLinks = (markdown, language, relative, slugs = new Map()) =>
   markdown.replace(/\]\((?!https?:|mailto:|#|\/)([^)\s]+?)\.md(#[^)\s]*)?\)/g, (_, target, anchor = '') => {
-    const resolved = path.posix.normalize(path.posix.join(path.posix.dirname(relative), target));
-    return `](${manualUrl(language, resolved.replace(/^(\.\.\/)+/, ''))}${anchor})`;
+    const resolved = path.posix.normalize(path.posix.join(path.posix.dirname(relative), target)).replace(/^(\.\.\/)+/, '');
+    return `](${manualUrl(language, slugs.get(`${language}/${resolved}`) ?? resolved)}${anchor})`;
   });
 
-const manualPassages = (file, text) => {
-  const [, language, relative] = /^docs\/manual\/(de|en)\/(.+)\.md$/.exec(file);
+const MANUAL_FILE = /^docs\/manual\/(de|en)\/(.+)\.md$/;
+
+/** The slug of every manual page, keyed "<language>/<path without .md>"; the path stands in without one. */
+const manualSlugs = (root, files) =>
+  new Map(
+    files.flatMap((file) => {
+      const match = MANUAL_FILE.exec(file);
+      if (!match || sourceTypeOf(file) !== 'MANUAL') return [];
+      const { data } = parseFrontMatter(fs.readFileSync(path.join(root, file), 'utf8'));
+      return [[`${match[1]}/${match[2]}`, data.slug ?? match[2]]];
+    }),
+  );
+
+const manualPassages = (file, text, slugs) => {
+  const [, language, relative] = MANUAL_FILE.exec(file);
   const { data, body: raw } = parseFrontMatter(text);
   // An empty `slug:` is the start page (/help); without the key the path stands in.
   const slug = data.slug ?? relative;
-  const body = resolveManualLinks(raw, language, relative);
+  const body = resolveManualLinks(raw, language, relative, slugs);
   const title = data.title || /^#\s+(.+)$/m.exec(body)?.[1] || slug;
   const audience = Array.isArray(data.audience) ? data.audience.join(', ') : data.audience;
   const preface = [data.summary, audience ? `Audience: ${audience}` : null].filter(Boolean).join('\n');
@@ -224,12 +240,13 @@ export const sanitizePassages = (passages, logger) =>
 export const collectRepoPassages = (root, { release, logger } = {}) => {
   const files = listFiles(root).filter((file) => sourceTypeOf(file));
   const messagesByApp = localeMessages(root, files);
+  const slugs = manualSlugs(root, files);
   const passages = files.flatMap((file) => {
     const text = fs.readFileSync(path.join(root, file), 'utf8');
     if (!text.trim()) return [];
     switch (sourceTypeOf(file)) {
       case 'MANUAL':
-        return manualPassages(file, text);
+        return manualPassages(file, text, slugs);
       case 'GLOSSARY':
         return glossaryPassages(file, text, release);
       case 'LOCALE':
@@ -247,16 +264,26 @@ export const collectRepoPassages = (root, { release, logger } = {}) => {
  */
 export const fetchGitbookPassages = async (baseUrl, { organizationId, fetchImpl = globalThis.fetch, logger, concurrency = 4 }) => {
   const base = baseUrl.replace(/\/$/, '');
+  const space = new URL(`${base}/`);
+  // Only pages of this space, never links or redirects to elsewhere.
+  const inSpace = (url) => {
+    try {
+      const parsed = new URL(url);
+      return parsed.origin === space.origin && parsed.pathname.startsWith(space.pathname) && !/(^|\/)\.\.(\/|$)/.test(url);
+    } catch {
+      return false;
+    }
+  };
   const get = async (url) => {
-    const response = await fetchImpl(url, { signal: AbortSignal.timeout(30_000) });
+    // Redirects are not followed: a page that moved elsewhere fails instead of being stored here.
+    const response = await fetchImpl(url, { redirect: 'manual', signal: AbortSignal.timeout(30_000) });
     if (!response.ok) throw new Error(`GitBook answered ${response.status} for ${url}`);
     return response.text();
   };
   const index = await get(`${base}/llms.txt`);
   const pages = [...index.matchAll(/^\s*-\s*\[([^\]]+)\]\((https?:\/\/[^)\s]+\.md)\)/gm)]
     .map(([, title, url]) => ({ title, url }))
-    // Only pages of this space, never links to elsewhere.
-    .filter(({ url }) => url.startsWith(`${base}/`));
+    .filter(({ url }) => inSpace(url));
   if (pages.length === 0) throw new Error(`No pages listed in ${base}/llms.txt`);
 
   const passages = [];

@@ -36,6 +36,7 @@ Einstellungen, die Deine Rolle nicht von Hand ändern kann, kann auch er nicht �
 ## Gut zu wissen
 
 - Deine Frage wird zusammen mit der Seite, auf der Du bist, und einer dort angezeigten Fehlermeldung gesendet. Du kannst also direkt an der Stelle fragen: „Warum kann ich das nicht speichern?“
+- Fragen zur Plattform und zu Fehlermeldungen beantwortet er aus diesem Handbuch, den online veröffentlichten Regeln Deiner Organisation und den Texten der Plattform und verlinkt die Seiten, die er genutzt hat.
 - Der Assistent ist eine KI und kann Fehler machen. Prüfe jede vorgeschlagene Änderung, bevor Du sie übernimmst.
 - Unterhaltungen werden nicht gespeichert. Bewertest Du eine Antwort als nicht hilfreich, kannst Du zustimmen, dass die Unterhaltung 30 Tage lang aufbewahrt wird, um den Assistenten zu verbessern.
 - Der Assistent ist nicht verfügbar, während ein Admin EduHub als eine andere Person ansieht.

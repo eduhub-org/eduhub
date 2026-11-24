@@ -1,6 +1,6 @@
 import { env } from "../lib/config.js";
 import { createHasuraClient } from "../lib/hasura.js";
-import { embedText, embeddingConfig, isZeroVector, toVectorLiteral } from "../lib/expertEmbeddings.js";
+import { cleanText, embedText, embeddingConfig, isZeroVector, toVectorLiteral } from "../lib/expertEmbeddings.js";
 import { rankPassages } from "../lib/knowledge/rank.js";
 
 /**
@@ -95,7 +95,8 @@ export default async function searchKnowledge(req, logger, { gql, read = env, fe
   if (!config) return { success: true, enabled: false, passages: [] };
 
   const query = String(req.body?.input?.query ?? "").trim().slice(0, MAX_QUERY_LENGTH);
-  if (query.length < MIN_QUERY_LENGTH) return { success: true, enabled: true, passages: [] };
+  // Also nothing to search when the text has no words left once cleaned (e.g. "***").
+  if (query.length < MIN_QUERY_LENGTH || !cleanText(query)) return { success: true, enabled: true, passages: [] };
   const courseId = Number.isInteger(req.body?.input?.courseId) ? req.body.input.courseId : null;
 
   try {

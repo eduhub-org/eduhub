@@ -26,6 +26,12 @@ export const headingId = (text) =>
 
 const unquote = (value) => value.replace(/^(['"])(.*)\1$/, '$2');
 
+// A quoted value keeps a `#`; elsewhere ` #` starts a comment.
+const scalarOf = (rest) => {
+  const quoted = /^(['"])(.*?)\1(\s+#.*)?$/.exec(rest);
+  return quoted ? quoted[2] : rest.replace(/(^|\s+)#.*$/, '').trim();
+};
+
 /**
  * The YAML front matter of a Markdown file, for the flat keys the manual uses (strings, numbers and
  * `[a, b]` lists). Returns the remaining body too.
@@ -35,19 +41,21 @@ export const parseFrontMatter = (text) => {
   if (!match) return { data: {}, body: text };
   const data = {};
   match[1].split(/\r?\n/).forEach((line) => {
-    const pair = /^([A-Za-z][\w-]*):\s*(.*?)\s*(#.*)?$/.exec(line);
+    const pair = /^([A-Za-z][\w-]*):(.*)$/.exec(line);
     if (!pair) return;
     const [, key, raw] = pair;
-    const list = /^\[(.*)\]$/.exec(raw);
+    const rest = raw.trim();
+    const list = /^\[(.*)\](\s+#.*)?$/.exec(rest);
     data[key] = list
       ? list[1].split(',').map((item) => unquote(item.trim())).filter(Boolean)
-      : unquote(raw);
+      : scalarOf(rest);
   });
   return { data, body: text.slice(match[0].length) };
 };
 
 /** Splits text over maxChars at paragraph (else line, else hard) boundaries, with an overlap. */
 export const splitLongText = (text, maxChars = DOC_MAX_CHARS, overlap = DOC_OVERLAP_CHARS) => {
+  if (!Number.isInteger(maxChars) || maxChars <= 0) throw new Error(`maxChars must be a positive integer, got ${maxChars}`);
   if (text.length <= maxChars) return [text];
   const parts = [];
   let start = 0;
@@ -74,14 +82,24 @@ export const chunkMarkdown = (markdown, { title: pageTitle, maxChars = DOC_MAX_C
   const sections = [];
   const trail = [];
   let current = { level: 0, heading: null, lines: [] };
-  let inFence = false;
+  // The open code fence ({ marker, length }); only a bare fence of the same marker, at least as long,
+  // closes it (CommonMark).
+  let fence = null;
   const flush = () => {
     const body = current.lines.join('\n').trim();
     if (body) sections.push({ level: current.level, heading: current.heading, trail: [...trail], body });
   };
   markdown.split(/\r?\n/).forEach((line) => {
-    if (/^\s*(```|~~~)/.test(line)) inFence = !inFence;
-    const heading = !inFence && /^(#{1,3})\s+(.+?)\s*#*\s*$/.exec(line);
+    const fenceLine = /^ {0,3}(`{3,}|~{3,})(.*)$/.exec(line);
+    if (fenceLine) {
+      const [, run, rest] = fenceLine;
+      if (!fence) {
+        if (!(run[0] === '`' && rest.includes('`'))) fence = { marker: run[0], length: run.length };
+      } else if (run[0] === fence.marker && run.length >= fence.length && !rest.trim()) {
+        fence = null;
+      }
+    }
+    const heading = !fence && /^(#{1,3})\s+(.+?)\s*#*\s*$/.exec(line);
     if (!heading) {
       current.lines.push(line);
       return;
@@ -171,7 +189,7 @@ export const chunkCode = (code, path, { maxChars = CODE_MAX_CHARS } = {}) => {
     const previous = chunks[chunks.length - 1];
     // A few lines on their own (a closing export, the tail of a long declaration) say nothing; they
     // join the passage before them.
-    if (previous && text.length < MIN_CODE_CHUNK_CHARS) {
+    if (previous && text.length < MIN_CODE_CHUNK_CHARS && previous.text.length + 1 + text.length <= maxChars) {
       previous.text = `${previous.text}\n${text}`;
       previous.endLine = segment.end + 1;
       previous.names = [...new Set([...previous.names, ...names])];
@@ -190,6 +208,17 @@ export const chunkCode = (code, path, { maxChars = CODE_MAX_CHARS } = {}) => {
       let start = segment.start;
       let length = 0;
       for (let line = segment.start; line <= segment.end; line += 1) {
+        // A single line over the limit (generated or minified code) is cut into pieces of its own.
+        if (lines[line].length > maxChars) {
+          if (line > start) emit({ start, end: line - 1 }, owner);
+          for (let at = 0; at < lines[line].length; at += maxChars) {
+            const piece = lines[line].slice(at, at + maxChars).trim();
+            if (piece) chunks.push({ startLine: line + 1, endLine: line + 1, names: owner, text: piece });
+          }
+          start = line + 1;
+          length = 0;
+          continue;
+        }
         length += lines[line].length + 1;
         if (length > maxChars && line > start) {
           emit({ start, end: line - 1 }, owner);
@@ -197,7 +226,7 @@ export const chunkCode = (code, path, { maxChars = CODE_MAX_CHARS } = {}) => {
           length = lines[line].length + 1;
         }
       }
-      emit({ start, end: segment.end }, owner);
+      if (start <= segment.end) emit({ start, end: segment.end }, owner);
       return;
     }
     if (pending && textOf({ start: pending.start, end: segment.end }).length <= maxChars) {

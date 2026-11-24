@@ -3,7 +3,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { afterAll, beforeAll, describe, expect, it, jest } from '@jest/globals';
-import { chunkCode, chunkMarkdown, headingId, parseFrontMatter } from '../chunk.js';
+import { chunkCode, chunkMarkdown, headingId, parseFrontMatter, splitLongText } from '../chunk.js';
 import { DENIED_PATHS, SECRET_PATTERNS, findSecrets, redactEmails, sourceTypeOf } from '../safety.js';
 import {
   collectRepoPassages,
@@ -27,6 +27,17 @@ const STRIPE_KEY = ['sk', 'live', 'a1B2c3D4e5F6g7H8i9J0kLmN'].join('_');
 const PRIVATE_KEY = ['-----BEGIN', 'RSA PRIVATE KEY-----\nMIIEow\n-----END RSA PRIVATE KEY-----'].join(' ');
 
 /** A small checkout with every kind of source, and files that must never be indexed. */
+// An address that is neither a published role mailbox nor an example.
+const PERSONAL_EMAIL = /[\w.+-]+@[\w-]+(\.[\w-]+)+/g;
+const personalDataIn = (passages) =>
+  passages.flatMap((passage) =>
+    ['title', 'path', 'url', 'content'].flatMap((field) =>
+      (String(passage[field] ?? '').match(PERSONAL_EMAIL) ?? [])
+        .filter((address) => redactEmails(address) !== address)
+        .map(() => `${passage.path} ${field}`)
+    )
+  );
+
 const writeFixtureRepo = () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'knowledge-repo-'));
   const files = {
@@ -54,7 +65,7 @@ const writeFixtureRepo = () => {
       "  return <button>{t('apply')}</button>;",
       '};',
       '',
-      '// Contact for questions: maria.mustermann@gmail.com or edu-support@opencampus.sh',
+      '// Contact for questions: maria.mustermann@gmail.com, anna.schmidt@opencampus.sh or edu-support@opencampus.sh',
       'export const contact = true;',
     ].join('\n'),
     'frontend-nx/apps/edu-hub/lib/payment.ts': `export const stripeKey = '${STRIPE_KEY}';\n`,
@@ -84,6 +95,12 @@ const writeFixtureRepo = () => {
     ].join('\n'),
     'docs/manual/de/index.md':
       '---\ntitle: Hilfe\nslug:\nlanguage: de\n---\n\n## Erste Schritte\n\nLies [Anmelden](participants/registration.md#wenn-der-kurs-voll-ist).\n',
+    // A citation that would carry a personal address.
+    'docs/manual/de/participants/kontakt.md':
+      '---\ntitle: Kontakt\nslug: kontakt/maria.mustermann@gmail.com\nlanguage: de\n---\n\n## Fragen\n\nSchreib uns.\n',
+    // A page that moved: links to it use its slug, not its file name.
+    'docs/manual/de/participants/apply.md':
+      '---\ntitle: "Bewerbung #2"\nslug: bewerben # short\nlanguage: de\n---\n\n## Ablauf\n\nSiehe [Anmelden](registration.md).\n',
     'docs/manual/en/participants/registration.md':
       '---\ntitle: Registering\nslug: participants/registration\nlanguage: en\n---\n\n## When the course is full\n\nYou join the waitlist.\n',
     // Never indexed:
@@ -221,6 +238,33 @@ describe('chunking', () => {
     expect(chunks[chunks.length - 1].text.endsWith('export default Big;')).toBe(true);
     chunks.forEach((chunk) => expect(chunk.names).toContain('Big'));
   });
+
+  it('closes a code fence only with a matching bare fence', () => {
+    const markdown = '## A\n````md\n```\n## inside\n```\n````\n## B\nText B\n~~~\n## tilde\n``` x\n~~~\n## C\nText C';
+    expect(chunkMarkdown(markdown, {}).map((c) => c.anchor)).toEqual(['a', 'b', 'c']);
+  });
+
+  it('keeps # inside quoted front-matter values and drops comments', () => {
+    const { data } = parseFrontMatter("---\ntitle: \"Guide #2\"\nslug: guide # the page\nnote: a#b\naudience: [participant] # who\nempty:\n---\n");
+    expect(data).toEqual({ title: 'Guide #2', slug: 'guide', note: 'a#b', audience: ['participant'], empty: '' });
+  });
+
+  it('rejects a chunk budget that is not a positive integer', () => {
+    expect(() => splitLongText('abc', 0)).toThrow('positive integer');
+    expect(() => splitLongText('abc', -5)).toThrow('positive integer');
+  });
+
+  it('never emits a code passage over the limit', () => {
+    const long = `export const big = () => {\n${'  x();\n'.repeat(320)}};\nexport const tail = 1;\n`;
+    const minified = `export const data = '${'a'.repeat(4500)}';\n`;
+    [long, minified].forEach((code) => {
+      const chunks = chunkCode(code, 'lib/big.ts', { maxChars: 2000 });
+      chunks.forEach((chunk) => expect(chunk.text.length).toBeLessThanOrEqual(2000));
+    });
+    const pieces = chunkCode(minified, 'lib/big.ts', { maxChars: 2000 });
+    expect(pieces.length).toBe(3);
+    pieces.forEach((piece) => expect([piece.startLine, piece.endLine]).toEqual([1, 1]));
+  });
 });
 
 describe('what may be indexed', () => {
@@ -296,6 +340,7 @@ describe('collecting passages from a checkout', () => {
       'CONTEXT.md',
       'backend/metadata/databases/default/tables/public_Course.yaml',
       'docs/manual/de/index.md',
+      'docs/manual/de/participants/apply.md',
       'docs/manual/de/participants/registration.md',
       'docs/manual/en/participants/registration.md',
       'frontend-nx/apps/edu-hub/components/ApplyButton.tsx',
@@ -336,6 +381,25 @@ describe('collecting passages from a checkout', () => {
     expect(code).not.toContain('maria.mustermann@gmail.com');
     expect(code).toContain('[email]');
     expect(code).toContain('edu-support@opencampus.sh');
+    // A named mailbox on the platform's domain is personal data too.
+    expect(code).not.toContain('anna.schmidt@opencampus.sh');
+  });
+
+  it('leaves no personal data in any stored or cited field', () => {
+    expect(passages.some((p) => p.path === 'docs/manual/de/participants/kontakt.md')).toBe(false);
+    expect(personalDataIn(passages)).toEqual([]);
+    // The check itself catches an address left in a citation.
+    expect(personalDataIn([{ path: 'x', url: '/help/maria.mustermann@gmail.com', content: 'edu@opencampus.sh' }])).toEqual(['x url']);
+  });
+
+  it('links manual pages at their own slug and keeps quoted # in front matter', () => {
+    const apply = passages.find((p) => p.path === 'docs/manual/de/participants/apply.md');
+    expect(apply.title).toBe('Bewerbung #2 › Ablauf');
+    expect(apply.url).toBe('/help/bewerben#ablauf');
+    const index = passages.find((p) => p.path === 'docs/manual/de/index.md');
+    expect(index.content).toContain('](/help/participants/registration#wenn-der-kurs-voll-ist)');
+    const slugs = new Map([['de/participants/apply', 'bewerben']]);
+    expect(resolveManualLinks('[x](apply.md#ablauf)', 'de', 'participants/registration', slugs)).toBe('[x](/help/bewerben#ablauf)');
   });
 
   it('links manual sections to /help, code to the released tag, and code to the texts it shows', () => {
@@ -388,6 +452,10 @@ describe('the repository itself', () => {
       if (found.length) throw new Error(`${passage.path} holds ${found.join(', ')}`);
     });
   });
+
+  it('holds no personal e-mail addresses in any field', () => {
+    expect(personalDataIn(passages)).toEqual([]);
+  });
 });
 
 describe('ranking', () => {
@@ -438,6 +506,18 @@ describe('ranking', () => {
   });
 });
 
+describe('shortening returned passages', () => {
+  it('keeps the texts a long code passage shows', () => {
+    const texts = '\n\nTexts shown by this code:\nassistant.errors.OFF: Der Assistent ist aus';
+    const [passage] = rankPassages([
+      { id: 1, sourceType: 'CODE', similarity: 0.8, path: 'a.ts', title: 'a.ts', url: '/a', content: `${'x'.repeat(2400)}${texts}` },
+    ]);
+    expect(passage.content.length).toBeLessThanOrEqual(1800);
+    expect(passage.content.endsWith(texts)).toBe(true);
+    expect(passage.content).toContain('x…\n\nTexts shown');
+  });
+});
+
 describe('building the index', () => {
   const passage = (n) => ({
     sourceType: 'CODE',
@@ -468,13 +548,16 @@ describe('building the index', () => {
   });
 
   it('keeps the previous index when a build fails', async () => {
-    const { state, gql } = createKnowledgeStore({ failInsertAfter: 1 });
+    // The live build uses one insert; the replacement stores its first batch, then fails.
+    const { state, gql } = createKnowledgeStore({ failInsertAfter: 2 });
     await buildKnowledgeIndex({ passages: [passage(1)], gql, config: fakeConfig, release: 'v1', runId: 'v1@a', logger });
-    const many = Array.from({ length: 150 }, (_, i) => passage(i + 10));
+    // The first staged passage matches the search as well as the live one does.
+    const many = [{ ...passage(1), url: '/staged1' }, ...Array.from({ length: 150 }, (_, i) => passage(i + 10))];
     await expect(
       buildKnowledgeIndex({ passages: many, gql, config: fakeConfig, release: 'v2', runId: 'v2@b', logger })
     ).rejects.toThrow('connection reset');
     expect(state.indexes.map((index) => index.id)).toEqual(['v1@a']);
+    expect(state.chunks.filter((c) => c.indexRunId === 'v2@b').length).toBeGreaterThan(0);
 
     // Searches only see the live build, also while the leftovers of the failed one are stored.
     const result = await searchKnowledge(asUser({ query: 'value1 compute1 input' }), logger, {
@@ -538,6 +621,7 @@ describe('fetching the organization rules from GitBook', () => {
     const fetchImpl = jest.fn(async (url) => ({ ok: url in pages, status: url in pages ? 200 : 404, text: async () => pages[url] }));
     const passages = await fetchGitbookPassages('https://opencampus.gitbook.io/faq/', { organizationId: 7, fetchImpl, logger });
     expect(fetchImpl).not.toHaveBeenCalledWith('https://evil.example.com/x.md', expect.anything());
+    fetchImpl.mock.calls.forEach(([, options]) => expect(options.redirect).toBe('manual'));
     expect(passages).toEqual([
       expect.objectContaining({
         sourceType: 'ORGANIZATION_RULES',
@@ -546,6 +630,28 @@ describe('fetching the organization rules from GitBook', () => {
         url: 'https://opencampus.gitbook.io/faq/readme/termine',
         path: 'readme/termine',
       }),
+    ]);
+  });
+});
+
+describe('fetching GitBook pages that leave the space', () => {
+  it('skips links outside the space and fails on a redirect', async () => {
+    const pages = {
+      'https://opencampus.gitbook.io/faq/llms.txt': [
+        '- [Moved](https://opencampus.gitbook.io/faq/moved.md)',
+        '- [Up](https://opencampus.gitbook.io/faq/../other/x.md)',
+        '- [Sibling](https://opencampus.gitbook.io/faqs-old/x.md)',
+      ].join('\n'),
+    };
+    const fetchImpl = jest.fn(async (url) =>
+      url in pages ? { ok: true, status: 200, text: async () => pages[url] } : { ok: false, status: 302, text: async () => '' }
+    );
+    await expect(fetchGitbookPassages('https://opencampus.gitbook.io/faq', { organizationId: 7, fetchImpl, logger })).rejects.toThrow(
+      'GitBook answered 302 for https://opencampus.gitbook.io/faq/moved.md'
+    );
+    expect(fetchImpl.mock.calls.map(([url]) => url)).toEqual([
+      'https://opencampus.gitbook.io/faq/llms.txt',
+      'https://opencampus.gitbook.io/faq/moved.md',
     ]);
   });
 });
@@ -638,6 +744,12 @@ describe('searchKnowledge', () => {
     });
     const [query] = store.gql.request.mock.calls.find(([q]) => q.includes('KnowledgeAskerOrganizations'));
     expect(query).toMatch(/published: \{ _eq: true \}, Program: \{ published: \{ _eq: true \} \}/);
+  });
+
+  it('returns nothing, not an error, for a query without words', async () => {
+    const gql = { request: jest.fn() };
+    expect(await searchKnowledge(asUser({ query: '***' }), logger, { gql, read })).toEqual({ success: true, enabled: true, passages: [] });
+    expect(gql.request).not.toHaveBeenCalled();
   });
 
   it('is off without a provider, refuses anonymous callers and reports failures', async () => {

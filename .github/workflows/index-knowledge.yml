@@ -55,10 +55,22 @@ jobs:
         id: tag
         env:
           INPUT_TAG: ${{ inputs.tag }}
+          # The commit the triggering deployment ran on (empty for a manual run).
+          DEPLOYED_SHA: ${{ github.event.workflow_run.head_sha }}
         run: |
           set -euo pipefail
           tag="${INPUT_TAG:-}"
-          if [ -z "$tag" ]; then
+          if [ -z "$tag" ] && [ -n "${DEPLOYED_SHA:-}" ]; then
+            # The Release workflow tags its "chore(release)" commit on top of the deployed one, at
+            # the same time as the deployment: the release of this deployment is the first tag that
+            # contains it, whatever reached production since. Wait for it if it isn't pushed yet.
+            for attempt in $(seq 1 20); do
+              tag="$(git tag --contains "$DEPLOYED_SHA" --list 'v*' --sort=v:refname | head -n 1)"
+              [ -n "$tag" ] && break
+              sleep 30
+              git fetch --quiet --tags origin
+            done
+          elif [ -z "$tag" ]; then
             tag="$(git tag --merged HEAD --list 'v*' --sort=-v:refname | head -n 1)"
           fi
           if ! printf '%s' "$tag" | grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+$'; then

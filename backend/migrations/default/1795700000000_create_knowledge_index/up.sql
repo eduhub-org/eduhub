@@ -51,8 +51,9 @@ CREATE TABLE "public"."KnowledgeChunk" (
 COMMENT ON TABLE "public"."KnowledgeChunk" IS
   E'A passage of the Assistant''s knowledge index (issue #2195) with its embedding. Only rows of a run listed in KnowledgeIndex are searched. contentHash is md5 of the embedded text, so unchanged passages reuse their embedding in the next build.';
 
-CREATE INDEX "KnowledgeChunk_indexRunId" ON "public"."KnowledgeChunk" ("indexRunId");
-CREATE INDEX "KnowledgeChunk_model_contentHash" ON "public"."KnowledgeChunk" ("model", "contentHash");
+CREATE INDEX "KnowledgeChunk_indexRunId_idx" ON "public"."KnowledgeChunk" ("indexRunId");
+CREATE INDEX "KnowledgeChunk_model_contentHash_idx" ON "public"."KnowledgeChunk" ("model", "contentHash");
+CREATE INDEX "KnowledgeChunk_organizationId_idx" ON "public"."KnowledgeChunk" ("organizationId");
 
 CREATE TRIGGER "set_public_KnowledgeChunk_updated_at"
 BEFORE UPDATE ON "public"."KnowledgeChunk"

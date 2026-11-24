@@ -36,6 +36,7 @@ Settings your role can't change by hand, it can't change either.
 ## Good to know
 
 - Your question is sent together with the page you are on and any error shown on it, so you can ask "Why can't I save this?" right where it happens.
+- It answers questions about the platform and about error messages from this manual, the rules your organization publishes online and the platform's own texts, and links the pages it used.
 - The Assistant is an AI and can make mistakes. Check every Proposed Change before applying it.
 - Conversations are not stored. If you rate an answer as not helpful, you can agree to the conversation being kept for 30 days to improve the Assistant.
 - The Assistant is not available while an Admin is viewing EduHub as someone else.

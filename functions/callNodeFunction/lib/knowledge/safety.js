@@ -62,9 +62,11 @@ export const SECRET_PATTERNS = [
 export const findSecrets = (text) =>
   SECRET_PATTERNS.filter(({ pattern }) => pattern.test(text)).map(({ name }) => name);
 
-// Addresses the platform publishes itself; everything else is replaced.
-const PUBLIC_EMAIL_DOMAINS = /@(opencampus\.sh|example\.(com|org|net))$/i;
+// The platform's published role mailboxes (the ones the released code and texts use) and example
+// domains. Any other address, also a named mailbox on opencampus.sh, is replaced.
+const PUBLIC_EMAILS =
+  /^((noreply|edu|edu-support|stujo|admin|info|projekt|rechnungen)@opencampus\.sh|[\w.+-]+@example\.(com|org|net))$/i;
 
-/** E-mail addresses are personal data unless they are the platform's own or examples. */
+/** E-mail addresses are personal data unless they are a published role mailbox or an example. */
 export const redactEmails = (text) =>
-  text.replace(/[\w.+-]+@[\w-]+(\.[\w-]+)+/g, (address) => (PUBLIC_EMAIL_DOMAINS.test(address) ? address : '[email]'));
+  text.replace(/[\w.+-]+@[\w-]+(\.[\w-]+)+/g, (address) => (PUBLIC_EMAILS.test(address) ? address : '[email]'));

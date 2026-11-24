@@ -19,6 +19,23 @@ export const MAX_PASSAGES = 8;
 // One file or page should not fill the answer on its own.
 const MAX_PER_PATH = 2;
 const MAX_CONTENT_CHARS = 1800;
+const TEXTS_SHOWN = '\n\nTexts shown by this code:\n';
+// Code a long code passage keeps at least, next to its (capped) list of texts.
+const MIN_CODE_CHARS = 400;
+
+/**
+ * Caps a passage at MAX_CONTENT_CHARS. A code passage keeps its "Texts shown by this code" list,
+ * which is often what matched an error message, and gives up code instead; its link still points at
+ * all of its lines.
+ */
+const shorten = (content) => {
+  if (content.length <= MAX_CONTENT_CHARS) return content;
+  const at = content.indexOf(TEXTS_SHOWN);
+  if (at === -1) return `${content.slice(0, MAX_CONTENT_CHARS)}…`;
+  const texts = content.slice(at);
+  const budget = Math.max(MAX_CONTENT_CHARS - texts.length - 1, MIN_CODE_CHARS);
+  return at > budget ? `${content.slice(0, budget)}…${texts}` : content;
+};
 
 export const rankPassages = (matches, { limit = MAX_PASSAGES } = {}) => {
   const perPath = new Map();
@@ -40,7 +57,7 @@ export const rankPassages = (matches, { limit = MAX_PASSAGES } = {}) => {
       sourceType,
       title,
       url,
-      content: content.length > MAX_CONTENT_CHARS ? `${content.slice(0, MAX_CONTENT_CHARS)}…` : content,
+      content: shorten(content),
       language: language ?? null,
       similarity: Math.round(similarity * 1000) / 1000,
       score: Math.round(score * 1000) / 1000,
