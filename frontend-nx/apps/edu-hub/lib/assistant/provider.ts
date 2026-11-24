@@ -87,6 +87,18 @@ const messagesText = (messages: ChatMessage[]) =>
     )
     .join('');
 
+/**
+ * Billed tokens of a reply. Output includes reasoning, which is billed as output: Gemini leaves its
+ * reasoning tokens out of `completion_tokens` (OpenAI counts them in), but both count them in
+ * `total_tokens`, so output is the total minus the prompt whenever the total is reported.
+ */
+export const readUsage = (usage: { prompt_tokens?: number; completion_tokens?: number; total_tokens?: number }): Usage => {
+  const inputTokens = usage.prompt_tokens ?? 0;
+  const completion = usage.completion_tokens ?? 0;
+  const fromTotal = typeof usage.total_tokens === 'number' ? usage.total_tokens - inputTokens : 0;
+  return { inputTokens, outputTokens: Math.max(completion, fromTotal) };
+};
+
 /** Parses an SSE byte stream of Chat Completions chunks into a turn. */
 const readStream = async (
   body: ReadableStream<Uint8Array>,
@@ -112,9 +124,7 @@ const readStream = async (
     } catch {
       return;
     }
-    if (chunk.usage) {
-      usage = { inputTokens: chunk.usage.prompt_tokens ?? 0, outputTokens: chunk.usage.completion_tokens ?? 0 };
-    }
+    if (chunk.usage) usage = readUsage(chunk.usage);
     const delta = chunk.choices?.[0]?.delta;
     if (!delta) return;
     if (typeof delta.content === 'string' && delta.content) {
