@@ -1,4 +1,5 @@
 import { useRouter } from 'next/router';
+import { manageCoursePath } from '../../helpers/coursePath';
 import { FC, useCallback, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { MdVisibility } from 'react-icons/md';
@@ -51,7 +52,7 @@ export const ParticipantPreviewNotice: FC = () => {
         setErrorMessage(t(`errors.${payload?.messageKey ?? 'TEST_ENROLLMENT_FAILED'}`));
         return;
       }
-      router.push(`/manage/course/${courseId}`);
+      router.push(manageCoursePath(courseId));
     } catch {
       setErrorMessage(t('errors.TEST_ENROLLMENT_FAILED'));
     }

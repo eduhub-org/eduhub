@@ -1,0 +1,5 @@
+# The Assistant's knowledge search (issue #2195). No role permissions: only the searchKnowledge
+# action calls it, with the admin secret.
+function:
+  name: match_knowledge
+  schema: public

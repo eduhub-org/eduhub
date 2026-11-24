@@ -16,6 +16,7 @@ import { Tooltip } from '@mui/material';
 import { HelpOutline } from '@mui/icons-material';
 import { ErrorMessageDialog } from '../../../common/dialogs/ErrorMessageDialog';
 import { LocationIcon } from './SessionLocations';
+import { onlineMeetingUrl } from '../../../../helpers/sessionLocationResolution';
 
 interface SessionAddressesIProps {
   address: ManagedCourse_Course_by_pk_Sessions_SessionAddresses | null;
@@ -29,10 +30,9 @@ export const SessionAddresses: FC<SessionAddressesIProps> = ({ address, refetchQ
   const tCommon = useTranslations('common');
   const [showAddressLookupError, setShowAddressLookupError] = useState(true);
 
-  const defaultSessionAddress = address?.CourseLocation?.defaultSessionAddress;
   const defaultSessionAddressId = address?.CourseLocation?.defaultSessionAddressId;
-  const sessionAddress = address?.address || defaultSessionAddress;
   const isOnline = address?.CourseLocation?.locationOption === 'ONLINE';
+  const sessionAddress = isOnline ? onlineMeetingUrl(address) : '';
   const isValidLink = isLinkFormat(sessionAddress ?? '');
   
   // Get the current locationAddressId if it exists

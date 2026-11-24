@@ -1,0 +1,4 @@
+# Finished builds of the Assistant's knowledge index (issue #2195). No role permissions.
+table:
+  name: KnowledgeIndex
+  schema: public

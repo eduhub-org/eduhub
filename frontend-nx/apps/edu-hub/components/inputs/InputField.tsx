@@ -150,6 +150,12 @@ type InputFieldProps = {
   transformRejectedMessage?: string;
 
   /**
+   * Async check run right before `updateValueMutation` (e.g. "is this title still free?").
+   * Resolve to an error message to show it and skip the save, or to null to save.
+   */
+  validateBeforeSave?: (text: string) => Promise<string | null>;
+
+  /**
    * Callback function called after successful text update.
    * @param data - The data returned from the mutation.
    */
@@ -236,6 +242,7 @@ const InputField: React.FC<InputFieldProps> = ({
   updateValueMutation,
   transformMutationText,
   transformRejectedMessage,
+  validateBeforeSave,
   onValueUpdated,
   refetchQueries = [],
   helpText,
@@ -536,8 +543,30 @@ const InputField: React.FC<InputFieldProps> = ({
           return;
         }
 
-        lastSentValueRef.current = newText;
-        updateText({ variables: { itemId: effectiveItemIdRef.current, text: textValue } });
+        const itemIdToSave = effectiveItemIdRef.current;
+        const save = () => {
+          lastSentValueRef.current = newText;
+          updateText({ variables: { itemId: itemIdToSave, text: textValue } });
+        };
+        if (validateBeforeSave) {
+          validateBeforeSave(newText)
+            .then((message) => {
+              // The user kept typing or moved on: the next debounced call checks the newer text.
+              if (localTextRef.current !== newText || effectiveItemIdRef.current !== itemIdToSave) return;
+              if (message) {
+                setErrorMessage(message);
+                setHasBlurred(true);
+                return;
+              }
+              setErrorMessage('');
+              save();
+            })
+            // If the check itself fails, save anyway; the server still has the last word.
+            .catch(save);
+          setHasBlurred(false);
+          return;
+        }
+        save();
       } else if (onValueUpdated) {
         onValueUpdated({ text: newText });
       }

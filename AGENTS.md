@@ -97,6 +97,10 @@ vs jest-config). This is now fixed by pinning `@babel/core` to `7.29.7` via a
     is matched by StuJo's Tailwind `content` globs, so those must cover
     `../edu-hub/components/**`. Direction of travel: more sharing over time —
     see `docs/STUJO_INTEGRATION_PLAN.md` §8.1.
+11. **Manual**: `docs/manual/{de,en}` is the user manual shown at `/help` and
+    the Assistant's main knowledge source. A PR into `develop` that changes
+    what users see or can do updates it in both languages in the same PR —
+    run `/update-manual`. Format: `docs/manual/README.md`.
 
 ## Behavioral guidelines (Karpathy)
 
@@ -128,6 +132,7 @@ context from this file by design.
 | `/version-update-summaries` | User-facing release notes for Slack/announcements |
 | `/create-project-issue` | Filing a GitHub issue on the EduHub project board |
 | `/pencil-design` | Reading/editing `.pen` design files via the Pencil MCP |
+| `/update-manual` | Before a PR into `develop` (or a promotion): update `docs/manual` for user-visible changes |
 
 **Browser / UI inspection:** Prefer MCP server **`cursor-ide-browser`** (Cursor’s
 internal Browser tab — sees the user’s open tabs, session, and cookies). Use

@@ -34,9 +34,13 @@ import { getRegistrationFeatures } from './ApplicationsTab/registrationConfig';
 import Loading from '../../common/Loading';
 import { ProgramType } from '../../../types/enums';
 import { readLastOpenedTab, storeLastOpenedTab } from './lastOpenedTab';
+import { CourseSegment } from '../../../helpers/coursePath';
+import { useCanonicalManageCoursePath } from '../../../hooks/useCanonicalManageCoursePath';
 
 interface Props {
   courseId: number;
+  /** The path segment this page was reached through, kept in step with the program type. */
+  expectedSegment: CourseSegment;
 }
 
 interface CourseManagementProps extends Props {
@@ -95,7 +99,7 @@ const getNextCourseStatus = (course: ManagedCourse_Course_by_pk) => {
  * can read every course of their organization, and would otherwise get a page on which every save
  * fails.
  */
-export const ManageCourseContent: FC<Props> = ({ courseId }) => {
+export const ManageCourseContent: FC<Props> = ({ courseId, expectedSegment }) => {
   const isAdmin = useIsAdmin();
   const isOrgAdmin = useIsOrgAdmin();
   const userId = useUserId();
@@ -127,14 +131,26 @@ export const ManageCourseContent: FC<Props> = ({ courseId }) => {
   if (manageable && !instructsCourse) {
     return (
       <ManagementRoleProvider role={AuthRoles.org_admin}>
-        <CourseManagement courseId={courseId} manageAsOrgAdmin orgAdminOfCourse />
+        <CourseManagement courseId={courseId} expectedSegment={expectedSegment} manageAsOrgAdmin orgAdminOfCourse />
       </ManagementRoleProvider>
     );
   }
-  return <CourseManagement courseId={courseId} manageAsOrgAdmin={false} orgAdminOfCourse={!!manageable} />;
+  return (
+    <CourseManagement
+      courseId={courseId}
+      expectedSegment={expectedSegment}
+      manageAsOrgAdmin={false}
+      orgAdminOfCourse={!!manageable}
+    />
+  );
 };
 
-const CourseManagement: FC<CourseManagementProps> = ({ courseId, manageAsOrgAdmin, orgAdminOfCourse = false }) => {
+const CourseManagement: FC<CourseManagementProps> = ({
+  courseId,
+  expectedSegment,
+  manageAsOrgAdmin,
+  orgAdminOfCourse = false,
+}) => {
   const t = useTranslations('manageCourse');
   const managedCourseQueryOptions = useMemo(
     () => ({
@@ -159,6 +175,8 @@ const CourseManagement: FC<CourseManagementProps> = ({ courseId, manageAsOrgAdmi
   }
 
   const course: ManagedCourse_Course_by_pk | null = qResult.data?.Course_by_pk || null;
+
+  useCanonicalManageCoursePath(courseId, expectedSegment, course?.Program.type);
 
   // null until the user picks a tab here; until then the tab remembered for this course (if it is
   // still shown) or the first tab is open.

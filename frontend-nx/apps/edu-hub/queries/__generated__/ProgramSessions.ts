@@ -9,6 +9,12 @@ import { LocationOption_enum } from "./../../__generated__/globalTypes";
 // GraphQL query operation: ProgramSessions
 // ====================================================
 
+export interface ProgramSessions_Session_SessionAddresses_OnlineMeetingLink {
+  __typename: "OnlineMeetingLink";
+  id: number;
+  url: string;
+}
+
 export interface ProgramSessions_Session_SessionAddresses {
   __typename: "SessionAddress";
   id: number;
@@ -24,6 +30,10 @@ export interface ProgramSessions_Session_SessionAddresses {
    * Foreign key to LocationAddress. Replaces the free-text address field with a structured address reference. Nullable during migration period.
    */
   locationAddressId: number | null;
+  /**
+   * An object relationship
+   */
+  OnlineMeetingLink: ProgramSessions_Session_SessionAddresses_OnlineMeetingLink | null;
 }
 
 export interface ProgramSessions_Session {

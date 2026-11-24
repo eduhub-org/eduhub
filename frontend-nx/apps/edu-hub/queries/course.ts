@@ -9,6 +9,7 @@ import {
 import { ADMIN_ENROLLMENT_FRAGMENT } from './enrollmentFragment';
 import { ENROLLMENT_HISTORY_FRAGMENT } from './enrollmentHistoryFragment';
 import { ADMIN_SESSION_FRAGMENT, SESSION_FRAGMENT } from './sessionFragement';
+import { SESSION_ONLINE_LINKS_FRAGMENT } from './onlineMeetingLink';
 import { USER_FRAGMENT } from './userFragment';
 import { PROGRAM_FRAGMENT_MINIMUM_PROPERTIES } from './programFragment';
 
@@ -85,6 +86,7 @@ export const MANAGED_COURSE = gql`
   ${ADMIN_COURSE_FRAGMENT}
   ${ADMIN_SESSION_FRAGMENT}
   ${SESSION_FRAGMENT}
+  ${SESSION_ONLINE_LINKS_FRAGMENT}
   query ManagedCourse($id: Int!) {
     Course_by_pk(id: $id) {
       ...AdminCourseFragment
@@ -93,6 +95,10 @@ export const MANAGED_COURSE = gql`
         defaultSessionAddress
         defaultSessionAddressId
         locationOption
+        OnlineMeetingLink {
+          id
+          url
+        }
       }
       Sessions(order_by: { startDateTime: asc }) {
         ...AdminSessionFragment
@@ -110,6 +116,7 @@ export const MANAGED_COURSE = gql`
         organizationId
         Sessions(order_by: { startDateTime: asc }) {
           ...SessionFragment
+          ...SessionOnlineLinksFragment
         }
       }
     }
@@ -578,20 +585,6 @@ export const UPDATE_COURSE_LOCATION = gql`
   }
 `;
 
-export const UPDATE_COURSE_SESSION_DEFAULT_ADDRESS = gql`
-  mutation UpdateCourseDefaultSessionAddress(
-    $itemId: Int!
-    $text: String!
-  ) {
-    update_CourseLocation_by_pk(
-      pk_columns: { id: $itemId }
-      _set: { defaultSessionAddress: $text }
-    ) {
-      id
-    }
-  }
-`;
-
 export const UPDATE_COURSE_DEFAULT_SESSION_ADDRESS_ID = gql`
   mutation UpdateCourseDefaultSessionAddressId(
     $itemId: Int!
@@ -1011,6 +1004,17 @@ export const MANAGED_COURSE_PARTICIPANT_EXPORT = gql`
           }
         }
       }
+    }
+  }
+`;
+
+/** Course titles of programs, to keep titles unique per course/degree program (helpers/courseTitles). */
+export const COURSE_TITLES_IN_PROGRAMS = gql`
+  query CourseTitlesInPrograms($programIds: [Int!]!) {
+    Course(where: { programId: { _in: $programIds } }) {
+      id
+      title
+      programId
     }
   }
 `;

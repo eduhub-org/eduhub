@@ -444,6 +444,17 @@ variable "ghost_newsletter_credentials_encryption_key" {
   sensitive   = true
 }
 
+variable "mcp_proposal_secret" {
+  description = "HMAC key signing the EduHub MCP server's Proposed Changes between propose and apply"
+  type        = string
+  sensitive   = true
+
+  validation {
+    condition     = length(var.mcp_proposal_secret) >= 32
+    error_message = "mcp_proposal_secret must contain at least 32 characters."
+  }
+}
+
 variable "guest_token_secret" {
   description = "HMAC key signing guest self-service (manage) links; rotating it invalidates all links already sent"
   type        = string
@@ -544,4 +555,54 @@ variable "embedding_location" {
   description = "Vertex AI region for the expert search embeddings; empty uses var.region"
   type        = string
   default     = ""
+}
+variable "assistant_llm_provider" {
+  description = "LLM provider of the Assistant: vertex, or empty to turn the Assistant off (ADR 0005)"
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = contains(["", "vertex"], var.assistant_llm_provider)
+    error_message = "assistant_llm_provider must be \"vertex\" or empty."
+  }
+}
+variable "assistant_llm_location" {
+  description = "Vertex AI location of the Assistant's model: the eu multi-region or an EU region. Never global: it gives no control over where requests are processed (ADR 0005)."
+  type        = string
+  default     = "eu"
+
+  validation {
+    condition     = var.assistant_llm_location == "eu" || startswith(var.assistant_llm_location, "europe-")
+    error_message = "assistant_llm_location must be \"eu\" or a europe-* region, never global."
+  }
+}
+variable "assistant_llm_model" {
+  description = "Model id of the Assistant for Vertex's OpenAI-compatible API; set from the trial in issue #2191"
+  type        = string
+  default     = "google/gemini-3.8-flash"
+}
+variable "assistant_monthly_spend_cap_eur" {
+  description = "Monthly spending cap of the Assistant in EUR; once reached, the Assistant is off until the next month"
+  type        = number
+  default     = 50
+}
+variable "assistant_llm_price_input_eur_per_mtok" {
+  description = "Price of the Assistant's model per million input tokens in EUR, from the Vertex AI price list for the chosen model and location. The spending cap multiplies it with the tokens the API reports; without it the Assistant stays off."
+  type        = number
+  default     = null
+}
+variable "assistant_llm_price_output_eur_per_mtok" {
+  description = "Price of the Assistant's model per million output tokens (including reasoning) in EUR, from the Vertex AI price list; without it the Assistant stays off"
+  type        = number
+  default     = null
+}
+variable "vertex_global_endpoint_policy" {
+  description = "Organization policy constraints/gcp.restrictEndpointUsage denying the global Vertex AI endpoint in this project: empty (not managed), dry_run (violations are only logged) or enforce. Needs roles/orgpolicy.policyAdmin, which can only be granted at the organization, for the Terraform service account."
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = contains(["", "dry_run", "enforce"], var.vertex_global_endpoint_policy)
+    error_message = "vertex_global_endpoint_policy must be empty, \"dry_run\" or \"enforce\"."
+  }
 }

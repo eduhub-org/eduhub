@@ -1,6 +1,6 @@
 import { createHasuraClient } from "../lib/hasura.js";
 import * as config from "../lib/config.js";
-import { parseMatrixResponse } from "../lib/matrixRoomUtils.js";
+import { creatorsHaveImplicitPower, parseMatrixResponse } from "../lib/matrixRoomUtils.js";
 
 const GET_COURSE_CONTEXT = `
   query GetCourseContext($courseId: Int!) {
@@ -77,6 +77,19 @@ const SET_COURSE_ROOM_IF_EMPTY = `
 
 const ALLOWED_ROLES = new Set(["admin", "instructor_access", "instructor"]);
 
+/**
+ * Room settings in course rooms that only the bot may change. Everything else
+ * stays at state_default (50), e.g. m.room.pinned_events for instructors.
+ */
+const COURSE_ROOM_BOT_ONLY_EVENTS = {
+  "m.room.encryption": 100,
+  "m.room.power_levels": 100,
+  "m.room.join_rules": 100,
+  "m.room.history_visibility": 100,
+  "m.room.tombstone": 100,
+  "m.room.server_acl": 100,
+};
+
 const trimAndNull = (value) => {
   if (value == null) return null;
   const trimmed = String(value).trim();
@@ -140,6 +153,17 @@ const createRoomWithAlias = async ({
     const aliasResult = await parseMatrixResponse(aliasResponse);
     return aliasResult.room_id;
   }
+};
+
+/** The room version the homeserver uses for new rooms, or null if it does not say. */
+const getDefaultRoomVersion = async ({ homeserverUrl, token, signal }) => {
+  const response = await fetch(`${homeserverUrl}/_matrix/client/v3/capabilities`, {
+    method: "GET",
+    headers: matrixHeaders(token),
+    signal,
+  });
+  const result = await parseMatrixResponse(response);
+  return result?.capabilities?.["m.room_versions"]?.default ?? null;
 };
 
 const putStateEvent = async ({
@@ -484,10 +508,21 @@ export default async function createMatrixRoom(req, logger) {
       logger,
       signal: controller.signal,
     });
+    // Pin the version we check against, so the room is created with the same one.
+    const roomVersion = await getDefaultRoomVersion({
+      homeserverUrl: matrixConfig.homeserverUrl,
+      token: matrixConfig.token,
+      signal: controller.signal,
+    });
+    // The bot goes last, so an instructor mapped to the bot's id cannot lower it to 50.
     const powerLevelUsers = {
-      ...(matrixConfig.adminUserId && { [matrixConfig.adminUserId]: 100 }),
       ...instructorUsers,
+      [matrixConfig.adminUserId]: 100,
     };
+    // The bot creates the room, so from room version 12 on its power is implicit.
+    if (creatorsHaveImplicitPower(roomVersion)) {
+      delete powerLevelUsers[matrixConfig.adminUserId];
+    }
     const roomId = await createRoomWithAlias({
       homeserverUrl: matrixConfig.homeserverUrl,
       token: matrixConfig.token,
@@ -495,6 +530,7 @@ export default async function createMatrixRoom(req, logger) {
       serverName: matrixConfig.serverName,
       signal: controller.signal,
       payload: {
+        ...(roomVersion && { room_version: roomVersion }),
         name: roomName,
         topic: topic || "",
         visibility: "private",
@@ -510,6 +546,10 @@ export default async function createMatrixRoom(req, logger) {
               users_default: 0,
               events_default: 0,
               state_default: 50,
+              // Instructors (50) may pin, rename and moderate, but these
+              // settings would break or open up the room, so only the bot
+              // (100, or creator in room version 12) may change them.
+              events: COURSE_ROOM_BOT_ONLY_EVENTS,
               redact: 50,
               ban: 50,
               kick: 50,

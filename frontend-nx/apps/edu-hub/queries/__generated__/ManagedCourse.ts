@@ -39,6 +39,12 @@ export interface ManagedCourse_Course_by_pk_SourceSession {
   Course: ManagedCourse_Course_by_pk_SourceSession_Course | null;
 }
 
+export interface ManagedCourse_Course_by_pk_Sessions_SessionAddresses_CourseLocation_OnlineMeetingLink {
+  __typename: "OnlineMeetingLink";
+  id: number;
+  url: string;
+}
+
 export interface ManagedCourse_Course_by_pk_Sessions_SessionAddresses_CourseLocation {
   __typename: "CourseLocation";
   id: number;
@@ -54,6 +60,16 @@ export interface ManagedCourse_Course_by_pk_Sessions_SessionAddresses_CourseLoca
    * References a LocationAddress that serves as the default for sessions in this course location. Replaces the legacy text-based defaultSessionAddress field.
    */
   defaultSessionAddressId: number | null;
+  /**
+   * An object relationship
+   */
+  OnlineMeetingLink: ManagedCourse_Course_by_pk_Sessions_SessionAddresses_CourseLocation_OnlineMeetingLink | null;
+}
+
+export interface ManagedCourse_Course_by_pk_Sessions_SessionAddresses_OnlineMeetingLink {
+  __typename: "OnlineMeetingLink";
+  id: number;
+  url: string;
 }
 
 export interface ManagedCourse_Course_by_pk_Sessions_SessionAddresses {
@@ -75,6 +91,10 @@ export interface ManagedCourse_Course_by_pk_Sessions_SessionAddresses {
    * An object relationship
    */
   CourseLocation: ManagedCourse_Course_by_pk_Sessions_SessionAddresses_CourseLocation | null;
+  /**
+   * An object relationship
+   */
+  OnlineMeetingLink: ManagedCourse_Course_by_pk_Sessions_SessionAddresses_OnlineMeetingLink | null;
 }
 
 export interface ManagedCourse_Course_by_pk_Sessions_SessionSpeakers_User_Organization {
@@ -229,6 +249,12 @@ export interface ManagedCourse_Course_by_pk_CourseInstructors {
   User: ManagedCourse_Course_by_pk_CourseInstructors_User;
 }
 
+export interface ManagedCourse_Course_by_pk_CourseLocations_OnlineMeetingLink {
+  __typename: "OnlineMeetingLink";
+  id: number;
+  url: string;
+}
+
 export interface ManagedCourse_Course_by_pk_CourseLocations {
   __typename: "CourseLocation";
   id: number;
@@ -244,6 +270,16 @@ export interface ManagedCourse_Course_by_pk_CourseLocations {
    * References a LocationAddress that serves as the default for sessions in this course location. Replaces the legacy text-based defaultSessionAddress field.
    */
   defaultSessionAddressId: number | null;
+  /**
+   * An object relationship
+   */
+  OnlineMeetingLink: ManagedCourse_Course_by_pk_CourseLocations_OnlineMeetingLink | null;
+}
+
+export interface ManagedCourse_Course_by_pk_Program_Sessions_SessionAddresses_CourseLocation_OnlineMeetingLink {
+  __typename: "OnlineMeetingLink";
+  id: number;
+  url: string;
 }
 
 export interface ManagedCourse_Course_by_pk_Program_Sessions_SessionAddresses_CourseLocation {
@@ -261,6 +297,16 @@ export interface ManagedCourse_Course_by_pk_Program_Sessions_SessionAddresses_Co
    * References a LocationAddress that serves as the default for sessions in this course location. Replaces the legacy text-based defaultSessionAddress field.
    */
   defaultSessionAddressId: number | null;
+  /**
+   * An object relationship
+   */
+  OnlineMeetingLink: ManagedCourse_Course_by_pk_Program_Sessions_SessionAddresses_CourseLocation_OnlineMeetingLink | null;
+}
+
+export interface ManagedCourse_Course_by_pk_Program_Sessions_SessionAddresses_OnlineMeetingLink {
+  __typename: "OnlineMeetingLink";
+  id: number;
+  url: string;
 }
 
 export interface ManagedCourse_Course_by_pk_Program_Sessions_SessionAddresses {
@@ -282,6 +328,10 @@ export interface ManagedCourse_Course_by_pk_Program_Sessions_SessionAddresses {
    * An object relationship
    */
   CourseLocation: ManagedCourse_Course_by_pk_Program_Sessions_SessionAddresses_CourseLocation | null;
+  /**
+   * An object relationship
+   */
+  OnlineMeetingLink: ManagedCourse_Course_by_pk_Program_Sessions_SessionAddresses_OnlineMeetingLink | null;
 }
 
 export interface ManagedCourse_Course_by_pk_Program_Sessions_SessionSpeakers_User {

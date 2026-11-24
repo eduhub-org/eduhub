@@ -11,6 +11,13 @@ object_relationships:
   - name: Session
     using:
       foreign_key_constraint_on: sessionId
+  - name: OnlineMeetingLink
+    using:
+      foreign_key_constraint_on:
+        column: sessionAddressId
+        table:
+          name: OnlineMeetingLink
+          schema: public
 insert_permissions:
   - role: instructor_access
     permission:

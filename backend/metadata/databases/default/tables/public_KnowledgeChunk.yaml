@@ -1,0 +1,9 @@
+# The Assistant's knowledge index (issue #2195). No role permissions: only the searchKnowledge
+# action and the release indexer use it, with the admin secret.
+table:
+  name: KnowledgeChunk
+  schema: public
+object_relationships:
+  - name: Organization
+    using:
+      foreign_key_constraint_on: organizationId

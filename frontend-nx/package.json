@@ -36,6 +36,7 @@
     "@fullcalendar/timegrid": "^6.1.20",
     "@headlessui/react": "^2.2.10",
     "@hello-pangea/dnd": "^18.0.1",
+    "@modelcontextprotocol/sdk": "^1.32.2",
     "@mui/icons-material": "^6.5.0",
     "@mui/material": "^6.5.0",
     "@mui/material-nextjs": "^7.0.0",
@@ -75,7 +76,8 @@
     "tailwind-merge": "^2.5.4",
     "tslib": "^2.7.0",
     "use-debounce": "^10.0.4",
-    "uuid": "^11.1.1"
+    "uuid": "^11.1.1",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",
