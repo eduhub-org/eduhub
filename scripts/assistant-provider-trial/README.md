@@ -13,7 +13,7 @@ endpoint is refused, since it gives no control over where requests are processed
 
 | Column | Meaning |
 |--------|---------|
-| Tools OK (1st try / with retry) | The expected tool was called with the expected arguments, and no forbidden tool was called. "With retry" allows one invalid call that is answered with a validation error, as the backend will do (#2193). |
+| Tools OK (1st try / with retry) | The expected tool was called with the expected arguments, and no forbidden tool was called. "With retry" allows one invalid call that is answered with the same `INVALID_ARGUMENTS` error the Assistant backend sends. |
 | Invalid calls, tool markup in text | Arguments that don't parse or don't match the schema; `<tool_call>` text instead of a real tool call. |
 | German "du", "Sie"/mixed | Address form in German answers (regex heuristic, check the flagged ones by hand). |
 | Language match | Answer in the language of the question. |
@@ -25,14 +25,19 @@ Answer quality is rated by hand: fill in `rating` (1–5) in `answers.csv`.
 
 ## Files
 
-- `cases.json`: 27 test cases in German and English: platform and error questions,
+- `cases.json`: 30 test cases in German and English: platform and error questions,
   "my data" (waitlist, invitation deadline, attendance, certificates), catalogue,
-  out-of-scope requests and Organizer tasks (texts from notes, settings, Sessions,
-  including Sessions locked by registrations).
-- `tools.json`: mock tools that follow the planned Assistant tools (#2193)
-  and course-setup MCP operations (ADR 0006), with fixed fictional results.
-  Once the MCP server exists, replace them with its real tool list and run again.
-- `system_prompt.md`: the system prompt under test.
+  out-of-scope requests and Organizer tasks (texts from notes, texts in the wrong
+  language, settings, adding and moving Sessions, Sessions locked by registrations,
+  creating a course). `role` is `user`, `instructor` or `org_admin`.
+- `tools.json`: the tool definitions exactly as the Assistant offers them to the
+  model: the user tools from `frontend-nx/apps/edu-hub/lib/assistant/userTools.ts`
+  and the course-setup tools of the MCP server (`lib/mcp/server.ts`), without
+  apply and discard, which the model never gets. Results are fictional mocks in
+  the shape the model receives. When a tool changes in the app, copy its new
+  definition here.
+- `system_prompt.md`: the Assistant's system prompt from `lib/assistant/prompt.ts`;
+  the harness fills in the Organizer rules, role, page and page error the same way.
 - `providers.example.json`: targets; copy it to `providers.json` (git-ignored).
 
 ## Run

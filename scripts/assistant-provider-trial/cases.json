@@ -1,177 +1,861 @@
 {
-  "_comment": "Trial test set for issue #2191. expect.tool: the tool that must be called (null = no data tool; tools in expect.allow are still fine). expect.args: required argument values; strings match case-insensitively as substrings, other values must be equal. forbid: tools that must not be called. mock: per-case tool results overriding tools.json. All data is fictional.",
+  "_comment": "Trial test set for issue #2191. expect.tool: the tool that must be called (null = no data tool; tools in expect.allow are still fine). expect.args: required argument values; strings match case-insensitively as substrings, every item of an expected list must match some item of the actual list, other values must be equal. forbid: tools that must not be called. mock: per-case tool results overriding tools.json. role: user, instructor or org_admin. All data is fictional.",
   "cases": [
     {
-      "id": "de-platform-01", "lang": "de", "category": "platform", "role": "user",
-      "page": { "route": "/" },
-      "messages": [{ "role": "user", "content": "Wie bewerbe ich mich für einen Kurs?" }],
-      "expect": { "tool": "search_knowledge" }
-    },
-    {
-      "id": "de-platform-02", "lang": "de", "category": "platform", "role": "user",
-      "page": { "route": "/course/4711", "courseId": 4711 },
-      "messages": [{ "role": "user", "content": "Was passiert, wenn ich die Einladung nicht rechtzeitig annehme?" }],
-      "expect": { "tool": "search_knowledge" }
-    },
-    {
-      "id": "de-platform-03", "lang": "de", "category": "platform", "role": "user",
-      "page": { "route": "/profile" },
-      "messages": [{ "role": "user", "content": "Was brauche ich für ein Leistungszertifikat?" }],
-      "expect": { "tool": "search_knowledge" }
-    },
-    {
-      "id": "en-platform-01", "lang": "en", "category": "platform", "role": "user",
-      "page": { "route": "/" },
-      "messages": [{ "role": "user", "content": "How do I apply for a course?" }],
-      "expect": { "tool": "search_knowledge" }
-    },
-    {
-      "id": "de-error-01", "lang": "de", "category": "error", "role": "user",
-      "page": { "route": "/course/4711", "courseId": 4711, "error": "Die Bewerbungsfrist für diesen Kurs ist abgelaufen." },
-      "messages": [{ "role": "user", "content": "Warum kann ich mich nicht bewerben??" }],
-      "expect": { "tool": null, "allow": ["search_knowledge", "search_courses", "get_my_registrations"] }
-    },
-    {
-      "id": "en-error-01", "lang": "en", "category": "error", "role": "user",
-      "page": { "route": "/course/4733", "courseId": 4733, "error": "Upload failed: file is larger than 10 MB." },
-      "messages": [{ "role": "user", "content": "my project upload keeps failing, what do I do" }],
-      "expect": { "tool": null, "allow": ["search_knowledge"] }
-    },
-    {
-      "id": "de-catalogue-01", "lang": "de", "category": "catalogue", "role": "user",
-      "page": { "route": "/" },
-      "messages": [{ "role": "user", "content": "Gibt es Kurse zu Machine Learning auf Deutsch?" }],
-      "expect": { "tool": "search_courses", "args": { "query": "machine learning", "language": "de" } }
-    },
-    {
-      "id": "en-catalogue-01", "lang": "en", "category": "catalogue", "role": "user",
-      "page": { "route": "/" },
-      "messages": [{ "role": "user", "content": "Any deep learning courses on Thursdays?" }],
-      "expect": { "tool": "search_courses", "args": { "query": "deep learning", "weekDay": "THURSDAY" } }
-    },
-    {
-      "id": "de-mydata-01", "lang": "de", "category": "my_data", "role": "user",
-      "page": { "route": "/" },
-      "messages": [{ "role": "user", "content": "Auf welchem Platz der Warteliste bin ich?" }],
-      "expect": { "tool": "get_my_registrations" }
-    },
-    {
-      "id": "de-mydata-02", "lang": "de", "category": "my_data", "role": "user",
-      "page": { "route": "/course/4711", "courseId": 4711 },
-      "messages": [{ "role": "user", "content": "Bis wann muss ich die Einladung für diesen Kurs annehmen?" }],
-      "expect": { "tool": "get_my_registrations" }
-    },
-    {
-      "id": "de-mydata-03", "lang": "de", "category": "my_data", "role": "user",
-      "page": { "route": "/course/4711", "courseId": 4711 },
-      "messages": [{ "role": "user", "content": "Wie oft darf ich noch fehlen?" }],
-      "expect": { "tool": "get_my_attendance", "args": { "courseId": 4711 } }
-    },
-    {
-      "id": "de-mydata-04", "lang": "de", "category": "my_data", "role": "user",
-      "page": { "route": "/profile" },
-      "messages": [{ "role": "user", "content": "Wo finde ich mein Zertifikat von Data Literacy?" }],
-      "expect": { "tool": "get_my_certificates" }
-    },
-    {
-      "id": "en-mydata-01", "lang": "en", "category": "my_data", "role": "user",
-      "page": { "route": "/course/4733", "courseId": 4733 },
-      "messages": [{ "role": "user", "content": "Did I get a spot in this course?" }],
-      "expect": { "tool": "get_my_registrations" }
-    },
-    {
-      "id": "en-mydata-02", "lang": "en", "category": "my_data", "role": "user",
-      "page": { "route": "/course/4711", "courseId": 4711 },
-      "messages": [{ "role": "user", "content": "How many sessions have I missed so far?" }],
-      "expect": { "tool": "get_my_attendance", "args": { "courseId": 4711 } }
-    },
-    {
-      "id": "de-multiturn-01", "lang": "de", "category": "my_data", "role": "user",
-      "page": { "route": "/" },
+      "id": "de-platform-01",
+      "lang": "de",
+      "category": "platform",
+      "role": "user",
+      "page": {
+        "path": "/"
+      },
       "messages": [
-        { "role": "user", "content": "Hi! Ich hab mich für zwei Kurse beworben." },
-        { "role": "assistant", "content": "Hi! Soll ich nachsehen, wie der Stand deiner Bewerbungen ist?" },
-        { "role": "user", "content": "Ja bitte, und sag mir, wo ich noch handeln muss." }
+        {
+          "role": "user",
+          "content": "Wie bewerbe ich mich für einen Kurs?"
+        }
       ],
-      "expect": { "tool": "get_my_registrations" }
-    },
-    {
-      "id": "de-scope-01", "lang": "de", "category": "out_of_scope", "role": "organizer",
-      "page": { "route": "/manage/course/4711", "courseId": 4711 },
-      "messages": [{ "role": "user", "content": "Setz bitte Lena Beispiel von der Warteliste in den Kurs." }],
-      "expect": { "tool": null, "allow": ["search_knowledge", "get_course"] },
-      "forbid": ["propose_course_settings", "propose_course_texts", "propose_sessions"]
-    },
-    {
-      "id": "en-scope-01", "lang": "en", "category": "out_of_scope", "role": "user",
-      "page": { "route": "/" },
-      "messages": [{ "role": "user", "content": "Can you email the instructor that I'll be late today?" }],
-      "expect": { "tool": null, "allow": ["search_knowledge"] }
-    },
-    {
-      "id": "de-privacy-01", "lang": "de", "category": "out_of_scope", "role": "user",
-      "page": { "route": "/course/4711", "courseId": 4711 },
-      "messages": [{ "role": "user", "content": "Wer ist sonst noch in dem Kurs angemeldet?" }],
-      "expect": { "tool": null, "allow": ["search_knowledge"] }
-    },
-    {
-      "id": "de-org-texts-01", "lang": "de", "category": "organizer", "role": "organizer",
-      "page": { "route": "/manage/course/4711", "courseId": 4711 },
-      "messages": [{ "role": "user", "content": "Mach mir aus diesen Notizen eine Kursbeschreibung auf Deutsch:\n- ML Grundlagen, Python vorausgesetzt\n- 10 Termine, dienstags 18 Uhr\n- Projekt am Ende, eigene Daten mitbringen erlaubt\n- Ziel: eigenes Modell trainieren und bewerten können" }],
-      "expect": { "tool": "propose_course_texts", "args": { "courseId": 4711, "language": "de" } },
-      "forbid": ["propose_sessions"]
-    },
-    {
-      "id": "en-org-texts-01", "lang": "en", "category": "organizer", "role": "organizer",
-      "page": { "route": "/manage/course/4711", "courseId": 4711 },
-      "messages": [{ "role": "user", "content": "Please write the English learning goals for this course: students can clean a dataset, train a classifier, and explain precision vs recall." }],
-      "expect": { "tool": "propose_course_texts", "args": { "courseId": 4711, "language": "en" } }
-    },
-    {
-      "id": "de-org-settings-01", "lang": "de", "category": "organizer", "role": "organizer",
-      "page": { "route": "/manage/course/4711", "courseId": 4711 },
-      "messages": [{ "role": "user", "content": "Erhöh die maximale Teilnehmerzahl auf 40 und verschieb die Bewerbungsfrist auf den 15. Dezember." }],
-      "expect": { "tool": "propose_course_settings", "args": { "courseId": 4711, "settings": { "maxParticipants": 40, "applicationEnd": "2026-12-15" } } }
-    },
-    {
-      "id": "de-org-settings-02", "lang": "de", "category": "organizer", "role": "organizer",
-      "page": { "route": "/manage/course/4711", "courseId": 4711 },
-      "messages": [{ "role": "user", "content": "Die Teilnehmenden sollen höchstens zwei Termine verpassen dürfen, und zeig die freien Plätze an." }],
-      "expect": { "tool": "propose_course_settings", "args": { "courseId": 4711, "settings": { "maxMissedSessions": 2, "showAvailablePlaces": true } } }
-    },
-    {
-      "id": "en-org-settings-01", "lang": "en", "category": "organizer", "role": "organizer",
-      "page": { "route": "/manage/course/4711", "courseId": 4711 },
-      "messages": [{ "role": "user", "content": "Move the course to Wednesdays, 17:30 to 19:00." }],
-      "expect": { "tool": "propose_course_settings", "args": { "courseId": 4711, "settings": { "weekDay": "WEDNESDAY", "startTime": "17:30", "endTime": "19:00" } } }
-    },
-    {
-      "id": "de-org-sessions-01", "lang": "de", "category": "organizer", "role": "organizer",
-      "page": { "route": "/manage/course/4711", "courseId": 4711 },
-      "messages": [{ "role": "user", "content": "Leg drei Termine an: 13., 20. und 27. Januar 2027, jeweils 18 bis 19:30 Uhr. Titel: Grundlagen, Regression, Klassifikation." }],
-      "expect": { "tool": "propose_sessions", "args": { "courseId": 4711 } }
-    },
-    {
-      "id": "en-org-sessions-01", "lang": "en", "category": "organizer", "role": "organizer",
-      "page": { "route": "/manage/course/4711", "courseId": 4711 },
-      "messages": [{ "role": "user", "content": "Create weekly sessions on Tuesdays from Jan 12 to Feb 2, 2027, 6–7:30 pm, titled 'Week 1' to 'Week 4'." }],
-      "expect": { "tool": "propose_sessions", "args": { "courseId": 4711 } }
-    },
-    {
-      "id": "de-org-sessions-locked", "lang": "de", "category": "organizer", "role": "organizer",
-      "page": { "route": "/manage/course/4711", "courseId": 4711 },
-      "messages": [{ "role": "user", "content": "Füg noch einen Termin am 3. Februar 2027 um 18 Uhr hinzu, 90 Minuten, Titel Abschlusspräsentationen." }],
-      "expect": { "tool": "propose_sessions", "args": { "courseId": 4711 } },
-      "mock": {
-        "get_course": { "id": 4711, "title": "Einführung in Machine Learning", "registrationCount": 12, "sessions": [] },
-        "propose_sessions": { "error": "SESSIONS_LOCKED", "message": "This course already has registrations, so Sessions can't be changed through the Assistant." }
+      "expect": {
+        "tool": "search_knowledge"
       }
     },
     {
-      "id": "de-participant-cant-edit", "lang": "de", "category": "out_of_scope", "role": "user",
-      "page": { "route": "/course/4711", "courseId": 4711 },
-      "messages": [{ "role": "user", "content": "Ändere die Kursbeschreibung, da ist ein Tippfehler drin." }],
-      "expect": { "tool": null, "allow": ["search_knowledge"] }
+      "id": "de-platform-02",
+      "lang": "de",
+      "category": "platform",
+      "role": "user",
+      "page": {
+        "path": "/course/4711",
+        "courseId": 4711
+      },
+      "messages": [
+        {
+          "role": "user",
+          "content": "Was passiert, wenn ich die Einladung nicht rechtzeitig annehme?"
+        }
+      ],
+      "expect": {
+        "tool": "search_knowledge"
+      }
+    },
+    {
+      "id": "de-platform-03",
+      "lang": "de",
+      "category": "platform",
+      "role": "user",
+      "page": {
+        "path": "/profile"
+      },
+      "messages": [
+        {
+          "role": "user",
+          "content": "Was brauche ich für ein Leistungszertifikat?"
+        }
+      ],
+      "expect": {
+        "tool": "search_knowledge"
+      }
+    },
+    {
+      "id": "en-platform-01",
+      "lang": "en",
+      "category": "platform",
+      "role": "user",
+      "page": {
+        "path": "/"
+      },
+      "messages": [
+        {
+          "role": "user",
+          "content": "How do I apply for a course?"
+        }
+      ],
+      "expect": {
+        "tool": "search_knowledge"
+      }
+    },
+    {
+      "id": "de-error-01",
+      "lang": "de",
+      "category": "error",
+      "role": "user",
+      "page": {
+        "path": "/course/4711",
+        "courseId": 4711,
+        "error": "Die Bewerbungsfrist für diesen Kurs ist abgelaufen."
+      },
+      "messages": [
+        {
+          "role": "user",
+          "content": "Warum kann ich mich nicht bewerben??"
+        }
+      ],
+      "expect": {
+        "tool": null,
+        "allow": [
+          "search_knowledge",
+          "search_courses",
+          "get_my_registrations"
+        ]
+      }
+    },
+    {
+      "id": "en-error-01",
+      "lang": "en",
+      "category": "error",
+      "role": "user",
+      "page": {
+        "path": "/course/4733",
+        "courseId": 4733,
+        "error": "Upload failed: file is larger than 10 MB."
+      },
+      "messages": [
+        {
+          "role": "user",
+          "content": "my project upload keeps failing, what do I do"
+        }
+      ],
+      "expect": {
+        "tool": null,
+        "allow": [
+          "search_knowledge"
+        ]
+      }
+    },
+    {
+      "id": "de-catalogue-01",
+      "lang": "de",
+      "category": "catalogue",
+      "role": "user",
+      "page": {
+        "path": "/"
+      },
+      "messages": [
+        {
+          "role": "user",
+          "content": "Gibt es Kurse zu Machine Learning auf Deutsch?"
+        }
+      ],
+      "expect": {
+        "tool": "search_courses",
+        "args": {
+          "query": "machine learning",
+          "language": "de"
+        }
+      }
+    },
+    {
+      "id": "en-catalogue-01",
+      "lang": "en",
+      "category": "catalogue",
+      "role": "user",
+      "page": {
+        "path": "/"
+      },
+      "messages": [
+        {
+          "role": "user",
+          "content": "Any deep learning courses I can still apply for?"
+        }
+      ],
+      "expect": {
+        "tool": "search_courses",
+        "args": {
+          "query": "deep learning",
+          "openForApplications": true
+        }
+      }
+    },
+    {
+      "id": "de-mydata-01",
+      "lang": "de",
+      "category": "my_data",
+      "role": "user",
+      "page": {
+        "path": "/"
+      },
+      "messages": [
+        {
+          "role": "user",
+          "content": "Auf welchem Platz der Warteliste bin ich?"
+        }
+      ],
+      "expect": {
+        "tool": "get_my_registrations"
+      }
+    },
+    {
+      "id": "de-mydata-02",
+      "lang": "de",
+      "category": "my_data",
+      "role": "user",
+      "page": {
+        "path": "/course/4711",
+        "courseId": 4711
+      },
+      "messages": [
+        {
+          "role": "user",
+          "content": "Bis wann muss ich die Einladung für diesen Kurs annehmen?"
+        }
+      ],
+      "expect": {
+        "tool": "get_my_registrations"
+      }
+    },
+    {
+      "id": "de-mydata-03",
+      "lang": "de",
+      "category": "my_data",
+      "role": "user",
+      "page": {
+        "path": "/course/4711",
+        "courseId": 4711
+      },
+      "messages": [
+        {
+          "role": "user",
+          "content": "Wie oft darf ich noch fehlen?"
+        }
+      ],
+      "expect": {
+        "tool": "get_my_attendance",
+        "args": {
+          "courseId": 4711
+        }
+      }
+    },
+    {
+      "id": "de-mydata-04",
+      "lang": "de",
+      "category": "my_data",
+      "role": "user",
+      "page": {
+        "path": "/profile"
+      },
+      "messages": [
+        {
+          "role": "user",
+          "content": "Wo finde ich mein Zertifikat von Data Literacy?"
+        }
+      ],
+      "expect": {
+        "tool": "get_my_registrations"
+      }
+    },
+    {
+      "id": "en-mydata-01",
+      "lang": "en",
+      "category": "my_data",
+      "role": "user",
+      "page": {
+        "path": "/course/4733",
+        "courseId": 4733
+      },
+      "messages": [
+        {
+          "role": "user",
+          "content": "Did I get a spot in this course?"
+        }
+      ],
+      "expect": {
+        "tool": "get_my_registrations"
+      }
+    },
+    {
+      "id": "en-mydata-02",
+      "lang": "en",
+      "category": "my_data",
+      "role": "user",
+      "page": {
+        "path": "/course/4711",
+        "courseId": 4711
+      },
+      "messages": [
+        {
+          "role": "user",
+          "content": "How many sessions have I missed so far?"
+        }
+      ],
+      "expect": {
+        "tool": "get_my_attendance",
+        "args": {
+          "courseId": 4711
+        }
+      }
+    },
+    {
+      "id": "de-multiturn-01",
+      "lang": "de",
+      "category": "my_data",
+      "role": "user",
+      "page": {
+        "path": "/"
+      },
+      "messages": [
+        {
+          "role": "user",
+          "content": "Hi! Ich hab mich für zwei Kurse beworben."
+        },
+        {
+          "role": "assistant",
+          "content": "Hi! Soll ich nachsehen, wie der Stand deiner Bewerbungen ist?"
+        },
+        {
+          "role": "user",
+          "content": "Ja bitte, und sag mir, wo ich noch handeln muss."
+        }
+      ],
+      "expect": {
+        "tool": "get_my_registrations"
+      }
+    },
+    {
+      "id": "de-scope-01",
+      "lang": "de",
+      "category": "out_of_scope",
+      "role": "instructor",
+      "page": {
+        "path": "/manage/course/4711",
+        "courseId": 4711
+      },
+      "messages": [
+        {
+          "role": "user",
+          "content": "Setz bitte Lena Beispiel von der Warteliste in den Kurs."
+        }
+      ],
+      "expect": {
+        "tool": null,
+        "allow": [
+          "search_knowledge",
+          "get_course",
+          "get_registration_count",
+          "list_courses"
+        ]
+      },
+      "forbid": [
+        "propose_course_settings",
+        "propose_course_texts",
+        "propose_sessions",
+        "propose_create_course"
+      ]
+    },
+    {
+      "id": "en-scope-01",
+      "lang": "en",
+      "category": "out_of_scope",
+      "role": "user",
+      "page": {
+        "path": "/"
+      },
+      "messages": [
+        {
+          "role": "user",
+          "content": "Can you email the instructor that I'll be late today?"
+        }
+      ],
+      "expect": {
+        "tool": null,
+        "allow": [
+          "search_knowledge"
+        ]
+      }
+    },
+    {
+      "id": "de-privacy-01",
+      "lang": "de",
+      "category": "out_of_scope",
+      "role": "user",
+      "page": {
+        "path": "/course/4711",
+        "courseId": 4711
+      },
+      "messages": [
+        {
+          "role": "user",
+          "content": "Wer ist sonst noch in dem Kurs angemeldet?"
+        }
+      ],
+      "expect": {
+        "tool": null,
+        "allow": [
+          "search_knowledge"
+        ]
+      }
+    },
+    {
+      "id": "de-org-texts-01",
+      "lang": "de",
+      "category": "organizer",
+      "role": "instructor",
+      "page": {
+        "path": "/manage/course/4711",
+        "courseId": 4711
+      },
+      "messages": [
+        {
+          "role": "user",
+          "content": "Mach mir aus diesen Notizen eine Kursbeschreibung auf Deutsch:\n- ML Grundlagen, Python vorausgesetzt\n- 10 Termine, dienstags 18 Uhr\n- Projekt am Ende, eigene Daten mitbringen erlaubt\n- Ziel: eigenes Modell trainieren und bewerten können"
+        }
+      ],
+      "expect": {
+        "tool": "propose_course_texts",
+        "args": {
+          "courseId": 4711,
+          "language": "de"
+        }
+      },
+      "forbid": [
+        "propose_sessions"
+      ]
+    },
+    {
+      "id": "en-org-texts-01",
+      "lang": "en",
+      "category": "organizer",
+      "role": "instructor",
+      "page": {
+        "path": "/manage/course/4733",
+        "courseId": 4733
+      },
+      "messages": [
+        {
+          "role": "user",
+          "content": "Please write the English learning goals for this course: students can clean a dataset, train a classifier, and explain precision vs recall."
+        }
+      ],
+      "expect": {
+        "tool": "propose_course_texts",
+        "args": {
+          "courseId": 4733
+        }
+      },
+      "mock": {
+        "get_course": {
+          "id": 4733,
+          "updatedAt": "2026-11-20T09:30:00.000+00:00",
+          "programType": "COURSES",
+          "title": "Deep Learning with PyTorch",
+          "tagline": "Build and train neural networks",
+          "learningGoals": "",
+          "headingDescriptionField1": "What is it about?",
+          "contentDescriptionField1": "",
+          "headingDescriptionField2": "What do you need?",
+          "contentDescriptionField2": "",
+          "maxParticipants": 25,
+          "applicationEnd": "2026-12-15",
+          "maxMissedSessions": 2,
+          "language": "EN",
+          "weekDay": "THURSDAY",
+          "startTime": "18:30:00",
+          "endTime": "20:00:00",
+          "sessionReminderLeadHours": 24,
+          "showAvailablePlaces": false,
+          "attendanceCertificatePossible": true,
+          "achievementCertificatePossible": true,
+          "registrationCount": 0,
+          "sessionsChangeable": true,
+          "courseLocations": [
+            {
+              "id": 93,
+              "locationOption": "ONLINE",
+              "defaultSessionAddress": "https://example.zoom.us/j/4733",
+              "defaultSessionAddressId": 503
+            }
+          ],
+          "sessions": []
+        },
+        "get_registration_count": {
+          "courseId": 4733,
+          "registrationCount": 0,
+          "sessionsChangeable": true
+        }
+      }
+    },
+    {
+      "id": "de-org-settings-01",
+      "lang": "de",
+      "category": "organizer",
+      "role": "instructor",
+      "page": {
+        "path": "/manage/course/4711",
+        "courseId": 4711
+      },
+      "messages": [
+        {
+          "role": "user",
+          "content": "Erhöh die maximale Teilnehmerzahl auf 40 und verschieb die Bewerbungsfrist auf den 15. Dezember."
+        }
+      ],
+      "expect": {
+        "tool": "propose_course_settings",
+        "args": {
+          "courseId": 4711,
+          "settings": {
+            "maxParticipants": 40,
+            "applicationEnd": "2026-12-15"
+          }
+        }
+      }
+    },
+    {
+      "id": "de-org-settings-02",
+      "lang": "de",
+      "category": "organizer",
+      "role": "instructor",
+      "page": {
+        "path": "/manage/course/4711",
+        "courseId": 4711
+      },
+      "messages": [
+        {
+          "role": "user",
+          "content": "Die Teilnehmenden sollen höchstens zwei Termine verpassen dürfen, und zeig die freien Plätze an."
+        }
+      ],
+      "expect": {
+        "tool": "propose_course_settings",
+        "args": {
+          "courseId": 4711,
+          "settings": {
+            "maxMissedSessions": 2,
+            "showAvailablePlaces": true
+          }
+        }
+      }
+    },
+    {
+      "id": "en-org-settings-01",
+      "lang": "en",
+      "category": "organizer",
+      "role": "instructor",
+      "page": {
+        "path": "/manage/course/4711",
+        "courseId": 4711
+      },
+      "messages": [
+        {
+          "role": "user",
+          "content": "Move the course to Wednesdays, 17:30 to 19:00."
+        }
+      ],
+      "expect": {
+        "tool": "propose_course_settings",
+        "args": {
+          "courseId": 4711,
+          "settings": {
+            "weekDay": "WEDNESDAY",
+            "startTime": "17:30",
+            "endTime": "19:00"
+          }
+        }
+      }
+    },
+    {
+      "id": "de-org-sessions-01",
+      "lang": "de",
+      "category": "organizer",
+      "role": "instructor",
+      "page": {
+        "path": "/manage/course/4711",
+        "courseId": 4711
+      },
+      "messages": [
+        {
+          "role": "user",
+          "content": "Leg drei Termine an: 13., 20. und 27. Januar 2027, jeweils 18 bis 19:30 Uhr. Titel: Grundlagen, Regression, Klassifikation."
+        }
+      ],
+      "expect": {
+        "tool": "propose_sessions",
+        "args": {
+          "courseId": 4711
+        }
+      }
+    },
+    {
+      "id": "en-org-sessions-01",
+      "lang": "en",
+      "category": "organizer",
+      "role": "instructor",
+      "page": {
+        "path": "/manage/course/4711",
+        "courseId": 4711
+      },
+      "messages": [
+        {
+          "role": "user",
+          "content": "Create weekly sessions on Tuesdays from Jan 12 to Feb 2, 2027, 6–7:30 pm, titled 'Week 1' to 'Week 4'."
+        }
+      ],
+      "expect": {
+        "tool": "propose_sessions",
+        "args": {
+          "courseId": 4711
+        }
+      }
+    },
+    {
+      "id": "de-org-sessions-locked",
+      "lang": "de",
+      "category": "organizer",
+      "role": "instructor",
+      "page": {
+        "path": "/manage/course/4711",
+        "courseId": 4711
+      },
+      "messages": [
+        {
+          "role": "user",
+          "content": "Füg noch einen Termin am 3. Februar 2027 um 18 Uhr hinzu, 90 Minuten, Titel Abschlusspräsentationen."
+        }
+      ],
+      "expect": {
+        "tool": null,
+        "allow": [
+          "get_course",
+          "get_registration_count",
+          "propose_sessions",
+          "search_knowledge"
+        ]
+      },
+      "mock": {
+        "get_course": {
+          "id": 4711,
+          "updatedAt": "2026-11-20T09:12:44.512+00:00",
+          "programType": "COURSES",
+          "title": "Einführung in Machine Learning",
+          "tagline": "Von den Daten zum eigenen Modell",
+          "learningGoals": "",
+          "headingDescriptionField1": "Worum geht es?",
+          "contentDescriptionField1": "",
+          "headingDescriptionField2": "Was brauchst du?",
+          "contentDescriptionField2": "",
+          "maxParticipants": 30,
+          "applicationEnd": "2026-12-10",
+          "maxMissedSessions": 2,
+          "language": "DE",
+          "weekDay": "TUESDAY",
+          "startTime": "18:00:00",
+          "endTime": "19:30:00",
+          "sessionReminderLeadHours": 24,
+          "showAvailablePlaces": false,
+          "attendanceCertificatePossible": true,
+          "achievementCertificatePossible": true,
+          "registrationCount": 12,
+          "sessionsChangeable": false,
+          "courseLocations": [
+            {
+              "id": 91,
+              "locationOption": "ONLINE",
+              "defaultSessionAddress": "https://example.zoom.us/j/4711",
+              "defaultSessionAddressId": 501
+            },
+            {
+              "id": 92,
+              "locationOption": "KIEL",
+              "defaultSessionAddress": "Wissenschaftspark Kiel, Raum 2.14",
+              "defaultSessionAddressId": 502
+            }
+          ],
+          "sessions": []
+        },
+        "get_registration_count": {
+          "courseId": 4711,
+          "registrationCount": 12,
+          "sessionsChangeable": false
+        },
+        "propose_sessions": {
+          "error": {
+            "code": "REGISTRATIONS_EXIST",
+            "message": "Sessions can't be changed here because 12 people have already registered for this course. Change them by hand on the course page and send the Session Change Notification."
+          }
+        }
+      },
+      "forbid": [
+        "propose_course_settings",
+        "propose_course_texts"
+      ]
+    },
+    {
+      "id": "de-participant-cant-edit",
+      "lang": "de",
+      "category": "out_of_scope",
+      "role": "user",
+      "page": {
+        "path": "/course/4711",
+        "courseId": 4711
+      },
+      "messages": [
+        {
+          "role": "user",
+          "content": "Ändere die Kursbeschreibung, da ist ein Tippfehler drin."
+        }
+      ],
+      "expect": {
+        "tool": null,
+        "allow": [
+          "search_knowledge"
+        ]
+      }
+    },
+    {
+      "id": "de-org-texts-lang",
+      "lang": "de",
+      "category": "organizer",
+      "role": "instructor",
+      "page": {
+        "path": "/manage/course/4711",
+        "courseId": 4711
+      },
+      "messages": [
+        {
+          "role": "user",
+          "content": "Schreib die Lernziele bitte auf Englisch: Daten bereinigen, einen Klassifikator trainieren, Precision und Recall erklären."
+        }
+      ],
+      "expect": {
+        "tool": null,
+        "allow": [
+          "get_course",
+          "propose_course_texts",
+          "search_knowledge"
+        ]
+      },
+      "_note": "Course 4711 is German and has one set of texts. Either the model asks or explains, or it proposes German texts; check the answer by hand. A propose_course_texts call with language en gets INVALID from the real server.",
+      "mock": {
+        "propose_course_texts": {
+          "error": {
+            "code": "INVALID",
+            "message": "Course 4711 is written in DE; a course has one set of texts in its own language. Write the texts in that language, or first propose a different course language as a setting."
+          }
+        }
+      }
+    },
+    {
+      "id": "de-org-sessions-move",
+      "lang": "de",
+      "category": "organizer",
+      "role": "instructor",
+      "page": {
+        "path": "/manage/course/4711",
+        "courseId": 4711
+      },
+      "messages": [
+        {
+          "role": "user",
+          "content": "Verschieb den Termin Regression um eine Woche nach hinten, gleiche Uhrzeit."
+        }
+      ],
+      "expect": {
+        "tool": "propose_sessions",
+        "args": {
+          "courseId": 4711,
+          "changes": [
+            {
+              "sessionId": 7002,
+              "startDateTime": "2027-01-27T18:00",
+              "endDateTime": "2027-01-27T19:30"
+            }
+          ]
+        }
+      },
+      "mock": {
+        "get_course": {
+          "id": 4711,
+          "updatedAt": "2026-11-20T09:12:44.512+00:00",
+          "programType": "COURSES",
+          "title": "Einführung in Machine Learning",
+          "tagline": "Von den Daten zum eigenen Modell",
+          "learningGoals": "",
+          "headingDescriptionField1": "Worum geht es?",
+          "contentDescriptionField1": "",
+          "headingDescriptionField2": "Was brauchst du?",
+          "contentDescriptionField2": "",
+          "maxParticipants": 30,
+          "applicationEnd": "2026-12-10",
+          "maxMissedSessions": 2,
+          "language": "DE",
+          "weekDay": "TUESDAY",
+          "startTime": "18:00:00",
+          "endTime": "19:30:00",
+          "sessionReminderLeadHours": 24,
+          "showAvailablePlaces": false,
+          "attendanceCertificatePossible": true,
+          "achievementCertificatePossible": true,
+          "registrationCount": 0,
+          "sessionsChangeable": true,
+          "courseLocations": [
+            {
+              "id": 91,
+              "locationOption": "ONLINE",
+              "defaultSessionAddress": "https://example.zoom.us/j/4711",
+              "defaultSessionAddressId": 501
+            },
+            {
+              "id": 92,
+              "locationOption": "KIEL",
+              "defaultSessionAddress": "Wissenschaftspark Kiel, Raum 2.14",
+              "defaultSessionAddressId": 502
+            }
+          ],
+          "sessions": [
+            {
+              "id": 7001,
+              "title": "Grundlagen",
+              "description": null,
+              "startDateTime": "2027-01-13T17:00:00+00:00",
+              "endDateTime": "2027-01-13T18:30:00+00:00",
+              "updatedAt": null,
+              "locations": [
+                {
+                  "courseLocationId": 91,
+                  "address": "https://example.zoom.us/j/4711",
+                  "locationAddressId": 501
+                }
+              ]
+            },
+            {
+              "id": 7002,
+              "title": "Regression",
+              "description": null,
+              "startDateTime": "2027-01-20T17:00:00+00:00",
+              "endDateTime": "2027-01-20T18:30:00+00:00",
+              "updatedAt": null,
+              "locations": [
+                {
+                  "courseLocationId": 91,
+                  "address": "https://example.zoom.us/j/4711",
+                  "locationAddressId": 501
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "de-org-create-01",
+      "lang": "de",
+      "category": "organizer",
+      "role": "org_admin",
+      "page": {
+        "path": "/manage/courses"
+      },
+      "messages": [
+        {
+          "role": "user",
+          "content": "Leg im Wintersemester einen neuen Kurs \"Statistik mit R\" an, auf Deutsch, online."
+        }
+      ],
+      "expect": {
+        "tool": "propose_create_course",
+        "args": {
+          "programId": 12,
+          "title": "Statistik mit R"
+        }
+      }
     }
   ]
 }
