@@ -6,7 +6,8 @@ import { env } from "./config.js";
  *
  * EMBEDDING_PROVIDER selects the provider:
  * - "vertex": Google Vertex AI (production). Needs EMBEDDING_LOCATION; the project comes from
- *   EMBEDDING_PROJECT_ID or the metadata server, the token from the function's service account.
+ *   EMBEDDING_PROJECT_ID or the metadata server, the token from EMBEDDING_ACCESS_TOKEN or the
+ *   function's service account.
  * - "fake": a deterministic word-hashing embedding for local development and tests. It only finds
  *   texts that share words, which is enough to exercise the whole pipeline without credentials.
  * - unset: semantic search is off; the sync does nothing and the search reports it as disabled.
@@ -37,6 +38,8 @@ export const embeddingConfig = (read = env) => {
     modelKey: `${provider}:${model}`,
     location: read("EMBEDDING_LOCATION"),
     projectId: read("EMBEDDING_PROJECT_ID"),
+    // Outside GCP (the knowledge indexer in GitHub Actions) there is no metadata server.
+    accessToken: read("EMBEDDING_ACCESS_TOKEN") || null,
     minSimilarity: Number.isFinite(minSimilarity) ? minSimilarity : DEFAULT_MIN_SIMILARITY[provider],
   };
 };
@@ -99,7 +102,10 @@ const vertexEmbedding = async (config, text, taskType, fetchImpl) => {
     `/locations/${config.location}/publishers/google/models/${config.model}:predict`;
   const response = await fetchImpl(url, {
     method: "POST",
-    headers: { Authorization: `Bearer ${await accessToken(fetchImpl)}`, "Content-Type": "application/json" },
+    headers: {
+      Authorization: `Bearer ${config.accessToken || (await accessToken(fetchImpl))}`,
+      "Content-Type": "application/json",
+    },
     // gemini-embedding-001 takes one text per request.
     body: JSON.stringify({
       instances: [{ content: text, task_type: taskType }],

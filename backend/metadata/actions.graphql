@@ -1015,3 +1015,27 @@ type ExpertRoleMatchResult {
   sourceId: Int!
   similarity: Float!
 }
+
+type Query {
+  searchKnowledge(
+    query: String!
+    courseId: Int
+  ): SearchKnowledgeResult!
+}
+
+type SearchKnowledgeResult {
+  success: Boolean!
+  enabled: Boolean!
+  error: String
+  passages: [KnowledgePassage!]!
+}
+
+type KnowledgePassage {
+  sourceType: String!
+  title: String!
+  url: String!
+  content: String!
+  language: String
+  similarity: Float!
+  score: Float!
+}

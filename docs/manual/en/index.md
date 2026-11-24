@@ -29,3 +29,5 @@ Organizers are the instructors of a course and the Org Admins of the organizatio
 ## The Assistant
 
 The **Assistant** is the AI chat available on every EduHub page once you are logged in. It answers questions about how the platform works, about courses and about your own registrations, and it helps Organizers set up their courses. It is an AI, not a person. It can only see and do what you yourself can see and do in EduHub. When it can't help, it tells you so and points you to a contact.
+
+It answers questions about how EduHub works, and about error messages, from this manual, from the rules your course's organization publishes online and from the platform's own texts. It links the pages its answer is based on. Check important details there, especially when it doesn't name a page.

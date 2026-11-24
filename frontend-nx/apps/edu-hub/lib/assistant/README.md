@@ -10,7 +10,7 @@ person chatting.
 | `provider.ts` | Chat Completions client (SSE, `store: false`), and the `fake` provider |
 | `credentials.ts` | Vertex AI token from the metadata server, cached and refreshed |
 | `prompt.ts` | System prompt: an AI with no persona, "du", on-screen words, contact |
-| `userTools.ts` | Read tools over the asker's own data and the public catalogue |
+| `userTools.ts` | Read tools over the asker's own data, the public catalogue and the knowledge index |
 | `courseSetupTools.ts` | The EduHub MCP server's tools (ADR 0006), in-process, for Organizers |
 | `chat.ts` | The tool loop: rounds, one retry after an invalid tool call |
 | `limits.ts` | Per-user rate limit, message and conversation length |
@@ -96,6 +96,49 @@ is stored in `AssistantFeedback` without a user id, and only with `consent: true
   enforces the rest. The admin secret is only used for the spending totals, never by a tool.
 - While an admin views the platform as someone else, the Assistant is off (`IMPERSONATING`).
 
+## Knowledge index (`search_knowledge`, #2195)
+
+Every logged-in user's Assistant can call `search_knowledge` (in `userTools.ts`). It calls the
+Hasura action `searchKnowledge` as the asker (role `user`), served by
+`functions/callNodeFunction/searchKnowledge`, which embeds the question with the expert-search
+embeddings (`lib/expertEmbeddings.js`, `gemini-embedding-001` on Vertex AI in `europe-west1`, or
+`fake` locally) and searches the pgvector table `KnowledgeChunk` with `match_knowledge`.
+
+Sources, ranked in this order (similarity × a weight per source, `lib/knowledge/rank.js`):
+
+| Source type | From | Link |
+|-------------|------|------|
+| `ORGANIZATION_RULES` | the opencampus GitBook (`llms.txt` + each page's Markdown), stored for the Organizations `opencampus.sh` and `EduHub Default` (which still owns the live programs; `KNOWLEDGE_GITBOOK_ORGANIZATION`), only for people in one of them or looking at one of their courses | GitBook page |
+| `MANUAL` | `docs/manual/{de,en}/**/*.md` (#2196), picked up as pages appear | `/help/<slug>#<heading>`, `/en/help/…` |
+| `GLOSSARY` | `CONTEXT.md` | GitHub at the release tag |
+| `LOCALE` | `locales/{de,en}.json` of edu-hub and StuJo, as `key.path: text` | GitHub at the release tag, with line |
+| `CODE` | frontend `components`, `pages`, `lib`, `hooks`, …; `functions/**`; Hasura tables, functions and actions metadata | GitHub at the release tag, with lines |
+
+Only passages at least `KNOWLEDGE_SEARCH_MIN_SIMILARITY` close to the question are returned
+(default 0.62 for Vertex, tuned on real embeddings so off-topic questions get nothing; 0.05 for
+`fake`). Source weights are small (×1.00–1.04) and only decide between passages about equally close.
+
+Docs are split by `#`/`##`/`###` heading (about 1,500 characters, 200 overlap), code by file and
+top-level declaration (about 2,000 characters). A code passage also lists the on-screen texts it
+shows (translation keys, also ALL_CAPS codes looked up as `errors.${code}`), so an error message
+finds both its locale key and the code that raises it.
+
+What may be indexed is an allowlist of paths, minus a denylist (env files, keys, seeds,
+migrations, tests, generated types, scripts; `lib/knowledge/safety.js`); passages that look like
+they hold a secret are dropped and personal e-mail addresses replaced. Nothing is read from the
+database. A test scans what this repository would produce.
+
+**Rebuild:** `.github/workflows/index-knowledge.yml` runs `functions/callNodeFunction/scripts/index-knowledge.js`
+on the latest release tag after each successful production deployment (or by hand). It reuses
+embeddings of unchanged passages and switches to the new build in one transaction; a failed or
+suspiciously small build keeps the previous index. Locally:
+
+```bash
+cd functions/callNodeFunction
+EMBEDDING_PROVIDER=fake HASURA_ENDPOINT=http://localhost:8080/v1/graphql HASURA_ADMIN_SECRET=myadminsecretkey \
+  node scripts/index-knowledge.js --repo ../.. --release local --gitbook-organization "<an Organization name>"
+```
+
 ## Configuration
 
 | Variable | Default | Meaning |
@@ -126,6 +169,5 @@ memory.
 
 ## Not yet
 
-- `search_knowledge` arrives with the knowledge index (#2195).
 - The waitlist position: participants can't see it in Hasura today, so the Assistant reports the
   waitlist status and the number of people waiting.

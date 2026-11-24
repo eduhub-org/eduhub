@@ -70,3 +70,25 @@ resource "google_org_policy_policy" "deny_global_vertex_endpoint" {
 
   depends_on = [google_project_service.orgpolicy]
 }
+
+# Knowledge index (issue #2195): .github/workflows/index-knowledge.yml runs as
+# the GitHub deploy account (created in infrastructure/foundation) after each
+# production deployment. It writes the index through Hasura with the admin
+# secret and embeds passages with Vertex AI, so it gets read access to that
+# one secret and roles/aiplatform.user. Accepted trade-off: a leaked GitHub
+# key could read the Hasura admin secret.
+locals {
+  github_service_account = "serviceAccount:github@${var.project_id}.iam.gserviceaccount.com"
+}
+
+resource "google_secret_manager_secret_iam_member" "hasura_graphql_admin_key_github" {
+  secret_id = google_secret_manager_secret.hasura_graphql_admin_key.id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = local.github_service_account
+}
+
+resource "google_project_iam_member" "knowledge_index_vertex_ai_user" {
+  project = var.project_id
+  role    = "roles/aiplatform.user"
+  member  = local.github_service_account
+}
