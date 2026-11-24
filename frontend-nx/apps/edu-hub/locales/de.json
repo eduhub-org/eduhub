@@ -3940,6 +3940,35 @@
     "more": "Alle Änderungen findest du in unserer <privacy>Datenschutzerklärung</privacy>.",
     "dismiss": "Hinweis schließen"
   },
+  "assistant": {
+    "errors": {
+      "NOT_LOGGED_IN": "Bitte melde Dich an, um den Assistenten zu fragen.",
+      "OFF": "Der Assistent ist gerade nicht verfügbar.",
+      "SPENDING_CAP_REACHED": "Der Assistent ist für diesen Monat pausiert, weil sein Monatsbudget aufgebraucht ist. Ab dem 1. des nächsten Monats ist er wieder da. Bei Fragen schreib an {contact}.",
+      "RATE_LIMITED_SHORT": "Du hast in kurzer Zeit viele Fragen gestellt. Bitte warte etwa {minutes} Minuten und frag dann weiter.",
+      "RATE_LIMITED_DAILY": "Du hast heute die maximale Zahl an Fragen erreicht. Morgen kannst Du wieder fragen.",
+      "MESSAGE_TOO_LONG": "Deine Nachricht ist zu lang. Bitte kürze sie auf höchstens {max} Zeichen.",
+      "CONVERSATION_TOO_LONG": "Dieses Gespräch ist zu lang geworden. Bitte starte ein neues Gespräch.",
+      "INVALID_REQUEST": "Die Anfrage konnte nicht gelesen werden. Bitte lade die Seite neu.",
+      "IMPERSONATING": "Während Du die Plattform als eine andere Person ansiehst, ist der Assistent nicht verfügbar.",
+      "ROLE_NOT_ALLOWED": "Diese Rolle kannst Du für den Assistenten nicht verwenden.",
+      "BUSY": "Der Assistent ist gerade ausgelastet. Bitte versuch es in einer Minute noch einmal.",
+      "UNAVAILABLE": "Der Assistent konnte gerade nicht antworten. Bitte versuch es später noch einmal oder schreib an {contact}.",
+      "TOOL_CALL_FAILED": "Der Assistent konnte die nötigen Daten nicht abrufen. Bitte formuliere Deine Frage anders oder schreib an {contact}.",
+      "FEEDBACK_CONSENT_REQUIRED": "Ohne Deine Einwilligung speichern wir das Gespräch nicht.",
+      "PROPOSAL_UNAUTHENTICATED": "Deine Anmeldung ist abgelaufen. Bitte melde Dich neu an und übernimm die Änderung dann noch einmal.",
+      "PROPOSAL_FORBIDDEN": "Mit Deiner aktuellen Rolle kannst Du diesen Kurs nicht ändern.",
+      "PROPOSAL_NOT_FOUND": "Den Kurs oder Eintrag zu dieser Änderung gibt es nicht mehr.",
+      "PROPOSAL_INVALID": "Diese Änderung kann nicht übernommen werden. Bitte den Assistant um einen neuen Vorschlag.",
+      "PROPOSAL_NO_CHANGE": "Diese Änderung enthält nichts Neues für den Kurs.",
+      "PROPOSAL_REGISTRATIONS_EXIST": "Diese Änderung kann nicht übernommen werden, weil sich schon Personen angemeldet haben.",
+      "PROPOSAL_STALE": "Der Kurs wurde nach diesem Vorschlag geändert. Bitte den Assistant um einen neuen Vorschlag.",
+      "PROPOSAL_TITLE_TAKEN": "Ein anderer Kurs in diesem Programm hat schon diesen Titel. Bitte wähle einen anderen Titel.",
+      "PROPOSAL_EXPIRED": "Dieser Vorschlag ist abgelaufen. Bitte den Assistant um einen neuen.",
+      "PROPOSAL_HASURA_ERROR": "Die Änderung konnte nicht gespeichert werden. Bitte versuch es später noch einmal oder schreib an {contact}.",
+      "PROPOSAL_FAILED": "Beim Speichern der Änderung ist etwas schiefgegangen. Bitte versuch es später noch einmal oder schreib an {contact}."
+    }
+  },
   "help": {
     "title": "Handbuch",
     "start": "Start",
