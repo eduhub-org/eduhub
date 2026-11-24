@@ -9,6 +9,12 @@ import { LocationOption_enum } from "./../../__generated__/globalTypes";
 // GraphQL fragment: AdminSessionFragment
 // ====================================================
 
+export interface AdminSessionFragment_SessionAddresses_CourseLocation_OnlineMeetingLink {
+  __typename: "OnlineMeetingLink";
+  id: number;
+  url: string;
+}
+
 export interface AdminSessionFragment_SessionAddresses_CourseLocation {
   __typename: "CourseLocation";
   id: number;
@@ -24,6 +30,16 @@ export interface AdminSessionFragment_SessionAddresses_CourseLocation {
    * References a LocationAddress that serves as the default for sessions in this course location. Replaces the legacy text-based defaultSessionAddress field.
    */
   defaultSessionAddressId: number | null;
+  /**
+   * An object relationship
+   */
+  OnlineMeetingLink: AdminSessionFragment_SessionAddresses_CourseLocation_OnlineMeetingLink | null;
+}
+
+export interface AdminSessionFragment_SessionAddresses_OnlineMeetingLink {
+  __typename: "OnlineMeetingLink";
+  id: number;
+  url: string;
 }
 
 export interface AdminSessionFragment_SessionAddresses {
@@ -45,6 +61,10 @@ export interface AdminSessionFragment_SessionAddresses {
    * An object relationship
    */
   CourseLocation: AdminSessionFragment_SessionAddresses_CourseLocation | null;
+  /**
+   * An object relationship
+   */
+  OnlineMeetingLink: AdminSessionFragment_SessionAddresses_OnlineMeetingLink | null;
 }
 
 export interface AdminSessionFragment_SessionSpeakers_User_Organization {

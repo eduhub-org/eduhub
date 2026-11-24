@@ -52,6 +52,10 @@ module.exports = {
           'expand-hover': 'var(--eduhub-table-expand-hover)',
         },
         success: 'var(--eduhub-success)',
+        diff: {
+          removed: 'var(--eduhub-diff-removed)',
+          added: 'var(--eduhub-diff-added)',
+        },
         warning: 'var(--eduhub-warning)',
         cta: {
           DEFAULT: 'var(--eduhub-cta)',

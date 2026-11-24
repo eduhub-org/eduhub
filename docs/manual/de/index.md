@@ -29,3 +29,5 @@ Organisator:innen sind die Kursleitungen eines Kurses und die Org-Admins der Org
 ## Der Assistent
 
 Der **Assistent** ist der KI-Chat, den Du auf jeder EduHub-Seite nutzen kannst, sobald Du angemeldet bist. Er beantwortet Fragen dazu, wie die Plattform funktioniert, zu Kursen und zu Deinen eigenen Anmeldungen, und hilft Organisator:innen beim Einrichten ihrer Kurse. Er ist eine KI, kein Mensch. Er kann nur sehen und tun, was Du selbst in EduHub sehen und tun kannst. Wenn er nicht helfen kann, sagt er das und nennt Dir einen Kontakt.
+
+Fragen dazu, wie EduHub funktioniert, und zu Fehlermeldungen beantwortet er aus diesem Handbuch, aus den Regeln, die die Organisation Deines Kurses online veröffentlicht, und aus den Texten der Plattform. In seiner Antwort verlinkt er die Seiten, auf die sie sich stützt. Prüfe wichtige Angaben dort, vor allem wenn er keine Seite nennt.

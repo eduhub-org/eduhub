@@ -95,10 +95,16 @@ const COURSE_QUERY = `
       programId
       Program { type }
       CourseEnrollments_aggregate { aggregate { count } }
-      CourseLocations(order_by: { id: asc }) { id locationOption defaultSessionAddress defaultSessionAddressId }
+      CourseLocations(order_by: { id: asc }) {
+        id locationOption defaultSessionAddress defaultSessionAddressId
+        OnlineMeetingLink { url }
+      }
       Sessions(order_by: { id: asc }) {
         id title description startDateTime endDateTime updated_at
-        SessionAddresses(order_by: { id: asc }) { courseLocationId address locationAddressId }
+        SessionAddresses(order_by: { id: asc }) {
+          courseLocationId address locationAddressId
+          OnlineMeetingLink { url }
+        }
       }
     }
   }
@@ -209,7 +215,13 @@ export const createHasuraCourseStore = ({ url, token, role, fetchImpl = fetch }:
         programType: c.Program?.type ?? null,
         fields,
         registrationCount: c.CourseEnrollments_aggregate.aggregate.count,
-        courseLocations: c.CourseLocations,
+        // Meeting links live in OnlineMeetingLink; the tools keep calling them the address of
+        // an online location. Writing one back as an address is safe: a database trigger moves
+        // it into OnlineMeetingLink.
+        courseLocations: c.CourseLocations.map(({ OnlineMeetingLink, ...location }: any) => ({
+          ...location,
+          defaultSessionAddress: OnlineMeetingLink?.url ?? location.defaultSessionAddress,
+        })),
         sessions: c.Sessions.map((s: any) => ({
           id: s.id,
           title: s.title,
@@ -217,7 +229,10 @@ export const createHasuraCourseStore = ({ url, token, role, fetchImpl = fetch }:
           startDateTime: s.startDateTime,
           endDateTime: s.endDateTime,
           updatedAt: s.updated_at ?? null,
-          locations: s.SessionAddresses,
+          locations: s.SessionAddresses.map(({ OnlineMeetingLink, ...location }: any) => ({
+            ...location,
+            address: OnlineMeetingLink?.url || location.address,
+          })),
         })),
       } satisfies CourseSnapshot;
     },

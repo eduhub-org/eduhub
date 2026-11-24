@@ -11,6 +11,7 @@ import {
   ManagedCourse_Course_by_pk_Sessions_SessionAddresses,
 } from '../../../../queries/__generated__/ManagedCourse';
 import { isProgramSession } from '../../../../helpers/programSessions';
+import { onlineMeetingUrl } from '../../../../helpers/sessionLocationResolution';
 
 type SessionRow = ManagedCourse_Course_by_pk_Sessions | ManagedCourse_Course_by_pk_Program_Sessions;
 
@@ -75,7 +76,10 @@ export const SessionLocationChips: FC<{ entries: SessionLocationEntry[]; iconsOn
     <div className="flex flex-wrap items-center gap-1.5 min-w-0">
       {entries.filter((entry) => entry.address).map((entry) => {
         const label = tCommon(`location.${entry.option}`);
-        const address = entry.address?.address || entry.address?.CourseLocation?.defaultSessionAddress || '';
+        const address =
+          entry.option === 'ONLINE'
+            ? onlineMeetingUrl(entry.address)
+            : entry.address?.address || entry.address?.CourseLocation?.defaultSessionAddress || '';
         return (
           <Tooltip key={entry.key} title={[label, address].filter(Boolean).join(' · ')}>
             <span
