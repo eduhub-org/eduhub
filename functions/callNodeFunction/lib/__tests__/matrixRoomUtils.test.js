@@ -1,6 +1,11 @@
 import { describe, expect, it, test } from "@jest/globals";
 import assert from "node:assert/strict";
-import { normalizeMatrixRoomId, isValidMatrixRoomId, parseMatrixResponse } from "../matrixRoomUtils.js";
+import {
+  normalizeMatrixRoomId,
+  isValidMatrixRoomId,
+  parseMatrixResponse,
+  creatorsHaveImplicitPower,
+} from "../matrixRoomUtils.js";
 
 test("normalizeMatrixRoomId from Element hash URL", () => {
   assert.equal(
@@ -80,4 +85,13 @@ describe('parseMatrixResponse', () => {
       status: 502,
     });
   });
+});
+
+test("creatorsHaveImplicitPower from room version 12 on", () => {
+  assert.equal(creatorsHaveImplicitPower("12"), true);
+  assert.equal(creatorsHaveImplicitPower("13"), true);
+  assert.equal(creatorsHaveImplicitPower("11"), false);
+  assert.equal(creatorsHaveImplicitPower("10"), false);
+  assert.equal(creatorsHaveImplicitPower("org.matrix.msc1234"), false);
+  assert.equal(creatorsHaveImplicitPower(null), false);
 });

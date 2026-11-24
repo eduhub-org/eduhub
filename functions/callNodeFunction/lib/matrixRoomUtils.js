@@ -75,6 +75,17 @@ export const normalizeMatrixRoomId = (input) => {
   return withoutQuery;
 };
 
+/**
+ * Room versions 12 and later give the room's creators an unlimited power level
+ * that is not written into m.room.power_levels. Listing a creator in its
+ * `users` map makes createRoom fail ("Creator ... must not appear in
+ * content.users"). Unknown or unstable versions keep the older behaviour.
+ */
+export const creatorsHaveImplicitPower = (roomVersion) => {
+  const version = trimAndNull(roomVersion);
+  return version != null && /^\d+$/.test(version) && Number(version) >= 12;
+};
+
 /** Matrix DNS-style hostname labels (RFC 1123 relaxed). */
 const isMatrixHostname = (host) => {
   if (!host || host.length > 253) return false;
