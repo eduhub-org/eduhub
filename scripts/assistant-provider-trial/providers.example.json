@@ -1,5 +1,5 @@
 {
-  "_comment": "Copy to providers.json (git-ignored) and replace PROJECT_ID (use the staging project). Check the model ids on the Vertex AI model pages. Prices per 1M tokens from the Vertex AI price list. The global endpoint is refused.",
+  "_comment": "Copy to providers.json (git-ignored) and replace PROJECT_ID (use the staging project). Check the model ids on the Vertex AI model pages. Prices per 1M tokens from the Vertex AI price list. The global endpoint is refused unless a target sets allow_global_endpoint (synthetic trial data only; the name must contain \"global\").",
   "targets": [
     {
       "name": "gemini-3.8-flash-eu",
@@ -7,16 +7,36 @@
       "api_key_command": "gcloud auth print-access-token",
       "model": "google/gemini-3.8-flash",
       "currency": "USD",
-      "price_per_mtok": { "input": null, "output": null },
+      "price_per_mtok": {
+        "input": null,
+        "output": null
+      },
       "extra_body": {}
     },
     {
-      "name": "gemini-2.5-flash-europe-west1",
-      "base_url": "https://europe-west1-aiplatform.googleapis.com/v1/projects/PROJECT_ID/locations/europe-west1/endpoints/openapi",
+      "name": "gemma-4-26b-a4b-global",
+      "base_url": "https://aiplatform.googleapis.com/v1/projects/PROJECT_ID/locations/global/endpoints/openapi",
       "api_key_command": "gcloud auth print-access-token",
-      "model": "google/gemini-2.5-flash",
+      "model": "google/gemma-4-26b-a4b-it-maas",
+      "allow_global_endpoint": true,
       "currency": "USD",
-      "price_per_mtok": { "input": null, "output": null },
+      "price_per_mtok": {
+        "input": null,
+        "output": null
+      },
+      "extra_body": {}
+    },
+    {
+      "name": "deepseek-v4.1-flash-global",
+      "base_url": "https://aiplatform.googleapis.com/v1/projects/PROJECT_ID/locations/global/endpoints/openapi",
+      "api_key_command": "gcloud auth print-access-token",
+      "model": "deepseek-ai/deepseek-v4.1-flash-1017-maas",
+      "allow_global_endpoint": true,
+      "currency": "USD",
+      "price_per_mtok": {
+        "input": null,
+        "output": null
+      },
       "extra_body": {}
     }
   ]

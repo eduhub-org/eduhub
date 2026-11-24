@@ -22,6 +22,9 @@ contract and setup.
    `global` endpoint is never used: it gives no control over where requests
    are processed, and the organization policy
    `constraints/gcp.restrictEndpointUsage` should block it.
+   (The provider trial in `scripts/assistant-provider-trial/` may call open-weight
+   models on `global` with its fictional cases only, to compare models that are
+   later hosted by an EU provider; no user data and never the Assistant.)
 2. **The Assistant calls Vertex AI through its OpenAI-compatible Chat
    Completions API.** Base URL, credentials and model are configuration, so
    moving to an EU provider later needs no code change, only a prompt retest.
