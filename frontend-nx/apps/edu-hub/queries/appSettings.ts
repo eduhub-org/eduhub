@@ -17,6 +17,16 @@ export const APP_SETTINGS = gql`
       privacyContactEmail
       heroHeadlineDe
       heroHeadlineEn
+      matrixChatEnabled
+    }
+  }
+`;
+
+export const UPDATE_APP_SETTINGS_MATRIX_CHAT = gql`
+  mutation UpdateMatrixChatEnabled($appName: String!, $value: Boolean!) {
+    update_AppSettings_by_pk(pk_columns: { appName: $appName }, _set: { matrixChatEnabled: $value }) {
+      appName
+      matrixChatEnabled
     }
   }
 `;

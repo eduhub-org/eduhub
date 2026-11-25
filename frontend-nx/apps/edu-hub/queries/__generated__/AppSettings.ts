@@ -56,6 +56,10 @@ export interface AppSettings_AppSettings {
    * English homepage hero headline as Markdown: **bold** marks the emphasised words, each line break starts a new line. NULL falls back to the built-in translation.
    */
   heroHeadlineEn: string | null;
+  /**
+   * Whether course pages show the embedded Matrix course chat to participants and instructors.
+   */
+  matrixChatEnabled: boolean;
 }
 
 export interface AppSettings {

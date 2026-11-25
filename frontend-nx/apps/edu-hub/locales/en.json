@@ -2742,6 +2742,9 @@
     }
   },
   "manageAppSettings": {
+    "matrixChatSettings": "Course chat",
+    "matrixChatEnabled": "Show the course chat on course pages",
+    "matrixChatHint": "Participants and instructors see the chat on the course page once the course has a Matrix room (Manage courses → Participant chat). When off, links to the room in Element stay as they are.",
     "backgroundImageURL": "Background image URL",
     "bannerBackgroundColor": "News Banner background color",
     "bannerFontColor": "News Banner text color",
@@ -3636,6 +3639,10 @@
           "label": "Homepage content",
           "description": "FAQ section on the homepage"
         },
+        "chat": {
+          "label": "Course chat",
+          "description": "Turn the embedded Matrix chat on course pages on or off"
+        },
         "emails": {
           "label": "Email templates",
           "description": "Automated emails to participants and instructors"
@@ -4100,5 +4107,52 @@
     "org_rules_link": "Go to the rules and FAQ",
     "version_release": "Manual as of release <release></release>, commit <commit></commit>",
     "version_commit": "Manual as of commit <commit></commit> (not released yet)"
+  },
+  "matrixChat": {
+    "login_redirecting": "Taking you to the course chat login …",
+    "login_completing": "Finishing your course chat login …",
+    "not_configured": "The course chat is not set up here.",
+    "login_failed": "Logging in to the course chat did not work. Please try again.",
+    "login_denied": "You cancelled the course chat login.",
+    "session_missing": "Please log in to EduHub first, then try again.",
+    "try_again": "Try again",
+    "back_home": "Back to the start page",
+    "back_to_course": "Back to the course",
+    "title": "Course chat",
+    "connecting": "Connecting to the chat …",
+    "connect_intro": "Talk to the other participants and the instructors here. To do so, connect to the chat once.",
+    "connect_button": "Connect to the chat",
+    "other_tab": "The chat is open in another tab. Close it there and it will appear here.",
+    "offline": "Connection lost. New messages will appear once it is back.",
+    "join_failed": "You could not join the chat. Please try again later.",
+    "load_older": "Load older messages",
+    "loading_older": "Loading …",
+    "no_more": "This is the start of the chat.",
+    "empty": "No messages yet. Write the first one!",
+    "composer_label": "Message",
+    "composer_placeholder": "Write a message … (Shift+Enter for a new line)",
+    "send": "Send",
+    "sending": "Sending …",
+    "not_sent": "Not sent.",
+    "retry": "Send again",
+    "deleted": "This message was deleted.",
+    "encrypted": "Encrypted message, not readable here.",
+    "unsupported": "This message cannot be shown here.",
+    "wrong_account": "The chat login in this browser still belonged to {matrixId}, not to your own account. We discarded it. Please try again and choose “Use another account” there.",
+    "pinned_title": "Pinned",
+    "pinned_badge": "pinned",
+    "pin": "Pin",
+    "unpin": "Unpin",
+    "delete": "Delete",
+    "delete_title": "Delete message?",
+    "delete_question": "The message is removed for everyone in the chat. This cannot be undone.",
+    "action_failed": "That did not work. You may not have the rights for it in this chat.",
+    "edited": "edited",
+    "reply_unavailable": "Original message not available",
+    "image_loading": "Loading image",
+    "image_failed": "The image could not be loaded.",
+    "image_open": "Open full-size image",
+    "unread": "{count, plural, one {# new message} other {# new messages}}",
+    "connect_failed": "The chat could not connect. Check your internet connection and try again."
   }
 }

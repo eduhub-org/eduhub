@@ -2727,6 +2727,9 @@
     }
   },
   "manageAppSettings": {
+    "matrixChatSettings": "Kurs-Chat",
+    "matrixChatEnabled": "Kurs-Chat auf Kursseiten anzeigen",
+    "matrixChatHint": "Teilnehmende und Kursleitungen sehen den Chat auf der Kursseite, sobald der Kurs einen Matrix-Raum hat (Kurse verwalten → Teilnehmenden-Chat). Ausgeschaltet bleiben Raumlinks nach Element unverändert.",
     "appSettings": "App Einstellungen",
     "backgroundImageURL": "Hintergrundbild URL",
     "previewImageURL": "Vorschaubild URL",
@@ -3621,6 +3624,10 @@
           "label": "Startseiten-Inhalte",
           "description": "FAQ-Bereich auf der Startseite"
         },
+        "chat": {
+          "label": "Kurs-Chat",
+          "description": "Eingebetteten Matrix-Chat auf Kursseiten ein- oder ausschalten"
+        },
         "emails": {
           "label": "E-Mail-Vorlagen",
           "description": "Automatische E-Mails an Teilnehmende und Kursleitungen"
@@ -4085,5 +4092,52 @@
     "org_rules_link": "Zu den Regeln und FAQ",
     "version_release": "Stand des Handbuchs: Release <release></release>, Commit <commit></commit>",
     "version_commit": "Stand des Handbuchs: Commit <commit></commit> (noch kein Release)"
+  },
+  "matrixChat": {
+    "login_redirecting": "Du wirst zur Anmeldung für den Kurs-Chat weitergeleitet …",
+    "login_completing": "Deine Anmeldung für den Kurs-Chat wird abgeschlossen …",
+    "not_configured": "Der Kurs-Chat ist hier nicht eingerichtet.",
+    "login_failed": "Die Anmeldung beim Kurs-Chat hat nicht geklappt. Versuch es bitte noch einmal.",
+    "login_denied": "Du hast die Anmeldung beim Kurs-Chat abgebrochen.",
+    "session_missing": "Bitte melde dich zuerst bei EduHub an und versuch es dann noch einmal.",
+    "try_again": "Erneut versuchen",
+    "back_home": "Zur Startseite",
+    "back_to_course": "Zurück zum Kurs",
+    "title": "Kurs-Chat",
+    "connecting": "Chat wird verbunden …",
+    "connect_intro": "Tausch dich hier mit den anderen Teilnehmenden und der Kursleitung aus. Dafür verbindest du dich einmalig mit dem Chat.",
+    "connect_button": "Chat verbinden",
+    "other_tab": "Der Chat ist gerade in einem anderen Tab geöffnet. Schließ ihn dort, dann erscheint er hier.",
+    "offline": "Verbindung unterbrochen. Neue Nachrichten erscheinen, sobald sie wieder steht.",
+    "join_failed": "Du konntest dem Chat nicht beitreten. Versuch es später noch einmal.",
+    "load_older": "Ältere Nachrichten laden",
+    "loading_older": "Wird geladen …",
+    "no_more": "Hier beginnt der Chat.",
+    "empty": "Noch keine Nachrichten. Schreib die erste!",
+    "composer_label": "Nachricht",
+    "composer_placeholder": "Nachricht schreiben … (Umschalt+Enter für eine neue Zeile)",
+    "send": "Senden",
+    "sending": "Wird gesendet …",
+    "not_sent": "Nicht gesendet.",
+    "retry": "Erneut senden",
+    "deleted": "Diese Nachricht wurde gelöscht.",
+    "encrypted": "Verschlüsselte Nachricht, hier nicht lesbar.",
+    "unsupported": "Diese Nachricht kann hier nicht angezeigt werden.",
+    "wrong_account": "Für den Chat warst du in diesem Browser noch als {matrixId} angemeldet, nicht mit deinem eigenen Konto. Wir haben diese Anmeldung verworfen. Versuch es noch einmal und wähle dort „Anderes Konto verwenden“.",
+    "pinned_title": "Angeheftet",
+    "pinned_badge": "angeheftet",
+    "pin": "Anheften",
+    "unpin": "Lösen",
+    "delete": "Löschen",
+    "delete_title": "Nachricht löschen?",
+    "delete_question": "Die Nachricht wird für alle im Chat entfernt. Das lässt sich nicht rückgängig machen.",
+    "action_failed": "Das hat nicht geklappt. Vielleicht fehlen dir dafür die Rechte im Chat.",
+    "edited": "bearbeitet",
+    "reply_unavailable": "Ursprüngliche Nachricht nicht verfügbar",
+    "image_loading": "Bild wird geladen",
+    "image_failed": "Bild konnte nicht geladen werden.",
+    "image_open": "Bild in voller Größe öffnen",
+    "unread": "{count, plural, one {# neue Nachricht} other {# neue Nachrichten}}",
+    "connect_failed": "Der Chat konnte nicht verbunden werden. Prüf deine Internetverbindung und versuch es noch einmal."
   }
 }

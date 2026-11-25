@@ -38,6 +38,8 @@ services:
       NEXT_PUBLIC_STUJO_URL: http://${DEV_HOST:-localhost}:5001
       NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL: ${NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL:-}
       NEXT_PUBLIC_MATRIX_SERVER_NAME: ${NEXT_PUBLIC_MATRIX_SERVER_NAME:-}
+      NEXT_PUBLIC_MATRIX_HOMESERVER_URL: ${NEXT_PUBLIC_MATRIX_HOMESERVER_URL:-}
+      NEXT_PUBLIC_MATRIX_OAUTH_CLIENT_ID: ${NEXT_PUBLIC_MATRIX_OAUTH_CLIENT_ID:-}
       # The Stripe webhook route lives in this app (pages/api/webhooks/stripe.ts),
       # so it needs the keys too -- without them `stripe listen --forward-to
       # localhost:5000/api/webhooks/stripe` (docs/STRIPE_INTEGRATION.md) only
@@ -298,5 +300,107 @@ services:
       - ./keycloak/themes/edu-hub:/opt/keycloak/themes/edu-hub
       - ./keycloak/disable-theme-cache.cli:/opt/keycloak/startup-scripts/disable-theme-cache.cli
 
+  # Local Matrix stack for the embedded course chat, mirroring production:
+  # Synapse delegates logins to the Matrix Authentication Service (MAS), which
+  # logs people in through Keycloak. Only started with
+  # `docker compose --profile matrix up`; config and dev secrets in matrix/.
+  mas_db:
+    container_name: eduhub-mas-db
+    image: postgres:17
+    profiles: [matrix]
+    environment:
+      POSTGRES_USER: mas
+      POSTGRES_PASSWORD: dev-only-mas-db-password
+      POSTGRES_DB: mas
+    volumes:
+      - mas_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mas -d mas"]
+      interval: 5s
+      retries: 10
+
+  # Creates MAS's RSA signing key once, so no private key lives in the repo.
+  # The MAS image has no shell, so the Synapse image (which has openssl) does it.
+  mas_keys:
+    container_name: eduhub-mas-keys
+    image: matrixdotorg/synapse:v1.165.0
+    profiles: [matrix]
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - >-
+        [ -s /keys/rsa.pem ] || openssl genrsa -out /keys/rsa.pem 2048 &&
+        chmod 644 /keys/rsa.pem
+    volumes:
+      - mas_keys:/keys
+
+  mas:
+    container_name: eduhub-mas
+    image: ghcr.io/element-hq/matrix-authentication-service:1.29.0
+    profiles: [matrix]
+    command: ["server", "--config=/config/config.yaml"]
+    ports:
+      - "${DEV_BIND_ADDRESS:-127.0.0.1}:8090:8080"
+    volumes:
+      - ./matrix/mas:/config:ro
+      - mas_keys:/keys:ro
+    depends_on:
+      mas_db:
+        condition: service_healthy
+      mas_keys:
+        condition: service_completed_successfully
+      keycloak:
+        condition: service_started
+
+  synapse:
+    container_name: eduhub-synapse
+    image: matrixdotorg/synapse:v1.165.0
+    profiles: [matrix]
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      # Create the signing key on first start (as the synapse user, UID 991),
+      # then hand over to the image's normal start script.
+      - >-
+        chown -R 991:991 /data &&
+        gosu 991:991 python -m synapse.app.homeserver
+        --config-path /config/homeserver.yaml --generate-keys &&
+        exec /start.py
+    environment:
+      SYNAPSE_CONFIG_PATH: /config/homeserver.yaml
+    # No published port: browsers reach Synapse through matrix_proxy.
+    volumes:
+      - ./matrix/synapse:/config:ro
+      - synapse_data:/data
+    depends_on:
+      - mas
+
+  # The homeserver address for browsers and clients (http://localhost:8008).
+  # Sends /login, /logout and /refresh to MAS and the rest to Synapse.
+  matrix_proxy:
+    container_name: eduhub-matrix-proxy
+    image: caddy:2.11.9-alpine
+    profiles: [matrix]
+    ports:
+      - "${DEV_BIND_ADDRESS:-127.0.0.1}:8008:8008"
+    volumes:
+      - ./matrix/proxy/Caddyfile:/etc/caddy/Caddyfile:ro
+    depends_on:
+      - synapse
+      - mas
+
+  # Element Web, pointed at the local Synapse, for checking rooms by hand.
+  element:
+    container_name: eduhub-element
+    image: vectorim/element-web:v1.12.35
+    profiles: [matrix]
+    ports:
+      - "${DEV_BIND_ADDRESS:-127.0.0.1}:8088:80"
+    volumes:
+      - ./matrix/element/config.json:/app/config.json:ro
+    depends_on:
+      - matrix_proxy
+
 volumes:
   db_hasura_data:
+  synapse_data:
+  mas_db_data:
+  mas_keys:

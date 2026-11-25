@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { FC, useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { CircularProgress } from '@mui/material';
@@ -39,6 +40,12 @@ import { useIsCourseWithEnrollment } from '../../../hooks/course';
 import { coursePath } from '../../../helpers/coursePath';
 import NotificationSnackbar from '../../common/dialogs/NotificationSnackbar';
 import { useDeclareParticipantPreview } from '../../../contexts/ParticipantPreviewContext';
+import { useViewAs } from '../../../hooks/viewAs';
+import { useAppSettings } from '../../../contexts/AppSettingsContext';
+
+// Browser only: it reads the Matrix session from localStorage and runs a sync
+// loop, and keeps matrix-js-sdk out of the server bundle.
+const CourseChat = dynamic(() => import('./CourseChat'), { ssr: false });
 
 /**
  * Page rhythm. Every vertical gap on this page comes from one of these, so a gap
@@ -105,6 +112,8 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
   const tCommon = useTranslations('common');
   const isLoggedIn = useIsLoggedIn();
   const userId = useUserId();
+  const { asPlainUser } = useViewAs();
+  const { matrixChatEnabled } = useAppSettings();
   const [resetValues, setResetValues] = useState<boolean | null>(null);
   const [showSuccessSnackbar, setShowSuccessSnackbar] = useState(false);
   const { railRef, railTop } = useRailStickyTop();
@@ -295,6 +304,18 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
   const canSeeParticipants =
     isLoggedInParticipant || (isLoggedIn && courseEnrollment?.status === CourseEnrollmentStatus_enum.REGISTERED);
 
+  // The course chat is for the people taking part and the course's instructors,
+  // once an admin has switched it on (Settings → Course chat). Not while viewing
+  // as someone else: the Matrix session is the admin's own.
+  const matrixRoomId = authorizedCourseData?.Course_by_pk?.matrixRoomId;
+  const isCourseInstructor = !!userId && course.CourseInstructors.some((instructor) => instructor.User?.id === userId);
+  const showCourseChat =
+    matrixChatEnabled &&
+    isLoggedIn &&
+    !asPlainUser &&
+    !!matrixRoomId &&
+    (canSeeParticipants || isCourseInstructor);
+
   return (
     <div>
       {getCoursesAuthorizedLoading || getCoursesUnauthorizedLoading ? (
@@ -451,6 +472,11 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
               {canSeeParticipants && (
                 <div className="min-w-0 text-white mx-6 xl:mx-0">
                   <CourseParticipants courseId={course.id} currentUserId={userId} />
+                </div>
+              )}
+              {showCourseChat && (
+                <div className="min-w-0 text-white mx-6 xl:mx-0">
+                  <CourseChat roomId={matrixRoomId} />
                 </div>
               )}
               <DescriptionFields course={course} />

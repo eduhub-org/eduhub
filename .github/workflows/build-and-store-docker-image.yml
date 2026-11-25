@@ -43,6 +43,14 @@ on:
       NEXT_PUBLIC_MATRIX_SERVER_NAME:
         required: false
         type: string
+      # Matrix homeserver (client API) URL for the embedded chat — set at docker build time for Next.js client bundle
+      NEXT_PUBLIC_MATRIX_HOMESERVER_URL:
+        required: false
+        type: string
+      # Fixed OAuth client id of EduHub in the Matrix auth server (optional) — set at docker build time for Next.js client bundle
+      NEXT_PUBLIC_MATRIX_OAUTH_CLIENT_ID:
+        required: false
+        type: string
       # Stujo job board URL — must be set at docker build time for Next.js client bundle
       NEXT_PUBLIC_STUJO_URL:
         required: false
@@ -68,6 +76,8 @@ jobs:
       NEXT_PUBLIC_STORAGE_BUCKET_URL: ${{ inputs.NEXT_PUBLIC_STORAGE_BUCKET_URL }}
       NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL: ${{ inputs.NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL }}
       NEXT_PUBLIC_MATRIX_SERVER_NAME: ${{ inputs.NEXT_PUBLIC_MATRIX_SERVER_NAME }}
+      NEXT_PUBLIC_MATRIX_HOMESERVER_URL: ${{ inputs.NEXT_PUBLIC_MATRIX_HOMESERVER_URL }}
+      NEXT_PUBLIC_MATRIX_OAUTH_CLIENT_ID: ${{ inputs.NEXT_PUBLIC_MATRIX_OAUTH_CLIENT_ID }}
       NEXT_PUBLIC_STUJO_URL: ${{ inputs.NEXT_PUBLIC_STUJO_URL }}
 
     steps:
@@ -98,6 +108,8 @@ jobs:
             --build-arg "NEXT_PUBLIC_STORAGE_BUCKET_URL=${NEXT_PUBLIC_STORAGE_BUCKET_URL}" \
             --build-arg "NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL=${NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL}" \
             --build-arg "NEXT_PUBLIC_MATRIX_SERVER_NAME=${NEXT_PUBLIC_MATRIX_SERVER_NAME}" \
+            --build-arg "NEXT_PUBLIC_MATRIX_HOMESERVER_URL=${NEXT_PUBLIC_MATRIX_HOMESERVER_URL}" \
+            --build-arg "NEXT_PUBLIC_MATRIX_OAUTH_CLIENT_ID=${NEXT_PUBLIC_MATRIX_OAUTH_CLIENT_ID}" \
             --build-arg "NEXT_PUBLIC_STUJO_URL=${NEXT_PUBLIC_STUJO_URL}" \
             --build-arg "GIT_COMMIT=${GITHUB_SHA}" \
             --build-arg "GIT_REF=${GITHUB_REF_NAME}"

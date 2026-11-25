@@ -1,0 +1,55 @@
+# DEV ONLY: local Synapse for EduHub development (docker compose --profile matrix).
+# Logins go through the Matrix Authentication Service (MAS), see matrix/mas/.
+# Every secret in this file is a public placeholder. Never reuse any of them on a
+# real server. Reference: https://element-hq.github.io/synapse/latest/usage/configuration/config_documentation.html
+
+# Domain part of every Matrix ID on this server: @handle:localhost, !room:localhost
+server_name: "localhost"
+# Base URL that browsers and clients use to reach Synapse.
+public_baseurl: "http://localhost:8008/"
+
+pid_file: /data/homeserver.pid
+report_stats: false
+
+listeners:
+  - port: 8008
+    type: http
+    tls: false
+    x_forwarded: false
+    bind_addresses: ["0.0.0.0"]
+    resources:
+      - names: [client]
+        compress: false
+
+# SQLite is enough for local development; production uses PostgreSQL.
+database:
+  name: sqlite3
+  args:
+    database: /data/homeserver.db
+
+log_config: "/config/log.config"
+media_store_path: /data/media_store
+signing_key_path: "/data/localhost.signing.key"
+
+# No federation with other homeservers.
+federation_domain_whitelist: []
+trusted_key_servers: []
+suppress_key_server_warning: true
+
+# Secrets (dev placeholders).
+macaroon_secret_key: "dev-only-macaroon-secret-key"
+form_secret: "dev-only-form-secret"
+
+# Same as the Synapse default, written out because course chat depends on it:
+# rooms are only end-to-end encrypted when the creator asks for it.
+encryption_enabled_by_default_for_room_type: "off"
+
+# Like production: Synapse does no logins itself but delegates them to the
+# Matrix Authentication Service (matrix/mas/config.yaml). Synapse asks MAS to
+# introspect every access token; MAS creates Matrix users through Synapse.
+matrix_authentication_service:
+  enabled: true
+  # Internal address in the Docker network (browsers use localhost:8090).
+  endpoint: "http://mas:8080/"
+  # Must match matrix.secret in matrix/mas/config.yaml.
+  secret: "dev-only-mas-synapse-shared-secret"

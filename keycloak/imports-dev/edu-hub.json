@@ -1331,6 +1331,39 @@
       ]
     },
     {
+      "id": "5b0c7f3e-6a1d-4c2e-9f8a-3d7e1b2c4a60",
+      "clientId": "matrix-authentication-service",
+      "name": "Matrix Authentication Service (local)",
+      "description": "DEV ONLY: upstream OIDC login for the local MAS in docker-compose (profile matrix), which Synapse delegates logins to. The secret is a public placeholder.",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "dev-only-mas-client-secret",
+      "redirectUris": [
+        "http://localhost:8090/upstream/callback/01M7J8Q3MF1QK40ZC1MW3K49SH"
+      ],
+      "webOrigins": [],
+      "bearerOnly": false,
+      "consentRequired": false,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "publicClient": false,
+      "frontchannelLogout": false,
+      "protocol": "openid-connect",
+      "attributes": {
+        "login_theme": "edu-hub",
+        "backchannel.logout.url": "http://mas:8080/upstream/backchannel-logout/01M7J8Q3MF1QK40ZC1MW3K49SH",
+        "backchannel.logout.session.required": "true"
+      },
+      "fullScopeAllowed": false,
+      "defaultClientScopes": [
+        "profile",
+        "email"
+      ],
+      "optionalClientScopes": []
+    },
+    {
       "id": "24062e0f-b71b-4014-8177-0e908d5c5535",
       "clientId": "realm-management",
       "name": "${client_realm-management}",

@@ -15,6 +15,7 @@ Dieses Handbuch erklärt, wie die Plattform funktioniert. Die Regeln der Organis
 - [Registrieren und bewerben](participants/registration.md): direkte Registrierung, Bewerbungen, kostenpflichtige Kurse und Anmeldung ohne Konto.
 - [Einladungen und Warteliste](participants/invitations-and-waitlist.md): was passiert, wenn ein Kurs voll ist, wie Du eine Einladung annimmst oder ablehnst und wie Du stornierst.
 - [Anwesenheit und Zertifikate](participants/attendance-and-certificates.md): wie Deine Anwesenheit erfasst wird und wo Du Deine Zertifikate bekommst.
+- [Der Kurs-Chat](participants/course-chat.md): den Chat auf der Kursseite verbinden, darin schreiben und ihn in der Element-App öffnen.
 
 ## Für Organisator:innen
 
@@ -25,6 +26,7 @@ Organisator:innen sind die Kursleitungen eines Kurses und die Org-Admins der Org
 - [Anmeldungen bearbeiten](organizers/registrations.md): Bewerbungen, Einladungen, Warteliste und Teilnehmende.
 - [Anwesenheit und Zertifikate](organizers/attendance-and-certificates.md): Anwesenheit prüfen und Zertifikate ausstellen lassen.
 - [Kurse mit dem Assistenten einrichten](organizers/assistant.md): Texte, Einstellungen und Termine vom Assistenten entwerfen lassen.
+- [Den Kurs-Chat moderieren](organizers/course-chat.md): Nachrichten anheften und löschen, den Chat auf Kursseiten einschalten.
 
 ## Der Assistent
 

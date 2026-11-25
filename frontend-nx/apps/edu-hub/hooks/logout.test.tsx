@@ -1,14 +1,25 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { signOut } from 'next-auth/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { signOut, useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 
 import useLogout from './logout';
+import { logoutMatrix } from '../lib/matrix/oauth';
 
-jest.mock('next-auth/react', () => ({ signOut: jest.fn() }));
+jest.mock('next-auth/react', () => ({ signOut: jest.fn(), useSession: jest.fn() }));
 jest.mock('next/router', () => ({ useRouter: jest.fn() }));
+jest.mock('../lib/matrix/oauth', () => ({ logoutMatrix: jest.fn() }));
 
 const mockedSignOut = signOut as jest.MockedFunction<typeof signOut>;
 const mockedUseRouter = useRouter as jest.MockedFunction<typeof useRouter>;
+const mockedUseSession = useSession as jest.MockedFunction<typeof useSession>;
+const mockedLogoutMatrix = logoutMatrix as jest.MockedFunction<typeof logoutMatrix>;
+
+/** Signed in as this EduHub user (the Keycloak sub in the Hasura claims). */
+const signedInAs = (userId: string) =>
+  mockedUseSession.mockReturnValue({
+    data: { profile: { 'https://hasura.io/jwt/claims': { 'x-hasura-user-id': userId } } },
+    status: 'authenticated',
+  } as unknown as ReturnType<typeof useSession>);
 const originalFetch = global.fetch;
 const originalLocation = Object.getOwnPropertyDescriptor(window, 'location');
 
@@ -28,6 +39,10 @@ const LogoutButton = () => {
 describe('useLogout', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockedUseSession.mockReturnValue({ data: null, status: 'unauthenticated' } as unknown as ReturnType<
+      typeof useSession
+    >);
+    mockedLogoutMatrix.mockResolvedValue(undefined);
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
       json: async () => ({ url: 'https://login.example/logout' }),
@@ -89,5 +104,44 @@ describe('useLogout', () => {
     await waitFor(() =>
       expect(replaceLocation).toHaveBeenCalledWith('https://login.example/logout')
     );
+  });
+
+  it('ends the chat (Matrix) session of the signed-in user before clearing the EduHub session', async () => {
+    signedInAs('user-1');
+    mockedUseRouter.mockReturnValue({ replace: jest.fn().mockResolvedValue(true) } as unknown as ReturnType<
+      typeof useRouter
+    >);
+    mockedSignOut.mockReturnValue(new Promise(() => undefined));
+
+    render(<LogoutButton />);
+    fireEvent.click(screen.getByRole('button', { name: 'Logout' }));
+
+    await waitFor(() => expect(mockedSignOut).toHaveBeenCalled());
+    expect(mockedLogoutMatrix).toHaveBeenCalledWith('user-1');
+    expect(mockedLogoutMatrix.mock.invocationCallOrder[0]).toBeLessThan(mockedSignOut.mock.invocationCallOrder[0]);
+  });
+
+  it('does not let a homeserver that never answers block the EduHub logout', async () => {
+    jest.useFakeTimers();
+    try {
+      signedInAs('user-1');
+      mockedLogoutMatrix.mockReturnValue(new Promise(() => undefined));
+      mockedUseRouter.mockReturnValue({ replace: jest.fn().mockResolvedValue(true) } as unknown as ReturnType<
+        typeof useRouter
+      >);
+      mockedSignOut.mockReturnValue(new Promise(() => undefined));
+
+      render(<LogoutButton />);
+      fireEvent.click(screen.getByRole('button', { name: 'Logout' }));
+      expect(mockedSignOut).not.toHaveBeenCalled();
+
+      await act(async () => {
+        jest.advanceTimersByTime(3000);
+      });
+
+      await waitFor(() => expect(mockedSignOut).toHaveBeenCalledWith({ redirect: false }));
+    } finally {
+      jest.useRealTimers();
+    }
   });
 });

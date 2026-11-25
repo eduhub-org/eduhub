@@ -20,6 +20,7 @@ select_permissions:
         - heroHeadlineDe
         - heroHeadlineEn
         - logoUrl
+        - matrixChatEnabled
         - operatorName
         - previewImageURL
         - primaryColor
