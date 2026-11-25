@@ -7,11 +7,11 @@ language: en
 summary: How Organizers use the Assistant to draft course texts, settings and Sessions as Proposed Changes, and what it can't do.
 ---
 
-The **Assistant** is the AI chat behind the **Ask the Assistant** button on every page. Besides answering questions, it helps Organizers set up their courses. It acts only with your own rights: it can't see or change anything you couldn't see or change yourself.
+The **Assistant** is the AI chat behind the **Ask me or give me a task…** bar at the bottom right of every page; you can also open it with **Ctrl+K** (**⌘K** on a Mac). It opens at the right edge, with the page still visible next to it. Besides answering questions, it helps Organizers set up their courses. It acts only with your own rights: it can't see or change anything you couldn't see or change yourself.
 
 ## Proposed Changes
 
-The Assistant never saves anything on its own. Everything it wants to change appears in the chat as a **Proposed change**, with **Before** and **After**:
+The Assistant never saves anything on its own. Everything it wants to change appears in the chat as a **Proposed change**. For texts, what is removed is struck through and what is new is highlighted; for settings, the old value is struck through before the new one:
 
 - Click **Apply** to save the change. The chat then says "Applied and saved."
 - Click **Discard** if you don't want it. Nothing is saved.
@@ -35,8 +35,9 @@ Settings your role can't change by hand, it can't change either.
 
 ## Good to know
 
-- Your question is sent together with the page you are on and any error shown on it, so you can ask "Why can't I save this?" right where it happens.
+- Your question is sent together with the page you are on and any error shown on it; what goes along is shown above the input field. So you can ask "Why can't I save this?" right where it happens.
+- On a course's management page it suggests a few tasks to start with, such as shortening the tagline. One click sends it.
 - It answers questions about the platform and about error messages from this manual, the rules your organization publishes online and the platform's own texts, and links the pages it used.
 - The Assistant is an AI and can make mistakes. Check every Proposed Change before applying it.
-- Conversations are not stored. If you rate an answer as not helpful, you can agree to the conversation being kept for 30 days to improve the Assistant.
+- Conversations are not stored. You can rate each answer with thumbs up or down. If you rate an answer as not helpful, you can agree to the conversation up to that answer being kept for 30 days to improve the Assistant.
 - The Assistant is not available while an Admin is viewing EduHub as someone else.

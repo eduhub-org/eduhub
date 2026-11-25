@@ -3941,22 +3941,40 @@
     "dismiss": "Hinweis schließen"
   },
   "assistant": {
-    "button": "Frag den Assistenten",
+    "button": "Frag mich oder gib mir eine Aufgabe…",
     "open": "KI-Assistenten öffnen",
-    "title": "KI-Assistent",
-    "ai_notice": "Du schreibst mit einer KI, nicht mit einem Menschen. Sie kann Fehler machen, prüfe also wichtige Antworten.",
-    "privacy_link": "Datenschutzerklärung",
+    "title": "Assistent",
+    "close": "Schließen",
+    "ai_notice": "KI · kann Fehler machen ·",
+    "privacy_link": "Datenschutz",
     "login_prompt": "Melde Dich an, um dem Assistenten Fragen zu EduHub, den Kursen und Deinen Anmeldungen zu stellen.",
     "login": "Anmelden",
     "unavailable_viewing_as": "Der Assistent ist nicht verfügbar, während Du EduHub als eine andere Person ansiehst.",
     "intro": "Frag mich zu EduHub, den Kursen oder Deinen Anmeldungen. Wenn Du einen Kurs verwaltest, entwerfe ich Änderungen, die Du prüfst und selbst übernimmst.",
+    "empty_title": "Wie kann ich Dir helfen?",
+    "suggestions": {
+      "questions_label": "Fragen",
+      "tasks_label": "Aufgaben auf dieser Seite",
+      "questions": {
+        "what_can_you_change": "Was kannst Du an diesem Kurs für mich ändern?",
+        "course_apply": "Wie bewerbe ich mich für diesen Kurs?",
+        "course_certificate": "Was brauche ich für ein Zertifikat in diesem Kurs?",
+        "how_to_apply": "Wie bewerbe ich mich für einen Kurs?",
+        "my_certificates": "Wo finde ich meine Zertifikate?"
+      },
+      "tasks": {
+        "shorten_tagline": "Kürze die Kurzbeschreibung",
+        "improve_goals": "Überarbeite die Lernziele",
+        "move_sessions": "Verschiebe alle Termine um eine Stunde nach hinten"
+      }
+    },
     "conversation": "Unterhaltung mit dem Assistenten",
     "you_wrote": "Du:",
     "assistant_wrote": "Assistent:",
     "thinking": "Schreibt…",
     "input_label": "Deine Frage",
-    "input_placeholder": "Schreib Deine Frage…",
-    "context_note": "Mit Deiner Frage werden die aktuelle Seite und eine dort angezeigte Fehlermeldung gesendet.",
+    "input_placeholder": "Frag mich oder gib mir eine Aufgabe…",
+    "shortcut_ctrl": "Strg K",
     "send": "Senden",
     "stop": "Stopp",
     "new_conversation": "Neue Unterhaltung",
@@ -3989,17 +4007,15 @@
       "PROPOSAL_FAILED": "Beim Speichern der Änderung ist etwas schiefgegangen. Bitte versuch es später noch einmal oder schreib an {contact}.",
       "generic": "Etwas ist schiefgelaufen. Bitte versuch es später noch einmal.",
       "NETWORK": "Die Verbindung wurde unterbrochen. Bitte versuch es noch einmal.",
-      "INTERRUPTED": "Die Antwort wurde abgebrochen. Bitte frag noch einmal."
+      "INTERRUPTED": "Die Antwort wurde abgebrochen. Bitte frag noch einmal.",
+      "EMPTY_REPLY": "Darauf kam keine Antwort. Bitte frag noch einmal."
     },
     "context": {
-      "summary": "Mit Deiner Frage gesendet",
-      "page": "Seite: {path}",
-      "course": "Kurs-ID: {id}",
-      "session": "Termin-ID: {id}",
-      "error": "Angezeigter Fehler: {message}"
+      "chip": "Wird mitgesendet: {page}",
+      "chip_with_error": "Wird mitgesendet: {page} und die angezeigte Fehlermeldung"
     },
     "feedback": {
-      "question": "War das hilfreich?",
+      "question": "War diese Antwort hilfreich?",
       "helpful": "Hilfreich",
       "not_helpful": "Nicht hilfreich",
       "consent_label": "Unterhaltung aufbewahren?",

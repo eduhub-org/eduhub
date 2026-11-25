@@ -1,5 +1,6 @@
 import { FC, ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
+import { MdArrowForward, MdOutlineEditNote } from 'react-icons/md';
 
 import type { AssistantError, ProposalStatus, ProposedChange } from './api';
 import { wordDiff } from './wordDiff';
@@ -80,46 +81,58 @@ export const ProposedChangeCard: FC<Props> = ({ state, onApply, onDiscard }) => 
   return (
     <section
       aria-labelledby={headingId}
-      className="my-2 rounded-lg border border-border-primary bg-bg-card p-3 text-sm text-label-primary"
+      className="my-3 flex flex-col gap-3 rounded-xl border border-border-primary p-4 text-sm text-label-primary"
       data-testid="proposed-change"
     >
-      <h3 id={headingId} className="font-semibold">
-        {t('title', { kind: kindLabel })}
-      </h3>
-      {!finished && <p className="mb-2 text-xs text-label-secondary">{t('not_saved_yet')}</p>}
+      <div>
+        <h3 id={headingId} className="flex items-center gap-1.5 text-xs font-semibold text-label-secondary">
+          <MdOutlineEditNote className="text-base text-brand-light" aria-hidden="true" />
+          {t('title', { kind: kindLabel })}
+        </h3>
+        {!finished && <p className="mt-0.5 text-xs text-label-disabled">{t('not_saved_yet')}</p>}
+      </div>
 
-      <dl className="space-y-2">
+      <dl className="flex flex-col gap-3">
         {keys.map((key) => {
           const old = before[key];
           const next = after[key];
           const textDiff = typeof old === 'string' && typeof next === 'string';
+          const simple = (value: unknown) => value === null || value === undefined || typeof value !== 'object';
           return (
             <div key={key} className="min-w-0">
-              <dt className="font-medium">{label(key)}</dt>
+              <dt className="text-xs text-label-disabled">{label(key)}</dt>
               {textDiff ? (
-                <dd className="whitespace-pre-wrap break-words" aria-label={t('text_diff', { field: label(key) })}>
+                <dd className="whitespace-pre-wrap break-words leading-relaxed" aria-label={t('text_diff', { field: label(key) })}>
                   {wordDiff(old, next).map((part, index) =>
                     part.type === 'same' ? (
                       <span key={index}>{part.text}</span>
                     ) : part.type === 'added' ? (
-                      <ins key={index} className="bg-diff-added no-underline" title={t('added')}>
+                      <ins key={index} className="rounded-sm bg-diff-added px-0.5 no-underline" title={t('added')}>
                         {part.text}
                       </ins>
                     ) : (
-                      <del key={index} className="bg-diff-removed" title={t('removed')}>
+                      <del key={index} className="rounded-sm bg-diff-removed px-0.5" title={t('removed')}>
                         {part.text}
                       </del>
                     )
                   )}
                 </dd>
+              ) : simple(old) && simple(next) ? (
+                <dd className="flex flex-wrap items-center gap-1.5 break-words">
+                  <span className="sr-only">{t('before')}:</span>
+                  <del className="text-label-disabled">{key in before ? formatValue(old) : t('none')}</del>
+                  <MdArrowForward className="shrink-0 text-label-disabled" aria-hidden="true" />
+                  <span className="sr-only">{t('after')}:</span>
+                  <ins className="font-semibold no-underline">{key in after ? formatValue(next) : t('none')}</ins>
+                </dd>
               ) : (
-                <dd className="grid grid-cols-1 gap-1 sm:grid-cols-2">
-                  <div className="min-w-0 break-words rounded bg-diff-removed p-1">
-                    <span className="block text-xs text-label-secondary">{t('before')}</span>
+                <dd className="mt-1 flex flex-col gap-2">
+                  <div className="min-w-0 break-words text-label-disabled">
+                    <span className="block text-xs">{t('before')}</span>
                     {key in before ? formatValue(old) : <span className="italic">{t('none')}</span>}
                   </div>
-                  <div className="min-w-0 break-words rounded bg-diff-added p-1">
-                    <span className="block text-xs text-label-secondary">{t('after')}</span>
+                  <div className="min-w-0 break-words">
+                    <span className="block text-xs text-label-disabled">{t('after')}</span>
                     {key in after ? formatValue(next) : <span className="italic">{t('none')}</span>}
                   </div>
                 </dd>
@@ -129,11 +142,11 @@ export const ProposedChangeCard: FC<Props> = ({ state, onApply, onDiscard }) => 
         })}
       </dl>
 
-      <div aria-live="polite">
-        {status === 'APPLIED' && <p className="mt-2 font-medium text-success">{t('applied')}</p>}
-        {status === 'DISCARDED' && <p className="mt-2 text-label-secondary">{t('discarded')}</p>}
+      <div aria-live="polite" className="empty:hidden">
+        {status === 'APPLIED' && <p className="font-medium text-success">{t('applied')}</p>}
+        {status === 'DISCARDED' && <p className="text-label-secondary">{t('discarded')}</p>}
         {error && (
-          <p className="mt-2 text-error" role="status">
+          <p className="text-error" role="status">
             {/* The widget's own texts fit the card best; the server's localized message covers the other codes. */}
             {t.has(`errors.${error.code}`) ? t(`errors.${error.code}`) : error.message || t('errors.generic')}
           </p>
@@ -141,12 +154,12 @@ export const ProposedChangeCard: FC<Props> = ({ state, onApply, onDiscard }) => 
       </div>
 
       {!finished && (
-        <div className="mt-3 flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-1">
           <button
             type="button"
             onClick={onApply}
             disabled={!canApply}
-            className="rounded-full bg-cta px-4 py-1 text-label-primary hover:bg-cta-hover disabled:opacity-50"
+            className="rounded-full bg-label-primary px-4 py-1.5 font-semibold text-bg-primary disabled:opacity-50"
           >
             {busy ? t('applying') : t('apply')}
           </button>
@@ -154,7 +167,7 @@ export const ProposedChangeCard: FC<Props> = ({ state, onApply, onDiscard }) => 
             type="button"
             onClick={onDiscard}
             disabled={busy}
-            className="rounded-full border border-label-primary px-4 py-1 disabled:opacity-50"
+            className="rounded-full px-3 py-1.5 font-medium text-label-secondary hover:text-label-primary disabled:opacity-50"
           >
             {t('discard')}
           </button>

@@ -30,7 +30,8 @@ The backend's `lib/assistant/README.md` (PR #2200) is the spec. In short:
   `create_course` proposal could create two courses). After discard the widget forgets the id
   (discard doesn't revoke it server-side), so later `proposals` entries omit it.
 - `POST /api/assistant/feedback` with `{ rating, consent, messages? }`; `messages` only for 👎
-  with consent.
+  with consent. Each answer is rated on its own: `messages` is the conversation up to and
+  including the rated answer.
 
 Error texts: the chat endpoint's `message` is already localized and shown as is; the texts for its
 codes live under `assistant.errors.<CODE>` on the backend branch. This branch only adds
