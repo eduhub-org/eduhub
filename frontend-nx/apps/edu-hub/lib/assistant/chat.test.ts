@@ -6,6 +6,7 @@ import { createFakeCourseStore, createWorld } from '../mcp/testing/fakeCourseSto
 import { ChatEvent, runChat } from './chat';
 import { createCourseSetupTools } from './courseSetupTools';
 import { buildSystemPrompt } from './prompt';
+import { ProviderError } from './provider';
 import { call, fakeHasura, scriptedProvider } from './testing/helpers';
 import { createUserTools } from './userTools';
 
@@ -27,6 +28,36 @@ const run = async (script: Parameters<typeof scriptedProvider>[0], tools = userT
   });
   return { provider, events, summary };
 };
+
+describe('provider errors', () => {
+  const failingRun = (error: Error) => {
+    const provider = { model: 'failing', complete: async () => Promise.reject(error) };
+    const events: ChatEvent[] = [];
+    return runChat({
+      provider,
+      tools: userTools(),
+      system: 'system',
+      messages: [{ role: 'user', content: 'Geheime Frage' }],
+      maxToolRounds: 6,
+      emit: (e) => events.push(e),
+    }).then((summary) => ({ summary, events }));
+  };
+
+  it("logs the provider's code and HTTP status so a misconfiguration can be told apart", async () => {
+    const log = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+    const { summary, events } = await failingRun(new ProviderError('PROVIDER_UNAUTHORIZED', 401));
+    expect(summary.outcome).toBe('UNAVAILABLE');
+    expect(events).toContainEqual({ type: 'error', code: 'UNAVAILABLE' });
+    expect(log).toHaveBeenCalledWith('Assistant: the model call failed: PROVIDER_UNAUTHORIZED (HTTP 401)');
+  });
+
+  it("logs only the name of any other error, never its message", async () => {
+    const log = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+    await failingRun(new TypeError('Geheime Frage'));
+    expect(log).toHaveBeenCalledWith('Assistant: the model call failed: TypeError');
+    expect(JSON.stringify(log.mock.calls)).not.toContain('Geheime');
+  });
+});
 
 describe('tool calls', () => {
   it('lets the model retry once after invalid JSON, with the validation error as the tool result', async () => {
