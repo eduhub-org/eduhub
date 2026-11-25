@@ -4,6 +4,7 @@ import { FC } from 'react';
 import { Page } from '../../components/layout/Page';
 import {
   PrivacyAnalytics,
+  PrivacyAssistant,
   PrivacyAsOfDate,
   PrivacyCourseChat,
   PrivacyCourseParticipation,
@@ -58,11 +59,12 @@ const Privacy: FC = () => {
           </PrivacyDataCollection>
           <PrivacyOnlineSessions n={5} />
           <PrivacyCourseChat n={6} />
-          <PrivacyEmail n={7} />
-          <PrivacyFormbricks n={8} />
-          <PrivacyPayments n={9} />
-          <PrivacyFunderReports n={10} />
-          <PrivacyAnalytics n={11} />
+          <PrivacyAssistant n={7} />
+          <PrivacyEmail n={8} />
+          <PrivacyFormbricks n={9} />
+          <PrivacyPayments n={10} />
+          <PrivacyFunderReports n={11} />
+          <PrivacyAnalytics n={12} />
           <PrivacyAsOfDate />
         </div>
       </Page>
