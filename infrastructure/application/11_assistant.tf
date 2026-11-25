@@ -1,10 +1,11 @@
 ###############################################################################
-# Assistant (ADR 0005): Gemini on Vertex AI, processed in the EU
+# Assistant (ADR 0005, ADR 0008): an OpenAI-compatible LLM processed in the EU,
+# either on the IONOS AI Model Hub (ionos) or Gemini on Vertex AI (vertex)
 #####
 # The Assistant's backend runs in the edu service (a Next.js API route) and
-# calls Vertex AI's OpenAI-compatible Chat Completions API. The edu service
+# calls the provider's OpenAI-compatible Chat Completions API. The edu service
 # runs as the default compute service account, so that account gets
-# roles/aiplatform.user. The aiplatform API is enabled in 06_cloud-functions.tf.
+# roles/aiplatform.user for Vertex and read access to the API key otherwise. The aiplatform API is enabled in 06_cloud-functions.tf.
 #
 # Zero retention on Google's side (issue #2191):
 # - Request-response logging is off unless a PublisherModelConfig turns it on;
@@ -20,7 +21,48 @@ locals {
     ? "aiplatform.eu.rep.googleapis.com"
     : "${var.assistant_llm_location}-aiplatform.googleapis.com"
   )
-  assistant_llm_base_url = "https://${local.assistant_llm_host}/v1/projects/${var.project_id}/locations/${var.assistant_llm_location}/endpoints/openapi"
+  assistant_vertex_base_url = "https://${local.assistant_llm_host}/v1/projects/${var.project_id}/locations/${var.assistant_llm_location}/endpoints/openapi"
+
+  # IONOS AI Model Hub (ADR 0008): OpenAI-compatible, processed in Germany, with
+  # a static API key. The app's generic "openai" provider speaks to it.
+  assistant_ionos_base_url = "https://openai.inference.de-txl.ionos.com/v1"
+
+  assistant_llm_base_url = var.assistant_llm_provider == "ionos" ? local.assistant_ionos_base_url : local.assistant_vertex_base_url
+  # ASSISTANT_LLM_PROVIDER as the app reads it (lib/assistant/config.ts).
+  assistant_app_provider = var.assistant_llm_provider == "ionos" ? "openai" : var.assistant_llm_provider
+  assistant_llm_model = var.assistant_llm_model != "" ? var.assistant_llm_model : (
+    var.assistant_llm_provider == "ionos" ? "Qwen/Qwen3.8-27B" : "google/gemini-3.8-flash"
+  )
+  # The key is used only with a provider that needs one: the variable set shares it with
+  # every workspace, and on vertex it would replace the service account's token. Only
+  # whether it is set decides what to create; the key itself stays sensitive.
+  assistant_has_api_key = var.assistant_llm_provider == "ionos" && nonsensitive(var.assistant_llm_api_key != "")
+}
+
+# The provider's API key, for providers other than Vertex AI (which uses the
+# service account's token). Without a key nothing is created and the app
+# reports the Assistant as misconfigured, so a missing key never blocks a deploy.
+resource "google_secret_manager_secret" "assistant_llm_api_key" {
+  count     = local.assistant_has_api_key ? 1 : 0
+  provider  = google-beta
+  secret_id = "assistant-llm-api-key"
+  replication {
+    auto {}
+  }
+}
+
+resource "google_secret_manager_secret_version" "assistant_llm_api_key" {
+  count       = local.assistant_has_api_key ? 1 : 0
+  provider    = google-beta
+  secret      = google_secret_manager_secret.assistant_llm_api_key[0].name
+  secret_data = var.assistant_llm_api_key
+}
+
+resource "google_secret_manager_secret_iam_member" "assistant_llm_api_key" {
+  count     = local.assistant_has_api_key ? 1 : 0
+  secret_id = google_secret_manager_secret.assistant_llm_api_key[0].id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${data.google_project.eduhub.number}-compute@developer.gserviceaccount.com"
 }
 
 resource "google_project_iam_member" "assistant_vertex_ai_user" {

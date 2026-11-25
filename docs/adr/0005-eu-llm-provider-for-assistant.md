@@ -1,7 +1,7 @@
 # ADR 0005: The Assistant runs on Gemini Flash on Vertex AI, processed in the EU
 
 ## Status
-Accepted; Gemini model pending a short trial
+Accepted; model and provider superseded by ADR 0008 (Qwen3.8 27B on IONOS)
 
 ## Context
 

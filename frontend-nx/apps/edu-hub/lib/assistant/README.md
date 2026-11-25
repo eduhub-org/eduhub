@@ -1,7 +1,7 @@
 # Assistant backend
 
 The server side of the **Assistant** (issue #2193, ADR 0005): a streaming chat endpoint that
-calls an OpenAI-compatible model (Gemini Flash on Vertex AI, in the EU) and runs tools as the
+calls an OpenAI-compatible model (Qwen3.8 27B on the IONOS AI Model Hub in Germany, ADR 0008; or Gemini Flash on Vertex AI in the EU) and runs tools as the
 person chatting.
 
 | File | What it does |
@@ -145,7 +145,7 @@ EMBEDDING_PROVIDER=fake HASURA_ENDPOINT=http://localhost:8080/v1/graphql HASURA_
 |----------|---------|---------|
 | `ASSISTANT_LLM_PROVIDER` | off | `vertex`, `openai` (any OpenAI-compatible API) or `fake` |
 | `ASSISTANT_LLM_BASE_URL` | | e.g. `https://aiplatform.eu.rep.googleapis.com/v1/projects/P/locations/eu/endpoints/openapi`; the global endpoint is refused |
-| `ASSISTANT_LLM_MODEL` | | e.g. `google/gemini-3.8-flash` |
+| `ASSISTANT_LLM_MODEL` | | e.g. `Qwen/Qwen3.8-27B` (IONOS) or `google/gemini-3.8-flash` (Vertex) |
 | `ASSISTANT_LLM_API_KEY` | | static key; for `vertex` only to override the metadata-server token (local test with `gcloud auth print-access-token`) |
 | `ASSISTANT_LLM_PRICE_INPUT_EUR_PER_MTOK`, `…_OUTPUT_…` | | required for a paid provider, else it stays off |
 | `ASSISTANT_LLM_EXTRA_BODY` | `{}` | JSON merged into each request, e.g. `{"reasoning_effort":"low"}` |
