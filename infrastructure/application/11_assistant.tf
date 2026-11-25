@@ -33,8 +33,10 @@ locals {
   assistant_llm_model = var.assistant_llm_model != "" ? var.assistant_llm_model : (
     var.assistant_llm_provider == "ionos" ? "Qwen/Qwen3.8-27B" : "google/gemini-3.8-flash"
   )
-  # Only whether a key is set is used to decide what to create; the key stays sensitive.
-  assistant_has_api_key = nonsensitive(var.assistant_llm_api_key != "")
+  # The key is used only with a provider that needs one: the variable set shares it with
+  # every workspace, and on vertex it would replace the service account's token. Only
+  # whether it is set decides what to create; the key itself stays sensitive.
+  assistant_has_api_key = var.assistant_llm_provider == "ionos" && nonsensitive(var.assistant_llm_api_key != "")
 }
 
 # The provider's API key, for providers other than Vertex AI (which uses the
