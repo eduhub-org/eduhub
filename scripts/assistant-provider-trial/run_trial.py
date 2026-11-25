@@ -164,11 +164,19 @@ def api_key(target, refresh=False):
 
 def check_endpoint(target):
     """Refuse Vertex AI's global endpoint: it gives no control over where a
-    request is processed (ADR 0005)."""
+    request is processed (ADR 0005). A target may opt in with
+    "allow_global_endpoint": true to compare models only offered there. That is
+    fine for this trial, whose cases and tool results are fictional, but such a
+    model can't serve the Assistant. Its name must contain "global", so every
+    result table says so."""
     url = target["base_url"]
     host = urlparse(url).hostname or ""
     if "/locations/global/" in url + "/" or host == "aiplatform.googleapis.com":
-        sys.exit(f"{target['name']}: the global Vertex AI endpoint is not allowed; use a regional or eu endpoint")
+        if target.get("allow_global_endpoint") is not True:
+            sys.exit(f"{target['name']}: the global Vertex AI endpoint is not allowed; use a regional or eu endpoint")
+        if "global" not in target["name"]:
+            sys.exit(f"{target['name']}: a target on the global endpoint must have \"global\" in its name")
+        print(f"[{target['name']}] global endpoint: synthetic trial data only, not usable for the Assistant", file=sys.stderr)
 
 
 def strip_keys(schema, keys):
@@ -386,7 +394,11 @@ def run_case(target, case, tools, system_prompt):
                 rec["ttft"], rec["ttfc"] = out["ttft"], out["ttfc"]
             if out["usage"]:
                 rec["prompt_tokens"] += out["usage"].get("prompt_tokens", 0)
-                rec["completion_tokens"] += out["usage"].get("completion_tokens", 0)
+                # Billed output includes reasoning, which Gemini leaves out of completion_tokens
+                # but counts in total_tokens (OpenAI counts it in both).
+                u = out["usage"]
+                from_total = u["total_tokens"] - u.get("prompt_tokens", 0) if "total_tokens" in u else 0
+                rec["completion_tokens"] += max(u.get("completion_tokens", 0), from_total)
             else:
                 rec["usage_reported"] = False
             if "<tool_call>" in out["content"]:

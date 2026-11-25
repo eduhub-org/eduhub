@@ -1,13 +1,21 @@
 # Assistant provider trial
 
 Compares models for the **Assistant** (ADR 0005, issue #2191) on the same test
-set: Gemini 3.8 Flash on the Vertex AI `eu` multi-region endpoint vs Gemini 2.5
-Flash in europe-west1, both through Vertex's OpenAI-compatible Chat Completions
-API. Any other OpenAI-compatible endpoint works too (e.g. STACKIT or IONOS, once
-the move to an EU provider is back on). Python 3 standard library only.
+set: Gemini 3.8 Flash on the Vertex AI `eu` multi-region endpoint vs the
+open-weight candidates Gemma 4 26B A4B and DeepSeek V4.1 Flash, all through
+Vertex's OpenAI-compatible Chat Completions API. Any other OpenAI-compatible
+endpoint works too, e.g. an EU provider hosting the same open-weight models
+(OVHcloud, Scaleway). Python 3 standard library only.
 
 Every request is sent with `store: false`. A target on Vertex's `global`
-endpoint is refused, since it gives no control over where requests are processed.
+endpoint is refused, since it gives no control over where requests are processed,
+unless it sets `"allow_global_endpoint": true` **and** its name contains `global`
+(so every result table shows it). That exists only because Gemma 4 and DeepSeek
+V4.1 Flash are offered on `global` alone: such a target is for this trial's
+fictional cases only and can never serve the Assistant, which still refuses
+`global`. If `vertex_global_endpoint_policy` (infrastructure/README.md) is
+`dry_run` in the project, these requests show up as expected violations in its
+log; under `enforce` they fail, so run global targets in a project without it.
 
 ## What it measures
 
@@ -46,7 +54,7 @@ Answer quality is rated by hand: fill in `rating` (1–5) in `answers.csv`.
 cd scripts/assistant-provider-trial
 cp providers.example.json providers.json   # set PROJECT_ID, model ids and prices
 gcloud auth login                          # an account with roles/aiplatform.user
-python3 run_trial.py --targets gemini-2.5-flash-europe-west1 --only de-mydata-01
+python3 run_trial.py --targets gemini-3.8-flash-eu --only de-mydata-01
 python3 run_trial.py --repeat 3             # all targets, 3 runs per case
 ```
 
