@@ -234,8 +234,11 @@ describe('AssistantWidget', () => {
     expect(await screen.findByText(/The connection was lost/)).toBeInTheDocument();
   });
 
-  it('says so when a reply ends without any text', async () => {
-    replyWith([{ type: 'done' }]);
+  it.each([
+    ['no text', []],
+    ['only whitespace', [{ type: 'delta', text: '  \n ' }]],
+  ] as [string, ChatEvent[]][])('says so when a reply ends with %s', async (_case, events) => {
+    replyWith([...events, { type: 'done' }]);
     renderWidget();
     openPanel();
     await ask('Hello?');
@@ -461,6 +464,20 @@ describe('AssistantWidget', () => {
         }),
         'instructor'
       );
+    });
+
+    it('keeps a rating when the panel is closed and reopened, so it is sent once', async () => {
+      await answerOnce();
+      await act(async () => {
+        fireEvent.click(screen.getByRole('button', { name: 'Helpful' }));
+      });
+
+      await closePanel();
+      openPanel();
+
+      expect(screen.getByRole('button', { name: 'Helpful' })).toBeDisabled();
+      expect(screen.getByRole('button', { name: 'Helpful' })).toHaveAttribute('aria-pressed', 'true');
+      expect(mockSendFeedback).toHaveBeenCalledTimes(1);
     });
 
     it('sends only the 👎 rating when consent is refused', async () => {

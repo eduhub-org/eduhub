@@ -55,6 +55,9 @@ const useAssistantRole = (path: string): string => {
   return currentRole;
 };
 
+/** Text the reader can see; a reply of only whitespace counts as empty. */
+const hasText = (message: ConversationMessage) => message.content.trim().length > 0;
+
 const iconButton =
   'flex h-8 w-8 items-center justify-center rounded-lg text-label-secondary hover:bg-bg-secondary hover:text-label-primary disabled:opacity-50';
 
@@ -72,10 +75,31 @@ const ContextChip: FC = () => {
   const [label, setLabel] = useState(router.asPath.split(/[?#]/)[0]);
   const [hasError, setHasError] = useState(false);
 
+  // Follow the page, not only the route: a heading that loads later, or an error
+  // that appears or goes away, changes what Send includes, so the chip says so too.
   useEffect(() => {
     const path = router.asPath.split(/[?#]/)[0];
-    setLabel(readPageLabel(path));
-    setHasError(Boolean(readVisibleError()));
+    let frame = 0;
+    const check = () => {
+      frame = 0;
+      setLabel(readPageLabel(path));
+      setHasError(Boolean(readVisibleError()));
+    };
+    check();
+    const observer = new MutationObserver(() => {
+      if (!frame) frame = requestAnimationFrame(check);
+    });
+    observer.observe(document.body, {
+      subtree: true,
+      childList: true,
+      characterData: true,
+      attributes: true,
+      attributeFilter: ['style', 'class', 'hidden', 'aria-hidden'],
+    });
+    return () => {
+      observer.disconnect();
+      if (frame) cancelAnimationFrame(frame);
+    };
   }, [router.asPath]);
 
   return (
@@ -95,11 +119,11 @@ const Reply: FC<{
 }> = ({ message, contactHref, onDecide }) => {
   const t = useTranslations('assistant');
   // A reply that ended without text, proposal or error must not leave an empty gap.
-  const empty = !message.streaming && !message.content && message.proposals.length === 0;
+  const empty = !message.streaming && !hasText(message) && message.proposals.length === 0;
   const error = message.error ?? (empty ? { code: 'EMPTY_REPLY', message: '' } : undefined);
   return (
     <div className="min-w-0">
-      {message.content && (
+      {hasText(message) && (
         <div className="prose prose-sm prose-invert max-w-none break-words text-label-primary">
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
@@ -116,7 +140,7 @@ const Reply: FC<{
           </ReactMarkdown>
         </div>
       )}
-      {message.streaming && (message.lookingUp || !message.content) && (
+      {message.streaming && (message.lookingUp || !hasText(message)) && (
         <p className="text-sm text-label-secondary">{message.lookingUp ? t('looking_up') : t('thinking')}</p>
       )}
       {message.proposals.map((state) => (
@@ -204,7 +228,7 @@ const Chat: FC<{ conversation: Conversation; role: string; contactHref: string }
 }) => {
   const t = useTranslations('assistant');
   const router = useRouter();
-  const { messages, sending, send, stop, decide } = conversation;
+  const { messages, sending, send, stop, decide, rate } = conversation;
   const [draft, setDraft] = useState('');
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
@@ -259,9 +283,11 @@ const Chat: FC<{ conversation: Conversation; role: string; contactHref: string }
               <div key={message.id} className="group max-w-full">
                 <p className="sr-only">{t('assistant_wrote')}</p>
                 <Reply message={message} contactHref={contactHref} onDecide={decide} />
-                {!message.streaming && !message.error && (message.content || message.proposals.length > 0) && (
+                {!message.streaming && !message.error && (hasText(message) || message.proposals.length > 0) && (
                   <FeedbackControls
                     persistent={message.id === lastAnswerId}
+                    rated={message.rating}
+                    onRate={(rating) => rate(message.id, rating)}
                     role={role}
                     route={router.pathname}
                     getMessages={() => toPayload(messages.slice(0, index + 1))}
@@ -340,6 +366,7 @@ export const AssistantWidget: FC<Props> = ({ privacyHref = '/privacy', contactHr
   const role = useAssistantRole(router.asPath);
   const isMac = useIsMac();
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     if (!isSessionLoading && !isLoggedIn) clearStoredConversations();
@@ -359,6 +386,28 @@ export const AssistantWidget: FC<Props> = ({ privacyHref = '/privacy', contactHr
     // The launcher is back once the panel is gone; focus it on the next frame.
     requestAnimationFrame(() => buttonRef.current?.focus());
   };
+
+  // The chat focuses its input; without a chat (logged out, loading, viewing as
+  // someone else) focus the panel itself, so keyboard users land inside it.
+  useEffect(() => {
+    const panel = panelRef.current;
+    if (open && panel && !panel.contains(document.activeElement)) panel.focus();
+  }, [open, isSessionLoading, isLoggedIn, viewingAsSomeone]);
+
+  // Escape closes the panel wherever focus is, since the page beside it stays
+  // usable, unless another dialog or control already handled the key.
+  useEffect(() => {
+    if (!open) return undefined;
+    const onEscape = (event: globalThis.KeyboardEvent) => {
+      if (event.key !== 'Escape' || event.defaultPrevented) return;
+      const target = event.target instanceof Element ? event.target : null;
+      if (target?.closest('[role="dialog"], [role="alertdialog"]') && !target.closest('[data-assistant-panel]')) return;
+      setOpen(false);
+      requestAnimationFrame(() => buttonRef.current?.focus());
+    };
+    window.addEventListener('keydown', onEscape);
+    return () => window.removeEventListener('keydown', onEscape);
+  }, [open]);
 
   useEffect(() => {
     const onShortcut = (event: globalThis.KeyboardEvent) => {
@@ -396,12 +445,13 @@ export const AssistantWidget: FC<Props> = ({ privacyHref = '/privacy', contactHr
 
       {open && (
         <aside
+          ref={panelRef}
+          tabIndex={-1}
           role="dialog"
           aria-modal="false"
           aria-labelledby="assistant-title"
           data-assistant-panel
-          onKeyDown={(event) => event.key === 'Escape' && close()}
-          className="fixed inset-0 z-[1200] flex flex-col bg-bg-primary text-label-primary sm:left-auto sm:w-[400px] sm:border-l sm:border-border-primary sm:shadow-2xl"
+          className="fixed inset-0 z-[1200] flex flex-col bg-bg-primary focus:outline-none text-label-primary sm:left-auto sm:w-[400px] sm:border-l sm:border-border-primary sm:shadow-2xl"
         >
           <header className="flex items-center gap-2 border-b border-border-primary py-3 pl-5 pr-3">
             <div className="min-w-0 flex-1">

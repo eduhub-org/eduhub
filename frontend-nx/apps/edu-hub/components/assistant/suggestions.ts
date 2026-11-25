@@ -16,7 +16,7 @@ export const suggestionsFor = (route: string, role: string): Suggestions => {
   if (route === '/manage/course/[courseId]' && COURSE_MANAGERS.includes(role)) {
     return {
       questions: ['what_can_you_change'],
-      tasks: ['shorten_tagline', 'improve_goals', 'move_sessions'],
+      tasks: ['shorten_tagline', 'improve_goals', 'extend_application_end'],
     };
   }
   if (route.startsWith('/course/[courseId]')) {

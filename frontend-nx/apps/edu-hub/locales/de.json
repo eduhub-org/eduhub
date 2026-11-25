@@ -3965,7 +3965,7 @@
       "tasks": {
         "shorten_tagline": "Kürze die Kurzbeschreibung",
         "improve_goals": "Überarbeite die Lernziele",
-        "move_sessions": "Verschiebe alle Termine um eine Stunde nach hinten"
+        "extend_application_end": "Verlängere den Bewerbungsschluss um eine Woche"
       }
     },
     "conversation": "Unterhaltung mit dem Assistenten",

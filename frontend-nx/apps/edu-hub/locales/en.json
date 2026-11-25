@@ -3980,7 +3980,7 @@
       "tasks": {
         "shorten_tagline": "Shorten the tagline",
         "improve_goals": "Improve the learning goals",
-        "move_sessions": "Move all sessions one hour later"
+        "extend_application_end": "Extend the application deadline by one week"
       }
     },
     "conversation": "Conversation with the Assistant",

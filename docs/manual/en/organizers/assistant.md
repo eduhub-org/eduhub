@@ -7,7 +7,7 @@ language: en
 summary: How Organizers use the Assistant to set up courses, events and degrees and to draft course texts, settings, Sessions and email templates as Proposed Changes, and what it can't do.
 ---
 
-The **Assistant** is the AI chat behind the **Ask me or give me a task…** bar at the bottom right of every page; you can also open it with **Ctrl+K** (**⌘K** on a Mac). It opens at the right edge, with the page still visible next to it. Besides answering questions, it helps Organizers set up their courses. It acts only with your own rights: it can't see or change anything you couldn't see or change yourself.
+The **Assistant** is the AI chat behind the **Ask me or give me a task…** bar at the bottom right of every page; you can also open it with **Ctrl+K** (**⌘K** on a Mac). It opens at the right edge, with the page still visible next to it. On a phone the bar shows only an icon, and the Assistant fills the whole screen. Besides answering questions, it helps Organizers set up their courses. It acts only with your own rights: it can't see or change anything you couldn't see or change yourself.
 
 ## Proposed Changes
 
@@ -50,5 +50,5 @@ Settings your role can't change by hand, it can't change either.
 - On a course's management page it suggests a few tasks to start with, such as shortening the tagline. One click sends it.
 - It answers questions about the platform and about error messages from this manual, the rules your organization publishes online and the platform's own texts, and links the pages it used.
 - The Assistant is an AI and can make mistakes. Check every Proposed Change before applying it.
-- Conversations are not stored. You can rate each answer with thumbs up or down. If you rate an answer as not helpful, you can agree to the conversation up to that answer being kept for 30 days to improve the Assistant.
+- A conversation stays only in this browser tab until you close it or log out; EduHub doesn't store it. You can rate each answer with thumbs up or down. If you rate an answer as not helpful, you can agree to the conversation up to that answer being kept by EduHub for 30 days to improve the Assistant.
 - The Assistant is not available while an Admin is viewing EduHub as someone else.

@@ -23,6 +23,8 @@ export interface ConversationMessage {
   streaming?: boolean;
   /** The backend is running a tool (looking up data) for this reply. */
   lookingUp?: boolean;
+  /** This answer's 👍/👎, kept with the conversation so it can't be sent twice. */
+  rating?: 'up' | 'down';
 }
 
 const STORAGE_PREFIX = 'eduhub-assistant:';
@@ -244,11 +246,16 @@ export const useAssistantConversation = ({
     [messages, role, locale, apollo, updateProposal]
   );
 
+  /** Records (or, after a failed send, clears) the rating of one answer. */
+  const rate = useCallback((id: string, rating: 'up' | 'down' | undefined) => {
+    setMessages((current) => current.map((message) => (message.id === id ? { ...message, rating } : message)));
+  }, []);
+
   const reset = useCallback(() => {
     abortRef.current?.abort();
     setSending(false);
     setMessages([]);
   }, []);
 
-  return { messages, sending, send, stop, decide, reset };
+  return { messages, sending, send, stop, decide, rate, reset };
 };

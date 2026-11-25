@@ -14,27 +14,34 @@ interface Props {
   getMessages: () => ChatMessagePayload[];
   /** Always shown (the latest answer); earlier answers show it on hover, focus or touch. */
   persistent?: boolean;
+  /** The rating this answer already has; it outlives closing the panel. */
+  rated?: 'up' | 'down';
+  onRate: (rating: 'up' | 'down' | undefined) => void;
 }
 
-const iconButton = 'rounded-md p-1 text-label-disabled hover:bg-bg-secondary hover:text-label-primary disabled:opacity-50';
+// 44 px touch targets on touch screens, so a miss on 👎 can't land on 👍.
+const iconButton =
+  'inline-flex items-center justify-center rounded-md p-1 text-label-disabled hover:bg-bg-secondary hover:text-label-primary disabled:opacity-50 [@media(pointer:coarse)]:min-h-[44px] [@media(pointer:coarse)]:min-w-[44px]';
 
 /** 👍 / 👎 for one answer. 👎 asks before the conversation up to that answer is kept. */
-export const FeedbackControls: FC<Props> = ({ role, route, getMessages, persistent = false }) => {
+export const FeedbackControls: FC<Props> = ({ role, route, getMessages, persistent = false, rated, onRate }) => {
   const t = useTranslations('assistant.feedback');
   const [step, setStep] = useState<Step>('ask');
-  const [rating, setRating] = useState<'up' | 'down' | null>(null);
+  const rating = rated ?? null;
 
   const submit = async (value: 'up' | 'down', consent: boolean) => {
-    setRating(value);
+    // Recorded before sending, so a reopened panel can't send it a second time.
+    onRate(value);
     setStep('sending');
     const ok = await sendFeedback(
       { rating: value, consent, route, ...(value === 'down' && consent && { messages: getMessages() }) },
       role
     );
+    if (!ok) onRate(undefined);
     setStep(ok ? 'thanks' : 'failed');
   };
 
-  const chosen = step !== 'ask';
+  const chosen = (step !== 'ask' && step !== 'failed') || Boolean(rated);
   const visibility =
     persistent || chosen
       ? ''
