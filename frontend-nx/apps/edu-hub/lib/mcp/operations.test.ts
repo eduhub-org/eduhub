@@ -504,3 +504,110 @@ describe('smaller review fixes', () => {
     }
   });
 });
+
+describe('course mails', () => {
+  /** An event in program 30 of org 1, registering directly, run by ins-1. */
+  const addEvent = () =>
+    world.courses.push({
+      ...structuredClone(world.courses[0]),
+      id: 4,
+      programId: 30,
+      programType: 'EVENTS',
+      registrationType: 'DIRECT_CONFIRMATION',
+    });
+
+  it('lists the mails the course sends, its own copy before the default', async () => {
+    const result = await setupFor(world, 'oa-1', 'org_admin').getMailTemplates({ courseId: 1 });
+    expect(result.registrationType).toBe('APPROVAL_WITH_INPUT');
+    expect(result.mails).toEqual([
+      { type: 'APPLICATION_CONFIRMED', customized: true, subject: 'Bestätigt: ML', content: expect.stringContaining('ML-Kurs') },
+      { type: 'SESSION_REMINDER', customized: false, subject: 'Erinnerung', content: '<p>Bald geht es los.</p>' },
+    ]);
+  });
+
+  it("lists every mail that may apply to an instructor, who can't read the registration type", async () => {
+    const result = await setupFor(world, 'ins-1', 'instructor').getMailTemplates({ courseId: 1 });
+    expect(result.registrationType).toBeNull();
+    expect(result.mails.map((m) => m.type).sort()).toEqual(['APPLICATION_CONFIRMED', 'REGISTRATION_CONFIRMED', 'SESSION_REMINDER']);
+    expect(result.mails.find((m) => m.type === 'APPLICATION_CONFIRMED')?.customized).toBe(true);
+  });
+
+  it('shows an event its Registration Confirmation', async () => {
+    addEvent();
+    const result = await setupFor(world, 'oa-1', 'org_admin').getMailTemplates({ courseId: 4 });
+    expect(result.mails.map((m) => m.type)).toEqual(['REGISTRATION_CONFIRMED', 'SESSION_REMINDER']);
+  });
+
+  it('lets instructors read but not change the mails', async () => {
+    const setup = setupFor(world, 'ins-1', 'instructor');
+    const result = setup.proposeMailTemplate({ courseId: 1, type: 'SESSION_REMINDER', subject: 'Neu' });
+    expect(await errorCode(result)).toBe('FORBIDDEN');
+  });
+
+  it('refuses the mails of a course the caller does not manage', async () => {
+    const setup = setupFor(world, 'oa-2', 'org_admin');
+    expect(await errorCode(setup.getMailTemplates({ courseId: 1 }))).toBe('NOT_FOUND');
+    expect(await errorCode(setup.proposeMailTemplate({ courseId: 1, type: 'SESSION_REMINDER', subject: 'x' }))).toBe(
+      'NOT_FOUND'
+    );
+  });
+
+  it("applies a change of a default as the course's own copy, leaving the default as it was", async () => {
+    addEvent();
+    const setup = setupFor(world, 'oa-1', 'org_admin');
+    const content =
+      '<p>Hallo [User:FirstName],</p><p>[#if:CourseDateTime]Wann: [Course:DateTime][/if:CourseDateTime]</p>' +
+      '<p>Bring deinen Laptop mit.</p>';
+    const proposal = await setup.proposeMailTemplate({ courseId: 4, type: 'registration_confirmed', content });
+    expect(proposal).toMatchObject({
+      kind: 'mail_template',
+      courseId: 4,
+      before: { mailType: 'REGISTRATION_CONFIRMED', content: expect.not.stringContaining('Laptop') },
+      after: { mailType: 'REGISTRATION_CONFIRMED', subject: 'Du bist dabei: [Enrollment:CourseId--Course:Name]', content },
+    });
+    expect(proposal.message).not.toContain('placeholders');
+    expect(world.mails).toHaveLength(4);
+
+    await expect(setup.applyProposedChange(proposal)).resolves.toMatchObject({ status: 'APPLIED', kind: 'mail_template' });
+    expect(world.mails.find((m) => m.courseId === 4)).toMatchObject({
+      type: 'REGISTRATION_CONFIRMED',
+      content,
+      from: 'edu@example.org',
+    });
+    expect(world.mails.find((m) => m.id === 1)?.content).not.toContain('Laptop');
+    expect(metrics).toEqual([
+      { metric: 'mcp_proposal', event: 'created', kind: 'mail_template' },
+      { metric: 'mcp_proposal', event: 'applied', kind: 'mail_template' },
+    ]);
+  });
+
+  it("updates the course's existing copy", async () => {
+    const setup = setupFor(world, 'oa-1', 'org_admin');
+    const proposal = await setup.proposeMailTemplate({ courseId: 1, type: 'APPLICATION_CONFIRMED', subject: 'Willkommen' });
+    await setup.applyProposedChange(proposal);
+    expect(world.mails.filter((m) => m.courseId === 1)).toEqual([expect.objectContaining({ id: 4, subject: 'Willkommen' })]);
+  });
+
+  it('refuses to apply when the mail changed since the proposal', async () => {
+    const setup = setupFor(world, 'oa-1', 'org_admin');
+    const proposal = await setup.proposeMailTemplate({ courseId: 1, type: 'SESSION_REMINDER', subject: 'Gleich' });
+    await setup.applyProposedChange(
+      await setup.proposeMailTemplate({ courseId: 1, type: 'SESSION_REMINDER', subject: 'Bald' })
+    );
+    expect(await errorCode(setup.applyProposedChange(proposal))).toBe('STALE');
+  });
+
+  it('refuses mails the course does not send, and changes that change nothing', async () => {
+    const setup = setupFor(world, 'oa-1', 'org_admin');
+    const propose = (input: { type: string; subject?: string }) => setup.proposeMailTemplate({ courseId: 1, ...input });
+    expect(await errorCode(propose({ type: 'REGISTRATION_CONFIRMED', subject: 'x' }))).toBe('INVALID');
+    expect(await errorCode(propose({ type: 'SESSION_REMINDER', subject: 'Erinnerung' }))).toBe('NO_CHANGE');
+    expect(await errorCode(propose({ type: 'SESSION_REMINDER' }))).toBe('INVALID');
+  });
+
+  it('points out placeholders the new text drops', async () => {
+    const setup = setupFor(world, 'oa-1', 'org_admin');
+    const proposal = await setup.proposeMailTemplate({ courseId: 1, type: 'APPLICATION_CONFIRMED', content: '<p>Hallo!</p>' });
+    expect(proposal.message).toContain('[User:FirstName]');
+  });
+});

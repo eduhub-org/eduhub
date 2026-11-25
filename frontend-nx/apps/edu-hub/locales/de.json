@@ -4030,7 +4030,8 @@
         "course_texts": "Kurstexte",
         "course_settings": "Kurseinstellungen",
         "sessions": "Termine",
-        "create_course": "neuer Kurs"
+        "create_course": "neuer Kurs",
+        "mail_template": "E-Mail"
       },
       "fields": {
         "title": "Titel",
@@ -4052,7 +4053,10 @@
         "attendanceCertificatePossible": "Teilnahmebescheinigung möglich",
         "achievementCertificatePossible": "Leistungszertifikat möglich",
         "sessions": "Termine",
-        "deletedSessionIds": "Gelöschte Termine"
+        "deletedSessionIds": "Gelöschte Termine",
+        "mailType": "E-Mail",
+        "subject": "Betreff",
+        "content": "Text"
       },
       "errors": {
         "generic": "Die Änderung konnte nicht übernommen werden.",

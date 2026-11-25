@@ -1,5 +1,5 @@
 import { OperationError } from '../errors';
-import { CourseSnapshot, CourseStore, SETTING_FIELDS, SessionChanges, TEXT_FIELDS } from '../types';
+import { CourseSnapshot, CourseStore, MailTemplate, SETTING_FIELDS, SessionChanges, TEXT_FIELDS } from '../types';
 
 /**
  * In-memory CourseStore for tests. It models the parts of Hasura's permissions the operations rely
@@ -13,6 +13,13 @@ export interface FakeCourse extends Omit<CourseSnapshot, 'registrationCount'> {
   organizationId: number;
   instructorIds: string[];
   registrations: number;
+  /** Default APPROVAL_WITH_INPUT, as the column default. */
+  registrationType?: string;
+}
+
+/** A mail template row; courseId null for a system default. */
+export interface FakeMail extends MailTemplate {
+  courseId: number | null;
 }
 
 export interface FakeProgram {
@@ -30,6 +37,7 @@ export interface FakeWorld {
   allowedRoles: Record<string, string[]>;
   /** userId → organizations they are an Org Admin of (with the matching capability). */
   orgAdminOf: Record<string, number[]>;
+  mails: FakeMail[];
 }
 
 /** Instructors can't update these columns in Hasura (see public_Course.yaml). */
@@ -162,8 +170,62 @@ export const createFakeCourseStore = (world: FakeWorld, userId: string, role: st
       });
       return id;
     },
+    async getCourseMails(courseId) {
+      const c = find(courseId);
+      // Instructors read their courses' mails; only Org Admins and admins may write them (MailTemplate.yaml).
+      const visible = c && manages(c);
+      const strip = (row: FakeMail): MailTemplate => {
+        const { courseId: _courseId, ...m } = structuredClone(row);
+        void _courseId;
+        return m;
+      };
+      return {
+        // Instructors can't read it on unpublished courses (public_Course.yaml); the seed courses are unpublished.
+        registrationType: visible && role !== 'instructor' ? c.registrationType ?? 'APPROVAL_WITH_INPUT' : null,
+        course: visible ? world.mails.filter((m) => m.courseId === courseId).map(strip) : [],
+        defaults: world.mails.filter((m) => m.courseId === null).map(strip),
+      };
+    },
+    async saveCourseMail(courseId, { type, subject, content }, target) {
+      const c = find(courseId);
+      if (!c || !manages(c) || (role !== 'admin' && role !== 'org_admin')) return false;
+      if ('existing' in target) {
+        const row = world.mails.find((m) => m.id === target.existing.id && m.updatedAt === target.existing.updatedAt);
+        if (!row) return false;
+        Object.assign(row, { subject, content, updatedAt: nextTimestamp() });
+        return true;
+      }
+      if (world.mails.some((m) => m.courseId === courseId && m.type === type)) {
+        throw new OperationError('HASURA_ERROR', 'Uniqueness violation');
+      }
+      const { from, cc, bcc } = target.base;
+      world.mails.push({
+        id: Math.max(0, ...world.mails.map((m) => m.id)) + 1,
+        courseId,
+        type,
+        subject,
+        content,
+        from,
+        cc,
+        bcc,
+        updatedAt: nextTimestamp(),
+      });
+      return true;
+    },
   };
 };
+
+const mail = (id: number, type: string, courseId: number | null, subject: string, content: string): FakeMail => ({
+  id,
+  type,
+  courseId,
+  subject,
+  content,
+  from: 'edu@example.org',
+  cc: null,
+  bcc: null,
+  updatedAt: '2026-11-01T09:00:00+00:00',
+});
 
 const fields = (title: string, language = 'DE') => ({
   title,
@@ -258,4 +320,10 @@ export const createWorld = (): FakeWorld => ({
     'u-1': ['user'],
   },
   orgAdminOf: { 'oa-1': [1], 'oa-2': [2] },
+  mails: [
+    mail(1, 'REGISTRATION_CONFIRMED', null, 'Du bist dabei: [Enrollment:CourseId--Course:Name]', '<p>Hallo [User:FirstName],</p><p>[#if:CourseDateTime]Wann: [Course:DateTime][/if:CourseDateTime]</p>'),
+    mail(2, 'APPLICATION_CONFIRMED', null, 'Bestätigt', '<p>Hallo [User:FirstName], du bist bestätigt.</p>'),
+    mail(3, 'SESSION_REMINDER', null, 'Erinnerung', '<p>Bald geht es los.</p>'),
+    mail(4, 'APPLICATION_CONFIRMED', 1, 'Bestätigt: ML', '<p>Hallo [User:FirstName], willkommen im ML-Kurs.</p>'),
+  ],
 });

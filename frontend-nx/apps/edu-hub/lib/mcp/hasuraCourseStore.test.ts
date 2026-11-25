@@ -45,6 +45,22 @@ describe('createHasuraCourseStore', () => {
     await expect(store.verifyCaller()).rejects.toMatchObject({ code: 'UNAUTHENTICATED' });
   });
 
+  it("saves a course's mail: a new copy keeps the default's sender, an update is guarded by updated_at", async () => {
+    const base = { id: 1, type: 'SESSION_REMINDER', subject: 'Alt', content: '<p>Alt</p>', from: 'edu@x', cc: 'cc@x', bcc: null, updatedAt: 't1' };
+    const change = { type: 'SESSION_REMINDER', subject: 'Neu', content: '<p>Neu</p>' };
+    const { fetchImpl, calls } = fakeFetch([
+      { data: { insert_MailTemplate_one: { id: 9 } } },
+      { data: { update_MailTemplate: { affected_rows: 0 } } },
+    ]);
+    const store = createHasuraCourseStore({ url: 'http://hasura', token: TOKEN, role: 'org_admin', fetchImpl });
+
+    await expect(store.saveCourseMail(7, change, { base })).resolves.toBe(true);
+    expect(calls[0].body.variables.object).toEqual({ ...change, courseId: 7, from: 'edu@x', cc: 'cc@x', bcc: null });
+
+    await expect(store.saveCourseMail(7, change, { existing: { ...base, id: 9 } })).resolves.toBe(false);
+    expect(calls[1].body.variables).toEqual({ id: 9, updatedAt: 't1', set: { subject: 'Neu', content: '<p>Neu</p>' } });
+  });
+
   it('reports a write as not saved when the course changed (updated_at no longer matches)', async () => {
     const { fetchImpl, calls } = fakeFetch([{ data: { update_Course: { affected_rows: 0 } } }]);
     const store = createHasuraCourseStore({ url: 'http://hasura', token: TOKEN, role: 'instructor', fetchImpl });

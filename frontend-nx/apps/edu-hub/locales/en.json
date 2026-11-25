@@ -4045,7 +4045,8 @@
         "course_texts": "course texts",
         "course_settings": "course settings",
         "sessions": "sessions",
-        "create_course": "new course"
+        "create_course": "new course",
+        "mail_template": "email"
       },
       "fields": {
         "title": "Title",
@@ -4067,7 +4068,10 @@
         "attendanceCertificatePossible": "Certificate of attendance possible",
         "achievementCertificatePossible": "Certificate of achievement possible",
         "sessions": "Sessions",
-        "deletedSessionIds": "Deleted sessions"
+        "deletedSessionIds": "Deleted sessions",
+        "mailType": "Email",
+        "subject": "Subject",
+        "content": "Text"
       },
       "errors": {
         "generic": "The change could not be applied.",

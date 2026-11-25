@@ -183,4 +183,34 @@ const RUN = Date.now();
       await deleteCourseAsOrgAdmin(applied.courseId);
     }
   });
+
+  it("an instructor reads their course's mails but can't change them", async () => {
+    const setup = setupFor(tokens.instructor, 'instructor');
+    const { mails } = await setup.getMailTemplates({ courseId: SEEDED_WITH_REGISTRATIONS });
+    expect(mails.length).toBeGreaterThan(0);
+    await expect(
+      setup.proposeMailTemplate({ courseId: SEEDED_WITH_REGISTRATIONS, type: mails[0].type, subject: 'x' })
+    ).rejects.toMatchObject({ code: 'FORBIDDEN' });
+  });
+
+  it("an Org Admin changes a course's mail as its own copy; a stale proposal fails", async () => {
+    const setup = setupFor(tokens.orgadmin, 'org_admin');
+    const { mails } = await setup.getMailTemplates({ courseId: ORG_9100_COURSE });
+    const mail = mails.find((m) => !m.customized);
+    if (!mail) throw new Error(`Course ${ORG_9100_COURSE} has no mail left that uses the default`);
+    const subject = `MCP test mail ${RUN}`;
+    const first = await setup.proposeMailTemplate({ courseId: ORG_9100_COURSE, type: mail.type, subject });
+    const second = await setup.proposeMailTemplate({ courseId: ORG_9100_COURSE, type: mail.type, subject: `${subject} B` });
+    try {
+      await expect(setup.applyProposedChange(first)).resolves.toMatchObject({ status: 'APPLIED', kind: 'mail_template' });
+      const after = (await setup.getMailTemplates({ courseId: ORG_9100_COURSE })).mails.find((m) => m.type === mail.type);
+      expect(after).toMatchObject({ customized: true, subject, content: mail.content });
+      await expect(setup.applyProposedChange(second)).rejects.toMatchObject({ code: 'STALE' });
+    } finally {
+      await asOrgAdmin(
+        'mutation ($courseId: Int!, $type: MailTemplateType_enum!) { delete_MailTemplate(where: { courseId: { _eq: $courseId }, type: { _eq: $type } }) { affected_rows } }',
+        { courseId: ORG_9100_COURSE, type: mail.type }
+      );
+    }
+  });
 });

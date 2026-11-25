@@ -47,7 +47,9 @@ interface Props {
 
 export const ProposedChangeCard: FC<Props> = ({ state, onApply, onDiscard }) => {
   const t = useTranslations('assistant.proposal');
+  const tMails = useTranslations('manageEmailTemplates.template_types');
   const { proposal, status, busy, error } = state;
+  const mailName = (type: unknown) => (typeof type === 'string' && tMails.has(type) ? tMails(type) : String(type));
 
   const label = (key: string) => (t.has(`fields.${key}`) ? t(`fields.${key}`) : key);
   const kindLabel = t.has(`kinds.${proposal.kind}`) ? t(`kinds.${proposal.kind}`) : proposal.kind;
@@ -92,6 +94,15 @@ export const ProposedChangeCard: FC<Props> = ({ state, onApply, onDiscard }) => 
         {keys.map((key) => {
           const old = before[key];
           const next = after[key];
+          // Which mail a mail proposal changes: the same before and after, so just its name.
+          if (key === 'mailType') {
+            return (
+              <div key={key} className="min-w-0">
+                <dt className="font-medium">{label(key)}</dt>
+                <dd>{mailName(next ?? old)}</dd>
+              </div>
+            );
+          }
           const textDiff = typeof old === 'string' && typeof next === 'string';
           return (
             <div key={key} className="min-w-0">

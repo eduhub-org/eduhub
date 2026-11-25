@@ -36,15 +36,48 @@ describe('EduHub MCP server', () => {
       'apply_proposed_change',
       'discard_proposed_change',
       'get_course',
+      'get_mail_templates',
       'get_registration_count',
+      'get_setup_guide',
       'list_courses',
       'list_programs',
       'propose_course_settings',
       'propose_course_texts',
       'propose_create_course',
+      'propose_mail_template',
       'propose_sessions',
     ]);
     expect(tools.find((t) => t.name === 'apply_proposed_change')?.annotations?.destructiveHint).toBe(true);
+  });
+
+  it('gives a setup guide per program type', async () => {
+    const client = await connect(createWorld(), 'oa-1', 'org_admin');
+    const event = await call(client, 'get_setup_guide', { programType: 'EVENTS' });
+    expect(event).toMatchObject({ isError: false, body: { programType: 'EVENTS' } });
+    // The agenda question: a program with several parts becomes one Session per item, with times.
+    expect(event.body.guide).toMatch(/one Session per program item/);
+    expect(event.body.guide).toMatch(/get_mail_templates/);
+    const degree = await call(client, 'get_setup_guide', { programType: 'DEGREES' });
+    expect(degree.body.guide).toMatch(/no instructors/);
+    const other = (await client.callTool({ name: 'get_setup_guide', arguments: { programType: 'OTHER' } })) as {
+      isError?: boolean;
+    };
+    expect(other.isError).toBe(true);
+  });
+
+  it('drafts a change of a course mail over MCP', async () => {
+    const client = await connect(createWorld(), 'oa-1', 'org_admin');
+    const mails = await call(client, 'get_mail_templates', { courseId: 1 });
+    expect(mails.body.mails.map((m: { type: string }) => m.type)).toContain('APPLICATION_CONFIRMED');
+    const proposed = await call(client, 'propose_mail_template', {
+      courseId: 1,
+      type: 'SESSION_REMINDER',
+      subject: 'Morgen geht es los',
+    });
+    expect(proposed).toMatchObject({
+      isError: false,
+      body: { status: 'PROPOSED', kind: 'mail_template', after: { subject: 'Morgen geht es los' } },
+    });
   });
 
   it('proposes and applies a change over MCP', async () => {
