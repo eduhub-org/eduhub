@@ -9,6 +9,7 @@ served at `POST /api/mcp` (MCP Streamable HTTP, stateless, JSON responses).
 | `proposals.ts` | Signing/verifying Proposed Changes and the staleness fingerprint |
 | `hasuraCourseStore.ts` | Hasura access with the caller's token and role (never the admin secret) |
 | `server.ts` | MCP tool definitions (zod schemas) over the operations |
+| `setupGuides.ts` | Per program type (events, courses, degrees): what to ask before drafting (`get_setup_guide`) |
 | `metrics.ts` | Anonymous counters: proposals created / applied per kind |
 | `../../pages/api/mcp.ts` | The HTTP endpoint |
 
@@ -41,6 +42,15 @@ checks the token and role on every call; the server adds no rights of its own.
   role, an altered one, and one older than 24 hours.
 - Settings a role can't update in Hasura (e.g. `applicationEnd` for instructors)
   are refused at propose, read from Hasura's schema for that role.
+- Course mails (`get_mail_templates`, `propose_mail_template`): the mails a
+  course sends for its registration type, as on the course's email templates
+  section (`utils/getEditableEmailTemplateTypes.ts`), each from the course's own
+  copy or the default. Instructors read them; only Org Admins and admins change
+  them (as in `public_MailTemplate.yaml`). A change of a default is applied as
+  the course's own copy with the default's sender, cc and bcc; only subject and
+  text can be changed. Apply refuses it when the course's copy appeared or
+  changed since the proposal (`STALE`). Instructors can't read the registration
+  type of an unpublished course, so they get the mails of every type.
 
 Errors are tool results with `isError: true` and
 `{"error": {"code": "...", "message": "..."}}`.
@@ -71,11 +81,12 @@ trial with the real list:
 - The result field `proposedChangeId` is the signed token to pass to
   `apply_proposed_change`; the mock returned a short id.
 - New: `list_courses`, `list_programs`, `get_registration_count`,
-  `propose_create_course`, `apply_proposed_change`, `discard_proposed_change`.
+  `propose_create_course`, `apply_proposed_change`, `discard_proposed_change`,
+  `get_setup_guide`, `get_mail_templates`, `propose_mail_template`.
 
 ## Not in v1
 
-- People actions, emails, OAuth for external clients (v2).
+- People actions, sending emails, OAuth for external clients (v2).
 
 ## Accepted limits
 

@@ -4028,6 +4028,7 @@
     "proposal": {
       "title": "Vorgeschlagene Änderung: {kind}",
       "not_saved_yet": "Noch nicht gespeichert. Prüfe die Änderung und übernimm sie selbst.",
+      "dropped_placeholders": "Achtung: Diese Platzhalter fehlen im neuen Text und werden beim Versand nicht mehr ausgefüllt: {placeholders}",
       "before": "Vorher",
       "after": "Nachher",
       "added": "Hinzugefügt",
@@ -4046,7 +4047,8 @@
         "course_texts": "Kurstexte",
         "course_settings": "Kurseinstellungen",
         "sessions": "Termine",
-        "create_course": "neuer Kurs"
+        "create_course": "neuer Kurs",
+        "mail_template": "E-Mail"
       },
       "fields": {
         "title": "Titel",
@@ -4068,7 +4070,10 @@
         "attendanceCertificatePossible": "Teilnahmebescheinigung möglich",
         "achievementCertificatePossible": "Leistungszertifikat möglich",
         "sessions": "Termine",
-        "deletedSessionIds": "Gelöschte Termine"
+        "deletedSessionIds": "Gelöschte Termine",
+        "mailType": "E-Mail",
+        "subject": "Betreff",
+        "content": "Text"
       },
       "errors": {
         "generic": "Die Änderung konnte nicht übernommen werden.",

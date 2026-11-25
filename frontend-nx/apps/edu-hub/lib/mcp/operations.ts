@@ -1,8 +1,11 @@
 import { titlesMustBeUnique } from '../../helpers/courseTitles';
+import { CourseRegistrationType_enum } from '../../__generated__/globalTypes';
+import { getEditableEmailTemplateTypes } from '../../utils/getEditableEmailTemplateTypes';
 import { OperationError } from './errors';
 import { countProposal } from './metrics';
 import {
   fingerprint,
+  mailFingerprint,
   PROPOSAL_TTL_SECONDS,
   ProposalKind,
   ProposalPayload,
@@ -15,6 +18,8 @@ import {
   CourseSession,
   CourseSnapshot,
   CourseStore,
+  MailTemplate,
+  MailTemplateChange,
   MANAGING_ROLES,
   NewCourse,
   NewSession,
@@ -86,6 +91,8 @@ export interface ProposedChangeResult {
   after: unknown;
   expiresAt: string;
   message: string;
+  /** Mail proposals only: placeholders and blocks the current mail has and the draft drops. */
+  droppedPlaceholders?: string[];
 }
 
 interface Options {
@@ -94,7 +101,23 @@ interface Options {
   now?: () => number;
 }
 
+export interface MailTemplateInput {
+  courseId: number;
+  /** A mail type from get_mail_templates, e.g. REGISTRATION_CONFIRMED. */
+  type: string;
+  subject?: string;
+  content?: string;
+}
+
 const PAGE_SIZE = 100;
+
+/** Told to the model, so it warns the Organizer before they apply a mail that lost its placeholders. */
+export const droppedPlaceholdersNote = (dropped: string[]) =>
+  `These placeholders are no longer in the mail: ${dropped.join(', ')}. ` +
+  'Tell the Organizer, unless they asked for that.';
+
+/** Placeholders and conditional blocks in a mail, e.g. [User:FirstName], [#if:Online]. */
+const placeholders = (text: string) => new Set(text.match(/\[[#/]?[A-Za-z][\w:-]*\]/g) ?? []);
 
 const PROPOSED_MESSAGE = 'Not saved yet. Show the Organizer before and after; only apply saves it.';
 
@@ -187,7 +210,7 @@ export const createCourseSetup = ({ store, secret, now = Date.now }: Options) =>
   const propose = (
     who: Caller,
     course: CourseSnapshot,
-    kind: Exclude<ProposalKind, 'create_course'>,
+    kind: Exclude<ProposalKind, 'create_course' | 'mail_template'>,
     changes: ProposalPayload['changes'],
     before: unknown,
     after: unknown
@@ -289,6 +312,60 @@ export const createCourseSetup = ({ store, secret, now = Date.now }: Options) =>
     if (Date.parse(end) <= Date.parse(start)) {
       throw new OperationError('INVALID', `${label}: the end must be after the start.`);
     }
+  };
+
+  const assertMayChangeMails = (who: Caller) => {
+    if (who.role !== 'admin' && who.role !== 'org_admin') {
+      throw new OperationError(
+        'FORBIDDEN',
+        'Only Org Admins and Admins can change the mails of a course. Instructors can read them; ask an Org Admin.'
+      );
+    }
+  };
+
+  /** The mails the course sends, each from its own copy or the default. */
+  const courseMails = async (course: CourseSnapshot) => {
+    const mails = await store.getCourseMails(course.id);
+    const editableFor = (registrationType: string | null) =>
+      getEditableEmailTemplateTypes({
+        registrationType: registrationType as CourseRegistrationType_enum | null,
+        attendanceCertificatePossible: course.fields.attendanceCertificatePossible as boolean | null,
+        achievementCertificatePossible: course.fields.achievementCertificatePossible as boolean | null,
+      });
+    // Instructors can't read the registration type of an unpublished course (public_Course.yaml), so
+    // they get the mails of every registration type. Only Org Admins and Admins, who can read it, change mails.
+    const editable = mails.registrationType
+      ? editableFor(mails.registrationType)
+      : Object.values(CourseRegistrationType_enum).flatMap(editableFor);
+    // Copies made earlier for types no longer offered are still sent, so they stay listed.
+    const types = [...new Set([...editable, ...mails.course.map((m) => m.type)])];
+    const byType = (list: MailTemplate[]) => new Map(list.map((m) => [m.type, m]));
+    const copies = byType(mails.course);
+    const defaults = byType(mails.defaults);
+    return { registrationType: mails.registrationType, types, copies, defaults };
+  };
+
+  const applyMailTemplate = async (who: Caller, proposal: ProposalPayload) => {
+    assertMayChangeMails(who);
+    const course = await managedCourse(who, proposal.courseId);
+    const change = proposal.changes as MailTemplateChange;
+    const { copies, defaults } = await courseMails(course);
+    const copy = copies.get(change.type);
+    if (mailFingerprint(copy) !== proposal.fingerprint) {
+      throw new OperationError(
+        'STALE',
+        `This mail of course ${course.id} has changed since the change was proposed, so it was not applied. ` +
+          'Read the mails again and ask for a new proposal.'
+      );
+    }
+    const base = defaults.get(change.type);
+    if (!copy && !base) throw new OperationError('NOT_FOUND', `There is no default mail of type ${change.type}.`);
+    const saved = await store.saveCourseMail(course.id, change, copy ? { existing: copy } : { base: base as MailTemplate });
+    if (!saved) {
+      throw new OperationError('STALE', `The mail changed while applying, or you can't change it; nothing was saved.`);
+    }
+    countProposal('applied', 'mail_template');
+    return { status: 'APPLIED' as const, kind: 'mail_template' as const, courseId: course.id };
   };
 
   const applyCreateCourse = async (who: Caller, proposal: ProposalPayload) => {
@@ -485,6 +562,64 @@ export const createCourseSetup = ({ store, secret, now = Date.now }: Options) =>
       });
     },
 
+    /**
+     * The mails the course sends to participants, each with whether the course has its own copy.
+     * Instructors may read them; only Org Admins and Admins may change them.
+     */
+    async getMailTemplates({ courseId }: { courseId: number }) {
+      const course = await managedCourse(await caller(), courseId);
+      const { registrationType, types, copies, defaults } = await courseMails(course);
+      return {
+        courseId,
+        registrationType,
+        mails: types.flatMap((type) => {
+          const mail = copies.get(type) ?? defaults.get(type);
+          return mail ? [{ type, customized: copies.has(type), subject: mail.subject, content: mail.content }] : [];
+        }),
+      };
+    },
+
+    async proposeMailTemplate({ courseId, type, subject, content }: MailTemplateInput) {
+      const who = await caller();
+      const course = await managedCourse(who, courseId);
+      assertMayChangeMails(who);
+      const mailType = type.toUpperCase();
+      const { registrationType, types, copies, defaults } = await courseMails(course);
+      if (!registrationType) {
+        throw new OperationError('FORBIDDEN', `You can't read the registration type of course ${courseId}, so you can't change its mails.`);
+      }
+      if (!types.includes(mailType)) {
+        throw new OperationError(
+          'INVALID',
+          `Course ${courseId} doesn't send a ${mailType} mail it could change. Its mails are: ${types.join(', ') || 'none'}.`
+        );
+      }
+      const current = copies.get(mailType) ?? defaults.get(mailType);
+      if (!current) throw new OperationError('NOT_FOUND', `There is no default mail of type ${mailType}.`);
+      if (subject === undefined && content === undefined) throw new OperationError('INVALID', 'Nothing to change was given.');
+      const next = { subject: subject ?? current.subject, content: content ?? current.content };
+      if (!next.subject.trim() || !next.content.trim()) {
+        throw new OperationError('INVALID', 'A mail needs a subject and a text.');
+      }
+      if (next.subject === current.subject && next.content === current.content) {
+        throw new OperationError('NO_CHANGE', 'The mail already reads like this.');
+      }
+      const kept = placeholders(next.subject + next.content);
+      const dropped = [...placeholders(current.subject + current.content)].filter((p) => !kept.has(p));
+
+      const change: MailTemplateChange = { type: mailType, ...next };
+      const before = { mailType, subject: current.subject, content: current.content };
+      const after = { mailType, ...next };
+      const result = issue(who, 'mail_template', course.id, mailFingerprint(copies.get(mailType)), change, before, after);
+      return dropped.length
+        ? {
+            ...result,
+            droppedPlaceholders: dropped,
+            message: `${result.message} ${droppedPlaceholdersNote(dropped)}`,
+          }
+        : result;
+    },
+
     async applyProposedChange({ proposedChangeId }: { proposedChangeId: string }) {
       const who = await caller();
       const proposal = verifyProposal(proposedChangeId, secret, now());
@@ -492,6 +627,7 @@ export const createCourseSetup = ({ store, secret, now = Date.now }: Options) =>
         throw new OperationError('FORBIDDEN', 'This Proposed Change was made for someone else or another role.');
       }
       if (proposal.kind === 'create_course') return applyCreateCourse(who, proposal);
+      if (proposal.kind === 'mail_template') return applyMailTemplate(who, proposal);
 
       const course = await managedCourse(who, proposal.courseId);
       if (fingerprint(course, proposal.kind) !== proposal.fingerprint) {

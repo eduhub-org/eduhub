@@ -157,6 +157,21 @@ describe('course-setup tools for Organizers', () => {
     await tools.close();
   });
 
+  it('tells the model which placeholders a mail draft drops', async () => {
+    const tools = await createCourseSetupTools(
+      createCourseSetup({ store: createFakeCourseStore(world(), 'oa-1', 'org_admin'), secret: 'test-secret' })
+    );
+    const result = await tools.call(
+      'propose_mail_template',
+      JSON.stringify({ courseId: 1, type: 'APPLICATION_CONFIRMED', content: '<p>Hallo!</p>' })
+    );
+    expect(result.status).toBe('ok');
+    if (result.status !== 'ok') return;
+    expect(result.proposal?.droppedPlaceholders).toEqual(['[User:FirstName]']);
+    expect(JSON.parse(result.content).message).toMatch(/Not saved yet.*\[User:FirstName\].*Tell the Organizer/);
+    await tools.close();
+  });
+
   it('streams a Proposed Change to the widget and routes tools by name', async () => {
     const w = world();
     const own = w.courses.find((c) => c.instructorIds.includes('ins-1'));
