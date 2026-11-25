@@ -4,7 +4,7 @@ slug: organizers/assistant
 audience: [organizer, admin]
 order: 50
 language: en
-summary: How Organizers use the Assistant to draft course texts, settings and Sessions as Proposed Changes, and what it can't do.
+summary: How Organizers use the Assistant to set up courses, events and degrees and to draft course texts, settings, Sessions and email templates as Proposed Changes, and what it can't do.
 ---
 
 The **Assistant** is the AI chat behind the **Ask the Assistant** button on every page. Besides answering questions, it helps Organizers set up their courses. It acts only with your own rights: it can't see or change anything you couldn't see or change yourself.
@@ -18,12 +18,22 @@ The Assistant never saves anything on its own. Everything it wants to change app
 
 A Proposed Change is valid for 24 hours. If that part of the course was changed in the meantime, it can no longer be applied; ask the Assistant for a new one.
 
+## It asks first, then drafts
+
+When you ask it to create or set up a course, an event or a degree, the Assistant first checks what is still missing. Before it proposes anything, it asks you a few short questions in one message, with a suggestion you can simply accept where there is one. For example:
+
+- For an event with several program items, it asks whether to set them up as the event's agenda, one Session per item (tab **Programme**, shown as **Agenda** on the event page), instead of writing them into the description. It then asks for any times it doesn't know yet.
+- Once the course exists, it tells you briefly what the confirmation email says and asks whether anything should be added, such as what to bring or how to get there.
+
+If you'd rather not answer, tell it to go ahead. It then uses the usual defaults and tells you which ones.
+
 ## What it can do
 
 - **Course texts** in German and English: title, short description, learning goals and the two info blocks. You can paste your notes and let it draft the texts from them.
 - **Course settings**: maximum participants, deadline, maximum missed Sessions, language, weekday and times, the Session reminder, whether available places are shown, and which certificates the course can award.
 - **Sessions**: add, change and delete Sessions and their Session Locations, but only while nobody has registered for the course yet, in any state (applied, invited, on the waitlist or confirmed). After that, change Sessions by hand on the **Dates** tab and send the Session change notification.
 - **Creating a course**: only for Org Admins and Admins, as in the course list. [Course titles must be unique](course-setup.md#course-titles-must-be-unique) here too.
+- **Email templates**: it shows you what the course's emails say, for example the registration confirmation, and drafts changes to their subject and text. An applied change only applies to this course: it gets its own template, and the default template stays as it is. Only Org Admins and Admins can change them; instructors can have the emails shown to them. EduHub fills in the date, place and calendar file from the Sessions when the email is sent.
 
 Settings your role can't change by hand, it can't change either.
 
@@ -31,6 +41,7 @@ Settings your role can't change by hand, it can't change either.
 
 - Act on people: rate applications, invite, move people up, confirm or set attendance.
 - Send emails.
+- Change the sender, CC or BCC of an email template, or the default templates.
 - Change the registration type, the price or the course chat, or publish a course.
 
 ## Good to know

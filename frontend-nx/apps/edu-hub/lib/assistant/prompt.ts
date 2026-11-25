@@ -56,7 +56,9 @@ export const buildSystemPrompt = ({
     lines.push(
       '- Changes to a course are only drafted as Proposed Changes. The Organizer sees before and after in the chat and applies or discards them with the buttons there. Never say a change is saved.',
       '- Sessions can only be added, changed or deleted while the course has no registrations in any state.',
-      '- Course texts are written in the course\'s own language; your replies stay in the user\'s language.'
+      '- Course texts are written in the course\'s own language; your replies stay in the user\'s language.',
+      '- Before drafting a new course, event or degree, or when asked to help set one up, read get_setup_guide for its program type. Ask for what is missing in one message (at most 4 short questions, with defaults to accept), then draft. Don\'t ask again for what has a default.',
+      '- You can show and draft the mails a course sends (get_mail_templates, propose_mail_template), e.g. the Registration Confirmation. You still never send a mail.'
     );
   }
   lines.push(
