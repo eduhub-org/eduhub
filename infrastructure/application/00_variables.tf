@@ -557,17 +557,23 @@ variable "embedding_location" {
   default     = ""
 }
 variable "assistant_llm_provider" {
-  description = "LLM provider of the Assistant: vertex, or empty to turn the Assistant off (ADR 0005)"
+  description = "LLM provider of the Assistant: ionos (IONOS AI Model Hub, Germany; needs assistant_llm_api_key), vertex (Gemini on Vertex AI in the EU), or empty to turn the Assistant off (ADR 0005, ADR 0008)"
   type        = string
   default     = ""
 
   validation {
-    condition     = contains(["", "vertex"], var.assistant_llm_provider)
-    error_message = "assistant_llm_provider must be \"vertex\" or empty."
+    condition     = contains(["", "vertex", "ionos"], var.assistant_llm_provider)
+    error_message = "assistant_llm_provider must be \"ionos\", \"vertex\" or empty."
   }
 }
+variable "assistant_llm_api_key" {
+  description = "API key of the Assistant's provider when it isn't Vertex AI: for ionos the token value of an IONOS AI Model Hub token. Kept in Secret Manager; while empty, an ionos Assistant stays off."
+  type        = string
+  default     = ""
+  sensitive   = true
+}
 variable "assistant_llm_location" {
-  description = "Vertex AI location of the Assistant's model: the eu multi-region or an EU region. Never global: it gives no control over where requests are processed (ADR 0005)."
+  description = "Vertex AI location of the Assistant's model (provider vertex only): the eu multi-region or an EU region. Never global: it gives no control over where requests are processed (ADR 0005)."
   type        = string
   default     = "eu"
 
@@ -577,9 +583,9 @@ variable "assistant_llm_location" {
   }
 }
 variable "assistant_llm_model" {
-  description = "Model id of the Assistant for Vertex's OpenAI-compatible API; set from the trial in issue #2191"
+  description = "Model id of the Assistant at its provider; empty for the provider's model from the trial: Qwen/Qwen3.8-27B on ionos, google/gemini-3.8-flash on vertex"
   type        = string
-  default     = "google/gemini-3.8-flash"
+  default     = ""
 }
 variable "assistant_monthly_spend_cap_eur" {
   description = "Monthly spending cap of the Assistant in EUR; once reached, the Assistant is off until the next month"
@@ -587,12 +593,12 @@ variable "assistant_monthly_spend_cap_eur" {
   default     = 50
 }
 variable "assistant_llm_price_input_eur_per_mtok" {
-  description = "Price of the Assistant's model per million input tokens in EUR, from the Vertex AI price list for the chosen model and location. The spending cap multiplies it with the tokens the API reports; without it the Assistant stays off."
+  description = "Price of the Assistant's model per million input tokens in EUR, from the provider's price list for the chosen model (and location). The spending cap multiplies it with the tokens the API reports; without it the Assistant stays off."
   type        = number
   default     = null
 }
 variable "assistant_llm_price_output_eur_per_mtok" {
-  description = "Price of the Assistant's model per million output tokens (including reasoning) in EUR, from the Vertex AI price list; without it the Assistant stays off"
+  description = "Price of the Assistant's model per million output tokens (including reasoning) in EUR, from the provider's price list; without it the Assistant stays off"
   type        = number
   default     = null
 }

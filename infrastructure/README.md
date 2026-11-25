@@ -28,7 +28,7 @@ They should be defined within a variable set, so it can be used by the staging a
 (9) **url_mask**
     - Zone for the Google Cloud Server, where the artifact registry as well as all other infrastructure will be instantiated.
 
-## Assistant: zero retention on Vertex AI (ADR 0005)
+## Assistant: provider and zero retention (ADR 0005, ADR 0008)
 
 `application/11_assistant.tf` grants the edu service access to Vertex AI and can deny
 the global endpoint. Two settings are outside Terraform and must be checked once per
@@ -50,10 +50,18 @@ project (staging and production), with an account that has `roles/aiplatform.adm
   P=eduhub-staging-new; M=gemini-3.8-flash; curl -s -o /dev/null -w '%{http_code}\n' -H "Authorization: Bearer $(gcloud auth print-access-token)" "https://aiplatform.eu.rep.googleapis.com/v1beta1/projects/$P/locations/eu/publishers/google/models/$M:fetchPublisherModelConfig"
   ```
 
-To turn the Assistant on, set `assistant_llm_provider = "vertex"` and the model's prices
+To turn the Assistant on, set `assistant_llm_provider` and the model's prices
 `assistant_llm_price_input_eur_per_mtok` / `assistant_llm_price_output_eur_per_mtok` (EUR per
-million tokens, from the Vertex AI price list for the model and location). The monthly spending
-cap (`assistant_monthly_spend_cap_eur`) is measured with them; without prices the Assistant stays off.
+million tokens, from the provider's price list). The monthly spending cap
+(`assistant_monthly_spend_cap_eur`) is measured with them; without prices the Assistant stays off.
+
+- `ionos` (ADR 0008): Qwen3.8 27B on the IONOS AI Model Hub. Put the token value of an IONOS
+  AI Model Hub token into the sensitive `assistant_llm_api_key` (variable set
+  `eduhub-application`); Terraform keeps it in Secret Manager. While it's empty, the Assistant
+  stays off. Prices for `Qwen/Qwen3.8-27B`: 0.40 / 2.70.
+- `vertex` (ADR 0005): Gemini on Vertex AI in the EU, with the zero-retention settings above.
+
+`assistant_llm_model` is empty by default, which picks the provider's model from the trial.
 
 To deny the global endpoint, the Terraform service account needs `roles/orgpolicy.policyAdmin`
 on the organization. Then set `vertex_global_endpoint_policy` to `dry_run`, check the audit

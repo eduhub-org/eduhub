@@ -145,7 +145,19 @@ resource "google_cloud_run_service" "eduhub" {
         # Assistant (ADR 0005, 11_assistant.tf). An empty provider turns it off.
         env {
           name  = "ASSISTANT_LLM_PROVIDER"
-          value = var.assistant_llm_provider
+          value = local.assistant_app_provider
+        }
+        dynamic "env" {
+          for_each = local.assistant_has_api_key ? [1] : []
+          content {
+            name = "ASSISTANT_LLM_API_KEY"
+            value_from {
+              secret_key_ref {
+                name = google_secret_manager_secret.assistant_llm_api_key[0].secret_id
+                key  = "latest"
+              }
+            }
+          }
         }
         env {
           name  = "ASSISTANT_LLM_BASE_URL"
@@ -153,7 +165,7 @@ resource "google_cloud_run_service" "eduhub" {
         }
         env {
           name  = "ASSISTANT_LLM_MODEL"
-          value = var.assistant_llm_model
+          value = local.assistant_llm_model
         }
         env {
           name  = "ASSISTANT_MONTHLY_SPEND_CAP_EUR"
@@ -203,5 +215,7 @@ resource "google_cloud_run_service" "eduhub" {
     google_secret_manager_secret_iam_member.mcp_proposal_secret,
     google_secret_manager_secret_iam_member.stripe_secret_key_eduhub,
     google_secret_manager_secret_iam_member.stripe_webhook_secret_eduhub,
+    google_secret_manager_secret_version.assistant_llm_api_key,
+    google_secret_manager_secret_iam_member.assistant_llm_api_key,
   ]
 }
