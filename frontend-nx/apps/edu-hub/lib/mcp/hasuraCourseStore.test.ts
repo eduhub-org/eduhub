@@ -61,6 +61,18 @@ describe('createHasuraCourseStore', () => {
     expect(calls[1].body.variables).toEqual({ id: 9, updatedAt: 't1', set: { subject: 'Neu', content: '<p>Neu</p>' } });
   });
 
+  it('reports a course mail copy made in the meantime as not saved', async () => {
+    const base = { id: 1, type: 'SESSION_REMINDER', subject: 'Alt', content: 'x', from: null, cc: null, bcc: null, updatedAt: 't1' };
+    const { fetchImpl } = fakeFetch([
+      { errors: [{ message: 'Uniqueness violation. duplicate key value violates unique constraint', extensions: { code: 'constraint-violation' } }] },
+      { errors: [{ message: 'something else', extensions: { code: 'unexpected' } }] },
+    ]);
+    const store = createHasuraCourseStore({ url: 'http://hasura', token: TOKEN, role: 'org_admin', fetchImpl });
+    const change = { type: 'SESSION_REMINDER', subject: 'Neu', content: 'y' };
+    await expect(store.saveCourseMail(7, change, { base })).resolves.toBe(false);
+    await expect(store.saveCourseMail(7, change, { base })).rejects.toMatchObject({ code: 'HASURA_ERROR' });
+  });
+
   it('reports a write as not saved when the course changed (updated_at no longer matches)', async () => {
     const { fetchImpl, calls } = fakeFetch([{ data: { update_Course: { affected_rows: 0 } } }]);
     const store = createHasuraCourseStore({ url: 'http://hasura', token: TOKEN, role: 'instructor', fetchImpl });

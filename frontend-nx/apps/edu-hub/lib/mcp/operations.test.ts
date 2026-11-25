@@ -605,6 +605,20 @@ describe('course mails', () => {
     expect(await errorCode(propose({ type: 'SESSION_REMINDER' }))).toBe('INVALID');
   });
 
+  it('reports a copy made between the stale check and the write as STALE', async () => {
+    const store = createFakeCourseStore(world, 'oa-1', 'org_admin');
+    const setup = createCourseSetup({ store, secret: SECRET });
+    const proposal = await setup.proposeMailTemplate({ courseId: 1, type: 'SESSION_REMINDER', subject: 'Gleich' });
+    const getCourseMails = store.getCourseMails.bind(store);
+    // The copy appears right after apply has read the mails.
+    jest.spyOn(store, 'getCourseMails').mockImplementationOnce(async (id) => {
+      const mails = await getCourseMails(id);
+      world.mails.push({ ...world.mails[2], id: 99, courseId: 1 });
+      return mails;
+    });
+    expect(await errorCode(setup.applyProposedChange(proposal))).toBe('STALE');
+  });
+
   it('points out placeholders the new text drops', async () => {
     const setup = setupFor(world, 'oa-1', 'org_admin');
     const proposal = await setup.proposeMailTemplate({ courseId: 1, type: 'APPLICATION_CONFIRMED', content: '<p>Hallo!</p>' });

@@ -357,11 +357,17 @@ export const createHasuraCourseStore = ({ url, token, role, fetchImpl = fetch }:
         return data.update_MailTemplate?.affected_rows === 1;
       }
       const { from, cc, bcc } = target.base;
-      const data = await request<{ insert_MailTemplate_one: { id: number } | null }>(
-        `mutation McpInsertCourseMail($object: MailTemplate_insert_input!) { insert_MailTemplate_one(object: $object) { id } }`,
-        { object: { type, courseId, subject, content, from, cc, bcc } }
-      );
-      return !!data.insert_MailTemplate_one;
+      try {
+        const data = await request<{ insert_MailTemplate_one: { id: number } | null }>(
+          `mutation McpInsertCourseMail($object: MailTemplate_insert_input!) { insert_MailTemplate_one(object: $object) { id } }`,
+          { object: { type, courseId, subject, content, from, cc, bcc } }
+        );
+        return !!data.insert_MailTemplate_one;
+      } catch (error) {
+        // A copy was made in the meantime (unique type + courseId): the proposal is stale, nothing saved.
+        if (error instanceof OperationError && /uniqueness violation|duplicate key/i.test(error.message)) return false;
+        throw error;
+      }
     },
   };
 };

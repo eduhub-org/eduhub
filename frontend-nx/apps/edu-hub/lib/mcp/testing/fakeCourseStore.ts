@@ -195,9 +195,8 @@ export const createFakeCourseStore = (world: FakeWorld, userId: string, role: st
         Object.assign(row, { subject, content, updatedAt: nextTimestamp() });
         return true;
       }
-      if (world.mails.some((m) => m.courseId === courseId && m.type === type)) {
-        throw new OperationError('HASURA_ERROR', 'Uniqueness violation');
-      }
+      // Hasura's unique (type, courseId) constraint; the real store reports it as not saved.
+      if (world.mails.some((m) => m.courseId === courseId && m.type === type)) return false;
       const { from, cc, bcc } = target.base;
       world.mails.push({
         id: Math.max(0, ...world.mails.map((m) => m.id)) + 1,
