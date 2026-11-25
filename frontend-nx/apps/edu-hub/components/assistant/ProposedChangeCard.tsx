@@ -89,6 +89,11 @@ export const ProposedChangeCard: FC<Props> = ({ state, onApply, onDiscard }) => 
         {t('title', { kind: kindLabel })}
       </h3>
       {!finished && <p className="mb-2 text-xs text-label-secondary">{t('not_saved_yet')}</p>}
+      {!finished && !!proposal.droppedPlaceholders?.length && (
+        <p className="mb-2 text-xs text-error" role="note">
+          {t('dropped_placeholders', { placeholders: proposal.droppedPlaceholders.join(', ') })}
+        </p>
+      )}
 
       <dl className="space-y-2">
         {keys.map((key) => {

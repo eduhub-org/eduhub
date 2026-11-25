@@ -609,5 +609,6 @@ describe('course mails', () => {
     const setup = setupFor(world, 'oa-1', 'org_admin');
     const proposal = await setup.proposeMailTemplate({ courseId: 1, type: 'APPLICATION_CONFIRMED', content: '<p>Hallo!</p>' });
     expect(proposal.message).toContain('[User:FirstName]');
+    expect(proposal.droppedPlaceholders).toEqual(['[User:FirstName]']);
   });
 });

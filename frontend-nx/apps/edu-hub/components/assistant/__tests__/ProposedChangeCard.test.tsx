@@ -52,4 +52,29 @@ describe('ProposedChangeCard', () => {
     expect(screen.queryByText('APPLICATION_CONFIRMED')).not.toBeInTheDocument();
     expect(screen.getByLabelText('Changes to Text')).toHaveTextContent('bring a laptop');
   });
+
+  it('warns when a mail draft drops placeholders', () => {
+    render(
+      <ProposedChangeCard
+        state={{
+          key: 'p2',
+          busy: false,
+          status: 'PROPOSED',
+          proposal: {
+            status: 'PROPOSED',
+            proposedChangeId: 'signed',
+            kind: 'mail_template',
+            courseId: 7,
+            before: { mailType: 'APPLICATION_CONFIRMED', content: '<p>Hi [User:FirstName]</p>' },
+            after: { mailType: 'APPLICATION_CONFIRMED', content: '<p>Hi</p>' },
+            expiresAt: '2026-11-26T10:00:00Z',
+            droppedPlaceholders: ['[User:FirstName]'],
+          },
+        }}
+        onApply={jest.fn()}
+        onDiscard={jest.fn()}
+      />
+    );
+    expect(screen.getByRole('note')).toHaveTextContent('[User:FirstName]');
+  });
 });

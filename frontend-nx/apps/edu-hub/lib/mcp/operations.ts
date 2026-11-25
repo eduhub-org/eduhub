@@ -91,6 +91,8 @@ export interface ProposedChangeResult {
   after: unknown;
   expiresAt: string;
   message: string;
+  /** Mail proposals only: placeholders and blocks the current mail has and the draft drops. */
+  droppedPlaceholders?: string[];
 }
 
 interface Options {
@@ -108,6 +110,11 @@ export interface MailTemplateInput {
 }
 
 const PAGE_SIZE = 100;
+
+/** Told to the model, so it warns the Organizer before they apply a mail that lost its placeholders. */
+export const droppedPlaceholdersNote = (dropped: string[]) =>
+  `These placeholders are no longer in the mail: ${dropped.join(', ')}. ` +
+  'Tell the Organizer, unless they asked for that.';
 
 /** Placeholders and conditional blocks in a mail, e.g. [User:FirstName], [#if:Online]. */
 const placeholders = (text: string) => new Set(text.match(/\[[#/]?[A-Za-z][\w:-]*\]/g) ?? []);
@@ -607,9 +614,8 @@ export const createCourseSetup = ({ store, secret, now = Date.now }: Options) =>
       return dropped.length
         ? {
             ...result,
-            message:
-              `${result.message} These placeholders are no longer in the mail: ${dropped.join(', ')}. ` +
-              'Tell the Organizer, unless they asked for that.',
+            droppedPlaceholders: dropped,
+            message: `${result.message} ${droppedPlaceholdersNote(dropped)}`,
           }
         : result;
     },

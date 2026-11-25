@@ -4027,6 +4027,7 @@
     "proposal": {
       "title": "Proposed change: {kind}",
       "not_saved_yet": "Not saved yet. Check the change and apply it yourself.",
+      "dropped_placeholders": "Note: these placeholders are missing from the new text and will no longer be filled in when the email is sent: {placeholders}",
       "before": "Before",
       "after": "After",
       "added": "Added",
