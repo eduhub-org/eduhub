@@ -141,8 +141,8 @@ describe('AssistantWidget', () => {
     renderWidget();
     openPanel();
 
-    expect(screen.getByText(/You are chatting with an AI, not a person/)).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Privacy policy' })).toHaveAttribute('href', '/privacy');
+    expect(screen.getByText(/AI · can make mistakes/)).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Privacy' })).toHaveAttribute('href', '/privacy');
   });
 
   it('is not available while an admin views the app as someone else', () => {
@@ -154,7 +154,7 @@ describe('AssistantWidget', () => {
     expect(screen.queryByLabelText('Your question')).not.toBeInTheDocument();
   });
 
-  it('sends the question with the page context, shows what was sent and streams the reply', async () => {
+  it('sends the question with the page context, says what is sent and streams the reply', async () => {
     replyWith([
       { type: 'delta', text: 'Your course ' },
       { type: 'delta', text: 'starts on Monday.' },
@@ -172,8 +172,7 @@ describe('AssistantWidget', () => {
       pageContext: { path: '/manage/course/7', route: '/manage/course/[courseId]', courseId: 7 },
     });
     expect(await screen.findByText('Your course starts on Monday.')).toBeInTheDocument();
-    expect(screen.getByText('Sent with your question')).toBeInTheDocument();
-    expect(screen.getByText('Course ID: 7')).toBeInTheDocument();
+    expect(screen.getByText('Sent along: /manage/course/7')).toBeInTheDocument();
   });
 
   it('shows the backend’s localized error with a contact link when the Assistant cannot answer', async () => {
@@ -189,6 +188,31 @@ describe('AssistantWidget', () => {
       'href',
       'mailto:edu@opencampus.sh'
     );
+  });
+
+  it('offers questions and course tasks to start with, and sends the one picked', async () => {
+    replyWith([{ type: 'delta', text: 'Here is a shorter one.' }, { type: 'done' }]);
+    renderWidget();
+    openPanel();
+
+    expect(screen.getByRole('button', { name: 'What can you change in this course for me?' })).toBeInTheDocument();
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: 'Shorten the tagline' }));
+    });
+
+    expect(mockStreamChat.mock.calls[0][0].messages).toEqual([{ role: 'user', content: 'Shorten the tagline' }]);
+    expect(await screen.findByText('Here is a shorter one.')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Shorten the tagline' })).not.toBeInTheDocument();
+  });
+
+  it('opens with Ctrl+K and closes with Escape', async () => {
+    renderWidget();
+    fireEvent.keyDown(window, { key: 'k', ctrlKey: true });
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+
+    fireEvent.keyDown(screen.getByLabelText('Your question'), { key: 'Escape' });
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(screen.getByRole('button', { name: 'Open the AI Assistant' })).toBeInTheDocument();
   });
 
   it('does not send while Enter confirms an IME candidate', () => {
@@ -208,6 +232,19 @@ describe('AssistantWidget', () => {
     await ask('Hello?');
 
     expect(await screen.findByText(/The connection was lost/)).toBeInTheDocument();
+  });
+
+  it.each([
+    ['no text', []],
+    ['only whitespace', [{ type: 'delta', text: '  \n ' }]],
+  ] as [string, ChatEvent[]][])('says so when a reply ends with %s', async (_case, events) => {
+    replyWith([...events, { type: 'done' }]);
+    renderWidget();
+    openPanel();
+    await ask('Hello?');
+
+    expect(await screen.findByText(/No answer came back/)).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Helpful' })).not.toBeInTheDocument();
   });
 
   it('says it is looking something up while a tool runs', async () => {
@@ -405,6 +442,42 @@ describe('AssistantWidget', () => {
         },
         'instructor'
       );
+    });
+
+    it('rates one answer and keeps only the conversation up to it', async () => {
+      await answerOnce();
+      replyWith([{ type: 'delta', text: 'A second answer.' }, { type: 'done' }]);
+      await ask('Another question');
+      await screen.findByText('A second answer.');
+
+      fireEvent.click(screen.getAllByRole('button', { name: 'Not helpful' })[0]);
+      await act(async () => {
+        fireEvent.click(screen.getByRole('button', { name: 'Yes, keep it' }));
+      });
+
+      expect(mockSendFeedback).toHaveBeenCalledWith(
+        expect.objectContaining({
+          messages: [
+            { role: 'user', content: 'A question' },
+            { role: 'assistant', content: 'An answer.' },
+          ],
+        }),
+        'instructor'
+      );
+    });
+
+    it('keeps a rating when the panel is closed and reopened, so it is sent once', async () => {
+      await answerOnce();
+      await act(async () => {
+        fireEvent.click(screen.getByRole('button', { name: 'Helpful' }));
+      });
+
+      await closePanel();
+      openPanel();
+
+      expect(screen.getByRole('button', { name: 'Helpful' })).toBeDisabled();
+      expect(screen.getByRole('button', { name: 'Helpful' })).toHaveAttribute('aria-pressed', 'true');
+      expect(mockSendFeedback).toHaveBeenCalledTimes(1);
     });
 
     it('sends only the 👎 rating when consent is refused', async () => {

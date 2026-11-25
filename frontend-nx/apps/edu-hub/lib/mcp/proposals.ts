@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 import { OperationError } from './errors';
-import type { CourseFields, CourseSnapshot, NewCourse, SessionChanges } from './types';
+import type { CourseFields, CourseSnapshot, MailTemplate, MailTemplateChange, NewCourse, SessionChanges } from './types';
 
 /**
  * Proposed Changes are stateless: the server signs what it proposed and the client hands the token
@@ -9,7 +9,7 @@ import type { CourseFields, CourseSnapshot, NewCourse, SessionChanges } from './
  * part of the course it touches, so apply can refuse a proposal made against an older state.
  */
 
-export type ProposalKind = 'course_texts' | 'course_settings' | 'sessions' | 'create_course';
+export type ProposalKind = 'course_texts' | 'course_settings' | 'sessions' | 'create_course' | 'mail_template';
 
 export interface ProposalPayload {
   v: 1;
@@ -20,7 +20,7 @@ export interface ProposalPayload {
   role: string;
   /** Fingerprint of the touched part of the course when the change was proposed. */
   fingerprint: string;
-  changes: Partial<CourseFields> | SessionChanges | NewCourse;
+  changes: Partial<CourseFields> | SessionChanges | NewCourse | MailTemplateChange;
   /** Expiry, seconds since the epoch. */
   exp: number;
 }
@@ -70,10 +70,21 @@ const sha256 = (value: unknown) => crypto.createHash('sha256').update(canonical(
  * row (including `updated_at`); Sessions use the Sessions and their Session Locations, which do not
  * change the course's `updated_at`. Registrations are not part of it: they are re-checked on apply.
  */
-export const fingerprint = (course: CourseSnapshot, kind: Exclude<ProposalKind, 'create_course'>): string => {
+export const fingerprint = (
+  course: CourseSnapshot,
+  kind: Exclude<ProposalKind, 'create_course' | 'mail_template'>
+): string => {
   if (kind === 'sessions') {
     const sessions = [...course.sessions].sort((a, b) => a.id - b.id);
     return sha256({ sessions, courseLocations: course.courseLocations });
   }
   return sha256({ updatedAt: course.updatedAt, fields: course.fields });
 };
+
+/**
+ * Fingerprint of a course's mail of one type: its own copy, or 'default' while it has none (then a
+ * copy made in the meantime makes the proposal stale). Edits of the default don't, as the copy
+ * replaces it.
+ */
+export const mailFingerprint = (copy: MailTemplate | undefined): string =>
+  copy ? sha256({ id: copy.id, updatedAt: copy.updatedAt, subject: copy.subject, content: copy.content }) : 'default';

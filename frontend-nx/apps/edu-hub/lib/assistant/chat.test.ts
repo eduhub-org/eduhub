@@ -128,6 +128,11 @@ describe('system prompt', () => {
     expect(prompt('user', false)).not.toContain('Proposed Changes');
     expect(prompt('instructor', true)).toContain('Proposed Changes');
   });
+
+  it('tells Organizers to read the setup guide and ask before drafting', () => {
+    expect(prompt('org_admin', true)).toMatch(/get_setup_guide[^\n]*Ask for what is missing in one message/);
+    expect(prompt('user', false)).not.toContain('get_setup_guide');
+  });
 });
 
 describe('search_courses', () => {

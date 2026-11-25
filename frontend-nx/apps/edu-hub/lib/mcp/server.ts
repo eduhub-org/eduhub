@@ -2,6 +2,7 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
 import { OperationError } from './errors';
 import type { CourseSetup } from './operations';
+import { PROGRAM_TYPES, setupGuide } from './setupGuides';
 
 /**
  * The EduHub MCP server (ADR 0006): course-setup tools over the operations in `operations.ts`.
@@ -203,6 +204,53 @@ export const createMcpServer = (setup: CourseSetup) => {
       annotations: proposes,
     },
     (args) => run(() => setup.proposeCreateCourse(args))
+  );
+
+  server.registerTool(
+    'get_setup_guide',
+    {
+      description:
+        'What to ask and check when setting up a course, event or degree: a checklist for the program type ' +
+        '(see list_programs or get_course programType). Read it before drafting a new course or when the Organizer ' +
+        'asks for help setting one up, then ask for what is missing before you propose.',
+      inputSchema: { programType: z.enum(PROGRAM_TYPES) },
+      annotations: readOnly,
+    },
+    async ({ programType }) => ({ content: [{ type: 'text' as const, text: JSON.stringify(setupGuide(programType)) }] })
+  );
+
+  server.registerTool(
+    'get_mail_templates',
+    {
+      description:
+        'The mails a course sends to participants (e.g. REGISTRATION_CONFIRMED, the Registration Confirmation of ' +
+        'events), each with subject and HTML text, and whether the course has its own copy or uses the default. ' +
+        'One text holds a German and an English half. Placeholders like [User:FirstName], [Course:DateTime], ' +
+        '[Course:LocationList] and blocks like [#if:Online]…[/if:Online] are filled in when the mail is sent. ' +
+        'registrationType null means your role can\'t see it; the list then has the mails of every registration type.',
+      inputSchema: { courseId },
+      annotations: readOnly,
+    },
+    ({ courseId }) => run(() => setup.getMailTemplates({ courseId }))
+  );
+
+  server.registerTool(
+    'propose_mail_template',
+    {
+      description:
+        'Draft a new subject and/or text for one of the course\'s mails (a type from get_mail_templates). Only Org ' +
+        'Admins and Admins. Change only what the Organizer asked for: keep the HTML structure, both language halves ' +
+        'and the placeholders and blocks you don\'t mean to remove. Sender, cc and bcc stay as they are. ' +
+        `Only this course's mail changes, not the default. ${PROPOSES}`,
+      inputSchema: {
+        courseId,
+        type: z.string().min(1).describe('Mail type, e.g. REGISTRATION_CONFIRMED'),
+        subject: z.string().optional(),
+        content: z.string().optional().describe('The whole new HTML text, not just the changed part'),
+      },
+      annotations: proposes,
+    },
+    (args) => run(() => setup.proposeMailTemplate(args))
   );
 
   server.registerTool(

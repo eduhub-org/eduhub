@@ -5,6 +5,7 @@ import {
   CourseSnapshot,
   CourseStore,
   CourseSummary,
+  MailTemplate,
   MANAGING_ROLES,
   ProgramSummary,
   SessionChanges,
@@ -128,6 +129,18 @@ const PROGRAM_QUERY = `
     }
   }
 `;
+
+const MAIL_FIELDS = 'id type subject content from cc bcc updated_at';
+
+const MAILS_QUERY = `
+  query McpCourseMails($courseId: Int!) {
+    Course(where: { id: { _eq: $courseId } }, limit: 1) { registrationType }
+    course: MailTemplate(where: { courseId: { _eq: $courseId } }, order_by: { id: asc }) { ${MAIL_FIELDS} }
+    defaults: MailTemplate(where: { courseId: { _is_null: true } }, order_by: { id: asc }) { ${MAIL_FIELDS} }
+  }
+`;
+
+const toMail = ({ updated_at, ...m }: any): MailTemplate => ({ ...m, updatedAt: updated_at });
 
 const toProgram = (p: any): ProgramSummary => ({
   id: p.id,
@@ -319,6 +332,42 @@ export const createHasuraCourseStore = ({ url, token, role, fetchImpl = fetch }:
       );
       if (!data.insert_Course_one) throw new OperationError('FORBIDDEN', 'Hasura did not create the course.');
       return data.insert_Course_one.id;
+    },
+
+    async getCourseMails(courseId) {
+      const data = await request<{ Course: { registrationType: string | null }[]; course: any[]; defaults: any[] }>(
+        MAILS_QUERY,
+        { courseId }
+      );
+      return {
+        registrationType: data.Course[0]?.registrationType ?? null,
+        course: data.course.map(toMail),
+        defaults: data.defaults.map(toMail),
+      };
+    },
+
+    async saveCourseMail(courseId, { type, subject, content }, target) {
+      if ('existing' in target) {
+        const data = await request<{ update_MailTemplate: { affected_rows: number } | null }>(
+          `mutation McpUpdateCourseMail($id: Int!, $updatedAt: timestamptz!, $set: MailTemplate_set_input!) {
+            update_MailTemplate(where: { id: { _eq: $id }, updated_at: { _eq: $updatedAt } }, _set: $set) { affected_rows }
+          }`,
+          { id: target.existing.id, updatedAt: target.existing.updatedAt, set: { subject, content } }
+        );
+        return data.update_MailTemplate?.affected_rows === 1;
+      }
+      const { from, cc, bcc } = target.base;
+      try {
+        const data = await request<{ insert_MailTemplate_one: { id: number } | null }>(
+          `mutation McpInsertCourseMail($object: MailTemplate_insert_input!) { insert_MailTemplate_one(object: $object) { id } }`,
+          { object: { type, courseId, subject, content, from, cc, bcc } }
+        );
+        return !!data.insert_MailTemplate_one;
+      } catch (error) {
+        // A copy was made in the meantime (unique type + courseId): the proposal is stale, nothing saved.
+        if (error instanceof OperationError && /uniqueness violation|duplicate key/i.test(error.message)) return false;
+        throw error;
+      }
     },
   };
 };

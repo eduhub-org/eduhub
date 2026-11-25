@@ -28,6 +28,8 @@ export interface ProposedChange {
   after: unknown;
   expiresAt: string;
   message?: string;
+  /** Mail proposals: placeholders the draft drops, shown as a warning. */
+  droppedPlaceholders?: string[];
 }
 
 export interface ChatMessagePayload {

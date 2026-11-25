@@ -1,6 +1,6 @@
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js';
-import type { CourseSetup } from '../mcp/operations';
+import { type CourseSetup, droppedPlaceholdersNote } from '../mcp/operations';
 import { createMcpServer } from '../mcp/server';
 import { cleanSchema, invalidArguments, parseArguments, ProposalEvent, ToolSet, unknownTool } from './tools';
 
@@ -88,7 +88,12 @@ export const createCourseSetupTools = async (
         const { proposedChangeId, ...forModel } = proposal;
         return {
           status: 'ok',
-          content: JSON.stringify({ ...forModel, message: PROPOSED_FOR_MODEL }),
+          content: JSON.stringify({
+            ...forModel,
+            message: proposal.droppedPlaceholders?.length
+              ? `${PROPOSED_FOR_MODEL} ${droppedPlaceholdersNote(proposal.droppedPlaceholders)}`
+              : PROPOSED_FOR_MODEL,
+          }),
           proposal,
         };
       }
