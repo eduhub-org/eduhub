@@ -3956,22 +3956,40 @@
     "dismiss": "Close notice"
   },
   "assistant": {
-    "button": "Ask the Assistant",
+    "button": "Ask me or give me a task…",
     "open": "Open the AI Assistant",
-    "title": "AI Assistant",
-    "ai_notice": "You are chatting with an AI, not a person. It can make mistakes, so check important answers.",
-    "privacy_link": "Privacy policy",
+    "title": "Assistant",
+    "close": "Close",
+    "ai_notice": "AI · can make mistakes ·",
+    "privacy_link": "Privacy",
     "login_prompt": "Log in to ask the Assistant about EduHub, the courses and your own registrations.",
     "login": "Log in",
     "unavailable_viewing_as": "The Assistant is not available while you are viewing EduHub as someone else.",
     "intro": "Ask me about EduHub, the courses or your registrations. If you manage a course, I can draft changes for you to check and apply.",
+    "empty_title": "How can I help?",
+    "suggestions": {
+      "questions_label": "Questions",
+      "tasks_label": "Tasks on this page",
+      "questions": {
+        "what_can_you_change": "What can you change in this course for me?",
+        "course_apply": "How do I apply for this course?",
+        "course_certificate": "What do I need for a certificate in this course?",
+        "how_to_apply": "How do I apply for a course?",
+        "my_certificates": "Where do I find my certificates?"
+      },
+      "tasks": {
+        "shorten_tagline": "Shorten the tagline",
+        "improve_goals": "Improve the learning goals",
+        "extend_application_end": "Extend the application deadline by one week"
+      }
+    },
     "conversation": "Conversation with the Assistant",
     "you_wrote": "You:",
     "assistant_wrote": "Assistant:",
     "thinking": "Writing…",
     "input_label": "Your question",
-    "input_placeholder": "Type your question…",
-    "context_note": "Your question is sent with the page you are on and any error shown on it.",
+    "input_placeholder": "Ask me or give me a task…",
+    "shortcut_ctrl": "Ctrl K",
     "send": "Send",
     "stop": "Stop",
     "new_conversation": "New conversation",
@@ -4004,17 +4022,15 @@
       "PROPOSAL_FAILED": "Something went wrong while saving the change. Please try again later or write to {contact}.",
       "generic": "Something went wrong. Please try again later.",
       "NETWORK": "The connection was lost. Please try again.",
-      "INTERRUPTED": "The reply was cut off. Please ask again."
+      "INTERRUPTED": "The reply was cut off. Please ask again.",
+      "EMPTY_REPLY": "No answer came back. Please ask again."
     },
     "context": {
-      "summary": "Sent with your question",
-      "page": "Page: {path}",
-      "course": "Course ID: {id}",
-      "session": "Session ID: {id}",
-      "error": "Error shown: {message}"
+      "chip": "Sent along: {page}",
+      "chip_with_error": "Sent along: {page} and the error shown"
     },
     "feedback": {
-      "question": "Was this helpful?",
+      "question": "Was this answer helpful?",
       "helpful": "Helpful",
       "not_helpful": "Not helpful",
       "consent_label": "Keep this conversation?",
