@@ -377,8 +377,9 @@ findings in them.
 
 ### 2.17 Assistant, MCP and LLM providers (new area, from #2198 on)
 
-Code under `frontend-nx/apps/edu-hub/lib/assistant/`, `lib/mcp/`,
-`components/assistant/` and `scripts/assistant-provider-trial/`.
+Code under `lib/assistant/`, `lib/mcp/` and `components/assistant/` in
+`frontend-nx/apps/edu-hub/`, and `scripts/assistant-provider-trial/` at the
+repo root.
 
 - **Streaming**: a streamed response is parsed for every shape the provider
   documents: a tool call split over several chunks or indices, a name or id
@@ -399,7 +400,8 @@ Code under `frontend-nx/apps/edu-hub/lib/assistant/`, `lib/mcp/`,
   (§2.1).
 - **Costs**: every model call counts against the spending cap
   (`lib/assistant/spending.ts`), including reasoning tokens (#2219).
-- **Providers**: endpoints follow ADR 0005. The Assistant never uses Vertex's
+- **Providers**: endpoints follow
+  `docs/adr/0005-eu-llm-provider-for-assistant.md`. The Assistant never uses Vertex's
   `global` endpoint; the provider trial may, with its fictional cases only.
 
 ## 3. Checks better done in CI than by the reviewer

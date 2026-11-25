@@ -193,7 +193,9 @@ jobs:
             - `pr.diff`: the whole PR against its base branch. Lines outside
               it already existed before the PR.
             - `commits.txt`: the PR's commit messages.
-            Both diffs leave out `__generated__/` files and lockfiles.
+            Both diffs leave out `__generated__/` files and lockfiles; the
+            `files` list in `pr.json` still shows whether they changed (for
+            regenerated types, or a lockfile without `package.json`).
             The PR head is checked out in the working directory. You have
             no shell; use Read, Glob and Grep on the checkout and on the
             input folder only.
@@ -202,9 +204,10 @@ jobs:
             1. Read the context the playbook names in §1 from the checkout.
             2. Review `range.diff`. Read surrounding code in the checkout. Use
                `pr.diff` to tell whether a problem already existed. Then make
-               the second pass from playbook §1.8: go through the inputs and
-               state transitions of each changed trigger, permission rule,
-               parser and status handler.
+               a second pass: go through the inputs and state transitions of
+               each changed trigger, permission rule, parser and status
+               handler (NULL and back, inherited values, a foreign key moved,
+               two columns in one write, retries, split or empty input).
             3. If `range-from.txt` is an earlier review of this job (a
                `github-actions[bot]` entry in `reviews.json`), this is an
                incremental run: don't repeat a finding already raised in
