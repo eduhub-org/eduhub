@@ -12,6 +12,8 @@ import { createRateLimiter } from './limits';
 import { DEFAULT_CONTACT } from './prompt';
 import { ChatProvider, createProvider } from './provider';
 import { createHasuraSpendTracker, createMemorySpendTracker } from './spending';
+import { createHasuraReportSearch, createReportTools } from './reportTools';
+import type { ReportsHandlerDeps } from './reports';
 import { combineToolSets } from './tools';
 import { createUserTools } from './userTools';
 
@@ -73,7 +75,9 @@ export const assistantDeps = (): ChatHandlerDeps => {
     contact: process.env.ASSISTANT_CONTACT || DEFAULT_CONTACT,
     buildTools: async (session, role) => {
       const caller = { url: HASURA_URL, token: session.accessToken, userId: session.userId };
-      const userTools = createUserTools(caller, stripSchemaKeys);
+      // Report search reads other people's open reports, so it needs the admin secret (reportTools.ts).
+      const reportSearch = adminSecret && HASURA_URL ? createHasuraReportSearch({ url: HASURA_URL, adminSecret }) : null;
+      const userTools = combineToolSets(createUserTools(caller, stripSchemaKeys), createReportTools(caller, reportSearch, stripSchemaKeys));
       const secret = process.env.MCP_PROPOSAL_SECRET;
       if (!COURSE_SETUP_ROLES.includes(role) || !secret) return userTools;
       // The course-setup tools act with the asker's token and chosen role, never as admin.
@@ -115,4 +119,10 @@ export const proposalsDeps: ProposalsHandlerDeps = {
       secret,
     });
   },
+};
+
+export const reportsDeps: ReportsHandlerDeps = {
+  getSession: getAssistantSession,
+  hasuraUrl: HASURA_URL,
+  contact: process.env.ASSISTANT_CONTACT || DEFAULT_CONTACT,
 };

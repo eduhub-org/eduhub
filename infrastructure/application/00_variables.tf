@@ -381,14 +381,14 @@ variable "zoom_api_secret" {
   type        = string
 }
 variable "zoom_attendance_pre_buffer_min" {
-  description = "Minutes before Session.startDateTime to still accept a Zoom instance for attendance aggregation."
+  description = "Minutes before Session.startDateTime a Zoom instance may have started and still run into the session (only time inside the session counts)."
   type        = number
-  default     = 30
+  default     = 720
 }
 variable "zoom_attendance_post_buffer_min" {
-  description = "Minutes after Session.endDateTime to still accept a Zoom instance (captures reconnects right after class)."
+  description = "Minutes after Session.endDateTime a Zoom instance may start and still be checked. Time after the session never counts, so 0 is enough."
   type        = number
-  default     = 120
+  default     = 0
 }
 variable "lms_url" {
   description = "URL to the LimeSurvey instance"
@@ -557,17 +557,23 @@ variable "embedding_location" {
   default     = ""
 }
 variable "assistant_llm_provider" {
-  description = "LLM provider of the Assistant: vertex, or empty to turn the Assistant off (ADR 0005)"
+  description = "LLM provider of the Assistant: ionos (IONOS AI Model Hub, Germany; needs assistant_llm_api_key), vertex (Gemini on Vertex AI in the EU), or empty to turn the Assistant off (ADR 0005, ADR 0008)"
   type        = string
   default     = ""
 
   validation {
-    condition     = contains(["", "vertex"], var.assistant_llm_provider)
-    error_message = "assistant_llm_provider must be \"vertex\" or empty."
+    condition     = contains(["", "vertex", "ionos"], var.assistant_llm_provider)
+    error_message = "assistant_llm_provider must be \"ionos\", \"vertex\" or empty."
   }
 }
+variable "assistant_llm_api_key" {
+  description = "API key of the Assistant's provider when it isn't Vertex AI: for ionos the token value of an IONOS AI Model Hub token. Kept in Secret Manager; while empty, an ionos Assistant stays off."
+  type        = string
+  default     = ""
+  sensitive   = true
+}
 variable "assistant_llm_location" {
-  description = "Vertex AI location of the Assistant's model: the eu multi-region or an EU region. Never global: it gives no control over where requests are processed (ADR 0005)."
+  description = "Vertex AI location of the Assistant's model (provider vertex only): the eu multi-region or an EU region. Never global: it gives no control over where requests are processed (ADR 0005)."
   type        = string
   default     = "eu"
 
@@ -577,9 +583,9 @@ variable "assistant_llm_location" {
   }
 }
 variable "assistant_llm_model" {
-  description = "Model id of the Assistant for Vertex's OpenAI-compatible API; set from the trial in issue #2191"
+  description = "Model id of the Assistant at its provider; empty for the provider's model from the trial: Qwen/Qwen3.8-27B on ionos, google/gemini-3.8-flash on vertex"
   type        = string
-  default     = "google/gemini-3.8-flash"
+  default     = ""
 }
 variable "assistant_monthly_spend_cap_eur" {
   description = "Monthly spending cap of the Assistant in EUR; once reached, the Assistant is off until the next month"
@@ -587,12 +593,61 @@ variable "assistant_monthly_spend_cap_eur" {
   default     = 50
 }
 variable "assistant_llm_price_input_eur_per_mtok" {
-  description = "Price of the Assistant's model per million input tokens in EUR, from the Vertex AI price list for the chosen model and location. The spending cap multiplies it with the tokens the API reports; without it the Assistant stays off."
+  description = "Price of the Assistant's model per million input tokens in EUR, from the provider's price list for the chosen model (and location). The spending cap multiplies it with the tokens the API reports; without it the Assistant stays off."
   type        = number
   default     = null
 }
 variable "assistant_llm_price_output_eur_per_mtok" {
-  description = "Price of the Assistant's model per million output tokens (including reasoning) in EUR, from the Vertex AI price list; without it the Assistant stays off"
+  description = "Price of the Assistant's model per million output tokens (including reasoning) in EUR, from the provider's price list; without it the Assistant stays off"
+  type        = number
+  default     = null
+}
+variable "summary_llm_provider" {
+  description = "LLM provider of the weekly issue report summary (issue #2234), run by callNodeFunction: ionos (IONOS AI Model Hub, with assistant_llm_api_key), vertex (Gemini on Vertex AI in the EU, with the function's service account), off, or empty to follow the Assistant: ionos when the Assistant runs on ionos with a key, otherwise off"
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = contains(["", "off", "vertex", "ionos"], var.summary_llm_provider)
+    error_message = "summary_llm_provider must be \"ionos\", \"vertex\", \"off\" or empty."
+  }
+}
+variable "summary_llm_model" {
+  description = "Model id of the weekly summary at its provider; empty for Qwen/Qwen3.5-397B-A17B on ionos (the strongest model on the IONOS AI Model Hub). Required on vertex."
+  type        = string
+  default     = ""
+}
+variable "summary_llm_location" {
+  description = "Vertex AI location of the summary model (provider vertex only): eu or a region inside the EU, never global (ADR 0005)"
+  type        = string
+  default     = "eu"
+
+  # Inside the EU only: not every europe-* region is (europe-west2 is London, europe-west6 Zürich).
+  validation {
+    condition = contains([
+      "eu",
+      "europe-west1",      # Belgium
+      "europe-west3",      # Frankfurt
+      "europe-west4",      # Netherlands
+      "europe-west8",      # Milan
+      "europe-west9",      # Paris
+      "europe-west10",     # Berlin
+      "europe-west12",     # Turin
+      "europe-north1",     # Finland
+      "europe-north2",     # Stockholm
+      "europe-central2",   # Warsaw
+      "europe-southwest1", # Madrid
+    ], var.summary_llm_location)
+    error_message = "summary_llm_location must be \"eu\" or a Google Cloud region inside the EU, never global."
+  }
+}
+variable "summary_llm_price_input_eur_per_mtok" {
+  description = "Price of the summary model per million input tokens in EUR; shown with each summary as its estimated cost"
+  type        = number
+  default     = null
+}
+variable "summary_llm_price_output_eur_per_mtok" {
+  description = "Price of the summary model per million output tokens (including reasoning) in EUR"
   type        = number
   default     = null
 }

@@ -28,7 +28,7 @@ They should be defined within a variable set, so it can be used by the staging a
 (9) **url_mask**
     - Zone for the Google Cloud Server, where the artifact registry as well as all other infrastructure will be instantiated.
 
-## Assistant: zero retention on Vertex AI (ADR 0005)
+## Assistant: provider and zero retention (ADR 0005, ADR 0008)
 
 `application/11_assistant.tf` grants the edu service access to Vertex AI and can deny
 the global endpoint. Two settings are outside Terraform and must be checked once per
@@ -50,10 +50,45 @@ project (staging and production), with an account that has `roles/aiplatform.adm
   P=eduhub-staging-new; M=gemini-3.8-flash; curl -s -o /dev/null -w '%{http_code}\n' -H "Authorization: Bearer $(gcloud auth print-access-token)" "https://aiplatform.eu.rep.googleapis.com/v1beta1/projects/$P/locations/eu/publishers/google/models/$M:fetchPublisherModelConfig"
   ```
 
-To turn the Assistant on, set `assistant_llm_provider = "vertex"` and the model's prices
+To turn the Assistant on, set `assistant_llm_provider` and the model's prices
 `assistant_llm_price_input_eur_per_mtok` / `assistant_llm_price_output_eur_per_mtok` (EUR per
-million tokens, from the Vertex AI price list for the model and location). The monthly spending
-cap (`assistant_monthly_spend_cap_eur`) is measured with them; without prices the Assistant stays off.
+million tokens, from the provider's price list). The monthly spending cap
+(`assistant_monthly_spend_cap_eur`) is measured with them; without prices the Assistant stays off.
+
+- `ionos` (ADR 0008): Qwen3.8 27B on the IONOS AI Model Hub. Put the token value of an IONOS
+  AI Model Hub token into the sensitive `assistant_llm_api_key` (variable set
+  `eduhub-application`); Terraform keeps it in Secret Manager. While it's empty, the Assistant
+  stays off. Prices for `Qwen/Qwen3.8-27B`: 0.40 / 2.70.
+
+  **Renewing the IONOS token.** An AI Model Hub token lives at most 365 days and Terraform can't
+  renew it (the IONOS provider has no resource for API tokens). Create it with the full TTL and
+  set a reminder two weeks before it expires. To renew: create a new token in the IONOS Token
+  Manager, replace `assistant_llm_api_key`, redeploy staging and production, then delete the old
+  token. If it expires anyway, the alert `EduHub Assistant: provider rejects the credentials`
+  posts to the Slack channel of `alert_slack_channel_id` (`10_monitoring.tf`).
+- `vertex` (ADR 0005): Gemini on Vertex AI in the EU, with the zero-retention settings above.
+
+`assistant_llm_model` is empty by default, which picks the provider's model from the trial.
+
+The weekly summary of bug reports and feature ideas on `/manage/reports` (issue #2234) runs in
+callNodeFunction with its own model, so it can use a stronger one than the chat. By default
+(`summary_llm_provider` empty) it follows the Assistant: when the Assistant runs on `ionos` with a
+key, the summary uses `Qwen/Qwen3.5-397B-A17B`, the strongest model on the IONOS AI Model Hub, with
+the same key and with thinking turned off (`reasoning_effort: none`: the model's thinking would
+count against the output cap and could outrun the function's 180 s). Otherwise no summary is
+written. To show its cost with each summary, set `summary_llm_price_input_eur_per_mtok` /
+`summary_llm_price_output_eur_per_mtok` from the IONOS price list.
+
+To choose differently, set `summary_llm_provider`:
+
+- `ionos` with another `summary_llm_model` from the IONOS AI Model Hub.
+- `vertex`: Gemini on Vertex AI in `summary_llm_location` (default `eu`), with
+  callNodeFunction's service account, which already has `roles/aiplatform.user`. Needs
+  `summary_llm_model`. The zero-retention settings above apply to this model too.
+- `off`: no summary.
+
+One run sends at most 200 reports and 200 thumbs-down rows, each cut short, and caps the output at
+6000 tokens.
 
 To deny the global endpoint, the Terraform service account needs `roles/orgpolicy.policyAdmin`
 on the organization. Then set `vertex_global_endpoint_policy` to `dry_run`, check the audit

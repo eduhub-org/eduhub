@@ -28,7 +28,15 @@ export interface ProposedChange {
   after: unknown;
   expiresAt: string;
   message?: string;
+  /** Mail proposals: placeholders the draft drops, shown as a warning. */
+  droppedPlaceholders?: string[];
 }
+
+/** A bug report, feature idea, vote or withdrawal the Assistant drafted (issue #2234); only the user's click sends it. */
+export type ReportDraft =
+  | { kind: 'create'; type: 'BUG' | 'FEATURE'; title: string; description: string }
+  | { kind: 'vote'; reportId: number; type: 'BUG' | 'FEATURE'; summary: string }
+  | { kind: 'withdraw'; reportId: number; summary: string };
 
 export interface ChatMessagePayload {
   role: 'user' | 'assistant';
@@ -50,6 +58,7 @@ export interface AssistantError {
 export type ChatEvent =
   | { type: 'delta'; text: string }
   | { type: 'proposal'; proposal: ProposedChange }
+  | { type: 'report'; report: ReportDraft }
   | { type: 'tool'; name: string; status: 'running' | 'done' | 'failed' }
   | { type: 'error'; error: AssistantError }
   | { type: 'done' };
@@ -75,6 +84,10 @@ const toChatEvent = (block: string): ChatEvent | null => {
       return typeof body.text === 'string' ? { type: 'delta', text: body.text } : null;
     case 'proposal':
       return { type: 'proposal', proposal: body as unknown as ProposedChange };
+    case 'report':
+      return ['create', 'vote', 'withdraw'].includes(body.kind as string)
+        ? { type: 'report', report: body as unknown as ReportDraft }
+        : null;
     case 'tool':
       return typeof body.name === 'string' && ['running', 'done', 'failed'].includes(body.status as string)
         ? { type: 'tool', name: body.name, status: body.status as 'running' | 'done' | 'failed' }
@@ -196,6 +209,8 @@ export interface FeedbackRequest {
   messages?: ChatMessagePayload[];
   /** The route pattern (e.g. `/course/[courseId]`), without IDs. */
   route?: string;
+  /** What was wrong, in the user's words; sent for 👎 with or without the conversation. */
+  comment?: string;
 }
 
 export const sendFeedback = async (feedback: FeedbackRequest, role: string): Promise<boolean> => {
@@ -208,5 +223,32 @@ export const sendFeedback = async (feedback: FeedbackRequest, role: string): Pro
     return response.ok;
   } catch {
     return false;
+  }
+};
+
+export type ReportOutcome = { ok: true; reportId: number } | { ok: false; error: AssistantError };
+
+/** Sends a drafted report, vote or withdrawal. Only the user's click on the card calls this. */
+export const sendReport = async (
+  draft: ReportDraft,
+  { role, locale, route }: { role: string; locale: string; route?: string }
+): Promise<ReportOutcome> => {
+  const body =
+    draft.kind === 'create'
+      ? { action: 'create', type: draft.type, title: draft.title, description: draft.description, route }
+      : draft.kind === 'vote'
+        ? { action: 'vote', reportId: draft.reportId, summary: draft.summary }
+        : { action: 'withdraw', reportId: draft.reportId };
+  try {
+    const response = await fetch(`${ASSISTANT_API_BASE}/reports`, {
+      method: 'POST',
+      headers: headers(role),
+      body: JSON.stringify({ ...body, locale }),
+    });
+    if (!response.ok) return { ok: false, error: await jsonError(response) };
+    const result = await response.json();
+    return { ok: true, reportId: Number(result?.reportId) };
+  } catch {
+    return { ok: false, error: { code: 'NETWORK', message: '' } };
   }
 };

@@ -11,6 +11,7 @@ from pythonFunctions.check_course_continuation import check_course_continuation
 from pythonFunctions.create_certificates import create_certificates
 from pythonFunctions.create_instructor_certificates import create_instructor_certificates
 from pythonFunctions.delete_expired_assistant_feedback import delete_expired_assistant_feedback
+from pythonFunctions.anonymize_closed_issue_reports import anonymize_closed_issue_reports
 from pythonFunctions.expire_invitations import expire_invitations
 from pythonFunctions.generate_instructor_invoice import generate_instructor_invoice
 from pythonFunctions.expire_job_postings import expire_job_postings
@@ -34,6 +35,7 @@ PYTHON_FUNCTIONS: Dict[str, Callable] = {
     "create_certificates": create_certificates,
     "create_instructor_certificates": create_instructor_certificates,
     "delete_expired_assistant_feedback": delete_expired_assistant_feedback,
+    "anonymize_closed_issue_reports": anonymize_closed_issue_reports,
     "expire_invitations": expire_invitations,
     "expire_job_postings": expire_job_postings,
     "generate_instructor_invoice": generate_instructor_invoice,

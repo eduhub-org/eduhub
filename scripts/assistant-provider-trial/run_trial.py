@@ -8,6 +8,7 @@ import argparse
 import copy
 import csv
 import datetime as dt
+from zoneinfo import ZoneInfo
 import http.client
 import json
 import os
@@ -96,8 +97,21 @@ def args_match(actual, expected):
             k in actual and args_match(actual[k], v) for k, v in expected.items()
         )
     if isinstance(expected, str):
+        if isinstance(actual, str) and LOCAL_TIME_RE.fullmatch(expected):
+            # A Berlin wall time: any offset naming the same moment matches, as the backend
+            # stores the instant (17:00+00:00 is 18:00 in Berlin in January).
+            try:
+                moment = dt.datetime.fromisoformat(actual.replace("Z", "+00:00"))
+                if moment.tzinfo:
+                    return moment == dt.datetime.fromisoformat(expected).replace(tzinfo=BERLIN)
+            except ValueError:
+                return False
         return isinstance(actual, str) and expected.lower() in actual.lower()
     return actual == expected
+
+
+LOCAL_TIME_RE = re.compile(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}")
+BERLIN = ZoneInfo("Europe/Berlin")
 
 
 # ---------------------------------------------------------------- language
@@ -315,7 +329,7 @@ ORGANIZER_RULES = (
     "- Changes to a course are only drafted as Proposed Changes. The Organizer sees before and after in the chat "
     "and applies or discards them with the buttons there. Never say a change is saved.\n"
     "- Sessions can only be added, changed or deleted while the course has no registrations in any state.\n"
-    "- Course texts are written in the course's own language.\n"
+    "- Course texts are written in the course's own language; your replies stay in the user's language.\n"
 )
 
 

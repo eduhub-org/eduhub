@@ -124,6 +124,34 @@ export interface SessionChanges {
   delete: number[];
 }
 
+/** A mail template: a system default (courseId null) or a course's own copy of one type. */
+export interface MailTemplate {
+  id: number;
+  type: string;
+  subject: string;
+  /** HTML; one body holds the German and the English half. */
+  content: string;
+  from: string | null;
+  cc: string | null;
+  bcc: string | null;
+  updatedAt: string;
+}
+
+/** What decides which mails a course sends, and its templates. */
+export interface CourseMails {
+  registrationType: string | null;
+  /** The course's own copies; any other type is sent from the default. */
+  course: MailTemplate[];
+  defaults: MailTemplate[];
+}
+
+/** The part of a mail template the Assistant may change. Sender, cc and bcc stay as they are. */
+export interface MailTemplateChange {
+  type: string;
+  subject: string;
+  content: string;
+}
+
 /**
  * Data access with the caller's own token and role. The Hasura implementation is in
  * `hasuraCourseStore.ts`; tests use an in-memory one.
@@ -153,4 +181,15 @@ export interface CourseStore {
   coursesTitled(programId: number, title: string): Promise<{ id: number; title: string }[]>;
   /** Creates the course with its location options; returns its id. */
   createCourse(course: NewCourse): Promise<number>;
+  /** The course's registration type, its own mail templates and the defaults, as the caller may read them. */
+  getCourseMails(courseId: number): Promise<CourseMails>;
+  /**
+   * Saves a course's copy of a mail template: updates `existing` if it still has its `updatedAt`
+   * (false when no row matched), or else inserts a copy of `base` with the change.
+   */
+  saveCourseMail(
+    courseId: number,
+    change: MailTemplateChange,
+    target: { existing: MailTemplate } | { base: MailTemplate }
+  ): Promise<boolean>;
 }

@@ -87,7 +87,7 @@ const metadata = async (path, fetchImpl) => {
 };
 
 /** Access token of the function's service account, cached until shortly before it expires. */
-const accessToken = async (fetchImpl) => {
+export const accessToken = async (fetchImpl = globalThis.fetch) => {
   if (cachedToken && cachedToken.expiresAt > Date.now() + 60_000) return cachedToken.value;
   const body = await (await metadata("instance/service-accounts/default/token", fetchImpl)).json();
   cachedToken = { value: body.access_token, expiresAt: Date.now() + body.expires_in * 1000 };

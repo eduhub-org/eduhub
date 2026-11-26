@@ -1,7 +1,7 @@
 # Assistant backend
 
 The server side of the **Assistant** (issue #2193, ADR 0005): a streaming chat endpoint that
-calls an OpenAI-compatible model (Gemini Flash on Vertex AI, in the EU) and runs tools as the
+calls an OpenAI-compatible model (Qwen3.8 27B on the IONOS AI Model Hub in Germany, ADR 0008; or Gemini Flash on Vertex AI in the EU) and runs tools as the
 person chatting.
 
 | File | What it does |
@@ -18,7 +18,9 @@ person chatting.
 | `metrics.ts` | Anonymous metrics, one JSON log line per request |
 | `handler.ts` | `POST /api/assistant/chat` (SSE) |
 | `proposals.ts` | `POST /api/assistant/proposals` (apply/discard from the widget) |
-| `feedback.ts` | `POST /api/assistant/feedback` (👍/👎; 👎 conversation with consent) |
+| `feedback.ts` | `POST /api/assistant/feedback` (👍/👎; 👎 comment, conversation with consent) |
+| `reportTools.ts` | Tools for Reports (#2234): search open ones, draft a report, vote or withdrawal, list the asker's own |
+| `reports.ts` | `POST /api/assistant/reports` (send, join or withdraw a Report from the widget's card) |
 | `server.ts` | Production wiring (session, Hasura URL, singletons) |
 
 ## Endpoints
@@ -83,8 +85,38 @@ the result (`{ status: "APPLIED", kind, courseId, … }` / `{ status: "DISCARDED
 `{ "rating": "up" | "down", "consent": boolean, "messages"?: [...], "comment"?, "route"?, "locale"? }`.
 A rating alone is only counted. With `rating: "down"` and `messages`, the conversation (text only)
 is stored in `AssistantFeedback` without a user id, and only with `consent: true` (else 400
-`FEEDBACK_CONSENT_REQUIRED`). The `user` role may insert, nobody but admin may read; the
+`FEEDBACK_CONSENT_REQUIRED`). A 👎 `comment` is stored too, with the conversation when consented and
+on its own otherwise (#2234). The `user` role may insert, nobody but admin may read; the
 `delete_expired_assistant_feedback` cron deletes rows after 30 days. Answers 204.
+
+### `POST /api/assistant/reports`
+
+Reports (issue #2234): bug reports and feature ideas about the platform. The model only drafts:
+`propose_report`, `propose_vote` and `propose_withdraw` return the draft as a `report` event
+(`{ kind: 'create', type, title, description }`, `{ kind: 'vote', reportId, type, summary }` or
+`{ kind: 'withdraw', reportId, summary }`), which the widget shows as a card. Only the user's click
+calls this endpoint:
+
+- `{ action: 'create', type: 'BUG' | 'FEATURE', title, description, route?, locale? }` inserts the
+  report together with the reporter's own vote (at most 5 reports per person in 24 hours, else 429
+  `REPORT_LIMIT_REACHED`);
+- `{ action: 'vote', reportId, summary }` adds a vote with the summary the user saw (409
+  `REPORT_ALREADY_VOTED` or `REPORT_CLOSED`);
+- `{ action: 'withdraw', reportId }` deletes the user's own report while it is `NEW` and nobody
+  else joined (409 `REPORT_NOT_WITHDRAWABLE`).
+
+All three run with the user's token under the `user` role; Hasura's permissions on `IssueReport`
+and `IssueReportVote` decide. 200 `{ reportId }`. Users never read another person's report text:
+the `user` role sees only status, note and dates of reports it voted on, and its own votes'
+summaries. The card's state goes back to the model as a note (`[Report card create: sent by the
+user]`).
+
+`search_reports` is the one tool that reads with the admin secret: it must compare with other
+people's open reports. It returns only open reports to the model, which is told never to show them;
+the user sees the model's own summary on the vote card. The weekly English summary for admins is
+written by `functions/callNodeFunction/generateIssueReportSummary` with its own model
+(`SUMMARY_LLM_*`), and `anonymize_closed_issue_reports` removes the user id 6 months after a report
+is closed.
 
 ## Acting as the asker
 
@@ -93,7 +125,8 @@ is stored in `AssistantFeedback` without a user id, and only with `consent: true
   pin matters: the `user` role includes `user_access_others`, which lists other people's
   Registrations (ids only) for a query without a user filter.
 - Course-setup tools act with the asker's token and chosen role through the MCP operations; Hasura
-  enforces the rest. The admin secret is only used for the spending totals, never by a tool.
+  enforces the rest. The admin secret is only used for the spending totals and by `search_reports`
+  (see above), never to write.
 - While an admin views the platform as someone else, the Assistant is off (`IMPERSONATING`).
 
 ## Knowledge index (`search_knowledge`, #2195)
@@ -129,7 +162,8 @@ they hold a secret are dropped and personal e-mail addresses replaced. Nothing i
 database. A test scans what this repository would produce.
 
 **Rebuild:** `.github/workflows/index-knowledge.yml` runs `functions/callNodeFunction/scripts/index-knowledge.js`
-on the latest release tag after each successful production deployment (or by hand). It reuses
+on the latest release tag as the last job of each successful production deployment, or by hand
+with `gh workflow run index-knowledge.yml --ref production`. It reuses
 embeddings of unchanged passages and switches to the new build in one transaction; a failed or
 suspiciously small build keeps the previous index. Locally:
 
@@ -145,7 +179,7 @@ EMBEDDING_PROVIDER=fake HASURA_ENDPOINT=http://localhost:8080/v1/graphql HASURA_
 |----------|---------|---------|
 | `ASSISTANT_LLM_PROVIDER` | off | `vertex`, `openai` (any OpenAI-compatible API) or `fake` |
 | `ASSISTANT_LLM_BASE_URL` | | e.g. `https://aiplatform.eu.rep.googleapis.com/v1/projects/P/locations/eu/endpoints/openapi`; the global endpoint is refused |
-| `ASSISTANT_LLM_MODEL` | | e.g. `google/gemini-3.8-flash` |
+| `ASSISTANT_LLM_MODEL` | | e.g. `Qwen/Qwen3.8-27B` (IONOS) or `google/gemini-3.8-flash` (Vertex) |
 | `ASSISTANT_LLM_API_KEY` | | static key; for `vertex` only to override the metadata-server token (local test with `gcloud auth print-access-token`) |
 | `ASSISTANT_LLM_PRICE_INPUT_EUR_PER_MTOK`, `…_OUTPUT_…` | | required for a paid provider, else it stays off |
 | `ASSISTANT_LLM_EXTRA_BODY` | `{}` | JSON merged into each request, e.g. `{"reasoning_effort":"low"}` |

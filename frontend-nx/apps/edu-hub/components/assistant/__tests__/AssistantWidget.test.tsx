@@ -2,7 +2,7 @@ import React from 'react';
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { AssistantWidget } from '../AssistantWidget';
-import type { ChatEvent, ChatRequest, ProposedChange } from '../api';
+import type { ChatEvent, ChatRequest, ProposedChange, ReportDraft } from '../api';
 
 // next-intl ships ESM only, which this Jest setup can't load. This stand-in reads
 // the real en.json, so a missing translation key still fails the test.
@@ -59,8 +59,10 @@ jest.mock('remark-gfm', () => ({ __esModule: true, default: () => undefined }));
 const mockStreamChat = jest.fn();
 const mockDecideProposal = jest.fn();
 const mockSendFeedback = jest.fn();
+const mockSendReport = jest.fn();
 jest.mock('../api', () => ({
   ...jest.requireActual('../api'),
+  sendReport: (...args: unknown[]) => mockSendReport(...args),
   streamChat: (...args: unknown[]) => mockStreamChat(...args),
   decideProposal: (...args: unknown[]) => mockDecideProposal(...args),
   sendFeedback: (...args: unknown[]) => mockSendFeedback(...args),
@@ -111,6 +113,7 @@ beforeEach(() => {
   mockStreamChat.mockReset();
   mockDecideProposal.mockReset();
   mockSendFeedback.mockReset().mockResolvedValue(true);
+  mockSendReport.mockReset();
   window.sessionStorage.clear();
   document.body.innerHTML = '';
 });
@@ -141,8 +144,8 @@ describe('AssistantWidget', () => {
     renderWidget();
     openPanel();
 
-    expect(screen.getByText(/You are chatting with an AI, not a person/)).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Privacy policy' })).toHaveAttribute('href', '/privacy');
+    expect(screen.getByText(/AI · can make mistakes/)).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Privacy' })).toHaveAttribute('href', '/privacy#assistant');
   });
 
   it('is not available while an admin views the app as someone else', () => {
@@ -154,7 +157,7 @@ describe('AssistantWidget', () => {
     expect(screen.queryByLabelText('Your question')).not.toBeInTheDocument();
   });
 
-  it('sends the question with the page context, shows what was sent and streams the reply', async () => {
+  it('sends the question with the page context, says what is sent and streams the reply', async () => {
     replyWith([
       { type: 'delta', text: 'Your course ' },
       { type: 'delta', text: 'starts on Monday.' },
@@ -172,8 +175,7 @@ describe('AssistantWidget', () => {
       pageContext: { path: '/manage/course/7', route: '/manage/course/[courseId]', courseId: 7 },
     });
     expect(await screen.findByText('Your course starts on Monday.')).toBeInTheDocument();
-    expect(screen.getByText('Sent with your question')).toBeInTheDocument();
-    expect(screen.getByText('Course ID: 7')).toBeInTheDocument();
+    expect(screen.getByText('Sent along: /manage/course/7')).toBeInTheDocument();
   });
 
   it('shows the backend’s localized error with a contact link when the Assistant cannot answer', async () => {
@@ -189,6 +191,31 @@ describe('AssistantWidget', () => {
       'href',
       'mailto:edu@opencampus.sh'
     );
+  });
+
+  it('offers questions and course tasks to start with, and sends the one picked', async () => {
+    replyWith([{ type: 'delta', text: 'Here is a shorter one.' }, { type: 'done' }]);
+    renderWidget();
+    openPanel();
+
+    expect(screen.getByRole('button', { name: 'What can you change in this course for me?' })).toBeInTheDocument();
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: 'Shorten the tagline' }));
+    });
+
+    expect(mockStreamChat.mock.calls[0][0].messages).toEqual([{ role: 'user', content: 'Shorten the tagline' }]);
+    expect(await screen.findByText('Here is a shorter one.')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Shorten the tagline' })).not.toBeInTheDocument();
+  });
+
+  it('opens with Ctrl+K and closes with Escape', async () => {
+    renderWidget();
+    fireEvent.keyDown(window, { key: 'k', ctrlKey: true });
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+
+    fireEvent.keyDown(screen.getByLabelText('Your question'), { key: 'Escape' });
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(screen.getByRole('button', { name: 'Open the AI Assistant' })).toBeInTheDocument();
   });
 
   it('does not send while Enter confirms an IME candidate', () => {
@@ -208,6 +235,19 @@ describe('AssistantWidget', () => {
     await ask('Hello?');
 
     expect(await screen.findByText(/The connection was lost/)).toBeInTheDocument();
+  });
+
+  it.each([
+    ['no text', []],
+    ['only whitespace', [{ type: 'delta', text: '  \n ' }]],
+  ] as [string, ChatEvent[]][])('says so when a reply ends with %s', async (_case, events) => {
+    replyWith([...events, { type: 'done' }]);
+    renderWidget();
+    openPanel();
+    await ask('Hello?');
+
+    expect(await screen.findByText(/No answer came back/)).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Helpful' })).not.toBeInTheDocument();
   });
 
   it('says it is looking something up while a tool runs', async () => {
@@ -231,6 +271,93 @@ describe('AssistantWidget', () => {
     expect(screen.queryByText('Looking it up…')).not.toBeInTheDocument();
     await act(async () => finish());
     expect(screen.getByText('Yes, place 3.')).toBeInTheDocument();
+  });
+
+  describe('Report card (issue #2234)', () => {
+    const showReport = async (report: ReportDraft) => {
+      replyWith([{ type: 'delta', text: 'Here is a draft.' }, { type: 'report', report }, { type: 'done' }]);
+      renderWidget();
+      openPanel();
+      await ask('The CSV export is broken');
+      return screen.findByTestId('report-card');
+    };
+    const bug: ReportDraft = { kind: 'create', type: 'BUG', title: 'CSV export broken', description: 'Exporting fails.' };
+
+    it('sends a drafted report only on the user\'s click, once, from the page it was asked on', async () => {
+      let resolveSend: (value: unknown) => void = () => undefined;
+      mockSendReport.mockImplementation(() => new Promise((resolve) => (resolveSend = resolve)));
+      const card = await showReport(bug);
+      expect(within(card).getByText('Report: Bug')).toBeInTheDocument();
+      expect(within(card).getByText('CSV export broken')).toBeInTheDocument();
+      expect(within(card).getByText(/Not sent yet/)).toBeInTheDocument();
+      expect(mockSendReport).not.toHaveBeenCalled();
+
+      const send = within(card).getByRole('button', { name: 'Send' });
+      fireEvent.click(send);
+      fireEvent.click(send);
+      await act(async () => resolveSend({ ok: true, reportId: 3 }));
+
+      expect(mockSendReport).toHaveBeenCalledTimes(1);
+      expect(mockSendReport).toHaveBeenCalledWith(bug, { role: 'instructor', locale: 'en', route: '/manage/course/[courseId]' });
+      expect(within(card).getByText(/What happened to my reports\?/)).toBeInTheDocument();
+      expect(within(card).queryByRole('button', { name: 'Send' })).not.toBeInTheDocument();
+    });
+
+    it('keeps a send on its way, and its outcome, across a remount, so it is never sent twice', async () => {
+      let resolveSend: (value: unknown) => void = () => undefined;
+      mockSendReport.mockImplementation(() => new Promise((resolve) => (resolveSend = resolve)));
+      const card = await showReport(bug);
+      fireEvent.click(within(card).getByRole('button', { name: 'Send' }));
+
+      // Navigating while the send is on its way: the outcome lands in the stored conversation.
+      cleanup();
+      await act(async () => resolveSend({ ok: true, reportId: 3 }));
+      renderWidget();
+      openPanel();
+      const remounted = await screen.findByTestId('report-card');
+      expect(within(remounted).getByText(/What happened to my reports\?/)).toBeInTheDocument();
+      expect(within(remounted).queryByRole('button', { name: 'Send' })).not.toBeInTheDocument();
+      expect(mockSendReport).toHaveBeenCalledTimes(1);
+    });
+
+    it('shows a send still on its way after a remount and its outcome once it arrives', async () => {
+      let resolveSend: (value: unknown) => void = () => undefined;
+      mockSendReport.mockImplementation(() => new Promise((resolve) => (resolveSend = resolve)));
+      const card = await showReport(bug);
+      fireEvent.click(within(card).getByRole('button', { name: 'Send' }));
+
+      cleanup();
+      renderWidget();
+      openPanel();
+      const remounted = await screen.findByTestId('report-card');
+      expect(within(remounted).getByRole('button', { name: 'Sending…' })).toBeDisabled();
+      await act(async () => resolveSend({ ok: true, reportId: 3 }));
+      expect(within(screen.getByTestId('report-card')).getByText(/What happened to my reports\?/)).toBeInTheDocument();
+      expect(mockSendReport).toHaveBeenCalledTimes(1);
+    });
+
+    it('tells the model what the user did with the card', async () => {
+      const card = await showReport({ kind: 'vote', reportId: 4, type: 'FEATURE', summary: 'Dark mode for the platform' });
+      expect(within(card).getByText('Existing report: Idea')).toBeInTheDocument();
+      fireEvent.click(within(card).getByRole('button', { name: 'Discard' }));
+      expect(within(card).getByText('Discarded. Nothing was sent.')).toBeInTheDocument();
+
+      replyWith([{ type: 'delta', text: 'Okay.' }, { type: 'done' }]);
+      await ask('Never mind');
+      const request = mockStreamChat.mock.calls[1][0] as ChatRequest;
+      expect(request.messages[1].proposals).toEqual([{ kind: 'report_vote', courseId: null, status: 'DISCARDED' }]);
+      expect(mockSendReport).not.toHaveBeenCalled();
+    });
+
+    it('shows why sending failed and does not offer it again when it can\'t succeed', async () => {
+      mockSendReport.mockResolvedValue({ ok: false, error: { code: 'REPORT_ALREADY_VOTED', message: 'You already support this report.' } });
+      const card = await showReport({ kind: 'vote', reportId: 4, type: 'BUG', summary: 'Export fails' });
+      await act(async () => {
+        fireEvent.click(within(card).getByRole('button', { name: 'Join' }));
+      });
+      expect(within(card).getByText('You already support this report.')).toBeInTheDocument();
+      expect(within(card).getByRole('button', { name: 'Join' })).toBeDisabled();
+    });
   });
 
   describe('Proposed Change', () => {
@@ -407,14 +534,64 @@ describe('AssistantWidget', () => {
       );
     });
 
+    it('rates one answer and keeps only the conversation up to it', async () => {
+      await answerOnce();
+      replyWith([{ type: 'delta', text: 'A second answer.' }, { type: 'done' }]);
+      await ask('Another question');
+      await screen.findByText('A second answer.');
+
+      fireEvent.click(screen.getAllByRole('button', { name: 'Not helpful' })[0]);
+      await act(async () => {
+        fireEvent.click(screen.getByRole('button', { name: 'Yes, keep it' }));
+      });
+
+      expect(mockSendFeedback).toHaveBeenCalledWith(
+        expect.objectContaining({
+          messages: [
+            { role: 'user', content: 'A question' },
+            { role: 'assistant', content: 'An answer.' },
+          ],
+        }),
+        'instructor'
+      );
+    });
+
+    it('keeps a rating when the panel is closed and reopened, so it is sent once', async () => {
+      await answerOnce();
+      await act(async () => {
+        fireEvent.click(screen.getByRole('button', { name: 'Helpful' }));
+      });
+
+      await closePanel();
+      openPanel();
+
+      expect(screen.getByRole('button', { name: 'Helpful' })).toBeDisabled();
+      expect(screen.getByRole('button', { name: 'Helpful' })).toHaveAttribute('aria-pressed', 'true');
+      expect(mockSendFeedback).toHaveBeenCalledTimes(1);
+    });
+
     it('sends only the 👎 rating when consent is refused', async () => {
       await answerOnce();
       fireEvent.click(screen.getByRole('button', { name: 'Not helpful' }));
       await act(async () => {
-        fireEvent.click(screen.getByRole('button', { name: 'No, only send the rating' }));
+        fireEvent.click(screen.getByRole('button', { name: "No, don't keep it" }));
       });
 
       expect(mockSendFeedback).toHaveBeenCalledWith({ rating: 'down', consent: false, route: '/manage/course/[courseId]' }, 'instructor');
+    });
+
+    it('sends a 👎 comment with or without the conversation (issue #2234)', async () => {
+      await answerOnce();
+      fireEvent.click(screen.getByRole('button', { name: 'Not helpful' }));
+      fireEvent.change(screen.getByLabelText("What wasn't helpful? (optional)"), { target: { value: ' The date is wrong. ' } });
+      await act(async () => {
+        fireEvent.click(screen.getByRole('button', { name: "No, don't keep it" }));
+      });
+
+      expect(mockSendFeedback).toHaveBeenCalledWith(
+        { rating: 'down', consent: false, route: '/manage/course/[courseId]', comment: 'The date is wrong.' },
+        'instructor'
+      );
     });
   });
 

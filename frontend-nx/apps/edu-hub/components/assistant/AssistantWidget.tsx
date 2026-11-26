@@ -1,12 +1,20 @@
-import { FC, FormEvent, KeyboardEvent, useEffect, useRef, useState } from 'react';
+import { FC, FormEvent, KeyboardEvent, ReactNode, useEffect, useRef, useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useRouter } from 'next/router';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { MdOutlineChat } from 'react-icons/md';
+import {
+  MdArrowUpward,
+  MdAutoAwesome,
+  MdClose,
+  MdHelpOutline,
+  MdOutlineAddComment,
+  MdOutlineAutoFixHigh,
+  MdOutlineMail,
+  MdStop,
+} from 'react-icons/md';
 
-import { DialogShell } from '../common/dialogs/DialogShell';
 import { useImpersonation } from '../../contexts/ImpersonationContext';
 import {
   useCurrentRole,
@@ -16,10 +24,11 @@ import {
   useIsSessionLoading,
 } from '../../hooks/authentication';
 import { AuthRoles } from '../../types/enums';
-import type { PageContext } from './api';
 import { FeedbackControls } from './FeedbackControls';
-import { buildPageContext } from './pageContext';
+import { ReportCard } from './ReportCard';
+import { buildPageContext, readVisibleError } from './pageContext';
 import { ProposedChangeCard } from './ProposedChangeCard';
+import { suggestionsFor } from './suggestions';
 import {
   clearStoredConversations,
   ConversationMessage,
@@ -47,18 +56,61 @@ const useAssistantRole = (path: string): string => {
   return currentRole;
 };
 
-const SentContext: FC<{ context: PageContext }> = ({ context }) => {
+/** Text the reader can see; a reply of only whitespace counts as empty. */
+const hasText = (message: ConversationMessage) => message.content.trim().length > 0;
+const hasCards = (message: ConversationMessage) => message.proposals.length > 0 || (message.reports?.length ?? 0) > 0;
+
+const iconButton =
+  'flex h-8 w-8 items-center justify-center rounded-lg text-label-secondary hover:bg-bg-secondary hover:text-label-primary disabled:opacity-50';
+
+/** The page's own heading names it best; the path is the fallback. */
+const readPageLabel = (path: string): string =>
+  document.querySelector('main h1')?.textContent?.replace(/\s+/g, ' ').trim().slice(0, 80) || path;
+
+/**
+ * What goes along with a question, said once above the input instead of under
+ * every message: the page, and an error shown on it.
+ */
+const ContextChip: FC = () => {
   const t = useTranslations('assistant.context');
+  const router = useRouter();
+  const [label, setLabel] = useState(router.asPath.split(/[?#]/)[0]);
+  const [hasError, setHasError] = useState(false);
+
+  // Follow the page, not only the route: a heading that loads later, or an error
+  // that appears or goes away, changes what Send includes, so the chip says so too.
+  useEffect(() => {
+    const path = router.asPath.split(/[?#]/)[0];
+    let frame = 0;
+    const check = () => {
+      frame = 0;
+      setLabel(readPageLabel(path));
+      setHasError(Boolean(readVisibleError()));
+    };
+    check();
+    const observer = new MutationObserver(() => {
+      if (!frame) frame = requestAnimationFrame(check);
+    });
+    observer.observe(document.body, {
+      subtree: true,
+      childList: true,
+      characterData: true,
+      attributes: true,
+      attributeFilter: ['style', 'class', 'hidden', 'aria-hidden'],
+    });
+    return () => {
+      observer.disconnect();
+      if (frame) cancelAnimationFrame(frame);
+    };
+  }, [router.asPath]);
+
   return (
-    <details className="mt-1 text-xs text-label-secondary">
-      <summary className="cursor-pointer">{t('summary')}</summary>
-      <ul className="pl-4">
-        <li>{t('page', { path: context.path })}</li>
-        {context.courseId && <li>{t('course', { id: context.courseId })}</li>}
-        {context.sessionId && <li>{t('session', { id: context.sessionId })}</li>}
-        {context.errorMessage && <li>{t('error', { message: context.errorMessage })}</li>}
-      </ul>
-    </details>
+    <p
+      className="max-w-full self-start truncate rounded-md bg-bg-secondary px-2 py-1 text-xs text-label-secondary"
+      title={t(hasError ? 'chip_with_error' : 'chip', { page: label })}
+    >
+      {t(hasError ? 'chip_with_error' : 'chip', { page: label })}
+    </p>
   );
 };
 
@@ -66,12 +118,16 @@ const Reply: FC<{
   message: ConversationMessage;
   contactHref: string;
   onDecide: (id: string, action: 'apply' | 'discard') => void;
-}> = ({ message, contactHref, onDecide }) => {
+  onDecideReport: (id: string, action: 'send' | 'dismiss') => void;
+}> = ({ message, contactHref, onDecide, onDecideReport }) => {
   const t = useTranslations('assistant');
+  // A reply that ended without text, card or error must not leave an empty gap.
+  const empty = !message.streaming && !hasText(message) && !hasCards(message);
+  const error = message.error ?? (empty ? { code: 'EMPTY_REPLY', message: '' } : undefined);
   return (
     <div className="min-w-0">
-      {message.content && (
-        <div className="prose prose-sm max-w-none break-words text-label-primary">
+      {hasText(message) && (
+        <div className="prose prose-sm prose-invert max-w-none break-words text-label-primary">
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
             components={{
@@ -87,8 +143,8 @@ const Reply: FC<{
           </ReactMarkdown>
         </div>
       )}
-      {message.streaming && (message.lookingUp || !message.content) && (
-        <p className="text-label-secondary">{message.lookingUp ? t('looking_up') : t('thinking')}</p>
+      {message.streaming && (message.lookingUp || !hasText(message)) && (
+        <p className="text-sm text-label-secondary">{message.lookingUp ? t('looking_up') : t('thinking')}</p>
       )}
       {message.proposals.map((state) => (
         <ProposedChangeCard
@@ -98,15 +154,77 @@ const Reply: FC<{
           onDiscard={() => onDecide(state.key, 'discard')}
         />
       ))}
-      {message.error && (
-        <p className="mt-1 text-error">
+      {message.reports?.map((state) => (
+        <ReportCard
+          key={state.key}
+          state={state}
+          onSend={() => onDecideReport(state.key, 'send')}
+          onDismiss={() => onDecideReport(state.key, 'dismiss')}
+        />
+      ))}
+      {error && (
+        <p className="mt-1 text-sm text-error">
           {/* The backend sends `message` already in the user's language. */}
-          {message.error.message ||
-            (t.has(`errors.${message.error.code}`) ? t(`errors.${message.error.code}`) : t('errors.generic'))}{' '}
-          <a href={contactHref} className="underline">
+          {error.message || (t.has(`errors.${error.code}`) ? t(`errors.${error.code}`) : t('errors.generic'))}{' '}
+          <a href={contactHref} className="text-label-secondary underline">
             {t('contact')}
           </a>
         </p>
+      )}
+    </div>
+  );
+};
+
+const SuggestionGroup: FC<{ label: string; icon: ReactNode; items: string[]; onPick: (text: string) => void }> = ({
+  label,
+  icon,
+  items,
+  onPick,
+}) => (
+  <div className="flex flex-col gap-1">
+    <h4 className="px-2 text-xs font-semibold text-label-disabled">{label}</h4>
+    <ul className="flex flex-col">
+      {items.map((text) => (
+        <li key={text}>
+          <button
+            type="button"
+            onClick={() => onPick(text)}
+            className="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-left text-sm text-label-secondary hover:bg-bg-secondary hover:text-label-primary"
+          >
+            <span className="shrink-0 text-base text-label-disabled" aria-hidden="true">
+              {icon}
+            </span>
+            {text}
+          </button>
+        </li>
+      ))}
+    </ul>
+  </div>
+);
+
+const EmptyState: FC<{ role: string; onPick: (text: string) => void }> = ({ role, onPick }) => {
+  const t = useTranslations('assistant');
+  const router = useRouter();
+  const { questions, tasks } = suggestionsFor(router.pathname, role);
+  return (
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-2">
+        <h3 className="text-lg font-bold">{t('empty_title')}</h3>
+        <p className="text-sm text-label-secondary">{t('intro')}</p>
+      </div>
+      <SuggestionGroup
+        label={t('suggestions.questions_label')}
+        icon={<MdHelpOutline />}
+        items={questions.map((key) => t(`suggestions.questions.${key}`))}
+        onPick={onPick}
+      />
+      {tasks.length > 0 && (
+        <SuggestionGroup
+          label={t('suggestions.tasks_label')}
+          icon={<MdOutlineAutoFixHigh />}
+          items={tasks.map((key) => t(`suggestions.tasks.${key}`))}
+          onPick={onPick}
+        />
       )}
     </div>
   );
@@ -121,7 +239,7 @@ const Chat: FC<{ conversation: Conversation; role: string; contactHref: string }
 }) => {
   const t = useTranslations('assistant');
   const router = useRouter();
-  const { messages, sending, send, stop, decide, reset } = conversation;
+  const { messages, sending, send, stop, decide, decideReport, rate } = conversation;
   const [draft, setDraft] = useState('');
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
@@ -134,11 +252,21 @@ const Chat: FC<{ conversation: Conversation; role: string; contactHref: string }
     endRef.current?.scrollIntoView?.({ block: 'end' });
   }, [messages]);
 
+  // Grow with the text up to a few lines, then scroll.
+  useEffect(() => {
+    const input = inputRef.current;
+    if (!input) return;
+    input.style.height = 'auto';
+    input.style.height = `${Math.min(input.scrollHeight, 160)}px`;
+  }, [draft]);
+
+  // Read the page when the question is sent, so the visible error is the current one.
+  const ask = (text: string) => send(text, buildPageContext(router));
+
   const submit = (event?: FormEvent) => {
     event?.preventDefault();
     if (!draft.trim() || sending) return;
-    // Read the page when the question is sent, so the visible error is the current one.
-    send(draft, buildPageContext(router));
+    ask(draft);
     setDraft('');
   };
 
@@ -147,93 +275,97 @@ const Chat: FC<{ conversation: Conversation; role: string; contactHref: string }
     if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing) submit(event);
   };
 
-  const hasReply = messages.some((m) => m.role === 'assistant' && !m.streaming && (m.content || m.proposals.length));
+  const lastAnswerId = [...messages].reverse().find((m) => m.role === 'assistant')?.id;
 
   return (
-    <div className="flex min-h-0 flex-col gap-3" data-assistant-panel>
-      <div role="log" aria-live="polite" aria-label={t('conversation')} className="flex flex-col gap-3">
-        {messages.length === 0 && <p className="text-label-secondary">{t('intro')}</p>}
-        {messages.map((message) =>
-          message.role === 'user' ? (
-            <div key={message.id} className="ml-auto max-w-[85%] min-w-0">
-              <p className="sr-only">{t('you_wrote')}</p>
-              <p className="whitespace-pre-wrap break-words rounded-lg bg-bg-secondary px-3 py-2">{message.content}</p>
-              {message.pageContext && <SentContext context={message.pageContext} />}
-            </div>
-          ) : (
-            <div key={message.id} className="max-w-full">
-              <p className="sr-only">{t('assistant_wrote')}</p>
-              <Reply message={message} contactHref={contactHref} onDecide={decide} />
-            </div>
-          )
-        )}
-        <div ref={endRef} />
+    <>
+      <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5">
+        <div role="log" aria-live="polite" aria-label={t('conversation')} className="flex flex-col gap-5">
+          {messages.length === 0 && <EmptyState role={role} onPick={(text) => !sending && ask(text)} />}
+          {messages.map((message, index) =>
+            message.role === 'user' ? (
+              <div key={message.id} className="ml-auto max-w-[85%] min-w-0">
+                <p className="sr-only">{t('you_wrote')}</p>
+                <p className="whitespace-pre-wrap break-words rounded-2xl rounded-br-sm bg-bg-secondary px-3.5 py-2.5 text-sm">
+                  {message.content}
+                </p>
+              </div>
+            ) : (
+              <div key={message.id} className="group max-w-full">
+                <p className="sr-only">{t('assistant_wrote')}</p>
+                <Reply message={message} contactHref={contactHref} onDecide={decide} onDecideReport={decideReport} />
+                {!message.streaming && !message.error && (hasText(message) || hasCards(message)) && (
+                  <FeedbackControls
+                    persistent={message.id === lastAnswerId}
+                    rated={message.rating}
+                    onRate={(rating) => rate(message.id, rating)}
+                    role={role}
+                    route={router.pathname}
+                    getMessages={() => toPayload(messages.slice(0, index + 1))}
+                  />
+                )}
+              </div>
+            )
+          )}
+          <div ref={endRef} />
+        </div>
       </div>
 
-      <form onSubmit={submit} className="flex flex-col gap-2">
+      <form onSubmit={submit} className="flex flex-col gap-2 px-4 pb-4 pt-2">
+        <ContextChip />
         <label htmlFor="assistant-input" className="sr-only">
           {t('input_label')}
         </label>
-        <textarea
-          id="assistant-input"
-          ref={inputRef}
-          value={draft}
-          onChange={(event) => setDraft(event.target.value)}
-          onKeyDown={onKeyDown}
-          rows={2}
-          maxLength={4000}
-          placeholder={t('input_placeholder')}
-          className="w-full resize-none rounded border border-border-primary bg-bg-card p-2 text-label-primary"
-        />
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <p className="text-xs text-label-secondary">{t('context_note')}</p>
+        <div className="flex items-end gap-2 rounded-2xl border border-border-primary bg-bg-primary py-2 pl-4 pr-2 focus-within:border-label-secondary">
+          <textarea
+            id="assistant-input"
+            ref={inputRef}
+            value={draft}
+            onChange={(event) => setDraft(event.target.value)}
+            onKeyDown={onKeyDown}
+            rows={1}
+            maxLength={4000}
+            placeholder={t('input_placeholder')}
+            className="max-h-40 min-w-0 flex-1 resize-none self-center bg-transparent py-1 text-sm text-label-primary placeholder:text-label-disabled focus:outline-none"
+          />
           {sending ? (
-            <button type="button" onClick={stop} className="rounded-full border border-label-primary px-4 py-1">
-              {t('stop')}
+            <button
+              type="button"
+              onClick={stop}
+              aria-label={t('stop')}
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-label-primary text-bg-primary"
+            >
+              <MdStop aria-hidden="true" />
             </button>
           ) : (
             <button
               type="submit"
+              aria-label={t('send')}
               disabled={!draft.trim()}
-              className="rounded-full bg-cta px-4 py-1 text-label-primary hover:bg-cta-hover disabled:opacity-50"
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-label-primary text-bg-primary disabled:bg-bg-secondary disabled:text-label-disabled"
             >
-              {t('send')}
+              <MdArrowUpward aria-hidden="true" />
             </button>
           )}
         </div>
       </form>
-
-      <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border-primary pt-2">
-        {hasReply ? (
-          <FeedbackControls
-            key={messages[0]?.id}
-            role={role}
-            route={router.pathname}
-            getMessages={() => toPayload(messages)}
-          />
-        ) : (
-          <span />
-        )}
-        <div className="flex gap-3 text-xs">
-          {messages.length > 0 && (
-            <button type="button" onClick={reset} className="underline" disabled={sending}>
-              {t('new_conversation')}
-            </button>
-          )}
-          <a href={contactHref} className="underline">
-            {t('contact')}
-          </a>
-        </div>
-      </div>
-    </div>
+    </>
   );
 };
 
+/** Ctrl+K on Windows/Linux, ⌘K on macOS. */
+const useIsMac = () => {
+  const [isMac, setIsMac] = useState(false);
+  useEffect(() => setIsMac(/Mac|iPhone|iPad/.test(navigator.platform)), []);
+  return isMac;
+};
+
 /**
- * The Assistant: a button on every page that opens the chat. Logged-out visitors
- * get a prompt to log in instead. Shared, so StuJo can mount it later via `@eduhub/*`.
+ * The Assistant: a bar on every page that opens a drawer at the right edge, next
+ * to the page the question is about. Logged-out visitors get a prompt to log in
+ * instead. Shared, so StuJo can mount it later via `@eduhub/*`.
  */
-export const AssistantWidget: FC<Props> = ({ privacyHref = '/privacy', contactHref = ASSISTANT_CONTACT_HREF }) => {
+export const AssistantWidget: FC<Props> = ({ privacyHref = '/privacy#assistant', contactHref = ASSISTANT_CONTACT_HREF }) => {
   const t = useTranslations('assistant');
   const [open, setOpen] = useState(false);
   const isLoggedIn = useIsLoggedIn();
@@ -243,7 +375,9 @@ export const AssistantWidget: FC<Props> = ({ privacyHref = '/privacy', contactHr
   const router = useRouter();
   const locale = useLocale();
   const role = useAssistantRole(router.asPath);
+  const isMac = useIsMac();
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     if (!isSessionLoading && !isLoggedIn) clearStoredConversations();
@@ -260,54 +394,126 @@ export const AssistantWidget: FC<Props> = ({ privacyHref = '/privacy', contactHr
 
   const close = () => {
     setOpen(false);
-    buttonRef.current?.focus();
+    // The launcher is back once the panel is gone; focus it on the next frame.
+    requestAnimationFrame(() => buttonRef.current?.focus());
   };
+
+  // The chat focuses its input; without a chat (logged out, loading, viewing as
+  // someone else) focus the panel itself, so keyboard users land inside it.
+  useEffect(() => {
+    const panel = panelRef.current;
+    if (open && panel && !panel.contains(document.activeElement)) panel.focus();
+  }, [open, isSessionLoading, isLoggedIn, viewingAsSomeone]);
+
+  // Escape closes the panel wherever focus is, since the page beside it stays
+  // usable, unless another dialog or control already handled the key.
+  useEffect(() => {
+    if (!open) return undefined;
+    const onEscape = (event: globalThis.KeyboardEvent) => {
+      if (event.key !== 'Escape' || event.defaultPrevented) return;
+      const target = event.target instanceof Element ? event.target : null;
+      if (target?.closest('[role="dialog"], [role="alertdialog"]') && !target.closest('[data-assistant-panel]')) return;
+      setOpen(false);
+      requestAnimationFrame(() => buttonRef.current?.focus());
+    };
+    window.addEventListener('keydown', onEscape);
+    return () => window.removeEventListener('keydown', onEscape);
+  }, [open]);
+
+  useEffect(() => {
+    const onShortcut = (event: globalThis.KeyboardEvent) => {
+      // Rich-text editors use Ctrl+K for links; leave it to them.
+      const inEditor = event.target instanceof HTMLElement && event.target.isContentEditable;
+      if (event.defaultPrevented || inEditor) return;
+      if (event.key.toLowerCase() === 'k' && (event.metaKey || event.ctrlKey) && !event.altKey && !event.shiftKey) {
+        event.preventDefault();
+        setOpen(true);
+      }
+    };
+    window.addEventListener('keydown', onShortcut);
+    return () => window.removeEventListener('keydown', onShortcut);
+  }, []);
 
   return (
     <>
-      <button
-        ref={buttonRef}
-        type="button"
-        onClick={() => setOpen(true)}
-        aria-haspopup="dialog"
-        aria-label={t('open')}
-        className="light fixed bottom-4 right-4 z-[1200] flex items-center gap-2 rounded-full bg-cta px-4 py-3 text-label-primary shadow-lg hover:bg-cta-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-label-primary"
-      >
-        <MdOutlineChat className="text-xl" aria-hidden="true" />
-        <span className="hidden sm:inline">{t('button')}</span>
-      </button>
+      {!open && (
+        <button
+          ref={buttonRef}
+          type="button"
+          onClick={() => setOpen(true)}
+          aria-haspopup="dialog"
+          aria-label={t('open')}
+          aria-keyshortcuts="Control+K Meta+K"
+          className="fixed bottom-4 right-4 z-[1200] flex items-center gap-3 rounded-full border border-border-primary bg-bg-secondary p-3 text-label-secondary shadow-lg hover:text-label-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-label-primary sm:py-2.5 sm:pl-4 sm:pr-2.5"
+        >
+          <MdAutoAwesome className="text-xl text-brand-light" aria-hidden="true" />
+          <span className="hidden text-sm sm:inline">{t('button')}</span>
+          <kbd className="hidden rounded-md border border-border-primary bg-bg-primary px-2 py-0.5 font-sans text-xs text-label-disabled sm:inline">
+            {isMac ? '⌘ K' : t('shortcut_ctrl')}
+          </kbd>
+        </button>
+      )}
 
-      <DialogShell
-        open={open}
-        onClose={close}
-        title={t('title')}
-        ariaLabelledBy="assistant-title"
-        fullScreenOnMobile
-      >
-        <p className="sticky top-0 z-10 mb-3 rounded bg-bg-secondary p-2 text-xs text-label-primary shadow-sm">
-          {t('ai_notice')}{' '}
-          <a href={privacyHref} className="underline" target="_blank" rel="noopener noreferrer">
-            {t('privacy_link')}
-          </a>
-        </p>
-
-        {isSessionLoading ? null : !isLoggedIn ? (
-          <div className="flex flex-col items-start gap-3">
-            <p>{t('login_prompt')}</p>
-            <button
-              type="button"
-              onClick={() => signIn('keycloak')}
-              className="rounded-full bg-cta px-4 py-1 text-label-primary hover:bg-cta-hover"
-            >
-              {t('login')}
+      {open && (
+        <aside
+          ref={panelRef}
+          tabIndex={-1}
+          role="dialog"
+          aria-modal="false"
+          aria-labelledby="assistant-title"
+          data-assistant-panel
+          className="fixed inset-0 z-[1200] flex flex-col bg-bg-primary focus:outline-none text-label-primary sm:left-auto sm:w-[400px] sm:border-l sm:border-border-primary sm:shadow-2xl"
+        >
+          <header className="flex items-center gap-2 border-b border-border-primary py-3 pl-5 pr-3">
+            <div className="min-w-0 flex-1">
+              <h2 id="assistant-title" className="font-bold">
+                {t('title')}
+              </h2>
+              <p className="text-xs text-label-disabled">
+                {t('ai_notice')}{' '}
+                <a href={privacyHref} className="underline hover:text-label-secondary" target="_blank" rel="noopener noreferrer">
+                  {t('privacy_link')}
+                </a>
+              </p>
+            </div>
+            {canChat && conversation.messages.length > 0 && (
+              <button
+                type="button"
+                onClick={conversation.reset}
+                disabled={conversation.sending}
+                aria-label={t('new_conversation')}
+                title={t('new_conversation')}
+                className={iconButton}
+              >
+                <MdOutlineAddComment aria-hidden="true" />
+              </button>
+            )}
+            <a href={contactHref} aria-label={t('contact')} title={t('contact')} className={iconButton}>
+              <MdOutlineMail aria-hidden="true" />
+            </a>
+            <button type="button" onClick={close} aria-label={t('close')} className={iconButton}>
+              <MdClose className="text-lg" aria-hidden="true" />
             </button>
-          </div>
-        ) : viewingAsSomeone ? (
-          <p>{t('unavailable_viewing_as')}</p>
-        ) : (
-          <Chat conversation={conversation} role={role} contactHref={contactHref} />
-        )}
-      </DialogShell>
+          </header>
+
+          {isSessionLoading ? null : !isLoggedIn ? (
+            <div className="flex flex-col items-start gap-3 p-5">
+              <p>{t('login_prompt')}</p>
+              <button
+                type="button"
+                onClick={() => signIn('keycloak')}
+                className="rounded-full bg-label-primary px-4 py-1 font-semibold text-bg-primary"
+              >
+                {t('login')}
+              </button>
+            </div>
+          ) : viewingAsSomeone ? (
+            <p className="p-5">{t('unavailable_viewing_as')}</p>
+          ) : (
+            <Chat conversation={conversation} role={role} contactHref={contactHref} />
+          )}
+        </aside>
+      )}
     </>
   );
 };

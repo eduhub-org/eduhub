@@ -4,12 +4,29 @@ name: Index Assistant knowledge
 # after every successful production deployment, or by hand for a given tag. The indexer reuses
 # embeddings of unchanged passages and switches to the new index in one transaction, so a failed
 # run keeps the previous index live.
+#
+# The production deployment (build-production-infrastructure.yml) calls this workflow as its last
+# job, so it runs from the production branch, which the production environment requires. A
+# workflow_run trigger can't do that: GitHub runs it from the default branch (develop), and the
+# environment rejects it. By hand, start it with `gh workflow run index-knowledge.yml --ref production`.
 
 on:
-  workflow_run:
-    workflows: ["Setup Environment"]
-    types: [completed]
-    branches: [production]
+  workflow_call:
+    inputs:
+      deployed_sha:
+        description: "The commit the calling deployment ran on"
+        type: string
+        required: true
+      tag:
+        description: "Release tag to index; empty = the release of deployed_sha"
+        type: string
+        required: false
+        default: ""
+      force:
+        description: "Replace the index even if the new one is much smaller"
+        type: boolean
+        required: false
+        default: false
   workflow_dispatch:
     inputs:
       tag:
@@ -30,10 +47,6 @@ concurrency:
 jobs:
   index:
     name: Build the knowledge index
-    # Only after a deployment that succeeded (a push to production, not a pull request).
-    if: >-
-      github.event_name == 'workflow_dispatch' ||
-      (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push')
     runs-on: ubuntu-latest
     timeout-minutes: 30
     environment: production
@@ -55,8 +68,8 @@ jobs:
         id: tag
         env:
           INPUT_TAG: ${{ inputs.tag }}
-          # The commit the triggering deployment ran on (empty for a manual run).
-          DEPLOYED_SHA: ${{ github.event.workflow_run.head_sha }}
+          # The commit the calling deployment ran on (empty for a manual run).
+          DEPLOYED_SHA: ${{ inputs.deployed_sha }}
         run: |
           set -euo pipefail
           tag="${INPUT_TAG:-}"

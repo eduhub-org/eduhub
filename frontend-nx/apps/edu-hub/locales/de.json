@@ -52,6 +52,7 @@
       "manual": "Handbuch",
       "faq": "FAQ",
       "user": "Benutzer",
+      "reports": "Meldungen",
       "admin_users": "Admin-Benutzer",
       "experts": "Experten",
       "courses": "Kurse",
@@ -1220,10 +1221,17 @@
     },
     "error_loading_programs": "Die Programme konnten nicht geladen werden. Bitte versuche es später erneut.",
     "empty_state": {
-      "events": "Es gibt noch kein Veranstaltungsprogramm. Bitte einen Plattform-Admin, ein Veranstaltungsprogramm für deine Organisation anzulegen, bevor du hier Veranstaltungen verwalten kannst.",
-      "courses": "Es gibt noch kein Kursprogramm. Bitte einen Plattform-Admin, ein Kursprogramm für deine Organisation anzulegen, bevor du hier Kurse verwalten kannst.",
-      "degrees": "Es gibt noch kein Studiengangsprogramm. Bitte einen Plattform-Admin, ein Studiengangsprogramm für deine Organisation anzulegen, bevor du hier Studiengänge verwalten kannst."
+      "events": "Es gibt noch kein Veranstaltungsprogramm.",
+      "courses": "Es gibt noch kein Kursprogramm.",
+      "degrees": "Es gibt noch kein Studiengangsprogramm."
     },
+    "create_first_program": {
+      "events": "Veranstaltungsprogramm anlegen",
+      "courses": "Kursprogramm anlegen",
+      "degrees": "Studiengangsprogramm anlegen"
+    },
+    "empty_state_ask_admin": "Bitte einen Plattform-Admin, ein Programm für deine Organisation anzulegen.",
+    "create_program_failed": "Das Programm konnte nicht angelegt werden. Bitte versuche es erneut.",
     "open_in_new_tab": "In neuem Tab öffnen",
     "close": "Schließen",
     "cancel": "Abbrechen",
@@ -2622,6 +2630,17 @@
       "programs_unpublished_success_singular": "Programm wurde erfolgreich zurückgezogen",
       "programs_unpublished_success_plural": "{count} Programme wurden erfolgreich zurückgezogen",
       "bulk_action_failed": "Die Massenaktion ist fehlgeschlagen. Bitte versuche es erneut."
+    },
+    "create_dialog": {
+      "title": "Programm anlegen",
+      "type_label": "Programmart",
+      "organization_label": "Organisation",
+      "single_organization": "Das Programm gehört zu {organization}.",
+      "no_organization": "Du darfst für keine Organisation ein Programm dieser Art anlegen.",
+      "hint": "Titel, Zeiträume und weitere Einstellungen kannst du nach dem Anlegen bearbeiten.",
+      "create_button": "Anlegen",
+      "success": "Programm wurde angelegt.",
+      "error": "Das Programm konnte nicht angelegt werden. Bitte versuche es erneut."
     }
   },
   "manageUsers": {
@@ -3941,22 +3960,40 @@
     "dismiss": "Hinweis schließen"
   },
   "assistant": {
-    "button": "Frag den Assistenten",
+    "button": "Frag mich oder gib mir eine Aufgabe…",
     "open": "KI-Assistenten öffnen",
-    "title": "KI-Assistent",
-    "ai_notice": "Du schreibst mit einer KI, nicht mit einem Menschen. Sie kann Fehler machen, prüfe also wichtige Antworten.",
-    "privacy_link": "Datenschutzerklärung",
+    "title": "Assistent",
+    "close": "Schließen",
+    "ai_notice": "KI · kann Fehler machen ·",
+    "privacy_link": "Datenschutz",
     "login_prompt": "Melde Dich an, um dem Assistenten Fragen zu EduHub, den Kursen und Deinen Anmeldungen zu stellen.",
     "login": "Anmelden",
     "unavailable_viewing_as": "Der Assistent ist nicht verfügbar, während Du EduHub als eine andere Person ansiehst.",
     "intro": "Frag mich zu EduHub, den Kursen oder Deinen Anmeldungen. Wenn Du einen Kurs verwaltest, entwerfe ich Änderungen, die Du prüfst und selbst übernimmst.",
+    "empty_title": "Wie kann ich Dir helfen?",
+    "suggestions": {
+      "questions_label": "Fragen",
+      "tasks_label": "Aufgaben auf dieser Seite",
+      "questions": {
+        "what_can_you_change": "Was kannst Du an diesem Kurs für mich ändern?",
+        "course_apply": "Wie bewerbe ich mich für diesen Kurs?",
+        "course_certificate": "Was brauche ich für ein Zertifikat in diesem Kurs?",
+        "how_to_apply": "Wie bewerbe ich mich für einen Kurs?",
+        "my_certificates": "Wo finde ich meine Zertifikate?"
+      },
+      "tasks": {
+        "shorten_tagline": "Kürze die Kurzbeschreibung",
+        "improve_goals": "Überarbeite die Lernziele",
+        "extend_application_end": "Verlängere den Bewerbungsschluss um eine Woche"
+      }
+    },
     "conversation": "Unterhaltung mit dem Assistenten",
     "you_wrote": "Du:",
     "assistant_wrote": "Assistent:",
     "thinking": "Schreibt…",
     "input_label": "Deine Frage",
-    "input_placeholder": "Schreib Deine Frage…",
-    "context_note": "Mit Deiner Frage werden die aktuelle Seite und eine dort angezeigte Fehlermeldung gesendet.",
+    "input_placeholder": "Frag mich oder gib mir eine Aufgabe…",
+    "shortcut_ctrl": "Strg K",
     "send": "Senden",
     "stop": "Stopp",
     "new_conversation": "Neue Unterhaltung",
@@ -3989,29 +4026,35 @@
       "PROPOSAL_FAILED": "Beim Speichern der Änderung ist etwas schiefgegangen. Bitte versuch es später noch einmal oder schreib an {contact}.",
       "generic": "Etwas ist schiefgelaufen. Bitte versuch es später noch einmal.",
       "NETWORK": "Die Verbindung wurde unterbrochen. Bitte versuch es noch einmal.",
-      "INTERRUPTED": "Die Antwort wurde abgebrochen. Bitte frag noch einmal."
+      "INTERRUPTED": "Die Antwort wurde abgebrochen. Bitte frag noch einmal.",
+      "EMPTY_REPLY": "Darauf kam keine Antwort. Bitte frag noch einmal.",
+      "REPORT_LIMIT_REACHED": "Du hast heute schon {max} Meldungen geschickt. Morgen kannst Du wieder welche schicken.",
+      "REPORT_ALREADY_VOTED": "Du bist bei dieser Meldung schon dabei.",
+      "REPORT_CLOSED": "Diese Meldung ist schon abgeschlossen oder gibt es nicht mehr.",
+      "REPORT_NOT_WITHDRAWABLE": "Diese Meldung kannst Du nicht mehr zurückziehen: Das EduHub-Team hat sie schon angesehen oder andere haben sich angeschlossen.",
+      "REPORT_FAILED": "Deine Meldung konnte gerade nicht gespeichert werden. Bitte versuch es später noch einmal oder schreib an {contact}."
     },
     "context": {
-      "summary": "Mit Deiner Frage gesendet",
-      "page": "Seite: {path}",
-      "course": "Kurs-ID: {id}",
-      "session": "Termin-ID: {id}",
-      "error": "Angezeigter Fehler: {message}"
+      "chip": "Wird mitgesendet: {page}",
+      "chip_with_error": "Wird mitgesendet: {page} und die angezeigte Fehlermeldung"
     },
     "feedback": {
-      "question": "War das hilfreich?",
+      "question": "War diese Antwort hilfreich?",
       "helpful": "Hilfreich",
       "not_helpful": "Nicht hilfreich",
       "consent_label": "Unterhaltung aufbewahren?",
-      "consent_question": "Dürfen wir diese Unterhaltung 30 Tage lang aufbewahren, um den Assistenten zu verbessern? Ohne Deine Zustimmung zählen wir nur die Bewertung.",
+      "consent_question": "Dürfen wir diese Unterhaltung 30 Tage lang aufbewahren, um den Assistenten zu verbessern? Ohne Deine Zustimmung bekommen wir nur die Bewertung und Deinen Kommentar.",
       "consent_yes": "Ja, aufbewahren",
-      "consent_no": "Nein, nur die Bewertung senden",
+      "consent_no": "Nein, nicht aufbewahren",
       "thanks": "Danke für Dein Feedback!",
-      "failed": "Dein Feedback konnte nicht gesendet werden."
+      "failed": "Dein Feedback konnte nicht gesendet werden.",
+      "comment_label": "Was war nicht hilfreich? (freiwillig)",
+      "comment_placeholder": "z. B. „Die Antwort war falsch, weil …“"
     },
     "proposal": {
       "title": "Vorgeschlagene Änderung: {kind}",
       "not_saved_yet": "Noch nicht gespeichert. Prüfe die Änderung und übernimm sie selbst.",
+      "dropped_placeholders": "Achtung: Diese Platzhalter fehlen im neuen Text und werden beim Versand nicht mehr ausgefüllt: {placeholders}",
       "before": "Vorher",
       "after": "Nachher",
       "added": "Hinzugefügt",
@@ -4030,7 +4073,8 @@
         "course_texts": "Kurstexte",
         "course_settings": "Kurseinstellungen",
         "sessions": "Termine",
-        "create_course": "neuer Kurs"
+        "create_course": "neuer Kurs",
+        "mail_template": "E-Mail"
       },
       "fields": {
         "title": "Titel",
@@ -4052,7 +4096,10 @@
         "attendanceCertificatePossible": "Teilnahmebescheinigung möglich",
         "achievementCertificatePossible": "Leistungszertifikat möglich",
         "sessions": "Termine",
-        "deletedSessionIds": "Gelöschte Termine"
+        "deletedSessionIds": "Gelöschte Termine",
+        "mailType": "E-Mail",
+        "subject": "Betreff",
+        "content": "Text"
       },
       "errors": {
         "generic": "Die Änderung konnte nicht übernommen werden.",
@@ -4067,7 +4114,28 @@
         "ROLE_NOT_ALLOWED": "Mit Deiner aktuellen Rolle kannst Du diese Änderung nicht vornehmen."
       }
     },
-    "looking_up": "Schaut nach…"
+    "looking_up": "Schaut nach…",
+    "report": {
+      "title_create": "Meldung: {type}",
+      "title_vote": "Bestehende Meldung: {type}",
+      "title_withdraw": "Meldung zurückziehen",
+      "types": {
+        "BUG": "Fehler",
+        "FEATURE": "Idee"
+      },
+      "not_sent_yet": "Noch nicht gesendet. Prüf die Meldung und schick sie selbst ab.",
+      "vote_hint": "Jemand hat das schon gemeldet. Wenn Du Dich anschließt, zählt Deine Stimme mit.",
+      "withdraw_hint": "Die Meldung wird gelöscht.",
+      "send": "Senden",
+      "sending": "Wird gesendet …",
+      "vote": "Mich anschließen",
+      "withdraw": "Zurückziehen",
+      "dismiss": "Verwerfen",
+      "sent": "Gesendet. Frag mich jederzeit „Was ist aus meinen Meldungen geworden?“, um den Stand zu sehen.",
+      "voted": "Du bist dabei. Frag mich jederzeit „Was ist aus meinen Meldungen geworden?“, um den Stand zu sehen.",
+      "withdrawn": "Zurückgezogen.",
+      "dismissed": "Verworfen. Nichts wurde gesendet."
+    }
   },
   "help": {
     "title": "Handbuch",
@@ -4085,5 +4153,63 @@
     "org_rules_link": "Zu den Regeln und FAQ",
     "version_release": "Stand des Handbuchs: Release <release></release>, Commit <commit></commit>",
     "version_commit": "Stand des Handbuchs: Commit <commit></commit> (noch kein Release)"
+  },
+  "manageReports": {
+    "headline": "Meldungen",
+    "intro": "Fehler und Ideen, die Nutzende über den Assistenten geschickt haben. Setz Status und Priorität; der Status und Deine öffentliche Notiz sind für alle sichtbar, die die Meldung geschickt oder sich angeschlossen haben, wenn sie den Assistenten danach fragen.",
+    "columns": {
+      "type": "Art",
+      "title": "Titel",
+      "people": "Betroffene",
+      "status": "Status",
+      "priority": "Priorität",
+      "created": "Gemeldet am"
+    },
+    "type": {
+      "BUG": "Fehler",
+      "FEATURE": "Idee"
+    },
+    "status": {
+      "NEW": "Neu",
+      "PLANNED": "Geplant",
+      "IN_PROGRESS": "In Arbeit",
+      "DONE": "Erledigt",
+      "DECLINED": "Abgelehnt",
+      "DUPLICATE": "Duplikat"
+    },
+    "priority": {
+      "HIGH": "Hoch",
+      "MEDIUM": "Mittel",
+      "LOW": "Niedrig",
+      "none": "Keine"
+    },
+    "details": {
+      "description": "Beschreibung",
+      "id": "Nummer",
+      "people": "Betroffene (mit Duplikaten)",
+      "page": "Seite",
+      "role_language": "Rolle · Sprache",
+      "reporter": "Gemeldet von",
+      "reporter_removed": "Entfernt (6 Monate nach Abschluss anonymisiert oder Konto gelöscht)",
+      "duplicate_of": "Duplikat von",
+      "mark_duplicate": "Duplikat von Meldung Nr.",
+      "public_note": "Öffentliche Notiz",
+      "github_issue": "GitHub-Issue"
+    },
+    "help": {
+      "mark_duplicate": "Nummer der ursprünglichen Meldung (#). Setzt den Status auf „Duplikat“; die Betroffenen zählen beim Original mit.",
+      "public_note": "Sehen alle, die die Meldung geschickt oder sich angeschlossen haben, z. B. „Geplant für das Frühjahr“ oder warum sie abgelehnt wurde.",
+      "github_issue": "Link zum Issue, sobald die Meldung geplant ist."
+    },
+    "error": {
+      "duplicate_failed": "Die Meldung konnte nicht als Duplikat markiert werden. Gibt es eine Meldung mit dieser Nummer?"
+    },
+    "summary": {
+      "title": "Wochenzusammenfassung",
+      "week": "Woche",
+      "none": "Noch keine Zusammenfassung. Sie wird jeden Montag erstellt.",
+      "meta": "{from} – {to} · {reports, plural, one {# neue Meldung} other {# neue Meldungen}} · {feedback, plural, one {# 👎-Rückmeldung} other {# 👎-Rückmeldungen}}",
+      "cost": "{cost} € mit {model}"
+    }
   }
 }

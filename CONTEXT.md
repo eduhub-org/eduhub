@@ -55,7 +55,7 @@ More places held than the course has. Only organizers can overbook, and are warn
 ### Attendance
 
 **Attendance Record**:
-One entry from an attendance source for a Session: a Zoom participant or a submitted check-in (LimeSurvey) response. Records are kept as they came in; many match nobody (other courses, unsubmitted, unknown names).
+One entry from an attendance source for a Session: a Zoom participant or a submitted check-in (LimeSurvey) response. Check-ins are kept as they came in. A Zoom record holds only the person's time inside the Session: someone in the meeting only before or after it gets no record. Many records match nobody (other courses, unsubmitted, unknown names).
 _Avoid_: attendance (for a raw entry)
 
 **Attendance**:
@@ -190,6 +190,10 @@ _Avoid_: Chatbot, agent, bot (in copy), any persona name
 **Proposed Change**:
 A change to a course the **Assistant** has drafted for an **Organizer**, shown as before and after. Nothing is saved until the Organizer applies it; they can also discard it. A Proposed Change can only touch a Course's Sessions while nobody has registered for the Course yet, in any state (applied, invited, waitlisted or confirmed). It can only create a Course for someone who may already create one.
 _Avoid_: Action, auto-edit
+
+**Report**:
+A bug report or feature idea about the platform that a person sends through the **Assistant**. The Assistant drafts it; only the person's click sends it. Others with the same problem or wish join it instead of sending another, and everyone who sent or joined one sees its status and the team's public note. Admins triage Reports and read a weekly summary of them.
+_Avoid_: Ticket, issue (in copy), feedback (that is the thumbs up or down on an answer)
 
 ## Relationships
 

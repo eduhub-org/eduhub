@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import type { ProposedChangeResult } from '../mcp/operations';
 import type { ToolDefinition } from './provider';
+import type { ReportDraft } from './reports';
 
 /**
  * A set of tools the model may call. `call` takes the raw JSON string the model produced, so
@@ -12,7 +13,7 @@ import type { ToolDefinition } from './provider';
 export type ProposalEvent = ProposedChangeResult;
 
 export type ToolResult =
-  | { status: 'ok'; content: string; proposal?: ProposalEvent }
+  | { status: 'ok'; content: string; proposal?: ProposalEvent; report?: ReportDraft }
   /** The arguments didn't parse or validate, or the tool doesn't exist. */
   | { status: 'invalid'; content: string }
   /** The tool ran and refused (e.g. FORBIDDEN, REGISTRATIONS_EXIST); the model explains it. */

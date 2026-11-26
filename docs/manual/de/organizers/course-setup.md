@@ -13,6 +13,10 @@ Nur Org-Admins und Admins können Kurse anlegen. Öffne **Kurse verwalten**, wä
 
 Du kannst den Kurs auch vom [Assistenten](assistant.md) anlegen und seine Texte entwerfen lassen.
 
+### Wenn es noch kein Programm gibt
+
+Jeder Kurs gehört zu einem Programm. Siehst Du noch kein Programm dieser Art, zeigt **Kurse verwalten** das an und bietet **Kursprogramm anlegen** (oder **Veranstaltungsprogramm anlegen** / **Studiengangsprogramm anlegen**). Klicke darauf und bestätige mit **Anlegen**. Verwaltest Du mehrere Organisationen, wählst Du vorher, zu welcher das Programm gehört. Der Knopf erscheint nur, solange keine Deiner Organisationen ein Programm dieser Art hat; danach werden weitere Programme unter **Einstellungen → Programme** angelegt (von Org-Admins, die die Einstellungen verwalten dürfen, und von Plattform-Admins). Das Programm wird als **Neues Programm** angelegt; Titel, Zeiträume und weitere Einstellungen änderst Du danach. Den Knopf siehst Du nur für die Programmarten, die Du verwalten darfst. Sonst bitte einen Plattform-Admin, das Programm anzulegen.
+
 ### Kurstitel müssen eindeutig sein
 
 In einem Kurs- oder Degree-Programm braucht jeder Kurs einen eigenen Titel. Groß- und Kleinschreibung und Leerzeichen am Anfang oder Ende zählen nicht als Unterschied. Ist der Titel schon vergeben, siehst Du: „In diesem Programm gibt es schon „…“. Titel müssen innerhalb eines Programms eindeutig sein.“ Event-Programme sind ausgenommen: Mehrere Events dürfen denselben Titel haben.

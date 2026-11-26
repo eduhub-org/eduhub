@@ -85,3 +85,23 @@ it('requires login and a rating', async () => {
   expect(b.status).toBe(400);
   expect(requests).toHaveLength(0);
 });
+
+it('stores a 👎 comment without the conversation when the user does not agree to share it (issue #2234)', async () => {
+  const { handler, requests } = setup();
+  const http = mockHttp({ rating: 'down', consent: false, comment: ' Die Frist stimmt nicht. ', route: '/course/[courseId]' });
+  await handler(http.req, http.res);
+
+  expect(http.status).toBe(204);
+  expect(requests).toHaveLength(1);
+  expect(requests[0].body.variables.object).toEqual({ conversation: null, comment: 'Die Frist stimmt nicht.', route: '/course/[courseId]', model: 'fake' });
+});
+
+it('ignores a comment on 👍 and a blank comment', async () => {
+  const { handler, requests } = setup();
+  for (const body of [{ rating: 'up', comment: 'super' }, { rating: 'down', consent: false, comment: '   ' }]) {
+    const http = mockHttp(body);
+    await handler(http.req, http.res);
+    expect(http.status).toBe(204);
+  }
+  expect(requests).toHaveLength(0);
+});
