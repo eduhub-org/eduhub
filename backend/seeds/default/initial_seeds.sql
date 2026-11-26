@@ -3024,6 +3024,7 @@ INSERT INTO public."CourseGroup" (id, "courseId", "groupOptionId", created_at, u
 -- Dev accounts: admin and instructor teach a past, a running and an upcoming course
 -- (with an instructor certificate for the past one); user@example.com took several
 -- past courses (one with achievement and attendance certificates) and a running one.
+-- The instructor also teaches 7003, 7005-7008 and 7012 (added at the end of this file).
 INSERT INTO public."CourseInstructor" (id, "courseId", "userId", "certificateURL", created_at, updated_at) VALUES (9101, 7002, '8914bee9-0549-44af-bcae-cafeec5ba92e', '8914bee9-0549-44af-bcae-cafeec5ba92e/7002/instructor_certificate.pdf', '2024-04-15 09:00:00+00', '2024-04-15 09:00:00+00');
 INSERT INTO public."CourseInstructor" (id, "courseId", "userId", "certificateURL", created_at, updated_at) VALUES (9102, 7010, '8914bee9-0549-44af-bcae-cafeec5ba92e', NULL, '2024-04-15 09:00:00+00', '2024-04-15 09:00:00+00');
 INSERT INTO public."CourseInstructor" (id, "courseId", "userId", "certificateURL", created_at, updated_at) VALUES (9103, 7011, '8914bee9-0549-44af-bcae-cafeec5ba92e', NULL, '2024-04-15 09:00:00+00', '2024-04-15 09:00:00+00');
