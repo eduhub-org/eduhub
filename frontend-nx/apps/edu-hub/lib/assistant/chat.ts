@@ -112,6 +112,11 @@ export const runChat = async ({
   } catch (error) {
     if (signal?.aborted || (error as Error)?.name === 'AbortError') return { ...summary, outcome: 'aborted' };
     const code: ChatErrorCode = error instanceof ProviderError && error.code === 'PROVIDER_BUSY' ? 'BUSY' : 'UNAVAILABLE';
+    // A ProviderError's message is only its code and HTTP status; of any other error only the
+    // name is logged, as its message could quote the conversation.
+    console.error(
+      `Assistant: the model call failed: ${error instanceof ProviderError ? error.message : (error as Error)?.name ?? 'unknown'}`
+    );
     emit({ type: 'error', code });
     return { ...summary, outcome: code };
   }

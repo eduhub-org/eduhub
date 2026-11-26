@@ -45,10 +45,14 @@ model anyway.
 
 ## Consequences
 
-- IONOS documents that inference runs in Germany, prompts and outputs are not
-  logged or used for training, and no subprocessors are involved. Its
-  operational logs and the data processing agreement under the general IONOS
-  terms are to be confirmed with IONOS.
+- IONOS documents that inference runs in Germany and that prompts and
+  outputs are not logged or used for training. The data processing agreement
+  ("AVV IONOS Cloud", version 11/2026) is part of the IONOS Cloud terms and
+  needs no separate signature. Its subprocessor list names IONOS group
+  companies for AI Model Hub support and operation: IONOS SE (Germany), IONOS
+  Cloud Romania S.R.L. and IONOS Cloud Solutions Spain S.L.U., all in the EU.
+  How long IONOS keeps its operational logs (time, model, token count) is to
+  be confirmed with IONOS.
 - The privacy policy needs the Assistant section ADR 0005 promised, naming
   IONOS as processor, before the Assistant is used in production.
 - `store=false` has no effect at IONOS; zero retention rests on its terms.

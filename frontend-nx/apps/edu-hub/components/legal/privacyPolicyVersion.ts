@@ -8,7 +8,7 @@
  * For changes that are not material (wording, removed processing) leave
  * PRIVACY_NOTICE_VERSION at its old value. Process: docs/LEGAL_DOCUMENTS.md.
  */
-export const PRIVACY_POLICY_VERSION = '2026-11-17';
+export const PRIVACY_POLICY_VERSION = '2026-11-26';
 
 /**
  * The policy version whose changes account holders are told about once. Equal
