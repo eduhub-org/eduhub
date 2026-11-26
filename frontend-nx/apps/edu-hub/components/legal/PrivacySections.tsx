@@ -912,8 +912,8 @@ export const PrivacyAssistant: FC<SectionProps> = ({ n }) => {
       </p>
       <p>
         {isEnglish
-          ? 'The language model is run for us by IONOS SE, Elgendorfer Str. 57, 56410 Montabaur, on its AI Model Hub in Germany. According to IONOS, inputs and outputs are neither logged nor used to train models. A contract for data processing (DPA) exists with IONOS.'
-          : 'Das Sprachmodell betreibt für uns die IONOS SE, Elgendorfer Str. 57, 56410 Montabaur, in ihrem AI Model Hub in Deutschland. Nach Angaben von IONOS werden Eingaben und Ausgaben weder protokolliert noch zum Training von Modellen verwendet. Mit IONOS besteht ein Vertrag zur Auftragsverarbeitung (AVV).'}
+          ? 'The language model is run for us by IONOS Cloud GmbH, Elgendorfer Str. 57, 56410 Montabaur, on its AI Model Hub in Germany. According to IONOS, inputs and outputs are neither logged nor used to train models. A contract for data processing (DPA) exists with IONOS.'
+          : 'Das Sprachmodell betreibt für uns die IONOS Cloud GmbH, Elgendorfer Str. 57, 56410 Montabaur, in ihrem AI Model Hub in Deutschland. Nach Angaben von IONOS werden Eingaben und Ausgaben weder protokolliert noch zum Training von Modellen verwendet. Mit IONOS besteht ein Vertrag zur Auftragsverarbeitung (AVV).'}
       </p>
       <p>
         {isEnglish
