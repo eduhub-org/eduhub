@@ -14,7 +14,6 @@ import {
   UpdateProgramPublishedVariables,
 } from '../../../queries/__generated__/UpdateProgramPublished';
 import {
-  INSERT_PROGRAM,
   UPDATE_PROGRAM_PUBLISHED,
   DELETE_PROGRAM,
   UPDATE_PROGRAM_APPLICATION_START,
@@ -24,7 +23,6 @@ import {
   UPDATE_PROGRAM_DEFAULT_PROJECT_SUBMISSION_DEADLINE,
   UPDATE_PROGRAM_TITLE,
 } from '../../../queries/updateProgram';
-import { InsertProgram, InsertProgramVariables } from '../../../queries/__generated__/InsertProgram';
 
 import TableGrid from '../../common/TableGrid';
 import { usePersistedPageSize, useTableGrid } from '../../common/TableGrid/hooks';
@@ -35,6 +33,7 @@ import DatePicker from '../../inputs/DatePicker';
 import NotificationSnackbar from '../../common/dialogs/NotificationSnackbar';
 import CommonPageHeader from '../../common/CommonPageHeader';
 import ExpandableProgramRow from './ExpandableProgramRow';
+import CreateProgramDialog from './CreateProgramDialog';
 import { useTranslations } from 'next-intl';
 
 const QUERY_LIMIT = 100;
@@ -103,11 +102,9 @@ export const ManageProgramsContent: FC<ManageProgramsContentProps> = ({ inSettin
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  // Mutations
-  const [insertProgram] = useManageMutation<InsertProgram, InsertProgramVariables>(INSERT_PROGRAM, {
-    refetchQueries: ['ProgramList'],
-  });
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
 
+  // Mutations
   const [updatePublished] = useManageMutation<UpdateProgramPublished, UpdateProgramPublishedVariables>(
     UPDATE_PROGRAM_PUBLISHED,
     {
@@ -115,24 +112,18 @@ export const ManageProgramsContent: FC<ManageProgramsContentProps> = ({ inSettin
     }
   );
 
-  // Add program handler
-  const handleAddProgram = useCallback(async () => {
-    try {
-      await insertProgram({
-        variables: {
-          title: t('title.placeholder'),
-          today: new Date(),
-        },
-      });
+  // The dialog asks for the program type and owning organization, which the insert must set:
+  // Program.type and Program.organizationId otherwise fall back to COURSES and the default
+  // organization, which the org_admin insert check rejects for org admins.
+  const handleProgramCreated = useCallback(() => {
+    setSuccessMessage(t('create_dialog.success'));
+    setShowSuccessNotification(true);
+  }, [t]);
 
-      setSuccessMessage(t('notifications.programs_published_success_singular'));
-      setShowSuccessNotification(true);
-    } catch (error) {
-      console.error('Error adding program:', error);
-      setErrorMessage(t('notifications.bulk_action_failed', { action: 'add' }));
-      setShowErrorNotification(true);
-    }
-  }, [insertProgram, t]);
+  const handleProgramCreateFailed = useCallback(() => {
+    setErrorMessage(t('create_dialog.error'));
+    setShowErrorNotification(true);
+  }, [t]);
 
   // Bulk action handlers
   const handleBulkAction = useCallback(
@@ -396,7 +387,7 @@ export const ManageProgramsContent: FC<ManageProgramsContentProps> = ({ inSettin
         refetchQueries={['ProgramList']}
         bulkActions={bulkActions}
         onBulkAction={handleBulkAction}
-        onAddButtonClick={handleAddProgram}
+        onAddButtonClick={() => setCreateDialogOpen(true)}
         addButtonText={t('add_program_button')}
         expandableRowComponent={(props) => <ExpandableProgramRow program={props.row} />}
         deleteMutation={DELETE_PROGRAM}
@@ -412,6 +403,12 @@ export const ManageProgramsContent: FC<ManageProgramsContentProps> = ({ inSettin
 
   const notifications = (
     <>
+      <CreateProgramDialog
+        open={createDialogOpen}
+        onClose={() => setCreateDialogOpen(false)}
+        onCreated={handleProgramCreated}
+        onError={handleProgramCreateFailed}
+      />
       <NotificationSnackbar
         open={showSuccessNotification}
         onClose={() => setShowSuccessNotification(false)}

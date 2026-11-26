@@ -212,6 +212,10 @@ export const MY_ORG_ADMIN_CAPABILITIES = gql`
   query MyOrgAdminCapabilities($userId: uuid!) {
     OrganizationAdmin(where: { userId: { _eq: $userId } }, order_by: [{ created_at: asc }, { id: asc }]) {
       organizationId
+      Organization {
+        id
+        name
+      }
       canManageCourses
       canManageEvents
       canManageDegrees

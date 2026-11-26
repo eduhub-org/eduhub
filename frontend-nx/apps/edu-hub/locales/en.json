@@ -1236,10 +1236,17 @@
     },
     "error_loading_programs": "The programs could not be loaded. Please try again later.",
     "empty_state": {
-      "events": "No events programs exist yet. Ask a platform admin to set up an events program for your organization before you can manage events here.",
-      "courses": "No course programs exist yet. Ask a platform admin to set up a course program for your organization before you can manage courses here.",
-      "degrees": "No degree programs exist yet. Ask a platform admin to set up a degree program for your organization before you can manage degrees here."
+      "events": "No events program exists yet.",
+      "courses": "No course program exists yet.",
+      "degrees": "No degree program exists yet."
     },
+    "create_first_program": {
+      "events": "Create events program",
+      "courses": "Create course program",
+      "degrees": "Create degree program"
+    },
+    "empty_state_ask_admin": "Ask a platform admin to set up a program for your organization.",
+    "create_program_failed": "The program could not be created. Please try again.",
     "open_in_new_tab": "Open in new tab",
     "close": "Close",
     "cancel": "Cancel",
@@ -2637,6 +2644,17 @@
       "programs_unpublished_success_singular": "Program was successfully unpublished",
       "programs_unpublished_success_plural": "{count} programs were successfully unpublished",
       "bulk_action_failed": "The bulk action failed. Please try again."
+    },
+    "create_dialog": {
+      "title": "Create program",
+      "type_label": "Program type",
+      "organization_label": "Organization",
+      "single_organization": "The program belongs to {organization}.",
+      "no_organization": "You may not create a program of this type for any organization.",
+      "hint": "You can edit the title, dates and other settings after creating it.",
+      "create_button": "Create",
+      "success": "Program created.",
+      "error": "The program could not be created. Please try again."
     }
   },
   "manageUsers": {

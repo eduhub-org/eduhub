@@ -34,4 +34,6 @@ export interface InsertProgram {
 export interface InsertProgramVariables {
   title: string;
   today: any;
+  type: string;
+  organizationId: number;
 }
