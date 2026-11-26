@@ -22,7 +22,7 @@ const setup = (overrides: Partial<FeedbackHandlerDeps> = {}) => {
     getSession: async () => session(),
     rateLimiter: createRateLimiter({ rateShortMax: 10, rateShortWindowMs: 60_000, rateDailyMax: 30 }),
     hasuraUrl: 'http://h',
-    contact: 'edu-support@opencampus.sh',
+    contact: 'edu@opencampus.sh',
     fetchImpl,
     ...overrides,
   });

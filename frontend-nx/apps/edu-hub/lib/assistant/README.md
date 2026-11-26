@@ -189,7 +189,7 @@ EMBEDDING_PROVIDER=fake HASURA_ENDPOINT=http://localhost:8080/v1/graphql HASURA_
 | `ASSISTANT_MAX_MESSAGE_CHARS` | 4000 | per user message |
 | `ASSISTANT_MAX_CONVERSATION_MESSAGES`, `…_CHARS` | 40, 60000 | per conversation |
 | `ASSISTANT_MAX_TOOL_ROUNDS` | 6 | model rounds per reply |
-| `ASSISTANT_CONTACT` | `edu-support@opencampus.sh` | named when the Assistant can't help |
+| `ASSISTANT_CONTACT` | `edu@opencampus.sh` | named when the Assistant can't help |
 
 The rate limit is kept in memory per server instance (no user ids stored); with several Cloud Run
 instances a person can get up to that multiple. The spending cap is global, in the database.

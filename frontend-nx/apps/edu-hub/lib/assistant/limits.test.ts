@@ -94,7 +94,7 @@ describe('monthly spending cap', () => {
     expect(http.json.error).toEqual({
       code: 'SPENDING_CAP_REACHED',
       message:
-        'Der Assistent ist für diesen Monat pausiert, weil sein Monatsbudget aufgebraucht ist. Ab dem 1. des nächsten Monats ist er wieder da. Bei Fragen schreib an edu-support@opencampus.sh.',
+        'Der Assistent ist für diesen Monat pausiert, weil sein Monatsbudget aufgebraucht ist. Ab dem 1. des nächsten Monats ist er wieder da. Bei Fragen schreib an edu@opencampus.sh.',
     });
     expect(provider.requests).toHaveLength(0);
   });

@@ -22,7 +22,7 @@ const setup = (answer: (query: string) => Answer, overrides: Partial<ReportsHand
   const handler = createReportsHandler({
     getSession: async () => session(),
     hasuraUrl: 'http://h',
-    contact: 'edu-support@opencampus.sh',
+    contact: 'edu@opencampus.sh',
     fetchImpl,
     now: () => new Date('2026-11-26T12:00:00Z'),
     ...overrides,

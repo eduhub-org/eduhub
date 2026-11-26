@@ -144,7 +144,9 @@ describe('system prompt', () => {
     expect(text).toMatch(/never claim to be human/);
     expect(text).toMatch(/"du" \(never "Sie"\)/);
     expect(text).toMatch(/words the user sees on screen/);
-    expect(text).toContain('edu-support@opencampus.sh');
+    expect(text).toContain('point to the contact: edu@opencampus.sh.');
+    expect(text).toMatch(/Never name any other email address/);
+    expect(text).toMatch(/If the user points out a mistake, admit it/);
     expect(text).toContain('Today is 2026-11-23');
     expect(text).toContain('Current page: /course/7 (course 7)');
   });
