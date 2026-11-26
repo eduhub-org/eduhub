@@ -1,0 +1,5 @@
+table:
+  name: IssueReportType
+  schema: public
+is_enum: true
+# Read by admins only (full access by default); users see the values through IssueReport.

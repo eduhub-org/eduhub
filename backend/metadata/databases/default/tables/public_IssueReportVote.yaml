@@ -1,0 +1,44 @@
+table:
+  name: IssueReportVote
+  schema: public
+# One row per person affected by an IssueReport (issue #2234): the reporter (isReporter, set by a
+# trigger) and everyone who added their voice through the Assistant. `summary` is what that person
+# saw. Users insert and read only their own votes; admins have full access.
+object_relationships:
+  - name: IssueReport
+    using:
+      foreign_key_constraint_on: issueReportId
+  - name: User
+    using:
+      foreign_key_constraint_on: userId
+insert_permissions:
+  - role: user_access
+    permission:
+      # Only on open reports; one vote per person (unique constraint).
+      check:
+        IssueReport:
+          status:
+            _in:
+              - NEW
+              - PLANNED
+              - IN_PROGRESS
+      set:
+        userId: x-hasura-user-id
+      columns:
+        - issueReportId
+        - summary
+select_permissions:
+  - role: user_access
+    permission:
+      # userId is always the user's own (row filter); it is selectable so queries can pin it.
+      columns:
+        - id
+        - issueReportId
+        - userId
+        - summary
+        - isReporter
+        - created_at
+      filter:
+        userId:
+          _eq: X-Hasura-User-Id
+      allow_aggregations: true

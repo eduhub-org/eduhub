@@ -13,7 +13,13 @@ import { ToolSet, ZodTool, zodToolSet } from './tools';
  */
 
 export class HasuraRequestError extends Error {
-  constructor(public readonly code: 'HASURA_ERROR' | 'UNAUTHENTICATED') {
+  constructor(
+    public readonly code: 'HASURA_ERROR' | 'UNAUTHENTICATED',
+    /** Hasura's own error code (e.g. constraint-violation), for callers that tell errors apart. */
+    public readonly hasuraCode?: string,
+    /** Hasura's message; never logged or returned, it can quote data. */
+    public readonly hasuraMessage?: string
+  ) {
     super(code);
     this.name = 'HasuraRequestError';
   }
@@ -43,7 +49,7 @@ export const hasuraAsUser = ({ url, token, fetchImpl = fetch }: HasuraCaller, ro
     const body = await response.json().catch(() => ({}));
     if (body.errors?.length) {
       const code = body.errors[0]?.extensions?.code;
-      throw new HasuraRequestError(code === 'invalid-jwt' || code === 'access-denied' ? 'UNAUTHENTICATED' : 'HASURA_ERROR');
+      throw new HasuraRequestError(code === 'invalid-jwt' || code === 'access-denied' ? 'UNAUTHENTICATED' : 'HASURA_ERROR', code, body.errors[0]?.message);
     }
     if (!response.ok || !body.data) throw new HasuraRequestError('HASURA_ERROR');
     return body.data as T;

@@ -15,6 +15,7 @@ This manual explains how the platform works. It does not contain the rules of th
 - [Registering and applying](participants/registration.md): direct registration, applications, paid courses and registering as a guest.
 - [Invitations and the waitlist](participants/invitations-and-waitlist.md): what happens when a course is full, how to accept or decline an invitation, and how to cancel.
 - [Attendance and certificates](participants/attendance-and-certificates.md): how your attendance is recorded and where you get your certificates.
+- [Reporting bugs and suggesting ideas](participants/reports.md): telling the EduHub team through the Assistant what doesn't work or what you'd like.
 
 ## For Organizers
 
@@ -28,6 +29,6 @@ Organizers are the instructors of a course and the Org Admins of the organizatio
 
 ## The Assistant
 
-The **Assistant** is the AI chat available on every EduHub page once you are logged in. It answers questions about how the platform works, about courses and about your own registrations, and it helps Organizers set up their courses. It is an AI, not a person. It can only see and do what you yourself can see and do in EduHub. When it can't help, it tells you so and points you to a contact.
+The **Assistant** is the AI chat available on every EduHub page once you are logged in. It answers questions about how the platform works, about courses and about your own registrations, and it helps Organizers set up their courses. You can also [report bugs and suggest ideas](participants/reports.md) through it. It is an AI, not a person. It can only see and do what you yourself can see and do in EduHub. When it can't help, it tells you so and points you to a contact.
 
 It answers questions about how EduHub works, and about error messages, from this manual, from the rules your course's organization publishes online and from the platform's own texts. It links the pages its answer is based on. Check important details there, especially when it doesn't name a page.

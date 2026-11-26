@@ -143,6 +143,13 @@ update (only `PRIVACY_POLICY_VERSION` was bumped). Whoever writes the next
   such. The directory also finds people by meaning: course, session,
   project and achievement-option texts are turned into vectors with Google
   Cloud Vertex AI (no notes).
+- **Reports through the Assistant** (policy version 2026-11-26, issue #2234): people can send
+  bug reports and feature ideas through the Assistant, or join existing ones; we keep them with a
+  reference to the account until 6 months after the report is closed. A weekly summary of the
+  reports and of the 👎 comments and conversations is written by the IONOS AI Model Hub, without
+  account data (e-mail addresses in the texts are replaced). A 👎 comment is now kept for 30 days
+  even without consent to keep the conversation. Changed practice (all new), worded as such. The
+  notice was deliberately deferred until more of the Assistant work ships (decided 2026-11-26).
 
 The policy has no public change history: GDPR asks for the current policy and
 for telling users about material changes, not for a changelog. What applied

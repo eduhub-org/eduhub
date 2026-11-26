@@ -24,6 +24,8 @@ import type { ToolSet } from './tools';
  * - `tool` `{ name, status: 'running' | 'done' | 'failed' }`
  * - `proposal` the MCP server's ProposedChangeResult as-is: a Proposed Change for the widget to
  *   show with Apply/Discard buttons, which call /api/assistant/proposals themselves
+ * - `report` a draft bug report, feature idea, vote or withdrawal (lib/assistant/reports.ts) for the
+ *   widget to show as a card whose button calls /api/assistant/reports
  * - `error` `{ code, message }`
  * - `done` `{}`
  *
@@ -170,6 +172,7 @@ export const createChatHandler = (deps: ChatHandlerDeps) => async (req: NextApiR
     if (event.type === 'text') send('delta', { text: event.delta });
     else if (event.type === 'tool') send('tool', { name: event.name, status: event.status });
     else if (event.type === 'proposal') send('proposal', event.proposal);
+    else if (event.type === 'report') send('report', event.report);
     else send('error', { code: event.code, message: errorMessage(event.code, locale, { contact }) });
   };
 
@@ -203,6 +206,7 @@ export const createChatHandler = (deps: ChatHandlerDeps) => async (req: NextApiR
       invalidToolCalls: summary.invalidToolCalls,
       toolErrors: summary.toolErrors,
       proposals: summary.proposals,
+      reports: summary.reports,
       inputTokens: summary.usage.inputTokens,
       outputTokens: summary.usage.outputTokens,
       costEur: Number(cost.toFixed(6)),

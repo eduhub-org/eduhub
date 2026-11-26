@@ -8,7 +8,8 @@ import { hasuraAsUser, OWN_DATA_ROLE } from './userTools';
 /**
  * A 👍/👎 rating (issue #2193): POST `{ rating: 'up' | 'down', consent?, messages?, comment?,
  * route?, locale? }`. A rating alone is only counted (anonymous metric). A 👎 with `messages` stores
- * the conversation, and only with `consent: true`. Answers 204.
+ * the conversation, and only with `consent: true`. A 👎 with a `comment` stores the comment, with
+ * the conversation if consented, without it otherwise (issue #2234). Answers 204.
  *
  * It is inserted with the user's own token under the `user` role (an insert-only permission) and
  * without any user id. Nobody but admins can read it, and a cron job deletes it after 30 days.
@@ -46,9 +47,12 @@ export const createFeedbackHandler = (deps: FeedbackHandlerDeps) => async (req: 
 
   const { rating } = body;
   if (rating !== 'up' && rating !== 'down') return refuse(res, 400, 'INVALID_REQUEST', locale);
-  const store = rating === 'down' && body.messages !== undefined;
+  const comment = typeof body.comment === 'string' && body.comment.trim() ? body.comment.trim().slice(0, MAX_COMMENT_CHARS) : null;
+  const withConversation = rating === 'down' && body.messages !== undefined;
   // Never keep a conversation without consent, even if the widget sent one.
-  if (store && body.consent !== true) return refuse(res, 400, 'FEEDBACK_CONSENT_REQUIRED', locale);
+  if (withConversation && body.consent !== true) return refuse(res, 400, 'FEEDBACK_CONSENT_REQUIRED', locale);
+  // A 👎 comment is kept on its own too, anonymous and for 30 days like the conversation (issue #2234).
+  const store = withConversation || (rating === 'down' && comment !== null);
 
   const allowed = deps.rateLimiter.take(session.userId);
   if (allowed.ok === false) {
@@ -60,20 +64,22 @@ export const createFeedbackHandler = (deps: FeedbackHandlerDeps) => async (req: 
     return res.status(204).end();
   }
 
-  const input = Array.isArray(body.messages) ? body.messages : null;
-  const valid =
-    input &&
-    input.length > 0 &&
-    input.length <= limits.maxConversationMessages &&
-    input.every((m) => m && (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string');
-  if (!valid) return refuse(res, 400, 'INVALID_REQUEST', locale);
-  // Only the text is kept: no Proposed Change ids or anything else the widget attaches.
-  const messages = (input as { role: string; content: string }[]).map(({ role, content }) => ({ role, content }));
-  // The Assistant's replies count too, so allow twice the conversation limit in total.
-  const total = messages.reduce((sum, m) => sum + m.content.length, 0);
-  if (total > 2 * limits.maxConversationChars) return refuse(res, 400, 'CONVERSATION_TOO_LONG', locale);
+  let messages: { role: string; content: string }[] | null = null;
+  if (withConversation) {
+    const input = Array.isArray(body.messages) ? body.messages : null;
+    const valid =
+      input &&
+      input.length > 0 &&
+      input.length <= limits.maxConversationMessages &&
+      input.every((m) => m && (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string');
+    if (!valid) return refuse(res, 400, 'INVALID_REQUEST', locale);
+    // Only the text is kept: no Proposed Change ids or anything else the widget attaches.
+    messages = (input as { role: string; content: string }[]).map(({ role, content }) => ({ role, content }));
+    // The Assistant's replies count too, so allow twice the conversation limit in total.
+    const total = messages.reduce((sum, m) => sum + m.content.length, 0);
+    if (total > 2 * limits.maxConversationChars) return refuse(res, 400, 'CONVERSATION_TOO_LONG', locale);
+  }
 
-  const comment = typeof body.comment === 'string' && body.comment.trim() ? body.comment.trim().slice(0, MAX_COMMENT_CHARS) : null;
   const route = typeof body.route === 'string' && body.route.startsWith('/') ? body.route.slice(0, 300) : null;
   try {
     await hasuraAsUser({ url: deps.hasuraUrl, token: session.accessToken, userId: session.userId, fetchImpl: deps.fetchImpl }, OWN_DATA_ROLE)(
