@@ -1,4 +1,7 @@
 SET check_function_bodies = false;
+-- Published courses are inserted before their instructors further down, which
+-- course_publish_requires_instructor would reject; it is re-enabled at the end.
+ALTER TABLE public."Course" DISABLE TRIGGER course_publish_requires_instructor;
 INSERT INTO public."AchievementOption" (id, title, description, "recordType", "evaluationScriptUrl", created_at, updated_at, published, "achievementDocumentationTemplateId") VALUES (1, 'online course project', 'Vivamus rutrum congue volutpat. Fusce quis convallis elit, id dictum lacus. Nam volutpat suscipit dapibus. Aliquam nunc diam, fringilla in laoreet eget, luctus quis libero.', 'ONLINE_COURSE', NULL, '2022-12-19 13:40:34.079378+00', '2022-12-19 13:55:01.645233+00', true, NULL);
 INSERT INTO public."AchievementOption" (id, title, description, "recordType", "evaluationScriptUrl", created_at, updated_at, published, "achievementDocumentationTemplateId") VALUES (2, 'regular project', 'Vivamus rutrum congue volutpat. Fusce quis convallis elit, id dictum lacus. Nam volutpat suscipit dapibus. Aliquam nunc diam, fringilla in laoreet eget, luctus quis libero.', 'ONLINE_COURSE', NULL, '2022-12-19 13:40:34.079378+00', '2022-12-19 13:55:01.645233+00', true, NULL);
 INSERT INTO public."AchievementOption" (id, title, description, "recordType", "evaluationScriptUrl", created_at, updated_at, published, "achievementDocumentationTemplateId") VALUES (3, 'online course project present', 'Vivamus rutrum congue volutpat. Fusce quis convallis elit, id dictum lacus. Nam volutpat suscipit dapibus. Aliquam nunc diam, fringilla in laoreet eget, luctus quis libero.', 'ONLINE_COURSE', NULL, '2022-12-19 13:40:34.079378+00', '2022-12-19 13:55:01.645233+00', true, NULL);
@@ -3021,6 +3024,7 @@ INSERT INTO public."CourseGroup" (id, "courseId", "groupOptionId", created_at, u
 -- Dev accounts: admin and instructor teach a past, a running and an upcoming course
 -- (with an instructor certificate for the past one); user@example.com took several
 -- past courses (one with achievement and attendance certificates) and a running one.
+-- The instructor also teaches 7003, 7005-7008 and 7012 (added at the end of this file).
 INSERT INTO public."CourseInstructor" (id, "courseId", "userId", "certificateURL", created_at, updated_at) VALUES (9101, 7002, '8914bee9-0549-44af-bcae-cafeec5ba92e', '8914bee9-0549-44af-bcae-cafeec5ba92e/7002/instructor_certificate.pdf', '2024-04-15 09:00:00+00', '2024-04-15 09:00:00+00');
 INSERT INTO public."CourseInstructor" (id, "courseId", "userId", "certificateURL", created_at, updated_at) VALUES (9102, 7010, '8914bee9-0549-44af-bcae-cafeec5ba92e', NULL, '2024-04-15 09:00:00+00', '2024-04-15 09:00:00+00');
 INSERT INTO public."CourseInstructor" (id, "courseId", "userId", "certificateURL", created_at, updated_at) VALUES (9103, 7011, '8914bee9-0549-44af-bcae-cafeec5ba92e', NULL, '2024-04-15 09:00:00+00', '2024-04-15 09:00:00+00');
@@ -12445,3 +12449,41 @@ WHERE s."endDateTime" < now()
 ON CONFLICT (id) DO NOTHING;
 
 -- END GENERATED COURSE_ATTENDANCE_SEED
+
+
+-- Every published course and event needs an instructor (organizer for events), see the
+-- course_publish_requires_instructor trigger. These had none: the courses go to the Instructor
+-- test account, the events to Team Coding.Waterkant. The org 9100 test courses go to Maria Schmidt,
+-- because hasura.integration.test.ts expects instructor@example.com not to teach course 9002.
+INSERT INTO public."CourseInstructor" (id, "courseId", "userId", created_at, updated_at) VALUES
+  (9600, 7003, 'cccccccc-cccc-cccc-cccc-cccccccccccc', '2026-04-20 05:00:00+00', '2026-04-20 05:00:00+00'),
+  (9601, 7005, 'cccccccc-cccc-cccc-cccc-cccccccccccc', '2026-04-20 05:00:00+00', '2026-04-20 05:00:00+00'),
+  (9602, 7006, 'cccccccc-cccc-cccc-cccc-cccccccccccc', '2026-04-20 05:00:00+00', '2026-04-20 05:00:00+00'),
+  (9603, 7007, 'cccccccc-cccc-cccc-cccc-cccccccccccc', '2026-04-20 05:00:00+00', '2026-04-20 05:00:00+00'),
+  (9604, 7008, 'cccccccc-cccc-cccc-cccc-cccccccccccc', '2026-04-20 05:00:00+00', '2026-04-20 05:00:00+00'),
+  (9605, 7012, 'cccccccc-cccc-cccc-cccc-cccccccccccc', '2026-04-20 05:00:00+00', '2026-04-20 05:00:00+00'),
+  (9606, 7101, 'c0de0000-0000-0000-0000-000000007000', '2026-04-20 05:00:00+00', '2026-04-20 05:00:00+00'),
+  (9607, 7102, 'c0de0000-0000-0000-0000-000000007000', '2026-04-20 05:00:00+00', '2026-04-20 05:00:00+00'),
+  (9608, 7103, 'c0de0000-0000-0000-0000-000000007000', '2026-04-20 05:00:00+00', '2026-04-20 05:00:00+00'),
+  (9609, 7104, 'c0de0000-0000-0000-0000-000000007000', '2026-04-20 05:00:00+00', '2026-04-20 05:00:00+00'),
+  (9610, 7105, 'c0de0000-0000-0000-0000-000000007000', '2026-04-20 05:00:00+00', '2026-04-20 05:00:00+00'),
+  (9611, 7201, 'c0de0000-0000-0000-0000-000000007000', '2026-04-20 05:00:00+00', '2026-04-20 05:00:00+00'),
+  (9612, 7202, 'c0de0000-0000-0000-0000-000000007000', '2026-04-20 05:00:00+00', '2026-04-20 05:00:00+00'),
+  (9613, 7203, 'c0de0000-0000-0000-0000-000000007000', '2026-04-20 05:00:00+00', '2026-04-20 05:00:00+00'),
+  (9614, 7204, 'c0de0000-0000-0000-0000-000000007000', '2026-04-20 05:00:00+00', '2026-04-20 05:00:00+00'),
+  (9615, 7205, 'c0de0000-0000-0000-0000-000000007000', '2026-04-20 05:00:00+00', '2026-04-20 05:00:00+00'),
+  (9616, 7206, 'c0de0000-0000-0000-0000-000000007000', '2026-04-20 05:00:00+00', '2026-04-20 05:00:00+00'),
+  (9617, 7207, 'c0de0000-0000-0000-0000-000000007000', '2026-04-20 05:00:00+00', '2026-04-20 05:00:00+00'),
+  (9618, 7208, 'c0de0000-0000-0000-0000-000000007000', '2026-04-20 05:00:00+00', '2026-04-20 05:00:00+00'),
+  (9619, 7209, 'c0de0000-0000-0000-0000-000000007000', '2026-04-20 05:00:00+00', '2026-04-20 05:00:00+00'),
+  (9620, 7210, 'c0de0000-0000-0000-0000-000000007000', '2026-04-20 05:00:00+00', '2026-04-20 05:00:00+00'),
+  (9621, 7211, 'c0de0000-0000-0000-0000-000000007000', '2026-04-20 05:00:00+00', '2026-04-20 05:00:00+00'),
+  (9622, 7212, 'c0de0000-0000-0000-0000-000000007000', '2026-04-20 05:00:00+00', '2026-04-20 05:00:00+00'),
+  (9623, 7213, 'c0de0000-0000-0000-0000-000000007000', '2026-04-20 05:00:00+00', '2026-04-20 05:00:00+00'),
+  (9624, 7214, 'c0de0000-0000-0000-0000-000000007000', '2026-04-20 05:00:00+00', '2026-04-20 05:00:00+00'),
+  (9625, 9001, '11111111-1111-1111-1111-111111111111', '2026-04-20 05:00:00+00', '2026-04-20 05:00:00+00'),
+  (9626, 9002, '11111111-1111-1111-1111-111111111111', '2026-04-20 05:00:00+00', '2026-04-20 05:00:00+00')
+ON CONFLICT (id) DO NOTHING;
+SELECT pg_catalog.setval(pg_get_serial_sequence('public."CourseInstructor"', 'id'), (SELECT max(id) FROM public."CourseInstructor"), true);
+
+ALTER TABLE public."Course" ENABLE TRIGGER course_publish_requires_instructor;

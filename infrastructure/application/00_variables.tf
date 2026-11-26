@@ -602,6 +602,87 @@ variable "assistant_llm_price_output_eur_per_mtok" {
   type        = number
   default     = null
 }
+variable "summary_llm_provider" {
+  description = "LLM provider of the weekly issue report summary (issue #2234), run by callNodeFunction: ionos (IONOS AI Model Hub, with assistant_llm_api_key), vertex (Gemini on Vertex AI in the EU, with the function's service account), off, or empty to follow the Assistant: ionos when the Assistant runs on ionos with a key, otherwise off"
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = contains(["", "off", "vertex", "ionos"], var.summary_llm_provider)
+    error_message = "summary_llm_provider must be \"ionos\", \"vertex\", \"off\" or empty."
+  }
+}
+variable "summary_llm_model" {
+  description = "Model id of the weekly summary at its provider; empty for Qwen/Qwen3.5-397B-A17B on ionos (the strongest model on the IONOS AI Model Hub). Required on vertex."
+  type        = string
+  default     = ""
+}
+variable "summary_llm_location" {
+  description = "Vertex AI location of the summary model (provider vertex only): eu or a region inside the EU, never global (ADR 0005)"
+  type        = string
+  default     = "eu"
+
+  # Inside the EU only: not every europe-* region is (europe-west2 is London, europe-west6 Zürich).
+  validation {
+    condition = contains([
+      "eu",
+      "europe-west1",      # Belgium
+      "europe-west3",      # Frankfurt
+      "europe-west4",      # Netherlands
+      "europe-west8",      # Milan
+      "europe-west9",      # Paris
+      "europe-west10",     # Berlin
+      "europe-west12",     # Turin
+      "europe-north1",     # Finland
+      "europe-north2",     # Stockholm
+      "europe-central2",   # Warsaw
+      "europe-southwest1", # Madrid
+    ], var.summary_llm_location)
+    error_message = "summary_llm_location must be \"eu\" or a Google Cloud region inside the EU, never global."
+  }
+}
+variable "summary_llm_price_input_eur_per_mtok" {
+  description = "Price of the summary model per million input tokens in EUR; shown with each summary as its estimated cost"
+  type        = number
+  default     = null
+}
+variable "summary_llm_price_output_eur_per_mtok" {
+  description = "Price of the summary model per million output tokens (including reasoning) in EUR"
+  type        = number
+  default     = null
+}
+variable "github_app_id" {
+  description = "App ID of the EduHub Reports GitHub App, which turns approved Assistant reports into GitHub issues and syncs their status back (12_github_reports.tf). Empty turns the sync off."
+  type        = string
+  default     = ""
+}
+variable "github_app_installation_id" {
+  description = "Installation ID of the EduHub Reports GitHub App on the organization (the number at the end of its installation settings URL)"
+  type        = string
+  default     = ""
+}
+variable "github_app_private_key" {
+  description = "Private key (PEM) of the EduHub Reports GitHub App. Kept in Secret Manager."
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+variable "github_app_webhook_secret" {
+  description = "Webhook secret of the EduHub Reports GitHub App; /api/webhooks/github refuses deliveries not signed with it. Kept in Secret Manager."
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+variable "github_issue_repo" {
+  description = "Repository (owner/name) the report issues are created in: eduhub-org/eduhub in production, empty or a private sandbox repo on staging"
+  type        = string
+  default     = ""
+}
+variable "github_project_number" {
+  description = "Number of the organization project board new report issues go on (4: EduHub Development); null for no board"
+  type        = number
+  default     = null
+}
 variable "vertex_global_endpoint_policy" {
   description = "Organization policy constraints/gcp.restrictEndpointUsage denying the global Vertex AI endpoint in this project: empty (not managed), dry_run (violations are only logged) or enforce. Needs roles/orgpolicy.policyAdmin, which can only be granted at the organization, for the Terraform service account."
   type        = string

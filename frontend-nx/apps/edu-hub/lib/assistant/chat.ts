@@ -1,5 +1,6 @@
 import type { IncomingMessage } from './limits';
 import { ChatMessage, ChatProvider, ProviderError, Usage } from './provider';
+import type { ReportDraft } from './reports';
 import type { ProposalEvent, ToolSet } from './tools';
 
 /**
@@ -13,6 +14,7 @@ export type ChatEvent =
   | { type: 'text'; delta: string }
   | { type: 'tool'; name: string; status: 'running' | 'done' | 'failed' }
   | { type: 'proposal'; proposal: ProposalEvent }
+  | { type: 'report'; report: ReportDraft }
   | { type: 'error'; code: ChatErrorCode };
 
 export type ChatErrorCode = 'TOOL_CALL_FAILED' | 'BUSY' | 'UNAVAILABLE';
@@ -24,6 +26,7 @@ export interface ChatSummary {
   invalidToolCalls: number;
   toolErrors: number;
   proposals: number;
+  reports: number;
   usage: Usage;
 }
 
@@ -51,6 +54,7 @@ export const runChat = async ({
     invalidToolCalls: 0,
     toolErrors: 0,
     proposals: 0,
+    reports: 0,
     usage: { inputTokens: 0, outputTokens: 0 },
   };
   const conversation: ChatMessage[] = [{ role: 'system', content: system }, ...messages];
@@ -103,6 +107,10 @@ export const runChat = async ({
           if (result.proposal) {
             summary.proposals += 1;
             emit({ type: 'proposal', proposal: result.proposal });
+          }
+          if (result.report) {
+            summary.reports += 1;
+            emit({ type: 'report', report: result.report });
           }
         }
         conversation.push({ role: 'tool', tool_call_id: call.id, content: result.content });

@@ -142,6 +142,26 @@ resource "google_cloud_run_service" "eduhub" {
             }
           }
         }
+        # GitHub sync of Assistant reports (12_github_reports.tf); none while it is off.
+        dynamic "env" {
+          for_each = local.github_reports_env
+          content {
+            name  = env.key
+            value = env.value
+          }
+        }
+        dynamic "env" {
+          for_each = local.github_reports_edu_secrets
+          content {
+            name = env.key
+            value_from {
+              secret_key_ref {
+                name = env.value
+                key  = "latest"
+              }
+            }
+          }
+        }
         # Assistant (ADR 0005, 11_assistant.tf). An empty provider turns it off.
         env {
           name  = "ASSISTANT_LLM_PROVIDER"
@@ -217,5 +237,9 @@ resource "google_cloud_run_service" "eduhub" {
     google_secret_manager_secret_iam_member.stripe_webhook_secret_eduhub,
     google_secret_manager_secret_version.assistant_llm_api_key,
     google_secret_manager_secret_iam_member.assistant_llm_api_key,
+    google_secret_manager_secret_version.github_app_private_key,
+    google_secret_manager_secret_version.github_app_webhook_secret,
+    google_secret_manager_secret_iam_member.github_app_private_key_eduhub,
+    google_secret_manager_secret_iam_member.github_app_webhook_secret_eduhub,
   ]
 }

@@ -19,6 +19,7 @@ export interface ChatMetric {
   invalidToolCalls: number;
   toolErrors: number;
   proposals: number;
+  reports: number;
   inputTokens: number;
   outputTokens: number;
   costEur: number;

@@ -150,6 +150,7 @@ describe.each(LOCALES)('manageCourses messages in %s.json', (_locale, messages) 
     'default_title',
     'delete_button.delete_confirmation',
     'empty_state',
+    'create_first_program',
     'copy_to_program_dialog.title',
     'copy_to_program_dialog.description',
     'copy_to_program_dialog.button',

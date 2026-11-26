@@ -23,14 +23,19 @@ The backend's `lib/assistant/README.md` (PR #2200) is the spec. In short:
 - `POST /api/assistant/chat` with `{ locale, messages: [{ role, content, proposals? }], pageContext }`
   and `x-hasura-role`. Failures before the stream answer JSON `{ error: { code, message } }`;
   otherwise SSE events `delta {text}`, `tool {name, status}`, `proposal` (the MCP
-  `ProposedChangeResult` as-is), `error {code, message}`, and `done` always last.
+  `ProposedChangeResult` as-is), `report` (a drafted Report, vote or withdrawal, #2234),
+  `error {code, message}`, and `done` always last.
 - `POST /api/assistant/proposals` with `{ proposedChangeId, action: "apply" | "discard" }`. Only
   the widget's buttons call it; the model never gets apply or discard. Both buttons are disabled
   while a request is in flight and nothing retries (a duplicate apply of a stateless
   `create_course` proposal could create two courses). After discard the widget forgets the id
   (discard doesn't revoke it server-side), so later `proposals` entries omit it.
-- `POST /api/assistant/feedback` with `{ rating, consent, messages? }`; `messages` only for 👎
-  with consent. Each answer is rated on its own: `messages` is the conversation up to and
+- `POST /api/assistant/reports` with `{ action: "create" | "vote" | "withdraw", … }`, only from a
+  `ReportCard`'s button (#2234). A click while sending is dropped. A `create` sends the route of
+  the page the question was asked on. The card's state travels back to the model in the
+  `proposals` entries as kind `report_create`, `report_vote` or `report_withdraw`.
+- `POST /api/assistant/feedback` with `{ rating, consent, messages?, comment? }`; `messages` only
+  for 👎 with consent, `comment` (what wasn't helpful) for 👎 with or without it. Each answer is rated on its own: `messages` is the conversation up to and
   including the rated answer.
 
 Error texts: the chat endpoint's `message` is already localized and shown as is; the texts for its

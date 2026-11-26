@@ -52,6 +52,7 @@
       "manual": "Handbuch",
       "faq": "FAQ",
       "user": "Benutzer",
+      "reports": "Meldungen",
       "admin_users": "Admin-Benutzer",
       "experts": "Experten",
       "courses": "Kurse",
@@ -1220,10 +1221,17 @@
     },
     "error_loading_programs": "Die Programme konnten nicht geladen werden. Bitte versuche es später erneut.",
     "empty_state": {
-      "events": "Es gibt noch kein Veranstaltungsprogramm. Bitte einen Plattform-Admin, ein Veranstaltungsprogramm für deine Organisation anzulegen, bevor du hier Veranstaltungen verwalten kannst.",
-      "courses": "Es gibt noch kein Kursprogramm. Bitte einen Plattform-Admin, ein Kursprogramm für deine Organisation anzulegen, bevor du hier Kurse verwalten kannst.",
-      "degrees": "Es gibt noch kein Studiengangsprogramm. Bitte einen Plattform-Admin, ein Studiengangsprogramm für deine Organisation anzulegen, bevor du hier Studiengänge verwalten kannst."
+      "events": "Es gibt noch kein Veranstaltungsprogramm.",
+      "courses": "Es gibt noch kein Kursprogramm.",
+      "degrees": "Es gibt noch kein Studiengangsprogramm."
     },
+    "create_first_program": {
+      "events": "Veranstaltungsprogramm anlegen",
+      "courses": "Kursprogramm anlegen",
+      "degrees": "Studiengangsprogramm anlegen"
+    },
+    "empty_state_ask_admin": "Bitte einen Plattform-Admin, ein Programm für deine Organisation anzulegen.",
+    "create_program_failed": "Das Programm konnte nicht angelegt werden. Bitte versuche es erneut.",
     "open_in_new_tab": "In neuem Tab öffnen",
     "close": "Schließen",
     "cancel": "Abbrechen",
@@ -2622,6 +2630,17 @@
       "programs_unpublished_success_singular": "Programm wurde erfolgreich zurückgezogen",
       "programs_unpublished_success_plural": "{count} Programme wurden erfolgreich zurückgezogen",
       "bulk_action_failed": "Die Massenaktion ist fehlgeschlagen. Bitte versuche es erneut."
+    },
+    "create_dialog": {
+      "title": "Programm anlegen",
+      "type_label": "Programmart",
+      "organization_label": "Organisation",
+      "single_organization": "Das Programm gehört zu {organization}.",
+      "no_organization": "Du darfst für keine Organisation ein Programm dieser Art anlegen.",
+      "hint": "Titel, Zeiträume und weitere Einstellungen kannst du nach dem Anlegen bearbeiten.",
+      "create_button": "Anlegen",
+      "success": "Programm wurde angelegt.",
+      "error": "Das Programm konnte nicht angelegt werden. Bitte versuche es erneut."
     }
   },
   "manageUsers": {
@@ -4008,7 +4027,12 @@
       "generic": "Etwas ist schiefgelaufen. Bitte versuch es später noch einmal.",
       "NETWORK": "Die Verbindung wurde unterbrochen. Bitte versuch es noch einmal.",
       "INTERRUPTED": "Die Antwort wurde abgebrochen. Bitte frag noch einmal.",
-      "EMPTY_REPLY": "Darauf kam keine Antwort. Bitte frag noch einmal."
+      "EMPTY_REPLY": "Darauf kam keine Antwort. Bitte frag noch einmal.",
+      "REPORT_LIMIT_REACHED": "Du hast heute schon {max} Meldungen geschickt. Morgen kannst Du wieder welche schicken.",
+      "REPORT_ALREADY_VOTED": "Du bist bei dieser Meldung schon dabei.",
+      "REPORT_CLOSED": "Diese Meldung ist schon abgeschlossen oder gibt es nicht mehr.",
+      "REPORT_NOT_WITHDRAWABLE": "Diese Meldung kannst Du nicht mehr zurückziehen: Das EduHub-Team hat sie schon angesehen oder andere haben sich angeschlossen.",
+      "REPORT_FAILED": "Deine Meldung konnte gerade nicht gespeichert werden. Bitte versuch es später noch einmal oder schreib an {contact}."
     },
     "context": {
       "chip": "Wird mitgesendet: {page}",
@@ -4019,11 +4043,13 @@
       "helpful": "Hilfreich",
       "not_helpful": "Nicht hilfreich",
       "consent_label": "Unterhaltung aufbewahren?",
-      "consent_question": "Dürfen wir diese Unterhaltung 30 Tage lang aufbewahren, um den Assistenten zu verbessern? Ohne Deine Zustimmung zählen wir nur die Bewertung.",
+      "consent_question": "Dürfen wir diese Unterhaltung 30 Tage lang aufbewahren, um den Assistenten zu verbessern? Ohne Deine Zustimmung bekommen wir nur die Bewertung und Deinen Kommentar.",
       "consent_yes": "Ja, aufbewahren",
-      "consent_no": "Nein, nur die Bewertung senden",
+      "consent_no": "Nein, nicht aufbewahren",
       "thanks": "Danke für Dein Feedback!",
-      "failed": "Dein Feedback konnte nicht gesendet werden."
+      "failed": "Dein Feedback konnte nicht gesendet werden.",
+      "comment_label": "Was war nicht hilfreich? (freiwillig)",
+      "comment_placeholder": "z. B. „Die Antwort war falsch, weil …“"
     },
     "proposal": {
       "title": "Vorgeschlagene Änderung: {kind}",
@@ -4088,7 +4114,28 @@
         "ROLE_NOT_ALLOWED": "Mit Deiner aktuellen Rolle kannst Du diese Änderung nicht vornehmen."
       }
     },
-    "looking_up": "Schaut nach…"
+    "looking_up": "Schaut nach…",
+    "report": {
+      "title_create": "Meldung: {type}",
+      "title_vote": "Bestehende Meldung: {type}",
+      "title_withdraw": "Meldung zurückziehen",
+      "types": {
+        "BUG": "Fehler",
+        "FEATURE": "Idee"
+      },
+      "not_sent_yet": "Noch nicht gesendet. Prüf die Meldung und schick sie selbst ab.",
+      "vote_hint": "Jemand hat das schon gemeldet. Wenn Du Dich anschließt, zählt Deine Stimme mit.",
+      "withdraw_hint": "Die Meldung wird gelöscht.",
+      "send": "Senden",
+      "sending": "Wird gesendet …",
+      "vote": "Mich anschließen",
+      "withdraw": "Zurückziehen",
+      "dismiss": "Verwerfen",
+      "sent": "Gesendet. Frag mich jederzeit „Was ist aus meinen Meldungen geworden?“, um den Stand zu sehen.",
+      "voted": "Du bist dabei. Frag mich jederzeit „Was ist aus meinen Meldungen geworden?“, um den Stand zu sehen.",
+      "withdrawn": "Zurückgezogen.",
+      "dismissed": "Verworfen. Nichts wurde gesendet."
+    }
   },
   "help": {
     "title": "Handbuch",
@@ -4106,5 +4153,93 @@
     "org_rules_link": "Zu den Regeln und FAQ",
     "version_release": "Stand des Handbuchs: Release <release></release>, Commit <commit></commit>",
     "version_commit": "Stand des Handbuchs: Commit <commit></commit> (noch kein Release)"
+  },
+  "manageReports": {
+    "headline": "Meldungen",
+    "intro": "Fehler und Ideen, die Nutzende über den Assistenten geschickt haben. Setz Status und Priorität; der Status und Deine öffentliche Notiz sind für alle sichtbar, die die Meldung geschickt oder sich angeschlossen haben, wenn sie den Assistenten danach fragen.",
+    "columns": {
+      "type": "Art",
+      "title": "Titel",
+      "people": "Betroffene",
+      "status": "Status",
+      "priority": "Priorität",
+      "created": "Gemeldet am"
+    },
+    "type": {
+      "BUG": "Fehler",
+      "FEATURE": "Idee"
+    },
+    "status": {
+      "NEW": "Neu",
+      "PLANNED": "Geplant",
+      "IN_PROGRESS": "In Arbeit",
+      "DONE": "Erledigt",
+      "DECLINED": "Abgelehnt",
+      "DUPLICATE": "Duplikat"
+    },
+    "priority": {
+      "HIGH": "Hoch",
+      "MEDIUM": "Mittel",
+      "LOW": "Niedrig",
+      "none": "Keine"
+    },
+    "details": {
+      "description": "Beschreibung",
+      "id": "Nummer",
+      "people": "Betroffene (mit Duplikaten)",
+      "page": "Seite",
+      "role_language": "Rolle · Sprache",
+      "reporter": "Gemeldet von",
+      "reporter_removed": "Entfernt (6 Monate nach Abschluss anonymisiert oder Konto gelöscht)",
+      "duplicate_of": "Duplikat von",
+      "mark_duplicate": "Duplikat von Meldung Nr.",
+      "public_note": "Öffentliche Notiz",
+      "github_issue": "GitHub-Issue",
+      "github_create_or_link": "Issue erstellen oder verknüpfen"
+    },
+    "help": {
+      "mark_duplicate": "Nummer der ursprünglichen Meldung (#). Setzt den Status auf „Duplikat“; die Betroffenen zählen beim Original mit.",
+      "public_note": "Sehen alle, die die Meldung geschickt oder sich angeschlossen haben, z. B. „Geplant für das Frühjahr“ oder warum sie abgelehnt wurde.",
+      "github_issue": "Nimmt die Meldung an: Sie wird „Geplant“ und bekommt ein öffentliches GitHub-Issue.",
+      "github_synced": "Synchronisiert: Wird das Issue geschlossen, wieder geöffnet oder auf dem Board verschoben, ändert sich hier der Status."
+    },
+    "summary": {
+      "title": "Wochenzusammenfassung",
+      "week": "Woche",
+      "none": "Noch keine Zusammenfassung. Sie wird jeden Montag erstellt.",
+      "meta": "{from} – {to} · {reports, plural, one {# neue Meldung} other {# neue Meldungen}} · {feedback, plural, one {# 👎-Rückmeldung} other {# 👎-Rückmeldungen}}",
+      "cost": "{cost} € mit {model}"
+    },
+    "issue_dialog": {
+      "title": "Meldung #{id} als „{status}“ annehmen",
+      "mode_create": "Neues Issue erstellen",
+      "mode_link": "Bestehendes Issue verknüpfen",
+      "public_hint": "Das Issue ist in {repo} öffentlich. Prüf, dass Titel und Beschreibung keine Namen, E-Mail-Adressen oder anderen persönlichen Angaben enthalten.",
+      "issue_title": "Titel des Issues",
+      "issue_description": "Beschreibung des Issues",
+      "footer_label": "Wird unter der Beschreibung ergänzt und aktuell gehalten:",
+      "issue_number": "Issue-Nummer",
+      "link_help": "Ein offenes oder geschlossenes Issue in {repo}. Es bekommt die Fußzeile mit der Meldungsnummer und der Zahl der Betroffenen.",
+      "cancel": "Abbrechen",
+      "create": "Issue erstellen",
+      "link": "Issue verknüpfen"
+    },
+    "sync_error": {
+      "NOT_LOGGED_IN": "Deine Sitzung ist abgelaufen. Bitte melde Dich erneut an.",
+      "NOT_ADMIN": "Nur Admins können Meldungen ändern.",
+      "INVALID_REQUEST": "Etwas fehlt oder ist ungültig. Bitte prüf Deine Eingaben.",
+      "INVALID_STATUS": "Dieser Status lässt sich hier nicht setzen.",
+      "GITHUB_OFF": "Die GitHub-Synchronisierung ist nicht eingerichtet.",
+      "REPORT_NOT_FOUND": "Die Meldung gibt es nicht mehr.",
+      "ORIGINAL_NOT_FOUND": "Die Meldung konnte nicht als Duplikat markiert werden. Gibt es eine Meldung mit dieser Nummer?",
+      "ALREADY_LINKED": "Diese Meldung hat schon ein GitHub-Issue.",
+      "ISSUE_REQUIRED": "Eine geplante Meldung braucht ein GitHub-Issue. Erstell oder verknüpf eins.",
+      "ISSUE_NOT_FOUND": "Dieses Issue gibt es im Repository nicht.",
+      "ISSUE_TAKEN": "Dieses Issue gehört schon zu Meldung #{reportId}. Markier diese Meldung stattdessen als Duplikat davon.",
+      "LINKED_CANNOT_BE_NEW": "Eine Meldung mit öffentlichem Issue kann nicht zurück auf „Neu“.",
+      "GITHUB_FAILED": "GitHub hat die Änderung nicht angenommen. Bitte versuch es später noch einmal.",
+      "FAILED": "Die Änderung konnte nicht gespeichert werden. Bitte versuch es noch einmal.",
+      "METHOD_NOT_ALLOWED": "Die Änderung konnte nicht gespeichert werden. Bitte versuch es noch einmal."
+    }
   }
 }

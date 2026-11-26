@@ -277,3 +277,54 @@
     - name: Hasura-Secret
       value_from_env: HASURA_CLOUD_FUNCTION_SECRET
   comment: Deletes Assistant conversations rated thumbs-down after 30 days (issue 2193)
+- name: generate_issue_report_summary
+  webhook: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+  # Mondays 05:17 UTC, so the week's summary is there when the team starts (issue #2234).
+  schedule: 17 5 * * 1
+  include_in_metadata: true
+  payload: {}
+  retry_conf:
+    num_retries: 0
+    retry_interval_seconds: 10
+    # Below callNodeFunction's 180 s timeout; the model call stops after 140 s.
+    timeout_seconds: 170
+    tolerance_seconds: 21600
+  headers:
+    - name: Function-Name
+      value: generateIssueReportSummary
+    - name: Hasura-Secret
+      value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+  comment: Writes the weekly English summary of bug reports, feature ideas and Assistant feedback for /manage/reports (issue 2234)
+- name: anonymize_closed_issue_reports
+  webhook: '{{CLOUD_FUNCTION_LINK_CALL_PYTHON_FUNCTION}}'
+  schedule: 45 3 * * *
+  include_in_metadata: true
+  payload: {}
+  retry_conf:
+    num_retries: 0
+    retry_interval_seconds: 10
+    timeout_seconds: 3699
+    tolerance_seconds: 21600
+  headers:
+    - name: Function-Name
+      value: anonymize_closed_issue_reports
+    - name: Hasura-Secret
+      value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+  comment: Removes the user id from issue reports and their votes 6 months after the report was closed (issue 2234)
+- name: reconcile_issue_reports_with_github
+  webhook: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+  # Nightly; the GitHub App's webhook keeps reports current during the day.
+  schedule: 52 3 * * *
+  include_in_metadata: true
+  payload: {}
+  retry_conf:
+    num_retries: 0
+    retry_interval_seconds: 10
+    timeout_seconds: 170
+    tolerance_seconds: 21600
+  headers:
+    - name: Function-Name
+      value: reconcileIssueReportsWithGithub
+    - name: Hasura-Secret
+      value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+  comment: Compares reports linked to GitHub issues with GitHub and corrects status, link and the issue footer (issue 2234 follow-up)

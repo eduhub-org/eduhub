@@ -197,6 +197,12 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
         </MenuItem>
       )}
 
+      {isAdmin && (
+        <MenuItem component={Link} href="/manage/reports" onClick={closeMenu} selected={isActiveRoute('/manage/reports')}>
+          {t('menu.reports')}
+        </MenuItem>
+      )}
+
       {canViewExpertsMenu && (
         <MenuItem
           component={Link}

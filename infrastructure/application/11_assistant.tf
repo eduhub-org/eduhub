@@ -37,6 +37,52 @@ locals {
   # every workspace, and on vertex it would replace the service account's token. Only
   # whether it is set decides what to create; the key itself stays sensitive.
   assistant_has_api_key = var.assistant_llm_provider == "ionos" && nonsensitive(var.assistant_llm_api_key != "")
+
+  # Weekly issue report summary (issue #2234): callNodeFunction's generateIssueReportSummary, with
+  # its own (typically stronger) model at the same kind of EU provider. On ionos it reuses the
+  # Assistant's API key secret, so it needs the Assistant on ionos with a key.
+  summary_llm_host = (
+    var.summary_llm_location == "eu"
+    ? "aiplatform.eu.rep.googleapis.com"
+    : "${var.summary_llm_location}-aiplatform.googleapis.com"
+  )
+  # Empty summary_llm_provider follows the Assistant: ionos when it runs there with a key.
+  summary_provider = (
+    var.summary_llm_provider == "" ? (local.assistant_has_api_key ? "ionos" : "off") : var.summary_llm_provider
+  )
+  summary_llm_base_url = local.summary_provider == "ionos" ? local.assistant_ionos_base_url : (
+    "https://${local.summary_llm_host}/v1/projects/${var.project_id}/locations/${var.summary_llm_location}/endpoints/openapi"
+  )
+  summary_llm_model = var.summary_llm_model != "" ? var.summary_llm_model : (
+    local.summary_provider == "ionos" ? "Qwen/Qwen3.5-397B-A17B" : ""
+  )
+  summary_has_api_key = local.summary_provider == "ionos" && local.assistant_has_api_key
+  # Empty while the summary is off (no SUMMARY_LLM_PROVIDER: the function writes nothing).
+  summary_env = { for name, value in {
+    # lib/summaryLlm.js: "openai" is any OpenAI-compatible endpoint with a key.
+    SUMMARY_LLM_PROVIDER = local.summary_provider == "ionos" ? "openai" : local.summary_provider
+    SUMMARY_LLM_BASE_URL = local.summary_llm_base_url
+    SUMMARY_LLM_MODEL    = local.summary_llm_model
+    # Qwen3.5 397B thinks by default, and its thinking counts against the output cap and could
+    # outrun callNodeFunction's 180 s, so it is turned off.
+    SUMMARY_LLM_EXTRA_BODY                = local.summary_provider == "ionos" ? jsonencode({ reasoning_effort = "none" }) : ""
+    SUMMARY_LLM_PRICE_INPUT_EUR_PER_MTOK  = var.summary_llm_price_input_eur_per_mtok == null ? "" : tostring(var.summary_llm_price_input_eur_per_mtok)
+    SUMMARY_LLM_PRICE_OUTPUT_EUR_PER_MTOK = var.summary_llm_price_output_eur_per_mtok == null ? "" : tostring(var.summary_llm_price_output_eur_per_mtok)
+  } : name => value if local.summary_provider != "off" }
+  summary_secrets = local.summary_has_api_key ? [{
+    key       = "SUMMARY_LLM_API_KEY"
+    secret_id = google_secret_manager_secret.assistant_llm_api_key[0].secret_id
+    id        = google_secret_manager_secret.assistant_llm_api_key[0].id
+  }] : []
+}
+
+# callNodeFunction's shared account reads the IONOS key for the weekly summary. On vertex it uses
+# its own token: the account already has roles/aiplatform.user for the expert search embeddings.
+resource "google_secret_manager_secret_iam_member" "summary_llm_api_key" {
+  count     = local.summary_has_api_key ? 1 : 0
+  secret_id = google_secret_manager_secret.assistant_llm_api_key[0].id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${google_service_account.custom_cloud_function_account.email}"
 }
 
 # The provider's API key, for providers other than Vertex AI (which uses the
