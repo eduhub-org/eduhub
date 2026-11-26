@@ -88,6 +88,8 @@ export interface ReportsHandlerDeps {
   contact: string;
   fetchImpl?: typeof fetch;
   now?: () => Date;
+  /** After a successful join, e.g. to update the linked GitHub issue's footer (lib/github). */
+  onVoted?: (reportId: number) => Promise<void>;
 }
 
 /**
@@ -154,6 +156,8 @@ export const createReportsHandler = (deps: ReportsHandlerDeps) => async (req: Ne
       if (refused === 'UNIQUE') return fail(409, 'REPORT_ALREADY_VOTED');
       if (refused === 'CHECK') return fail(409, 'REPORT_CLOSED');
       console.info(JSON.stringify({ metric: 'assistant_report', event: 'voted' }));
+      // Not awaited: the join is stored; updating the GitHub footer must not delay the answer.
+      void deps.onVoted?.(reportId).catch(() => undefined);
       return res.status(200).json({ reportId });
     }
 

@@ -125,4 +125,6 @@ export const reportsDeps: ReportsHandlerDeps = {
   getSession: getAssistantSession,
   hasuraUrl: HASURA_URL,
   contact: process.env.ASSISTANT_CONTACT || DEFAULT_CONTACT,
+  // Loaded on demand: lib/github/server imports this module.
+  onVoted: async (reportId) => (await import('../github/server')).refreshReportFooter(reportId),
 };

@@ -76,6 +76,14 @@ services:
       # default and deliberately a single switch -- see the read-only gate in
       # pages/api/impersonation/graphql.ts.
       IMPERSONATION_ALLOW_WRITES: ${IMPERSONATION_ALLOW_WRITES:-}
+      # GitHub sync of Assistant reports (lib/github): off unless all of these are set. Use your own
+      # test App and a sandbox repo, never eduhub-org/eduhub; GitHub can't reach a local webhook.
+      GITHUB_APP_ID: ${GITHUB_APP_ID:-}
+      GITHUB_APP_INSTALLATION_ID: ${GITHUB_APP_INSTALLATION_ID:-}
+      GITHUB_APP_PRIVATE_KEY: ${GITHUB_APP_PRIVATE_KEY:-}
+      GITHUB_APP_WEBHOOK_SECRET: ${GITHUB_APP_WEBHOOK_SECRET:-}
+      GITHUB_ISSUE_REPO: ${GITHUB_ISSUE_REPO:-}
+      GITHUB_PROJECT_NUMBER: ${GITHUB_PROJECT_NUMBER:-}
 
   # StuJo job board frontend (apps/stujo) — same dev image as edu-hub,
   # served on http://localhost:5001
@@ -169,6 +177,12 @@ services:
       SUMMARY_LLM_BASE_URL: ${SUMMARY_LLM_BASE_URL:-}
       SUMMARY_LLM_MODEL: ${SUMMARY_LLM_MODEL:-}
       SUMMARY_LLM_API_KEY: ${SUMMARY_LLM_API_KEY:-}
+      # Nightly reconcile of the GitHub report sync: off unless the App is configured (see frontend-nx).
+      GITHUB_APP_ID: ${GITHUB_APP_ID:-}
+      GITHUB_APP_INSTALLATION_ID: ${GITHUB_APP_INSTALLATION_ID:-}
+      GITHUB_APP_PRIVATE_KEY: ${GITHUB_APP_PRIVATE_KEY:-}
+      GITHUB_ISSUE_REPO: ${GITHUB_ISSUE_REPO:-}
+      GITHUB_PROJECT_NUMBER: ${GITHUB_PROJECT_NUMBER:-}
 
   python_functions:
     container_name: eduhub-python-functions

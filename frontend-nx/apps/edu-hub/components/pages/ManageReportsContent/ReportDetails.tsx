@@ -2,36 +2,40 @@ import { FC, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 
 import InputField from '../../inputs/InputField';
-import { useAdminMutation } from '../../../hooks/authedMutation';
-import {
-  UPDATE_ISSUE_REPORT_DUPLICATE_OF,
-  UPDATE_ISSUE_REPORT_GITHUB_URL,
-  UPDATE_ISSUE_REPORT_PUBLIC_NOTE,
-} from '../../../queries/issueReports';
+import { Button } from '../../common/Button';
+import { UPDATE_ISSUE_REPORT_PUBLIC_NOTE } from '../../../queries/issueReports';
 import { IssueReportList_IssueReport } from '../../../queries/__generated__/IssueReportList';
+import { ISSUE_STATUSES } from './reportUtils';
+import { issueUrl, SyncRequest } from './useReportSync';
 
 interface Props {
   row: IssueReportList_IssueReport;
-  onError: (message: string) => void;
+  /** `owner/name` while the GitHub sync is on, else null. */
+  repo: string | null;
+  send: (request: SyncRequest) => Promise<unknown>;
+  onError: (error: unknown) => void;
+  /** Opens the GitHub issue dialog for this report with the status it will get. */
+  onApprove: (status: string) => void;
 }
 
 /** One report in full: the text, where it came from, who sent it, and what reporters see back. */
-export const ReportDetails: FC<Props> = ({ row, onError }) => {
+export const ReportDetails: FC<Props> = ({ row, repo, send, onError, onApprove }) => {
   const t = useTranslations('manageReports');
-  const [markDuplicate] = useAdminMutation(UPDATE_ISSUE_REPORT_DUPLICATE_OF, { refetchQueries: ['IssueReportList'] });
 
   // By the original's number (shown as #id), so any report can be the original, however old.
   const onDuplicateOf = useCallback(
-    async (value: string) => {
-      const duplicateOfId = Number.parseInt(value, 10);
+    async (data: { text?: string }) => {
+      // Without a mutation, InputField hands over `{ text }`.
+      const duplicateOfId = Number.parseInt(String(data?.text ?? '').replace(/^#/, ''), 10);
       if (!Number.isInteger(duplicateOfId) || duplicateOfId <= 0 || duplicateOfId === row.id) return;
       try {
-        await markDuplicate({ variables: { id: row.id, duplicateOfId } });
-      } catch {
-        onError(t('error.duplicate_failed'));
+        // Through the sync route: a linked issue is closed as a duplicate too.
+        await send({ action: 'status', reportId: row.id, status: 'DUPLICATE', duplicateOfId });
+      } catch (e) {
+        onError(e);
       }
     },
-    [markDuplicate, row.id, onError, t]
+    [send, row.id, onError]
   );
 
   const reporter = row.User ? `${row.User.firstName} ${row.User.lastName} (${row.User.email})` : t('details.reporter_removed');
@@ -93,17 +97,31 @@ export const ReportDetails: FC<Props> = ({ row, onError }) => {
         updateValueMutation={UPDATE_ISSUE_REPORT_PUBLIC_NOTE}
         refetchQueries={['IssueReportList']}
       />
-      <InputField
-        variant="material"
-        type="link"
-        label={t('details.github_issue')}
-        itemId={row.id}
-        value={row.githubIssueUrl ?? ''}
-        maxLength={500}
-        helpText={t('help.github_issue')}
-        updateValueMutation={UPDATE_ISSUE_REPORT_GITHUB_URL}
-        refetchQueries={['IssueReportList']}
-      />
+      {repo && (
+        <div className="text-sm">
+          <h3 className="mb-1 font-semibold text-label-secondary">{t('details.github_issue')}</h3>
+          {row.githubIssueNumber ? (
+            <p>
+              <a
+                href={issueUrl(repo, row.githubIssueNumber)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline"
+              >
+                {repo}#{row.githubIssueNumber}
+              </a>{' '}
+              <span className="text-label-secondary">{t('help.github_synced')}</span>
+            </p>
+          ) : (
+            <div className="flex flex-col items-start gap-1">
+              <Button onClick={() => onApprove(ISSUE_STATUSES.includes(row.status) ? row.status : 'PLANNED')}>
+                {t('details.github_create_or_link')}
+              </Button>
+              <span className="text-label-secondary">{t('help.github_issue')}</span>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

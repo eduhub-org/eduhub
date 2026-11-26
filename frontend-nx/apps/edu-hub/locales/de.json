@@ -4194,15 +4194,14 @@
       "duplicate_of": "Duplikat von",
       "mark_duplicate": "Duplikat von Meldung Nr.",
       "public_note": "Öffentliche Notiz",
-      "github_issue": "GitHub-Issue"
+      "github_issue": "GitHub-Issue",
+      "github_create_or_link": "Issue erstellen oder verknüpfen"
     },
     "help": {
       "mark_duplicate": "Nummer der ursprünglichen Meldung (#). Setzt den Status auf „Duplikat“; die Betroffenen zählen beim Original mit.",
       "public_note": "Sehen alle, die die Meldung geschickt oder sich angeschlossen haben, z. B. „Geplant für das Frühjahr“ oder warum sie abgelehnt wurde.",
-      "github_issue": "Link zum Issue, sobald die Meldung geplant ist."
-    },
-    "error": {
-      "duplicate_failed": "Die Meldung konnte nicht als Duplikat markiert werden. Gibt es eine Meldung mit dieser Nummer?"
+      "github_issue": "Nimmt die Meldung an: Sie wird „Geplant“ und bekommt ein öffentliches GitHub-Issue.",
+      "github_synced": "Synchronisiert: Wird das Issue geschlossen, wieder geöffnet oder auf dem Board verschoben, ändert sich hier der Status."
     },
     "summary": {
       "title": "Wochenzusammenfassung",
@@ -4210,6 +4209,37 @@
       "none": "Noch keine Zusammenfassung. Sie wird jeden Montag erstellt.",
       "meta": "{from} – {to} · {reports, plural, one {# neue Meldung} other {# neue Meldungen}} · {feedback, plural, one {# 👎-Rückmeldung} other {# 👎-Rückmeldungen}}",
       "cost": "{cost} € mit {model}"
+    },
+    "issue_dialog": {
+      "title": "Meldung #{id} als „{status}“ annehmen",
+      "mode_create": "Neues Issue erstellen",
+      "mode_link": "Bestehendes Issue verknüpfen",
+      "public_hint": "Das Issue ist in {repo} öffentlich. Prüf, dass Titel und Beschreibung keine Namen, E-Mail-Adressen oder anderen persönlichen Angaben enthalten.",
+      "issue_title": "Titel des Issues",
+      "issue_description": "Beschreibung des Issues",
+      "footer_label": "Wird unter der Beschreibung ergänzt und aktuell gehalten:",
+      "issue_number": "Issue-Nummer",
+      "link_help": "Ein offenes oder geschlossenes Issue in {repo}. Es bekommt die Fußzeile mit der Meldungsnummer und der Zahl der Betroffenen.",
+      "cancel": "Abbrechen",
+      "create": "Issue erstellen",
+      "link": "Issue verknüpfen"
+    },
+    "sync_error": {
+      "NOT_LOGGED_IN": "Deine Sitzung ist abgelaufen. Bitte melde Dich erneut an.",
+      "NOT_ADMIN": "Nur Admins können Meldungen ändern.",
+      "INVALID_REQUEST": "Etwas fehlt oder ist ungültig. Bitte prüf Deine Eingaben.",
+      "INVALID_STATUS": "Dieser Status lässt sich hier nicht setzen.",
+      "GITHUB_OFF": "Die GitHub-Synchronisierung ist nicht eingerichtet.",
+      "REPORT_NOT_FOUND": "Die Meldung gibt es nicht mehr.",
+      "ORIGINAL_NOT_FOUND": "Die Meldung konnte nicht als Duplikat markiert werden. Gibt es eine Meldung mit dieser Nummer?",
+      "ALREADY_LINKED": "Diese Meldung hat schon ein GitHub-Issue.",
+      "ISSUE_REQUIRED": "Eine geplante Meldung braucht ein GitHub-Issue. Erstell oder verknüpf eins.",
+      "ISSUE_NOT_FOUND": "Dieses Issue gibt es im Repository nicht.",
+      "ISSUE_TAKEN": "Dieses Issue gehört schon zu Meldung #{reportId}. Markier diese Meldung stattdessen als Duplikat davon.",
+      "LINKED_CANNOT_BE_NEW": "Eine Meldung mit öffentlichem Issue kann nicht zurück auf „Neu“.",
+      "GITHUB_FAILED": "GitHub hat die Änderung nicht angenommen. Bitte versuch es später noch einmal.",
+      "FAILED": "Die Änderung konnte nicht gespeichert werden. Bitte versuch es noch einmal.",
+      "METHOD_NOT_ALLOWED": "Die Änderung konnte nicht gespeichert werden. Bitte versuch es noch einmal."
     }
   }
 }
