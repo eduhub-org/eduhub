@@ -26,35 +26,6 @@ export interface IssueReportList_IssueReport_User {
   email: string;
 }
 
-export interface IssueReportList_IssueReport_Votes_aggregate_aggregate {
-  __typename: "IssueReportVote_aggregate_fields";
-  count: number;
-}
-
-export interface IssueReportList_IssueReport_Votes_aggregate {
-  __typename: "IssueReportVote_aggregate";
-  aggregate: IssueReportList_IssueReport_Votes_aggregate_aggregate | null;
-}
-
-export interface IssueReportList_IssueReport_Duplicates_Votes_aggregate_aggregate {
-  __typename: "IssueReportVote_aggregate_fields";
-  count: number;
-}
-
-export interface IssueReportList_IssueReport_Duplicates_Votes_aggregate {
-  __typename: "IssueReportVote_aggregate";
-  aggregate: IssueReportList_IssueReport_Duplicates_Votes_aggregate_aggregate | null;
-}
-
-export interface IssueReportList_IssueReport_Duplicates {
-  __typename: "IssueReport";
-  id: number;
-  /**
-   * An aggregate relationship
-   */
-  Votes_aggregate: IssueReportList_IssueReport_Duplicates_Votes_aggregate;
-}
-
 export interface IssueReportList_IssueReport {
   __typename: "IssueReport";
   id: number;
@@ -77,13 +48,9 @@ export interface IssueReportList_IssueReport {
    */
   User: IssueReportList_IssueReport_User | null;
   /**
-   * An aggregate relationship
+   * Votes on the report and on reports marked as its duplicates.
    */
-  Votes_aggregate: IssueReportList_IssueReport_Votes_aggregate;
-  /**
-   * An array relationship
-   */
-  Duplicates: IssueReportList_IssueReport_Duplicates[];
+  peopleAffected: number | null;
 }
 
 export interface IssueReportList_IssueReport_aggregate_aggregate {

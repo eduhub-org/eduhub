@@ -114,7 +114,13 @@ describe('generateIssueReportSummary', () => {
 
     expect(result).toEqual({ success: true, reports: 1, feedback: 1 });
     const input = gql.requests.find((r) => r.query.includes('IssueReportSummaryInput')).variables;
-    expect(input).toEqual({ since: '2026-11-23T05:17:00Z', open: ['NEW', 'PLANNED', 'IN_PROGRESS'], maxReports: MAX_REPORTS, maxFeedback: MAX_FEEDBACK });
+    expect(input).toEqual({
+      since: '2026-11-23T05:17:00Z',
+      until: NOW.toISOString(),
+      open: ['NEW', 'PLANNED', 'IN_PROGRESS'],
+      maxReports: MAX_REPORTS,
+      maxFeedback: MAX_FEEDBACK,
+    });
 
     expect(calls[0].url).toBe(`${vertex.SUMMARY_LLM_BASE_URL}/chat/completions`);
     expect(calls[0].init.headers.Authorization).toBe('Bearer token');
@@ -173,6 +179,19 @@ describe('what the model sees', () => {
     expect(user.content).toContain('"peopleAffected":3');
     expect(user.content).toContain('"newThisPeriod":true');
     expect(user.content).not.toMatch(/alice|u-1/);
+  });
+
+  it('replaces e-mail addresses in the free texts, except published role mailboxes', () => {
+    const line = feedbackLine({ comment: 'Write to jane.doe@uni-kiel.de or edu-support@opencampus.sh', conversation: null });
+    expect(JSON.parse(line).comment).toBe('Write to [email] or edu-support@opencampus.sh');
+    const [, user] = buildMessages({
+      since: 's',
+      until: 'u',
+      reports: [report({ description: 'Mail to max@example.de bounced' })],
+      newReportCount: 1,
+      feedback: [],
+    });
+    expect(user.content).toContain('Mail to [email] bounced');
   });
 
   it('keeps only the comment and the end of a 👎 conversation, cut short', () => {

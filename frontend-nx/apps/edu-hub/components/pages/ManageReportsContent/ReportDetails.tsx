@@ -1,19 +1,14 @@
-import { FC, useCallback, useMemo } from 'react';
+import { FC, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 
 import InputField from '../../inputs/InputField';
-import DropDownSelector from '../../inputs/DropDownSelector';
-import { useAdminQuery } from '../../../hooks/authedQuery';
 import { useAdminMutation } from '../../../hooks/authedMutation';
 import {
-  ISSUE_REPORT_OPTIONS,
   UPDATE_ISSUE_REPORT_DUPLICATE_OF,
   UPDATE_ISSUE_REPORT_GITHUB_URL,
   UPDATE_ISSUE_REPORT_PUBLIC_NOTE,
 } from '../../../queries/issueReports';
 import { IssueReportList_IssueReport } from '../../../queries/__generated__/IssueReportList';
-import { IssueReportOptions } from '../../../queries/__generated__/IssueReportOptions';
-import { peopleAffected } from './reportUtils';
 
 interface Props {
   row: IssueReportList_IssueReport;
@@ -23,22 +18,15 @@ interface Props {
 /** One report in full: the text, where it came from, who sent it, and what reporters see back. */
 export const ReportDetails: FC<Props> = ({ row, onError }) => {
   const t = useTranslations('manageReports');
-  const { data } = useAdminQuery<IssueReportOptions>(ISSUE_REPORT_OPTIONS);
-  const [markDuplicate] = useAdminMutation(UPDATE_ISSUE_REPORT_DUPLICATE_OF, { refetchQueries: ['IssueReportList', 'IssueReportOptions'] });
+  const [markDuplicate] = useAdminMutation(UPDATE_ISSUE_REPORT_DUPLICATE_OF, { refetchQueries: ['IssueReportList'] });
 
-  const duplicateOptions = useMemo(
-    () =>
-      (data?.IssueReport ?? [])
-        .filter((r) => r.id !== row.id)
-        .map((r) => ({ value: String(r.id), label: `#${r.id} ${r.title}` })),
-    [data, row.id]
-  );
-
+  // By the original's number (shown as #id), so any report can be the original, however old.
   const onDuplicateOf = useCallback(
     async (value: string) => {
-      if (!value) return;
+      const duplicateOfId = Number.parseInt(value, 10);
+      if (!Number.isInteger(duplicateOfId) || duplicateOfId <= 0 || duplicateOfId === row.id) return;
       try {
-        await markDuplicate({ variables: { id: row.id, duplicateOfId: Number(value) } });
+        await markDuplicate({ variables: { id: row.id, duplicateOfId } });
       } catch {
         onError(t('error.duplicate_failed'));
       }
@@ -61,7 +49,7 @@ export const ReportDetails: FC<Props> = ({ row, onError }) => {
         </div>
         <div>
           <dt className="text-label-secondary">{t('details.people')}</dt>
-          <dd>{peopleAffected(row)}</dd>
+          <dd>{row.peopleAffected ?? 0}</dd>
         </div>
         <div>
           <dt className="text-label-secondary">{t('details.page')}</dt>
@@ -84,12 +72,13 @@ export const ReportDetails: FC<Props> = ({ row, onError }) => {
           </div>
         )}
       </dl>
-      <DropDownSelector
+      <InputField
         variant="material"
+        type="number"
         label={t('details.mark_duplicate')}
+        itemId={row.id}
         value={row.duplicateOfId ? String(row.duplicateOfId) : ''}
-        options={duplicateOptions}
-        searchable
+        min={1}
         onValueUpdated={onDuplicateOf}
         helpText={t('help.mark_duplicate')}
       />

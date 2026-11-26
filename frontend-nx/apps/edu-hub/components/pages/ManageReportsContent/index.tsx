@@ -15,8 +15,7 @@ import { ISSUE_REPORT_LIST, UPDATE_ISSUE_REPORT_PRIORITY, UPDATE_ISSUE_REPORT_ST
 import { IssueReportList, IssueReportList_IssueReport } from '../../../queries/__generated__/IssueReportList';
 import { ReportDetails } from './ReportDetails';
 import { WeeklySummaries } from './WeeklySummaries';
-import { OPEN_STATUSES, peopleAffected, PRIORITIES, REPORT_STATUSES, REPORT_TYPES } from './reportUtils';
-
+import { OPEN_STATUSES, PRIORITIES, REPORT_STATUSES, REPORT_TYPES } from './reportUtils';
 
 /**
  * Bug reports and feature ideas sent through the Assistant (issue #2234), for admins to
@@ -29,7 +28,19 @@ const ManageReportsContent: FC = () => {
   const [statusFilter, setStatusFilter] = useState<string[]>(OPEN_STATUSES);
   const [error, setError] = useState<string | null>(null);
 
-  const { data, loading, initialLoading, error: queryError, pageIndex, setPageIndex, searchFilter, setSearchFilter, sorting, setSorting } =
+  const {
+    data,
+    loading,
+    initialLoading,
+    error: queryError,
+    pageIndex,
+    pageSize,
+    setPageIndex,
+    searchFilter,
+    setSearchFilter,
+    sorting,
+    setSorting,
+  } =
     useTableGrid({
       queryHook: useAdminQuery,
       query: ISSUE_REPORT_LIST,
@@ -43,7 +54,7 @@ const ManageReportsContent: FC = () => {
           ],
         },
       }),
-      sortColumnMapper: (columnId: string) => (columnId === 'people' ? { Votes_aggregate: { count: null } } : columnId),
+      sortColumnMapper: (columnId: string) => (columnId === 'people' ? 'peopleAffected' : columnId),
       defaultSort: [{ created_at: 'desc' }],
     });
   const rows = (data as IssueReportList | undefined)?.IssueReport ?? [];
@@ -57,6 +68,8 @@ const ManageReportsContent: FC = () => {
   );
 
   const statusOptions = useMemo(() => REPORT_STATUSES.map((value) => ({ value, label: t(`status.${value}`) })), [t]);
+  // DUPLICATE needs the original, so it is only set with "Mark as duplicate of" in the details.
+  const settableStatusOptions = useMemo(() => statusOptions.filter((o) => o.value !== 'DUPLICATE'), [statusOptions]);
   const priorityOptions = useMemo(() => PRIORITIES.map((value) => ({ value, label: t(`priority.${value}`) })), [t]);
 
   const columns = useMemo<ColumnDef<IssueReportList_IssueReport>[]>(
@@ -80,7 +93,7 @@ const ManageReportsContent: FC = () => {
         header: t('columns.people'),
         size: 90,
         enableSorting: true,
-        cell: ({ row }) => <span className="px-2">{peopleAffected(row.original)}</span>,
+        cell: ({ row }) => <span className="px-2">{row.original.peopleAffected ?? 0}</span>,
       },
       {
         accessorKey: 'status',
@@ -91,7 +104,7 @@ const ManageReportsContent: FC = () => {
             variant="material"
             identifierVariables={{ id: row.original.id }}
             value={row.original.status}
-            options={statusOptions}
+            options={row.original.status === 'DUPLICATE' ? statusOptions : settableStatusOptions}
             updateValueMutation={UPDATE_ISSUE_REPORT_STATUS}
             refetchQueries={['IssueReportList']}
           />
@@ -123,7 +136,7 @@ const ManageReportsContent: FC = () => {
         cell: ({ row }) => <span className="px-2">{new Date(row.original.created_at).toLocaleDateString(locale)}</span>,
       },
     ],
-    [t, locale, statusOptions, priorityOptions]
+    [t, locale, statusOptions, settableStatusOptions, priorityOptions]
   );
 
   return (
@@ -140,6 +153,7 @@ const ManageReportsContent: FC = () => {
             data={rows}
             totalCount={(data as IssueReportList | undefined)?.IssueReport_aggregate.aggregate?.count ?? 0}
             pageIndex={pageIndex}
+            pageSize={pageSize}
             onPageChange={setPageIndex}
             searchFilter={searchFilter}
             onSearchFilterChange={setSearchFilter}

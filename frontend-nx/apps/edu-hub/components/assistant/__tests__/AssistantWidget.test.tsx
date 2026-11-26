@@ -303,6 +303,39 @@ describe('AssistantWidget', () => {
       expect(within(card).queryByRole('button', { name: 'Send' })).not.toBeInTheDocument();
     });
 
+    it('keeps a send on its way, and its outcome, across a remount, so it is never sent twice', async () => {
+      let resolveSend: (value: unknown) => void = () => undefined;
+      mockSendReport.mockImplementation(() => new Promise((resolve) => (resolveSend = resolve)));
+      const card = await showReport(bug);
+      fireEvent.click(within(card).getByRole('button', { name: 'Send' }));
+
+      // Navigating while the send is on its way: the outcome lands in the stored conversation.
+      cleanup();
+      await act(async () => resolveSend({ ok: true, reportId: 3 }));
+      renderWidget();
+      openPanel();
+      const remounted = await screen.findByTestId('report-card');
+      expect(within(remounted).getByText(/What happened to my reports\?/)).toBeInTheDocument();
+      expect(within(remounted).queryByRole('button', { name: 'Send' })).not.toBeInTheDocument();
+      expect(mockSendReport).toHaveBeenCalledTimes(1);
+    });
+
+    it('shows a send still on its way after a remount and its outcome once it arrives', async () => {
+      let resolveSend: (value: unknown) => void = () => undefined;
+      mockSendReport.mockImplementation(() => new Promise((resolve) => (resolveSend = resolve)));
+      const card = await showReport(bug);
+      fireEvent.click(within(card).getByRole('button', { name: 'Send' }));
+
+      cleanup();
+      renderWidget();
+      openPanel();
+      const remounted = await screen.findByTestId('report-card');
+      expect(within(remounted).getByRole('button', { name: 'Sending…' })).toBeDisabled();
+      await act(async () => resolveSend({ ok: true, reportId: 3 }));
+      expect(within(screen.getByTestId('report-card')).getByText(/What happened to my reports\?/)).toBeInTheDocument();
+      expect(mockSendReport).toHaveBeenCalledTimes(1);
+    });
+
     it('tells the model what the user did with the card', async () => {
       const card = await showReport({ kind: 'vote', reportId: 4, type: 'FEATURE', summary: 'Dark mode for the platform' });
       expect(within(card).getByText('Existing report: Idea')).toBeInTheDocument();

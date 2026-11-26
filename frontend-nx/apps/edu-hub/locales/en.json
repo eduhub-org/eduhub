@@ -4189,17 +4189,17 @@
       "reporter": "Reported by",
       "reporter_removed": "Removed (anonymized 6 months after closing, or account deleted)",
       "duplicate_of": "Duplicate of",
-      "mark_duplicate": "Mark as duplicate of",
+      "mark_duplicate": "Duplicate of report no.",
       "public_note": "Public note",
       "github_issue": "GitHub issue"
     },
     "help": {
-      "mark_duplicate": "Sets the status to \"Duplicate\". The people affected count towards the original.",
+      "mark_duplicate": "Number of the original report (#). Sets the status to \"Duplicate\"; the people affected count towards the original.",
       "public_note": "Shown to everyone who sent or joined the report, e.g. \"Planned for spring\" or why it was declined.",
       "github_issue": "Link to the issue once the report is planned."
     },
     "error": {
-      "duplicate_failed": "The report couldn't be marked as a duplicate."
+      "duplicate_failed": "The report couldn't be marked as a duplicate. Is there a report with this number?"
     },
     "summary": {
       "title": "Weekly summary",

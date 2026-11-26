@@ -8300,6 +8300,7 @@ export interface IssueReport_bool_exp {
   githubIssueUrl?: String_comparison_exp | null;
   id?: Int_comparison_exp | null;
   locale?: String_comparison_exp | null;
+  peopleAffected?: Int_comparison_exp | null;
   priority?: IssueReportPriority_enum_comparison_exp | null;
   publicNote?: String_comparison_exp | null;
   role?: String_comparison_exp | null;
@@ -8355,6 +8356,7 @@ export interface IssueReport_order_by {
   githubIssueUrl?: order_by | null;
   id?: order_by | null;
   locale?: order_by | null;
+  peopleAffected?: order_by | null;
   priority?: order_by | null;
   publicNote?: order_by | null;
   role?: order_by | null;

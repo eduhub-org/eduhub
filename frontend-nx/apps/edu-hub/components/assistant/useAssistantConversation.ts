@@ -8,6 +8,7 @@ import {
   PageContext,
   ProposalDecision,
   ProposalOutcome,
+  ReportOutcome,
   sendReport,
   streamChat,
 } from './api';
@@ -60,8 +61,15 @@ const settle = (p: ProposalState, action: ProposalDecision, outcome: ProposalOut
   return { ...p, busy: false, status: 'DISCARDED', proposal: { ...p.proposal, proposedChangeId: '' } };
 };
 
-/** Report cards being sent; a second click before the first re-render must not send twice. */
-const sendingReports = new Set<string>();
+/**
+ * Report sends on their way, by card key. Module scope like `pending`: a send outlives the
+ * widget when the user navigates, and the next mount must neither offer Send again (a second
+ * report) nor miss the outcome. A double click is dropped while its key is in here.
+ */
+const pendingReports = new Map<string, Promise<ReportOutcome>>();
+
+const settleReport = (r: ReportState, outcome: ReportOutcome): ReportState =>
+  outcome.ok ? { ...r, busy: false, status: 'APPLIED' } : { ...r, busy: false, status: 'FAILED', error: outcome.error };
 
 let counter = 0;
 const newId = () => `${Date.now().toString(36)}-${(counter++).toString(36)}`;
@@ -78,8 +86,11 @@ const load = (key: string | null): ConversationMessage[] => {
       streaming: false,
       lookingUp: false,
       // A send a reload cut off may or may not have arrived; the user can ask about their reports.
-      reports: message.reports?.map((r) =>
-        r.busy ? { ...r, busy: false, status: 'FAILED', error: { code: 'NETWORK', message: '' } } : r
+      reports: message.reports?.map(
+        (r): ReportState =>
+          r.busy && !pendingReports.has(r.key)
+            ? { ...r, busy: false, status: 'FAILED', error: { code: 'NETWORK', message: '' } }
+            : r
       ),
       proposals: message.proposals.map(
         (p): ProposalState =>
@@ -147,6 +158,12 @@ export const useAssistantConversation = ({
       .forEach(({ key }) => {
         const request = pending.get(key);
         request?.outcome.then((outcome) => updateProposal(key, (p) => settle(p, request.action, outcome)));
+      });
+    // …and of a report send.
+    loaded
+      .flatMap((m) => m.reports ?? [])
+      .forEach(({ key }) => {
+        pendingReports.get(key)?.then((outcome) => updateReport(key, (r) => settleReport(r, outcome)));
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps -- runs once per stored conversation
   }, [storageKey]);
@@ -263,38 +280,50 @@ export const useAssistantConversation = ({
     [messages, role, locale, apollo, updateProposal]
   );
 
-  const updateReport = (key: string, update: (state: ReportState) => ReportState) =>
-    setMessages((current) =>
-      current.map((message) =>
-        message.reports?.some((r) => r.key === key)
-          ? { ...message, reports: message.reports.map((r) => (r.key === key ? update(r) : r)) }
-          : message
-      )
-    );
+  const updateReport = useCallback(
+    (key: string, update: (state: ReportState) => ReportState) => {
+      const apply = (current: ConversationMessage[]) =>
+        current.map((message) =>
+          message.reports?.some((r) => r.key === key)
+            ? { ...message, reports: message.reports.map((r) => (r.key === key ? update(r) : r)) }
+            : message
+        );
+      if (mounted.current) {
+        setMessages(apply);
+        return;
+      }
+      // The widget is gone (the user navigated): record the outcome in the stored conversation.
+      if (!storageKey) return;
+      try {
+        const stored = window.sessionStorage.getItem(storageKey);
+        if (stored) window.sessionStorage.setItem(storageKey, JSON.stringify(apply(JSON.parse(stored))));
+      } catch {
+        // Storage blocked: nothing was stored to correct.
+      }
+    },
+    [storageKey]
+  );
 
   /** Sends or dismisses a report card. Only the user's click calls this; a click while sending is dropped. */
   const decideReport = useCallback(
     async (key: string, action: 'send' | 'dismiss') => {
       const index = messages.findIndex((m) => m.reports?.some((r) => r.key === key));
       const state = messages[index]?.reports?.find((r) => r.key === key);
-      if (!state || state.busy || sendingReports.has(key) || state.status === 'APPLIED' || state.status === 'DISCARDED') return;
+      if (!state || state.busy || pendingReports.has(key) || state.status === 'APPLIED' || state.status === 'DISCARDED') return;
       if (action === 'dismiss') {
         updateReport(key, (r) => ({ ...r, status: 'DISCARDED', error: undefined }));
         return;
       }
       // The page the user was on when they asked, where the problem happened.
       const route = [...messages.slice(0, index)].reverse().find((m) => m.role === 'user')?.pageContext?.route;
-      sendingReports.add(key);
+      const request = sendReport(state.draft, { role, locale, route });
+      pendingReports.set(key, request);
       updateReport(key, (r) => ({ ...r, busy: true, error: undefined }));
-      const outcome = await sendReport(state.draft, { role, locale, route });
-      sendingReports.delete(key);
-      updateReport(key, (r) =>
-        outcome.ok
-          ? { ...r, busy: false, status: 'APPLIED' }
-          : { ...r, busy: false, status: 'FAILED', error: outcome.error }
-      );
+      const outcome = await request;
+      pendingReports.delete(key);
+      updateReport(key, (r) => settleReport(r, outcome));
     },
-    [messages, role, locale]
+    [messages, role, locale, updateReport]
   );
 
   /** Records (or, after a failed send, clears) the rating of one answer. */

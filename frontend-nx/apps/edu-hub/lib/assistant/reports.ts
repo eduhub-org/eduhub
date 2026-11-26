@@ -130,9 +130,18 @@ export const createReportsHandler = (deps: ReportsHandlerDeps) => async (req: Ne
       if (today.IssueReportVote_aggregate.aggregate.count >= REPORT_LIMITS.perDay)
         return fail(429, 'REPORT_LIMIT_REACHED');
 
-      const data = await request<{ insert_IssueReport_one: { id: number } }>(CREATE, {
-        object: { type, title, description, route, role, locale, Votes: { data: [{ summary: title }] } },
-      });
+      let data: { insert_IssueReport_one: { id: number } };
+      try {
+        data = await request(CREATE, {
+          object: { type, title, description, route, role, locale, Votes: { data: [{ summary: title }] } },
+        });
+      } catch (error) {
+        // The database enforces the limit too (issue_report_limit_per_day), e.g. for two requests at once.
+        if (error instanceof HasuraRequestError && /REPORT_LIMIT_REACHED/.test(error.hasuraMessage ?? '')) {
+          return fail(429, 'REPORT_LIMIT_REACHED');
+        }
+        throw error;
+      }
       console.info(JSON.stringify({ metric: 'assistant_report', event: 'created', type }));
       return res.status(200).json({ reportId: data.insert_IssueReport_one.id });
     }

@@ -25,7 +25,7 @@ If someone has already reported the same thing, the Assistant shows a card **Exi
 
 Ask the Assistant "What happened to my reports?" any time. It lists the reports you sent or joined, with their status (new, planned, in progress, done, declined or duplicate) and the EduHub team's note, if there is one.
 
-As long as nobody has looked at a report you sent and nobody else has joined it, you can ask the Assistant to withdraw it; it shows a card with **Withdraw**.
+As long as a report you sent still has the status new and nobody else has joined it, you can ask the Assistant to withdraw it; it shows a card with **Withdraw**.
 
 ## Feedback on the Assistant's answers
 

@@ -46,7 +46,9 @@ CREATE TABLE "public"."IssueReport" (
   CONSTRAINT "IssueReport_priority_fkey" FOREIGN KEY ("priority") REFERENCES "public"."IssueReportPriority"("value") ON UPDATE CASCADE ON DELETE RESTRICT,
   CONSTRAINT "IssueReport_userId_fkey" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON UPDATE CASCADE ON DELETE SET NULL,
   CONSTRAINT "IssueReport_duplicateOfId_fkey" FOREIGN KEY ("duplicateOfId") REFERENCES "public"."IssueReport"("id") ON UPDATE CASCADE ON DELETE SET NULL,
-  CONSTRAINT "IssueReport_not_duplicate_of_itself" CHECK ("duplicateOfId" IS NULL OR "duplicateOfId" <> "id")
+  CONSTRAINT "IssueReport_not_duplicate_of_itself" CHECK ("duplicateOfId" IS NULL OR "duplicateOfId" <> "id"),
+  -- DUPLICATE always names the report it duplicates (the admin page sets both together).
+  CONSTRAINT "IssueReport_duplicate_has_original" CHECK ("status" <> 'DUPLICATE' OR "duplicateOfId" IS NOT NULL)
 );
 COMMENT ON TABLE "public"."IssueReport" IS E'Bug reports and feature ideas sent through the Assistant (issue #2234); triaged by admins.';
 CREATE INDEX "IssueReport_userId_idx" ON "public"."IssueReport" ("userId");
@@ -82,6 +84,27 @@ BEFORE INSERT OR UPDATE OF "status", "duplicateOfId" ON "public"."IssueReport"
 FOR EACH ROW
 EXECUTE PROCEDURE "public"."issue_report_set_closed_at"();
 
+-- At most 5 new reports per person in 24 hours, for every writer, also direct GraphQL inserts (the
+-- endpoint checks first only to answer with a friendly message). Withdrawn reports are deleted and
+-- no longer count; they leave nothing behind either.
+CREATE OR REPLACE FUNCTION "public"."issue_report_limit_per_day"()
+RETURNS TRIGGER AS $$
+BEGIN
+  IF NEW."userId" IS NOT NULL AND (
+    SELECT count(*) FROM "public"."IssueReport" r
+    WHERE r."userId" = NEW."userId" AND r."created_at" > now() - interval '24 hours'
+  ) >= 5 THEN
+    RAISE EXCEPTION 'REPORT_LIMIT_REACHED' USING ERRCODE = 'check_violation';
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER "issue_report_limit_per_day"
+BEFORE INSERT ON "public"."IssueReport"
+FOR EACH ROW
+EXECUTE PROCEDURE "public"."issue_report_limit_per_day"();
+
 -- One row per person affected: the reporter (isReporter) and everyone who added their voice.
 -- `summary` is the text that person saw: their own report's title, or the Assistant's summary of
 -- someone else's report. Users never see another person's title or description.
@@ -116,6 +139,15 @@ CREATE TRIGGER "issue_report_vote_set_is_reporter"
 BEFORE INSERT ON "public"."IssueReportVote"
 FOR EACH ROW
 EXECUTE PROCEDURE "public"."issue_report_vote_set_is_reporter"();
+
+-- People affected by a report: its own votes plus those on reports marked as its duplicates. A
+-- computed field, so the admin page can show and sort by the same number.
+CREATE OR REPLACE FUNCTION "public"."issue_report_people_affected"(report_row "public"."IssueReport")
+RETURNS integer AS $$
+  SELECT count(*)::integer FROM "public"."IssueReportVote" v
+  WHERE v."issueReportId" = report_row."id"
+     OR v."issueReportId" IN (SELECT d."id" FROM "public"."IssueReport" d WHERE d."duplicateOfId" = report_row."id")
+$$ LANGUAGE sql STABLE;
 
 -- The weekly summary written by the generate_issue_report_summary cron (English, Markdown).
 CREATE TABLE "public"."IssueReportSummary" (

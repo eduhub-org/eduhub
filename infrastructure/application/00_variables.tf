@@ -618,13 +618,27 @@ variable "summary_llm_model" {
   default     = ""
 }
 variable "summary_llm_location" {
-  description = "Vertex AI location of the summary model (provider vertex only): eu or an EU region, never global (ADR 0005)"
+  description = "Vertex AI location of the summary model (provider vertex only): eu or a region inside the EU, never global (ADR 0005)"
   type        = string
   default     = "eu"
 
+  # Inside the EU only: not every europe-* region is (europe-west2 is London, europe-west6 Zürich).
   validation {
-    condition     = var.summary_llm_location == "eu" || startswith(var.summary_llm_location, "europe-")
-    error_message = "summary_llm_location must be \"eu\" or a europe-* region, never global."
+    condition = contains([
+      "eu",
+      "europe-west1",      # Belgium
+      "europe-west3",      # Frankfurt
+      "europe-west4",      # Netherlands
+      "europe-west8",      # Milan
+      "europe-west9",      # Paris
+      "europe-west10",     # Berlin
+      "europe-west12",     # Turin
+      "europe-north1",     # Finland
+      "europe-north2",     # Stockholm
+      "europe-central2",   # Warsaw
+      "europe-southwest1", # Madrid
+    ], var.summary_llm_location)
+    error_message = "summary_llm_location must be \"eu\" or a Google Cloud region inside the EU, never global."
   }
 }
 variable "summary_llm_price_input_eur_per_mtok" {
