@@ -25,6 +25,9 @@ export const githubConfig = (read) => {
   };
 };
 
+/** Per GitHub call, so one slow answer can't use up the reconcile's time budget. */
+export const TIMEOUT_MS = 15_000;
+
 const base64url = (input) => Buffer.from(input).toString("base64url");
 
 export const appJwt = (appId, privateKey, now) => {
@@ -34,11 +37,12 @@ export const appJwt = (appId, privateKey, now) => {
 };
 
 export class GithubError extends Error {
-  constructor(status, message, type) {
+  constructor(status, message, type, path = []) {
     super(message);
     this.name = "GithubError";
     this.status = status;
     this.type = type;
+    this.path = path;
   }
 }
 
@@ -55,6 +59,7 @@ export const createGithubClient = (config, { fetchImpl = fetch, now = () => new 
         ...(body === undefined ? {} : { "content-type": "application/json" }),
       },
       body: body === undefined ? undefined : JSON.stringify(body),
+      signal: AbortSignal.timeout(TIMEOUT_MS),
     });
     const data = await response.json().catch(() => ({}));
     if (!response.ok) throw new GithubError(response.status, `GitHub ${method} ${path}: ${response.status} ${data?.message ?? ""}`.trim());
@@ -73,7 +78,7 @@ export const createGithubClient = (config, { fetchImpl = fetch, now = () => new 
     },
     async graphql(query, variables) {
       const data = await call("POST", "/graphql", `Bearer ${await installationToken()}`, { query, variables });
-      if (data.errors?.length) throw new GithubError(200, `GitHub GraphQL: ${data.errors[0]?.message ?? "error"}`, data.errors[0]?.type);
+      if (data.errors?.length) throw new GithubError(200, `GitHub GraphQL: ${data.errors[0]?.message ?? "error"}`, data.errors[0]?.type, data.errors[0]?.path ?? []);
       return data.data;
     },
   };
@@ -82,6 +87,7 @@ export const createGithubClient = (config, { fetchImpl = fetch, now = () => new 
 const ISSUE = `
   query EduhubIssue($owner: String!, $repo: String!, $number: Int!) {
     repository(owner: $owner, name: $repo) {
+      nameWithOwner
       issue(number: $number) {
         id number state stateReason
         repository { nameWithOwner }
@@ -100,17 +106,22 @@ const ISSUE = `
 
 const repoName = (gh) => `${gh.config.owner}/${gh.config.repo}`.toLowerCase();
 
-/** The issue as it is now, or null when it was deleted or moved to another repo. */
+/**
+ * The issue as it is now, or null when it was deleted or moved to another repo. Throws when the
+ * repository itself can't be read, which must never unlink every report (same as edu-hub's).
+ */
 export const readIssue = async (gh, number) => {
-  let issue;
+  let data;
   try {
-    const data = await gh.graphql(ISSUE, { owner: gh.config.owner, repo: gh.config.repo, number });
-    issue = data.repository?.issue ?? null;
+    data = await gh.graphql(ISSUE, { owner: gh.config.owner, repo: gh.config.repo, number });
   } catch (error) {
-    if (error instanceof GithubError && error.type === "NOT_FOUND") return null;
+    if (error instanceof GithubError && error.type === "NOT_FOUND" && error.path?.[error.path.length - 1] === "issue") return null;
     throw error;
   }
-  if (!issue || issue.repository.nameWithOwner.toLowerCase() !== repoName(gh)) return null;
+  if (!data.repository) throw new GithubError(200, `GitHub: repository ${repoName(gh)} not readable`);
+  const issue = data.repository.issue;
+  const home = data.repository.nameWithOwner.toLowerCase();
+  if (!issue || issue.repository.nameWithOwner.toLowerCase() !== home) return null;
   const item = gh.config.projectNumber
     ? issue.projectItems.nodes.find(
         (n) => n && n.project.number === gh.config.projectNumber && n.project.owner.login?.toLowerCase() === gh.config.owner.toLowerCase()
@@ -122,7 +133,7 @@ export const readIssue = async (gh, number) => {
     number: issue.number,
     open: issue.state === "OPEN",
     stateReason: issue.stateReason,
-    duplicateOfNumber: dup && dup.repository.nameWithOwner.toLowerCase() === repoName(gh) ? dup.number : null,
+    duplicateOfNumber: dup && dup.repository.nameWithOwner.toLowerCase() === home ? dup.number : null,
     boardItem: item ? { id: item.id, column: item.fieldValueByName?.name ?? null } : null,
   };
 };

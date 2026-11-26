@@ -1,6 +1,7 @@
 import { GithubClient } from './client';
 import {
   applyStatus,
+  closeOrphan,
   CLOSED_STATUSES,
   createIssue,
   ISSUE_STATUSES,
@@ -131,7 +132,16 @@ export const createIssueForReport = async (
     // The issue exists either way; a missing board card is fixed by moving it by hand.
     console.error('GitHub sync: adding the issue to the board failed', { issue: issue.number, error: String(error) });
   }
-  await store.update(reportId, { status, githubIssueNumber: issue.number });
+  try {
+    await store.update(reportId, { status, githubIssueNumber: issue.number });
+  } catch (error) {
+    // E.g. another admin linked the report meanwhile: close the public issue again instead of
+    // leaving it orphaned, so a retry doesn't create a second one.
+    await closeOrphan(gh, issue.node_id).catch(() =>
+      console.error('GitHub sync: closing an unlinked new issue failed', { issue: issue.number })
+    );
+    throw error;
+  }
   return issue.number;
 };
 

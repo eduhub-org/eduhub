@@ -6,6 +6,7 @@ import { Button } from '../../common/Button';
 import InputField from '../../inputs/InputField';
 import { IssueReportList_IssueReport } from '../../../queries/__generated__/IssueReportList';
 import { SyncRequest, SyncRequestError } from './useReportSync';
+import { visibleFooter } from '../../../lib/github/footer';
 
 interface Props {
   /** The report to approve and the status it gets (PLANNED or IN_PROGRESS); null: closed. */
@@ -66,11 +67,8 @@ export const GithubIssueDialog: FC<Props> = ({ target, repo, send, onClose }) =>
     }
   };
 
-  const footer = t('issue_dialog.footer_preview', {
-    id: row.id,
-    priority: row.priority ? t(`priority.${row.priority}`) : t('priority.none'),
-    people: row.peopleAffected ?? 0,
-  });
+  // Exactly what is posted (in English, like the rest of the issue).
+  const footer = visibleFooter({ reportId: row.id, priority: row.priority, people: row.peopleAffected ?? 0 });
 
   return (
     <DialogShell
@@ -124,7 +122,11 @@ export const GithubIssueDialog: FC<Props> = ({ target, repo, send, onClose }) =>
             />
             <div>
               <p className="mb-1 text-sm text-label-secondary">{t('issue_dialog.footer_label')}</p>
-              <p className="rounded bg-fill-primary p-2 text-sm">{footer}</p>
+              <div className="rounded bg-fill-primary p-2 text-sm">
+                {footer.map((line) => (
+                  <p key={line}>{line}</p>
+                ))}
+              </div>
             </div>
           </>
         ) : (

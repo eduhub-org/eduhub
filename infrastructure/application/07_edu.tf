@@ -237,5 +237,9 @@ resource "google_cloud_run_service" "eduhub" {
     google_secret_manager_secret_iam_member.stripe_webhook_secret_eduhub,
     google_secret_manager_secret_version.assistant_llm_api_key,
     google_secret_manager_secret_iam_member.assistant_llm_api_key,
+    google_secret_manager_secret_version.github_app_private_key,
+    google_secret_manager_secret_version.github_app_webhook_secret,
+    google_secret_manager_secret_iam_member.github_app_private_key_eduhub,
+    google_secret_manager_secret_iam_member.github_app_webhook_secret_eduhub,
   ]
 }

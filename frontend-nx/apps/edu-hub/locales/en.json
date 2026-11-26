@@ -4215,7 +4215,6 @@
       "issue_title": "Issue title",
       "issue_description": "Issue description",
       "footer_label": "Added below the description and kept up to date:",
-      "footer_preview": "EduHub report #{id} · priority: {priority} · {people, plural, one {# person} other {# people}} affected",
       "issue_number": "Issue number",
       "link_help": "An open or closed issue in {repo}. It gets the footer with the report number and people affected.",
       "cancel": "Cancel",

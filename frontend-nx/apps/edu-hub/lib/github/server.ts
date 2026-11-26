@@ -26,6 +26,7 @@ const adminSecretRequest = (): Request | null => {
       method: 'POST',
       headers: { 'content-type': 'application/json', 'x-hasura-admin-secret': secret },
       body: JSON.stringify({ query, variables }),
+      signal: AbortSignal.timeout(15_000),
     });
     const body = await response.json().catch(() => ({}));
     if (!response.ok || body.errors?.length || !body.data) throw new Error('HASURA_ERROR');

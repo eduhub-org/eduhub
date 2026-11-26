@@ -39,11 +39,15 @@ interface FakeIssue {
 const fakeGithub = (issues: Record<number, FakeIssue | null> = {}, config: Partial<GithubConfig> = {}) => {
   const writes: string[] = [];
   let next = 100;
+  let repoGone = false;
   const numberOf = (nodeId: string) => Number(nodeId.replace('I_', ''));
-  const gh: GithubClient & { writes: string[]; issues: typeof issues } = {
+  const gh: GithubClient & { writes: string[]; issues: typeof issues; loseRepo(): void } = {
     config: { ...CONFIG, ...config },
     writes,
     issues,
+    loseRepo() {
+      repoGone = true;
+    },
     async rest<T>(method: string, path: string, body?: any) {
       const number = Number(path.split('/').pop());
       if (method === 'POST') {
@@ -60,10 +64,12 @@ const fakeGithub = (issues: Record<number, FakeIssue | null> = {}, config: Parti
     async graphql<T>(query: string, variables: Record<string, any>) {
       const name = /(?:query|mutation) (\w+)/.exec(query)?.[1];
       if (name === 'EduhubIssue') {
+        if (repoGone) return { repository: null } as T;
         const i = issues[variables.number];
-        if (!i) return { repository: { issue: null } } as T;
+        if (!i) return { repository: { nameWithOwner: 'eduhub-org/eduhub', issue: null } } as T;
         return {
           repository: {
+            nameWithOwner: 'eduhub-org/eduhub',
             issue: {
               id: `I_${variables.number}`,
               number: variables.number,
@@ -244,6 +250,16 @@ describe('admin route', () => {
     expect(store.byId.get(1)?.status).toBe('NEW');
   });
 
+  it('closes a newly created issue again when the report could not be linked', async () => {
+    const { store, gh, call } = adminSetup([report()]);
+    store.update = async () => {
+      throw new Error('Uniqueness violation');
+    };
+    const http = await call({ action: 'create', reportId: 1, status: 'PLANNED', title: 't', description: 'd' });
+    expect(http.status).toBe(502);
+    expect(gh?.writes).toEqual(['create #100', 'board #100', 'column #100 Todo', 'close #100 NOT_PLANNED']);
+  });
+
   it('needs the dialog for approving an unlinked report, but not for closing one', async () => {
     const { store, call } = adminSetup([report()]);
     expect((await call({ action: 'status', reportId: 1, status: 'PLANNED' })).json).toEqual({ error: { code: 'ISSUE_REQUIRED' } });
@@ -331,6 +347,14 @@ describe('syncFromGithub', () => {
     gh.issues[8] = { open: false, stateReason: 'DUPLICATE' };
     expect(await syncFromGithub(gh, store, 8)).toBe('unchanged');
     expect(store.byId.get(2)).toMatchObject({ status: 'DUPLICATE', duplicateOfId: 1 });
+  });
+
+  it("never unlinks when the repository itself can't be read", async () => {
+    const gh = fakeGithub({ 7: { open: true } });
+    gh.loseRepo();
+    const store = fakeStore([report({ status: 'PLANNED', githubIssueNumber: 7 })]);
+    await expect(syncFromGithub(gh, store, 7)).rejects.toThrow('not readable');
+    expect(store.byId.get(1)?.githubIssueNumber).toBe(7);
   });
 
   it("keeps EduHub's PLANNED or IN_PROGRESS when there is no board", async () => {

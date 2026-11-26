@@ -64,7 +64,9 @@ export class GithubError extends Error {
     public readonly status: number,
     message: string,
     /** GraphQL's error type, e.g. NOT_FOUND for a deleted issue. */
-    public readonly type?: string
+    public readonly type?: string,
+    /** GraphQL's error path, e.g. ['repository', 'issue']: which lookup failed. */
+    public readonly path: Array<string | number> = []
   ) {
     super(message);
     this.name = 'GithubError';
@@ -78,6 +80,8 @@ export interface GithubClient {
 }
 
 const API = 'https://api.github.com';
+/** Per GitHub call, so one slow answer can't hold an admin request or a webhook delivery. */
+export const TIMEOUT_MS = 15_000;
 
 export const createGithubClient = (
   config: GithubConfig,
@@ -96,6 +100,7 @@ export const createGithubClient = (
         ...(body === undefined ? {} : { 'content-type': 'application/json' }),
       },
       body: body === undefined ? undefined : JSON.stringify(body),
+      signal: AbortSignal.timeout(TIMEOUT_MS),
     });
     const data = await response.json().catch(() => ({}));
     // Only status and GitHub's message: neither quotes a report.
@@ -119,7 +124,7 @@ export const createGithubClient = (
     async graphql<T>(query: string, variables: Record<string, unknown>) {
       const data = await call('POST', '/graphql', `Bearer ${await installationToken()}`, { query, variables });
       if (data.errors?.length)
-        throw new GithubError(200, `GitHub GraphQL: ${data.errors[0]?.message ?? 'error'}`, data.errors[0]?.type);
+        throw new GithubError(200, `GitHub GraphQL: ${data.errors[0]?.message ?? 'error'}`, data.errors[0]?.type, data.errors[0]?.path ?? []);
       return data.data as T;
     },
   };

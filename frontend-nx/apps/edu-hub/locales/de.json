@@ -4200,7 +4200,6 @@
       "issue_title": "Titel des Issues",
       "issue_description": "Beschreibung des Issues",
       "footer_label": "Wird unter der Beschreibung ergänzt und aktuell gehalten:",
-      "footer_preview": "EduHub report #{id} · priority: {priority} · {people, plural, one {# person} other {# people}} affected",
       "issue_number": "Issue-Nummer",
       "link_help": "Ein offenes oder geschlossenes Issue in {repo}. Es bekommt die Fußzeile mit der Meldungsnummer und der Zahl der Betroffenen.",
       "cancel": "Abbrechen",

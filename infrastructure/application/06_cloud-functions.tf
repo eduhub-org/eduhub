@@ -453,8 +453,13 @@ module "cloud_function" {
   public_invoker        = try(each.value.public_invoker, "policy")
 
   # The shared account's grants live outside the module; Cloud Run checks secret access when it
-  # deploys, so the summary's key grant (11_assistant.tf, none while the summary is off) comes first.
-  depends_on = [google_secret_manager_secret_iam_member.summary_llm_api_key]
+  # deploys, so the summary's key grant (11_assistant.tf, none while the summary is off) and the
+  # GitHub App key (12_github_reports.tf, none while the sync is off) come first.
+  depends_on = [
+    google_secret_manager_secret_iam_member.summary_llm_api_key,
+    google_secret_manager_secret_version.github_app_private_key,
+    google_secret_manager_secret_iam_member.github_app_private_key_functions,
+  ]
 }
 
 ###############################################################################

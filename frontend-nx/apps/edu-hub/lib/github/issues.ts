@@ -1,4 +1,5 @@
 import { GithubClient, GithubError } from './client';
+import { withFooter } from './footer';
 
 /**
  * The GitHub side of the report sync: one issue per approved report, on the project board when
@@ -43,44 +44,15 @@ export const statusFromIssue = (issue: IssueState | null): ReportStatus | null =
   return issue.boardItem?.column?.trim().toLowerCase() === IN_PROGRESS_COLUMN ? 'IN_PROGRESS' : 'PLANNED';
 };
 
-// --- The footer: what the issue says about the report, kept current by EduHub. -----------------
-
-const FOOTER_START = '<!-- eduhub-report:start -->';
-const FOOTER_END = '<!-- eduhub-report:end -->';
-
-export interface FooterData {
-  reportId: number;
-  priority: string | null;
-  people: number;
-}
-
-/** No names, emails or user ids: only what the team needs to prioritise. */
-export const renderFooter = ({ reportId, priority, people }: FooterData) =>
-  [
-    FOOTER_START,
-    '---',
-    `EduHub report #${reportId} · priority: ${priority ? priority.toLowerCase() : 'not set'} · ${people} ${
-      people === 1 ? 'person' : 'people'
-    } affected`,
-    '',
-    '<sub>Sent through the EduHub Assistant and approved by an admin. This footer is updated automatically.</sub>',
-    FOOTER_END,
-  ].join('\n');
-
-/** Replaces the footer, or appends it to an issue that has none (a linked existing issue). */
-export const withFooter = (body: string | null, footer: string) => {
-  const text = body ?? '';
-  const start = text.indexOf(FOOTER_START);
-  const end = text.indexOf(FOOTER_END);
-  if (start >= 0 && end > start) return `${text.slice(0, start)}${footer}${text.slice(end + FOOTER_END.length)}`;
-  return text.trim() ? `${text.trimEnd()}\n\n${footer}` : footer;
-};
+export { renderFooter, withFooter } from './footer';
+export type { FooterData } from './footer';
 
 // --- Reading -----------------------------------------------------------------------------------
 
 const ISSUE = `
   query EduhubIssue($owner: String!, $repo: String!, $number: Int!) {
     repository(owner: $owner, name: $repo) {
+      nameWithOwner
       issue(number: $number) {
         id number state stateReason
         repository { nameWithOwner }
@@ -115,22 +87,29 @@ interface IssueNode {
 
 const repoName = (gh: GithubClient) => `${gh.config.owner}/${gh.config.repo}`.toLowerCase();
 
-/** The issue as it is now, or null when it was deleted or moved to another repo. */
+/** A NOT_FOUND for the issue itself, as opposed to the repository. */
+const issueNotFound = (error: unknown) =>
+  error instanceof GithubError && error.type === 'NOT_FOUND' && error.path[error.path.length - 1] === 'issue';
+
+/**
+ * The issue as it is now, or null when it was deleted or moved to another repo. Throws when the
+ * repository itself can't be read (wrong GITHUB_ISSUE_REPO, the App lost access): that must never
+ * read as "every issue is gone" and unlink every report.
+ */
 export const readIssue = async (gh: GithubClient, number: number): Promise<IssueState | null> => {
-  let issue: IssueNode | null;
+  let data: { repository: { nameWithOwner: string; issue: IssueNode | null } | null };
   try {
-    const data = await gh.graphql<{ repository: { issue: IssueNode | null } | null }>(ISSUE, {
-      owner: gh.config.owner,
-      repo: gh.config.repo,
-      number,
-    });
-    issue = data.repository?.issue ?? null;
+    data = await gh.graphql(ISSUE, { owner: gh.config.owner, repo: gh.config.repo, number });
   } catch (error) {
-    if (error instanceof GithubError && error.type === 'NOT_FOUND') return null;
+    if (issueNotFound(error)) return null;
     throw error;
   }
-  // A transferred issue may still resolve, but in another repo: it is no longer ours.
-  if (!issue || issue.repository.nameWithOwner.toLowerCase() !== repoName(gh)) return null;
+  if (!data.repository) throw new GithubError(200, `GitHub: repository ${repoName(gh)} not readable`);
+  const issue = data.repository.issue;
+  // A transferred issue may still resolve, but in another repo: it is no longer ours. Compared with
+  // the repository as GitHub resolved it, so a renamed repo doesn't look like a transfer.
+  if (!issue || issue.repository.nameWithOwner.toLowerCase() !== data.repository.nameWithOwner.toLowerCase()) return null;
+  const home = data.repository.nameWithOwner.toLowerCase();
   const item = gh.config.projectNumber
     ? issue.projectItems.nodes.find(
         (n) => n && n.project.number === gh.config.projectNumber && n.project.owner.login?.toLowerCase() === gh.config.owner.toLowerCase()
@@ -142,8 +121,7 @@ export const readIssue = async (gh: GithubClient, number: number): Promise<Issue
     number: issue.number,
     open: issue.state === 'OPEN',
     stateReason: issue.stateReason,
-    duplicateOfNumber:
-      duplicateOf && duplicateOf.repository.nameWithOwner.toLowerCase() === repoName(gh) ? duplicateOf.number : null,
+    duplicateOfNumber: duplicateOf && duplicateOf.repository.nameWithOwner.toLowerCase() === home ? duplicateOf.number : null,
     boardItem: item ? { id: item.id, column: item.fieldValueByName?.name ?? null } : null,
   };
 };
@@ -308,6 +286,10 @@ export const applyStatus = async (
   if (!issue.open) await gh.graphql(REOPEN, { issueId: issue.nodeId });
   await setColumn(gh, issue, status);
 };
+
+/** Closes an issue EduHub just created but couldn't link, so a retry doesn't leave two. */
+export const closeOrphan = (gh: GithubClient, nodeId: string) =>
+  gh.graphql(CLOSE, { issueId: nodeId, reason: 'NOT_PLANNED', duplicateIssueId: null });
 
 /** Board placement of a newly created or linked issue. */
 export const placeOnBoard = (gh: GithubClient, issue: Pick<IssueState, 'nodeId' | 'boardItem'>, status: ReportStatus) =>

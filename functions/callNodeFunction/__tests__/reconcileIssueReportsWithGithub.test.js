@@ -1,6 +1,6 @@
 import { jest } from '@jest/globals';
 import { createVerify, generateKeyPairSync } from 'crypto';
-import reconcileIssueReportsWithGithub, { reportChange } from '../reconcileIssueReportsWithGithub/index.js';
+import reconcileIssueReportsWithGithub, { reportChange, runOrder, TIME_BUDGET_MS } from '../reconcileIssueReportsWithGithub/index.js';
 import { appJwt, githubConfig, statusFromIssue, withFooter, renderFooter } from '../lib/github.js';
 
 const logger = { info: jest.fn(), warn: jest.fn(), error: jest.fn() };
@@ -136,9 +136,11 @@ describe('reconcileIssueReportsWithGithub', () => {
       config: { owner: 'eduhub-org', repo: 'eduhub', projectNumber: 4 },
       async graphql(_query, { number }) {
         const i = issues[number];
-        if (!i) return { repository: { issue: null } };
+        if (i === 'no-repo') return { repository: null };
+        if (!i) return { repository: { nameWithOwner: 'eduhub-org/eduhub', issue: null } };
         return {
           repository: {
+            nameWithOwner: 'eduhub-org/eduhub',
             issue: {
               id: `I_${number}`,
               number,
@@ -191,6 +193,31 @@ describe('reconcileIssueReportsWithGithub', () => {
     await reconcileIssueReportsWithGithub({}, logger, { gql, github });
     expect(gql.updates).toEqual([]);
     expect(github.patches).toEqual([]);
+  });
+
+  it("never unlinks when the repository itself can't be read", async () => {
+    const gql = fakeGql([row({ id: 1, githubIssueNumber: 7 })]);
+    const result = await reconcileIssueReportsWithGithub({}, logger, { gql, github: fakeGithub({ 7: 'no-repo' }) });
+    expect(gql.updates).toEqual([]);
+    expect(result).toMatchObject({ success: false, failed: 1 });
+  });
+
+  it('checks open reports first, rotates closed ones by day and stops at the time budget', async () => {
+    const reports = [
+      row({ id: 1, status: 'DONE', githubIssueNumber: 1 }),
+      row({ id: 2, status: 'DONE', githubIssueNumber: 2 }),
+      row({ id: 3, status: 'PLANNED', githubIssueNumber: 3 }),
+    ];
+    const day = 24 * 60 * 60 * 1000;
+    expect(runOrder(reports, new Date(0)).map((r) => r.id)).toEqual([3, 1, 2]);
+    expect(runOrder(reports, new Date(day)).map((r) => r.id)).toEqual([3, 2, 1]);
+
+    let t = 0;
+    const clock = () => new Date((t += TIME_BUDGET_MS / 2 + 1));
+    const github = fakeGithub({ 1: { open: false, stateReason: 'COMPLETED', body: '' }, 2: { open: false, stateReason: 'COMPLETED', body: '' }, 3: { open: true, column: 'Todo', body: '' } });
+    const result = await reconcileIssueReportsWithGithub({}, logger, { gql: fakeGql(reports), github, now: clock });
+    expect(result.checked + result.left).toBe(3);
+    expect(result.left).toBeGreaterThan(0);
   });
 
   it('keeps going after one report fails', async () => {
