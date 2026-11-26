@@ -28,7 +28,6 @@ export interface FeedbackHandlerDeps {
   getSession(req: NextApiRequest): Promise<AssistantSession | null>;
   rateLimiter: RateLimiter;
   hasuraUrl: string;
-  contact: string;
   fetchImpl?: typeof fetch;
 }
 
@@ -88,7 +87,7 @@ export const createFeedbackHandler = (deps: FeedbackHandlerDeps) => async (req: 
     );
   } catch {
     console.error('Assistant: storing feedback failed');
-    return refuse(res, 503, 'UNAVAILABLE', locale, { contact: deps.contact });
+    return refuse(res, 503, 'UNAVAILABLE', locale);
   }
   console.info(JSON.stringify({ metric: 'assistant_feedback', event: 'stored', rating }));
   return res.status(204).end();

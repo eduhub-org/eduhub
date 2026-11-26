@@ -189,7 +189,7 @@ EMBEDDING_PROVIDER=fake HASURA_ENDPOINT=http://localhost:8080/v1/graphql HASURA_
 | `ASSISTANT_MAX_MESSAGE_CHARS` | 4000 | per user message |
 | `ASSISTANT_MAX_CONVERSATION_MESSAGES`, `…_CHARS` | 40, 60000 | per conversation |
 | `ASSISTANT_MAX_TOOL_ROUNDS` | 6 | model rounds per reply |
-| `ASSISTANT_CONTACT` | `edu@opencampus.sh` | named when the Assistant can't help |
+| `ASSISTANT_CONTACT` | | named in the system prompt when the Assistant can't help and linked in the widget (`GET /api/assistant/contact`); set in Terraform (`assistant_contact`) and docker-compose, no default in the code. Unset: no contact is named |
 
 The rate limit is kept in memory per server instance (no user ids stored); with several Cloud Run
 instances a person can get up to that multiple. The spending cap is global, in the database.

@@ -121,7 +121,6 @@ export const testDeps = (
     spend: createMemorySpendTracker(),
     rateLimiter: createRateLimiter(config.ok ? config.config.limits : { rateShortMax: 9, rateShortWindowMs: 1, rateDailyMax: 9 }),
     buildTools: async () => tools ?? { definitions: [], call: async () => ({ status: 'invalid', content: '{}' }) },
-    contact: 'edu@opencampus.sh',
     ...rest,
   };
   return deps;

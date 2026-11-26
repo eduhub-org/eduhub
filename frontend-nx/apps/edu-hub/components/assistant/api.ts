@@ -182,6 +182,18 @@ export type ProposalDecision = 'apply' | 'discard';
 
 export type ProposalOutcome = { ok: true; result: Record<string, unknown> } | { ok: false; error: AssistantError };
 
+/** The contact address configured on the server (ASSISTANT_CONTACT), or null when none is set. */
+export const fetchContact = async (): Promise<string | null> => {
+  try {
+    const response = await fetch(`${ASSISTANT_API_BASE}/contact`);
+    if (!response.ok) return null;
+    const { contact } = await response.json();
+    return typeof contact === 'string' && contact ? contact : null;
+  } catch {
+    return null;
+  }
+};
+
 /** Applies or discards a Proposed Change. Only the Organizer's click calls this; the model never can. */
 export const decideProposal = async (
   proposedChangeId: string,

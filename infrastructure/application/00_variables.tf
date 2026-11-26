@@ -592,6 +592,11 @@ variable "assistant_monthly_spend_cap_eur" {
   type        = number
   default     = 50
 }
+variable "assistant_contact" {
+  description = "Contact the Assistant names when it can't help, and in its error messages"
+  type        = string
+  default     = "edu@opencampus.sh"
+}
 variable "assistant_llm_price_input_eur_per_mtok" {
   description = "Price of the Assistant's model per million input tokens in EUR, from the provider's price list for the chosen model (and location). The spending cap multiplies it with the tokens the API reports; without it the Assistant stays off."
   type        = number

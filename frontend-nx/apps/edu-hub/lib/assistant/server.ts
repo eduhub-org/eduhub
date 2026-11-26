@@ -9,7 +9,7 @@ import type { FeedbackHandlerDeps } from './feedback';
 import type { ProposalsHandlerDeps } from './proposals';
 import type { AssistantSession, ChatHandlerDeps } from './handler';
 import { createRateLimiter } from './limits';
-import { DEFAULT_CONTACT } from './prompt';
+import { assistantContact } from './prompt';
 import { ChatProvider, createProvider } from './provider';
 import { createHasuraSpendTracker, createMemorySpendTracker } from './spending';
 import { createHasuraReportSearch, createReportTools } from './reportTools';
@@ -72,7 +72,7 @@ export const assistantDeps = (): ChatHandlerDeps => {
         : createMemorySpendTracker(),
     // When the Assistant is off, the handler refuses before the rate limit is consulted.
     rateLimiter: createRateLimiter(config.ok ? config.config.limits : { rateShortMax: 0, rateShortWindowMs: 1, rateDailyMax: 0 }),
-    contact: process.env.ASSISTANT_CONTACT || DEFAULT_CONTACT,
+    contact: assistantContact(),
     buildTools: async (session, role) => {
       const caller = { url: HASURA_URL, token: session.accessToken, userId: session.userId };
       // Report search reads other people's open reports, so it needs the admin secret (reportTools.ts).
@@ -95,11 +95,10 @@ export const assistantDeps = (): ChatHandlerDeps => {
 let feedback: FeedbackHandlerDeps | null = null;
 
 export const feedbackDeps = (): FeedbackHandlerDeps => {
-  const { config, getSession, contact } = assistantDeps();
+  const { config, getSession } = assistantDeps();
   feedback ??= {
     config,
     getSession,
-    contact,
     hasuraUrl: HASURA_URL,
     // Ratings are rare: 10 per 10 minutes and 30 a day are plenty.
     rateLimiter: createRateLimiter({ rateShortMax: 10, rateShortWindowMs: 10 * 60_000, rateDailyMax: 30 }),
@@ -109,7 +108,6 @@ export const feedbackDeps = (): FeedbackHandlerDeps => {
 
 export const proposalsDeps: ProposalsHandlerDeps = {
   getSession: getAssistantSession,
-  contact: process.env.ASSISTANT_CONTACT || DEFAULT_CONTACT,
   courseSetup: (session, role) => {
     const secret = process.env.MCP_PROPOSAL_SECRET;
     if (!secret || !HASURA_URL) return null;
@@ -124,7 +122,6 @@ export const proposalsDeps: ProposalsHandlerDeps = {
 export const reportsDeps: ReportsHandlerDeps = {
   getSession: getAssistantSession,
   hasuraUrl: HASURA_URL,
-  contact: process.env.ASSISTANT_CONTACT || DEFAULT_CONTACT,
   // Loaded on demand: lib/github/server imports this module.
   onVoted: async (reportId) => (await import('../github/server')).refreshReportFooter(reportId),
 };
