@@ -51,4 +51,5 @@ Settings your role can't change by hand, it can't change either.
 - It answers questions about the platform and about error messages from this manual, the rules your organization publishes online and the platform's own texts, and links the pages it used.
 - The Assistant is an AI and can make mistakes. Check every Proposed Change before applying it.
 - A conversation stays only in this browser tab until you close it or log out; EduHub doesn't store it. You can rate each answer with thumbs up or down. If you rate an answer as not helpful, you can agree to the conversation up to that answer being kept by EduHub for 30 days to improve the Assistant.
+- The Assistant's answers come from a language model run by IONOS in Germany. The **Privacy** link at the top of the chat, under its title, opens the part of the privacy policy that says which data is sent to it.
 - The Assistant is not available while an Admin is viewing EduHub as someone else.
