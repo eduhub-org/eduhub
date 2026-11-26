@@ -63,6 +63,20 @@ million tokens, from the provider's price list). The monthly spending cap
 
 `assistant_llm_model` is empty by default, which picks the provider's model from the trial.
 
+The weekly summary of bug reports and feature ideas on `/manage/reports` (issue #2234) runs in
+callNodeFunction with its own model, so it can use a stronger one than the chat. To turn it on,
+set `summary_llm_provider` and `summary_llm_model`, and for the cost shown with each summary
+`summary_llm_price_input_eur_per_mtok` / `summary_llm_price_output_eur_per_mtok`:
+
+- `vertex`: Gemini on Vertex AI in `summary_llm_location` (default `eu`), with
+  callNodeFunction's service account, which already has `roles/aiplatform.user`. The
+  zero-retention settings above apply to this model too.
+- `ionos`: a model on the IONOS AI Model Hub, with the Assistant's key (`assistant_llm_api_key`),
+  so it needs `assistant_llm_provider = "ionos"` with a key.
+
+While `summary_llm_provider` is empty, no summary is written. One run sends at most 200 reports and
+200 thumbs-down rows, each cut short, and caps the output at 6000 tokens.
+
 To deny the global endpoint, the Terraform service account needs `roles/orgpolicy.policyAdmin`
 on the organization. Then set `vertex_global_endpoint_policy` to `dry_run`, check the audit
 logs for denied requests, and switch to `enforce`.

@@ -25,6 +25,7 @@ import {
 } from '../../hooks/authentication';
 import { AuthRoles } from '../../types/enums';
 import { FeedbackControls } from './FeedbackControls';
+import { ReportCard } from './ReportCard';
 import { buildPageContext, readVisibleError } from './pageContext';
 import { ProposedChangeCard } from './ProposedChangeCard';
 import { suggestionsFor } from './suggestions';
@@ -57,6 +58,7 @@ const useAssistantRole = (path: string): string => {
 
 /** Text the reader can see; a reply of only whitespace counts as empty. */
 const hasText = (message: ConversationMessage) => message.content.trim().length > 0;
+const hasCards = (message: ConversationMessage) => message.proposals.length > 0 || (message.reports?.length ?? 0) > 0;
 
 const iconButton =
   'flex h-8 w-8 items-center justify-center rounded-lg text-label-secondary hover:bg-bg-secondary hover:text-label-primary disabled:opacity-50';
@@ -116,10 +118,11 @@ const Reply: FC<{
   message: ConversationMessage;
   contactHref: string;
   onDecide: (id: string, action: 'apply' | 'discard') => void;
-}> = ({ message, contactHref, onDecide }) => {
+  onDecideReport: (id: string, action: 'send' | 'dismiss') => void;
+}> = ({ message, contactHref, onDecide, onDecideReport }) => {
   const t = useTranslations('assistant');
-  // A reply that ended without text, proposal or error must not leave an empty gap.
-  const empty = !message.streaming && !hasText(message) && message.proposals.length === 0;
+  // A reply that ended without text, card or error must not leave an empty gap.
+  const empty = !message.streaming && !hasText(message) && !hasCards(message);
   const error = message.error ?? (empty ? { code: 'EMPTY_REPLY', message: '' } : undefined);
   return (
     <div className="min-w-0">
@@ -149,6 +152,14 @@ const Reply: FC<{
           state={state}
           onApply={() => onDecide(state.key, 'apply')}
           onDiscard={() => onDecide(state.key, 'discard')}
+        />
+      ))}
+      {message.reports?.map((state) => (
+        <ReportCard
+          key={state.key}
+          state={state}
+          onSend={() => onDecideReport(state.key, 'send')}
+          onDismiss={() => onDecideReport(state.key, 'dismiss')}
         />
       ))}
       {error && (
@@ -228,7 +239,7 @@ const Chat: FC<{ conversation: Conversation; role: string; contactHref: string }
 }) => {
   const t = useTranslations('assistant');
   const router = useRouter();
-  const { messages, sending, send, stop, decide, rate } = conversation;
+  const { messages, sending, send, stop, decide, decideReport, rate } = conversation;
   const [draft, setDraft] = useState('');
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
@@ -282,8 +293,8 @@ const Chat: FC<{ conversation: Conversation; role: string; contactHref: string }
             ) : (
               <div key={message.id} className="group max-w-full">
                 <p className="sr-only">{t('assistant_wrote')}</p>
-                <Reply message={message} contactHref={contactHref} onDecide={decide} />
-                {!message.streaming && !message.error && (hasText(message) || message.proposals.length > 0) && (
+                <Reply message={message} contactHref={contactHref} onDecide={decide} onDecideReport={decideReport} />
+                {!message.streaming && !message.error && (hasText(message) || hasCards(message)) && (
                   <FeedbackControls
                     persistent={message.id === lastAnswerId}
                     rated={message.rating}

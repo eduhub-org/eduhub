@@ -602,6 +602,41 @@ variable "assistant_llm_price_output_eur_per_mtok" {
   type        = number
   default     = null
 }
+variable "summary_llm_provider" {
+  description = "LLM provider of the weekly issue report summary (issue #2234), run by callNodeFunction: vertex (Gemini on Vertex AI in the EU, with the function's service account), ionos (IONOS AI Model Hub, with assistant_llm_api_key), or empty to write no summaries"
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = contains(["", "vertex", "ionos"], var.summary_llm_provider)
+    error_message = "summary_llm_provider must be \"ionos\", \"vertex\" or empty."
+  }
+}
+variable "summary_llm_model" {
+  description = "Model id of the weekly summary at its provider, e.g. a stronger model than the Assistant's for better planning. Required when summary_llm_provider is set."
+  type        = string
+  default     = ""
+}
+variable "summary_llm_location" {
+  description = "Vertex AI location of the summary model (provider vertex only): eu or an EU region, never global (ADR 0005)"
+  type        = string
+  default     = "eu"
+
+  validation {
+    condition     = var.summary_llm_location == "eu" || startswith(var.summary_llm_location, "europe-")
+    error_message = "summary_llm_location must be \"eu\" or a europe-* region, never global."
+  }
+}
+variable "summary_llm_price_input_eur_per_mtok" {
+  description = "Price of the summary model per million input tokens in EUR; shown with each summary as its estimated cost"
+  type        = number
+  default     = null
+}
+variable "summary_llm_price_output_eur_per_mtok" {
+  description = "Price of the summary model per million output tokens (including reasoning) in EUR"
+  type        = number
+  default     = null
+}
 variable "vertex_global_endpoint_policy" {
   description = "Organization policy constraints/gcp.restrictEndpointUsage denying the global Vertex AI endpoint in this project: empty (not managed), dry_run (violations are only logged) or enforce. Needs roles/orgpolicy.policyAdmin, which can only be granted at the organization, for the Terraform service account."
   type        = string

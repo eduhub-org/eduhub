@@ -1,0 +1,72 @@
+table:
+  name: IssueReport
+  schema: public
+# Bug reports and feature ideas sent through the Assistant (issue #2234).
+# Inserted by POST /api/assistant/reports with the user's own token under the `user` role, together
+# with the reporter's own IssueReportVote. Users read only status and admin note of reports they
+# reported or voted on; title and description stay with admins, because a voter must never see
+# another person's text (they see their vote's summary instead). Admins have full access.
+object_relationships:
+  - name: User
+    using:
+      foreign_key_constraint_on: userId
+  - name: DuplicateOf
+    using:
+      foreign_key_constraint_on: duplicateOfId
+array_relationships:
+  - name: Votes
+    using:
+      foreign_key_constraint_on:
+        column: issueReportId
+        table:
+          name: IssueReportVote
+          schema: public
+  - name: Duplicates
+    using:
+      foreign_key_constraint_on:
+        column: duplicateOfId
+        table:
+          name: IssueReport
+          schema: public
+insert_permissions:
+  - role: user_access
+    permission:
+      check: {}
+      set:
+        userId: x-hasura-user-id
+      columns:
+        - type
+        - title
+        - description
+        - route
+        - role
+        - locale
+select_permissions:
+  - role: user_access
+    permission:
+      columns:
+        - id
+        - type
+        - status
+        - publicNote
+        - closedAt
+        - created_at
+        - updated_at
+      filter:
+        Votes:
+          userId:
+            _eq: X-Hasura-User-Id
+delete_permissions:
+  # Withdraw: only the reporter, only while NEW, and only while nobody else has added their voice.
+  - role: user_access
+    permission:
+      filter:
+        _and:
+          - userId:
+              _eq: X-Hasura-User-Id
+          - status:
+              _eq: NEW
+          - _not:
+              Votes:
+                userId:
+                  _neq: X-Hasura-User-Id

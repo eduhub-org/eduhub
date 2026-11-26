@@ -8,9 +8,11 @@ import {
   PageContext,
   ProposalDecision,
   ProposalOutcome,
+  sendReport,
   streamChat,
 } from './api';
 import type { ProposalState } from './ProposedChangeCard';
+import type { ReportState } from './ReportCard';
 
 export interface ConversationMessage {
   id: string;
@@ -19,6 +21,8 @@ export interface ConversationMessage {
   /** What was sent about the page with a user message, shown to the user. */
   pageContext?: PageContext;
   proposals: ProposalState[];
+  /** Report cards (issue #2234); missing in conversations stored before they existed. */
+  reports?: ReportState[];
   error?: AssistantError;
   streaming?: boolean;
   /** The backend is running a tool (looking up data) for this reply. */
@@ -56,6 +60,9 @@ const settle = (p: ProposalState, action: ProposalDecision, outcome: ProposalOut
   return { ...p, busy: false, status: 'DISCARDED', proposal: { ...p.proposal, proposedChangeId: '' } };
 };
 
+/** Report cards being sent; a second click before the first re-render must not send twice. */
+const sendingReports = new Set<string>();
+
 let counter = 0;
 const newId = () => `${Date.now().toString(36)}-${(counter++).toString(36)}`;
 
@@ -70,6 +77,10 @@ const load = (key: string | null): ConversationMessage[] => {
       ...message,
       streaming: false,
       lookingUp: false,
+      // A send a reload cut off may or may not have arrived; the user can ask about their reports.
+      reports: message.reports?.map((r) =>
+        r.busy ? { ...r, busy: false, status: 'FAILED', error: { code: 'NETWORK', message: '' } } : r
+      ),
       proposals: message.proposals.map(
         (p): ProposalState =>
           p.busy && !pending.has(p.key)
@@ -85,19 +96,20 @@ const load = (key: string | null): ConversationMessage[] => {
 /** The conversation as the backend wants it: text plus what became of each proposal. */
 export const toPayload = (messages: ConversationMessage[]): ChatMessagePayload[] =>
   messages
-    .filter((message) => message.content || message.proposals.length > 0)
-    .map(({ role, content, proposals }) => ({
-      role,
-      content,
-      ...(proposals.length > 0 && {
-        proposals: proposals.map(({ proposal, status }) => ({
+    .filter((message) => message.content || message.proposals.length > 0 || (message.reports?.length ?? 0) > 0)
+    .map(({ role, content, proposals, reports = [] }) => {
+      const notes = [
+        ...proposals.map(({ proposal, status }) => ({
           ...(proposal.proposedChangeId && { proposedChangeId: proposal.proposedChangeId }),
           kind: proposal.kind,
           courseId: proposal.courseId,
           status,
         })),
-      }),
-    }));
+        // Report cards travel as notes too, so the model knows whether the user sent them.
+        ...reports.map(({ draft, status }) => ({ kind: `report_${draft.kind}`, courseId: null, status })),
+      ];
+      return { role, content, ...(notes.length > 0 && { proposals: notes }) };
+    });
 
 /**
  * The conversation lives only in this tab: memory plus sessionStorage, which the
@@ -183,6 +195,11 @@ export const useAssistantConversation = ({
               ...m,
               proposals: [...m.proposals, { key: newId(), proposal: event.proposal, status: 'PROPOSED', busy: false }],
             }));
+          } else if (event.type === 'report') {
+            updateMessage(reply.id, (m) => ({
+              ...m,
+              reports: [...(m.reports ?? []), { key: newId(), draft: event.report, status: 'PROPOSED', busy: false }],
+            }));
           } else if (event.type === 'tool') {
             updateMessage(reply.id, (m) => ({ ...m, lookingUp: event.status === 'running' }));
           } else if (event.type === 'error') {
@@ -246,6 +263,40 @@ export const useAssistantConversation = ({
     [messages, role, locale, apollo, updateProposal]
   );
 
+  const updateReport = (key: string, update: (state: ReportState) => ReportState) =>
+    setMessages((current) =>
+      current.map((message) =>
+        message.reports?.some((r) => r.key === key)
+          ? { ...message, reports: message.reports.map((r) => (r.key === key ? update(r) : r)) }
+          : message
+      )
+    );
+
+  /** Sends or dismisses a report card. Only the user's click calls this; a click while sending is dropped. */
+  const decideReport = useCallback(
+    async (key: string, action: 'send' | 'dismiss') => {
+      const index = messages.findIndex((m) => m.reports?.some((r) => r.key === key));
+      const state = messages[index]?.reports?.find((r) => r.key === key);
+      if (!state || state.busy || sendingReports.has(key) || state.status === 'APPLIED' || state.status === 'DISCARDED') return;
+      if (action === 'dismiss') {
+        updateReport(key, (r) => ({ ...r, status: 'DISCARDED', error: undefined }));
+        return;
+      }
+      // The page the user was on when they asked, where the problem happened.
+      const route = [...messages.slice(0, index)].reverse().find((m) => m.role === 'user')?.pageContext?.route;
+      sendingReports.add(key);
+      updateReport(key, (r) => ({ ...r, busy: true, error: undefined }));
+      const outcome = await sendReport(state.draft, { role, locale, route });
+      sendingReports.delete(key);
+      updateReport(key, (r) =>
+        outcome.ok
+          ? { ...r, busy: false, status: 'APPLIED' }
+          : { ...r, busy: false, status: 'FAILED', error: outcome.error }
+      );
+    },
+    [messages, role, locale]
+  );
+
   /** Records (or, after a failed send, clears) the rating of one answer. */
   const rate = useCallback((id: string, rating: 'up' | 'down' | undefined) => {
     setMessages((current) => current.map((message) => (message.id === id ? { ...message, rating } : message)));
@@ -257,5 +308,5 @@ export const useAssistantConversation = ({
     setMessages([]);
   }, []);
 
-  return { messages, sending, send, stop, decide, rate, reset };
+  return { messages, sending, send, stop, decide, decideReport, rate, reset };
 };

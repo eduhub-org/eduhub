@@ -52,6 +52,7 @@
       "manual": "Manual",
       "faq": "FAQ",
       "user": "User",
+      "reports": "Reports",
       "admin_users": "Admin Users",
       "experts": "Experts",
       "courses": "Courses",
@@ -4023,7 +4024,12 @@
       "generic": "Something went wrong. Please try again later.",
       "NETWORK": "The connection was lost. Please try again.",
       "INTERRUPTED": "The reply was cut off. Please ask again.",
-      "EMPTY_REPLY": "No answer came back. Please ask again."
+      "EMPTY_REPLY": "No answer came back. Please ask again.",
+      "REPORT_LIMIT_REACHED": "You have already sent {max} reports today. You can send more tomorrow.",
+      "REPORT_ALREADY_VOTED": "You already support this report.",
+      "REPORT_CLOSED": "This report is already closed or no longer exists.",
+      "REPORT_NOT_WITHDRAWABLE": "You can no longer withdraw this report: the EduHub team has already looked at it or others have joined.",
+      "REPORT_FAILED": "Your report couldn't be saved right now. Please try again later or write to {contact}."
     },
     "context": {
       "chip": "Sent along: {page}",
@@ -4034,11 +4040,13 @@
       "helpful": "Helpful",
       "not_helpful": "Not helpful",
       "consent_label": "Keep this conversation?",
-      "consent_question": "May we keep this conversation for 30 days so we can improve the Assistant? Without your consent we only count the rating.",
+      "consent_question": "May we keep this conversation for 30 days so we can improve the Assistant? Without your consent we only get the rating and your comment.",
       "consent_yes": "Yes, keep it",
-      "consent_no": "No, only send the rating",
+      "consent_no": "No, don't keep it",
       "thanks": "Thanks for your feedback!",
-      "failed": "Your feedback could not be sent."
+      "failed": "Your feedback could not be sent.",
+      "comment_label": "What wasn't helpful? (optional)",
+      "comment_placeholder": "e.g. \"The answer was wrong because …\""
     },
     "proposal": {
       "title": "Proposed change: {kind}",
@@ -4103,7 +4111,28 @@
         "ROLE_NOT_ALLOWED": "You can't make this change with your current role."
       }
     },
-    "looking_up": "Looking it up…"
+    "looking_up": "Looking it up…",
+    "report": {
+      "title_create": "Report: {type}",
+      "title_vote": "Existing report: {type}",
+      "title_withdraw": "Withdraw report",
+      "types": {
+        "BUG": "Bug",
+        "FEATURE": "Idea"
+      },
+      "not_sent_yet": "Not sent yet. Check the report and send it yourself.",
+      "vote_hint": "Someone has already reported this. If you join, your voice counts too.",
+      "withdraw_hint": "The report will be deleted.",
+      "send": "Send",
+      "sending": "Sending…",
+      "vote": "Join",
+      "withdraw": "Withdraw",
+      "dismiss": "Discard",
+      "sent": "Sent. Ask me \"What happened to my reports?\" any time to see the status.",
+      "voted": "You've joined. Ask me \"What happened to my reports?\" any time to see the status.",
+      "withdrawn": "Withdrawn.",
+      "dismissed": "Discarded. Nothing was sent."
+    }
   },
   "help": {
     "title": "Manual",
@@ -4121,5 +4150,63 @@
     "org_rules_link": "Go to the rules and FAQ",
     "version_release": "Manual as of release <release></release>, commit <commit></commit>",
     "version_commit": "Manual as of commit <commit></commit> (not released yet)"
+  },
+  "manageReports": {
+    "headline": "Reports",
+    "intro": "Bugs and ideas users sent through the Assistant. Set status and priority; the status and your public note are visible to everyone who sent or joined the report when they ask the Assistant about it.",
+    "columns": {
+      "type": "Type",
+      "title": "Title",
+      "people": "Affected",
+      "status": "Status",
+      "priority": "Priority",
+      "created": "Reported on"
+    },
+    "type": {
+      "BUG": "Bug",
+      "FEATURE": "Idea"
+    },
+    "status": {
+      "NEW": "New",
+      "PLANNED": "Planned",
+      "IN_PROGRESS": "In progress",
+      "DONE": "Done",
+      "DECLINED": "Declined",
+      "DUPLICATE": "Duplicate"
+    },
+    "priority": {
+      "HIGH": "High",
+      "MEDIUM": "Medium",
+      "LOW": "Low",
+      "none": "None"
+    },
+    "details": {
+      "description": "Description",
+      "id": "Number",
+      "people": "Affected (with duplicates)",
+      "page": "Page",
+      "role_language": "Role · language",
+      "reporter": "Reported by",
+      "reporter_removed": "Removed (anonymized 6 months after closing, or account deleted)",
+      "duplicate_of": "Duplicate of",
+      "mark_duplicate": "Mark as duplicate of",
+      "public_note": "Public note",
+      "github_issue": "GitHub issue"
+    },
+    "help": {
+      "mark_duplicate": "Sets the status to \"Duplicate\". The people affected count towards the original.",
+      "public_note": "Shown to everyone who sent or joined the report, e.g. \"Planned for spring\" or why it was declined.",
+      "github_issue": "Link to the issue once the report is planned."
+    },
+    "error": {
+      "duplicate_failed": "The report couldn't be marked as a duplicate."
+    },
+    "summary": {
+      "title": "Weekly summary",
+      "week": "Week",
+      "none": "No summary yet. One is written every Monday.",
+      "meta": "{from} – {to} · {reports, plural, one {# new report} other {# new reports}} · {feedback} 👎 feedback",
+      "cost": "{cost} € with {model}"
+    }
   }
 }
