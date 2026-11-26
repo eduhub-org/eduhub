@@ -15,7 +15,7 @@ You can also let the [Assistant](assistant.md) create the course and draft its t
 
 ### When there is no program yet
 
-Every course belongs to a program. If your organization has no program of this kind yet, **Manage Courses** says so and shows **Create course program** (or **Create events program** / **Create degree program**). Click it and confirm with **Create**. If you manage several organizations, first choose the one the program belongs to. The program is created as **New Program**, and you can change its title, dates and other settings afterwards. You only see the button for the kinds of programs you are allowed to manage. Otherwise, ask a platform admin to set up the program.
+Every course belongs to a program. If you don't see any program of this kind yet, **Manage Courses** says so and shows **Create course program** (or **Create events program** / **Create degree program**). Click it and confirm with **Create**. If you manage several organizations, first choose the one the program belongs to. The button only appears while none of your organizations has a program of this kind; once one exists, further programs are created under **Settings → Programs** (Org Admins who may manage settings, and platform admins). The program is created as **New Program**, and you can change its title, dates and other settings afterwards. You only see the button for the kinds of programs you are allowed to manage. Otherwise, ask a platform admin to set up the program.
 
 ### Course titles must be unique
 

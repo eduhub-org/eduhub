@@ -15,7 +15,7 @@ Du kannst den Kurs auch vom [Assistenten](assistant.md) anlegen und seine Texte 
 
 ### Wenn es noch kein Programm gibt
 
-Jeder Kurs gehört zu einem Programm. Hat Deine Organisation noch kein Programm dieser Art, zeigt **Kurse verwalten** das an und bietet **Kursprogramm anlegen** (oder **Veranstaltungsprogramm anlegen** / **Studiengangsprogramm anlegen**). Klicke darauf und bestätige mit **Anlegen**. Verwaltest Du mehrere Organisationen, wählst Du vorher, zu welcher das Programm gehört. Das Programm wird als **Neues Programm** angelegt; Titel, Zeiträume und weitere Einstellungen änderst Du danach. Den Knopf siehst Du nur für die Programmarten, die Du verwalten darfst. Sonst bitte einen Plattform-Admin, das Programm anzulegen.
+Jeder Kurs gehört zu einem Programm. Siehst Du noch kein Programm dieser Art, zeigt **Kurse verwalten** das an und bietet **Kursprogramm anlegen** (oder **Veranstaltungsprogramm anlegen** / **Studiengangsprogramm anlegen**). Klicke darauf und bestätige mit **Anlegen**. Verwaltest Du mehrere Organisationen, wählst Du vorher, zu welcher das Programm gehört. Der Knopf erscheint nur, solange keine Deiner Organisationen ein Programm dieser Art hat; danach werden weitere Programme unter **Einstellungen → Programme** angelegt (von Org-Admins, die die Einstellungen verwalten dürfen, und von Plattform-Admins). Das Programm wird als **Neues Programm** angelegt; Titel, Zeiträume und weitere Einstellungen änderst Du danach. Den Knopf siehst Du nur für die Programmarten, die Du verwalten darfst. Sonst bitte einen Plattform-Admin, das Programm anzulegen.
 
 ### Kurstitel müssen eindeutig sein
 

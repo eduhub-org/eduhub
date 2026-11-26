@@ -145,7 +145,11 @@ const ProgramManagementDashboard: FC<ProgramManagementDashboardProps> = ({ progr
 
   // Creating the first program of this type from the empty state. The new program's organization is
   // selected afterwards, so the dashboard lands on it once the program list has refetched.
-  const { organizations: creatableOrganizations } = useProgramCreationOptions(programType);
+  const {
+    organizations: creatableOrganizations,
+    loading: creationOptionsLoading,
+    error: creationOptionsError,
+  } = useProgramCreationOptions(programType);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [createFailed, setCreateFailed] = useState(false);
 
@@ -194,7 +198,14 @@ const ProgramManagementDashboard: FC<ProgramManagementDashboardProps> = ({ progr
     }
     if (organizationId === null || programs.length === 0) {
       // No program of this type is visible to the current admin yet: offer to create one for an
-      // organization they may manage this type for, or explain who can.
+      // organization they may manage this type for, or explain who can. Wait for the creation
+      // options first, so neither a pending nor a failed load reads as a missing permission.
+      if (creationOptionsLoading) {
+        return <Loading />;
+      }
+      if (creationOptionsError) {
+        return <div className="py-8 text-center text-error">{t('error_loading_programs')}</div>;
+      }
       const canCreate = creatableOrganizations.length > 0;
       return (
         <div className="py-8 flex flex-col items-center gap-4 text-center text-label-secondary">

@@ -29,11 +29,15 @@ export const useProgramCreationOptions = (programType: ProgramType) => {
   const isAdmin = useIsAdmin();
   const userId = useUserId();
 
-  const { data: organizationsData, loading: organizationsLoading } = useAdminQuery<OrganizationOptions>(
+  const {
+    data: organizationsData,
+    loading: organizationsLoading,
+    error: organizationsError,
+  } = useAdminQuery<OrganizationOptions>(
     ORGANIZATION_OPTIONS,
     { skip: !isAdmin }
   );
-  const { data: grantsData, loading: grantsLoading } = useOrgAdminQuery<MyOrgAdminCapabilities>(
+  const { data: grantsData, loading: grantsLoading, error: grantsError } = useOrgAdminQuery<MyOrgAdminCapabilities>(
     MY_ORG_ADMIN_CAPABILITIES,
     { variables: { userId }, skip: isAdmin || !userId }
   );
@@ -44,15 +48,31 @@ export const useProgramCreationOptions = (programType: ProgramType) => {
         value: String(org.id),
         label: org.name,
       }));
-      return { programTypes: ALL_PROGRAM_TYPES, organizations, loading: organizationsLoading };
+      return {
+        programTypes: ALL_PROGRAM_TYPES,
+        organizations,
+        loading: organizationsLoading,
+        error: organizationsError,
+      };
     }
     const grants = grantsData?.OrganizationAdmin ?? [];
     return {
       programTypes: creatableProgramTypes(grants),
       organizations: creatableOrganizations(grants, programType),
       loading: grantsLoading || !userId,
+      error: grantsError,
     };
-  }, [isAdmin, organizationsData, organizationsLoading, grantsData, grantsLoading, programType, userId]);
+  }, [
+    isAdmin,
+    organizationsData,
+    organizationsLoading,
+    organizationsError,
+    grantsData,
+    grantsLoading,
+    grantsError,
+    programType,
+    userId,
+  ]);
 };
 
 interface CreateProgramDialogProps {
