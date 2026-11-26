@@ -18,7 +18,7 @@ Until a Session has been checked its attendance is unknown, never missed. If Zoo
 
 ## Checking attendance
 
-- **Dates** tab: each Session shows how many people attended, for example "12 / 15 attended", or **Recorded after the session**. **Review raw attendance data** shows the entries Zoom and the check-in delivered, including those that matched nobody.
+- **Dates** tab: each Session shows how many people attended, for example "12 / 15 attended", or **Recorded after the session**. **Review raw attendance data** shows the entries Zoom and the check-in delivered, including those that matched nobody. Zoom entries show only the time during the Session; someone who was in the Zoom meeting only before or after it has no entry.
 - **Participations** tab (or **Projects & Participations**): one dot per Session for each participant, and an overall status: **Attendance requirement met**, **not met**, or **Attendance status pending**. Hover over a dot to see why it was set.
 
 ## Correcting attendance
