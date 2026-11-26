@@ -4,12 +4,16 @@ Attendance is gathered by:
 
 1. Listing past instances of a Zoom meeting id via
    ``GET /v2/past_meetings/{meetingId}/instances``.
-2. Filtering those instances to the ones that overlap the EduHub session
-   window (plus a configurable grace buffer on either side).
+2. Keeping the instances that may overlap the EduHub session: those that
+   started before the session ends, at most a lookback (default 12 h)
+   before it starts. A meeting opened early runs into the session as one
+   instance, so its start alone says little.
 3. Pulling the participant report for *each* surviving instance via
    ``GET /v2/report/meetings/{meetingUuid}/participants`` with pagination.
 4. Aggregating each participant's activity across all instances so that
    reconnects / rescheduled-right-after calls are collapsed to one row.
+   Only time inside the session counts; people who were in the meeting
+   only before or after it get no row.
 
 This replaces the previous single-call behaviour (which implicitly relied
 on Zoom's "last occurrence" semantics and was confused by post-session
@@ -28,10 +32,14 @@ import pandas as pd
 import requests
 
 
-# Default grace buffers (in minutes) for matching Zoom instances to a session
-# window. Overridable via env vars to avoid code changes for tuning.
-DEFAULT_PRE_BUFFER_MIN = 30
-DEFAULT_POST_BUFFER_MIN = 120
+# Which Zoom instances may hold a session's attendance, by their start (the
+# instances list carries no end time): started at most PRE before the session
+# start and before its end plus POST. An instance opened early runs into the
+# session (24 Nov 2026: opened 36 min early, the whole class was in it), so
+# PRE is generous; participant time outside the session is cut off anyway.
+# Overridable via env vars to avoid code changes for tuning.
+DEFAULT_PRE_BUFFER_MIN = 12 * 60
+DEFAULT_POST_BUFFER_MIN = 0
 
 # Default HTTP timeout for all Zoom API calls. A hang on any endpoint would
 # stall the daily attendance cron and block subsequent sessions from being
@@ -399,10 +407,9 @@ class ZoomClient:
 
         Zoom's ``past_meetings/instances`` response only contains each
         instance's ``start_time`` (not its end time), so filtering is by
-        start only. The post-buffer exists exactly to catch instances that
-        were started shortly before the scheduled end — or a reconnect
-        spawned mid-class — while excluding calls that start well after
-        the session is over.
+        start only: an instance that started before the session may still
+        run into it. Whether it did shows in its participant rows, which
+        :py:meth:`aggregate_participants` cuts to the session.
         """
         pre = pre_buffer if pre_buffer is not None else self._get_pre_buffer()
         post = post_buffer if post_buffer is not None else self._get_post_buffer()
@@ -554,8 +561,27 @@ class ZoomClient:
 
         return [bundles[representative] for representative in order]
 
+    @staticmethod
+    def _clip_intervals(
+        intervals: List[Tuple[pd.Timestamp, pd.Timestamp]],
+        window: Tuple[pd.Timestamp, pd.Timestamp],
+    ) -> List[Tuple[pd.Timestamp, pd.Timestamp]]:
+        """The parts of ``intervals`` inside ``window``."""
+        start, end = window
+        clipped = [(max(s, start), min(e, end)) for s, e in intervals]
+        return [(s, e) for s, e in clipped if e > s]
+
+    @classmethod
+    def _overlaps(cls, row: Dict[str, Any], window: Tuple[pd.Timestamp, pd.Timestamp]) -> bool:
+        """Whether a participant row has time inside ``window``."""
+        join = cls._to_utc_timestamp(row.get("join_time"))
+        leave = cls._to_utc_timestamp(row.get("leave_time"))
+        return join is not None and leave is not None and join < window[1] and leave > window[0]
+
     def aggregate_participants(
-        self, instance_rows: List[Dict[str, Any]]
+        self,
+        instance_rows: List[Dict[str, Any]],
+        window: Optional[Tuple[Any, Any]] = None,
     ) -> pd.DataFrame:
         """Collapse raw per-instance participant rows to one row per person.
 
@@ -563,7 +589,18 @@ class ZoomClient:
         (``name``, ``user_email``/``email``, ``join_time``, ``leave_time``,
         ``duration``) plus the augmented ``_meeting_uuid`` / ``_instance_start``
         added by :py:meth:`get_session_attendance`.
+
+        With ``window`` (session start, end), only time inside it counts:
+        join, leave, duration and interruptions are those within the
+        session, and a person who was in the meeting only outside it gets
+        no row.
         """
+        if window is not None:
+            window = (self._to_utc_timestamp(window[0]), self._to_utc_timestamp(window[1]))
+            # Drop rows outside the session before grouping: a same-named
+            # person who was there only before it would otherwise lend their
+            # email to a guest who attended.
+            instance_rows = [r for r in instance_rows if self._overlaps(r, window)]
         if not instance_rows:
             return pd.DataFrame(
                 columns=[
@@ -618,6 +655,11 @@ class ZoomClient:
                     instance_starts.append(str(inst_start))
 
             merged = self._merge_intervals(intervals)
+            if window is not None and merged:
+                merged = self._clip_intervals(merged, window)
+                if not merged:
+                    # In the meeting only before or after the session.
+                    continue
             total_duration = int(sum((e - s).total_seconds() for s, e in merged))
             join_dt = merged[0][0] if merged else None
             leave_dt = merged[-1][1] if merged else None
@@ -646,6 +688,8 @@ class ZoomClient:
                 }
             )
 
+        if not aggregated:
+            return self.aggregate_participants([])
         df = pd.DataFrame(aggregated)
         return df
 
@@ -698,7 +742,8 @@ class ZoomClient:
             )
             participants = self.get_meeting_participants_by_id(meeting_id)
             return self.aggregate_participants(
-                [dict(p, _meeting_uuid=None, _instance_start=None) for p in participants]
+                [dict(p, _meeting_uuid=None, _instance_start=None) for p in participants],
+                window=(session_start, session_end),
             )
 
         relevant = self.filter_instances_by_session_window(
@@ -706,7 +751,7 @@ class ZoomClient:
         )
 
         logging.info(
-            "Zoom meeting %s: %s past instances total, %s within session window",
+            "Zoom meeting %s: %s past instances total, %s that may overlap the session",
             meeting_id,
             len(instances),
             len(relevant),
@@ -776,7 +821,17 @@ class ZoomClient:
                 meeting_id,
             )
 
-        return self.aggregate_participants(all_rows)
+        aggregated = self.aggregate_participants(all_rows, window=(session_start, session_end))
+        if all_rows and aggregated.empty:
+            logging.warning(
+                "Zoom meeting %s: %s instance(s) checked, nobody was in them during "
+                "the session %s .. %s; recording empty attendance.",
+                meeting_id,
+                len(relevant),
+                session_start,
+                session_end,
+            )
+        return aggregated
 
     # ------------------------------------------------------------------
     # Backwards-compat: format_zoom_attendances used to do the "group by
