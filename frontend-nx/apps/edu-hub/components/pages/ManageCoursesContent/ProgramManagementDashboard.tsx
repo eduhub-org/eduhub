@@ -2,6 +2,8 @@ import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
 import CommonPageHeader from '../../common/CommonPageHeader';
+import { Button } from '../../common/Button';
+import NotificationSnackbar from '../../common/dialogs/NotificationSnackbar';
 import Loading from '../../common/Loading';
 import DropDownSelector from '../../inputs/DropDownSelector';
 import { useManageQuery, useOrgAdminQuery } from '../../../hooks/authedQuery';
@@ -16,6 +18,7 @@ import { ProgramType } from '../../../types/enums';
 import { programTypeMessageKey } from '../../../helpers/programType';
 import { Program_bool_exp } from '../../../__generated__/globalTypes';
 import ManageCoursesContent from './index';
+import CreateProgramDialog, { useProgramCreationOptions } from '../ManageProgramsContent/CreateProgramDialog';
 import {
   DEFAULT_ORGANIZATION_ID,
   organizationScopeOptions,
@@ -140,6 +143,16 @@ const ProgramManagementDashboard: FC<ProgramManagementDashboardProps> = ({ progr
     [allPrograms, organizationId]
   );
 
+  // Creating the first program of this type from the empty state. The new program's organization is
+  // selected afterwards, so the dashboard lands on it once the program list has refetched.
+  const {
+    organizations: creatableOrganizations,
+    loading: creationOptionsLoading,
+    error: creationOptionsError,
+  } = useProgramCreationOptions(programType);
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [createFailed, setCreateFailed] = useState(false);
+
   const handleOrganizationChange = useCallback(
     (value: string) => {
       if (value) {
@@ -184,13 +197,26 @@ const ProgramManagementDashboard: FC<ProgramManagementDashboardProps> = ({ progr
       return <div className="py-8 text-center text-error">{t('error_loading_programs')}</div>;
     }
     if (organizationId === null || programs.length === 0) {
-      // No program of this type is visible to the current admin yet. Org admins cannot create
-      // programs from the management UI (creation is platform-admin only and always produces a
-      // COURSES program owned by the default organization), so an informative empty state is shown
-      // instead of a blank page to explain how to get unblocked.
+      // No program of this type is visible to the current admin yet: offer to create one for an
+      // organization they may manage this type for, or explain who can. Wait for the creation
+      // options first, so neither a pending nor a failed load reads as a missing permission.
+      if (creationOptionsLoading) {
+        return <Loading />;
+      }
+      if (creationOptionsError) {
+        return <div className="py-8 text-center text-error">{t('error_loading_programs')}</div>;
+      }
+      const canCreate = creatableOrganizations.length > 0;
       return (
-        <div className="py-8 text-center text-label-secondary">
-          {t(`empty_state.${programTypeMessageKey(programType)}`)}
+        <div className="py-8 flex flex-col items-center gap-4 text-center text-label-secondary">
+          <p>{t(`empty_state.${programTypeMessageKey(programType)}`)}</p>
+          {canCreate ? (
+            <Button filled onClick={() => setCreateDialogOpen(true)}>
+              {t(`create_first_program.${programTypeMessageKey(programType)}`)}
+            </Button>
+          ) : (
+            <p>{t('empty_state_ask_admin')}</p>
+          )}
         </div>
       );
     }
@@ -213,6 +239,20 @@ const ProgramManagementDashboard: FC<ProgramManagementDashboardProps> = ({ progr
       {/* Once there are courses to manage, ManageCoursesContent shows the dropdown in its header row. */}
       {!showsCourses && organizationSelector}
       {body()}
+      <CreateProgramDialog
+        open={createDialogOpen}
+        onClose={() => setCreateDialogOpen(false)}
+        programType={programType}
+        defaultOrganizationId={organizationId}
+        onCreated={(program) => selectOrganization(program.organizationId)}
+        onError={() => setCreateFailed(true)}
+      />
+      <NotificationSnackbar
+        open={createFailed}
+        onClose={() => setCreateFailed(false)}
+        message={t('create_program_failed')}
+        duration={6000}
+      />
     </div>
   );
 };

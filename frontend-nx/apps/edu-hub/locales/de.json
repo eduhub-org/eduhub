@@ -1221,10 +1221,17 @@
     },
     "error_loading_programs": "Die Programme konnten nicht geladen werden. Bitte versuche es später erneut.",
     "empty_state": {
-      "events": "Es gibt noch kein Veranstaltungsprogramm. Bitte einen Plattform-Admin, ein Veranstaltungsprogramm für deine Organisation anzulegen, bevor du hier Veranstaltungen verwalten kannst.",
-      "courses": "Es gibt noch kein Kursprogramm. Bitte einen Plattform-Admin, ein Kursprogramm für deine Organisation anzulegen, bevor du hier Kurse verwalten kannst.",
-      "degrees": "Es gibt noch kein Studiengangsprogramm. Bitte einen Plattform-Admin, ein Studiengangsprogramm für deine Organisation anzulegen, bevor du hier Studiengänge verwalten kannst."
+      "events": "Es gibt noch kein Veranstaltungsprogramm.",
+      "courses": "Es gibt noch kein Kursprogramm.",
+      "degrees": "Es gibt noch kein Studiengangsprogramm."
     },
+    "create_first_program": {
+      "events": "Veranstaltungsprogramm anlegen",
+      "courses": "Kursprogramm anlegen",
+      "degrees": "Studiengangsprogramm anlegen"
+    },
+    "empty_state_ask_admin": "Bitte einen Plattform-Admin, ein Programm für deine Organisation anzulegen.",
+    "create_program_failed": "Das Programm konnte nicht angelegt werden. Bitte versuche es erneut.",
     "open_in_new_tab": "In neuem Tab öffnen",
     "close": "Schließen",
     "cancel": "Abbrechen",
@@ -2623,6 +2630,17 @@
       "programs_unpublished_success_singular": "Programm wurde erfolgreich zurückgezogen",
       "programs_unpublished_success_plural": "{count} Programme wurden erfolgreich zurückgezogen",
       "bulk_action_failed": "Die Massenaktion ist fehlgeschlagen. Bitte versuche es erneut."
+    },
+    "create_dialog": {
+      "title": "Programm anlegen",
+      "type_label": "Programmart",
+      "organization_label": "Organisation",
+      "single_organization": "Das Programm gehört zu {organization}.",
+      "no_organization": "Du darfst für keine Organisation ein Programm dieser Art anlegen.",
+      "hint": "Titel, Zeiträume und weitere Einstellungen kannst du nach dem Anlegen bearbeiten.",
+      "create_button": "Anlegen",
+      "success": "Programm wurde angelegt.",
+      "error": "Das Programm konnte nicht angelegt werden. Bitte versuche es erneut."
     }
   },
   "manageUsers": {
