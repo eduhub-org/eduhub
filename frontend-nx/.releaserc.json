@@ -6,7 +6,14 @@
     }
   ],
   "plugins": [
-    "@semantic-release/commit-analyzer",
+    [
+      "@semantic-release/commit-analyzer",
+      {
+        "releaseRules": [
+          {"hash": "45548d68d81422c0df3b5d5ffba993d5ce6326bb", "release": "minor"}
+        ]
+      }
+    ],
     [
       "@semantic-release/release-notes-generator",
       {
