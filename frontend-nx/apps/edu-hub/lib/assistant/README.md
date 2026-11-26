@@ -129,7 +129,8 @@ they hold a secret are dropped and personal e-mail addresses replaced. Nothing i
 database. A test scans what this repository would produce.
 
 **Rebuild:** `.github/workflows/index-knowledge.yml` runs `functions/callNodeFunction/scripts/index-knowledge.js`
-on the latest release tag after each successful production deployment (or by hand). It reuses
+on the latest release tag as the last job of each successful production deployment, or by hand
+with `gh workflow run index-knowledge.yml --ref production`. It reuses
 embeddings of unchanged passages and switches to the new build in one transaction; a failed or
 suspiciously small build keeps the previous index. Locally:
 

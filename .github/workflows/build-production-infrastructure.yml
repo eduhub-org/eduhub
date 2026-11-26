@@ -320,3 +320,18 @@ jobs:
       - name: Terraform Apply
         if: (github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/production') && github.event_name == 'push'
         run: terraform apply -auto-approve -input=false -var="keycloak_sha=${{ needs.check_folder_changes.outputs.keycloak_sha }}" -var="hasura_sha=${{ needs.check_folder_changes.outputs.hasura_sha }}" -var="frontend_sha=${{ needs.check_folder_changes.outputs.frontend_sha }}" -var="functions_sha=${{ needs.check_folder_changes.outputs.functions_sha }}"
+
+  # Rebuild the Assistant's knowledge index from the new release, only after a deployment
+  # that succeeded on a push to production (not for a pull request's plan).
+  index_knowledge:
+    name: "Index Assistant knowledge"
+    needs: [deploy_application]
+    if: >-
+      github.event_name == 'push' && github.ref == 'refs/heads/production' &&
+      needs.deploy_application.result == 'success'
+    permissions:
+      contents: read
+    uses: ./.github/workflows/index-knowledge.yml
+    with:
+      deployed_sha: ${{ github.sha }}
+    secrets: inherit
