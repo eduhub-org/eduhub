@@ -451,6 +451,10 @@ module "cloud_function" {
   service_account_email = try(each.value.service_account_email, null)
   service_account_id    = try(each.value.service_account_id, null)
   public_invoker        = try(each.value.public_invoker, "policy")
+
+  # The shared account's grants live outside the module; Cloud Run checks secret access when it
+  # deploys, so the summary's key grant (11_assistant.tf, none while the summary is off) comes first.
+  depends_on = [google_secret_manager_secret_iam_member.summary_llm_api_key]
 }
 
 ###############################################################################

@@ -35,34 +35,12 @@ export const ISSUE_REPORT_LIST = gql`
         lastName
         email
       }
-      Votes_aggregate {
-        aggregate {
-          count
-        }
-      }
-      Duplicates {
-        id
-        Votes_aggregate {
-          aggregate {
-            count
-          }
-        }
-      }
+      peopleAffected
     }
     IssueReport_aggregate(where: $filter) {
       aggregate {
         count
       }
-    }
-  }
-`;
-
-/** Reports another one can be marked a duplicate of. */
-export const ISSUE_REPORT_OPTIONS = gql`
-  query IssueReportOptions {
-    IssueReport(where: { status: { _neq: DUPLICATE } }, order_by: { id: desc }, limit: 500) {
-      id
-      title
     }
   }
 `;

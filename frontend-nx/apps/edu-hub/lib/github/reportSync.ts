@@ -47,24 +47,17 @@ export interface ReportStore {
 
 export type Request = <T>(query: string, variables: Record<string, unknown>) => Promise<T>;
 
-const FIELDS = `
-  id type status priority duplicateOfId githubIssueNumber
-  Votes_aggregate { aggregate { count } }
-  Duplicates { Votes_aggregate { aggregate { count } } }
-`;
+const FIELDS = 'id type status priority duplicateOfId githubIssueNumber peopleAffected';
 
 interface Row extends Omit<StoredReport, 'people'> {
-  Votes_aggregate: { aggregate: { count: number } | null };
-  Duplicates: Array<{ Votes_aggregate: { aggregate: { count: number } | null } }>;
+  /** Computed field: votes on the report and on reports marked as its duplicates. */
+  peopleAffected: number | null;
 }
 
 const toReport = (row: Row | null | undefined): StoredReport | null => {
   if (!row) return null;
-  const { Votes_aggregate, Duplicates, ...rest } = row;
-  return {
-    ...rest,
-    people: (Votes_aggregate.aggregate?.count ?? 0) + Duplicates.reduce((s, d) => s + (d.Votes_aggregate.aggregate?.count ?? 0), 0),
-  };
+  const { peopleAffected, ...rest } = row;
+  return { ...rest, people: peopleAffected ?? 0 };
 };
 
 export const createReportStore = (request: Request): ReportStore => ({
@@ -94,6 +87,7 @@ export const createReportStore = (request: Request): ReportStore => ({
 
 export type SyncErrorCode =
   | 'REPORT_NOT_FOUND'
+  | 'ORIGINAL_NOT_FOUND'
   | 'ALREADY_LINKED'
   | 'ISSUE_REQUIRED'
   | 'ISSUE_NOT_FOUND'
@@ -170,9 +164,11 @@ export const setReportStatus = async (
   { reportId, status, duplicateOfId }: { reportId: number; status: ReportStatus; duplicateOfId?: number }
 ) => {
   if (!REPORT_STATUSES.includes(status)) throw new SyncError('INVALID_STATUS');
-  if (duplicateOfId && (status !== 'DUPLICATE' || duplicateOfId === reportId)) throw new SyncError('INVALID_STATUS');
+  // DUPLICATE always names its original (IssueReport_duplicate_has_original), and only DUPLICATE does.
+  if ((status === 'DUPLICATE') !== !!duplicateOfId || duplicateOfId === reportId) throw new SyncError('INVALID_STATUS');
   const report = await requireReport(store, reportId);
-  const original = duplicateOfId ? await requireReport(store, duplicateOfId) : null;
+  const original = duplicateOfId ? await store.get(duplicateOfId) : null;
+  if (duplicateOfId && !original) throw new SyncError('ORIGINAL_NOT_FOUND');
 
   if (gh && report.githubIssueNumber) {
     if (status === 'NEW') throw new SyncError('LINKED_CANNOT_BE_NEW');
@@ -226,10 +222,14 @@ export const syncFromGithub = async (
     const original = await store.getByIssue(issue.duplicateOfNumber);
     if (original && original.id !== report.id) duplicateOfId = original.id;
   }
-  // A duplicate of an issue without a report stays a duplicate with no link in EduHub; a link an
-  // admin set here is kept.
-  if (report.status === target && (target !== 'DUPLICATE' || !duplicateOfId || report.duplicateOfId === duplicateOfId))
-    return 'unchanged';
+  if (target === 'DUPLICATE' && !duplicateOfId) {
+    // DUPLICATE needs an original in EduHub. A link an admin set here is kept; otherwise (the
+    // original issue has no report) it reads as declined: it won't be done as this report.
+    if (report.status === 'DUPLICATE' || report.status === 'DECLINED') return 'unchanged';
+    await store.update(report.id, { status: 'DECLINED' });
+    return 'updated';
+  }
+  if (report.status === target && report.duplicateOfId === (duplicateOfId ?? report.duplicateOfId)) return 'unchanged';
   await store.update(report.id, duplicateOfId ? { status: target, duplicateOfId } : { status: target });
   if (duplicateOfId) await refreshFooter(gh, store, duplicateOfId);
   return 'updated';

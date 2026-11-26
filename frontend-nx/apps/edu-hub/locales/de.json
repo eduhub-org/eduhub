@@ -4174,13 +4174,13 @@
       "reporter": "Gemeldet von",
       "reporter_removed": "Entfernt (6 Monate nach Abschluss anonymisiert oder Konto gelöscht)",
       "duplicate_of": "Duplikat von",
-      "mark_duplicate": "Als Duplikat markieren von",
+      "mark_duplicate": "Duplikat von Meldung Nr.",
       "public_note": "Öffentliche Notiz",
       "github_issue": "GitHub-Issue",
       "github_create_or_link": "Issue erstellen oder verknüpfen"
     },
     "help": {
-      "mark_duplicate": "Setzt den Status auf „Duplikat“. Die Betroffenen zählen beim Original mit.",
+      "mark_duplicate": "Nummer der ursprünglichen Meldung (#). Setzt den Status auf „Duplikat“; die Betroffenen zählen beim Original mit.",
       "public_note": "Sehen alle, die die Meldung geschickt oder sich angeschlossen haben, z. B. „Geplant für das Frühjahr“ oder warum sie abgelehnt wurde.",
       "github_issue": "Nimmt die Meldung an: Sie wird „Geplant“ und bekommt ein öffentliches GitHub-Issue.",
       "github_synced": "Synchronisiert: Wird das Issue geschlossen, wieder geöffnet oder auf dem Board verschoben, ändert sich hier der Status."
@@ -4214,6 +4214,7 @@
       "INVALID_STATUS": "Dieser Status lässt sich hier nicht setzen.",
       "GITHUB_OFF": "Die GitHub-Synchronisierung ist nicht eingerichtet.",
       "REPORT_NOT_FOUND": "Die Meldung gibt es nicht mehr.",
+      "ORIGINAL_NOT_FOUND": "Die Meldung konnte nicht als Duplikat markiert werden. Gibt es eine Meldung mit dieser Nummer?",
       "ALREADY_LINKED": "Diese Meldung hat schon ein GitHub-Issue.",
       "ISSUE_REQUIRED": "Eine geplante Meldung braucht ein GitHub-Issue. Erstell oder verknüpf eins.",
       "ISSUE_NOT_FOUND": "Dieses Issue gibt es im Repository nicht.",

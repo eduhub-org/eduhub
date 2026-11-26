@@ -1,4 +1,5 @@
 import { createHasuraClient } from "../lib/hasura.js";
+import { redactEmails } from "../lib/knowledge/safety.js";
 import { complete, costEur, summaryLlmConfig } from "../lib/summaryLlm.js";
 
 /**
@@ -12,8 +13,14 @@ import { complete, costEur, summaryLlmConfig } from "../lib/summaryLlm.js";
  * characters, and the output is capped (SUMMARY_LLM_MAX_OUTPUT_TOKENS), so one run's cost stays
  * bounded; the estimated cost is stored with the summary.
  *
- * No user ids, names or emails are sent: only the report texts, which the Assistant was told to
- * keep free of personal data. Logs hold counts only.
+ * No account data is sent: no user ids, names or account emails, only the texts and their triage
+ * state. The texts are what people wrote (the Assistant drafts reports without personal data, but
+ * comments and conversations are free text), so e-mail addresses in them are replaced with
+ * "[email]" (lib/knowledge/safety.js). Other personal details a person wrote, such as a name, can
+ * still reach the model; the privacy policy says so. Logs hold counts only.
+ *
+ * Rows are taken from [since, until), so a row that arrives while the summary is written belongs
+ * to the next one.
  */
 
 export const MAX_REPORTS = 200;
@@ -28,17 +35,30 @@ const LAST_SUMMARY = `
 `;
 
 const INPUT = `
-  query IssueReportSummaryInput($since: timestamptz!, $open: [IssueReportStatus_enum!]!, $maxReports: Int!, $maxFeedback: Int!) {
+  query IssueReportSummaryInput(
+    $since: timestamptz!
+    $until: timestamptz!
+    $open: [IssueReportStatus_enum!]!
+    $maxReports: Int!
+    $maxFeedback: Int!
+  ) {
     IssueReport(
-      where: { _or: [{ created_at: { _gte: $since } }, { status: { _in: $open } }] }
+      where: {
+        created_at: { _lt: $until }
+        _or: [{ created_at: { _gte: $since } }, { status: { _in: $open } }]
+      }
       order_by: { created_at: desc }
       limit: $maxReports
     ) {
       id type title description status priority route role created_at duplicateOfId
       Votes_aggregate { aggregate { count } }
     }
-    newReports: IssueReport_aggregate(where: { created_at: { _gte: $since } }) { aggregate { count } }
-    AssistantFeedback(where: { created_at: { _gte: $since } }, order_by: { created_at: desc }, limit: $maxFeedback) {
+    newReports: IssueReport_aggregate(where: { created_at: { _gte: $since, _lt: $until } }) { aggregate { count } }
+    AssistantFeedback(
+      where: { created_at: { _gte: $since, _lt: $until } }
+      order_by: { created_at: desc }
+      limit: $maxFeedback
+    ) {
       comment route conversation
     }
   }
@@ -51,7 +71,7 @@ const INSERT = `
 `;
 
 const cut = (text, max) => {
-  const clean = String(text ?? "").replace(/\s+/g, " ").trim();
+  const clean = redactEmails(String(text ?? "").replace(/\s+/g, " ").trim());
   return clean.length > max ? `${clean.slice(0, max)}…` : clean;
 };
 
@@ -128,7 +148,13 @@ export default async function generateIssueReportSummary(req, logger, { gql, rea
   const last = (await gql.request(LAST_SUMMARY)).IssueReportSummary[0]?.periodEnd;
   const since = last && last < until ? last : new Date(now().getTime() - 7 * DAY_MS).toISOString();
 
-  const input = await gql.request(INPUT, { since, open: OPEN_STATUSES, maxReports: MAX_REPORTS, maxFeedback: MAX_FEEDBACK });
+  const input = await gql.request(INPUT, {
+    since,
+    until,
+    open: OPEN_STATUSES,
+    maxReports: MAX_REPORTS,
+    maxFeedback: MAX_FEEDBACK,
+  });
   const reports = input.IssueReport;
   const feedback = input.AssistantFeedback;
   const newReportCount = input.newReports.aggregate.count;

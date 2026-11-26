@@ -27,7 +27,7 @@ Nimmt das Team eine Meldung an, veröffentlicht es sie als Issue im öffentliche
 
 Frag den Assistenten jederzeit: „Was ist aus meinen Meldungen geworden?“ Er zeigt Dir die Meldungen, die Du geschickt oder denen Du Dich angeschlossen hast, mit ihrem Stand (neu, geplant, in Arbeit, erledigt, abgelehnt oder Duplikat) und der Notiz des EduHub-Teams, falls es eine gibt.
 
-Solange sich noch niemand Deine Meldung angesehen und sich auch niemand angeschlossen hat, kannst Du den Assistenten bitten, sie zurückzuziehen; er zeigt dann eine Karte mit **Zurückziehen**.
+Solange Deine Meldung noch den Stand neu hat und sich niemand angeschlossen hat, kannst Du den Assistenten bitten, sie zurückzuziehen; er zeigt dann eine Karte mit **Zurückziehen**.
 
 ## Rückmeldung zu den Antworten des Assistenten
 

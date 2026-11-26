@@ -17,6 +17,7 @@ const hit = (overrides: Partial<SearchHit> = {}): SearchHit => ({
   description: 'Exporting participants as CSV fails with an error.',
   status: 'NEW',
   people: 2,
+  duplicates: 0,
   askerVoted: false,
   ...overrides,
 });
@@ -162,22 +163,38 @@ it("lists the user's own reports and votes with their own token, pinned to their
   ]);
 });
 
-it("drafts a withdrawal only for the user's own new report", async () => {
-  const { caller } = myReports([
-    { summary: 'Dark mode', isReporter: true, IssueReport: { id: 2, status: 'NEW' } },
-    { summary: 'Planned one', isReporter: true, IssueReport: { id: 3, status: 'PLANNED' } },
-    { summary: 'Other', isReporter: false, IssueReport: { id: 4, status: 'NEW' } },
-  ]);
-  const tools = createReportTools(caller, null);
+it("drafts a withdrawal only for the user's own new report that nobody else joined", async () => {
+  // Like Hasura: the query returns the caller's own reporter vote on that one report, if any.
+  const own: Record<number, unknown> = {
+    2: { summary: 'Dark mode', IssueReport: { id: 2, status: 'NEW' } },
+    3: { summary: 'Planned one', IssueReport: { id: 3, status: 'PLANNED' } },
+    5: { summary: 'Joined by others', IssueReport: { id: 5, status: 'NEW' } },
+    6: { summary: 'Has a duplicate', IssueReport: { id: 6, status: 'NEW' } },
+  };
+  const requests: any[] = [];
+  const fetchImpl = (async (_url: string, init: RequestInit) => {
+    const body = JSON.parse(String(init.body));
+    requests.push(body);
+    const vote = own[body.variables.reportId];
+    return new Response(JSON.stringify({ data: { IssueReportVote: vote ? [vote] : [] } }));
+  }) as unknown as typeof fetch;
+  const search = fakeSearch([hit({ id: 2, people: 1 }), hit({ id: 5, people: 3 }), hit({ id: 6, people: 1, duplicates: 1 })]);
+  const tools = createReportTools({ url: 'http://h', token: 'alice-token', userId: 'alice', fetchImpl }, search);
+
   expect(await tools.call('propose_withdraw', JSON.stringify({ reportId: 2 }))).toEqual(
     expect.objectContaining({ status: 'ok', report: { kind: 'withdraw', reportId: 2, summary: 'Dark mode' } })
   );
-  expect(await tools.call('propose_withdraw', JSON.stringify({ reportId: 3 }))).toEqual(
-    expect.objectContaining({ errorCode: 'NOT_NEW' })
-  );
-  expect(await tools.call('propose_withdraw', JSON.stringify({ reportId: 4 }))).toEqual(
-    expect.objectContaining({ errorCode: 'NOT_FOUND' })
-  );
+  expect(requests[0].variables).toEqual({ userId: 'alice', reportId: 2 });
+  for (const [reportId, code] of [
+    [3, 'NOT_NEW'],
+    [4, 'NOT_FOUND'],
+    [5, 'OTHERS_JOINED'],
+    [6, 'OTHERS_JOINED'],
+  ] as const) {
+    expect(await tools.call('propose_withdraw', JSON.stringify({ reportId }))).toEqual(
+      expect.objectContaining({ errorCode: code })
+    );
+  }
 });
 
 it('search words: three letters or more, no duplicates, at most eight', () => {
@@ -218,7 +235,7 @@ it("the admin search only asks for open reports and the asker's own votes", asyn
   }) as unknown as typeof fetch;
   const search = createHasuraReportSearch({ url: 'http://h', adminSecret: 's', fetchImpl });
   expect(await search.search(['50%'], 'alice')).toEqual([
-    { id: 4, type: 'BUG', title: 't', description: 'd', status: 'NEW', people: 3, askerVoted: true },
+    { id: 4, type: 'BUG', title: 't', description: 'd', status: 'NEW', people: 3, duplicates: 0, askerVoted: true },
   ]);
   const { where, userId } = requests[0].body.variables;
   expect(userId).toBe('alice');

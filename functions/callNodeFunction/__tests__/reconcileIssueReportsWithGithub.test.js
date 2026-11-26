@@ -59,10 +59,11 @@ describe('reportChange', () => {
     expect(reportChange({ ...base, status: 'DUPLICATE', duplicateOfId: 2 }, dup, ctx)).toBeNull();
   });
 
-  it('keeps a duplicate link set in EduHub when the original issue has no report', () => {
+  it('reads a duplicate of an issue without a report as declined, keeping a link set in EduHub', () => {
     const dup = issue({ open: false, stateReason: 'DUPLICATE', duplicateOfNumber: 99 });
     expect(reportChange({ ...base, status: 'DUPLICATE', duplicateOfId: 5 }, dup, ctx)).toBeNull();
-    expect(reportChange(base, dup, ctx)).toEqual({ status: 'DUPLICATE' });
+    expect(reportChange(base, dup, ctx)).toEqual({ status: 'DECLINED' });
+    expect(reportChange({ ...base, status: 'DECLINED' }, dup, ctx)).toBeNull();
   });
 });
 
@@ -111,8 +112,7 @@ describe('reconcileIssueReportsWithGithub', () => {
     priority: 'LOW',
     duplicateOfId: null,
     githubIssueNumber: 7,
-    Votes_aggregate: { aggregate: { count: 2 } },
-    Duplicates: [{ Votes_aggregate: { aggregate: { count: 1 } } }],
+    peopleAffected: 3,
     ...overrides,
   });
 

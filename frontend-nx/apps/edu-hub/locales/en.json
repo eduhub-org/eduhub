@@ -4189,13 +4189,13 @@
       "reporter": "Reported by",
       "reporter_removed": "Removed (anonymized 6 months after closing, or account deleted)",
       "duplicate_of": "Duplicate of",
-      "mark_duplicate": "Mark as duplicate of",
+      "mark_duplicate": "Duplicate of report no.",
       "public_note": "Public note",
       "github_issue": "GitHub issue",
       "github_create_or_link": "Create or link issue"
     },
     "help": {
-      "mark_duplicate": "Sets the status to \"Duplicate\". The people affected count towards the original.",
+      "mark_duplicate": "Number of the original report (#). Sets the status to \"Duplicate\"; the people affected count towards the original.",
       "public_note": "Shown to everyone who sent or joined the report, e.g. \"Planned for spring\" or why it was declined.",
       "github_issue": "Approves the report: it becomes \"Planned\" with a public GitHub issue.",
       "github_synced": "Synced: closing, reopening or moving the issue on the board updates the status here."
@@ -4229,6 +4229,7 @@
       "INVALID_STATUS": "This status can't be set here.",
       "GITHUB_OFF": "The GitHub sync is not set up.",
       "REPORT_NOT_FOUND": "The report no longer exists.",
+      "ORIGINAL_NOT_FOUND": "The report couldn't be marked as a duplicate. Is there a report with this number?",
       "ALREADY_LINKED": "This report already has a GitHub issue.",
       "ISSUE_REQUIRED": "A planned report needs a GitHub issue. Create or link one.",
       "ISSUE_NOT_FOUND": "There is no such issue in the repository.",

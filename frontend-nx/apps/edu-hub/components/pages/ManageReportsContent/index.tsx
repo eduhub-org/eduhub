@@ -16,9 +16,8 @@ import { IssueReportList, IssueReportList_IssueReport } from '../../../queries/_
 import { ReportDetails } from './ReportDetails';
 import { WeeklySummaries } from './WeeklySummaries';
 import { GithubIssueDialog } from './GithubIssueDialog';
-import { ISSUE_STATUSES, OPEN_STATUSES, peopleAffected, PRIORITIES, REPORT_STATUSES, REPORT_TYPES } from './reportUtils';
+import { ISSUE_STATUSES, OPEN_STATUSES, PRIORITIES, REPORT_STATUSES, REPORT_TYPES } from './reportUtils';
 import { SyncRequestError, useReportSync } from './useReportSync';
-
 
 /**
  * Bug reports and feature ideas sent through the Assistant (issue #2234), for admins to
@@ -35,7 +34,19 @@ const ManageReportsContent: FC = () => {
   // Bumped to remount the status dropdowns after a refused or cancelled change, so they show the stored value again.
   const [resetKey, setResetKey] = useState(0);
 
-  const { data, loading, initialLoading, error: queryError, pageIndex, setPageIndex, searchFilter, setSearchFilter, sorting, setSorting } =
+  const {
+    data,
+    loading,
+    initialLoading,
+    error: queryError,
+    pageIndex,
+    pageSize,
+    setPageIndex,
+    searchFilter,
+    setSearchFilter,
+    sorting,
+    setSorting,
+  } =
     useTableGrid({
       queryHook: useAdminQuery,
       query: ISSUE_REPORT_LIST,
@@ -49,7 +60,7 @@ const ManageReportsContent: FC = () => {
           ],
         },
       }),
-      sortColumnMapper: (columnId: string) => (columnId === 'people' ? { Votes_aggregate: { count: null } } : columnId),
+      sortColumnMapper: (columnId: string) => (columnId === 'people' ? 'peopleAffected' : columnId),
       defaultSort: [{ created_at: 'desc' }],
     });
   const rows = (data as IssueReportList | undefined)?.IssueReport ?? [];
@@ -63,8 +74,16 @@ const ManageReportsContent: FC = () => {
   );
 
   const statusOptions = useMemo(() => REPORT_STATUSES.map((value) => ({ value, label: t(`status.${value}`) })), [t]);
-  // A report whose issue is public can't go back to "new".
-  const linkedStatusOptions = useMemo(() => statusOptions.filter((o) => o.value !== 'NEW'), [statusOptions]);
+  // DUPLICATE needs the original, so it is only set with "Mark as duplicate of" in the details.
+  const settableStatusOptions = useMemo(() => statusOptions.filter((o) => o.value !== 'DUPLICATE'), [statusOptions]);
+  /** A report whose issue is public can't go back to "new". */
+  const optionsFor = useCallback(
+    (row: IssueReportList_IssueReport) =>
+      (row.status === 'DUPLICATE' ? statusOptions : settableStatusOptions).filter(
+        (o) => !(githubEnabled && row.githubIssueNumber && o.value === 'NEW')
+      ),
+    [statusOptions, settableStatusOptions, githubEnabled]
+  );
 
   const showSyncError = useCallback(
     (e: unknown) => {
@@ -119,7 +138,7 @@ const ManageReportsContent: FC = () => {
         header: t('columns.people'),
         size: 90,
         enableSorting: true,
-        cell: ({ row }) => <span className="px-2">{peopleAffected(row.original)}</span>,
+        cell: ({ row }) => <span className="px-2">{row.original.peopleAffected ?? 0}</span>,
       },
       {
         accessorKey: 'status',
@@ -130,7 +149,7 @@ const ManageReportsContent: FC = () => {
             key={`${row.original.id}-${row.original.status}-${resetKey}`}
             variant="material"
             value={row.original.status}
-            options={githubEnabled && row.original.githubIssueNumber ? linkedStatusOptions : statusOptions}
+            options={optionsFor(row.original)}
             onValueUpdated={(value: string) => onStatus(row.original, value)}
           />
         ),
@@ -161,7 +180,7 @@ const ManageReportsContent: FC = () => {
         cell: ({ row }) => <span className="px-2">{new Date(row.original.created_at).toLocaleDateString(locale)}</span>,
       },
     ],
-    [t, locale, statusOptions, linkedStatusOptions, priorityOptions, githubEnabled, onStatus, resetKey]
+    [t, locale, optionsFor, priorityOptions, onStatus, resetKey]
   );
 
   return (
@@ -178,6 +197,7 @@ const ManageReportsContent: FC = () => {
             data={rows}
             totalCount={(data as IssueReportList | undefined)?.IssueReport_aggregate.aggregate?.count ?? 0}
             pageIndex={pageIndex}
+            pageSize={pageSize}
             onPageChange={setPageIndex}
             searchFilter={searchFilter}
             onSearchFilterChange={setSearchFilter}

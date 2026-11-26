@@ -39,12 +39,15 @@ export interface SearchHit {
   description: string;
   status: string;
   people: number;
+  /** Other reports marked as duplicates of this one. */
+  duplicates: number;
   askerVoted: boolean;
 }
 
 const HIT_FIELDS = `
   id type title description status
   Votes_aggregate { aggregate { count } }
+  Duplicates_aggregate { aggregate { count } }
   AskerVotes: Votes(where: { userId: { _eq: $userId } }) { id }
 `;
 
@@ -62,9 +65,18 @@ const GET = `
 
 const MY_REPORTS = `
   query AssistantMyReports($userId: uuid!) {
-    IssueReportVote(where: { userId: { _eq: $userId } }, order_by: { created_at: desc }, limit: 50) {
+    IssueReportVote(where: { userId: { _eq: $userId } }, order_by: { created_at: desc }, limit: 100) {
       summary isReporter created_at
       IssueReport { id type status publicNote closedAt updated_at }
+    }
+  }
+`;
+
+const MY_OWN_REPORT = `
+  query AssistantMyOwnReport($userId: uuid!, $reportId: Int!) {
+    IssueReportVote(where: { userId: { _eq: $userId }, issueReportId: { _eq: $reportId }, isReporter: { _eq: true } }) {
+      summary
+      IssueReport { id status }
     }
   }
 `;
@@ -76,6 +88,7 @@ const toHit = (r: any): SearchHit => ({
   description: r.description,
   status: r.status,
   people: r.Votes_aggregate?.aggregate?.count ?? 0,
+  duplicates: r.Duplicates_aggregate?.aggregate?.count ?? 0,
   askerVoted: (r.AskerVotes ?? []).length > 0,
 });
 
@@ -229,8 +242,9 @@ export const createReportTools = (
       name: 'get_my_reports',
       description:
         'The bug reports and feature ideas the user sent or added their voice to: the summary they saw, the status ' +
-        "(NEW, PLANNED, IN_PROGRESS, DONE, DECLINED, DUPLICATE) and the EduHub team's note, if any. Say what the " +
-        'status means in on-screen words.',
+        "(NEW, PLANNED, IN_PROGRESS, DONE, DECLINED, DUPLICATE) and the EduHub team's note, if any, newest 100. " +
+        'Say what the status means in on-screen words. canWithdraw means sent by the user and still NEW; ' +
+        'propose_withdraw also checks that nobody else has joined.',
       schema: z.object({}).strict(),
       run: async () => {
         const data = await request<{ IssueReportVote: any[] }>(MY_REPORTS, { userId: caller.userId });
@@ -288,16 +302,20 @@ export const createReportTools = (
     {
       name: 'propose_withdraw',
       description:
-        'Offer the user to withdraw a report they sent themselves, while its status is NEW (canWithdraw in ' +
-        'get_my_reports). ' +
+        'Offer the user to withdraw a report they sent themselves, while its status is NEW and nobody else has ' +
+        'joined it (canWithdraw in get_my_reports). ' +
         notSaved,
       schema: withdrawSchema,
       run: async ({ reportId }: z.infer<typeof withdrawSchema>) => {
-        const data = await request<{ IssueReportVote: any[] }>(MY_REPORTS, { userId: caller.userId });
-        const own = data.IssueReportVote.find((v) => v.IssueReport?.id === reportId && v.isReporter);
+        const data = await request<{ IssueReportVote: any[] }>(MY_OWN_REPORT, { userId: caller.userId, reportId });
+        const own = data.IssueReportVote.find((v) => v.IssueReport);
         if (!own) return failure('NOT_FOUND', 'The user did not send a report with this id.');
         if (own.IssueReport.status !== 'NEW')
-          return failure('NOT_NEW', 'Only reports nobody has looked at yet can be withdrawn.');
+          return failure('NOT_NEW', 'Only reports that still have the status NEW can be withdrawn.');
+        // The same conditions as Hasura's delete permission, so the card's button can work.
+        const hit = reportSearch ? await reportSearch.get(reportId, caller.userId) : null;
+        if (hit && (hit.people > 1 || hit.duplicates > 0))
+          return failure('OTHERS_JOINED', 'Others have joined this report, so it can no longer be withdrawn.');
         return draft({ kind: 'withdraw', reportId, summary: own.summary }, notSaved);
       },
     },

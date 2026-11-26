@@ -1,14 +1,11 @@
-import { FC, useCallback, useMemo } from 'react';
+import { FC, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 
 import InputField from '../../inputs/InputField';
-import DropDownSelector from '../../inputs/DropDownSelector';
-import { useAdminQuery } from '../../../hooks/authedQuery';
 import { Button } from '../../common/Button';
-import { ISSUE_REPORT_OPTIONS, UPDATE_ISSUE_REPORT_PUBLIC_NOTE } from '../../../queries/issueReports';
+import { UPDATE_ISSUE_REPORT_PUBLIC_NOTE } from '../../../queries/issueReports';
 import { IssueReportList_IssueReport } from '../../../queries/__generated__/IssueReportList';
-import { IssueReportOptions } from '../../../queries/__generated__/IssueReportOptions';
-import { ISSUE_STATUSES, peopleAffected } from './reportUtils';
+import { ISSUE_STATUSES } from './reportUtils';
 import { issueUrl, SyncRequest } from './useReportSync';
 
 interface Props {
@@ -24,22 +21,16 @@ interface Props {
 /** One report in full: the text, where it came from, who sent it, and what reporters see back. */
 export const ReportDetails: FC<Props> = ({ row, repo, send, onError, onApprove }) => {
   const t = useTranslations('manageReports');
-  const { data } = useAdminQuery<IssueReportOptions>(ISSUE_REPORT_OPTIONS);
 
-  const duplicateOptions = useMemo(
-    () =>
-      (data?.IssueReport ?? [])
-        .filter((r) => r.id !== row.id)
-        .map((r) => ({ value: String(r.id), label: `#${r.id} ${r.title}` })),
-    [data, row.id]
-  );
-
+  // By the original's number (shown as #id), so any report can be the original, however old.
   const onDuplicateOf = useCallback(
-    async (value: string) => {
-      if (!value) return;
+    async (data: { text?: string }) => {
+      // Without a mutation, InputField hands over `{ text }`.
+      const duplicateOfId = Number.parseInt(String(data?.text ?? '').replace(/^#/, ''), 10);
+      if (!Number.isInteger(duplicateOfId) || duplicateOfId <= 0 || duplicateOfId === row.id) return;
       try {
         // Through the sync route: a linked issue is closed as a duplicate too.
-        await send({ action: 'status', reportId: row.id, status: 'DUPLICATE', duplicateOfId: Number(value) });
+        await send({ action: 'status', reportId: row.id, status: 'DUPLICATE', duplicateOfId });
       } catch (e) {
         onError(e);
       }
@@ -62,7 +53,7 @@ export const ReportDetails: FC<Props> = ({ row, repo, send, onError, onApprove }
         </div>
         <div>
           <dt className="text-label-secondary">{t('details.people')}</dt>
-          <dd>{peopleAffected(row)}</dd>
+          <dd>{row.peopleAffected ?? 0}</dd>
         </div>
         <div>
           <dt className="text-label-secondary">{t('details.page')}</dt>
@@ -85,12 +76,13 @@ export const ReportDetails: FC<Props> = ({ row, repo, send, onError, onApprove }
           </div>
         )}
       </dl>
-      <DropDownSelector
+      <InputField
         variant="material"
+        type="number"
         label={t('details.mark_duplicate')}
+        itemId={row.id}
         value={row.duplicateOfId ? String(row.duplicateOfId) : ''}
-        options={duplicateOptions}
-        searchable
+        min={1}
         onValueUpdated={onDuplicateOf}
         helpText={t('help.mark_duplicate')}
       />

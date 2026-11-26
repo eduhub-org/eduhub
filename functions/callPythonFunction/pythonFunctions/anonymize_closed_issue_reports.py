@@ -1,10 +1,19 @@
+import calendar
 import logging
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from api_clients import EduHubClient, HasuraQueryError
 
 # Who sent a bug report or feature idea, or joined one, is kept until 6 months after the report
 # was closed (DONE, DECLINED or DUPLICATE), for follow-up questions (issue #2234).
-RETENTION_DAYS = 183
+RETENTION_MONTHS = 6
+
+
+def months_before(moment, months):
+    """The same day and time `months` calendar months earlier; the month's last day if it is shorter."""
+    month_index = moment.year * 12 + moment.month - 1 - months
+    year, month = divmod(month_index, 12)
+    day = min(moment.day, calendar.monthrange(year, month + 1)[1])
+    return moment.replace(year=year, month=month + 1, day=day)
 
 
 def anonymize_closed_issue_reports(arguments):
@@ -20,7 +29,7 @@ def anonymize_closed_issue_reports(arguments):
         dict: {"success": True, "data": {"reports": n, "votes": m}} or {"success": False, "error": ...}
     """
     logging.info("########## Anonymize Closed Issue Reports Function ##########")
-    cutoff = (datetime.now(timezone.utc) - timedelta(days=RETENTION_DAYS)).isoformat()
+    cutoff = months_before(datetime.now(timezone.utc), RETENTION_MONTHS).isoformat()
     mutation = """
     mutation AnonymizeClosedIssueReports($cutoff: timestamptz!) {
         update_IssueReportVote(

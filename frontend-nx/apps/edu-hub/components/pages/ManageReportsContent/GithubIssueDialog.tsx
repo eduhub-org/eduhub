@@ -5,7 +5,6 @@ import { DialogShell } from '../../common/dialogs/DialogShell';
 import { Button } from '../../common/Button';
 import InputField from '../../inputs/InputField';
 import { IssueReportList_IssueReport } from '../../../queries/__generated__/IssueReportList';
-import { peopleAffected } from './reportUtils';
 import { SyncRequest, SyncRequestError } from './useReportSync';
 
 interface Props {
@@ -70,7 +69,7 @@ export const GithubIssueDialog: FC<Props> = ({ target, repo, send, onClose }) =>
   const footer = t('issue_dialog.footer_preview', {
     id: row.id,
     priority: row.priority ? t(`priority.${row.priority}`) : t('priority.none'),
-    people: peopleAffected(row),
+    people: row.peopleAffected ?? 0,
   });
 
   return (

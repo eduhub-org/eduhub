@@ -28,6 +28,14 @@ array_relationships:
         table:
           name: IssueReport
           schema: public
+computed_fields:
+  - name: peopleAffected
+    definition:
+      function:
+        name: issue_report_people_affected
+        schema: public
+      table_argument: report_row
+    comment: Votes on the report and on reports marked as its duplicates.
 insert_permissions:
   - role: user_access
     permission:
@@ -57,7 +65,8 @@ select_permissions:
           userId:
             _eq: X-Hasura-User-Id
 delete_permissions:
-  # Withdraw: only the reporter, only while NEW, and only while nobody else has added their voice.
+  # Withdraw: only the reporter, only while NEW, only while nobody else has added their voice, and
+  # only while no other report is marked as its duplicate (that one must keep its original).
   - role: user_access
     permission:
       filter:
@@ -70,3 +79,5 @@ delete_permissions:
               Votes:
                 userId:
                   _neq: X-Hasura-User-Id
+          - _not:
+              Duplicates: {}

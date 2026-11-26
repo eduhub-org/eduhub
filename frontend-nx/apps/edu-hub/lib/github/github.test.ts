@@ -235,6 +235,15 @@ describe('admin route', () => {
     expect(store.byId.get(1)).toMatchObject({ status: 'IN_PROGRESS', githubIssueNumber: 100 });
   });
 
+  it('needs an existing original for DUPLICATE', async () => {
+    const { store, call } = adminSetup([report()], {}, null);
+    expect((await call({ action: 'status', reportId: 1, status: 'DUPLICATE' })).json).toEqual({ error: { code: 'INVALID_STATUS' } });
+    expect((await call({ action: 'status', reportId: 1, status: 'DUPLICATE', duplicateOfId: 9 })).json).toEqual({
+      error: { code: 'ORIGINAL_NOT_FOUND' },
+    });
+    expect(store.byId.get(1)?.status).toBe('NEW');
+  });
+
   it('needs the dialog for approving an unlinked report, but not for closing one', async () => {
     const { store, call } = adminSetup([report()]);
     expect((await call({ action: 'status', reportId: 1, status: 'PLANNED' })).json).toEqual({ error: { code: 'ISSUE_REQUIRED' } });
@@ -312,6 +321,16 @@ describe('syncFromGithub', () => {
     expect(store.byId.get(1)).toMatchObject({ status: 'DUPLICATE', githubIssueNumber: null });
 
     expect(await syncFromGithub(gh, store, 12345)).toBe('none');
+  });
+
+  it('reads a duplicate of an issue without a report as declined, since DUPLICATE needs an original', async () => {
+    const gh = fakeGithub({ 7: { open: false, stateReason: 'DUPLICATE', duplicateOf: 55 } });
+    const store = fakeStore([report({ status: 'PLANNED', githubIssueNumber: 7 }), report({ id: 2, status: 'DUPLICATE', duplicateOfId: 1, githubIssueNumber: 8 })]);
+    expect(await syncFromGithub(gh, store, 7)).toBe('updated');
+    expect(store.byId.get(1)).toMatchObject({ status: 'DECLINED', duplicateOfId: null });
+    gh.issues[8] = { open: false, stateReason: 'DUPLICATE' };
+    expect(await syncFromGithub(gh, store, 8)).toBe('unchanged');
+    expect(store.byId.get(2)).toMatchObject({ status: 'DUPLICATE', duplicateOfId: 1 });
   });
 
   it("keeps EduHub's PLANNED or IN_PROGRESS when there is no board", async () => {

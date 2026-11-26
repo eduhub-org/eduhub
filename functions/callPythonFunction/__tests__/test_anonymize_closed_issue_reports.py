@@ -1,5 +1,5 @@
 """Unit tests for removing the user id from closed issue reports after 6 months (issue #2234)."""
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 
 from pythonFunctions import anonymize_closed_issue_reports as mod
 from api_clients import HasuraQueryError
@@ -28,8 +28,16 @@ def test_anonymizes_reports_closed_more_than_6_months_ago(monkeypatch):
     assert "update_IssueReport(" in query and "update_IssueReportVote(" in query
     assert "closedAt: {_lt: $cutoff}" in query
     cutoff = datetime.fromisoformat(client.calls[0]["variables"]["cutoff"])
-    expected = datetime.now(timezone.utc) - timedelta(days=183)
+    expected = mod.months_before(datetime.now(timezone.utc), 6)
     assert abs((cutoff - expected).total_seconds()) < 60
+
+
+def test_counts_calendar_months():
+    at = datetime(2026, 8, 2, 3, 45, tzinfo=timezone.utc)
+    assert mod.months_before(at, 6) == datetime(2026, 2, 2, 3, 45, tzinfo=timezone.utc)
+    # A shorter month ends the period on its last day.
+    assert mod.months_before(datetime(2026, 8, 31, tzinfo=timezone.utc), 6) == datetime(2026, 2, 28, tzinfo=timezone.utc)
+    assert mod.months_before(datetime(2027, 3, 15, tzinfo=timezone.utc), 6) == datetime(2026, 9, 15, tzinfo=timezone.utc)
 
 
 def test_reports_hasura_errors(monkeypatch):

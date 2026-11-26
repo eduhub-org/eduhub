@@ -78,6 +78,16 @@ it('refuses a sixth report within 24 hours', async () => {
   expect(requests).toHaveLength(1);
 });
 
+it('answers with the limit when the database refuses a report over it', async () => {
+  const { handler } = setup((q) =>
+    q.includes('ReportsToday') ? countToday(4) : hasuraError('permission-error', 'Check constraint violation. REPORT_LIMIT_REACHED')
+  );
+  const http = mockHttp(create);
+  await handler(http.req, http.res);
+  expect(http.status).toBe(429);
+  expect(http.json.error?.code).toBe('REPORT_LIMIT_REACHED');
+});
+
 it('refuses invalid reports without calling Hasura', async () => {
   const { handler, requests } = setup(() => countToday(0));
   for (const body of [

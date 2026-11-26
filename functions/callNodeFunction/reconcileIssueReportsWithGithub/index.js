@@ -19,9 +19,7 @@ const ISSUE_STATUSES = ["PLANNED", "IN_PROGRESS"];
 const LINKED = `
   query ReconcileLinkedIssueReports($limit: Int!) {
     IssueReport(where: { githubIssueNumber: { _is_null: false } }, order_by: { updated_at: asc }, limit: $limit) {
-      id status priority duplicateOfId githubIssueNumber
-      Votes_aggregate { aggregate { count } }
-      Duplicates { Votes_aggregate { aggregate { count } } }
+      id status priority duplicateOfId githubIssueNumber peopleAffected
     }
   }
 `;
@@ -31,9 +29,6 @@ const UPDATE = `
     update_IssueReport_by_pk(pk_columns: { id: $id }, _set: $set) { id }
   }
 `;
-
-const people = (r) =>
-  (r.Votes_aggregate.aggregate?.count ?? 0) + r.Duplicates.reduce((s, d) => s + (d.Votes_aggregate.aggregate?.count ?? 0), 0);
 
 /** The change one report needs, or null; same rules as syncFromGithub in edu-hub's reportSync.ts. */
 export const reportChange = (report, issue, { hasBoard, reportIdByIssue }) => {
@@ -45,7 +40,12 @@ export const reportChange = (report, issue, { hasBoard, reportIdByIssue }) => {
     const original = reportIdByIssue.get(issue.duplicateOfNumber);
     if (original && original !== report.id) duplicateOfId = original;
   }
-  if (report.status === target && (target !== "DUPLICATE" || !duplicateOfId || report.duplicateOfId === duplicateOfId)) return null;
+  // DUPLICATE needs an original in EduHub (IssueReport_duplicate_has_original); without one it
+  // reads as declined, unless an admin already set the link here.
+  if (target === "DUPLICATE" && !duplicateOfId) {
+    return report.status === "DUPLICATE" || report.status === "DECLINED" ? null : { status: "DECLINED" };
+  }
+  if (report.status === target && report.duplicateOfId === (duplicateOfId ?? report.duplicateOfId)) return null;
   return duplicateOfId ? { status: target, duplicateOfId } : { status: target };
 };
 
@@ -69,7 +69,7 @@ export default async function reconcileIssueReportsWithGithub(req, logger, { gql
         else counts.updated += 1;
       }
       // Rewritten only when it differs, e.g. after a missed update on someone joining.
-      if (issue) await updateFooter(gh, report.githubIssueNumber, renderFooter({ reportId: report.id, priority: report.priority, people: people(report) }));
+      if (issue) await updateFooter(gh, report.githubIssueNumber, renderFooter({ reportId: report.id, priority: report.priority, people: report.peopleAffected ?? 0 }));
       counts.checked += 1;
     } catch (error) {
       // Only the report id and GitHub's status: no report text.
