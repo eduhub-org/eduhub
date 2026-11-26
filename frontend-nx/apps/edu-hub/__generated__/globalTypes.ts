@@ -1194,6 +1194,62 @@ export enum Invoice_update_column {
 /**
  * unique or primary key constraints on table "JobOccupation"
  */
+export enum IssueReportPriority_enum {
+  HIGH = "HIGH",
+  LOW = "LOW",
+  MEDIUM = "MEDIUM",
+}
+
+export enum IssueReportStatus_enum {
+  DECLINED = "DECLINED",
+  DONE = "DONE",
+  DUPLICATE = "DUPLICATE",
+  IN_PROGRESS = "IN_PROGRESS",
+  NEW = "NEW",
+  PLANNED = "PLANNED",
+}
+
+export enum IssueReportType_enum {
+  BUG = "BUG",
+  FEATURE = "FEATURE",
+}
+
+export enum IssueReportVote_select_column {
+  created_at = "created_at",
+  id = "id",
+  isReporter = "isReporter",
+  issueReportId = "issueReportId",
+  summary = "summary",
+  userId = "userId",
+}
+
+export enum IssueReportVote_select_column_IssueReportVote_aggregate_bool_exp_bool_and_arguments_columns {
+  isReporter = "isReporter",
+}
+
+export enum IssueReportVote_select_column_IssueReportVote_aggregate_bool_exp_bool_or_arguments_columns {
+  isReporter = "isReporter",
+}
+
+export enum IssueReport_select_column {
+  closedAt = "closedAt",
+  created_at = "created_at",
+  description = "description",
+  duplicateOfId = "duplicateOfId",
+  githubIssueNumber = "githubIssueNumber",
+  id = "id",
+  locale = "locale",
+  priority = "priority",
+  publicNote = "publicNote",
+  role = "role",
+  route = "route",
+  status = "status",
+  title = "title",
+  type = "type",
+  updated_at = "updated_at",
+  userId = "userId",
+}
+
 export enum JobOccupation_constraint {
   JobOccupation_pkey = "JobOccupation_pkey",
 }
@@ -8062,6 +8118,291 @@ export interface Invoice_variance_order_by {
 /**
  * Boolean expression to filter rows from the table "JobOccupation". All fields are combined with a logical 'AND'.
  */
+export interface IssueReportPriority_enum_comparison_exp {
+  _eq?: IssueReportPriority_enum | null;
+  _in?: IssueReportPriority_enum[] | null;
+  _is_null?: boolean | null;
+  _neq?: IssueReportPriority_enum | null;
+  _nin?: IssueReportPriority_enum[] | null;
+}
+
+export interface IssueReportStatus_enum_comparison_exp {
+  _eq?: IssueReportStatus_enum | null;
+  _in?: IssueReportStatus_enum[] | null;
+  _is_null?: boolean | null;
+  _neq?: IssueReportStatus_enum | null;
+  _nin?: IssueReportStatus_enum[] | null;
+}
+
+export interface IssueReportType_enum_comparison_exp {
+  _eq?: IssueReportType_enum | null;
+  _in?: IssueReportType_enum[] | null;
+  _is_null?: boolean | null;
+  _neq?: IssueReportType_enum | null;
+  _nin?: IssueReportType_enum[] | null;
+}
+
+export interface IssueReportVote_aggregate_bool_exp {
+  bool_and?: IssueReportVote_aggregate_bool_exp_bool_and | null;
+  bool_or?: IssueReportVote_aggregate_bool_exp_bool_or | null;
+  count?: IssueReportVote_aggregate_bool_exp_count | null;
+}
+
+export interface IssueReportVote_aggregate_bool_exp_bool_and {
+  arguments: IssueReportVote_select_column_IssueReportVote_aggregate_bool_exp_bool_and_arguments_columns;
+  distinct?: boolean | null;
+  filter?: IssueReportVote_bool_exp | null;
+  predicate: Boolean_comparison_exp;
+}
+
+export interface IssueReportVote_aggregate_bool_exp_bool_or {
+  arguments: IssueReportVote_select_column_IssueReportVote_aggregate_bool_exp_bool_or_arguments_columns;
+  distinct?: boolean | null;
+  filter?: IssueReportVote_bool_exp | null;
+  predicate: Boolean_comparison_exp;
+}
+
+export interface IssueReportVote_aggregate_bool_exp_count {
+  arguments?: IssueReportVote_select_column[] | null;
+  distinct?: boolean | null;
+  filter?: IssueReportVote_bool_exp | null;
+  predicate: Int_comparison_exp;
+}
+
+export interface IssueReportVote_aggregate_order_by {
+  avg?: IssueReportVote_avg_order_by | null;
+  count?: order_by | null;
+  max?: IssueReportVote_max_order_by | null;
+  min?: IssueReportVote_min_order_by | null;
+  stddev?: IssueReportVote_stddev_order_by | null;
+  stddev_pop?: IssueReportVote_stddev_pop_order_by | null;
+  stddev_samp?: IssueReportVote_stddev_samp_order_by | null;
+  sum?: IssueReportVote_sum_order_by | null;
+  var_pop?: IssueReportVote_var_pop_order_by | null;
+  var_samp?: IssueReportVote_var_samp_order_by | null;
+  variance?: IssueReportVote_variance_order_by | null;
+}
+
+export interface IssueReportVote_avg_order_by {
+  id?: order_by | null;
+  issueReportId?: order_by | null;
+}
+
+export interface IssueReportVote_bool_exp {
+  IssueReport?: IssueReport_bool_exp | null;
+  User?: User_bool_exp | null;
+  _and?: IssueReportVote_bool_exp[] | null;
+  _not?: IssueReportVote_bool_exp | null;
+  _or?: IssueReportVote_bool_exp[] | null;
+  created_at?: timestamptz_comparison_exp | null;
+  id?: Int_comparison_exp | null;
+  isReporter?: Boolean_comparison_exp | null;
+  issueReportId?: Int_comparison_exp | null;
+  summary?: String_comparison_exp | null;
+  userId?: uuid_comparison_exp | null;
+}
+
+export interface IssueReportVote_max_order_by {
+  created_at?: order_by | null;
+  id?: order_by | null;
+  issueReportId?: order_by | null;
+  summary?: order_by | null;
+  userId?: order_by | null;
+}
+
+export interface IssueReportVote_min_order_by {
+  created_at?: order_by | null;
+  id?: order_by | null;
+  issueReportId?: order_by | null;
+  summary?: order_by | null;
+  userId?: order_by | null;
+}
+
+export interface IssueReportVote_stddev_order_by {
+  id?: order_by | null;
+  issueReportId?: order_by | null;
+}
+
+export interface IssueReportVote_stddev_pop_order_by {
+  id?: order_by | null;
+  issueReportId?: order_by | null;
+}
+
+export interface IssueReportVote_stddev_samp_order_by {
+  id?: order_by | null;
+  issueReportId?: order_by | null;
+}
+
+export interface IssueReportVote_sum_order_by {
+  id?: order_by | null;
+  issueReportId?: order_by | null;
+}
+
+export interface IssueReportVote_var_pop_order_by {
+  id?: order_by | null;
+  issueReportId?: order_by | null;
+}
+
+export interface IssueReportVote_var_samp_order_by {
+  id?: order_by | null;
+  issueReportId?: order_by | null;
+}
+
+export interface IssueReportVote_variance_order_by {
+  id?: order_by | null;
+  issueReportId?: order_by | null;
+}
+
+export interface IssueReport_aggregate_bool_exp {
+  count?: IssueReport_aggregate_bool_exp_count | null;
+}
+
+export interface IssueReport_aggregate_bool_exp_count {
+  arguments?: IssueReport_select_column[] | null;
+  distinct?: boolean | null;
+  filter?: IssueReport_bool_exp | null;
+  predicate: Int_comparison_exp;
+}
+
+export interface IssueReport_aggregate_order_by {
+  avg?: IssueReport_avg_order_by | null;
+  count?: order_by | null;
+  max?: IssueReport_max_order_by | null;
+  min?: IssueReport_min_order_by | null;
+  stddev?: IssueReport_stddev_order_by | null;
+  stddev_pop?: IssueReport_stddev_pop_order_by | null;
+  stddev_samp?: IssueReport_stddev_samp_order_by | null;
+  sum?: IssueReport_sum_order_by | null;
+  var_pop?: IssueReport_var_pop_order_by | null;
+  var_samp?: IssueReport_var_samp_order_by | null;
+  variance?: IssueReport_variance_order_by | null;
+}
+
+export interface IssueReport_avg_order_by {
+  duplicateOfId?: order_by | null;
+  id?: order_by | null;
+}
+
+export interface IssueReport_bool_exp {
+  DuplicateOf?: IssueReport_bool_exp | null;
+  Duplicates?: IssueReport_bool_exp | null;
+  Duplicates_aggregate?: IssueReport_aggregate_bool_exp | null;
+  User?: User_bool_exp | null;
+  Votes?: IssueReportVote_bool_exp | null;
+  Votes_aggregate?: IssueReportVote_aggregate_bool_exp | null;
+  _and?: IssueReport_bool_exp[] | null;
+  _not?: IssueReport_bool_exp | null;
+  _or?: IssueReport_bool_exp[] | null;
+  closedAt?: timestamptz_comparison_exp | null;
+  created_at?: timestamptz_comparison_exp | null;
+  description?: String_comparison_exp | null;
+  duplicateOfId?: Int_comparison_exp | null;
+  githubIssueNumber?: Int_comparison_exp | null;
+  id?: Int_comparison_exp | null;
+  locale?: String_comparison_exp | null;
+  peopleAffected?: Int_comparison_exp | null;
+  priority?: IssueReportPriority_enum_comparison_exp | null;
+  publicNote?: String_comparison_exp | null;
+  role?: String_comparison_exp | null;
+  route?: String_comparison_exp | null;
+  status?: IssueReportStatus_enum_comparison_exp | null;
+  title?: String_comparison_exp | null;
+  type?: IssueReportType_enum_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
+  userId?: uuid_comparison_exp | null;
+}
+
+export interface IssueReport_max_order_by {
+  closedAt?: order_by | null;
+  created_at?: order_by | null;
+  description?: order_by | null;
+  duplicateOfId?: order_by | null;
+  githubIssueNumber?: order_by | null;
+  id?: order_by | null;
+  locale?: order_by | null;
+  publicNote?: order_by | null;
+  role?: order_by | null;
+  route?: order_by | null;
+  title?: order_by | null;
+  updated_at?: order_by | null;
+  userId?: order_by | null;
+}
+
+export interface IssueReport_min_order_by {
+  closedAt?: order_by | null;
+  created_at?: order_by | null;
+  description?: order_by | null;
+  duplicateOfId?: order_by | null;
+  githubIssueNumber?: order_by | null;
+  id?: order_by | null;
+  locale?: order_by | null;
+  publicNote?: order_by | null;
+  role?: order_by | null;
+  route?: order_by | null;
+  title?: order_by | null;
+  updated_at?: order_by | null;
+  userId?: order_by | null;
+}
+
+export interface IssueReport_order_by {
+  DuplicateOf?: IssueReport_order_by | null;
+  Duplicates_aggregate?: IssueReport_aggregate_order_by | null;
+  User?: User_order_by | null;
+  Votes_aggregate?: IssueReportVote_aggregate_order_by | null;
+  closedAt?: order_by | null;
+  created_at?: order_by | null;
+  description?: order_by | null;
+  duplicateOfId?: order_by | null;
+  githubIssueNumber?: order_by | null;
+  id?: order_by | null;
+  locale?: order_by | null;
+  peopleAffected?: order_by | null;
+  priority?: order_by | null;
+  publicNote?: order_by | null;
+  role?: order_by | null;
+  route?: order_by | null;
+  status?: order_by | null;
+  title?: order_by | null;
+  type?: order_by | null;
+  updated_at?: order_by | null;
+  userId?: order_by | null;
+}
+
+export interface IssueReport_stddev_order_by {
+  duplicateOfId?: order_by | null;
+  id?: order_by | null;
+}
+
+export interface IssueReport_stddev_pop_order_by {
+  duplicateOfId?: order_by | null;
+  id?: order_by | null;
+}
+
+export interface IssueReport_stddev_samp_order_by {
+  duplicateOfId?: order_by | null;
+  id?: order_by | null;
+}
+
+export interface IssueReport_sum_order_by {
+  duplicateOfId?: order_by | null;
+  id?: order_by | null;
+}
+
+export interface IssueReport_var_pop_order_by {
+  duplicateOfId?: order_by | null;
+  id?: order_by | null;
+}
+
+export interface IssueReport_var_samp_order_by {
+  duplicateOfId?: order_by | null;
+  id?: order_by | null;
+}
+
+export interface IssueReport_variance_order_by {
+  duplicateOfId?: order_by | null;
+  id?: order_by | null;
+}
+
 export interface JobOccupation_bool_exp {
   JobPostings?: JobPosting_bool_exp | null;
   JobPostings_aggregate?: JobPosting_aggregate_bool_exp | null;

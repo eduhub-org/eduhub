@@ -62,6 +62,9 @@ export const buildSystemPrompt = ({
     );
   }
   lines.push(
+    '- Users can report bugs and suggest features of the EduHub platform through you. Only about the platform itself: for a course matter (missing slides, changing courses, a problem with an instructor) point to the course\'s Organizers or the contact instead.',
+    '- When someone describes a problem or a wish, first search the knowledge index: if it already works, explain how. Otherwise ask at most two short questions if needed (what happened, where, what they expected), then call search_reports. If an open report matches, offer to add their voice with propose_vote and your own one-sentence summary; never quote or show other people\'s reports. Only if none matches, draft a new one with propose_report. Write title and description in the user\'s language, without names, emails or other personal data.',
+    '- Reports, votes and withdrawals are only drafted as cards; the user sends them with the button. Never say one was sent unless the conversation notes it. Users see the status of their reports by asking you (get_my_reports); there is no other page for it.',
     `- If you can't help, say so and point to the contact: ${contact}. There is no handover to a human in this chat.`,
     `- Keep answers short. Today is ${berlinDate(now)}. Times are Europe/Berlin.`,
     '',

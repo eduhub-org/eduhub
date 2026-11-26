@@ -50,6 +50,12 @@ export interface IncomingMessage {
 }
 
 const PROPOSAL_STATUSES = ['PROPOSED', 'APPLIED', 'DISCARDED', 'FAILED'];
+const REPORT_CARD_STATUS: Record<string, string> = {
+  PROPOSED: 'shown, not sent',
+  APPLIED: 'sent by the user',
+  DISCARDED: 'dismissed by the user',
+  FAILED: 'sending failed',
+};
 
 /**
  * The widget lists, on an assistant message, what the Organizer did with its Proposed Changes.
@@ -63,7 +69,9 @@ const proposalNotes = (input: unknown): string | null => {
     const { kind, courseId, status } = (p && typeof p === 'object' ? p : {}) as Record<string, unknown>;
     if (typeof kind !== 'string' || !/^[a-z_]{1,40}$/.test(kind) || !PROPOSAL_STATUSES.includes(status as string)) return null;
     const course = typeof courseId === 'number' && Number.isInteger(courseId) && courseId > 0 ? ` for course ${courseId}` : '';
-    notes.push(`[Proposed Change ${kind}${course}: ${status}]`);
+    // Report cards (issue #2234) travel the same way, as kind report_create, report_vote or report_withdraw.
+    if (kind.startsWith('report_')) notes.push(`[Report card ${kind.slice(7)}: ${REPORT_CARD_STATUS[status as string]}]`);
+    else notes.push(`[Proposed Change ${kind}${course}: ${status}]`);
   }
   return notes.length ? `\n\n${notes.join('\n')}` : '';
 };

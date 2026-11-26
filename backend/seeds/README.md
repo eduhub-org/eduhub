@@ -161,6 +161,12 @@ copied from that session by the database triggers.
 
 - `admin@example.com` and `instructor@example.com` teach a past course (with an
   instructor certificate), a running course and the upcoming course 7011.
+  `instructor@example.com` also teaches 7003, 7005–7008 and 7012, because every
+  published course needs an instructor (`course_publish_requires_instructor`).
+- Team Coding.Waterkant organizes the events 7101–7105 and 7201–7214, and
+  Maria Schmidt teaches the org 9100 test courses 9001 and 9002.
+  `instructor@example.com` deliberately doesn't teach 9002, which
+  `lib/mcp/hasura.integration.test.ts` relies on.
 - `user@example.com` registered for several events (7201, a paid ticket for
   7204, an application for 7206, the running meetup series 7210, past 7211).
 - `user@example.com` took four past courses (7001 with achievement and

@@ -1,0 +1,4 @@
+table:
+  name: IssueReportSummary
+  schema: public
+# Weekly summary written by the generate_issue_report_summary cron (issue #2234). Admins only.

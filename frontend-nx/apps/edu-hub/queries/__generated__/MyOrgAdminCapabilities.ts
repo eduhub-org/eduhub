@@ -7,9 +7,19 @@
 // GraphQL query operation: MyOrgAdminCapabilities
 // ====================================================
 
+export interface MyOrgAdminCapabilities_OrganizationAdmin_Organization {
+  __typename: "Organization";
+  id: number;
+  name: string;
+}
+
 export interface MyOrgAdminCapabilities_OrganizationAdmin {
   __typename: "OrganizationAdmin";
   organizationId: number;
+  /**
+   * An object relationship
+   */
+  Organization: MyOrgAdminCapabilities_OrganizationAdmin_Organization;
   canManageCourses: boolean;
   canManageEvents: boolean;
   /**

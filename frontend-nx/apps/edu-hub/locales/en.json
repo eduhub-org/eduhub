@@ -52,6 +52,7 @@
       "manual": "Manual",
       "faq": "FAQ",
       "user": "User",
+      "reports": "Reports",
       "admin_users": "Admin Users",
       "experts": "Experts",
       "courses": "Courses",
@@ -1236,10 +1237,17 @@
     },
     "error_loading_programs": "The programs could not be loaded. Please try again later.",
     "empty_state": {
-      "events": "No events programs exist yet. Ask a platform admin to set up an events program for your organization before you can manage events here.",
-      "courses": "No course programs exist yet. Ask a platform admin to set up a course program for your organization before you can manage courses here.",
-      "degrees": "No degree programs exist yet. Ask a platform admin to set up a degree program for your organization before you can manage degrees here."
+      "events": "No events program exists yet.",
+      "courses": "No course program exists yet.",
+      "degrees": "No degree program exists yet."
     },
+    "create_first_program": {
+      "events": "Create events program",
+      "courses": "Create course program",
+      "degrees": "Create degree program"
+    },
+    "empty_state_ask_admin": "Ask a platform admin to set up a program for your organization.",
+    "create_program_failed": "The program could not be created. Please try again.",
     "open_in_new_tab": "Open in new tab",
     "close": "Close",
     "cancel": "Cancel",
@@ -2637,6 +2645,17 @@
       "programs_unpublished_success_singular": "Program was successfully unpublished",
       "programs_unpublished_success_plural": "{count} programs were successfully unpublished",
       "bulk_action_failed": "The bulk action failed. Please try again."
+    },
+    "create_dialog": {
+      "title": "Create program",
+      "type_label": "Program type",
+      "organization_label": "Organization",
+      "single_organization": "The program belongs to {organization}.",
+      "no_organization": "You may not create a program of this type for any organization.",
+      "hint": "You can edit the title, dates and other settings after creating it.",
+      "create_button": "Create",
+      "success": "Program created.",
+      "error": "The program could not be created. Please try again."
     }
   },
   "manageUsers": {
@@ -4023,7 +4042,12 @@
       "generic": "Something went wrong. Please try again later.",
       "NETWORK": "The connection was lost. Please try again.",
       "INTERRUPTED": "The reply was cut off. Please ask again.",
-      "EMPTY_REPLY": "No answer came back. Please ask again."
+      "EMPTY_REPLY": "No answer came back. Please ask again.",
+      "REPORT_LIMIT_REACHED": "You have already sent {max} reports today. You can send more tomorrow.",
+      "REPORT_ALREADY_VOTED": "You already support this report.",
+      "REPORT_CLOSED": "This report is already closed or no longer exists.",
+      "REPORT_NOT_WITHDRAWABLE": "You can no longer withdraw this report: the EduHub team has already looked at it or others have joined.",
+      "REPORT_FAILED": "Your report couldn't be saved right now. Please try again later or write to {contact}."
     },
     "context": {
       "chip": "Sent along: {page}",
@@ -4034,11 +4058,13 @@
       "helpful": "Helpful",
       "not_helpful": "Not helpful",
       "consent_label": "Keep this conversation?",
-      "consent_question": "May we keep this conversation for 30 days so we can improve the Assistant? Without your consent we only count the rating.",
+      "consent_question": "May we keep this conversation for 30 days so we can improve the Assistant? Without your consent we only get the rating and your comment.",
       "consent_yes": "Yes, keep it",
-      "consent_no": "No, only send the rating",
+      "consent_no": "No, don't keep it",
       "thanks": "Thanks for your feedback!",
-      "failed": "Your feedback could not be sent."
+      "failed": "Your feedback could not be sent.",
+      "comment_label": "What wasn't helpful? (optional)",
+      "comment_placeholder": "e.g. \"The answer was wrong because …\""
     },
     "proposal": {
       "title": "Proposed change: {kind}",
@@ -4103,7 +4129,28 @@
         "ROLE_NOT_ALLOWED": "You can't make this change with your current role."
       }
     },
-    "looking_up": "Looking it up…"
+    "looking_up": "Looking it up…",
+    "report": {
+      "title_create": "Report: {type}",
+      "title_vote": "Existing report: {type}",
+      "title_withdraw": "Withdraw report",
+      "types": {
+        "BUG": "Bug",
+        "FEATURE": "Idea"
+      },
+      "not_sent_yet": "Not sent yet. Check the report and send it yourself.",
+      "vote_hint": "Someone has already reported this. If you join, your voice counts too.",
+      "withdraw_hint": "The report will be deleted.",
+      "send": "Send",
+      "sending": "Sending…",
+      "vote": "Join",
+      "withdraw": "Withdraw",
+      "dismiss": "Discard",
+      "sent": "Sent. Ask me \"What happened to my reports?\" any time to see the status.",
+      "voted": "You've joined. Ask me \"What happened to my reports?\" any time to see the status.",
+      "withdrawn": "Withdrawn.",
+      "dismissed": "Discarded. Nothing was sent."
+    }
   },
   "help": {
     "title": "Manual",
@@ -4121,5 +4168,93 @@
     "org_rules_link": "Go to the rules and FAQ",
     "version_release": "Manual as of release <release></release>, commit <commit></commit>",
     "version_commit": "Manual as of commit <commit></commit> (not released yet)"
+  },
+  "manageReports": {
+    "headline": "Reports",
+    "intro": "Bugs and ideas users sent through the Assistant. Set status and priority; the status and your public note are visible to everyone who sent or joined the report when they ask the Assistant about it.",
+    "columns": {
+      "type": "Type",
+      "title": "Title",
+      "people": "Affected",
+      "status": "Status",
+      "priority": "Priority",
+      "created": "Reported on"
+    },
+    "type": {
+      "BUG": "Bug",
+      "FEATURE": "Idea"
+    },
+    "status": {
+      "NEW": "New",
+      "PLANNED": "Planned",
+      "IN_PROGRESS": "In progress",
+      "DONE": "Done",
+      "DECLINED": "Declined",
+      "DUPLICATE": "Duplicate"
+    },
+    "priority": {
+      "HIGH": "High",
+      "MEDIUM": "Medium",
+      "LOW": "Low",
+      "none": "None"
+    },
+    "details": {
+      "description": "Description",
+      "id": "Number",
+      "people": "Affected (with duplicates)",
+      "page": "Page",
+      "role_language": "Role · language",
+      "reporter": "Reported by",
+      "reporter_removed": "Removed (anonymized 6 months after closing, or account deleted)",
+      "duplicate_of": "Duplicate of",
+      "mark_duplicate": "Duplicate of report no.",
+      "public_note": "Public note",
+      "github_issue": "GitHub issue",
+      "github_create_or_link": "Create or link issue"
+    },
+    "help": {
+      "mark_duplicate": "Number of the original report (#). Sets the status to \"Duplicate\"; the people affected count towards the original.",
+      "public_note": "Shown to everyone who sent or joined the report, e.g. \"Planned for spring\" or why it was declined.",
+      "github_issue": "Approves the report: it becomes \"Planned\" with a public GitHub issue.",
+      "github_synced": "Synced: closing, reopening or moving the issue on the board updates the status here."
+    },
+    "summary": {
+      "title": "Weekly summary",
+      "week": "Week",
+      "none": "No summary yet. One is written every Monday.",
+      "meta": "{from} – {to} · {reports, plural, one {# new report} other {# new reports}} · {feedback} 👎 feedback",
+      "cost": "{cost} € with {model}"
+    },
+    "issue_dialog": {
+      "title": "Approve report #{id} as \"{status}\"",
+      "mode_create": "Create a new issue",
+      "mode_link": "Link an existing issue",
+      "public_hint": "The issue is public in {repo}. Check that title and description contain no names, emails or other personal details.",
+      "issue_title": "Issue title",
+      "issue_description": "Issue description",
+      "footer_label": "Added below the description and kept up to date:",
+      "issue_number": "Issue number",
+      "link_help": "An open or closed issue in {repo}. It gets the footer with the report number and people affected.",
+      "cancel": "Cancel",
+      "create": "Create issue",
+      "link": "Link issue"
+    },
+    "sync_error": {
+      "NOT_LOGGED_IN": "Your session has expired. Please log in again.",
+      "NOT_ADMIN": "Only admins can change reports.",
+      "INVALID_REQUEST": "Something is missing or invalid. Please check your input.",
+      "INVALID_STATUS": "This status can't be set here.",
+      "GITHUB_OFF": "The GitHub sync is not set up.",
+      "REPORT_NOT_FOUND": "The report no longer exists.",
+      "ORIGINAL_NOT_FOUND": "The report couldn't be marked as a duplicate. Is there a report with this number?",
+      "ALREADY_LINKED": "This report already has a GitHub issue.",
+      "ISSUE_REQUIRED": "A planned report needs a GitHub issue. Create or link one.",
+      "ISSUE_NOT_FOUND": "There is no such issue in the repository.",
+      "ISSUE_TAKEN": "This issue already belongs to report #{reportId}. Mark this report as its duplicate instead.",
+      "LINKED_CANNOT_BE_NEW": "A report with a public issue can't go back to \"New\".",
+      "GITHUB_FAILED": "GitHub didn't accept the change. Please try again later.",
+      "FAILED": "The change couldn't be saved. Please try again.",
+      "METHOD_NOT_ALLOWED": "The change couldn't be saved. Please try again."
+    }
   }
 }
