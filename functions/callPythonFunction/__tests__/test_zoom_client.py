@@ -782,6 +782,28 @@ class TestTimeOutsideTheSession:
         df = client.aggregate_participants(rows, window=self.WINDOW)
         assert list(df["name"]) == ["Jane"]
 
+    def test_someone_there_only_before_lends_no_email_to_a_same_named_guest(self):
+        client = _make_client()
+        rows = [{"name": "Alex", "user_email": "previous@example.com",
+                 "join_time": "2026-01-01T08:00:00Z", "leave_time": "2026-01-01T09:00:00Z"},
+                {"name": "Alex", "user_id": "guest-1",
+                 "join_time": "2026-01-01T10:00:00Z", "leave_time": "2026-01-01T11:00:00Z"}]
+        df = client.aggregate_participants(rows, window=self.WINDOW)
+        assert len(df) == 1
+        assert df.iloc[0]["email"] is None
+        assert df.iloc[0]["duration"] == 3600
+
+    def test_an_early_join_running_into_the_session_still_merges_with_a_reconnect(self):
+        client = _make_client()
+        rows = [{"name": "Alex", "user_email": "alex@example.com",
+                 "join_time": "2026-01-01T09:50:00Z", "leave_time": "2026-01-01T10:20:00Z"},
+                {"name": "Alex", "user_id": "guest-1",
+                 "join_time": "2026-01-01T10:25:00Z", "leave_time": "2026-01-01T11:00:00Z"}]
+        df = client.aggregate_participants(rows, window=self.WINDOW)
+        assert len(df) == 1
+        assert df.iloc[0]["email"] == "alex@example.com"
+        assert df.iloc[0]["duration"] == 55 * 60
+
     def test_nobody_inside_the_session_gives_an_empty_frame_with_columns(self):
         client = _make_client()
         rows = [{"name": "Early Bird", "join_time": "2026-01-01T08:00:00Z",

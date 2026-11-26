@@ -571,6 +571,13 @@ class ZoomClient:
         clipped = [(max(s, start), min(e, end)) for s, e in intervals]
         return [(s, e) for s, e in clipped if e > s]
 
+    @classmethod
+    def _overlaps(cls, row: Dict[str, Any], window: Tuple[pd.Timestamp, pd.Timestamp]) -> bool:
+        """Whether a participant row has time inside ``window``."""
+        join = cls._to_utc_timestamp(row.get("join_time"))
+        leave = cls._to_utc_timestamp(row.get("leave_time"))
+        return join is not None and leave is not None and join < window[1] and leave > window[0]
+
     def aggregate_participants(
         self,
         instance_rows: List[Dict[str, Any]],
@@ -590,6 +597,10 @@ class ZoomClient:
         """
         if window is not None:
             window = (self._to_utc_timestamp(window[0]), self._to_utc_timestamp(window[1]))
+            # Drop rows outside the session before grouping: a same-named
+            # person who was there only before it would otherwise lend their
+            # email to a guest who attended.
+            instance_rows = [r for r in instance_rows if self._overlaps(r, window)]
         if not instance_rows:
             return pd.DataFrame(
                 columns=[

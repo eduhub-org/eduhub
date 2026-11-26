@@ -18,7 +18,7 @@ Bis ein Termin geprüft wurde, ist seine Anwesenheit unbekannt, nie verpasst. La
 
 ## Anwesenheit prüfen
 
-- Reiter **Termine**: Jeder Termin zeigt, wie viele Personen anwesend waren, zum Beispiel „12 / 15 anwesend“, oder **Wird nach dem Termin erfasst**. **Rohdaten der Anwesenheit ansehen** zeigt die Einträge aus Zoom und dem Check-in, auch die, die niemandem zugeordnet werden konnten.
+- Reiter **Termine**: Jeder Termin zeigt, wie viele Personen anwesend waren, zum Beispiel „12 / 15 anwesend“, oder **Wird nach dem Termin erfasst**. **Rohdaten der Anwesenheit ansehen** zeigt die Einträge aus Zoom und dem Check-in, auch die, die niemandem zugeordnet werden konnten. Zoom-Einträge zeigen nur die Zeit während des Termins; wer nur vorher oder nachher im Zoom-Meeting war, hat keinen Eintrag.
 - Reiter **Teilnahmen** (oder **Projekte & Teilnahmen**): ein Punkt pro Termin für jede:n Teilnehmende:n und ein Gesamtstand: **Anwesenheitsanforderung erfüllt**, **nicht erfüllt** oder **Anwesenheitsstatus noch offen**. Fahre mit der Maus über einen Punkt, um zu sehen, warum er so gesetzt ist.
 
 ## Anwesenheit korrigieren
