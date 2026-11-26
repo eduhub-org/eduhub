@@ -194,13 +194,23 @@ describe('resolveSessionLocations', () => {
     ).toEqual(['ZBW Kiel (Düsternbrooker Weg 120)']);
   });
 
-  it('falls back to the free-text address and to "Online" without a link', () => {
+  it('shows the meeting link of an online session and "Online" without one', () => {
     expect(
       resolveSessionLocations([
-        { address: 'https://meet.example.com/x', CourseLocation: { locationOption: 'ONLINE' } },
+        {
+          address: '',
+          OnlineMeetingLink: { url: 'https://meet.example.com/x' },
+          CourseLocation: { locationOption: 'ONLINE' },
+        },
         { address: '', CourseLocation: { locationOption: 'ONLINE' } },
       ])
     ).toEqual(['https://meet.example.com/x', 'Online']);
+  });
+
+  it('never shows free text of an online session as its link', () => {
+    expect(
+      resolveSessionLocations([{ address: 'stale text', CourseLocation: { locationOption: 'ONLINE' } }])
+    ).toEqual(['Online']);
   });
 
   it("falls back to the course location's default venue and address", () => {
@@ -217,7 +227,7 @@ describe('resolveSessionLocations', () => {
         },
         {
           address: '',
-          CourseLocation: { locationOption: 'ONLINE', defaultSessionAddress: 'https://meet.example.com/y' },
+          CourseLocation: { locationOption: 'ONLINE', OnlineMeetingLink: { url: 'https://meet.example.com/y' } },
         },
       ])
     ).toEqual(['ZBW Kiel (Düsternbrooker Weg 120)', 'https://meet.example.com/y']);

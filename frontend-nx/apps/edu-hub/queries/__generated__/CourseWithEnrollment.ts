@@ -39,6 +39,12 @@ export interface CourseWithEnrollment_Course_by_pk_SourceSession {
   Course: CourseWithEnrollment_Course_by_pk_SourceSession_Course | null;
 }
 
+export interface CourseWithEnrollment_Course_by_pk_Sessions_SessionAddresses_CourseLocation_OnlineMeetingLink {
+  __typename: "OnlineMeetingLink";
+  id: number;
+  url: string;
+}
+
 export interface CourseWithEnrollment_Course_by_pk_Sessions_SessionAddresses_CourseLocation {
   __typename: "CourseLocation";
   id: number;
@@ -54,6 +60,16 @@ export interface CourseWithEnrollment_Course_by_pk_Sessions_SessionAddresses_Cou
    * References a LocationAddress that serves as the default for sessions in this course location. Replaces the legacy text-based defaultSessionAddress field.
    */
   defaultSessionAddressId: number | null;
+  /**
+   * An object relationship
+   */
+  OnlineMeetingLink: CourseWithEnrollment_Course_by_pk_Sessions_SessionAddresses_CourseLocation_OnlineMeetingLink | null;
+}
+
+export interface CourseWithEnrollment_Course_by_pk_Sessions_SessionAddresses_OnlineMeetingLink {
+  __typename: "OnlineMeetingLink";
+  id: number;
+  url: string;
 }
 
 export interface CourseWithEnrollment_Course_by_pk_Sessions_SessionAddresses {
@@ -75,6 +91,10 @@ export interface CourseWithEnrollment_Course_by_pk_Sessions_SessionAddresses {
    * An object relationship
    */
   CourseLocation: CourseWithEnrollment_Course_by_pk_Sessions_SessionAddresses_CourseLocation | null;
+  /**
+   * An object relationship
+   */
+  OnlineMeetingLink: CourseWithEnrollment_Course_by_pk_Sessions_SessionAddresses_OnlineMeetingLink | null;
 }
 
 export interface CourseWithEnrollment_Course_by_pk_Sessions_SessionSpeakers_User {
@@ -200,6 +220,12 @@ export interface CourseWithEnrollment_Course_by_pk_CourseInstructors {
   User: CourseWithEnrollment_Course_by_pk_CourseInstructors_User;
 }
 
+export interface CourseWithEnrollment_Course_by_pk_CourseLocations_OnlineMeetingLink {
+  __typename: "OnlineMeetingLink";
+  id: number;
+  url: string;
+}
+
 export interface CourseWithEnrollment_Course_by_pk_CourseLocations {
   __typename: "CourseLocation";
   id: number;
@@ -211,6 +237,10 @@ export interface CourseWithEnrollment_Course_by_pk_CourseLocations {
    * Either 'ONLINE' or one of the possible given offline locations
    */
   locationOption: LocationOption_enum | null;
+  /**
+   * An object relationship
+   */
+  OnlineMeetingLink: CourseWithEnrollment_Course_by_pk_CourseLocations_OnlineMeetingLink | null;
 }
 
 export interface CourseWithEnrollment_Course_by_pk_Program_Organization {
@@ -239,6 +269,12 @@ export interface CourseWithEnrollment_Course_by_pk_Program_Organization {
   hasGhostNewsletterConfigured: boolean | null;
 }
 
+export interface CourseWithEnrollment_Course_by_pk_Program_Sessions_SessionAddresses_CourseLocation_OnlineMeetingLink {
+  __typename: "OnlineMeetingLink";
+  id: number;
+  url: string;
+}
+
 export interface CourseWithEnrollment_Course_by_pk_Program_Sessions_SessionAddresses_CourseLocation {
   __typename: "CourseLocation";
   id: number;
@@ -254,6 +290,16 @@ export interface CourseWithEnrollment_Course_by_pk_Program_Sessions_SessionAddre
    * References a LocationAddress that serves as the default for sessions in this course location. Replaces the legacy text-based defaultSessionAddress field.
    */
   defaultSessionAddressId: number | null;
+  /**
+   * An object relationship
+   */
+  OnlineMeetingLink: CourseWithEnrollment_Course_by_pk_Program_Sessions_SessionAddresses_CourseLocation_OnlineMeetingLink | null;
+}
+
+export interface CourseWithEnrollment_Course_by_pk_Program_Sessions_SessionAddresses_OnlineMeetingLink {
+  __typename: "OnlineMeetingLink";
+  id: number;
+  url: string;
 }
 
 export interface CourseWithEnrollment_Course_by_pk_Program_Sessions_SessionAddresses {
@@ -275,6 +321,10 @@ export interface CourseWithEnrollment_Course_by_pk_Program_Sessions_SessionAddre
    * An object relationship
    */
   CourseLocation: CourseWithEnrollment_Course_by_pk_Program_Sessions_SessionAddresses_CourseLocation | null;
+  /**
+   * An object relationship
+   */
+  OnlineMeetingLink: CourseWithEnrollment_Course_by_pk_Program_Sessions_SessionAddresses_OnlineMeetingLink | null;
 }
 
 export interface CourseWithEnrollment_Course_by_pk_Program_Sessions_SessionSpeakers_User {

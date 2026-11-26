@@ -6,7 +6,7 @@ import {
   instructorCertificatesResultMessage,
   useCreateInstructorCertificates,
 } from './InstructorCertificatesButton';
-import { useRoleQuery } from '../../../hooks/authedQuery';
+import { useLazyRoleQuery, useRoleQuery } from '../../../hooks/authedQuery';
 
 import { QUERY_LIMIT } from '../../../pages/manage/courses';
 import { AdminCourseListVariables, AdminCourseList_Course } from '../../../queries/__generated__/AdminCourseList';
@@ -30,6 +30,7 @@ import {
 } from '../../../queries/__generated__/UpdateCourseAchievementCertificatePossible';
 import { isKnownCourseGroupOptionTitle } from '../../../helpers/courseGroupOptions';
 import { programTypeMessageKey } from '../../../helpers/programType';
+import { coursesWithoutInstructor } from '../../../helpers/courseInstructorRequirement';
 import { DEGREE_COURSES } from '../../../queries/courseDegree';
 import { DegreeCourses } from '../../../queries/__generated__/DegreeCourses';
 import { DELETE_A_COURSE } from '../../../queries/mutateCourse';
@@ -52,9 +53,15 @@ import { CourseEnrollmentStatus_enum, order_by } from '../../../__generated__/gl
 import { useTranslations, useLocale } from 'next-intl';
 import { CourseStatus_enum, LocationOption_enum } from '../../../__generated__/globalTypes';
 import InputField from '../../inputs/InputField';
-import { UPDATE_COURSE_PROPERTY, INSERT_COURSE } from '../../../queries/mutateCourse';
-import { UPDATE_COURSE_TITLE } from '../../../queries/course';
+import { UPDATE_COURSE_PROPERTY, INSERT_COURSE, PUBLISH_COURSES } from '../../../queries/mutateCourse';
+import { COURSE_TITLES_IN_PROGRAMS, UPDATE_COURSE_TITLE } from '../../../queries/course';
+import {
+  CourseTitlesInPrograms,
+  CourseTitlesInProgramsVariables,
+} from '../../../queries/__generated__/CourseTitlesInPrograms';
+import { findTitleClash, nextFreeTitle, titlesMustBeUnique } from '../../../helpers/courseTitles';
 import { UpdateCourseByPk, UpdateCourseByPkVariables } from '../../../queries/__generated__/UpdateCourseByPk';
+import { PublishCourses, PublishCoursesVariables } from '../../../queries/__generated__/PublishCourses';
 import {
   InsertCourseWithLocation,
   InsertCourseWithLocationVariables,
@@ -407,11 +414,35 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
   });
 
   const [updateCourse] = useManageMutation<UpdateCourseByPk, UpdateCourseByPkVariables>(UPDATE_COURSE_PROPERTY);
+  const [publishCourses] = useManageMutation<PublishCourses, PublishCoursesVariables>(PUBLISH_COURSES);
   const { confirmUnpublish, dialog: rausgegangenUnpublishDialog } = useRausgegangenUnpublishPrompt();
 
   const [insertCourse] = useManageMutation<InsertCourseWithLocation, InsertCourseWithLocationVariables>(INSERT_COURSE);
 
   const [copyCourses] = useManageMutation(COPY_COURSES_TO_PROGRAM);
+
+  // Course titles are unique within a course or degree program (not within event programs).
+  const enforceUniqueTitles = titlesMustBeUnique(programType);
+  const [fetchCourseTitles] = useLazyRoleQuery<CourseTitlesInPrograms, CourseTitlesInProgramsVariables>(
+    COURSE_TITLES_IN_PROGRAMS,
+    { context: { role: manageRole }, fetchPolicy: 'network-only' }
+  );
+  const courseTitlesIn = useCallback(
+    async (programId: number) => {
+      const { data, error } = await fetchCourseTitles({ variables: { programIds: [programId] } });
+      if (error || !data) throw error ?? new Error('Could not load the course titles');
+      return data.Course;
+    },
+    [fetchCourseTitles]
+  );
+  /** For a title field: an error message when another course in the program has the title. */
+  const titleFreeCheck = useCallback(
+    (courseId: number, programId: number) => async (title: string) => {
+      const clash = findTitleClash(await courseTitlesIn(programId), title, courseId);
+      return clash ? t('title_taken', { title: clash.title.trim() }) : null;
+    },
+    [courseTitlesIn, t]
+  );
   const [createInstructorCertificates] = useCreateInstructorCertificates();
 
   // A new offering needs a concrete program, hence a program tab (not "All") selected.
@@ -427,9 +458,18 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
     }
 
     try {
+      const defaultTitle = t(`default_title.${messageKey}`);
+      let title = defaultTitle;
+      if (enforceUniqueTitles) {
+        // A second "add" would repeat the default title, so number it ("… 2", "… 3").
+        title = nextFreeTitle(
+          defaultTitle,
+          (await courseTitlesIn(selectedProgram.id).catch(() => [])).map((c) => c.title)
+        );
+      }
       await insertCourse({
         variables: {
-          title: t(`default_title.${messageKey}`),
+          title,
           applicationEnd:
             selectedProgram?.defaultApplicationEnd && new Date(selectedProgram.defaultApplicationEnd) > new Date()
               ? selectedProgram.defaultApplicationEnd
@@ -448,7 +488,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
       setErrorMessage(t(`notifications.add_failed.${messageKey}`));
       setShowErrorNotification(true);
     }
-  }, [selectedProgramId, sortedPrograms, insertCourse, t, messageKey]);
+  }, [selectedProgramId, sortedPrograms, insertCourse, t, messageKey, enforceUniqueTitles, courseTitlesIn]);
 
   // Copying runs in two steps (bulk action opens the dialog, the dialog does the work), so the
   // selection is only released once the copy itself succeeded.
@@ -468,17 +508,20 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
 
       try {
         if (action === 'publish') {
-          // Update all selected courses to published
-          await Promise.all(
-            courseIds.map((id) =>
-              updateCourse({
-                variables: {
-                  id,
-                  changes: { published: true },
-                },
+          // A course or event can only go public with an instructor/organizer (the database
+          // refuses it too). Name the ones missing one instead of a generic failure.
+          const withoutInstructor = coursesWithoutInstructor(selectedCourses, programType);
+          if (withoutInstructor.length > 0) {
+            setErrorMessage(
+              t(`notifications.publish_requires_instructor.${messageKey}`, {
+                titles: withoutInstructor.map((course) => course.title).join(', '),
               })
-            )
-          );
+            );
+            setShowErrorNotification(true);
+            return false;
+          }
+          // One statement for all selected courses: they all go public or none do.
+          await publishCourses({ variables: { ids: courseIds } });
           // The publish mutation only returns the id, so the list rows (published marker and
           // status) have to be refetched for the page to show the new state.
           await refetch();
@@ -540,7 +583,17 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
         throw error;
       }
     },
-    [copyBulkAction, refetch, updateCourse, createInstructorCertificates, t, messageKey, confirmUnpublish]
+    [
+      copyBulkAction,
+      refetch,
+      updateCourse,
+      publishCourses,
+      createInstructorCertificates,
+      t,
+      messageKey,
+      confirmUnpublish,
+      programType,
+    ]
   );
 
   const bulkActions = [
@@ -675,8 +728,36 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
 
       if (confirmed && targetProgram && coursesToCopy.length > 0) {
         try {
+          // Titles are unique within a course or degree program: skip a course whose title the
+          // target program already has (or that an earlier course in this copy already took).
+          let copyable = coursesToCopy;
+          const skippedTitles: string[] = [];
+          if (enforceUniqueTitles) {
+            const taken: { id: number; title: string | null }[] = await courseTitlesIn(targetProgram.id);
+            copyable = coursesToCopy.filter((course) => {
+              if (findTitleClash(taken, course.title)) {
+                skippedTitles.push(course.title.trim());
+                return false;
+              }
+              taken.push({ id: -course.id, title: course.title });
+              return true;
+            });
+          }
+          if (copyable.length === 0) {
+            setErrorMessage(
+              t(`notifications.copy_titles_taken.${messageKey}`, {
+                titles: skippedTitles.join(', '),
+                programTitle: targetProgram.title,
+              })
+            );
+            setShowErrorNotification(true);
+            copyBulkAction.fail();
+            setCoursesToCopy([]);
+            return;
+          }
+
           // Prepare course data for copying
-          const coursesToInsert = coursesToCopy.map((course) => {
+          const coursesToInsert = copyable.map((course) => {
             // Use target program's default application deadline if available, otherwise use current date
             const defaultApplicationEnd = targetProgram.defaultApplicationEnd
               ? targetProgram.defaultApplicationEnd
@@ -737,16 +818,25 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
 
           setSuccessMessage(
             t(
-              coursesToCopy.length === 1
+              copyable.length === 1
                 ? `notifications.copied_success_singular.${messageKey}`
                 : `notifications.copied_success_plural.${messageKey}`,
               {
-                count: coursesToCopy.length,
+                count: copyable.length,
                 programTitle: targetProgram.title,
               }
             )
           );
           setShowSuccessNotification(true);
+          if (skippedTitles.length) {
+            setErrorMessage(
+              t(`notifications.copy_titles_taken.${messageKey}`, {
+                titles: skippedTitles.join(', '),
+                programTitle: targetProgram.title,
+              })
+            );
+            setShowErrorNotification(true);
+          }
           copyBulkAction.succeed();
         } catch (error) {
           console.error('Error copying courses:', error);
@@ -762,7 +852,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
 
       setCoursesToCopy([]);
     },
-    [copyBulkAction, coursesToCopy, copyCourses, t, messageKey]
+    [copyBulkAction, coursesToCopy, copyCourses, t, messageKey, enforceUniqueTitles, courseTitlesIn]
   );
 
   const courseStatus = (status: string) => {
@@ -882,6 +972,9 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
                   itemId={row.original.id}
                   value={row.original.title || ''}
                   updateValueMutation={UPDATE_COURSE_TITLE}
+                  validateBeforeSave={
+                    enforceUniqueTitles ? titleFreeCheck(row.original.id, row.original.programId) : undefined
+                  }
                   refetchQueries={['AdminCourseList']}
                 />
               </div>
@@ -1012,6 +1105,8 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
       getConfirmedCount,
       getUnratedAndRatedButNotInformed,
       courseTemplateCounts,
+      enforceUniqueTitles,
+      titleFreeCheck,
     ]
   );
 
@@ -1034,6 +1129,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
                 itemId={course.id}
                 value={course.title || ''}
                 updateValueMutation={UPDATE_COURSE_TITLE}
+                validateBeforeSave={enforceUniqueTitles ? titleFreeCheck(course.id, course.programId) : undefined}
                 refetchQueries={['AdminCourseList']}
               />
             </div>
@@ -1075,7 +1171,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
         </div>
       );
     },
-    [t, tAttendance, messageKey, getApplicationsCount, getConfirmedCount]
+    [t, tAttendance, messageKey, getApplicationsCount, getConfirmedCount, enforceUniqueTitles, titleFreeCheck]
   );
 
   const handlePageSizeChange = useCallback(

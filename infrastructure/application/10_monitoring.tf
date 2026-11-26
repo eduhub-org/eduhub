@@ -28,6 +28,7 @@ resource "google_monitoring_alert_policy" "service_errors" {
         AND NOT jsonPayload.detail.operation.error.code="not-found"
         AND NOT jsonPayload.detail.operation.error.code="invalid-jwt"
         AND NOT (textPayload:"AxiosError" AND textPayload:"status code 400" AND textPayload:"[...nextauth]")
+        AND NOT textPayload:"${local.assistant_unauthorized_log}"
       EOT
       label_extractors = {
         "service" = "EXTRACT(resource.labels.service_name)"
@@ -49,6 +50,58 @@ resource "google_monitoring_alert_policy" "service_errors" {
   documentation {
     mime_type = "text/markdown"
     content   = "An EduHub service logged an error in `${var.project_id}`. Open the incident for the matching log entry, or Logs Explorer filtered on the service and `severity>=ERROR OR jsonPayload.level=\"error\"`."
+  }
+}
+
+###############################################################################
+# Assistant credentials alert
+#####
+# The provider refusing the Assistant's credentials (HTTP 401/403) means the
+# IONOS token expired (its TTL is at most 365 days), was revoked or was pasted
+# incompletely; on vertex, the service account lost its role. Every chat then
+# fails, so this gets its own Slack message saying what to do, and the generic
+# error alert above leaves the line out. The app logs it from
+# frontend-nx/apps/edu-hub/lib/assistant/chat.ts.
+
+locals {
+  assistant_unauthorized_log = "Assistant: the model call failed: PROVIDER_UNAUTHORIZED"
+}
+
+resource "google_monitoring_alert_policy" "assistant_unauthorized" {
+  count = var.alert_slack_channel_id != "" && var.assistant_llm_provider != "" ? 1 : 0
+
+  display_name = "EduHub Assistant: provider rejects the credentials (${var.project_id})"
+  combiner     = "OR"
+
+  conditions {
+    display_name = "PROVIDER_UNAUTHORIZED in the edu service's logs"
+    condition_matched_log {
+      filter = <<-EOT
+        resource.type="cloud_run_revision"
+        AND resource.labels.service_name="${google_cloud_run_service.eduhub.name}"
+        AND textPayload:"${local.assistant_unauthorized_log}"
+      EOT
+    }
+  }
+
+  notification_channels = [var.alert_slack_channel_id]
+
+  alert_strategy {
+    # Every chat fails the same way until the key is replaced: one message a day.
+    notification_rate_limit {
+      period = "86400s"
+    }
+    auto_close = "86400s"
+  }
+
+  documentation {
+    mime_type = "text/markdown"
+    content   = <<-EOT
+      The Assistant's provider (`${var.assistant_llm_provider}`) rejects its credentials in `${var.project_id}`, so every chat fails.
+
+      - **ionos:** the AI Model Hub token has most likely expired (TTL at most 365 days). Create a new token in the IONOS Token Manager, put its value into `assistant_llm_api_key` (variable set `eduhub-application`) and redeploy. See "Renewing the IONOS token" in `infrastructure/README.md`.
+      - **vertex:** check that the default compute service account still has `roles/aiplatform.user`.
+    EOT
   }
 }
 

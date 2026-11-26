@@ -1,0 +1,14 @@
+table:
+  name: AssistantFeedback
+  schema: public
+# Inserted by POST /api/assistant/feedback with the user's own token under the `user` role.
+# Nobody but admin reads it; rows are deleted after 30 days (delete_expired_assistant_feedback).
+insert_permissions:
+  - role: user_access
+    permission:
+      check: {}
+      columns:
+        - conversation
+        - comment
+        - route
+        - model

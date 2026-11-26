@@ -4,7 +4,7 @@ import { MdHourglassEmpty, MdCancel, MdError, MdMailOutline, MdAccessTime } from
 
 import { CourseEnrollmentStatus_enum } from '../../../../__generated__/globalTypes';
 import { getPaymentStatusFromInvoices } from '../../../../utils/invoicePaymentStatus';
-import { Course_Course_by_pk } from '../../../../queries/__generated__/Course';
+import { Course_Course_by_pk, Course_Course_by_pk_CourseLocations } from '../../../../queries/__generated__/Course';
 import { CourseWithEnrollment_Course_by_pk_CourseEnrollments } from '../../../../queries/__generated__/CourseWithEnrollment';
 import { Button } from '../../../common/Button';
 import { useDisplayDate } from '../../../../helpers/dateTimeHelpers';
@@ -85,9 +85,13 @@ const CourseLinkInfos: FC<{ course: Course_Course_by_pk }> = ({ course }) => {
   const t = useTranslations('course');
 
   const chatLink = buildCourseChatLink(course);
-  const onlineLocation = course.CourseLocations?.find((location) => location.locationOption === 'ONLINE');
+  // The meeting link is only on the logged-in course query (CourseWithEnrollment):
+  // Hasura returns it to confirmed participants, instructors and admins only.
+  const onlineLocation = course.CourseLocations?.find((location) => location.locationOption === 'ONLINE') as
+    | (Course_Course_by_pk_CourseLocations & { OnlineMeetingLink?: { url: string } | null })
+    | undefined;
   const hasOnlineLocation = Boolean(onlineLocation);
-  const onlineMeetingUrl = getSafeExternalUrl(onlineLocation?.defaultSessionAddress?.trim());
+  const onlineMeetingUrl = getSafeExternalUrl(onlineLocation?.OnlineMeetingLink?.url?.trim());
   const hasOnlineMeeting = Boolean(onlineMeetingUrl);
   const onlineMeetingUnavailableMessage = hasOnlineLocation
     ? t('general.link_will_be_provided_soon')
@@ -142,7 +146,7 @@ const CourseLinkInfos: FC<{ course: Course_Course_by_pk }> = ({ course }) => {
  * - Course resource access (chat, online meeting) for CONFIRMED and COMPLETED statuses
  * - Responsive design for mobile and desktop
  * - Localized status messages and button text
- * - Integration with course chat (Mattermost) and video conferencing
+ * - Integration with course chat and video conferencing
  *
  * @param props - The component props
  * @returns JSX element representing the enrollment status and available actions

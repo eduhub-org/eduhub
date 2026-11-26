@@ -49,6 +49,7 @@
     "menu": {
       "profile": "Mein Profil",
       "my_certificates": "Meine Zertifikate",
+      "manual": "Handbuch",
       "faq": "FAQ",
       "user": "Benutzer",
       "admin_users": "Admin-Benutzer",
@@ -758,8 +759,6 @@
       "form_intro": "Bitte aktualisiere Deinen aktuellen Beschäftigungsstatus:",
       "confirm_sufficient_time": "Bitte bestätige die Kursteilnahme nur, wenn Du Zeit hast, bis zum Ende am Kurs teilzunehmen.",
       "important": "WICHTIG: KURSEINLADUNG BESTÄTIGEN!",
-      "mattermost_info_1": "Nach der Bestätigung gehe bitte direkt auf den Button zum Kurs-Chat.",
-      "mattermost_info_2": "Falls Du noch keinen Account in unserem Chat hast, musst Du Dich dort zunächst noch einmal anmelden.\nDer Kurs-Chat ist unser zentrales Kommunikationstool für die Kurse.",
       "newsletter_title": "Updates von {organization} abonnieren",
       "newsletter_description": "Erhalte Infos zu neuen Kursen, Lernangeboten und Programm-Neuigkeiten von {organization}.",
       "newsletter_legal": "Du kannst deine Einwilligung jederzeit in deinem Profil widerrufen. Die Verarbeitung erfolgt gemäß unserer <privacy>Datenschutzerklärung</privacy>.",
@@ -1235,6 +1234,7 @@
       "degrees": "Unbenanntes Degree"
     },
     "title": "Kurse verwalten",
+    "title_taken": "In diesem Programm gibt es schon „{title}“. Titel müssen innerhalb eines Programms eindeutig sein.",
     "all_programs": "Alle",
     "course_degree_title": {
       "label": "Teil der folgenden Degrees",
@@ -1273,7 +1273,9 @@
       "add": "Leitung hinzufügen",
       "add_event": "Organisator:in hinzufügen",
       "help_text": "Die Leitung kann das Angebot verwalten und wird auf seiner Seite genannt.",
-      "help_text_event": "Organisator:innen können das Event verwalten und werden auf seiner Seite genannt."
+      "help_text_event": "Organisator:innen können das Event verwalten und werden auf seiner Seite genannt.",
+      "last_required": "Ein veröffentlichtes Angebot braucht mindestens eine Leitung. Füge zuerst eine weitere Leitung hinzu oder nimm das Angebot offline.",
+      "last_required_event": "Ein veröffentlichtes Angebot braucht mindestens eine Organisator:in. Füge zuerst eine weitere Organisator:in hinzu oder nimm das Angebot offline."
     },
     "funding_organizations": {
       "label": "Förderorganisationen",
@@ -1320,7 +1322,6 @@
     "participant_chat": {
       "title": "Teilnehmenden-Chat",
       "button_open_element": "Zum Element-Raum",
-      "button_open_mattermost": "Zum Mattermost-Channel",
       "button_open_chat": "Zum Chat",
       "explanation": "Ein Matrix-Raum ist der Chat für dieses Angebot. Bestätigte Teilnehmende sehen auf der Seite des Angebots einen Button zum Raum und treten darüber bei. Die Leitung erhält im Raum automatisch Moderationsrechte; wer später zur Leitung hinzukommt, wird zusätzlich eingeladen.",
       "explanation_external": "Bestätigte Teilnehmende sehen auf der Seite des Angebots einen Button zu diesem Chat."
@@ -1456,6 +1457,11 @@
         "events": "{count} Events erfolgreich zurückgezogen",
         "degrees": "{count} Degrees erfolgreich zurückgezogen"
       },
+      "publish_requires_instructor": {
+        "courses": "Diese Kurse haben noch keine Kursleitung und können nicht veröffentlicht werden: {titles}. Füge zuerst eine Kursleitung hinzu.",
+        "events": "Diese Events haben noch keine Organisator:innen und können nicht veröffentlicht werden: {titles}. Füge zuerst eine Organisator:in hinzu.",
+        "degrees": "Diese Degrees können nicht veröffentlicht werden: {titles}."
+      },
       "bulk_action_failed": {
         "courses": "Die Massenaktion für die ausgewählten Kurse ist fehlgeschlagen. Bitte versuche es erneut.",
         "events": "Die Massenaktion für die ausgewählten Events ist fehlgeschlagen. Bitte versuche es erneut.",
@@ -1473,6 +1479,11 @@
         "courses": "{count} Kurse erfolgreich in {programTitle} kopiert",
         "events": "{count} Events erfolgreich in {programTitle} kopiert",
         "degrees": "{count} Degrees erfolgreich in {programTitle} kopiert"
+      },
+      "copy_titles_taken": {
+        "courses": "Nicht kopiert, weil {programTitle} schon Kurse mit diesen Titeln hat: {titles}",
+        "events": "Nicht kopiert, weil {programTitle} schon Events mit diesen Titeln hat: {titles}",
+        "degrees": "Nicht kopiert, weil {programTitle} schon Degrees mit diesen Titeln hat: {titles}"
       }
     },
     "participants": {
@@ -2159,6 +2170,7 @@
         "label": "Öffentliche Veranstaltung",
         "description": "Öffne diese Session für alle: Es entsteht ein Entwurf in den Veranstaltungen, den Du prüfen und dann veröffentlichen kannst. Anmelden kann sich dort jede Person, auch ohne Bewerbung für den Kurs.",
         "no_events_program": "Für diese Organisation gibt es noch kein Veranstaltungsprogramm. Bitte das Plattform-Team, eins anzulegen, damit Du Sessions öffentlich machen kannst.",
+        "course_not_published": "Veröffentliche zuerst das Angebot: Nur Sessions eines veröffentlichten Angebots können öffentlich gemacht werden.",
         "create": "Als Veranstaltung anlegen",
         "creating": "Wird angelegt …",
         "create_failed": "Die Veranstaltung konnte nicht angelegt werden.",
@@ -2382,7 +2394,8 @@
       "preview_page": "Vorschau der Seite",
       "view_page": "Seite ansehen",
       "publish": "Veröffentlichen",
-      "unpublish": "Veröffentlichung zurückziehen"
+      "unpublish": "Veröffentlichung zurückziehen",
+      "requires_organizer": "Das Angebot braucht mindestens eine Organisator:in, bevor es veröffentlicht werden kann. Füge zuerst eine Organisator:in hinzu."
     },
     "rausgegangen": {
       "title": "Rausgegangen",
@@ -3574,6 +3587,7 @@
   "footer": {
     "imprint": "Impressum",
     "privacy": "Datenschutz",
+    "manual": "Handbuch",
     "faq": "FAQ",
     "newsletter": "Newsletter",
     "sponsored_by": "Gefördert durch:",
@@ -3925,5 +3939,172 @@
     "nothing_to_do": "Du musst nichts unternehmen. Wir möchten dich lediglich darüber informieren, wie wir mit deinen Daten umgehen.",
     "more": "Alle Änderungen findest du in unserer <privacy>Datenschutzerklärung</privacy>.",
     "dismiss": "Hinweis schließen"
+  },
+  "assistant": {
+    "button": "Frag mich oder gib mir eine Aufgabe…",
+    "open": "KI-Assistenten öffnen",
+    "title": "Assistent",
+    "close": "Schließen",
+    "ai_notice": "KI · kann Fehler machen ·",
+    "privacy_link": "Datenschutz",
+    "login_prompt": "Melde Dich an, um dem Assistenten Fragen zu EduHub, den Kursen und Deinen Anmeldungen zu stellen.",
+    "login": "Anmelden",
+    "unavailable_viewing_as": "Der Assistent ist nicht verfügbar, während Du EduHub als eine andere Person ansiehst.",
+    "intro": "Frag mich zu EduHub, den Kursen oder Deinen Anmeldungen. Wenn Du einen Kurs verwaltest, entwerfe ich Änderungen, die Du prüfst und selbst übernimmst.",
+    "empty_title": "Wie kann ich Dir helfen?",
+    "suggestions": {
+      "questions_label": "Fragen",
+      "tasks_label": "Aufgaben auf dieser Seite",
+      "questions": {
+        "what_can_you_change": "Was kannst Du an diesem Kurs für mich ändern?",
+        "course_apply": "Wie bewerbe ich mich für diesen Kurs?",
+        "course_certificate": "Was brauche ich für ein Zertifikat in diesem Kurs?",
+        "how_to_apply": "Wie bewerbe ich mich für einen Kurs?",
+        "my_certificates": "Wo finde ich meine Zertifikate?"
+      },
+      "tasks": {
+        "shorten_tagline": "Kürze die Kurzbeschreibung",
+        "improve_goals": "Überarbeite die Lernziele",
+        "extend_application_end": "Verlängere den Bewerbungsschluss um eine Woche"
+      }
+    },
+    "conversation": "Unterhaltung mit dem Assistenten",
+    "you_wrote": "Du:",
+    "assistant_wrote": "Assistent:",
+    "thinking": "Schreibt…",
+    "input_label": "Deine Frage",
+    "input_placeholder": "Frag mich oder gib mir eine Aufgabe…",
+    "shortcut_ctrl": "Strg K",
+    "send": "Senden",
+    "stop": "Stopp",
+    "new_conversation": "Neue Unterhaltung",
+    "contact": "Schreib dem EduHub-Team",
+    "errors": {
+      "NOT_LOGGED_IN": "Bitte melde Dich an, um den Assistenten zu fragen.",
+      "OFF": "Der Assistent ist gerade nicht verfügbar.",
+      "SPENDING_CAP_REACHED": "Der Assistent ist für diesen Monat pausiert, weil sein Monatsbudget aufgebraucht ist. Ab dem 1. des nächsten Monats ist er wieder da. Bei Fragen schreib an {contact}.",
+      "RATE_LIMITED_SHORT": "Du hast in kurzer Zeit viele Fragen gestellt. Bitte warte etwa {minutes} Minuten und frag dann weiter.",
+      "RATE_LIMITED_DAILY": "Du hast heute die maximale Zahl an Fragen erreicht. Morgen kannst Du wieder fragen.",
+      "MESSAGE_TOO_LONG": "Deine Nachricht ist zu lang. Bitte kürze sie auf höchstens {max} Zeichen.",
+      "CONVERSATION_TOO_LONG": "Dieses Gespräch ist zu lang geworden. Bitte starte ein neues Gespräch.",
+      "INVALID_REQUEST": "Die Anfrage konnte nicht gelesen werden. Bitte lade die Seite neu.",
+      "IMPERSONATING": "Während Du die Plattform als eine andere Person ansiehst, ist der Assistent nicht verfügbar.",
+      "ROLE_NOT_ALLOWED": "Diese Rolle kannst Du für den Assistenten nicht verwenden.",
+      "BUSY": "Der Assistent ist gerade ausgelastet. Bitte versuch es in einer Minute noch einmal.",
+      "UNAVAILABLE": "Der Assistent konnte gerade nicht antworten. Bitte versuch es später noch einmal oder schreib an {contact}.",
+      "TOOL_CALL_FAILED": "Der Assistent konnte die nötigen Daten nicht abrufen. Bitte formuliere Deine Frage anders oder schreib an {contact}.",
+      "FEEDBACK_CONSENT_REQUIRED": "Ohne Deine Einwilligung speichern wir das Gespräch nicht.",
+      "PROPOSAL_UNAUTHENTICATED": "Deine Anmeldung ist abgelaufen. Bitte melde Dich neu an und übernimm die Änderung dann noch einmal.",
+      "PROPOSAL_FORBIDDEN": "Mit Deiner aktuellen Rolle kannst Du diesen Kurs nicht ändern.",
+      "PROPOSAL_NOT_FOUND": "Den Kurs oder Eintrag zu dieser Änderung gibt es nicht mehr.",
+      "PROPOSAL_INVALID": "Diese Änderung kann nicht übernommen werden. Bitte den Assistant um einen neuen Vorschlag.",
+      "PROPOSAL_NO_CHANGE": "Diese Änderung enthält nichts Neues für den Kurs.",
+      "PROPOSAL_REGISTRATIONS_EXIST": "Diese Änderung kann nicht übernommen werden, weil sich schon Personen angemeldet haben.",
+      "PROPOSAL_STALE": "Der Kurs wurde nach diesem Vorschlag geändert. Bitte den Assistant um einen neuen Vorschlag.",
+      "PROPOSAL_TITLE_TAKEN": "Ein anderer Kurs in diesem Programm hat schon diesen Titel. Bitte wähle einen anderen Titel.",
+      "PROPOSAL_EXPIRED": "Dieser Vorschlag ist abgelaufen. Bitte den Assistant um einen neuen.",
+      "PROPOSAL_HASURA_ERROR": "Die Änderung konnte nicht gespeichert werden. Bitte versuch es später noch einmal oder schreib an {contact}.",
+      "PROPOSAL_FAILED": "Beim Speichern der Änderung ist etwas schiefgegangen. Bitte versuch es später noch einmal oder schreib an {contact}.",
+      "generic": "Etwas ist schiefgelaufen. Bitte versuch es später noch einmal.",
+      "NETWORK": "Die Verbindung wurde unterbrochen. Bitte versuch es noch einmal.",
+      "INTERRUPTED": "Die Antwort wurde abgebrochen. Bitte frag noch einmal.",
+      "EMPTY_REPLY": "Darauf kam keine Antwort. Bitte frag noch einmal."
+    },
+    "context": {
+      "chip": "Wird mitgesendet: {page}",
+      "chip_with_error": "Wird mitgesendet: {page} und die angezeigte Fehlermeldung"
+    },
+    "feedback": {
+      "question": "War diese Antwort hilfreich?",
+      "helpful": "Hilfreich",
+      "not_helpful": "Nicht hilfreich",
+      "consent_label": "Unterhaltung aufbewahren?",
+      "consent_question": "Dürfen wir diese Unterhaltung 30 Tage lang aufbewahren, um den Assistenten zu verbessern? Ohne Deine Zustimmung zählen wir nur die Bewertung.",
+      "consent_yes": "Ja, aufbewahren",
+      "consent_no": "Nein, nur die Bewertung senden",
+      "thanks": "Danke für Dein Feedback!",
+      "failed": "Dein Feedback konnte nicht gesendet werden."
+    },
+    "proposal": {
+      "title": "Vorgeschlagene Änderung: {kind}",
+      "not_saved_yet": "Noch nicht gespeichert. Prüfe die Änderung und übernimm sie selbst.",
+      "dropped_placeholders": "Achtung: Diese Platzhalter fehlen im neuen Text und werden beim Versand nicht mehr ausgefüllt: {placeholders}",
+      "before": "Vorher",
+      "after": "Nachher",
+      "added": "Hinzugefügt",
+      "removed": "Entfernt",
+      "text_diff": "Änderungen an {field}",
+      "empty": "leer",
+      "none": "keine",
+      "yes": "Ja",
+      "no": "Nein",
+      "apply": "Übernehmen",
+      "applying": "Wird übernommen…",
+      "discard": "Verwerfen",
+      "applied": "Übernommen und gespeichert.",
+      "discarded": "Verworfen. Es wurde nichts gespeichert.",
+      "kinds": {
+        "course_texts": "Kurstexte",
+        "course_settings": "Kurseinstellungen",
+        "sessions": "Termine",
+        "create_course": "neuer Kurs",
+        "mail_template": "E-Mail"
+      },
+      "fields": {
+        "title": "Titel",
+        "tagline": "Kurzbeschreibung",
+        "learningGoals": "Lernziele",
+        "headingDescriptionField1": "Überschrift Beschreibung 1",
+        "contentDescriptionField1": "Beschreibung 1",
+        "headingDescriptionField2": "Überschrift Beschreibung 2",
+        "contentDescriptionField2": "Beschreibung 2",
+        "maxParticipants": "Maximale Teilnehmendenzahl",
+        "applicationEnd": "Bewerbungsschluss",
+        "maxMissedSessions": "Maximal verpasste Termine",
+        "language": "Sprache",
+        "weekDay": "Wochentag",
+        "startTime": "Beginn",
+        "endTime": "Ende",
+        "sessionReminderLeadHours": "Terminerinnerung (Stunden vorher)",
+        "showAvailablePlaces": "Freie Plätze anzeigen",
+        "attendanceCertificatePossible": "Teilnahmebescheinigung möglich",
+        "achievementCertificatePossible": "Leistungszertifikat möglich",
+        "sessions": "Termine",
+        "deletedSessionIds": "Gelöschte Termine",
+        "mailType": "E-Mail",
+        "subject": "Betreff",
+        "content": "Text"
+      },
+      "errors": {
+        "generic": "Die Änderung konnte nicht übernommen werden.",
+        "NETWORK": "Die Verbindung wurde unterbrochen. Es ist unklar, ob die Änderung gespeichert wurde. Prüf den Kurs, bevor Du es noch einmal versuchst.",
+        "STALE": "Der Kurs hat sich seit dem Vorschlag geändert, deshalb wurde nichts gespeichert. Bitte um einen neuen Vorschlag.",
+        "EXPIRED": "Dieser Vorschlag ist abgelaufen. Bitte um einen neuen.",
+        "FORBIDDEN": "Du darfst diese Änderung nicht vornehmen.",
+        "INVALID": "Die Änderung ist ungültig. Bitte um einen neuen Vorschlag.",
+        "TITLE_TAKEN": "In diesem Programm gibt es schon einen Kurs mit diesem Titel, deshalb wurde nichts gespeichert. Wähl einen anderen Titel.",
+        "REGISTRATIONS_EXIST": "Für diesen Kurs haben sich schon Personen angemeldet, deshalb kannst Du seine Termine nur von Hand ändern. Es wurde nichts gespeichert.",
+        "NO_CHANGE": "Dieser Vorschlag ändert nichts, es gibt also nichts zu übernehmen.",
+        "ROLE_NOT_ALLOWED": "Mit Deiner aktuellen Rolle kannst Du diese Änderung nicht vornehmen."
+      }
+    },
+    "looking_up": "Schaut nach…"
+  },
+  "help": {
+    "title": "Handbuch",
+    "start": "Start",
+    "nav_label": "Inhalt",
+    "audience_label": "Für",
+    "audience": {
+      "participant": "Teilnehmende",
+      "organizer": "Organisator:innen",
+      "admin": "Admins"
+    },
+    "fallback_notice": "Diese Seite gibt es noch nicht auf Deutsch. Du siehst die englische Fassung.",
+    "org_rules_title": "Regeln Deiner Organisation",
+    "org_rules_text": "Fristen, Zertifikatsregeln und andere Vorgaben legt die Organisation fest, die den Kurs anbietet. Sie stehen nicht in diesem Handbuch.",
+    "org_rules_link": "Zu den Regeln und FAQ",
+    "version_release": "Stand des Handbuchs: Release <release></release>, Commit <commit></commit>",
+    "version_commit": "Stand des Handbuchs: Commit <commit></commit> (noch kein Release)"
   }
 }

@@ -89,6 +89,7 @@ import { ErrorMessageDialog } from '../../../common/dialogs/ErrorMessageDialog';
 import NotificationSnackbar from '../../../common/dialogs/NotificationSnackbar';
 import { useFormatTimeString } from '../../../../helpers/dateTimeHelpers';
 import { usePersistedPageSize } from '../../../common/TableGrid/hooks';
+import { onlineMeetingUrl } from '../../../../helpers/sessionLocationResolution';
 
 /** Course sessions are editable; program sessions are shown read-only. */
 type SessionRow = ManagedCourse_Course_by_pk_Sessions | ManagedCourse_Course_by_pk_Program_Sessions;
@@ -953,7 +954,9 @@ const ExpandableSessionRowContent: FC<ExpandableSessionRowContentProps> = ({
                     {tCommon(`location.${entry.option}`)}
                   </span>
                   <span className="min-w-0 break-words text-sm text-label-secondary">
-                    {entry.address?.address || entry.address?.CourseLocation?.defaultSessionAddress || '–'}
+                    {(entry.option === 'ONLINE'
+                      ? onlineMeetingUrl(entry.address)
+                      : entry.address?.address || entry.address?.CourseLocation?.defaultSessionAddress) || '–'}
                   </span>
                   <span />
                 </Fragment>

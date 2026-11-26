@@ -381,14 +381,14 @@ variable "zoom_api_secret" {
   type        = string
 }
 variable "zoom_attendance_pre_buffer_min" {
-  description = "Minutes before Session.startDateTime to still accept a Zoom instance for attendance aggregation."
+  description = "Minutes before Session.startDateTime a Zoom instance may have started and still run into the session (only time inside the session counts)."
   type        = number
-  default     = 30
+  default     = 720
 }
 variable "zoom_attendance_post_buffer_min" {
-  description = "Minutes after Session.endDateTime to still accept a Zoom instance (captures reconnects right after class)."
+  description = "Minutes after Session.endDateTime a Zoom instance may start and still be checked. Time after the session never counts, so 0 is enough."
   type        = number
-  default     = 120
+  default     = 0
 }
 variable "lms_url" {
   description = "URL to the LimeSurvey instance"
@@ -404,14 +404,6 @@ variable "lms_password" {
 }
 variable "lms_attendance_survey_id" {
   description = "ID of the survey which is used to collect the attendance data"
-  type        = string
-}
-variable "mm_url" {
-  description = "URL of the Opencampus Mattermost Server"
-  type        = string
-}
-variable "mm_token" {
-  description = "The Admin Token from the Opencampus Mattermost Server"
   type        = string
 }
 
@@ -450,6 +442,17 @@ variable "ghost_newsletter_credentials_encryption_key" {
   description = "AES-256 key used to encrypt/decrypt Ghost newsletter API credentials at rest"
   type        = string
   sensitive   = true
+}
+
+variable "mcp_proposal_secret" {
+  description = "HMAC key signing the EduHub MCP server's Proposed Changes between propose and apply"
+  type        = string
+  sensitive   = true
+
+  validation {
+    condition     = length(var.mcp_proposal_secret) >= 32
+    error_message = "mcp_proposal_secret must contain at least 32 characters."
+  }
 }
 
 variable "guest_token_secret" {
@@ -552,4 +555,60 @@ variable "embedding_location" {
   description = "Vertex AI region for the expert search embeddings; empty uses var.region"
   type        = string
   default     = ""
+}
+variable "assistant_llm_provider" {
+  description = "LLM provider of the Assistant: ionos (IONOS AI Model Hub, Germany; needs assistant_llm_api_key), vertex (Gemini on Vertex AI in the EU), or empty to turn the Assistant off (ADR 0005, ADR 0008)"
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = contains(["", "vertex", "ionos"], var.assistant_llm_provider)
+    error_message = "assistant_llm_provider must be \"ionos\", \"vertex\" or empty."
+  }
+}
+variable "assistant_llm_api_key" {
+  description = "API key of the Assistant's provider when it isn't Vertex AI: for ionos the token value of an IONOS AI Model Hub token. Kept in Secret Manager; while empty, an ionos Assistant stays off."
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+variable "assistant_llm_location" {
+  description = "Vertex AI location of the Assistant's model (provider vertex only): the eu multi-region or an EU region. Never global: it gives no control over where requests are processed (ADR 0005)."
+  type        = string
+  default     = "eu"
+
+  validation {
+    condition     = var.assistant_llm_location == "eu" || startswith(var.assistant_llm_location, "europe-")
+    error_message = "assistant_llm_location must be \"eu\" or a europe-* region, never global."
+  }
+}
+variable "assistant_llm_model" {
+  description = "Model id of the Assistant at its provider; empty for the provider's model from the trial: Qwen/Qwen3.8-27B on ionos, google/gemini-3.8-flash on vertex"
+  type        = string
+  default     = ""
+}
+variable "assistant_monthly_spend_cap_eur" {
+  description = "Monthly spending cap of the Assistant in EUR; once reached, the Assistant is off until the next month"
+  type        = number
+  default     = 50
+}
+variable "assistant_llm_price_input_eur_per_mtok" {
+  description = "Price of the Assistant's model per million input tokens in EUR, from the provider's price list for the chosen model (and location). The spending cap multiplies it with the tokens the API reports; without it the Assistant stays off."
+  type        = number
+  default     = null
+}
+variable "assistant_llm_price_output_eur_per_mtok" {
+  description = "Price of the Assistant's model per million output tokens (including reasoning) in EUR, from the provider's price list; without it the Assistant stays off"
+  type        = number
+  default     = null
+}
+variable "vertex_global_endpoint_policy" {
+  description = "Organization policy constraints/gcp.restrictEndpointUsage denying the global Vertex AI endpoint in this project: empty (not managed), dry_run (violations are only logged) or enforce. Needs roles/orgpolicy.policyAdmin, which can only be granted at the organization, for the Terraform service account."
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = contains(["", "dry_run", "enforce"], var.vertex_global_endpoint_policy)
+    error_message = "vertex_global_endpoint_policy must be empty, \"dry_run\" or \"enforce\"."
+  }
 }

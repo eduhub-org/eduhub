@@ -5,6 +5,8 @@ import { Menu } from '../Menu';
 
 const logout = jest.fn();
 let mockIsOrgAdmin = false;
+let mockIsAdmin = false;
+let mockIsInstructor = false;
 let mockCanViewStatistics = false;
 
 jest.mock('next-intl', () => ({
@@ -16,8 +18,8 @@ jest.mock('next/router', () => ({
 }));
 
 jest.mock('../../../hooks/authentication', () => ({
-  useIsAdmin: () => false,
-  useIsInstructor: () => false,
+  useIsAdmin: () => mockIsAdmin,
+  useIsInstructor: () => mockIsInstructor,
   useIsOrgAdmin: () => mockIsOrgAdmin,
 }));
 
@@ -48,6 +50,8 @@ describe('account Menu', () => {
   beforeEach(() => {
     logout.mockClear();
     mockIsOrgAdmin = false;
+    mockIsAdmin = false;
+    mockIsInstructor = false;
     mockCanViewStatistics = false;
   });
 
@@ -117,5 +121,22 @@ describe('account Menu', () => {
 
     expect(screen.getByRole('menuitem', { name: 'menu.statistics' })).toHaveAttribute('href', '/statistics');
     expect(screen.getByText('menu.section_management')).toBeInTheDocument();
+  });
+
+  it('hides the manual entry from participants and org admins', async () => {
+    mockIsOrgAdmin = true;
+    await renderMenu();
+
+    expect(screen.queryByRole('menuitem', { name: 'menu.manual' })).not.toBeInTheDocument();
+  });
+
+  it.each([
+    ['admins', () => (mockIsAdmin = true)],
+    ['instructors', () => (mockIsInstructor = true)],
+  ])('links the in-app manual for %s', async (_, setRole) => {
+    setRole();
+    await renderMenu();
+
+    expect(screen.getByRole('menuitem', { name: 'menu.manual' })).toHaveAttribute('href', '/help');
   });
 });

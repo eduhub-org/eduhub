@@ -4,6 +4,8 @@ import org.keycloak.events.Event;
 import org.keycloak.events.EventListenerProvider;
 import org.keycloak.events.EventType;
 import org.keycloak.events.admin.AdminEvent;
+import org.keycloak.events.admin.OperationType;
+import org.keycloak.events.admin.ResourceType;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
@@ -16,7 +18,10 @@ import java.util.Map;
 
 /**
  * Keycloak Event Listener that assigns an immutable {@code matrix_user_handle}
- * attribute to users upon registration.
+ * attribute to users when they register, log in or are created by an admin
+ * (admin console, admin API, EduHub functions). Login is the safety net: the
+ * attribute is set before the token is issued, so every login to the chat
+ * (MAS requires the claim) carries a handle.
  *
  * The handle format is: {@code firstname.lastname.uuid6} where uuid6 is the
  * first 6 hex characters of the user's Keycloak UUID (hyphens stripped).
@@ -75,14 +80,27 @@ public class MatrixHandleEventListenerProvider implements EventListenerProvider 
 
     @Override
     public void onEvent(Event event) {
-        if (event.getType() == EventType.REGISTER) {
+        EventType type = event.getType();
+        if ((type == EventType.REGISTER || type == EventType.LOGIN) && event.getUserId() != null) {
             assignHandleIfMissing(event.getRealmId(), event.getUserId());
         }
     }
 
     @Override
     public void onEvent(AdminEvent event, boolean includeRepresentation) {
-        // Admin-created users are handled by the EduHub createUser function
+        String userId = createdUserId(event.getResourceType(), event.getOperationType(), event.getResourcePath());
+        if (userId != null) {
+            assignHandleIfMissing(event.getRealmId(), userId);
+        }
+    }
+
+    /** The user id of a "user created" admin event (resource path {@code users/<id>}), else null. */
+    static String createdUserId(ResourceType resourceType, OperationType operationType, String resourcePath) {
+        if (resourceType != ResourceType.USER || operationType != OperationType.CREATE || resourcePath == null) {
+            return null;
+        }
+        String[] parts = resourcePath.split("/");
+        return parts.length == 2 && parts[0].equals("users") && !parts[1].isEmpty() ? parts[1] : null;
     }
 
     @Override

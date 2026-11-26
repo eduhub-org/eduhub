@@ -25,7 +25,6 @@ import {
   INSERT_PROGRAM_SESSION,
   PROGRAM_SESSIONS,
   UPDATE_PROGRAM_SESSION_LOCATION_OPTION,
-  UPDATE_PROGRAM_SESSION_ONLINE_LINK,
 } from '../../../queries/programSession';
 import {
   DELETE_SESSION,
@@ -37,6 +36,7 @@ import {
   UPDATE_SESSION_TITLE,
 } from '../../../queries/course';
 import { CREATE_LOCATION_ADDRESS, LOCATION_ADDRESS_BY_LOCATION_OPTION } from '../../../queries/locationAddress';
+import { UPSERT_SESSION_ADDRESS_ONLINE_LINK } from '../../../queries/onlineMeetingLink';
 import TableGrid from '../../common/TableGrid';
 import CheckboxSelector from '../../inputs/CheckboxSelector';
 import DropDownSelector from '../../inputs/DropDownSelector';
@@ -118,8 +118,8 @@ const ProgramSessionLocation: FC<{ address: ProgramSessions_Session_SessionAddre
             compact
             placeholder={t('online_link_placeholder')}
             itemId={address.id}
-            value={address.address ?? ''}
-            updateValueMutation={UPDATE_PROGRAM_SESSION_ONLINE_LINK}
+            value={address.OnlineMeetingLink?.url ?? ''}
+            updateValueMutation={UPSERT_SESSION_ADDRESS_ONLINE_LINK}
             refetchQueries={REFETCH}
             fullWidth
           />

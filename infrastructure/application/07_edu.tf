@@ -107,6 +107,18 @@ resource "google_cloud_run_service" "eduhub" {
             }
           }
         }
+        # Signs the Proposed Changes of the MCP server (pages/api/mcp). Pinned to the
+        # version Terraform created, not "latest", so rotating the secret changes this
+        # template and rolls out a revision that uses the new key.
+        env {
+          name = "MCP_PROPOSAL_SECRET"
+          value_from {
+            secret_key_ref {
+              name = google_secret_manager_secret.mcp_proposal_secret.secret_id
+              key  = google_secret_manager_secret_version.mcp_proposal_secret.version
+            }
+          }
+        }
         # The Stripe webhook handler (pages/api/webhooks/stripe.ts) runs in this
         # service, not in the cloud function: it needs the secret key to build
         # the client and the signing secret to verify event signatures. Without
@@ -129,6 +141,43 @@ resource "google_cloud_run_service" "eduhub" {
               key  = "latest"
             }
           }
+        }
+        # Assistant (ADR 0005, 11_assistant.tf). An empty provider turns it off.
+        env {
+          name  = "ASSISTANT_LLM_PROVIDER"
+          value = local.assistant_app_provider
+        }
+        dynamic "env" {
+          for_each = local.assistant_has_api_key ? [1] : []
+          content {
+            name = "ASSISTANT_LLM_API_KEY"
+            value_from {
+              secret_key_ref {
+                name = google_secret_manager_secret.assistant_llm_api_key[0].secret_id
+                key  = "latest"
+              }
+            }
+          }
+        }
+        env {
+          name  = "ASSISTANT_LLM_BASE_URL"
+          value = local.assistant_llm_base_url
+        }
+        env {
+          name  = "ASSISTANT_LLM_MODEL"
+          value = local.assistant_llm_model
+        }
+        env {
+          name  = "ASSISTANT_MONTHLY_SPEND_CAP_EUR"
+          value = tostring(var.assistant_monthly_spend_cap_eur)
+        }
+        env {
+          name  = "ASSISTANT_LLM_PRICE_INPUT_EUR_PER_MTOK"
+          value = var.assistant_llm_price_input_eur_per_mtok == null ? "" : tostring(var.assistant_llm_price_input_eur_per_mtok)
+        }
+        env {
+          name  = "ASSISTANT_LLM_PRICE_OUTPUT_EUR_PER_MTOK"
+          value = var.assistant_llm_price_output_eur_per_mtok == null ? "" : tostring(var.assistant_llm_price_output_eur_per_mtok)
         }
       }
     }
@@ -162,7 +211,11 @@ resource "google_cloud_run_service" "eduhub" {
     google_secret_manager_secret_version.ghost_newsletter_credentials_encryption_key,
     google_secret_manager_secret_version.stripe_secret_key,
     google_secret_manager_secret_version.stripe_webhook_secret,
+    google_secret_manager_secret_version.mcp_proposal_secret,
+    google_secret_manager_secret_iam_member.mcp_proposal_secret,
     google_secret_manager_secret_iam_member.stripe_secret_key_eduhub,
     google_secret_manager_secret_iam_member.stripe_webhook_secret_eduhub,
+    google_secret_manager_secret_version.assistant_llm_api_key,
+    google_secret_manager_secret_iam_member.assistant_llm_api_key,
   ]
 }

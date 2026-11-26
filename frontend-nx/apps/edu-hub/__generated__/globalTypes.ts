@@ -1899,6 +1899,27 @@ export enum MotivationRating_update_column {
 }
 
 /**
+ * unique or primary key constraints on table "OnlineMeetingLink"
+ */
+export enum OnlineMeetingLink_constraint {
+  OnlineMeetingLink_courseLocationId_key = "OnlineMeetingLink_courseLocationId_key",
+  OnlineMeetingLink_pkey = "OnlineMeetingLink_pkey",
+  OnlineMeetingLink_sessionAddressId_key = "OnlineMeetingLink_sessionAddressId_key",
+}
+
+/**
+ * update columns of table "OnlineMeetingLink"
+ */
+export enum OnlineMeetingLink_update_column {
+  courseLocationId = "courseLocationId",
+  created_at = "created_at",
+  id = "id",
+  sessionAddressId = "sessionAddressId",
+  updated_at = "updated_at",
+  url = "url",
+}
+
+/**
  * unique or primary key constraints on table "OrganizationAdminClaimVerification"
  */
 export enum OrganizationAdminClaimVerification_constraint {
@@ -6577,6 +6598,7 @@ export interface CourseLocation_bool_exp {
   Course?: Course_bool_exp | null;
   DefaultSessionAddress?: LocationAddress_bool_exp | null;
   LocationOption?: LocationOption_bool_exp | null;
+  OnlineMeetingLink?: OnlineMeetingLink_bool_exp | null;
   _and?: CourseLocation_bool_exp[] | null;
   _not?: CourseLocation_bool_exp | null;
   _or?: CourseLocation_bool_exp[] | null;
@@ -6596,6 +6618,7 @@ export interface CourseLocation_insert_input {
   Course?: Course_obj_rel_insert_input | null;
   DefaultSessionAddress?: LocationAddress_obj_rel_insert_input | null;
   LocationOption?: LocationOption_obj_rel_insert_input | null;
+  OnlineMeetingLink?: OnlineMeetingLink_obj_rel_insert_input | null;
   courseId?: number | null;
   created_at?: any | null;
   defaultSessionAddress?: string | null;
@@ -9929,6 +9952,54 @@ export interface MotivationRating_order_by {
   Enrollments_aggregate?: CourseEnrollment_aggregate_order_by | null;
   comment?: order_by | null;
   value?: order_by | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "OnlineMeetingLink". All fields are combined with a logical 'AND'.
+ */
+export interface OnlineMeetingLink_bool_exp {
+  CourseLocation?: CourseLocation_bool_exp | null;
+  SessionAddress?: SessionAddress_bool_exp | null;
+  _and?: OnlineMeetingLink_bool_exp[] | null;
+  _not?: OnlineMeetingLink_bool_exp | null;
+  _or?: OnlineMeetingLink_bool_exp[] | null;
+  courseLocationId?: Int_comparison_exp | null;
+  created_at?: timestamptz_comparison_exp | null;
+  id?: Int_comparison_exp | null;
+  sessionAddressId?: Int_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
+  url?: String_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "OnlineMeetingLink"
+ */
+export interface OnlineMeetingLink_insert_input {
+  CourseLocation?: CourseLocation_obj_rel_insert_input | null;
+  SessionAddress?: SessionAddress_obj_rel_insert_input | null;
+  courseLocationId?: number | null;
+  created_at?: any | null;
+  id?: number | null;
+  sessionAddressId?: number | null;
+  updated_at?: any | null;
+  url?: string | null;
+}
+
+/**
+ * input type for inserting object relation for remote table "OnlineMeetingLink"
+ */
+export interface OnlineMeetingLink_obj_rel_insert_input {
+  data: OnlineMeetingLink_insert_input;
+  on_conflict?: OnlineMeetingLink_on_conflict | null;
+}
+
+/**
+ * on_conflict condition type for table "OnlineMeetingLink"
+ */
+export interface OnlineMeetingLink_on_conflict {
+  constraint: OnlineMeetingLink_constraint;
+  update_columns: OnlineMeetingLink_update_column[];
+  where?: OnlineMeetingLink_bool_exp | null;
 }
 
 /**
@@ -13903,6 +13974,7 @@ export interface SessionAddress_avg_order_by {
 export interface SessionAddress_bool_exp {
   CourseLocation?: CourseLocation_bool_exp | null;
   LocationAddress?: LocationAddress_bool_exp | null;
+  OnlineMeetingLink?: OnlineMeetingLink_bool_exp | null;
   Session?: Session_bool_exp | null;
   _and?: SessionAddress_bool_exp[] | null;
   _not?: SessionAddress_bool_exp | null;
@@ -13923,6 +13995,7 @@ export interface SessionAddress_bool_exp {
 export interface SessionAddress_insert_input {
   CourseLocation?: CourseLocation_obj_rel_insert_input | null;
   LocationAddress?: LocationAddress_obj_rel_insert_input | null;
+  OnlineMeetingLink?: OnlineMeetingLink_obj_rel_insert_input | null;
   Session?: Session_obj_rel_insert_input | null;
   address?: string | null;
   courseLocationId?: number | null;
@@ -13958,6 +14031,14 @@ export interface SessionAddress_min_order_by {
   locationAddressId?: order_by | null;
   sessionId?: order_by | null;
   updated_at?: order_by | null;
+}
+
+/**
+ * input type for inserting object relation for remote table "SessionAddress"
+ */
+export interface SessionAddress_obj_rel_insert_input {
+  data: SessionAddress_insert_input;
+  on_conflict?: SessionAddress_on_conflict | null;
 }
 
 /**

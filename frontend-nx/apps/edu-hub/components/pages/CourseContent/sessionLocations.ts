@@ -14,6 +14,7 @@ import {
   Course_Course_by_pk_CourseLocations as CourseLocation,
 } from '../../../queries/__generated__/Course';
 import { generateICalString, downloadICalFile } from '../../../helpers/icalExport';
+import { courseUrl } from '../../../helpers/coursePath';
 import { blockSchedule, contiguousBlocks, TimedSession } from '../../../helpers/sessionSchedule';
 import {
   AddressMap,
@@ -158,9 +159,9 @@ export const useCourseCalendarExport = ({
 }: CalendarExportArgs): (() => void) | null => {
   const handleExport = useCallback(() => {
     const calendarName = courseTitle ?? '';
-    const courseUrl =
+    const publicUrl =
       typeof window !== 'undefined' && courseId != null
-        ? `${window.location.origin}/course/${courseId}`
+        ? courseUrl(courseId, undefined, window.location.origin)
         : undefined;
 
     const icalEvents = buildCourseIcalEvents({
@@ -169,7 +170,7 @@ export const useCourseCalendarExport = ({
       addressMap,
       canSeeOnlineLink,
       calendarName,
-      courseUrl,
+      courseUrl: publicUrl,
     });
 
     downloadICalFile(

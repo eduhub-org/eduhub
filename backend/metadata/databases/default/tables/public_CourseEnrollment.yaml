@@ -462,24 +462,6 @@ update_permissions:
                       - canManageSettings:
                           _eq: true
 event_triggers:
-  - name: add_confirmed_user_to_mm
-    definition:
-      enable_manual: true
-      insert:
-        columns: '*'
-      update:
-        columns:
-          - status
-    retry_conf:
-      interval_sec: 10
-      num_retries: 0
-      timeout_sec: 60
-    webhook_from_env: CLOUD_FUNCTION_LINK_CALL_PYTHON_FUNCTION
-    headers:
-      - name: Function-Name
-        value: add_confirmed_user_to_mm
-      - name: Hasura-Secret
-        value_from_env: HASURA_CLOUD_FUNCTION_SECRET
   # A participant of a paid course asked the organizers to cancel (the guard
   # trigger only lets that column go from NULL to a server timestamp, once).
   - name: send_cancellation_request_email

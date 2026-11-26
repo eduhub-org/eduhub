@@ -55,7 +55,7 @@ More places held than the course has. Only organizers can overbook, and are warn
 ### Attendance
 
 **Attendance Record**:
-One entry from an attendance source for a Session: a Zoom participant or a submitted check-in (LimeSurvey) response. Records are kept as they came in; many match nobody (other courses, unsubmitted, unknown names).
+One entry from an attendance source for a Session: a Zoom participant or a submitted check-in (LimeSurvey) response. Check-ins are kept as they came in. A Zoom record holds only the person's time inside the Session: someone in the meeting only before or after it gets no record. Many records match nobody (other courses, unsubmitted, unknown names).
 _Avoid_: attendance (for a raw entry)
 
 **Attendance**:
@@ -167,13 +167,39 @@ The email organizers send by hand when Sessions are rescheduled or their Session
 The email a person gets once their Registration is confirmed. It is the same for Events and other Courses: when and where it names follow the Course's Sessions and Session Locations, not its Program type.
 _Avoid_: event confirmation vs. course confirmation as separate emails
 
+### Chat
+
+**Chat Account**:
+The opencampus.sh chat identity (`@<Chat Handle>:opencampus.sh`) of one EduHub account. Every EduHub account has exactly one, fixed by its Chat Handle; it is created on the chat server at the person's first confirmed Registration in a Course with a Course Chat or at their first chat login, whichever comes first. A person with two EduHub accounts therefore has two Chat Accounts.
+_Avoid_: Matrix user, Element account; accounts on other chat servers (e.g. matrix.org), which are not Chat Accounts
+
+**Chat Handle**:
+The fixed name of a Chat Account. It is set when the EduHub account is created and never changes, not even when the person's name does.
+_Avoid_: Matrix ID, username
+
+**Course Chat**:
+A Course's chat room. Participants enter it with their Chat Account; nobody from outside opencampus.sh can. A Participant is invited once their Registration is confirmed and is never removed automatically, not even after cancelling or dropping out; only Organizers remove people.
+_Avoid_: Matrix room, Element room, Kanal, "SIS-Element"; "Element" names the app only
+
+### Assistant
+
+**Assistant**:
+The in-app AI chat that answers questions about the platform, its courses and the asker's own data, and helps **Organizers** set up their courses. It acts only on behalf of the person chatting and can never see or do more than they can. It is plainly a machine: it has no human name or persona and never claims to be human.
+_Avoid_: Chatbot, agent, bot (in copy), any persona name
+
+**Proposed Change**:
+A change to a course the **Assistant** has drafted for an **Organizer**, shown as before and after. Nothing is saved until the Organizer applies it; they can also discard it. A Proposed Change can only touch a Course's Sessions while nobody has registered for the Course yet, in any state (applied, invited, waitlisted or confirmed). It can only create a Course for someone who may already create one.
+_Avoid_: Action, auto-edit
+
 ## Relationships
 
 - A **Course** has a number of **Places** and at most one **Registration** per person
 - A **Waitlist** belongs to one **Course**; **Moving up** takes someone off it
 - An **Invitation** holds one **Place** until it is accepted, declined or expires
 - A **Course** has zero or more **Sessions**; when it has any, exactly one of them is its **First Session**
+- A published course or event has at least one instructor (for an event, its **Organizers**); a degree has none
 - A **Participant** receives at most one **Session Reminder** per **Course**
+- An EduHub account has exactly one **Chat Account**; a **Course** has at most one **Course Chat**
 - A **Session** has many **Attendance Records** and at most one **Attendance** per **Participant** (or person who completed the Course); a **Manual Attendance** overrides the automatic one
 - An **Attendance Record** belongs to at most one **Attendance**; an **Attendance** can combine several Zoom **Attendance Records** of the same person
 - A **Session** has at most one **Manual Attendance** per **Participant**
@@ -183,6 +209,7 @@ _Avoid_: event confirmation vs. course confirmation as separate emails
 - A **Join Request** is announced to the **Project Team**; only a project with no team yet announces it to its mentors (or, without mentors, the course instructors)
 - An **Expert** has one or more **Expert Roles** and zero or more **Expert Notes**; each note belongs to no organization (central admins) or exactly one
 - An **Org Admin** sees only the **Experts** of their organization's courses, and only their organization's **Expert Notes**
+- An **Assistant** conversation belongs to one person and acts with that person's rights only; a **Proposed Change** belongs to one **Course** and is applied by one of its **Organizers**
 
 ## Example dialogue
 
@@ -197,3 +224,4 @@ _Avoid_: event confirmation vs. course confirmation as separate emails
 - "Session reminder" meant three emails (24h, 1h, 15min) before sessions. Resolved: one email, before the First Session only, at the Course's Reminder Lead Time.
 - "Project owner" meant both the person who started a project and the team running it, and a **Project Copy** treated the template's creator as its starter. Resolved: the **Project Proposer** is whoever started that project (for a copy, the team member who took on the template), and the **Project Team** decides on **Join Requests**.
 - "Event confirmation mail" was asked for as a separate template from the course one. Resolved: there is one **Registration Confirmation**; a Course with a single Session simply reads like an event invitation because it has one date.
+- "Chatbot" was used for the in-app AI help, and "instructors" for those who may change courses through it. Resolved: it is the **Assistant**, and course changes through it are for **Organizers** (and **Admins**), within the rights they already have.

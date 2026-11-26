@@ -1,6 +1,11 @@
 package sh.opencampus.keycloak;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
+import org.junit.jupiter.api.Test;
+import org.keycloak.events.admin.OperationType;
+import org.keycloak.events.admin.ResourceType;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -35,5 +40,14 @@ class MatrixHandleEventListenerProviderTest {
     })
     void computesHandle(String firstName, String lastName, String expected) {
         assertEquals(expected, MatrixHandleEventListenerProvider.computeHandle(firstName, lastName, UUID));
+    }
+
+    @Test
+    void readsUserIdOnlyFromUserCreateEvents() {
+        assertEquals(UUID, MatrixHandleEventListenerProvider.createdUserId(ResourceType.USER, OperationType.CREATE, "users/" + UUID));
+        assertNull(MatrixHandleEventListenerProvider.createdUserId(ResourceType.USER, OperationType.UPDATE, "users/" + UUID));
+        assertNull(MatrixHandleEventListenerProvider.createdUserId(ResourceType.GROUP, OperationType.CREATE, "groups/" + UUID));
+        assertNull(MatrixHandleEventListenerProvider.createdUserId(ResourceType.USER, OperationType.CREATE, "users/" + UUID + "/groups/x"));
+        assertNull(MatrixHandleEventListenerProvider.createdUserId(ResourceType.USER, OperationType.CREATE, null));
     }
 }
