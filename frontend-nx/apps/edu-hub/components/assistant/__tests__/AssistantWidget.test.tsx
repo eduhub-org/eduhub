@@ -145,7 +145,7 @@ describe('AssistantWidget', () => {
     openPanel();
 
     expect(screen.getByText(/AI · can make mistakes/)).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Privacy' })).toHaveAttribute('href', '/privacy');
+    expect(screen.getByRole('link', { name: 'Privacy' })).toHaveAttribute('href', '/privacy#assistant');
   });
 
   it('is not available while an admin views the app as someone else', () => {

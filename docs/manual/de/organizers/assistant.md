@@ -51,5 +51,6 @@ Einstellungen, die Deine Rolle nicht von Hand ändern kann, kann auch er nicht �
 - Fragen zur Plattform und zu Fehlermeldungen beantwortet er aus diesem Handbuch, den online veröffentlichten Regeln Deiner Organisation und den Texten der Plattform und verlinkt die Seiten, die er genutzt hat.
 - Der Assistent ist eine KI und kann Fehler machen. Prüfe jede vorgeschlagene Änderung, bevor Du sie übernimmst.
 - Eine Unterhaltung bleibt nur in diesem Browser-Tab, bis Du ihn schließt oder Dich abmeldest; EduHub speichert sie nicht. Unter jeder Antwort kannst Du sie mit Daumen hoch oder runter bewerten. Bewertest Du eine Antwort als nicht hilfreich, kannst Du schreiben, was nicht hilfreich war, und zustimmen, dass die Unterhaltung bis zu dieser Antwort 30 Tage lang bei EduHub aufbewahrt wird, um den Assistenten zu verbessern; Dein Kommentar wird in jedem Fall ohne Deinen Namen 30 Tage lang aufbewahrt.
+- Die Antworten des Assistenten erzeugt ein Sprachmodell, das IONOS in Deutschland betreibt. Der Link **Datenschutz** oben im Chat, unter seinem Titel, öffnet den Teil der Datenschutzerklärung, der beschreibt, welche Daten dafür übermittelt werden.
 - Über den Assistenten kannst Du auch [Fehler melden und Ideen vorschlagen](../participants/reports.md).
 - Der Assistent ist nicht verfügbar, während ein Admin EduHub als eine andere Person ansieht.

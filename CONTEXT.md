@@ -55,7 +55,7 @@ More places held than the course has. Only organizers can overbook, and are warn
 ### Attendance
 
 **Attendance Record**:
-One entry from an attendance source for a Session: a Zoom participant or a submitted check-in (LimeSurvey) response. Records are kept as they came in; many match nobody (other courses, unsubmitted, unknown names).
+One entry from an attendance source for a Session: a Zoom participant or a submitted check-in (LimeSurvey) response. Check-ins are kept as they came in. A Zoom record holds only the person's time inside the Session: someone in the meeting only before or after it gets no record. Many records match nobody (other courses, unsubmitted, unknown names).
 _Avoid_: attendance (for a raw entry)
 
 **Attendance**:

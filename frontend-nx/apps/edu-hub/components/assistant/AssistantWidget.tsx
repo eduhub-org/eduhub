@@ -365,7 +365,7 @@ const useIsMac = () => {
  * to the page the question is about. Logged-out visitors get a prompt to log in
  * instead. Shared, so StuJo can mount it later via `@eduhub/*`.
  */
-export const AssistantWidget: FC<Props> = ({ privacyHref = '/privacy', contactHref = ASSISTANT_CONTACT_HREF }) => {
+export const AssistantWidget: FC<Props> = ({ privacyHref = '/privacy#assistant', contactHref = ASSISTANT_CONTACT_HREF }) => {
   const t = useTranslations('assistant');
   const [open, setOpen] = useState(false);
   const isLoggedIn = useIsLoggedIn();

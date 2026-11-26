@@ -381,14 +381,14 @@ variable "zoom_api_secret" {
   type        = string
 }
 variable "zoom_attendance_pre_buffer_min" {
-  description = "Minutes before Session.startDateTime to still accept a Zoom instance for attendance aggregation."
+  description = "Minutes before Session.startDateTime a Zoom instance may have started and still run into the session (only time inside the session counts)."
   type        = number
-  default     = 30
+  default     = 720
 }
 variable "zoom_attendance_post_buffer_min" {
-  description = "Minutes after Session.endDateTime to still accept a Zoom instance (captures reconnects right after class)."
+  description = "Minutes after Session.endDateTime a Zoom instance may start and still be checked. Time after the session never counts, so 0 is enough."
   type        = number
-  default     = 120
+  default     = 0
 }
 variable "lms_url" {
   description = "URL to the LimeSurvey instance"

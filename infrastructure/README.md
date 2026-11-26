@@ -59,6 +59,13 @@ million tokens, from the provider's price list). The monthly spending cap
   AI Model Hub token into the sensitive `assistant_llm_api_key` (variable set
   `eduhub-application`); Terraform keeps it in Secret Manager. While it's empty, the Assistant
   stays off. Prices for `Qwen/Qwen3.8-27B`: 0.40 / 2.70.
+
+  **Renewing the IONOS token.** An AI Model Hub token lives at most 365 days and Terraform can't
+  renew it (the IONOS provider has no resource for API tokens). Create it with the full TTL and
+  set a reminder two weeks before it expires. To renew: create a new token in the IONOS Token
+  Manager, replace `assistant_llm_api_key`, redeploy staging and production, then delete the old
+  token. If it expires anyway, the alert `EduHub Assistant: provider rejects the credentials`
+  posts to the Slack channel of `alert_slack_channel_id` (`10_monitoring.tf`).
 - `vertex` (ADR 0005): Gemini on Vertex AI in the EU, with the zero-retention settings above.
 
 `assistant_llm_model` is empty by default, which picks the provider's model from the trial.
