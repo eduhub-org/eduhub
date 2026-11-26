@@ -713,3 +713,85 @@ class TestGetSessionAttendance:
 
         assert err.value.meeting_id == "77"
         assert err.value.failed_uuids == ["inst_bad"]
+
+
+class TestEarlyOpenedMeeting:
+    """24 Nov 2026: the meeting was opened 36 min before a 16:00-17:45 session
+    and the whole class sat in that one instance. It was dropped for starting
+    outside a 30-minute window, and every online participant was MISSED."""
+
+    SESSION = ("2026-11-24T15:00:00Z", "2026-11-24T16:45:00Z")
+
+    def test_default_window_keeps_an_instance_opened_well_before_the_session(self):
+        client = _make_client()
+        instances = [
+            {"uuid": "previous_day", "start_time": "2026-11-23T14:00:00Z"},
+            {"uuid": "opened_early", "start_time": "2026-11-24T14:24:31Z"},
+            {"uuid": "after_end", "start_time": "2026-11-24T17:00:00Z"},
+        ]
+        kept = client.filter_instances_by_session_window(instances, *self.SESSION)
+        assert [i["uuid"] for i in kept] == ["opened_early"]
+
+    def test_participants_of_an_early_opened_instance_are_counted(self):
+        client = _make_client()
+        instances = [{"uuid": "opened_early", "start_time": "2026-11-24T14:24:31Z"}]
+        rows = [
+            # Host, there from the start.
+            {"name": "Host", "user_email": "host@example.com",
+             "join_time": "2026-11-24T14:24:31Z", "leave_time": "2026-11-24T16:55:00Z"},
+            # Student joining shortly before the start, leaving after the end.
+            {"name": "Annika Boock", "join_time": "2026-11-24T14:56:16Z",
+             "leave_time": "2026-11-24T16:52:31Z"},
+        ]
+        with patch.object(client, "list_past_meeting_instances", return_value=instances), \
+                patch.object(client, "get_meeting_instance_participants", return_value=rows):
+            df = client.get_session_attendance("https://zoom.us/j/94372619321", *self.SESSION)
+
+        session_seconds = 105 * 60
+        assert sorted(df["name"]) == ["Annika Boock", "Host"]
+        assert (df["duration"] == session_seconds).all()
+        annika = df[df["name"] == "Annika Boock"].iloc[0]
+        assert annika["joinDateTime"] == pd.Timestamp(self.SESSION[0])
+        assert annika["leaveDateTime"] == pd.Timestamp(self.SESSION[1])
+
+
+class TestTimeOutsideTheSession:
+    WINDOW = ("2026-01-01T10:00:00Z", "2026-01-01T11:00:00Z")
+
+    def test_time_before_and_after_the_session_does_not_count(self):
+        client = _make_client()
+        rows = [{"name": "Jane", "user_email": "jane@example.com",
+                 "join_time": "2026-01-01T09:00:00Z", "leave_time": "2026-01-01T10:20:00Z"},
+                {"name": "Jane", "user_email": "jane@example.com",
+                 "join_time": "2026-01-01T10:50:00Z", "leave_time": "2026-01-01T12:00:00Z"}]
+        df = client.aggregate_participants(rows, window=self.WINDOW)
+        assert len(df) == 1
+        assert df.iloc[0]["duration"] == 30 * 60
+        assert df.iloc[0]["interruptionCount"] == 1
+        assert df.iloc[0]["intervals"] == [
+            (pd.Timestamp("2026-01-01T10:00:00Z"), pd.Timestamp("2026-01-01T10:20:00Z")),
+            (pd.Timestamp("2026-01-01T10:50:00Z"), pd.Timestamp("2026-01-01T11:00:00Z")),
+        ]
+
+    def test_someone_in_the_meeting_only_outside_the_session_gets_no_row(self):
+        client = _make_client()
+        rows = [{"name": "Early Bird", "join_time": "2026-01-01T08:00:00Z",
+                 "leave_time": "2026-01-01T09:55:00Z"},
+                {"name": "Jane", "join_time": "2026-01-01T10:00:00Z",
+                 "leave_time": "2026-01-01T11:00:00Z"}]
+        df = client.aggregate_participants(rows, window=self.WINDOW)
+        assert list(df["name"]) == ["Jane"]
+
+    def test_nobody_inside_the_session_gives_an_empty_frame_with_columns(self):
+        client = _make_client()
+        rows = [{"name": "Early Bird", "join_time": "2026-01-01T08:00:00Z",
+                 "leave_time": "2026-01-01T09:55:00Z"}]
+        df = client.aggregate_participants(rows, window=self.WINDOW)
+        assert df.empty
+        assert "intervals" in df.columns
+
+    def test_without_a_window_nothing_is_cut(self):
+        client = _make_client()
+        rows = [{"name": "Jane", "join_time": "2026-01-01T09:00:00Z",
+                 "leave_time": "2026-01-01T12:00:00Z"}]
+        assert client.aggregate_participants(rows).iloc[0]["duration"] == 3 * 3600
