@@ -4191,15 +4191,14 @@
       "duplicate_of": "Duplicate of",
       "mark_duplicate": "Mark as duplicate of",
       "public_note": "Public note",
-      "github_issue": "GitHub issue"
+      "github_issue": "GitHub issue",
+      "github_create_or_link": "Create or link issue"
     },
     "help": {
       "mark_duplicate": "Sets the status to \"Duplicate\". The people affected count towards the original.",
       "public_note": "Shown to everyone who sent or joined the report, e.g. \"Planned for spring\" or why it was declined.",
-      "github_issue": "Link to the issue once the report is planned."
-    },
-    "error": {
-      "duplicate_failed": "The report couldn't be marked as a duplicate."
+      "github_issue": "Approves the report: it becomes \"Planned\" with a public GitHub issue.",
+      "github_synced": "Synced: closing, reopening or moving the issue on the board updates the status here."
     },
     "summary": {
       "title": "Weekly summary",
@@ -4207,6 +4206,37 @@
       "none": "No summary yet. One is written every Monday.",
       "meta": "{from} – {to} · {reports, plural, one {# new report} other {# new reports}} · {feedback} 👎 feedback",
       "cost": "{cost} € with {model}"
+    },
+    "issue_dialog": {
+      "title": "Approve report #{id} as \"{status}\"",
+      "mode_create": "Create a new issue",
+      "mode_link": "Link an existing issue",
+      "public_hint": "The issue is public in {repo}. Check that title and description contain no names, emails or other personal details.",
+      "issue_title": "Issue title",
+      "issue_description": "Issue description",
+      "footer_label": "Added below the description and kept up to date:",
+      "footer_preview": "EduHub report #{id} · priority: {priority} · {people, plural, one {# person} other {# people}} affected",
+      "issue_number": "Issue number",
+      "link_help": "An open or closed issue in {repo}. It gets the footer with the report number and people affected.",
+      "cancel": "Cancel",
+      "create": "Create issue",
+      "link": "Link issue"
+    },
+    "sync_error": {
+      "NOT_LOGGED_IN": "Your session has expired. Please log in again.",
+      "NOT_ADMIN": "Only admins can change reports.",
+      "INVALID_REQUEST": "Something is missing or invalid. Please check your input.",
+      "INVALID_STATUS": "This status can't be set here.",
+      "GITHUB_OFF": "The GitHub sync is not set up.",
+      "REPORT_NOT_FOUND": "The report no longer exists.",
+      "ALREADY_LINKED": "This report already has a GitHub issue.",
+      "ISSUE_REQUIRED": "A planned report needs a GitHub issue. Create or link one.",
+      "ISSUE_NOT_FOUND": "There is no such issue in the repository.",
+      "ISSUE_TAKEN": "This issue already belongs to report #{reportId}. Mark this report as its duplicate instead.",
+      "LINKED_CANNOT_BE_NEW": "A report with a public issue can't go back to \"New\".",
+      "GITHUB_FAILED": "GitHub didn't accept the change. Please try again later.",
+      "FAILED": "The change couldn't be saved. Please try again.",
+      "METHOD_NOT_ALLOWED": "The change couldn't be saved. Please try again."
     }
   }
 }

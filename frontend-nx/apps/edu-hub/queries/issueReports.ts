@@ -1,6 +1,10 @@
 import { gql } from '@apollo/client';
 
-/** Bug reports and feature ideas sent through the Assistant (issue #2234); admins only. */
+/**
+ * Bug reports and feature ideas sent through the Assistant (issue #2234); admins only.
+ * Status and duplicate changes go through /api/manage/reports/github (useReportSync), so a linked
+ * GitHub issue changes with them.
+ */
 
 export const ISSUE_REPORT_LIST = gql`
   query IssueReportList(
@@ -21,7 +25,7 @@ export const ISSUE_REPORT_LIST = gql`
       priority
       duplicateOfId
       publicNote
-      githubIssueUrl
+      githubIssueNumber
       closedAt
       created_at
       updated_at
@@ -63,16 +67,6 @@ export const ISSUE_REPORT_OPTIONS = gql`
   }
 `;
 
-export const UPDATE_ISSUE_REPORT_STATUS = gql`
-  mutation UpdateIssueReportStatus($id: Int!, $value: IssueReportStatus_enum!) {
-    update_IssueReport_by_pk(pk_columns: { id: $id }, _set: { status: $value }) {
-      id
-      status
-      closedAt
-    }
-  }
-`;
-
 export const UPDATE_ISSUE_REPORT_PRIORITY = gql`
   mutation UpdateIssueReportPriority($id: Int!, $value: IssueReportPriority_enum) {
     update_IssueReport_by_pk(pk_columns: { id: $id }, _set: { priority: $value }) {
@@ -82,31 +76,11 @@ export const UPDATE_ISSUE_REPORT_PRIORITY = gql`
   }
 `;
 
-export const UPDATE_ISSUE_REPORT_DUPLICATE_OF = gql`
-  mutation UpdateIssueReportDuplicateOf($id: Int!, $duplicateOfId: Int!) {
-    update_IssueReport_by_pk(pk_columns: { id: $id }, _set: { status: DUPLICATE, duplicateOfId: $duplicateOfId }) {
-      id
-      status
-      duplicateOfId
-      closedAt
-    }
-  }
-`;
-
 export const UPDATE_ISSUE_REPORT_PUBLIC_NOTE = gql`
   mutation UpdateIssueReportPublicNote($itemId: Int!, $text: String) {
     update_IssueReport_by_pk(pk_columns: { id: $itemId }, _set: { publicNote: $text }) {
       id
       publicNote
-    }
-  }
-`;
-
-export const UPDATE_ISSUE_REPORT_GITHUB_URL = gql`
-  mutation UpdateIssueReportGithubUrl($itemId: Int!, $text: String) {
-    update_IssueReport_by_pk(pk_columns: { id: $itemId }, _set: { githubIssueUrl: $text }) {
-      id
-      githubIssueUrl
     }
   }
 `;

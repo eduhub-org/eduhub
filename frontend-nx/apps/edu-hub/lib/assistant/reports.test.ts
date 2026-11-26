@@ -105,6 +105,15 @@ it('adds a vote with the summary the user saw', async () => {
   });
 });
 
+it("refreshes the linked issue's footer after a vote, and a failure there doesn't fail the vote", async () => {
+  const onVoted = jest.fn().mockRejectedValue(new Error('GitHub down'));
+  const { handler } = setup(() => ({ data: { insert_IssueReportVote_one: { id: 3, issueReportId: 4 } } }), { onVoted });
+  const http = mockHttp({ action: 'vote', reportId: 4, summary: 'Same problem' });
+  await handler(http.req, http.res);
+  expect(http.status).toBe(200);
+  expect(onVoted).toHaveBeenCalledWith(4);
+});
+
 it('tells a second vote apart from a closed or missing report', async () => {
   const twice = setup(() => hasuraError('constraint-violation', 'Uniqueness violation. duplicate key value'));
   const a = mockHttp({ action: 'vote', reportId: 4, summary: 'Same problem' });

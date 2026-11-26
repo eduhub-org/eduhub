@@ -68,7 +68,10 @@ export interface IssueReportList_IssueReport {
   priority: IssueReportPriority_enum | null;
   duplicateOfId: number | null;
   publicNote: string | null;
-  githubIssueUrl: string | null;
+  /**
+   * Issue in GITHUB_ISSUE_REPO this report is synced with (lib/github in edu-hub, reconcileIssueReportsWithGithub).
+   */
+  githubIssueNumber: number | null;
   closedAt: any | null;
   created_at: any;
   updated_at: any;

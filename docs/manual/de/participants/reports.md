@@ -21,6 +21,8 @@ Du kannst bis zu 5 Meldungen am Tag schicken.
 
 Hat schon jemand dasselbe gemeldet, zeigt der Assistent statt einer neuen Meldung eine Karte **Bestehende Meldung** mit einer kurzen Zusammenfassung in seinen eigenen Worten. Klick auf **Mich anschließen**, damit Deine Stimme mitzählt: Je mehr Menschen betroffen sind, desto höher kann das Team die Meldung einplanen. Die Meldungen anderer selbst siehst Du nie.
 
+Nimmt das Team eine Meldung an, veröffentlicht es sie als Issue im öffentlichen Code-Repository von EduHub auf GitHub, damit Entwickler:innen daran arbeiten können. Ein Admin prüft den Text vorher, und das Issue enthält nie Deinen Namen.
+
 ## Was aus Deinen Meldungen geworden ist
 
 Frag den Assistenten jederzeit: „Was ist aus meinen Meldungen geworden?“ Er zeigt Dir die Meldungen, die Du geschickt oder denen Du Dich angeschlossen hast, mit ihrem Stand (neu, geplant, in Arbeit, erledigt, abgelehnt oder Duplikat) und der Notiz des EduHub-Teams, falls es eine gibt.
@@ -39,6 +41,23 @@ Darunter zeigt die Tabelle standardmäßig die offenen Meldungen; filtern kannst
 
 - sie **Als Duplikat markieren von** einer anderen Meldung. Die Betroffenen zählen beim Original mit.
 - eine **Öffentliche Notiz** zu schreiben, die alle sehen, die die Meldung geschickt oder sich angeschlossen haben, wenn sie den Assistenten fragen, zum Beispiel warum sie abgelehnt wurde.
-- einen Link zum **GitHub-Issue** einzutragen, sobald die Meldung geplant ist.
 
 Wer eine Meldung geschickt oder sich angeschlossen hat, wird 6 Monate nach dem Abschluss der Meldung (erledigt, abgelehnt oder Duplikat) entfernt.
+
+### Eine Meldung annehmen: das GitHub-Issue
+
+Ist die Verbindung zu GitHub eingerichtet, legt das Annehmen einer Meldung ihr Issue auf GitHub an:
+
+1. Setz den Status auf **Geplant** oder **In Arbeit**, oder öffne die Meldung und klick auf **Issue erstellen oder verknüpfen**.
+2. Wähl im Dialog **Neues Issue erstellen** und prüf Titel und Beschreibung. Das Issue ist öffentlich, also entfern Namen, E-Mail-Adressen und andere persönliche Angaben. Darunter wird eine Fußzeile mit Meldungsnummer, Priorität und der Zahl der Betroffenen ergänzt und aktuell gehalten. Alternativ wählst Du **Bestehendes Issue verknüpfen** und gibst die Nummer eines Issues ein, das das Team schon hat.
+3. Klick auf **Issue erstellen** oder **Issue verknüpfen**. Erst dann ändert sich der Status; **Abbrechen** lässt die Meldung, wie sie war.
+
+Neue Issues bekommen die Labels `bug` oder `feature` und `from-assistant` und landen auf dem Projekt-Board in der Spalte, die zum Status passt.
+
+Ab dann bestimmt GitHub den Status:
+
+- Wird das Issue als erledigt geschlossen, wird die Meldung **Erledigt**; als nicht geplant geschlossen, wird sie **Abgelehnt**; als Duplikat geschlossen, wird sie **Duplikat** (verknüpft mit der ursprünglichen Meldung, falls deren Issue eine hat).
+- Wird das Issue wieder geöffnet, wird die Meldung wieder **Geplant**; wird die Karte auf dem Board nach **In Progress** verschoben, wird sie **In Arbeit**.
+- Wird das Issue gelöscht oder in ein anderes Repository verschoben, verliert die Meldung die Verknüpfung und behält ihren letzten Status.
+
+Du kannst den Status hier weiterhin ändern: Das Issue wird dann passend geschlossen, wieder geöffnet oder verschoben. Eine Meldung mit Issue kann nicht zurück auf **Neu**, und ein Issue gehört nur zu einer Meldung; markier weitere Meldungen zum selben Thema als Duplikate.

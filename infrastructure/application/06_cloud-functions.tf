@@ -152,7 +152,7 @@ locals {
         # search (#2195); "" turns both off.
         EMBEDDING_PROVIDER = var.embedding_provider
         EMBEDDING_LOCATION = var.embedding_location != "" ? var.embedding_location : var.region
-      }, local.summary_env)
+      }, local.summary_env, local.github_reports_env)
       secrets = concat(
         [
           local.secret_env.KEYCLOAK_PW,
@@ -169,6 +169,8 @@ locals {
         ],
         # Weekly issue report summary on ionos (11_assistant.tf); last, so it doesn't reorder the others.
         local.summary_secrets,
+        # GitHub report sync's nightly reconcile (12_github_reports.tf); empty while it is off.
+        local.github_reports_function_secrets,
       )
       service_account_email = google_service_account.custom_cloud_function_account.email
     }

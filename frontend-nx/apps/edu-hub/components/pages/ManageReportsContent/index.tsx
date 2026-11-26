@@ -11,11 +11,13 @@ import DropDownSelector from '../../inputs/DropDownSelector';
 import { useAdminQuery } from '../../../hooks/authedQuery';
 import { useTableGrid } from '../../common/TableGrid/hooks';
 import { createMultiWordSearchCondition } from '../../common/TableGrid/utils';
-import { ISSUE_REPORT_LIST, UPDATE_ISSUE_REPORT_PRIORITY, UPDATE_ISSUE_REPORT_STATUS } from '../../../queries/issueReports';
+import { ISSUE_REPORT_LIST, UPDATE_ISSUE_REPORT_PRIORITY } from '../../../queries/issueReports';
 import { IssueReportList, IssueReportList_IssueReport } from '../../../queries/__generated__/IssueReportList';
 import { ReportDetails } from './ReportDetails';
 import { WeeklySummaries } from './WeeklySummaries';
-import { OPEN_STATUSES, peopleAffected, PRIORITIES, REPORT_STATUSES, REPORT_TYPES } from './reportUtils';
+import { GithubIssueDialog } from './GithubIssueDialog';
+import { ISSUE_STATUSES, OPEN_STATUSES, peopleAffected, PRIORITIES, REPORT_STATUSES, REPORT_TYPES } from './reportUtils';
+import { SyncRequestError, useReportSync } from './useReportSync';
 
 
 /**
@@ -28,6 +30,10 @@ const ManageReportsContent: FC = () => {
   const [typeFilter, setTypeFilter] = useState<string[]>([]);
   const [statusFilter, setStatusFilter] = useState<string[]>(OPEN_STATUSES);
   const [error, setError] = useState<string | null>(null);
+  const { enabled: githubEnabled, repo, send } = useReportSync();
+  const [issueTarget, setIssueTarget] = useState<{ row: IssueReportList_IssueReport; status: string } | null>(null);
+  // Bumped to remount the status dropdowns after a refused or cancelled change, so they show the stored value again.
+  const [resetKey, setResetKey] = useState(0);
 
   const { data, loading, initialLoading, error: queryError, pageIndex, setPageIndex, searchFilter, setSearchFilter, sorting, setSorting } =
     useTableGrid({
@@ -57,6 +63,39 @@ const ManageReportsContent: FC = () => {
   );
 
   const statusOptions = useMemo(() => REPORT_STATUSES.map((value) => ({ value, label: t(`status.${value}`) })), [t]);
+  // A report whose issue is public can't go back to "new".
+  const linkedStatusOptions = useMemo(() => statusOptions.filter((o) => o.value !== 'NEW'), [statusOptions]);
+
+  const showSyncError = useCallback(
+    (e: unknown) => {
+      const code = e instanceof SyncRequestError ? e.code : 'FAILED';
+      setError(t(`sync_error.${code}`, { reportId: e instanceof SyncRequestError ? e.reportId ?? '' : '' }));
+      setResetKey((k) => k + 1);
+    },
+    [t]
+  );
+
+  /** Approving an unlinked report needs its issue first (the dialog); everything else is saved directly. */
+  const onStatus = useCallback(
+    async (row: IssueReportList_IssueReport, status: string) => {
+      if (status === row.status) return;
+      if (githubEnabled && !row.githubIssueNumber && ISSUE_STATUSES.includes(status)) {
+        setIssueTarget({ row, status });
+        return;
+      }
+      try {
+        await send({ action: 'status', reportId: row.id, status });
+      } catch (e) {
+        showSyncError(e);
+      }
+    },
+    [githubEnabled, send, showSyncError]
+  );
+
+  const closeIssueDialog = useCallback(() => {
+    setIssueTarget(null);
+    setResetKey((k) => k + 1);
+  }, []);
   const priorityOptions = useMemo(() => PRIORITIES.map((value) => ({ value, label: t(`priority.${value}`) })), [t]);
 
   const columns = useMemo<ColumnDef<IssueReportList_IssueReport>[]>(
@@ -88,12 +127,11 @@ const ManageReportsContent: FC = () => {
         size: 170,
         cell: ({ row }) => (
           <DropDownSelector
+            key={`${row.original.id}-${row.original.status}-${resetKey}`}
             variant="material"
-            identifierVariables={{ id: row.original.id }}
             value={row.original.status}
-            options={statusOptions}
-            updateValueMutation={UPDATE_ISSUE_REPORT_STATUS}
-            refetchQueries={['IssueReportList']}
+            options={githubEnabled && row.original.githubIssueNumber ? linkedStatusOptions : statusOptions}
+            onValueUpdated={(value: string) => onStatus(row.original, value)}
           />
         ),
       },
@@ -123,7 +161,7 @@ const ManageReportsContent: FC = () => {
         cell: ({ row }) => <span className="px-2">{new Date(row.original.created_at).toLocaleDateString(locale)}</span>,
       },
     ],
-    [t, locale, statusOptions, priorityOptions]
+    [t, locale, statusOptions, linkedStatusOptions, priorityOptions, githubEnabled, onStatus, resetKey]
   );
 
   return (
@@ -164,9 +202,18 @@ const ManageReportsContent: FC = () => {
                 onChange: onFilter(setStatusFilter),
               },
             ]}
-            expandableRowComponent={({ row }) => <ReportDetails row={row} onError={setError} />}
+            expandableRowComponent={({ row }) => (
+              <ReportDetails
+                row={row}
+                repo={repo}
+                send={send}
+                onError={showSyncError}
+                onApprove={(status) => setIssueTarget({ row, status })}
+              />
+            )}
           />
         )}
+        {repo && <GithubIssueDialog target={issueTarget} repo={repo} send={send} onClose={closeIssueDialog} />}
         <ErrorMessageDialog errorMessage={error ?? ''} open={!!error} onClose={() => setError(null)} />
       </div>
     </PageBlock>

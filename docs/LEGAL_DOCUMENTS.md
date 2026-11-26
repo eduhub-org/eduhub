@@ -148,7 +148,9 @@ update (only `PRIVACY_POLICY_VERSION` was bumped). Whoever writes the next
   reference to the account until 6 months after the report is closed. A weekly summary of the
   reports and of the 👎 comments and conversations is written by the IONOS AI Model Hub, without
   names or account references. A 👎 comment is now kept for 30 days even without consent to keep
-  the conversation. Changed practice (all new), worded as such.
+  the conversation. Accepted reports are published as issues in the public GitHub repository,
+  after an admin checked the text, without names or account references. Changed practice (all
+  new), worded as such.
 
 The policy has no public change history: GDPR asks for the current policy and
 for telling users about material changes, not for a changelog. What applied
