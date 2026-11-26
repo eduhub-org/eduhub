@@ -603,17 +603,17 @@ variable "assistant_llm_price_output_eur_per_mtok" {
   default     = null
 }
 variable "summary_llm_provider" {
-  description = "LLM provider of the weekly issue report summary (issue #2234), run by callNodeFunction: vertex (Gemini on Vertex AI in the EU, with the function's service account), ionos (IONOS AI Model Hub, with assistant_llm_api_key), or empty to write no summaries"
+  description = "LLM provider of the weekly issue report summary (issue #2234), run by callNodeFunction: ionos (IONOS AI Model Hub, with assistant_llm_api_key), vertex (Gemini on Vertex AI in the EU, with the function's service account), off, or empty to follow the Assistant: ionos when the Assistant runs on ionos with a key, otherwise off"
   type        = string
   default     = ""
 
   validation {
-    condition     = contains(["", "vertex", "ionos"], var.summary_llm_provider)
-    error_message = "summary_llm_provider must be \"ionos\", \"vertex\" or empty."
+    condition     = contains(["", "off", "vertex", "ionos"], var.summary_llm_provider)
+    error_message = "summary_llm_provider must be \"ionos\", \"vertex\", \"off\" or empty."
   }
 }
 variable "summary_llm_model" {
-  description = "Model id of the weekly summary at its provider, e.g. a stronger model than the Assistant's for better planning. Required when summary_llm_provider is set."
+  description = "Model id of the weekly summary at its provider; empty for Qwen/Qwen3.5-397B-A17B on ionos (the strongest model on the IONOS AI Model Hub). Required on vertex."
   type        = string
   default     = ""
 }

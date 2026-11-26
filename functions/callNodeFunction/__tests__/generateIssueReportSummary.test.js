@@ -67,6 +67,28 @@ describe('summaryLlmConfig', () => {
   });
 });
 
+describe('the IONOS setup from Terraform', () => {
+  it('sends the strongest IONOS model with its key and thinking turned off', async () => {
+    const read = settings({
+      SUMMARY_LLM_PROVIDER: 'openai',
+      SUMMARY_LLM_BASE_URL: 'https://openai.inference.de-txl.ionos.com/v1',
+      SUMMARY_LLM_MODEL: 'Qwen/Qwen3.5-397B-A17B',
+      SUMMARY_LLM_API_KEY: 'ionos-key',
+      SUMMARY_LLM_EXTRA_BODY: '{"reasoning_effort":"none"}',
+    });
+    const calls = [];
+    const fetchImpl = async (url, init) => {
+      calls.push({ url, init, body: JSON.parse(init.body) });
+      return chatResponse('## Overview');
+    };
+    await generateIssueReportSummary({}, logger, { gql: fakeGql(), read, fetchImpl, now: () => NOW });
+
+    expect(calls[0].url).toBe('https://openai.inference.de-txl.ionos.com/v1/chat/completions');
+    expect(calls[0].init.headers.Authorization).toBe('Bearer ionos-key');
+    expect(calls[0].body).toEqual(expect.objectContaining({ model: 'Qwen/Qwen3.5-397B-A17B', reasoning_effort: 'none', store: false }));
+  });
+});
+
 describe('generateIssueReportSummary', () => {
   it('does nothing without a configured model', async () => {
     const gql = fakeGql();
