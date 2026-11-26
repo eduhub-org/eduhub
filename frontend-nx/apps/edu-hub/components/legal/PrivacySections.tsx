@@ -884,8 +884,18 @@ export const PrivacyCourseChat: FC<SectionProps> = ({ n }) => {
       </p>
       <p>
         {isEnglish
-          ? 'The legal basis is Art. 6 para. 1 lit. b GDPR. A contract for data processing (DPA) exists with the operator. The data is processed exclusively in Germany.'
-          : 'Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO. Mit dem Betreiber besteht ein Vertrag zur Auftragsverarbeitung (AVV). Die Daten werden ausschließlich in Deutschland verarbeitet.'}
+          ? 'The operator backs up the chat server daily, weekly and monthly; the backups are kept for at most 6 months. Deleted accounts and messages are not removed from existing backups individually, but disappear when the backups are rotated, after 6 months at the latest.'
+          : 'Der Betreiber sichert den Chat-Server täglich, wöchentlich und monatlich; die Sicherungen werden höchstens 6 Monate aufbewahrt. Gelöschte Konten und Nachrichten werden nicht einzeln aus bestehenden Sicherungen entfernt, sondern fallen mit deren Rotation weg, spätestens nach 6 Monaten.'}
+      </p>
+      <p>
+        {isEnglish
+          ? 'The chat server and its backups are located in Germany. Connections between your app and the chat server pass through the network of Cloudflare, Inc., 101 Townsend St., San Francisco, CA 94107, USA, which protects the server against attacks and decrypts and re-encrypts the transmission for this purpose. Cloudflare is certified under the EU-US Data Privacy Framework; in addition, the EU standard contractual clauses have been agreed.'
+          : 'Der Chat-Server und seine Sicherungen stehen in Deutschland. Verbindungen zwischen deiner App und dem Chat-Server laufen über das Netzwerk der Cloudflare, Inc., 101 Townsend St., San Francisco, CA 94107, USA, die den Server vor Angriffen schützt und die Übertragung dafür entschlüsselt und neu verschlüsselt. Cloudflare ist nach dem EU-US Data Privacy Framework zertifiziert; zusätzlich sind die EU-Standardvertragsklauseln vereinbart.'}
+      </p>
+      <p>
+        {isEnglish
+          ? 'The legal basis is Art. 6 para. 1 lit. b GDPR. Contracts for data processing (DPA) exist with the operator and with Cloudflare.'
+          : 'Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO. Mit dem Betreiber und mit Cloudflare bestehen Verträge zur Auftragsverarbeitung (AVV).'}
       </p>
     </>
   );
