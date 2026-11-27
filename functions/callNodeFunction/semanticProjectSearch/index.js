@@ -22,7 +22,8 @@ const MATCH_PROJECTS = `
     $model: String!
     $minSimilarity: float8!
     $count: Int!
-    $organizationIds: _int4
+    $courseOrganizationIds: _int4
+    $eventOrganizationIds: _int4
   ) {
     match_projects(
       args: {
@@ -30,7 +31,8 @@ const MATCH_PROJECTS = `
         embedding_model: $model
         min_similarity: $minSimilarity
         match_count: $count
-        organization_ids: $organizationIds
+        course_organization_ids: $courseOrganizationIds
+        event_organization_ids: $eventOrganizationIds
       }
     ) {
       projectId
@@ -39,8 +41,8 @@ const MATCH_PROJECTS = `
   }
 `;
 
-// The organizations whose course or event programs an org admin manages: the grants that let them
-// manage projects.
+// The organizations whose course or event programs an org admin manages, with which of the two each
+// grant covers (the Project permission scopes course and event programs separately).
 const MANAGED_ORGANIZATIONS = `
   query ProjectSearchOrganizations($userId: uuid!) {
     OrganizationAdmin(
@@ -50,9 +52,13 @@ const MANAGED_ORGANIZATIONS = `
       }
     ) {
       organizationId
+      canManageCourses
+      canManageEvents
     }
   }
 `;
+
+const toIntArray = (ids) => `{${[...new Set(ids)].join(",")}}`;
 
 export default async function semanticProjectSearch(req, logger, { gql, read, fetchImpl } = {}) {
   const role = req.body?.session_variables?.["x-hasura-role"];
@@ -68,14 +74,17 @@ export default async function semanticProjectSearch(req, logger, { gql, read, fe
 
   try {
     const client = gql ?? createHasuraClient();
-    // Org admins only ever see projects of their organizations' courses, so only those projects
-    // may take up the MATCH_COUNT places; admins match across all organizations.
-    let organizationIds = null;
+    // Org admins only see projects of the course programs (canManageCourses) and event programs
+    // (canManageEvents) of their organizations, so only those projects may take up the MATCH_COUNT
+    // places; admins match across all organizations (both scopes null).
+    let courseOrganizationIds = null;
+    let eventOrganizationIds = null;
     if (role === "org_admin") {
       const userId = req.body?.session_variables?.["x-hasura-user-id"];
       const grants = (await client.request(MANAGED_ORGANIZATIONS, { userId })).OrganizationAdmin;
       if (grants.length === 0) return { success: true, enabled: true, matches: [] };
-      organizationIds = `{${[...new Set(grants.map((grant) => grant.organizationId))].join(",")}}`;
+      courseOrganizationIds = toIntArray(grants.filter((g) => g.canManageCourses).map((g) => g.organizationId));
+      eventOrganizationIds = toIntArray(grants.filter((g) => g.canManageEvents).map((g) => g.organizationId));
     }
 
     const values = await embedText(config, query, "RETRIEVAL_QUERY", { fetchImpl });
@@ -85,7 +94,8 @@ export default async function semanticProjectSearch(req, logger, { gql, read, fe
       model: config.modelKey,
       minSimilarity: config.minSimilarity,
       count: MATCH_COUNT,
-      organizationIds,
+      courseOrganizationIds,
+      eventOrganizationIds,
     });
     return { success: true, enabled: true, matches: result.match_projects };
   } catch (error) {

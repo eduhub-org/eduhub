@@ -33,11 +33,13 @@ same way.
    takes its vector along (`ON DELETE CASCADE`).
 3. **Role scope before the limit.** The action `semanticProjectSearch` (admin
    and org_admin only) calls `match_projects` with the admin secret and
-   returns project ids and similarities only. For an Org Admin it passes the
-   organizations of their `OrganizationAdmin` grants with **Can manage
-   courses** or **Can manage events**; `match_projects` keeps only projects
-   listed in a course of a program of those organizations, **before** the 200
-   closest are taken, so other organizations' projects can't crowd them out.
+   returns project ids and similarities only. For an Org Admin it passes two
+   scopes, like the Project permission: the organizations whose grants have
+   **Can manage courses** (for course programs) and those with **Can manage
+   events** (for event programs). `match_projects` keeps only projects listed
+   in a course of a matching program, **before** the 200 closest are taken, so
+   projects the caller can't see (other organizations', or the other program
+   type) can't crowd them out.
    Every project is listed in a course, so there is no path through
    `Project.organizationId`. The overview then loads the matched projects by
    id under the caller's own role and filters, so the action never widens

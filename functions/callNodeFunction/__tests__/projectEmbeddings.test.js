@@ -141,15 +141,23 @@ describe('semanticProjectSearch', () => {
       model: 'fake:word-hash-768',
       minSimilarity: 0.2,
       count: 200,
-      organizationIds: null,
+      courseOrganizationIds: null,
+      eventOrganizationIds: null,
     });
   });
 
-  it("passes an org admin's course and event organizations to match_projects", async () => {
+  it("passes an org admin's course and event organizations to match_projects separately", async () => {
     const gql = {
       request: jest.fn(async (query) =>
         query.includes('ProjectSearchOrganizations')
-          ? { OrganizationAdmin: [{ organizationId: 4 }, { organizationId: 9 }, { organizationId: 4 }] }
+          ? {
+              OrganizationAdmin: [
+                { organizationId: 4, canManageCourses: true, canManageEvents: false },
+                { organizationId: 9, canManageCourses: true, canManageEvents: true },
+                { organizationId: 4, canManageCourses: true, canManageEvents: false },
+                { organizationId: 7, canManageCourses: false, canManageEvents: true },
+              ],
+            }
           : { match_projects: [] }
       ),
     };
@@ -161,7 +169,23 @@ describe('semanticProjectSearch', () => {
     expect(grantsQuery).toContain('canManageCourses');
     expect(grantsQuery).toContain('canManageEvents');
     expect(grantsQuery).not.toContain('canManageDegrees');
-    expect(gql.request.mock.calls[1][1]).toMatchObject({ organizationIds: '{4,9}' });
+    const matchVariables = gql.request.mock.calls[1][1];
+    expect(matchVariables).toMatchObject({ courseOrganizationIds: '{4,9}', eventOrganizationIds: '{9,7}' });
+    expect(matchVariables).not.toHaveProperty('organizationIds');
+  });
+
+  it('gives an events-only org admin an empty course scope', async () => {
+    const gql = {
+      request: jest.fn(async (query) =>
+        query.includes('ProjectSearchOrganizations')
+          ? { OrganizationAdmin: [{ organizationId: 7, canManageCourses: false, canManageEvents: true }] }
+          : { match_projects: [] }
+      ),
+    };
+
+    await semanticProjectSearch(request('org_admin', 'solar boat', 'u-1'), logger, { gql, read: fake });
+
+    expect(gql.request.mock.calls[1][1]).toMatchObject({ courseOrganizationIds: '{}', eventOrganizationIds: '{7}' });
   });
 
   it('finds nothing for an org admin without course or event grants', async () => {

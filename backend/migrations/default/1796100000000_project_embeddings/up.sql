@@ -50,16 +50,19 @@ COMMENT ON TABLE "public"."ProjectMatch" IS
   E'Return type of match_projects (semantic project search); always empty.';
 
 -- The projects most similar to a query embedding (cosine similarity), for one model. The embedding
--- is passed as text ("[0.1, ...]") since GraphQL has no vector type. organization_ids (null for
--- admins) keeps only projects listed in a course of a program of those organizations, before the
--- limit applies, so an org admin's best matches are not crowded out by other organizations'
--- projects. Every project is listed in a course, so there is no other path to an organization.
+-- is passed as text ("[0.1, ...]") since GraphQL has no vector type. For an org admin,
+-- course_organization_ids and event_organization_ids keep only projects listed in a course of a
+-- COURSES program (resp. EVENTS program) of those organizations, mirroring the Project permission,
+-- before the limit applies, so the best matches are not crowded out by projects the caller can't
+-- see. Both null (admins) means no scope. Every project is listed in a course, so there is no
+-- other path to an organization.
 CREATE OR REPLACE FUNCTION "public"."match_projects"(
   query_embedding text,
   embedding_model text,
   min_similarity double precision,
   match_count integer,
-  organization_ids integer[] DEFAULT NULL
+  course_organization_ids integer[] DEFAULT NULL,
+  event_organization_ids integer[] DEFAULT NULL
 )
 RETURNS SETOF "public"."ProjectMatch"
 LANGUAGE sql
@@ -70,12 +73,14 @@ AS $$
    WHERE e."model" = embedding_model
      AND 1 - (e."embedding" <=> query_embedding::vector) >= min_similarity
      AND (
-       organization_ids IS NULL
+       (course_organization_ids IS NULL AND event_organization_ids IS NULL)
        OR EXISTS (
             SELECT 1 FROM "public"."ProjectCourse" pc
               JOIN "public"."Course" c ON c."id" = pc."courseId"
               JOIN "public"."Program" p ON p."id" = c."programId"
-             WHERE pc."projectId" = e."projectId" AND p."organizationId" = ANY (organization_ids))
+             WHERE pc."projectId" = e."projectId"
+               AND (   (p."type" = 'COURSES' AND p."organizationId" = ANY (course_organization_ids))
+                    OR (p."type" = 'EVENTS'  AND p."organizationId" = ANY (event_organization_ids))))
      )
    ORDER BY e."embedding" <=> query_embedding::vector
    LIMIT match_count
