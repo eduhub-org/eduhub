@@ -2876,7 +2876,6 @@ export enum Project_select_column {
   presentationUrl = "presentationUrl",
   projectReviewRequestedAt = "projectReviewRequestedAt",
   proposedByUserId = "proposedByUserId",
-  publicationConsentWithdrawnAt = "publicationConsentWithdrawnAt",
   published = "published",
   rating = "rating",
   ratingComment = "ratingComment",
@@ -2930,7 +2929,6 @@ export enum Project_update_column {
   presentationUrl = "presentationUrl",
   projectReviewRequestedAt = "projectReviewRequestedAt",
   proposedByUserId = "proposedByUserId",
-  publicationConsentWithdrawnAt = "publicationConsentWithdrawnAt",
   published = "published",
   rating = "rating",
   ratingComment = "ratingComment",
@@ -13788,7 +13786,6 @@ export interface Project_bool_exp {
   projectReviewRequestedAt?: timestamptz_comparison_exp | null;
   projectStatusRank?: Int_comparison_exp | null;
   proposedByUserId?: uuid_comparison_exp | null;
-  publicationConsentWithdrawnAt?: timestamptz_comparison_exp | null;
   published?: Boolean_comparison_exp | null;
   rating?: ProjectRating_enum_comparison_exp | null;
   ratingComment?: String_comparison_exp | null;
@@ -13839,7 +13836,6 @@ export interface Project_insert_input {
   presentationUrl?: string | null;
   projectReviewRequestedAt?: any | null;
   proposedByUserId?: any | null;
-  publicationConsentWithdrawnAt?: any | null;
   published?: boolean | null;
   rating?: ProjectRating_enum | null;
   ratingComment?: string | null;
@@ -13874,7 +13870,6 @@ export interface Project_max_order_by {
   presentationUrl?: order_by | null;
   projectReviewRequestedAt?: order_by | null;
   proposedByUserId?: order_by | null;
-  publicationConsentWithdrawnAt?: order_by | null;
   ratingComment?: order_by | null;
   sentBackAt?: order_by | null;
   submissionDeadline?: order_by | null;
@@ -13905,7 +13900,6 @@ export interface Project_min_order_by {
   presentationUrl?: order_by | null;
   projectReviewRequestedAt?: order_by | null;
   proposedByUserId?: order_by | null;
-  publicationConsentWithdrawnAt?: order_by | null;
   ratingComment?: order_by | null;
   sentBackAt?: order_by | null;
   submissionDeadline?: order_by | null;
@@ -13970,7 +13964,6 @@ export interface Project_order_by {
   presentationUrl?: order_by | null;
   projectReviewRequestedAt?: order_by | null;
   proposedByUserId?: order_by | null;
-  publicationConsentWithdrawnAt?: order_by | null;
   published?: order_by | null;
   rating?: order_by | null;
   ratingComment?: order_by | null;

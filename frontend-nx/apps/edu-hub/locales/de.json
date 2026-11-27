@@ -1736,7 +1736,7 @@
         "authors": "Autor:innen",
         "type": "Typ",
         "no_authors": "Noch keine Autor:innen",
-        "consent_withdrawn_unpublished": "Am {date} zurückgenommen: Das Team hat seine Zustimmung zur Veröffentlichung widerrufen"
+        "consent_withdrawn": "Das Team hat seine Zustimmung zur Veröffentlichung am {date} widerrufen"
       },
       "actions": {
         "confirm_project": "Projekt bestätigen",

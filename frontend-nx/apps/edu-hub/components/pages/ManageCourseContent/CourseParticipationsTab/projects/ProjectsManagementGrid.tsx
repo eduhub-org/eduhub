@@ -471,18 +471,21 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
   );
 
   // The title with the team's publication decision underneath, once there is one, and a warning
-  // when the project was taken out of the showcase because its team withdrew consent.
+  // when the team's latest consent event withdrew its consent (a published project is then
+  // unpublished automatically by a database trigger).
   const renderTitle = useCallback(
     (project: ProjectRow) => {
       const decision = getPublicationDecision(project);
-      const consentWithdrawnAt = project.published ? null : project.publicationConsentWithdrawnAt;
+      const latestConsentEvent = project.ProjectConsentEvents?.[0];
+      const consentWithdrawnAt =
+        latestConsentEvent?.eventType === 'withdrawn' ? latestConsentEvent.created_at : null;
       return (
         <div className="min-w-0">
           <span className="font-medium text-label-primary">{project.title}</span>
           {consentWithdrawnAt && (
             <span className="mt-0.5 flex items-center gap-1 text-xs font-medium text-warning">
               <MdWarningAmber className="shrink-0" aria-hidden />
-              {t('projects.table.consent_withdrawn_unpublished', {
+              {t('projects.table.consent_withdrawn', {
                 date: formattedDate(new Date(consentWithdrawnAt)),
               })}
             </span>

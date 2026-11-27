@@ -6,15 +6,6 @@
 -- Keep in sync with canPublishProject / isOpenTemplate in
 -- frontend-nx/apps/edu-hub/components/pages/CourseContent/Projects/projectStatusDisplay.ts
 
--- When the team withdraws consent while the project is published, the project
--- is unpublished and this column records when, so Admins can see that it was
--- published until the team withdrew consent. Cleared when it is published again.
-ALTER TABLE public."Project"
-  ADD COLUMN "publicationConsentWithdrawnAt" timestamptz NULL;
-
-COMMENT ON COLUMN public."Project"."publicationConsentWithdrawnAt" IS
-  E'Set when the team withdrew publication consent while the project was published, which unpublished it automatically. Cleared when the project is published again.';
-
 -- Guard: published may only become true for an open Project Template or with
 -- the team's current consent. Runs for every role, the Hasura console and
 -- scripts. Only the change to true is checked, so re-saving an already
@@ -50,8 +41,6 @@ BEGIN
     END IF;
   END IF;
 
-  -- Published again: the earlier withdrawal no longer describes the project.
-  NEW."publicationConsentWithdrawnAt" := NULL;
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
@@ -60,15 +49,13 @@ CREATE TRIGGER enforce_project_publication_consent
 BEFORE INSERT OR UPDATE OF published ON public."Project"
 FOR EACH ROW EXECUTE FUNCTION public.enforce_project_publication_consent();
 
--- Withdrawing consent takes a published project out of the showcase and
--- stamps when. A project that isn't published is left alone (nothing to undo,
--- and no marker: it was never shown with this withdrawal).
+-- Withdrawing consent takes a published project out of the showcase. Staff see
+-- the withdrawal from the team's latest consent event, so nothing is stamped.
 CREATE OR REPLACE FUNCTION public.unpublish_project_on_consent_withdrawal()
 RETURNS TRIGGER AS $$
 BEGIN
   UPDATE public."Project"
-  SET published = false,
-      "publicationConsentWithdrawnAt" = NEW.created_at
+  SET published = false
   WHERE id = NEW."projectId"
     AND published IS TRUE;
   RETURN NULL;

@@ -2,4 +2,3 @@ DROP TRIGGER IF EXISTS unpublish_project_on_consent_withdrawal ON public."Projec
 DROP FUNCTION IF EXISTS public.unpublish_project_on_consent_withdrawal();
 DROP TRIGGER IF EXISTS enforce_project_publication_consent ON public."Project";
 DROP FUNCTION IF EXISTS public.enforce_project_publication_consent();
-ALTER TABLE public."Project" DROP COLUMN IF EXISTS "publicationConsentWithdrawnAt";

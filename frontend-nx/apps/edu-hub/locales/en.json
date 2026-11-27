@@ -1754,7 +1754,7 @@
         "authors": "Authors",
         "type": "Type",
         "no_authors": "No authors yet",
-        "consent_withdrawn_unpublished": "Unpublished on {date}: the team withdrew its publication consent"
+        "consent_withdrawn": "The team withdrew its publication consent on {date}"
       },
       "actions": {
         "confirm_project": "Confirm project",

@@ -64,7 +64,7 @@ A project can only be published once its Project Team has agreed to publication.
 
 Project Templates have no team and can always be published, for example so that a company finds participants for its topic. When you add a project without authors on a course's manage page, which makes it a Project Template, a note tells you it can be published in the showcase.
 
-If a team withdraws its consent while its project is published, the project is taken out of the showcase straight away. Its row then shows a warning, **Unpublished on** the date, **the team withdrew its publication consent**, until the project is published again. The status shows the project's normal Project Status.
+If a team withdraws its consent while its project is published, the project is taken out of the showcase straight away. Whenever a team has withdrawn its consent, its row shows a warning: **The team withdrew its publication consent on** the date. The warning disappears once the team agrees again. The status shows the project's normal Project Status.
 
 Suggesting a project for publication stays possible without the team's consent, so you can still talk to the team about it.
 

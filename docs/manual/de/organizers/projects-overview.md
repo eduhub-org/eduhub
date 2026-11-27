@@ -64,7 +64,7 @@ Veröffentlichen kannst Du ein Projekt nur, wenn sein Projektteam der Veröffent
 
 Projektvorlagen haben kein Team und können immer veröffentlicht werden, zum Beispiel damit ein Unternehmen Teilnehmende für sein Thema findet. Wenn Du auf der Verwaltungsseite eines Kurses ein Projekt ohne Autor:innen anlegst, also eine Projektvorlage, weist Dich ein Hinweis darauf hin, dass sie im Showcase veröffentlicht werden kann.
 
-Zieht ein Team seine Zustimmung zurück, während sein Projekt veröffentlicht ist, wird das Projekt sofort aus dem Showcase genommen. Seine Zeile zeigt dann eine Warnung, **Am** Datum **zurückgenommen: Das Team hat seine Zustimmung zur Veröffentlichung widerrufen**, bis das Projekt wieder veröffentlicht wird. Der Status zeigt den normalen Projektstatus.
+Zieht ein Team seine Zustimmung zurück, während sein Projekt veröffentlicht ist, wird das Projekt sofort aus dem Showcase genommen. Solange ein Team seine Zustimmung widerrufen hat, zeigt seine Zeile eine Warnung: **Das Team hat seine Zustimmung zur Veröffentlichung am** Datum **widerrufen**. Die Warnung verschwindet, sobald das Team wieder zustimmt. Der Status zeigt den normalen Projektstatus.
 
 Ein Projekt zur Veröffentlichung vorschlagen kannst Du auch ohne Zustimmung des Teams, damit Du mit dem Team darüber sprechen kannst.
 

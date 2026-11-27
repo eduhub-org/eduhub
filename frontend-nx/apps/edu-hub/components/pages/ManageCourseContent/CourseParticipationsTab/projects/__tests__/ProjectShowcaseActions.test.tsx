@@ -60,7 +60,6 @@ const passedProject = {
     },
   ],
   ProjectConsentEvents: [{ __typename: 'ProjectConsentEvent', id: 7, eventType: 'granted' }],
-  publicationConsentWithdrawnAt: null,
 } as unknown as ProjectRow;
 
 const withoutConsent = (project: ProjectRow, events: { eventType: string }[] = []): ProjectRow =>

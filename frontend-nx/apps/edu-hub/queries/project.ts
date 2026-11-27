@@ -62,7 +62,6 @@ export const PROJECT_FRAGMENT_DETAILED = gql`
     documentationInstructionId
     status
     published
-    publicationConsentWithdrawnAt
     type
     rating
     ratingComment
