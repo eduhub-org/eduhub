@@ -3,7 +3,9 @@ import { useTranslations } from 'next-intl';
 import { useDebouncedCallback } from 'use-debounce';
 import TextField from '@mui/material/TextField';
 
-import { useAdminQuery } from '../../../hooks/authedQuery';
+import { useManageQuery } from '../../../hooks/authedQuery';
+import { useManageProgramWhere } from '../../../hooks/manageScope';
+import { Project_bool_exp } from '../../../__generated__/globalTypes';
 import { AuthRoles } from '../../../types/enums';
 import { isKnownCourseGroupOptionTitle } from '../../../helpers/courseGroupOptions';
 import { PROGRAMS_WITH_MINIMUM_PROPERTIES } from '../../../queries/programList';
@@ -48,30 +50,42 @@ const sameStatuses = (a: readonly ProjectStatusKey[], b: readonly ProjectStatusK
   a.length === b.length && a.every((status) => b.includes(status));
 
 interface ProjectsOverviewFiltersProps {
-  /** The viewer's role; decides the Needs Attention preset. */
+  /** The viewer's management role; decides the Needs Attention preset. */
   role: AuthRoles;
+  /** The projects the viewer may see (empty for Admins); the status counts stay within it. */
+  scope?: Project_bool_exp;
   filters: ProjectsOverviewFilterState;
   onChange: (filters: ProjectsOverviewFilterState) => void;
 }
 
 /**
  * Status chips with counts (multi-select, Needs Attention preset), program and course-group
- * filters and keyword search for the projects overview. Everything is applied on the server.
+ * filters and keyword search for the projects overview. Everything is applied on the server,
+ * under the viewer's management role (admin or org_admin).
  */
-const ProjectsOverviewFilters: FC<ProjectsOverviewFiltersProps> = ({ role, filters, onChange }) => {
+const ProjectsOverviewFilters: FC<ProjectsOverviewFiltersProps> = ({
+  role,
+  scope,
+  filters,
+  onChange,
+}) => {
   const t = useTranslations('projectsOverview');
   const tCourse = useTranslations('course');
   const tCommon = useTranslations('common');
 
-  const { data: programsData } = useAdminQuery<Programs>(PROGRAMS_WITH_MINIMUM_PROPERTIES);
-  const { data: courseGroupData } = useAdminQuery<CourseGroupOptions>(COURSE_GROUP_OPTIONS);
+  // Org Admins only get their own programs to choose from.
+  const programWhere = useManageProgramWhere();
+  const { data: programsData } = useManageQuery<Programs>(PROGRAMS_WITH_MINIMUM_PROPERTIES, {
+    variables: { where: programWhere },
+  });
+  const { data: courseGroupData } = useManageQuery<CourseGroupOptions>(COURSE_GROUP_OPTIONS);
 
   const { programId, courseGroupId, search } = filters;
   const countVariables = useMemo(
-    () => projectsOverviewStatusCountVariables({ programId, courseGroupId, search }),
-    [programId, courseGroupId, search]
+    () => projectsOverviewStatusCountVariables({ programId, courseGroupId, search }, scope),
+    [programId, courseGroupId, search, scope]
   );
-  const countsQuery = useAdminQuery<ProjectsOverviewStatusCounts, ProjectsOverviewStatusCountsVariables>(
+  const countsQuery = useManageQuery<ProjectsOverviewStatusCounts, ProjectsOverviewStatusCountsVariables>(
     PROJECTS_OVERVIEW_STATUS_COUNTS,
     { variables: countVariables }
   );

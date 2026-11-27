@@ -151,9 +151,9 @@ export const PROJECTS_BY_COURSE = gql`
 `;
 
 export const PROJECTS_OVERVIEW = gql`
-  # Every project across all courses, for the Admin projects overview. Same row
-  # fragment as the course tab, plus the courses (and their programs) a project
-  # is listed in. Sorted by Project Status in lifecycle order (computed field,
+  # Every project across all courses for the projects overview (Org Admins add
+  # their programs as a scope to $where). Same row fragment as the course tab,
+  # plus the courses (and their programs) a project is listed in. Sorted by Project Status in lifecycle order (computed field,
   # see the project_status_rank SQL function), then most recently updated.
   # $where carries the overview's status chips, filters and keyword search.
   ${PROJECT_FRAGMENT_DETAILED}

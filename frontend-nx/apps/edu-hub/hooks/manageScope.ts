@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 
 import { useIsAdmin } from './authentication';
 import { useUserId } from './user';
-import { Course_bool_exp, Program_bool_exp } from '../__generated__/globalTypes';
+import { Course_bool_exp, Program_bool_exp, Project_bool_exp } from '../__generated__/globalTypes';
 
 // Where-fragments that scope the organization-management screens to the data an org admin is allowed
 // to manage. Super-admins get an empty filter (no scoping — they see everything). Org admins are
@@ -85,6 +85,12 @@ export const useManageProgramWhere = (): Program_bool_exp => {
   }, [isAdmin, userId]);
 };
 
+const orgAdminCourseWhere = (userId: string): Course_bool_exp => ({
+  _or: orgAdminProgramCapabilityOr(userId)!.map((branch) => ({
+    Program: branch,
+  })),
+});
+
 // Course_bool_exp scoping for the course management list.
 export const useManageCourseWhere = (): Course_bool_exp => {
   const isAdmin = useIsAdmin();
@@ -97,11 +103,24 @@ export const useManageCourseWhere = (): Course_bool_exp => {
     if (!userId) {
       return MATCH_NONE;
     }
-    return {
-      _or: orgAdminProgramCapabilityOr(userId)!.map((branch) => ({
-        Program: branch,
-      })),
-    };
+    return orgAdminCourseWhere(userId);
+  }, [isAdmin, userId]);
+};
+
+// Project_bool_exp scoping for the projects overview: projects listed in a course of a program the
+// org admin manages - the course/program branch of the Hasura org_admin_access rule on Project.
+export const useManageProjectWhere = (): Project_bool_exp => {
+  const isAdmin = useIsAdmin();
+  const userId = useUserId();
+
+  return useMemo(() => {
+    if (isAdmin) {
+      return {};
+    }
+    if (!userId) {
+      return MATCH_NONE;
+    }
+    return { ProjectCourses: { Course: orgAdminCourseWhere(userId) } };
   }, [isAdmin, userId]);
 };
 

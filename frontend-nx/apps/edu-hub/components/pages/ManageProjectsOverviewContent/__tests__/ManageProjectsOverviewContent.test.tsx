@@ -14,8 +14,12 @@ import {
 
 const tableGridProps = jest.fn();
 const managementRoles = jest.fn();
+const mockUseManageQuery = jest.fn();
 const mockUseAdminQuery = jest.fn();
 const mockUseRoleQuery = jest.fn();
+let mockIsAdmin = true;
+// The role the grid's ManagementRoleProvider hands down, as the real context would.
+let mockProvidedRole: string | undefined;
 
 jest.mock('next-intl', () => ({
   useTranslations: () => (key: string) => key,
@@ -34,6 +38,8 @@ jest.mock('next/router', () => ({
 }));
 
 jest.mock('../../../../hooks/authedQuery', () => ({
+  // useManageQuery pins the caller's management role (admin or org_admin) on the request.
+  useManageQuery: (...args: unknown[]) => mockUseManageQuery(...args),
   useAdminQuery: (...args: unknown[]) => mockUseAdminQuery(...args),
   useRoleQuery: (...args: unknown[]) => mockUseRoleQuery(...args),
 }));
@@ -48,15 +54,17 @@ jest.mock('../../../../hooks/user', () => ({
 
 jest.mock('../../../../hooks/authentication', () => ({
   ...jest.requireActual('../../../../hooks/authentication'),
-  useIsAdmin: () => true,
+  useIsAdmin: () => mockIsAdmin,
+  useManageRole: () => (mockIsAdmin ? 'admin' : 'org_admin'),
 }));
 
 jest.mock('../../../../hooks/managementRole', () => ({
   ManagementRoleProvider: ({ children, role }: { children: React.ReactNode; role?: string }) => {
     managementRoles(role);
+    mockProvidedRole = role;
     return <>{children}</>;
   },
-  useManagementRoleContext: () => undefined,
+  useManagementRoleContext: () => mockProvidedRole,
 }));
 
 // Render what a user would see of the table: the headers, every cell of every row, and the
@@ -190,9 +198,9 @@ type QueryDocument = { definitions: { kind: string; name?: { value: string } }[]
 const operationName = (doc: unknown) =>
   (doc as QueryDocument).definitions.find((d) => d.kind === 'OperationDefinition')?.name?.value;
 const queryNames = (mock: jest.Mock) => mock.mock.calls.map(([doc]) => operationName(doc));
-/** Variables of the latest call of the named admin query. */
+/** Variables of the latest call of the named overview query. */
 const lastVariables = (name: string) =>
-  mockUseAdminQuery.mock.calls.filter(([doc]) => operationName(doc) === name).at(-1)?.[1]
+  mockUseManageQuery.mock.calls.filter(([doc]) => operationName(doc) === name).at(-1)?.[1]
     ?.variables;
 
 const statusCount = (count: number) => ({
@@ -200,7 +208,7 @@ const statusCount = (count: number) => ({
   aggregate: { __typename: 'Project_aggregate_fields', count },
 });
 
-const adminQueryData: Record<string, unknown> = {
+const manageQueryData: Record<string, unknown> = {
   ProjectsOverview: { Project: [project], Project_aggregate: { aggregate: { count: 120 } } },
   ProjectsOverviewStatusCounts: {
     TEMPLATE: statusCount(10),
@@ -224,11 +232,14 @@ const adminQueryData: Record<string, unknown> = {
 
 describe('ManageProjectsOverviewContent', () => {
   beforeEach(() => {
+    mockIsAdmin = true;
+    mockProvidedRole = undefined;
     tableGridProps.mockClear();
     managementRoles.mockClear();
     mockUseAdminQuery.mockReset();
-    mockUseAdminQuery.mockImplementation((doc: unknown) => ({
-      data: adminQueryData[operationName(doc) ?? ''],
+    mockUseManageQuery.mockReset();
+    mockUseManageQuery.mockImplementation((doc: unknown) => ({
+      data: manageQueryData[operationName(doc) ?? ''],
       loading: false,
       refetch: jest.fn(),
     }));
@@ -240,7 +251,7 @@ describe('ManageProjectsOverviewContent', () => {
   it('loads the first page of 50 projects across all courses as admin', () => {
     render(<ManageProjectsOverviewContent />);
 
-    expect(queryNames(mockUseAdminQuery)).toEqual(expect.arrayContaining(['ProjectsOverview']));
+    expect(queryNames(mockUseManageQuery)).toEqual(expect.arrayContaining(['ProjectsOverview']));
     expect(lastVariables('ProjectsOverview')).toMatchObject({ limit: 50, offset: 0 });
     expect(lastTableProps()).toMatchObject({
       enablePagination: true,
@@ -313,10 +324,11 @@ const listWhere = () => lastVariables('ProjectsOverview')?.where;
 
 describe('ManageProjectsOverviewContent status chips, filters and search', () => {
   beforeEach(() => {
+    mockIsAdmin = true;
     tableGridProps.mockClear();
-    mockUseAdminQuery.mockReset();
-    mockUseAdminQuery.mockImplementation((doc: unknown) => ({
-      data: adminQueryData[operationName(doc) ?? ''],
+    mockUseManageQuery.mockReset();
+    mockUseManageQuery.mockImplementation((doc: unknown) => ({
+      data: manageQueryData[operationName(doc) ?? ''],
       loading: false,
       refetch: jest.fn(),
     }));
@@ -478,9 +490,10 @@ describe('ManageProjectsOverviewContent status chips, filters and search', () =>
 
 describe('ProjectsOverviewFilters Needs Attention preset per role', () => {
   beforeEach(() => {
-    mockUseAdminQuery.mockReset();
-    mockUseAdminQuery.mockImplementation((doc: unknown) => ({
-      data: adminQueryData[operationName(doc) ?? ''],
+    mockIsAdmin = true;
+    mockUseManageQuery.mockReset();
+    mockUseManageQuery.mockImplementation((doc: unknown) => ({
+      data: manageQueryData[operationName(doc) ?? ''],
       loading: false,
     }));
   });
@@ -509,5 +522,98 @@ describe('ProjectsOverviewFilters Needs Attention preset per role', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'filter.needs_attention' }));
     expect(onChange).toHaveBeenLastCalledWith(expect.objectContaining({ statuses: expected }));
+  });
+});
+
+describe('ManageProjectsOverviewContent for Org Admins', () => {
+  const publishedProject = { ...project, published: true, status: ProjectStatus_enum.COMPLETED };
+  // The course-program branch of the Org Admin scope (manageScope.ts), for the test user.
+  const coursesBranch = {
+    _and: [
+      { type: { _eq: 'COURSES' } },
+      {
+        Organization: {
+          OrganizationAdmins: {
+            _and: [{ userId: { _eq: 'admin-1' } }, { canManageCourses: { _eq: true } }],
+          },
+        },
+      },
+    ],
+  };
+  const orgAdminScope = {
+    ProjectCourses: { Course: { _or: expect.arrayContaining([{ Program: coursesBranch }]) } },
+  };
+
+  const renderAs = (isAdmin: boolean) => {
+    mockIsAdmin = isAdmin;
+    render(<ManageProjectsOverviewContent />);
+  };
+
+  beforeEach(() => {
+    mockProvidedRole = undefined;
+    tableGridProps.mockClear();
+    managementRoles.mockClear();
+    mockUseAdminQuery.mockReset();
+    mockUseManageQuery.mockReset();
+    mockUseManageQuery.mockImplementation((doc: unknown) => ({
+      data:
+        operationName(doc) === 'ProjectsOverview'
+          ? { Project: [publishedProject], Project_aggregate: { aggregate: { count: 1 } } }
+          : manageQueryData[operationName(doc) ?? ''],
+      loading: false,
+      refetch: jest.fn(),
+    }));
+    mockUseRoleQuery.mockReset();
+    mockUseRoleQuery.mockReturnValue({ data: undefined, loading: false, refetch: jest.fn() });
+    window.localStorage.clear();
+  });
+
+  it('runs the page, its filters and the grid under the org_admin role', () => {
+    renderAs(false);
+
+    expect(queryNames(mockUseManageQuery)).toEqual(
+      expect.arrayContaining([
+        'ProjectsOverview',
+        'ProjectsOverviewStatusCounts',
+        'Programs',
+        'CourseGroupOptions',
+      ])
+    );
+    // Nothing on the page pins the admin role for an Org Admin.
+    expect(mockUseAdminQuery).not.toHaveBeenCalled();
+    expect(managementRoles).toHaveBeenCalledWith(AuthRoles.org_admin);
+    expect(managementRoles).not.toHaveBeenCalledWith(AuthRoles.admin);
+  });
+
+  it("opens on the Org Admin's Needs Attention preset, limited to their programs", () => {
+    renderAs(false);
+
+    expect(pressedStatuses()).toEqual(['PROPOSED', 'SUBMITTED']);
+    expect(listWhere()).toEqual({
+      _and: [orgAdminScope, { projectStatusRank: { _in: [1, 4] } }],
+    });
+    expect(lastVariables('ProjectsOverviewStatusCounts').TEMPLATE).toEqual({
+      _and: [orgAdminScope, { projectStatusRank: { _in: [0] } }],
+    });
+    // The program dropdown lists only the programs they manage.
+    expect(lastVariables('Programs')).toEqual({
+      where: { _or: expect.arrayContaining([coursesBranch]) },
+    });
+  });
+
+  it('offers neither the publish action nor the settings links', () => {
+    renderAs(false);
+
+    expect(screen.getByRole('button', { name: 'projects.actions.preview' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'projects.actions.unpublish' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /settings_links/ })).not.toBeInTheDocument();
+  });
+
+  it('keeps publishing and the unscoped list for Admins', () => {
+    renderAs(true);
+
+    expect(screen.getByRole('button', { name: 'projects.actions.unpublish' })).toBeInTheDocument();
+    expect(listWhere()).toEqual({ projectStatusRank: { _in: [1, 4, 6] } });
+    expect(lastVariables('Programs')).toEqual({ where: {} });
   });
 });

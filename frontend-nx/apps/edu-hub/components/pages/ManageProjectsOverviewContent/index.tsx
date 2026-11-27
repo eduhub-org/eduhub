@@ -1,9 +1,10 @@
 import { FC, useCallback, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
-import { useAdminQuery } from '../../../hooks/authedQuery';
+import { useManageQuery } from '../../../hooks/authedQuery';
+import { useManageRole } from '../../../hooks/authentication';
+import { useManageProjectWhere } from '../../../hooks/manageScope';
 import { ManagementRoleProvider } from '../../../hooks/managementRole';
-import { AuthRoles } from '../../../types/enums';
 import { PROJECTS_OVERVIEW } from '../../../queries/project';
 import {
   ProjectsOverview,
@@ -48,26 +49,32 @@ const CourseList: FC<{ courses: ProjectsOverview_Project_courses[] }> = ({ cours
 };
 
 /**
- * Every project across all courses, for Admins: the course tab's project grid fed by a
- * cross-course query, paged on the server and sorted by Project Status, then last update.
+ * Every project across all courses, for Admins, and across their organization's programs, for
+ * Org Admins: the course tab's project grid fed by a cross-course query, paged on the server and
+ * sorted by Project Status, then last update. Runs under the viewer's management role.
  */
 const ManageProjectsOverviewContent: FC = () => {
   const t = useTranslations('projectsOverview');
+  // admin for Admins, org_admin for Org Admins: the page's queries, its filters and the grid.
+  const role = useManageRole();
+  // Hasura already limits what an Org Admin can read, but their reads are unioned with public
+  // read; this keeps other organizations' published projects out of the list and the counts.
+  const scope = useManageProjectWhere();
   const [pageIndex, setPageIndex] = useState(0);
   const [pageSize, setPageSize] = usePersistedPageSize(
     'projectsOverview',
     PROJECTS_OVERVIEW_PAGE_SIZE
   );
   const [filters, setFilters] = useState<ProjectsOverviewFilterState>(() =>
-    defaultProjectsOverviewFilters(AuthRoles.admin)
+    defaultProjectsOverviewFilters(role)
   );
-  const where = useMemo(() => projectsOverviewWhere(filters), [filters]);
+  const where = useMemo(() => projectsOverviewWhere(filters, scope), [filters, scope]);
   const handleFiltersChange = useCallback((next: ProjectsOverviewFilterState) => {
     setFilters(next);
     setPageIndex(0);
   }, []);
 
-  const query = useAdminQuery<ProjectsOverview, ProjectsOverviewVariables>(
+  const query = useManageQuery<ProjectsOverview, ProjectsOverviewVariables>(
     PROJECTS_OVERVIEW,
     { variables: { where, limit: pageSize, offset: pageIndex * pageSize } }
   );
@@ -109,12 +116,14 @@ const ManageProjectsOverviewContent: FC = () => {
         <CommonPageHeader headline={t('headline')} />
         <ProjectsOverviewSettingsLinks />
         <ProjectsOverviewFilters
-          role={AuthRoles.admin}
+          role={role}
+          scope={scope}
           filters={filters}
           onChange={handleFiltersChange}
         />
-        {/* The grid's own queries, mutations and inputs run as admin too. */}
-        <ManagementRoleProvider role={AuthRoles.admin}>
+        {/* The grid's own queries, mutations and inputs run under the same role. Publishing
+            shows only under admin (ProjectShowcaseActions). */}
+        <ManagementRoleProvider role={role}>
           <ProjectsManagementGrid
             projects={data?.Project}
             loading={query.loading}

@@ -9,6 +9,8 @@ let mockIsAdmin = false;
 let mockIsInstructor = false;
 let mockCanViewStatistics = false;
 let mockCanManageCourses = false;
+let mockCanManageEvents = false;
+let mockCanManageDegrees = false;
 
 jest.mock('next-intl', () => ({
   useTranslations: () => (key: string) => key,
@@ -27,8 +29,8 @@ jest.mock('../../../hooks/authentication', () => ({
 jest.mock('../../../hooks/orgAdminCapabilities', () => ({
   useOrgAdminCapabilities: () => ({
     canManageCourses: mockCanManageCourses,
-    canManageEvents: false,
-    canManageDegrees: false,
+    canManageEvents: mockCanManageEvents,
+    canManageDegrees: mockCanManageDegrees,
     canManageSettings: false,
     canViewStatistics: mockCanViewStatistics,
   }),
@@ -55,6 +57,8 @@ describe('account Menu', () => {
     mockIsInstructor = false;
     mockCanViewStatistics = false;
     mockCanManageCourses = false;
+    mockCanManageEvents = false;
+    mockCanManageDegrees = false;
   });
 
   it('leaves an 8px gap below the avatar trigger', async () => {
@@ -125,8 +129,24 @@ describe('account Menu', () => {
     expect(screen.getByText('menu.section_management')).toBeInTheDocument();
   });
 
-  it('links the projects overview for admins', async () => {
-    mockIsAdmin = true;
+  it.each([
+    ['admins', () => (mockIsAdmin = true)],
+    [
+      'org admins who manage courses',
+      () => {
+        mockIsOrgAdmin = true;
+        mockCanManageCourses = true;
+      },
+    ],
+    [
+      'org admins who manage events',
+      () => {
+        mockIsOrgAdmin = true;
+        mockCanManageEvents = true;
+      },
+    ],
+  ])('links the projects overview for %s', async (_, setRole) => {
+    setRole();
     await renderMenu();
 
     expect(screen.getByRole('menuitem', { name: 'menu.projects' })).toHaveAttribute(
@@ -137,10 +157,11 @@ describe('account Menu', () => {
 
   it.each([
     [
-      'org admins who manage courses',
+      'org admins who manage neither courses nor events',
       () => {
         mockIsOrgAdmin = true;
-        mockCanManageCourses = true;
+        mockCanManageDegrees = true;
+        mockCanViewStatistics = true;
       },
     ],
     ['instructors', () => (mockIsInstructor = true)],

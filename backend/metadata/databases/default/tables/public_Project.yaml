@@ -84,7 +84,8 @@ computed_fields:
         name: project_courses
         schema: public
       table_argument: project_row
-  # Admin-only for now (no role grants it): sorts the projects overview by Project Status.
+  # Sorts and filters the projects overview by Project Status. Granted to org_admin_access below
+  # (the overview runs as org_admin for Org Admins); admin has full access.
   - name: projectStatusRank
     comment: Lifecycle position of the derived Project Status, from 0 (Project Template) to 8 (Not Passed).
     definition:
@@ -314,6 +315,10 @@ select_permissions:
         - title
         - type
         - updated_at
+      # The projects overview orders and filters by Project Status and counts projects per status.
+      computed_fields:
+        - projectStatusRank
+      allow_aggregations: true
       filter:
         _or:
           - ProjectCourses:

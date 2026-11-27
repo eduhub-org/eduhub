@@ -48,11 +48,15 @@ const and = (conditions: Project_bool_exp[]): Project_bool_exp => {
   return { _and: nonEmpty };
 };
 
-/** Every active filter except the status chips (the status counts apply these too). */
+/**
+ * Every active filter except the status chips (the status counts apply these too), within the
+ * viewer's `scope` (empty for Admins; an Org Admin's programs, see useManageProjectWhere).
+ */
 export function projectsOverviewBaseWhere(
-  filters: Omit<ProjectsOverviewFilterState, 'statuses'>
+  filters: Omit<ProjectsOverviewFilterState, 'statuses'>,
+  scope: Project_bool_exp = {}
 ): Project_bool_exp {
-  const conditions: Project_bool_exp[] = [];
+  const conditions: Project_bool_exp[] = [scope];
   // A project is in a program (or course group) if any course it is listed in is.
   if (filters.programId) {
     conditions.push({
@@ -75,15 +79,19 @@ export function projectsOverviewBaseWhere(
 }
 
 /** The `where` of the overview's project list. */
-export function projectsOverviewWhere(filters: ProjectsOverviewFilterState): Project_bool_exp {
-  return and([projectsOverviewBaseWhere(filters), projectStatusWhere(filters.statuses)]);
+export function projectsOverviewWhere(
+  filters: ProjectsOverviewFilterState,
+  scope: Project_bool_exp = {}
+): Project_bool_exp {
+  return and([projectsOverviewBaseWhere(filters, scope), projectStatusWhere(filters.statuses)]);
 }
 
 /** One `where` per Project Status: the active filters plus that status. */
 export function projectsOverviewStatusCountVariables(
-  filters: Omit<ProjectsOverviewFilterState, 'statuses'>
+  filters: Omit<ProjectsOverviewFilterState, 'statuses'>,
+  scope: Project_bool_exp = {}
 ): ProjectsOverviewStatusCountsVariables {
-  const base = projectsOverviewBaseWhere(filters);
+  const base = projectsOverviewBaseWhere(filters, scope);
   return Object.fromEntries(
     PROJECT_STATUSES.map((status) => [status, and([base, projectStatusWhere([status])])])
   ) as unknown as ProjectsOverviewStatusCountsVariables;
