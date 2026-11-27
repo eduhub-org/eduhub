@@ -35,7 +35,7 @@ Under each answer you can rate it with thumbs up or down. With thumbs down you c
 
 ## For admins: the Reports page
 
-Admins find all reports under **Reports** in the user menu. Each Monday a summary of the week is written there in English: the new and open reports grouped by topic, likely duplicates, suggested priorities and recurring problems with the Assistant's answers. Earlier weeks can be picked under **Week**.
+Admins find all reports under **Reports** in the user menu. Each Monday a summary of the week is written there in English: the new and open reports grouped by topic, likely duplicates, suggested priorities and recurring problems with the Assistant's answers. A **Production errors** section groups the errors the platform's services logged that week and marks each group as a likely bug, a configuration problem (such as a missing or expired token), a capacity problem, a failing external service or noise, with a suggested next step. The summary is also written in weeks with errors but no reports. Earlier weeks can be picked under **Week**.
 
 Below it, the table shows the open reports by default; filter by **Type** and **Status**. For each report you set the **Status** and **Priority**. Open a report to see its description, the page and role it was sent from and who sent it, and to:
 

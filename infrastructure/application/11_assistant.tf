@@ -68,6 +68,10 @@ locals {
     SUMMARY_LLM_EXTRA_BODY                = local.summary_provider == "ionos" ? jsonencode({ reasoning_effort = "none" }) : ""
     SUMMARY_LLM_PRICE_INPUT_EUR_PER_MTOK  = var.summary_llm_price_input_eur_per_mtok == null ? "" : tostring(var.summary_llm_price_input_eur_per_mtok)
     SUMMARY_LLM_PRICE_OUTPUT_EUR_PER_MTOK = var.summary_llm_price_output_eur_per_mtok == null ? "" : tostring(var.summary_llm_price_output_eur_per_mtok)
+    # The summary also analyses the week's production errors (lib/errorLogs.js): the entries
+    # the Slack error alert matches (10_monitoring.tf), read with roles/logging.viewer below.
+    ERROR_LOG_PROJECT = var.project_id
+    ERROR_LOG_FILTER  = local.service_error_filter
   } : name => value if local.summary_provider != "off" }
   summary_secrets = local.summary_has_api_key ? [{
     key       = "SUMMARY_LLM_API_KEY"
@@ -83,6 +87,16 @@ resource "google_secret_manager_secret_iam_member" "summary_llm_api_key" {
   secret_id = google_secret_manager_secret.assistant_llm_api_key[0].id
   role      = "roles/secretmanager.secretAccessor"
   member    = "serviceAccount:${google_service_account.custom_cloud_function_account.email}"
+}
+
+# The weekly summary reads the production error logs. The shared account (also callPythonFunction
+# and apiProxy) can then read the project's logs; Data Access audit logs need
+# roles/logging.privateLogViewer and stay closed.
+resource "google_project_iam_member" "summary_logs_viewer" {
+  count   = local.summary_provider != "off" ? 1 : 0
+  project = var.project_id
+  role    = "roles/logging.viewer"
+  member  = "serviceAccount:${google_service_account.custom_cloud_function_account.email}"
 }
 
 # The provider's API key, for providers other than Vertex AI (which uses the
