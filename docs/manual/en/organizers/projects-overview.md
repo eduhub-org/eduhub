@@ -1,13 +1,16 @@
 ---
 title: Projects overview
 slug: organizers/projects-overview
-audience: [admin]
+audience: [organizer, admin]
 order: 45
 language: en
-summary: How Admins see and manage the projects of all courses in one list, in the order of their Project Status.
+summary: How Admins and Org Admins see and manage the projects of all courses, or of their organization's programs, in one list, in the order of their Project Status.
 ---
 
-The projects overview lists every project of every course in one place. Open it from the menu item **Projects** in the **Management** section. For now only Admins see it.
+The projects overview lists projects of many courses in one place. Open it from the menu item **Projects** in the **Management** section.
+
+- **Admins** see every project of every course.
+- **Org Admins** who may manage courses or events (**Can manage courses**, **Can manage events**) see it too. They see the projects listed in the courses of the programs they manage: course programs with **Can manage courses**, event programs with **Can manage events**, degree programs with **Can manage degrees**. Projects of other organizations don't appear, and the **Program** filter only offers their own programs. Instructors don't see the overview; they find their projects on the projects tab of their course's manage page.
 
 ## What the list shows
 
@@ -21,7 +24,7 @@ The list shows 50 projects per page. Use the arrows below the list to move betwe
 
 Above the list there is one chip per Project Status: **Project Template**, **Awaiting Confirmation**, **Ongoing**, **Sent Back**, **Submitted**, **Passed**, **Suggested for Publication**, **Published** and **Not Passed**. Each chip shows how many projects have that status. Click chips to show only projects with those statuses; you can select several at once, and clicking a selected chip deselects it.
 
-The overview opens on **Needs Attention**: the projects waiting for a decision from you. For Admins these are the statuses Awaiting Confirmation (Project Confirmation), Submitted (review) and Suggested for Publication. Click **Show all** to clear the selection and see every project, and **Needs Attention** to get back to it.
+The overview opens on **Needs Attention**: the projects waiting for a decision from you. For Admins these are the statuses Awaiting Confirmation (Project Confirmation), Submitted (review) and Suggested for Publication. For Org Admins they are Awaiting Confirmation and Submitted, because only Admins publish projects. Click **Show all** to clear the selection and see every project, and **Needs Attention** to get back to it.
 
 You can narrow the list further:
 
@@ -47,4 +50,4 @@ Since a project can be listed in several courses, the overview doesn't know whic
 
 Admins publish a project in the public showcase with **Publish**, and take it out again with **Unpublish**. Both are offered for Passed Projects (except online courses), open Project Templates and projects that are already published. Publishing fulfils a suggestion for publication; unpublishing leaves the project's status otherwise unchanged. Org Admins can't publish projects. The same buttons are on the projects tab of a course's manage page.
 
-Above the list, Admins find links to the settings **Project types** and **Documentation instructions**.
+Above the list, Admins find links to the settings **Project types** and **Documentation instructions**. Org Admins don't see these links.

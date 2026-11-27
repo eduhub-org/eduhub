@@ -1,13 +1,16 @@
 ---
 title: Projektübersicht
 slug: organizers/projects-overview
-audience: [admin]
+audience: [organizer, admin]
 order: 45
 language: de
-summary: Wie Admins die Projekte aller Kurse in einer Liste sehen und verwalten, sortiert nach ihrem Projektstatus.
+summary: Wie Admins und Org-Admins die Projekte aller Kurse oder der Programme ihrer Organisation in einer Liste sehen und verwalten, sortiert nach ihrem Projektstatus.
 ---
 
-Die Projektübersicht zeigt alle Projekte aller Kurse an einer Stelle. Du öffnest sie über den Menüpunkt **Projekte** im Bereich **Verwaltung**. Vorerst sehen sie nur Admins.
+Die Projektübersicht zeigt Projekte vieler Kurse an einer Stelle. Du öffnest sie über den Menüpunkt **Projekte** im Bereich **Verwaltung**.
+
+- **Admins** sehen alle Projekte aller Kurse.
+- **Org-Admins**, die Kurse oder Events verwalten dürfen (**Kann Kurse verwalten**, **Kann Events verwalten**), sehen sie auch. Sie sehen die Projekte, die in Kursen der Programme stehen, die sie verwalten: Kursprogramme mit **Kann Kurse verwalten**, Veranstaltungsprogramme mit **Kann Events verwalten**, Studiengangsprogramme mit **Kann Degrees verwalten**. Projekte anderer Organisationen erscheinen nicht, und der Filter **Programm** bietet nur die eigenen Programme an. Kursleitende sehen die Übersicht nicht; sie finden ihre Projekte im Projektreiter der Verwaltungsseite ihres Kurses.
 
 ## Was die Liste zeigt
 
@@ -21,7 +24,7 @@ Die Liste zeigt 50 Projekte pro Seite. Mit den Pfeilen unter der Liste wechselst
 
 Über der Liste gibt es für jeden Projektstatus einen Chip: **Projektvorlage**, **Wartet auf Bestätigung**, **In Bearbeitung**, **Zurückgegeben**, **Eingereicht**, **Bestanden**, **Zur Veröffentlichung vorgeschlagen**, **Veröffentlicht** und **Nicht bestanden**. Jeder Chip zeigt, wie viele Projekte diesen Status haben. Klicke auf Chips, um nur Projekte mit diesen Status anzuzeigen; Du kannst mehrere gleichzeitig auswählen, und ein Klick auf einen ausgewählten Chip hebt die Auswahl wieder auf.
 
-Die Übersicht öffnet mit **Handlungsbedarf**: den Projekten, die auf eine Entscheidung von Dir warten. Für Admins sind das die Status Wartet auf Bestätigung (Projektbestätigung), Eingereicht (Bewertung) und Zur Veröffentlichung vorgeschlagen. Mit **Alle anzeigen** hebst Du die Auswahl auf und siehst alle Projekte, mit **Handlungsbedarf** kommst Du zu ihr zurück.
+Die Übersicht öffnet mit **Handlungsbedarf**: den Projekten, die auf eine Entscheidung von Dir warten. Für Admins sind das die Status Wartet auf Bestätigung (Projektbestätigung), Eingereicht (Bewertung) und Zur Veröffentlichung vorgeschlagen. Für Org-Admins sind es Wartet auf Bestätigung und Eingereicht, denn nur Admins veröffentlichen Projekte. Mit **Alle anzeigen** hebst Du die Auswahl auf und siehst alle Projekte, mit **Handlungsbedarf** kommst Du zu ihr zurück.
 
 Du kannst die Liste weiter eingrenzen:
 
@@ -47,4 +50,4 @@ Da ein Projekt in mehreren Kursen stehen kann, weiß die Übersicht nicht, welch
 
 Admins veröffentlichen ein Projekt im öffentlichen Showcase mit **Veröffentlichen** und nehmen es mit **Veröffentlichung zurücknehmen** wieder heraus. Beides gibt es für bestandene Projekte (außer Onlinekursen), offene Projektvorlagen und bereits veröffentlichte Projekte. Mit dem Veröffentlichen ist ein Vorschlag zur Veröffentlichung erledigt; das Zurücknehmen ändert sonst nichts am Status des Projekts. Org-Admins können keine Projekte veröffentlichen. Dieselben Schaltflächen findest Du im Projektreiter der Verwaltungsseite eines Kurses.
 
-Über der Liste findest Du als Admin Links zu den Einstellungen **Projekttypen** und **Dokumentationsanleitungen**.
+Über der Liste findest Du als Admin Links zu den Einstellungen **Projekttypen** und **Dokumentationsanleitungen**. Org-Admins sehen diese Links nicht.
