@@ -44,7 +44,7 @@ EduHub uses automated semantic versioning with a three-branch workflow for consi
 - `perf:` - Performance improvement → **PATCH** version bump
 - `BREAKING CHANGE:` - Breaking change → **MAJOR** version bump (0.1.0 → 1.0.0)
 
-### Non-Version Bumping Types (appear in changelog)
+### Non-Version Bumping Types (not in the release notes)
 - `chore:` - Maintenance tasks
 - `docs:` - Documentation changes
 - `style:` - Code style changes
