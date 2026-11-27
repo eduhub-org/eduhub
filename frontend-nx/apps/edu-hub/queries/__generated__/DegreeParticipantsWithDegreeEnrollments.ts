@@ -126,6 +126,7 @@ export interface DegreeParticipantsWithDegreeEnrollments_Course_by_pk_CourseEnro
 
 export interface DegreeParticipantsWithDegreeEnrollments_Course_by_pk {
   __typename: "Course";
+  id: number;
   /**
    * An array relationship
    */

@@ -159,6 +159,7 @@ export interface CourseParticipations_Course_by_pk_Program {
 
 export interface CourseParticipations_Course_by_pk {
   __typename: "Course";
+  id: number;
   /**
    * An array relationship
    */

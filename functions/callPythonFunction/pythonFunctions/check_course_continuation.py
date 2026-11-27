@@ -36,12 +36,21 @@ def check_course_continuation(arguments):
         now_iso = datetime.now(timezone.utc).isoformat()
         frontend_url = os.environ.get("FRONTEND_URL") or "https://edu.opencampus.sh"
 
-        # Only courses that are still running: asking someone whether they
-        # intend to continue a finished course makes no sense, and it keeps the
-        # attendance fan-out of this query bounded.
+        # Only courses that are still running, i.e. have a session still to
+        # come - their own, or a mandatory program session, which counts toward
+        # the limit too: asking someone whether they intend to continue a
+        # finished course makes no sense, and it keeps the attendance fan-out
+        # of this query bounded. (Course.endTime is only the time of day a
+        # session ends, so it cannot tell a running course from a finished one.)
         query = """
         query CoursesWithMissedLimit($now: timestamptz!) {
-            Course(where: {maxMissedSessions: {_is_null: false}, endTime: {_gte: $now}}) {
+            Course(where: {
+                maxMissedSessions: {_is_null: false},
+                _or: [
+                    {Sessions: {endDateTime: {_gte: $now}}},
+                    {Program: {Sessions: {isMandatory: {_eq: true}, endDateTime: {_gte: $now}}}}
+                ]
+            }) {
                 id
                 title
                 maxMissedSessions
