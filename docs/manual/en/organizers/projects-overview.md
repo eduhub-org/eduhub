@@ -34,6 +34,16 @@ You can narrow the list further:
 
 The chip counts take the program, course group and search into account, so they show how many projects of each status match those filters.
 
+### Searching by meaning
+
+A search of three or more characters also finds projects by meaning, not only by the words you typed: searching for "renewable energy", for example, also finds a project about solar boats. The results then form one list sorted by relevance instead of by status: projects found both by their words and by their meaning come first, followed by the others in order of how well they match. A note above the list says that it is sorted by relevance.
+
+The status chips, program and course group still apply, and the chip counts show how many of the results have each status. The meaning of a project comes from its title, tagline and description; changes to these are picked up the next day. You only find projects you can also see in the normal list.
+
+If a search finds more keyword matches than can be sorted, a note tells you to refine your search. If the search by meaning is unavailable, a note says so and you only see keyword matches.
+
+Shorter searches (one or two characters) only look for the words and keep the normal order by status.
+
 ## Working on a project
 
 Click a row to expand it. You get the same actions as on the projects tab of a course's manage page: confirming a project (Project Confirmation), reviewing a submitted project, adding and removing authors and mentors, editing the title, tagline, description, cover image, type and documentation instruction, and suggesting a project for publication. Your changes are saved straight away.

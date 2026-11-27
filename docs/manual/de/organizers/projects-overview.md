@@ -34,6 +34,16 @@ Du kannst die Liste weiter eingrenzen:
 
 Die Zahlen auf den Chips berücksichtigen Programm, Kursgruppe und Suche; sie zeigen also, wie viele Projekte jedes Status zu diesen Filtern passen.
 
+### Nach Bedeutung suchen
+
+Eine Suche mit drei oder mehr Zeichen findet Projekte auch nach ihrer Bedeutung, nicht nur nach den eingegebenen Wörtern: Suchst Du zum Beispiel nach „erneuerbare Energie“, findest Du auch ein Projekt über Solarboote. Die Ergebnisse bilden dann eine Liste, die nach Relevanz statt nach Status sortiert ist: Projekte, die über ihre Wörter und ihre Bedeutung gefunden wurden, stehen oben, danach die anderen in der Reihenfolge, wie gut sie passen. Ein Hinweis über der Liste sagt Dir, dass sie nach Relevanz sortiert ist.
+
+Statuschips, Programm und Kursgruppe gelten weiter, und die Zahlen auf den Chips zeigen, wie viele der Ergebnisse jeden Status haben. Die Bedeutung eines Projekts ergibt sich aus Titel, Untertitel und Beschreibung; Änderungen daran werden am nächsten Tag berücksichtigt. Du findest nur Projekte, die Du auch in der normalen Liste siehst.
+
+Findet eine Suche mehr Stichwort-Treffer, als sortiert werden können, bittet Dich ein Hinweis, Deine Suche zu verfeinern. Ist die Suche nach Bedeutung gerade nicht verfügbar, sagt Dir ein Hinweis das, und Du siehst nur Stichwort-Treffer.
+
+Kürzere Suchen (ein oder zwei Zeichen) suchen nur nach den Wörtern und behalten die normale Sortierung nach Status.
+
 ## An einem Projekt arbeiten
 
 Klicke auf eine Zeile, um sie aufzuklappen. Du hast dieselben Aktionen wie im Projektreiter der Verwaltungsseite eines Kurses: ein Projekt bestätigen (Projektbestätigung), ein eingereichtes Projekt bewerten, Autor:innen und Mentor:innen hinzufügen und entfernen, Titel, Untertitel, Beschreibung, Titelbild, Typ und Dokumentationsanleitung ändern und ein Projekt zur Veröffentlichung vorschlagen. Deine Änderungen werden sofort gespeichert.
