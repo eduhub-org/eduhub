@@ -228,7 +228,7 @@ const manageQueryData: Record<string, unknown> = {
       { id: 4, title: 'Summer 2026', shortTitle: null },
     ],
   },
-  CourseGroupOptions: { CourseGroupOption: [{ id: 5, title: 'Tech & Coding' }] },
+  ProjectsOverviewCourseGroupOptions: { CourseGroupOption: [{ id: 5, title: 'Tech & Coding' }] },
 };
 
 describe('ManageProjectsOverviewContent', () => {
@@ -578,7 +578,7 @@ describe('ManageProjectsOverviewContent for Org Admins', () => {
         'ProjectsOverview',
         'ProjectsOverviewStatusCounts',
         'Programs',
-        'CourseGroupOptions',
+        'ProjectsOverviewCourseGroupOptions',
       ])
     );
     // Nothing on the page pins the admin role for an Org Admin.
@@ -601,6 +601,10 @@ describe('ManageProjectsOverviewContent for Org Admins', () => {
     expect(lastVariables('Programs')).toEqual({
       where: { _or: expect.arrayContaining([coursesBranch]) },
     });
+    // The course-group dropdown lists only groups used by a course they manage.
+    expect(lastVariables('ProjectsOverviewCourseGroupOptions')).toEqual({
+      courseWhere: { _or: expect.arrayContaining([{ Program: coursesBranch }]) },
+    });
   });
 
   it('offers neither the publish action nor the settings links', () => {
@@ -617,6 +621,8 @@ describe('ManageProjectsOverviewContent for Org Admins', () => {
     expect(screen.getByRole('button', { name: 'projects.actions.unpublish' })).toBeInTheDocument();
     expect(listWhere()).toEqual({ projectStatusRank: { _in: [1, 4, 6] } });
     expect(lastVariables('Programs')).toEqual({ where: {} });
+    // Admins get every course group that is used by any course.
+    expect(lastVariables('ProjectsOverviewCourseGroupOptions')).toEqual({ courseWhere: {} });
   });
 });
 

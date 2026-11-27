@@ -29,7 +29,7 @@ Die Übersicht öffnet mit **Handlungsbedarf**: den Projekten, die auf eine Ents
 Du kannst die Liste weiter eingrenzen:
 
 - **Programm**: Projekte, die in mindestens einem Kurs dieses Programms stehen.
-- **Kursgruppe**: Projekte, die in mindestens einem Kurs dieser Kursgruppe stehen.
+- **Kursgruppe**: Projekte, die in mindestens einem Kurs dieser Kursgruppe stehen. Zur Auswahl stehen nur Kursgruppen, die ein Kurs hat, den Du verwaltest.
 - **Suche**: findet Projekte, deren Titel, Untertitel oder Beschreibung, Namen der Autor:innen oder Mentor:innen, Kurstitel oder Programm-Kurztitel jedes eingegebene Wort enthalten.
 
 Die Zahlen auf den Chips berücksichtigen Programm, Kursgruppe und Suche; sie zeigen also, wie viele Projekte jedes Status zu diesen Filtern passen.

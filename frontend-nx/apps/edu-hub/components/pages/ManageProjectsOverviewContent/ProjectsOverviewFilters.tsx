@@ -4,15 +4,18 @@ import { useDebouncedCallback } from 'use-debounce';
 import TextField from '@mui/material/TextField';
 
 import { useManageQuery } from '../../../hooks/authedQuery';
-import { useManageProgramWhere } from '../../../hooks/manageScope';
+import { useManageCourseWhere, useManageProgramWhere } from '../../../hooks/manageScope';
 import { Project_bool_exp } from '../../../__generated__/globalTypes';
 import { AuthRoles } from '../../../types/enums';
 import { isKnownCourseGroupOptionTitle } from '../../../helpers/courseGroupOptions';
 import { PROGRAMS_WITH_MINIMUM_PROPERTIES } from '../../../queries/programList';
-import { COURSE_GROUP_OPTIONS } from '../../../queries/courseGroupOptions';
+import { PROJECTS_OVERVIEW_COURSE_GROUP_OPTIONS } from '../../../queries/courseGroupOptions';
 import { PROJECTS_OVERVIEW_STATUS_COUNTS } from '../../../queries/project';
 import { Programs } from '../../../queries/__generated__/Programs';
-import { CourseGroupOptions } from '../../../queries/__generated__/CourseGroupOptions';
+import {
+  ProjectsOverviewCourseGroupOptions,
+  ProjectsOverviewCourseGroupOptionsVariables,
+} from '../../../queries/__generated__/ProjectsOverviewCourseGroupOptions';
 import {
   ProjectsOverviewStatusCounts,
   ProjectsOverviewStatusCountsVariables,
@@ -79,12 +82,16 @@ const ProjectsOverviewFilters: FC<ProjectsOverviewFiltersProps> = ({
   const tCourse = useTranslations('course');
   const tCommon = useTranslations('common');
 
-  // Org Admins only get their own programs to choose from.
+  // Org Admins only get their own programs, and the course groups of their courses, to choose from.
   const programWhere = useManageProgramWhere();
   const { data: programsData } = useManageQuery<Programs>(PROGRAMS_WITH_MINIMUM_PROPERTIES, {
     variables: { where: programWhere },
   });
-  const { data: courseGroupData } = useManageQuery<CourseGroupOptions>(COURSE_GROUP_OPTIONS);
+  const courseWhere = useManageCourseWhere();
+  const { data: courseGroupData } = useManageQuery<
+    ProjectsOverviewCourseGroupOptions,
+    ProjectsOverviewCourseGroupOptionsVariables
+  >(PROJECTS_OVERVIEW_COURSE_GROUP_OPTIONS, { variables: { courseWhere } });
 
   const { programId, courseGroupId, search } = filters;
   const countVariables = useMemo(

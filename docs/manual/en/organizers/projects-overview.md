@@ -29,7 +29,7 @@ The overview opens on **Needs Attention**: the projects waiting for a decision f
 You can narrow the list further:
 
 - **Program**: projects listed in at least one course of that program.
-- **Course group**: projects listed in at least one course of that course group.
+- **Course group**: projects listed in at least one course of that course group. The list offers only course groups used by a course you manage.
 - **Search**: finds projects whose title, tagline or description, author or mentor names, course title or program short title contain every word you type.
 
 The chip counts take the program, course group and search into account, so they show how many projects of each status match those filters.
