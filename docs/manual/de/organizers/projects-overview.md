@@ -47,4 +47,12 @@ Da ein Projekt in mehreren Kursen stehen kann, weiß die Übersicht nicht, welch
 
 Admins veröffentlichen ein Projekt im öffentlichen Showcase mit **Veröffentlichen** und nehmen es mit **Veröffentlichung zurücknehmen** wieder heraus. Beides gibt es für bestandene Projekte (außer Onlinekursen), offene Projektvorlagen und bereits veröffentlichte Projekte. Mit dem Veröffentlichen ist ein Vorschlag zur Veröffentlichung erledigt; das Zurücknehmen ändert sonst nichts am Status des Projekts. Org-Admins können keine Projekte veröffentlichen. Dieselben Schaltflächen findest Du im Projektreiter der Verwaltungsseite eines Kurses.
 
+Veröffentlichen kannst Du ein Projekt nur, wenn sein Projektteam der Veröffentlichung zugestimmt hat. Das Team entscheidet beim Einreichen und kann seine Entscheidung später ändern; unter dem Titel siehst Du **Veröffentlichung zugestimmt** oder **Veröffentlichung abgelehnt**. Ohne Zustimmung des Teams ist **Veröffentlichen** ausgegraut, mit einem Hinweis, dass das Team nicht zugestimmt hat. Die Plattform lehnt eine solche Veröffentlichung überall ab, nicht nur auf dieser Seite. **Veröffentlichung zurücknehmen** ist immer möglich.
+
+Projektvorlagen haben kein Team und können immer veröffentlicht werden, zum Beispiel damit ein Unternehmen Teilnehmende für sein Thema findet. Wenn Du auf der Verwaltungsseite eines Kurses ein Projekt ohne Autor:innen anlegst, also eine Projektvorlage, weist Dich ein Hinweis darauf hin, dass sie im Showcase veröffentlicht werden kann.
+
+Zieht ein Team seine Zustimmung zurück, während sein Projekt veröffentlicht ist, wird das Projekt sofort aus dem Showcase genommen. Seine Zeile zeigt dann eine Warnung, **Am** Datum **zurückgenommen: Das Team hat seine Zustimmung zur Veröffentlichung widerrufen**, bis das Projekt wieder veröffentlicht wird. Der Status zeigt den normalen Projektstatus.
+
+Ein Projekt zur Veröffentlichung vorschlagen kannst Du auch ohne Zustimmung des Teams, damit Du mit dem Team darüber sprechen kannst.
+
 Über der Liste findest Du als Admin Links zu den Einstellungen **Projekttypen** und **Dokumentationsanleitungen**.

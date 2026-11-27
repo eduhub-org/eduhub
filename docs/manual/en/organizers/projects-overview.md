@@ -47,4 +47,12 @@ Since a project can be listed in several courses, the overview doesn't know whic
 
 Admins publish a project in the public showcase with **Publish**, and take it out again with **Unpublish**. Both are offered for Passed Projects (except online courses), open Project Templates and projects that are already published. Publishing fulfils a suggestion for publication; unpublishing leaves the project's status otherwise unchanged. Org Admins can't publish projects. The same buttons are on the projects tab of a course's manage page.
 
+A project can only be published once its Project Team has agreed to publication. The team decides when it submits the project and can change its mind later; below the title you see **Publication approved** or **Publication declined**. Without the team's consent **Publish** is greyed out, with a note that the team hasn't agreed. The platform refuses such a publication everywhere, not only on this page. **Unpublish** is always possible.
+
+Project Templates have no team and can always be published, for example so that a company finds participants for its topic. When you add a project without authors on a course's manage page, which makes it a Project Template, a note tells you it can be published in the showcase.
+
+If a team withdraws its consent while its project is published, the project is taken out of the showcase straight away. Its row then shows a warning, **Unpublished on** the date, **the team withdrew its publication consent**, until the project is published again. The status shows the project's normal Project Status.
+
+Suggesting a project for publication stays possible without the team's consent, so you can still talk to the team about it.
+
 Above the list, Admins find links to the settings **Project types** and **Documentation instructions**.
