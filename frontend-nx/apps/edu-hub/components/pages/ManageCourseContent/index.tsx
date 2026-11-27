@@ -1,5 +1,6 @@
 import { useTranslations } from 'next-intl';
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/router';
 import { useRoleMutation } from '../../../hooks/authedMutation';
 import { useOrgAdminQuery, useRoleQuery } from '../../../hooks/authedQuery';
 import { MANAGED_COURSE, ORG_ADMIN_MANAGEABLE_COURSE, UPDATE_COURSE_STATUS } from '../../../queries/course';
@@ -29,7 +30,7 @@ import { ParticipantPreviewButton } from './ParticipantPreviewButton';
 import { PublicEventNotice } from './PublicEventNotice';
 import { RausgegangenEventSection } from './RausgegangenEventSection';
 import { InstructorConfidentialityGate } from './InstructorConfidentialityGate';
-import { useIsAdmin, useIsOrgAdmin, useIsUserIdInList } from '../../../hooks/authentication';
+import { useIsAdmin, useIsInstructor, useIsOrgAdmin, useIsUserIdInList } from '../../../hooks/authentication';
 import { getRegistrationFeatures } from './ApplicationsTab/registrationConfig';
 import Loading from '../../common/Loading';
 import { ProgramType } from '../../../types/enums';
@@ -92,6 +93,14 @@ const getNextCourseStatus = (course: ManagedCourse_Course_by_pk) => {
  *
  * @returns {any} the component
  */
+const RedirectToCoursePage: FC<{ path: string }> = ({ path }) => {
+  const router = useRouter();
+  useEffect(() => {
+    router.replace(path);
+  }, [router, path]);
+  return null;
+};
+
 /**
  * Picks the role the course is managed under, then renders it. Admins and the course's own
  * instructors keep their session role, as before. An org admin who does not instruct the course
@@ -101,6 +110,7 @@ const getNextCourseStatus = (course: ManagedCourse_Course_by_pk) => {
  */
 export const ManageCourseContent: FC<Props> = ({ courseId, expectedSegment }) => {
   const isAdmin = useIsAdmin();
+  const isInstructor = useIsInstructor();
   const isOrgAdmin = useIsOrgAdmin();
   const userId = useUserId();
   const manageCourseWhere = useManageCourseWhere();
@@ -134,6 +144,12 @@ export const ManageCourseContent: FC<Props> = ({ courseId, expectedSegment }) =>
         <CourseManagement courseId={courseId} expectedSegment={expectedSegment} manageAsOrgAdmin orgAdminOfCourse />
       </ManagementRoleProvider>
     );
+  }
+  // Without an admin or instructor role ManagedCourse would go out as `user`, which may not read
+  // instructor fields such as Session.attendanceData, so Hasura rejects it. These are participants
+  // who followed a shared manage link: send them to the course page instead.
+  if (!isAdmin && !isInstructor) {
+    return <RedirectToCoursePage path={`/${expectedSegment}/${courseId}`} />;
   }
   return (
     <CourseManagement
