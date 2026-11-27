@@ -1,5 +1,6 @@
 import { FC, useCallback, useMemo, useState } from 'react';
 import { ColumnDef } from '@tanstack/react-table';
+import { ApolloError } from '@apollo/client';
 import { CircularProgress, Tooltip } from '@mui/material';
 import { HelpOutline } from '@mui/icons-material';
 import { useTranslations } from 'next-intl';
@@ -28,7 +29,6 @@ import {
 import { UserSelectionWithFilter_User } from '../../../../../queries/__generated__/UserSelectionWithFilter';
 import { SAVE_PROJECT_IMAGE } from '../../../../../queries/actions';
 import {
-  PROJECTS_BY_COURSE,
   PROJECT_TYPES,
   PROJECT_DOCUMENTATION_INSTRUCTIONS,
   DELETE_PROJECT_AUTHOR,
@@ -48,10 +48,6 @@ import {
   UPDATE_PROJECT_SUGGESTED_FOR_PUBLICATION,
   UPDATE_PROJECT_TYPE,
 } from '../../../../../queries/projectInstructor';
-import {
-  ProjectsByCourse,
-  ProjectsByCourseVariables,
-} from '../../../../../queries/__generated__/ProjectsByCourse';
 import {
   ProjectCoursesByCourse,
   ProjectCoursesByCourseVariables,
@@ -96,18 +92,33 @@ import ReviewProjectDialog from './ReviewProjectDialog';
 import AddProjectDialog from './AddProjectDialog';
 
 interface ProjectsManagementGridProps {
-  courseId: number;
+  /**
+   * The course the grid manages projects of. Without one, the course-only
+   * actions (add project to course, remove from course) are hidden and project
+   * links go to the plain Project Page.
+   */
+  courseId?: number;
+  /** The rows to show; `undefined` until the parent's first result arrives. */
+  projects: ProjectRow[] | undefined;
+  loading: boolean;
+  error?: ApolloError;
+  /** Operation names of the parent's row query, refetched after every change. */
+  refetchQueries: string[];
+  /** Reloads the parent's rows. */
+  onRefetch: () => void;
   programDefaultProjectType: string | null;
   /** Course / program fallback when `Project.submissionDeadline` is null. */
   courseDefaultProjectSubmissionDeadline: string | null | undefined;
   courseSubmissionDeadlineDefaultSource: CourseProjectSubmissionDefaultSource;
 }
 
-const REFETCH_QUERIES = ['ProjectsByCourse'];
-const REMOVE_REFETCH_QUERIES = ['ProjectsByCourse', 'ProjectCoursesByCourse'];
-
 const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
   courseId,
+  projects,
+  loading,
+  error,
+  refetchQueries,
+  onRefetch,
   programDefaultProjectType,
   courseDefaultProjectSubmissionDeadline,
   courseSubmissionDeadlineDefaultSource,
@@ -131,35 +142,33 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
     name: string;
   } | null>(null);
 
-  const projectsQuery = useRoleQuery<ProjectsByCourse, ProjectsByCourseVariables>(
-    PROJECTS_BY_COURSE,
-    { variables: { courseId } }
-  );
+  const hasCourse = courseId != null;
+  // Only needed to word the remove-from-course confirmation.
   const projectCoursesQuery = useRoleQuery<
     ProjectCoursesByCourse,
     ProjectCoursesByCourseVariables
-  >(PROJECT_COURSES_BY_COURSE, { variables: { courseId } });
+  >(PROJECT_COURSES_BY_COURSE, { variables: { courseId: courseId ?? 0 }, skip: !hasCourse });
   const projectTypesQuery = useRoleQuery<ProjectTypes>(PROJECT_TYPES);
   const documentationInstructionsQuery = useRoleQuery<ProjectDocumentationInstructions>(
     PROJECT_DOCUMENTATION_INSTRUCTIONS
   );
 
   const [insertAuthor] = useRoleMutation(INSTRUCTOR_INSERT_PROJECT_AUTHOR, {
-    refetchQueries: REFETCH_QUERIES,
+    refetchQueries,
   });
   const [deleteAuthor] = useRoleMutation(DELETE_PROJECT_AUTHOR, {
-    refetchQueries: REFETCH_QUERIES,
+    refetchQueries,
   });
   const [insertMentor] = useRoleMutation(INSERT_PROJECT_MENTOR, {
-    refetchQueries: REFETCH_QUERIES,
+    refetchQueries,
   });
   const [deleteMentor] = useRoleMutation(DELETE_PROJECT_MENTOR, {
-    refetchQueries: REFETCH_QUERIES,
+    refetchQueries,
   });
   const [updateSuggestedForPublication] = useRoleMutation(
     UPDATE_PROJECT_SUGGESTED_FOR_PUBLICATION,
     {
-      refetchQueries: REFETCH_QUERIES,
+      refetchQueries,
     }
   );
   const [removeProjectFromCourse] = useRoleMutation<
@@ -167,27 +176,26 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
     RemoveProjectFromCourseVariables
   >(REMOVE_PROJECT_FROM_COURSE);
   const [updateProjectType] = useRoleMutation(UPDATE_PROJECT_TYPE, {
-    refetchQueries: REFETCH_QUERIES,
+    refetchQueries,
   });
   // Selecting the instruction created in the dialog: this dropdown is
   // mutation-driven, so the choice has to be persisted rather than held in state.
   const [updateProjectDocumentationInstruction] = useRoleMutation(
     UPDATE_PROJECT_DOCUMENTATION_INSTRUCTION,
-    { refetchQueries: REFETCH_QUERIES }
+    { refetchQueries }
   );
 
-  const allProjects = projectsQuery.data?.Project ?? [];
+  const allProjects = useMemo(() => projects ?? [], [projects]);
 
   // Most recently created project (the query is ordered by id asc) that has a
   // type set. New projects default to its type + documentation instruction so
   // an instructor doesn't re-pick the same setup for every project in a course.
   const lastTypedProject = useMemo(() => {
-    const list = projectsQuery.data?.Project ?? [];
-    for (let i = list.length - 1; i >= 0; i--) {
-      if (list[i].type) return list[i];
+    for (let i = allProjects.length - 1; i >= 0; i--) {
+      if (allProjects[i].type) return allProjects[i];
     }
     return null;
-  }, [projectsQuery.data?.Project]);
+  }, [allProjects]);
 
   const blockedAuthorIds = useMemo(() => {
     const activeStatuses = new Set([
@@ -196,7 +204,7 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
       ProjectStatus_enum.SUBMITTED,
     ]);
     const ids = new Set<string>();
-    for (const p of projectsQuery.data?.Project ?? []) {
+    for (const p of allProjects) {
       if (!activeStatuses.has(p.status)) continue;
       for (const a of p.ProjectAuthors ?? []) {
         if (
@@ -208,19 +216,19 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
       }
     }
     return ids;
-  }, [projectsQuery.data?.Project]);
+  }, [allProjects]);
 
   /** Counts course projects whose parentProjectId points at a template (same course list). */
   const templateCopyCountByParentId = useMemo(() => {
     const counts = new Map<number, number>();
-    for (const p of projectsQuery.data?.Project ?? []) {
+    for (const p of allProjects) {
       if (p.parentProjectId != null) {
         const parentId = p.parentProjectId;
         counts.set(parentId, (counts.get(parentId) ?? 0) + 1);
       }
     }
     return counts;
-  }, [projectsQuery.data?.Project]);
+  }, [allProjects]);
 
   /** Titles of the other courses each project is listed in; removing it here keeps it there. */
   const otherCourseTitlesByProjectId = useMemo(() => {
@@ -316,13 +324,14 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
   // may not see every course the project is listed in.
   const handleRemoveProject = useCallback(
     async (project: ProjectRow) => {
+      if (courseId == null) return;
       await removeProjectFromCourse({
         variables: { projectId: project.id, courseId },
-        refetchQueries: REMOVE_REFETCH_QUERIES,
+        refetchQueries: [...refetchQueries, 'ProjectCoursesByCourse'],
         awaitRefetchQueries: true,
       });
     },
-    [courseId, removeProjectFromCourse]
+    [refetchQueries, courseId, removeProjectFromCourse]
   );
 
   const removeProjectQuestion = useCallback(
@@ -856,7 +865,7 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
                     options={rowInstructionOptions}
                     updateValueMutation={UPDATE_PROJECT_DOCUMENTATION_INSTRUCTION}
                     identifierVariables={{ itemId: row.id }}
-                    refetchQueries={REFETCH_QUERIES}
+                    refetchQueries={refetchQueries}
                     disabled={!canEditProjectType}
                   />
                 </div>
@@ -922,7 +931,7 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
                 project={row}
                 courseDefaultSubmissionDeadline={courseDefaultProjectSubmissionDeadline}
                 defaultDeadlineSource={courseSubmissionDeadlineDefaultSource}
-                refetchQueries={REFETCH_QUERIES}
+                refetchQueries={refetchQueries}
               />
               <div className="rounded-lg border border-border-primary p-4 bg-bg-secondary/30 space-y-3">
                 <ProjectPreviewLayout
@@ -942,7 +951,7 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
                             itemId={row.id}
                             value={row.title}
                             updateValueMutation={UPDATE_PROJECT_TITLE}
-                            refetchQueries={REFETCH_QUERIES}
+                            refetchQueries={refetchQueries}
                             helpText={tCourse('projects.my_project.field_tooltip_title')}
                             className="[&>div]:!mt-0 [&>div]:!mb-2"
                           />
@@ -984,7 +993,7 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
                       maxFileSize={5 * 1024 * 1024}
                       imageWidth={160}
                       imageHeight={96}
-                      refetchQueries={REFETCH_QUERIES}
+                      refetchQueries={refetchQueries}
                       uploadText={tCourse('projects.my_project.cover_image_upload_text')}
                       altText={tCourse('projects.my_project.cover_image_alt')}
                       onUploadError={handleCoverUploadError}
@@ -1005,7 +1014,7 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
                           itemId={row.id}
                           value={row.tagline ?? ''}
                           updateValueMutation={UPDATE_PROJECT_TAGLINE}
-                          refetchQueries={REFETCH_QUERIES}
+                          refetchQueries={refetchQueries}
                           maxLength={PROJECT_TAGLINE_MAX_LENGTH}
                           showCharacterCount={false}
                           className="!mb-0 border-transparent bg-transparent [&>div]:!px-0"
@@ -1027,7 +1036,7 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
                           itemId={row.id}
                           value={row.description ?? ''}
                           updateValueMutation={UPDATE_PROJECT_DESCRIPTION}
-                          refetchQueries={REFETCH_QUERIES}
+                          refetchQueries={refetchQueries}
                           maxLength={8000}
                           showCharacterCount={false}
                           className="!mb-0 min-h-[9rem] border-transparent bg-transparent [&>div]:!px-0"
@@ -1042,7 +1051,7 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
                   checked={Boolean(row.acceptingParticipants)}
                   updateValueMutation={UPDATE_PROJECT_ACCEPTING_PARTICIPANTS}
                   identifierVariables={{ itemId: row.id }}
-                  refetchQueries={REFETCH_QUERIES}
+                  refetchQueries={refetchQueries}
                   helpText={tCourse('projects.my_project.field_tooltip_accepting_participants')}
                 />
               </div>
@@ -1072,7 +1081,7 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
               project={row}
               courseDefaultSubmissionDeadline={courseDefaultProjectSubmissionDeadline}
               defaultDeadlineSource={courseSubmissionDeadlineDefaultSource}
-              refetchQueries={REFETCH_QUERIES}
+              refetchQueries={refetchQueries}
             />
             <div className="rounded-lg border border-border-primary p-3 bg-bg-secondary/20">
               <ProjectPreviewLayout
@@ -1105,12 +1114,13 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
       projectTypesList,
       courseDefaultProjectSubmissionDeadline,
       courseSubmissionDeadlineDefaultSource,
+      refetchQueries,
       t,
       tCourse,
     ]
   );
 
-  const initialLoading = projectsQuery.loading && !projectsQuery.data;
+  const initialLoading = loading && !projects;
   if (initialLoading) {
     return (
       <div className="flex justify-center py-6">
@@ -1124,20 +1134,20 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
       <TableGrid<ProjectRow>
         columns={columns}
         data={allProjects}
-        loading={projectsQuery.loading}
-        error={projectsQuery.error}
+        loading={loading}
+        error={error}
         enablePagination={false}
         showGlobalSearchField={false}
         pageIndex={0}
         onPageChange={() => undefined}
         searchFilter=""
         onSearchFilterChange={() => undefined}
-        refetchQueries={REFETCH_QUERIES}
+        refetchQueries={refetchQueries}
         addButtonText={t('projects.add_button')}
-        onAddButtonClick={() => setAddDialogOpen(true)}
+        onAddButtonClick={hasCourse ? () => setAddDialogOpen(true) : undefined}
         expandableRowComponent={expandableRowComponent}
         renderMobileRow={renderMobileRow}
-        onRowDelete={handleRemoveProject}
+        onRowDelete={hasCourse ? handleRemoveProject : undefined}
         // Until the project's courses are known, the confirmation can't say whether this removes
         // or deletes it, so the button waits (and explains itself if the query failed).
         canDeleteRow={(project) =>
@@ -1162,7 +1172,7 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
           documentationInstructionsQuery.data?.ProjectDocumentationInstruction ?? []
         }
         programDefaultProjectType={programDefaultProjectType}
-        refetchQueries={REFETCH_QUERIES}
+        refetchQueries={refetchQueries}
         onError={setErrorMessage}
       />
 
@@ -1171,11 +1181,11 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
         onClose={() => setReviewProject(null)}
         project={reviewProject}
         courseDefaultSubmissionDeadline={courseDefaultProjectSubmissionDeadline}
-        refetchQueries={REFETCH_QUERIES}
+        refetchQueries={refetchQueries}
         onError={setErrorMessage}
       />
 
-      {instructorUserId ? (
+      {hasCourse && instructorUserId ? (
         <AddProjectDialog
           open={addDialogOpen}
           onClose={() => setAddDialogOpen(false)}
@@ -1186,7 +1196,7 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
             lastTypedProject?.documentationInstructionId ?? null
           }
           blockedAuthorIds={blockedAuthorIds}
-          refetchQueries={REFETCH_QUERIES}
+          refetchQueries={refetchQueries}
           onError={setErrorMessage}
         />
       ) : null}
@@ -1198,9 +1208,9 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
           projectTypeValue={instructionDialogRow.type}
           selectedInstructionId={instructionDialogRow.documentationInstructionId}
           onCreated={handleInstructionCreated}
-          onSelectedDeleted={() => projectsQuery.refetch()}
+          onSelectedDeleted={onRefetch}
           onError={setErrorMessage}
-          refetchQueries={REFETCH_QUERIES}
+          refetchQueries={refetchQueries}
         />
       ) : null}
 
