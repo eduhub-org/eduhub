@@ -62,7 +62,7 @@ Admins publish a project in the public showcase with **Publish**, and take it ou
 
 A project can only be published once its Project Team has agreed to publication. The team decides when it submits the project and can change its mind later; below the title you see **Publication approved** or **Publication declined**. Without the team's consent **Publish** is greyed out, with a note that the team hasn't agreed. The platform refuses such a publication everywhere, not only on this page. **Unpublish** is always possible.
 
-Project Templates have no team and can always be published, for example so that a company finds participants for its topic. When you add a project without authors on a course's manage page, which makes it a Project Template, a note tells you it can be published in the showcase.
+Project Templates have no team and can always be published, for example so that a company finds participants for its topic. When you add a project without authors on a course's manage page, which makes it a Project Template, a note tells you it can be published in the showcase. If a published Project Template later gets a team, for example because you add an author, it is taken out of the showcase until that team agrees to publication.
 
 If a team withdraws its consent while its project is published, the project is taken out of the showcase straight away. Whenever a team has withdrawn its consent, its row shows a warning: **The team withdrew its publication consent on** the date. The warning disappears once the team agrees again. The status shows the project's normal Project Status.
 

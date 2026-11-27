@@ -67,3 +67,40 @@ AFTER INSERT ON public."ProjectConsentEvent"
 FOR EACH ROW
 WHEN (NEW."eventType" = 'withdrawn')
 EXECUTE FUNCTION public.unpublish_project_on_consent_withdrawal();
+
+-- A published Project Template that gains a Project Team (an organizer adds an
+-- ACCEPTED author, or a Join Request is accepted) is no longer exempt: without
+-- the team's consent it is taken out of the showcase, so team members never
+-- appear there without having agreed.
+CREATE OR REPLACE FUNCTION public.unpublish_project_on_team_without_consent()
+RETURNS TRIGGER AS $$
+DECLARE
+  latest_event text;
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM public."Project" p
+    WHERE p.id = NEW."projectId" AND p.published IS TRUE
+  ) THEN
+    RETURN NULL;
+  END IF;
+
+  SELECT e."eventType" INTO latest_event
+  FROM public."ProjectConsentEvent" e
+  WHERE e."projectId" = NEW."projectId"
+  ORDER BY e.created_at DESC, e.id DESC
+  LIMIT 1;
+
+  IF latest_event IS DISTINCT FROM 'granted' THEN
+    UPDATE public."Project"
+    SET published = false
+    WHERE id = NEW."projectId";
+  END IF;
+  RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER unpublish_project_on_team_without_consent
+AFTER INSERT OR UPDATE OF "participationStatus" ON public."ProjectAuthor"
+FOR EACH ROW
+WHEN (NEW."participationStatus" = 'ACCEPTED')
+EXECUTE FUNCTION public.unpublish_project_on_team_without_consent();
