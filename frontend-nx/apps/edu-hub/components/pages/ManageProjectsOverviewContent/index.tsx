@@ -16,9 +16,15 @@ import { usePersistedPageSize } from '../../common/TableGrid/hooks';
 import ProjectsManagementGrid, {
   ProjectsGridExtraColumn,
 } from '../ManageCourseContent/CourseParticipationsTab/projects/ProjectsManagementGrid';
+import ProjectsOverviewFilters from './ProjectsOverviewFilters';
+import {
+  defaultProjectsOverviewFilters,
+  ProjectsOverviewFilterState,
+  projectsOverviewWhere,
+} from './projectsOverviewWhere';
 
 export const PROJECTS_OVERVIEW_PAGE_SIZE = 50;
-const REFETCH_QUERIES = ['ProjectsOverview'];
+const REFETCH_QUERIES = ['ProjectsOverview', 'ProjectsOverviewStatusCounts'];
 
 const CourseList: FC<{ courses: ProjectsOverview_Project_courses[] }> = ({ courses }) => {
   const t = useTranslations('projectsOverview');
@@ -51,10 +57,18 @@ const ManageProjectsOverviewContent: FC = () => {
     'projectsOverview',
     PROJECTS_OVERVIEW_PAGE_SIZE
   );
+  const [filters, setFilters] = useState<ProjectsOverviewFilterState>(() =>
+    defaultProjectsOverviewFilters(AuthRoles.admin)
+  );
+  const where = useMemo(() => projectsOverviewWhere(filters), [filters]);
+  const handleFiltersChange = useCallback((next: ProjectsOverviewFilterState) => {
+    setFilters(next);
+    setPageIndex(0);
+  }, []);
 
   const query = useAdminQuery<ProjectsOverview, ProjectsOverviewVariables>(
     PROJECTS_OVERVIEW,
-    { variables: { limit: pageSize, offset: pageIndex * pageSize } }
+    { variables: { where, limit: pageSize, offset: pageIndex * pageSize } }
   );
   // Keep the last page on screen while the next one loads.
   const data = query.data ?? query.previousData;
@@ -92,6 +106,11 @@ const ManageProjectsOverviewContent: FC = () => {
     <PageBlock>
       <div className="max-w-screen-xl mx-auto mt-20">
         <CommonPageHeader headline={t('headline')} />
+        <ProjectsOverviewFilters
+          role={AuthRoles.admin}
+          filters={filters}
+          onChange={handleFiltersChange}
+        />
         {/* The grid's own queries, mutations and inputs run as admin too. */}
         <ManagementRoleProvider role={AuthRoles.admin}>
           <ProjectsManagementGrid

@@ -77,6 +77,7 @@ import {
   isProjectTypeEditable,
   canManagePublicationSuggestion,
   getPublicationDecision,
+  getProjectStatusChipKey,
   isPassedProject,
 } from '../../../CourseContent/Projects/projectStatusDisplay';
 import { IoIosCheckmarkCircle, IoIosCloseCircle } from 'react-icons/io';
@@ -631,6 +632,7 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
         enableSorting: false,
         cell: ({ row }) => (
           <StatusChip
+            displayKey={getProjectStatusChipKey(row.original)}
             status={row.original.status}
             rating={row.original.rating}
             ratingComment={row.original.ratingComment}
@@ -683,6 +685,7 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
       <div className="flex flex-col gap-2">
         <div>
           <StatusChip
+            displayKey={getProjectStatusChipKey(project)}
             status={project.status}
             rating={project.rating}
             ratingComment={project.ratingComment}
@@ -1000,6 +1003,7 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
                         )}
                       </div>
                       <StatusChip
+                        displayKey={getProjectStatusChipKey(row)}
                         status={row.status}
                         rating={row.rating}
                         ratingComment={row.ratingComment}

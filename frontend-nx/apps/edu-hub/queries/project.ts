@@ -155,9 +155,11 @@ export const PROJECTS_OVERVIEW = gql`
   # fragment as the course tab, plus the courses (and their programs) a project
   # is listed in. Sorted by Project Status in lifecycle order (computed field,
   # see the project_status_rank SQL function), then most recently updated.
+  # $where carries the overview's status chips, filters and keyword search.
   ${PROJECT_FRAGMENT_DETAILED}
-  query ProjectsOverview($limit: Int!, $offset: Int!) {
+  query ProjectsOverview($where: Project_bool_exp!, $limit: Int!, $offset: Int!) {
     Project(
+      where: $where
       order_by: [{ projectStatusRank: asc }, { updated_at: desc }, { id: desc }]
       limit: $limit
       offset: $offset
@@ -173,7 +175,71 @@ export const PROJECTS_OVERVIEW = gql`
         }
       }
     }
-    Project_aggregate {
+    Project_aggregate(where: $where) {
+      aggregate {
+        count
+      }
+    }
+  }
+`;
+
+export const PROJECTS_OVERVIEW_STATUS_COUNTS = gql`
+  # Number of projects per Project Status for the overview's status chips. Each
+  # variable is the overview's active filters (program, course group, search)
+  # plus that status's projectStatusRank, built by projectStatusWhere; the alias
+  # is the status's chip key (PROJECT_STATUSES).
+  query ProjectsOverviewStatusCounts(
+    $TEMPLATE: Project_bool_exp!
+    $PROPOSED: Project_bool_exp!
+    $ONGOING: Project_bool_exp!
+    $SENT_BACK: Project_bool_exp!
+    $SUBMITTED: Project_bool_exp!
+    $COMPLETED_PASSED: Project_bool_exp!
+    $SUGGESTED_FOR_PUBLICATION: Project_bool_exp!
+    $PUBLISHED: Project_bool_exp!
+    $INCOMPLETE_FAILED: Project_bool_exp!
+  ) {
+    TEMPLATE: Project_aggregate(where: $TEMPLATE) {
+      aggregate {
+        count
+      }
+    }
+    PROPOSED: Project_aggregate(where: $PROPOSED) {
+      aggregate {
+        count
+      }
+    }
+    ONGOING: Project_aggregate(where: $ONGOING) {
+      aggregate {
+        count
+      }
+    }
+    SENT_BACK: Project_aggregate(where: $SENT_BACK) {
+      aggregate {
+        count
+      }
+    }
+    SUBMITTED: Project_aggregate(where: $SUBMITTED) {
+      aggregate {
+        count
+      }
+    }
+    COMPLETED_PASSED: Project_aggregate(where: $COMPLETED_PASSED) {
+      aggregate {
+        count
+      }
+    }
+    SUGGESTED_FOR_PUBLICATION: Project_aggregate(where: $SUGGESTED_FOR_PUBLICATION) {
+      aggregate {
+        count
+      }
+    }
+    PUBLISHED: Project_aggregate(where: $PUBLISHED) {
+      aggregate {
+        count
+      }
+    }
+    INCOMPLETE_FAILED: Project_aggregate(where: $INCOMPLETE_FAILED) {
       aggregate {
         count
       }

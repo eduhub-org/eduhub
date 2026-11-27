@@ -432,8 +432,9 @@
       "action_failed": "Aktion fehlgeschlagen",
       "status": {
         "TEMPLATE": "Projektvorlage",
-        "PROPOSED": "Vorgeschlagen",
+        "PROPOSED": "Wartet auf Bestätigung",
         "ONGOING": "In Bearbeitung",
+        "SENT_BACK": "Zurückgegeben",
         "SUBMITTED": "Eingereicht",
         "COMPLETED": "Abgeschlossen",
         "COMPLETED_PASSED": "Bestanden",
@@ -2486,7 +2487,18 @@
   "projectsOverview": {
     "headline": "Projekte",
     "courses_column": "Kurs(e) / Programm",
-    "no_courses": "Kein Kurs"
+    "no_courses": "Kein Kurs",
+    "filter": {
+      "status_label": "Projektstatus",
+      "needs_attention": "Handlungsbedarf",
+      "show_all": "Alle anzeigen",
+      "program_label": "Programm",
+      "all_programs": "Alle Programme",
+      "course_group_label": "Kursgruppe",
+      "all_course_groups": "Alle Kursgruppen",
+      "search_label": "Suche",
+      "search_placeholder": "Titel, Personen, Kurs oder Programm"
+    }
   },
   "managePrograms": {
     "program_sessions": {

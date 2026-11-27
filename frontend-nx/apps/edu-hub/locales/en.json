@@ -431,15 +431,16 @@
       "section_heading_all": "Projects in this course",
       "action_failed": "Action failed",
       "status": {
-        "TEMPLATE": "Project template",
-        "PROPOSED": "Proposed",
-        "ONGOING": "In progress",
+        "TEMPLATE": "Project Template",
+        "PROPOSED": "Awaiting Confirmation",
+        "ONGOING": "Ongoing",
+        "SENT_BACK": "Sent Back",
         "SUBMITTED": "Submitted",
         "COMPLETED": "Completed",
         "COMPLETED_PASSED": "Passed",
         "INCOMPLETE": "Incomplete",
-        "INCOMPLETE_FAILED": "Failed",
-        "SUGGESTED_FOR_PUBLICATION": "Suggested for publication",
+        "INCOMPLETE_FAILED": "Not Passed",
+        "SUGGESTED_FOR_PUBLICATION": "Suggested for Publication",
         "PUBLISHED": "Published"
       },
       "type_label": {
@@ -2501,7 +2502,18 @@
   "projectsOverview": {
     "headline": "Projects",
     "courses_column": "Course(s) / Program",
-    "no_courses": "No course"
+    "no_courses": "No course",
+    "filter": {
+      "status_label": "Project Status",
+      "needs_attention": "Needs Attention",
+      "show_all": "Show all",
+      "program_label": "Program",
+      "all_programs": "All programs",
+      "course_group_label": "Course group",
+      "all_course_groups": "All course groups",
+      "search_label": "Search",
+      "search_placeholder": "Title, people, course or program"
+    }
   },
   "managePrograms": {
     "program_sessions": {
