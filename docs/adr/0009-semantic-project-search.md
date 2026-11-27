@@ -62,4 +62,5 @@ same way.
 - Swapping the model re-embeds both tables; both store the model key.
 - An Org Admin whose only grants are **Can manage degrees** or **Can manage
   settings** sees degree-program projects in the list but gets no semantic
-  matches; their search stays keyword-only.
+  matches; their search stays keyword-only. This is deliberate: semantic
+  search is scoped to course and event grants only.
