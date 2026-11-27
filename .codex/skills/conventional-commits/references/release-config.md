@@ -15,13 +15,7 @@ Important current behavior:
 - semantic-release is configured only for the `production` branch
 - the GitHub Actions release workflow runs only on `push` to `production`
 - release notes are generated from conventional-commit types
-- release automation updates:
-  - `frontend-nx/package.json`
-  - `package.json`
-  - `functions/*/package.json`
-  - `CHANGELOG.md`
-  - `VERSION`
-  - `frontend-nx/apps/edu-hub/public/version.json`
+- a release only creates the git tag `vX.Y.Z` on the deployed `production` commit and the GitHub release with its notes; it commits nothing (no version files, no changelog)
 
 ## Practical Implications
 

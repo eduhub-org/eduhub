@@ -22,7 +22,6 @@ const setup = (answer: (query: string) => Answer, overrides: Partial<ReportsHand
   const handler = createReportsHandler({
     getSession: async () => session(),
     hasuraUrl: 'http://h',
-    contact: 'edu-support@opencampus.sh',
     fetchImpl,
     now: () => new Date('2026-11-26T12:00:00Z'),
     ...overrides,
@@ -113,6 +112,15 @@ it('adds a vote with the summary the user saw', async () => {
   expect(requests[0].body.variables).toEqual({
     object: { issueReportId: 4, summary: 'The CSV export does not work.' },
   });
+});
+
+it("refreshes the linked issue's footer after a vote, and a failure there doesn't fail the vote", async () => {
+  const onVoted = jest.fn().mockRejectedValue(new Error('GitHub down'));
+  const { handler } = setup(() => ({ data: { insert_IssueReportVote_one: { id: 3, issueReportId: 4 } } }), { onVoted });
+  const http = mockHttp({ action: 'vote', reportId: 4, summary: 'Same problem' });
+  await handler(http.req, http.res);
+  expect(http.status).toBe(200);
+  expect(onVoted).toHaveBeenCalledWith(4);
 });
 
 it('tells a second vote apart from a closed or missing report', async () => {

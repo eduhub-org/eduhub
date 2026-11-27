@@ -24,6 +24,7 @@ import {
   useIsSessionLoading,
 } from '../../hooks/authentication';
 import { AuthRoles } from '../../types/enums';
+import { fetchContact } from './api';
 import { FeedbackControls } from './FeedbackControls';
 import { ReportCard } from './ReportCard';
 import { buildPageContext, readVisibleError } from './pageContext';
@@ -36,12 +37,10 @@ import {
   useAssistantConversation,
 } from './useAssistantConversation';
 
-export const ASSISTANT_CONTACT_HREF = 'mailto:edu@opencampus.sh';
-
 interface Props {
   /** Where the AI notice links to. StuJo can pass its own. */
   privacyHref?: string;
-  /** Where to turn when the Assistant can't help. */
+  /** Where to turn when the Assistant can't help; by default a mailto: link to the server's ASSISTANT_CONTACT. */
   contactHref?: string;
 }
 
@@ -116,7 +115,7 @@ const ContextChip: FC = () => {
 
 const Reply: FC<{
   message: ConversationMessage;
-  contactHref: string;
+  contactHref?: string;
   onDecide: (id: string, action: 'apply' | 'discard') => void;
   onDecideReport: (id: string, action: 'send' | 'dismiss') => void;
 }> = ({ message, contactHref, onDecide, onDecideReport }) => {
@@ -165,10 +164,15 @@ const Reply: FC<{
       {error && (
         <p className="mt-1 text-sm text-error">
           {/* The backend sends `message` already in the user's language. */}
-          {error.message || (t.has(`errors.${error.code}`) ? t(`errors.${error.code}`) : t('errors.generic'))}{' '}
-          <a href={contactHref} className="text-label-secondary underline">
-            {t('contact')}
-          </a>
+          {error.message || (t.has(`errors.${error.code}`) ? t(`errors.${error.code}`) : t('errors.generic'))}
+          {contactHref && (
+            <>
+              {' '}
+              <a href={contactHref} className="text-label-secondary underline">
+                {t('contact')}
+              </a>
+            </>
+          )}
         </p>
       )}
     </div>
@@ -232,7 +236,7 @@ const EmptyState: FC<{ role: string; onPick: (text: string) => void }> = ({ role
 
 type Conversation = ReturnType<typeof useAssistantConversation>;
 
-const Chat: FC<{ conversation: Conversation; role: string; contactHref: string }> = ({
+const Chat: FC<{ conversation: Conversation; role: string; contactHref?: string }> = ({
   conversation,
   role,
   contactHref,
@@ -365,9 +369,22 @@ const useIsMac = () => {
  * to the page the question is about. Logged-out visitors get a prompt to log in
  * instead. Shared, so StuJo can mount it later via `@eduhub/*`.
  */
-export const AssistantWidget: FC<Props> = ({ privacyHref = '/privacy#assistant', contactHref = ASSISTANT_CONTACT_HREF }) => {
+export const AssistantWidget: FC<Props> = ({ privacyHref = '/privacy#assistant', contactHref: contactHrefProp }) => {
   const t = useTranslations('assistant');
   const [open, setOpen] = useState(false);
+  const [serverContact, setServerContact] = useState<string | null>(null);
+  // The contact comes from the server (ASSISTANT_CONTACT), fetched once the panel is first opened.
+  useEffect(() => {
+    if (!open || contactHrefProp || serverContact) return;
+    let cancelled = false;
+    fetchContact().then((contact) => {
+      if (!cancelled) setServerContact(contact);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [open, contactHrefProp, serverContact]);
+  const contactHref = contactHrefProp ?? (serverContact ? `mailto:${serverContact}` : undefined);
   const isLoggedIn = useIsLoggedIn();
   const isSessionLoading = useIsSessionLoading();
   const { target, loading: impersonationLoading } = useImpersonation();
@@ -488,9 +505,11 @@ export const AssistantWidget: FC<Props> = ({ privacyHref = '/privacy#assistant',
                 <MdOutlineAddComment aria-hidden="true" />
               </button>
             )}
-            <a href={contactHref} aria-label={t('contact')} title={t('contact')} className={iconButton}>
-              <MdOutlineMail aria-hidden="true" />
-            </a>
+            {contactHref && (
+              <a href={contactHref} aria-label={t('contact')} title={t('contact')} className={iconButton}>
+                <MdOutlineMail aria-hidden="true" />
+              </a>
+            )}
             <button type="button" onClick={close} aria-label={t('close')} className={iconButton}>
               <MdClose className="text-lg" aria-hidden="true" />
             </button>

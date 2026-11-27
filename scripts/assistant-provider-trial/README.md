@@ -45,7 +45,10 @@ Answer quality is rated by hand: fill in `rating` (1–5) in `answers.csv`.
   the shape the model receives. When a tool changes in the app, copy its new
   definition here.
 - `system_prompt.md`: the Assistant's system prompt from `lib/assistant/prompt.ts`;
-  the harness fills in the Organizer rules, role, page and page error the same way.
+  the harness fills in the Organizer rules, role, page, page error and the contact rule
+  (from `ASSISTANT_CONTACT`) the same way. Left out are the rules for tools `tools.json`
+  doesn't offer: reports (`search_reports`, `propose_report`, …), `get_setup_guide` and
+  the mail templates. When a rule changes in `prompt.ts`, copy it here.
 - `providers.example.json`: targets; copy it to `providers.json` (git-ignored).
 
 ## Run
@@ -54,6 +57,7 @@ Answer quality is rated by hand: fill in `rating` (1–5) in `answers.csv`.
 cd scripts/assistant-provider-trial
 cp providers.example.json providers.json   # set PROJECT_ID, model ids and prices
 gcloud auth login                          # an account with roles/aiplatform.user
+export ASSISTANT_CONTACT=edu@opencampus.sh  # as in Terraform and docker-compose; unset, the prompt names no contact
 python3 run_trial.py --targets gemini-3.8-flash-eu --only de-mydata-01
 python3 run_trial.py --repeat 3             # all targets, 3 runs per case
 ```

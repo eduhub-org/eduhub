@@ -4005,7 +4005,7 @@
     "errors": {
       "NOT_LOGGED_IN": "Bitte melde Dich an, um den Assistenten zu fragen.",
       "OFF": "Der Assistent ist gerade nicht verfügbar.",
-      "SPENDING_CAP_REACHED": "Der Assistent ist für diesen Monat pausiert, weil sein Monatsbudget aufgebraucht ist. Ab dem 1. des nächsten Monats ist er wieder da. Bei Fragen schreib an {contact}.",
+      "SPENDING_CAP_REACHED": "Der Assistent ist für diesen Monat pausiert, weil sein Monatsbudget aufgebraucht ist. Ab dem 1. des nächsten Monats ist er wieder da.",
       "RATE_LIMITED_SHORT": "Du hast in kurzer Zeit viele Fragen gestellt. Bitte warte etwa {minutes} Minuten und frag dann weiter.",
       "RATE_LIMITED_DAILY": "Du hast heute die maximale Zahl an Fragen erreicht. Morgen kannst Du wieder fragen.",
       "MESSAGE_TOO_LONG": "Deine Nachricht ist zu lang. Bitte kürze sie auf höchstens {max} Zeichen.",
@@ -4014,8 +4014,8 @@
       "IMPERSONATING": "Während Du die Plattform als eine andere Person ansiehst, ist der Assistent nicht verfügbar.",
       "ROLE_NOT_ALLOWED": "Diese Rolle kannst Du für den Assistenten nicht verwenden.",
       "BUSY": "Der Assistent ist gerade ausgelastet. Bitte versuch es in einer Minute noch einmal.",
-      "UNAVAILABLE": "Der Assistent konnte gerade nicht antworten. Bitte versuch es später noch einmal oder schreib an {contact}.",
-      "TOOL_CALL_FAILED": "Der Assistent konnte die nötigen Daten nicht abrufen. Bitte formuliere Deine Frage anders oder schreib an {contact}.",
+      "UNAVAILABLE": "Der Assistent konnte gerade nicht antworten. Bitte versuch es später noch einmal.",
+      "TOOL_CALL_FAILED": "Der Assistent konnte die nötigen Daten nicht abrufen. Bitte formuliere Deine Frage anders.",
       "FEEDBACK_CONSENT_REQUIRED": "Ohne Deine Einwilligung speichern wir das Gespräch nicht.",
       "PROPOSAL_UNAUTHENTICATED": "Deine Anmeldung ist abgelaufen. Bitte melde Dich neu an und übernimm die Änderung dann noch einmal.",
       "PROPOSAL_FORBIDDEN": "Mit Deiner aktuellen Rolle kannst Du diesen Kurs nicht ändern.",
@@ -4026,8 +4026,8 @@
       "PROPOSAL_STALE": "Der Kurs wurde nach diesem Vorschlag geändert. Bitte den Assistant um einen neuen Vorschlag.",
       "PROPOSAL_TITLE_TAKEN": "Ein anderer Kurs in diesem Programm hat schon diesen Titel. Bitte wähle einen anderen Titel.",
       "PROPOSAL_EXPIRED": "Dieser Vorschlag ist abgelaufen. Bitte den Assistant um einen neuen.",
-      "PROPOSAL_HASURA_ERROR": "Die Änderung konnte nicht gespeichert werden. Bitte versuch es später noch einmal oder schreib an {contact}.",
-      "PROPOSAL_FAILED": "Beim Speichern der Änderung ist etwas schiefgegangen. Bitte versuch es später noch einmal oder schreib an {contact}.",
+      "PROPOSAL_HASURA_ERROR": "Die Änderung konnte nicht gespeichert werden. Bitte versuch es später noch einmal.",
+      "PROPOSAL_FAILED": "Beim Speichern der Änderung ist etwas schiefgegangen. Bitte versuch es später noch einmal.",
       "generic": "Etwas ist schiefgelaufen. Bitte versuch es später noch einmal.",
       "NETWORK": "Die Verbindung wurde unterbrochen. Bitte versuch es noch einmal.",
       "INTERRUPTED": "Die Antwort wurde abgebrochen. Bitte frag noch einmal.",
@@ -4036,7 +4036,7 @@
       "REPORT_ALREADY_VOTED": "Du bist bei dieser Meldung schon dabei.",
       "REPORT_CLOSED": "Diese Meldung ist schon abgeschlossen oder gibt es nicht mehr.",
       "REPORT_NOT_WITHDRAWABLE": "Diese Meldung kannst Du nicht mehr zurückziehen: Das EduHub-Team hat sie schon angesehen oder andere haben sich angeschlossen.",
-      "REPORT_FAILED": "Deine Meldung konnte gerade nicht gespeichert werden. Bitte versuch es später noch einmal oder schreib an {contact}."
+      "REPORT_FAILED": "Deine Meldung konnte gerade nicht gespeichert werden. Bitte versuch es später noch einmal."
     },
     "context": {
       "chip": "Wird mitgesendet: {page}",
@@ -4198,15 +4198,14 @@
       "duplicate_of": "Duplikat von",
       "mark_duplicate": "Duplikat von Meldung Nr.",
       "public_note": "Öffentliche Notiz",
-      "github_issue": "GitHub-Issue"
+      "github_issue": "GitHub-Issue",
+      "github_create_or_link": "Issue erstellen oder verknüpfen"
     },
     "help": {
       "mark_duplicate": "Nummer der ursprünglichen Meldung (#). Setzt den Status auf „Duplikat“; die Betroffenen zählen beim Original mit.",
       "public_note": "Sehen alle, die die Meldung geschickt oder sich angeschlossen haben, z. B. „Geplant für das Frühjahr“ oder warum sie abgelehnt wurde.",
-      "github_issue": "Link zum Issue, sobald die Meldung geplant ist."
-    },
-    "error": {
-      "duplicate_failed": "Die Meldung konnte nicht als Duplikat markiert werden. Gibt es eine Meldung mit dieser Nummer?"
+      "github_issue": "Nimmt die Meldung an: Sie wird „Geplant“ und bekommt ein öffentliches GitHub-Issue.",
+      "github_synced": "Synchronisiert: Wird das Issue geschlossen, wieder geöffnet oder auf dem Board verschoben, ändert sich hier der Status."
     },
     "summary": {
       "title": "Wochenzusammenfassung",
@@ -4214,6 +4213,37 @@
       "none": "Noch keine Zusammenfassung. Sie wird jeden Montag erstellt.",
       "meta": "{from} – {to} · {reports, plural, one {# neue Meldung} other {# neue Meldungen}} · {feedback, plural, one {# 👎-Rückmeldung} other {# 👎-Rückmeldungen}}",
       "cost": "{cost} € mit {model}"
+    },
+    "issue_dialog": {
+      "title": "Meldung #{id} als „{status}“ annehmen",
+      "mode_create": "Neues Issue erstellen",
+      "mode_link": "Bestehendes Issue verknüpfen",
+      "public_hint": "Das Issue ist in {repo} öffentlich. Prüf, dass Titel und Beschreibung keine Namen, E-Mail-Adressen oder anderen persönlichen Angaben enthalten.",
+      "issue_title": "Titel des Issues",
+      "issue_description": "Beschreibung des Issues",
+      "footer_label": "Wird unter der Beschreibung ergänzt und aktuell gehalten:",
+      "issue_number": "Issue-Nummer",
+      "link_help": "Ein offenes oder geschlossenes Issue in {repo}. Es bekommt die Fußzeile mit der Meldungsnummer und der Zahl der Betroffenen.",
+      "cancel": "Abbrechen",
+      "create": "Issue erstellen",
+      "link": "Issue verknüpfen"
+    },
+    "sync_error": {
+      "NOT_LOGGED_IN": "Deine Sitzung ist abgelaufen. Bitte melde Dich erneut an.",
+      "NOT_ADMIN": "Nur Admins können Meldungen ändern.",
+      "INVALID_REQUEST": "Etwas fehlt oder ist ungültig. Bitte prüf Deine Eingaben.",
+      "INVALID_STATUS": "Dieser Status lässt sich hier nicht setzen.",
+      "GITHUB_OFF": "Die GitHub-Synchronisierung ist nicht eingerichtet.",
+      "REPORT_NOT_FOUND": "Die Meldung gibt es nicht mehr.",
+      "ORIGINAL_NOT_FOUND": "Die Meldung konnte nicht als Duplikat markiert werden. Gibt es eine Meldung mit dieser Nummer?",
+      "ALREADY_LINKED": "Diese Meldung hat schon ein GitHub-Issue.",
+      "ISSUE_REQUIRED": "Eine geplante Meldung braucht ein GitHub-Issue. Erstell oder verknüpf eins.",
+      "ISSUE_NOT_FOUND": "Dieses Issue gibt es im Repository nicht.",
+      "ISSUE_TAKEN": "Dieses Issue gehört schon zu Meldung #{reportId}. Markier diese Meldung stattdessen als Duplikat davon.",
+      "LINKED_CANNOT_BE_NEW": "Eine Meldung mit öffentlichem Issue kann nicht zurück auf „Neu“.",
+      "GITHUB_FAILED": "GitHub hat die Änderung nicht angenommen. Bitte versuch es später noch einmal.",
+      "FAILED": "Die Änderung konnte nicht gespeichert werden. Bitte versuch es noch einmal.",
+      "METHOD_NOT_ALLOWED": "Die Änderung konnte nicht gespeichert werden. Bitte versuch es noch einmal."
     }
   }
 }

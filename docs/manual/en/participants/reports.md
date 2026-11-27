@@ -21,6 +21,8 @@ You can send up to 5 reports a day.
 
 If someone has already reported the same thing, the Assistant shows a card **Existing report** with a short summary in its own words instead of a new report. Click **Join** to add your voice: the more people are affected, the higher the team can prioritise it. You never see other people's reports themselves.
 
+When the team accepts a report, it publishes it as an issue in EduHub's public code repository on GitHub, so developers can work on it. An admin checks the text first, and the issue never contains your name.
+
 ## What became of your reports
 
 Ask the Assistant "What happened to my reports?" any time. It lists the reports you sent or joined, with their status (new, planned, in progress, done, declined or duplicate) and the EduHub team's note, if there is one.
@@ -39,6 +41,23 @@ Below it, the table shows the open reports by default; filter by **Type** and **
 
 - **Mark as duplicate of** another report. The people affected count towards the original.
 - Write a **Public note**, which everyone who sent or joined the report sees when they ask the Assistant, for example why it was declined.
-- Add a **GitHub issue** link once the report is planned.
 
 Who sent or joined a report is removed 6 months after the report was closed (done, declined or duplicate).
+
+### Accepting a report: the GitHub issue
+
+When the GitHub connection is set up, accepting a report creates its issue on GitHub:
+
+1. Set the status to **Planned** or **In progress**, or open the report and click **Create or link issue**.
+2. In the dialog, choose **Create a new issue** and check the title and description. The issue is public, so remove names, emails and other personal details. A footer with the report number, priority and the number of people affected is added below and kept up to date. Alternatively, choose **Link an existing issue** and enter the number of an issue the team already has.
+3. Click **Create issue** or **Link issue**. Only then does the status change; **Cancel** leaves the report as it was.
+
+New issues get the labels `bug` or `feature` and `from-assistant`, and go on the project board in the column that matches the status.
+
+From then on, GitHub drives the status:
+
+- Closing the issue as completed sets the report to **Done**; closing it as not planned sets **Declined**; closing it as a duplicate sets **Duplicate** (linked to the original report if that issue has one).
+- Reopening the issue sets the report back to **Planned**, and moving the card to **In Progress** on the board sets **In progress**.
+- If the issue is deleted or moved to another repository, the report loses its link and keeps its last status.
+
+You can still change the status here: the issue is closed, reopened or moved to match. A report with an issue can't go back to **New**, and an issue belongs to one report only; mark further reports about the same thing as duplicates.

@@ -34,6 +34,8 @@ The backend's `lib/assistant/README.md` (PR #2200) is the spec. In short:
   `ReportCard`'s button (#2234). A click while sending is dropped. A `create` sends the route of
   the page the question was asked on. The card's state travels back to the model in the
   `proposals` entries as kind `report_create`, `report_vote` or `report_withdraw`.
+- `GET /api/assistant/contact` returns `{ contact }`, the server's `ASSISTANT_CONTACT` or `null`; the
+  widget links to it with `mailto:` and hides the contact links when it is `null`.
 - `POST /api/assistant/feedback` with `{ rating, consent, messages?, comment? }`; `messages` only
   for 👎 with consent, `comment` (what wasn't helpful) for 👎 with or without it. Each answer is rated on its own: `messages` is the conversation up to and
   including the rated answer.
