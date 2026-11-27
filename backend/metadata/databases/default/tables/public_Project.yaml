@@ -214,6 +214,7 @@ select_permissions:
         - parentProjectId
         - presentationUrl
         - proposedByUserId
+        - publicationConsentWithdrawnAt
         - published
         - rating
         - ratingComment
@@ -256,6 +257,7 @@ select_permissions:
         - parentProjectId
         - presentationUrl
         - proposedByUserId
+        - publicationConsentWithdrawnAt
         - published
         - rating
         - ratingComment
@@ -300,6 +302,7 @@ select_permissions:
         - parentProjectId
         - presentationUrl
         - proposedByUserId
+        - publicationConsentWithdrawnAt
         - published
         - rating
         - ratingComment

@@ -176,6 +176,10 @@ export interface ProjectFragmentDetailed {
    */
   published: boolean;
   /**
+   * Set when the team withdrew publication consent while the project was published, which unpublished it automatically. Cleared when the project is published again.
+   */
+  publicationConsentWithdrawnAt: any | null;
+  /**
    * FK to ProjectType.value. Required with documentationInstructionId before leaving PROPOSED (check constraint). Drives mandatory deliverables and workflow (e.g. ONLINE_COURSE template claim may insert ONGOING directly).
    */
   type: string | null;

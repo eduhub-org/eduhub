@@ -1753,7 +1753,8 @@
         "title": "Title",
         "authors": "Authors",
         "type": "Type",
-        "no_authors": "No authors yet"
+        "no_authors": "No authors yet",
+        "consent_withdrawn_unpublished": "Unpublished on {date}: the team withdrew its publication consent"
       },
       "actions": {
         "confirm_project": "Confirm project",
@@ -1764,7 +1765,8 @@
         "withdraw_publication_suggestion": "Withdraw suggestion",
         "preview": "Preview",
         "publish": "Publish",
-        "unpublish": "Unpublish"
+        "unpublish": "Unpublish",
+        "publish_needs_consent": "The team hasn't agreed to publication. Without its consent the project can't be published."
       },
       "notifications": {
         "publish_success": "Project published",
@@ -1850,6 +1852,7 @@
         "no_authors_added": "No authors added yet.",
         "remove_author_aria": "Remove author",
         "template_notice": "If you leave the authors list empty, this project will serve as a template: course participants can copy it from the project list and form their own team based on it.",
+        "template_showcase_notice": "A project template can also be published in the public project showcase, where others can discover its topic.",
         "extra_fields_notice": "Please add more details to the project afterwards by expanding its row in the project list.",
         "submit_button": "Create",
         "error_title_required": "Please enter a project title.",

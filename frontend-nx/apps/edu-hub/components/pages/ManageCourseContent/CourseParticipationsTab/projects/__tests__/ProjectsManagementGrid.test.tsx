@@ -102,6 +102,7 @@ const project = {
   ],
   ProjectMentors: [],
   ProjectConsentEvents: [],
+  publicationConsentWithdrawnAt: null,
 } as unknown as ProjectRow;
 
 const renderGrid = (courseId?: number) =>
@@ -167,5 +168,32 @@ describe('ProjectsManagementGrid', () => {
     render(<>{actionColumn.cell({ row: { original: project } })}</>);
 
     expect(screen.getByRole('button', { name: 'projects.actions.preview' })).toBeInTheDocument();
+  });
+
+  describe('when the team withdrew consent while the project was published', () => {
+    const renderTitleCell = (row: ProjectRow) => {
+      renderGrid();
+      const titleColumn = lastTableProps().columns.find((c: { id: string }) => c.id === 'title');
+      return render(<>{titleColumn.cell({ row: { original: row } })}</>);
+    };
+    const withdrawn = {
+      ...project,
+      status: ProjectStatus_enum.COMPLETED,
+      published: false,
+      publicationConsentWithdrawnAt: '2026-11-20T10:00:00Z',
+      ProjectConsentEvents: [{ __typename: 'ProjectConsentEvent', id: 3, eventType: 'withdrawn' }],
+    } as unknown as ProjectRow;
+
+    it('marks the row as unpublished because consent was withdrawn', () => {
+      const { getByText } = renderTitleCell(withdrawn);
+
+      expect(getByText('projects.table.consent_withdrawn_unpublished')).toBeInTheDocument();
+    });
+
+    it('shows no marker for a project that was never unpublished that way', () => {
+      const { queryByText } = renderTitleCell({ ...withdrawn, publicationConsentWithdrawnAt: null } as ProjectRow);
+
+      expect(queryByText('projects.table.consent_withdrawn_unpublished')).not.toBeInTheDocument();
+    });
   });
 });

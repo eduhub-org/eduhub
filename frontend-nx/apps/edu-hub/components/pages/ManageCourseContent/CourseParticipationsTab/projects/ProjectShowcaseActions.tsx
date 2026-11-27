@@ -16,6 +16,7 @@ import NotificationSnackbar from '../../../../common/dialogs/NotificationSnackba
 import ProjectPreviewLayout from '../../../CourseContent/Projects/ProjectPreviewLayout';
 import ProjectReviewComment from '../../../CourseContent/Projects/ProjectReviewComment';
 import {
+  canPublishProject,
   isOnlineCourseProject,
   isOpenTemplate,
   shouldShowProjectResourceDownloadLinks,
@@ -23,10 +24,11 @@ import {
 import { ProjectRow } from '../../../CourseContent/Projects/types';
 
 /**
- * Projects that can go into the public showcase: passed projects (except online courses),
- * open Project Templates, and anything already published, so it can be taken out again.
+ * Projects the publish button is offered for: passed projects (except online courses), open
+ * Project Templates, and anything already published, so it can be taken out again. Whether
+ * publishing is actually allowed also needs the team's consent (canPublishProject).
  */
-const canBePublished = (project: ProjectRow): boolean =>
+const offersPublishing = (project: ProjectRow): boolean =>
   project.published ||
   isOpenTemplate(project) ||
   (project.status === ProjectStatus_enum.COMPLETED && !isOnlineCourseProject(project));
@@ -42,7 +44,9 @@ interface ProjectShowcaseActionsProps {
 /**
  * Row actions for the public showcase: a read-only preview of the project, and publishing or
  * unpublishing it. Only Admins can publish (Org Admins can't update `published`), so that button
- * shows only when the grid runs under the admin management role.
+ * shows only when the grid runs under the admin management role. Without the team's publication
+ * consent the publish button stays visible but disabled, with a note saying why (the database
+ * refuses it too); unpublishing is always possible.
  */
 const ProjectShowcaseActions: FC<ProjectShowcaseActionsProps> = ({
   project,
@@ -54,6 +58,8 @@ const ProjectShowcaseActions: FC<ProjectShowcaseActionsProps> = ({
   const isAdmin = useManagementRoleContext() === AuthRoles.admin;
   const [previewOpen, setPreviewOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
+  const consentNoteId = `publish-consent-note-${project.id}`;
+  const publishBlocked = !project.published && !canPublishProject(project);
 
   const [updatePublished, { loading }] = useRoleMutation<
     UpdateProjectPublished,
@@ -76,7 +82,12 @@ const ProjectShowcaseActions: FC<ProjectShowcaseActionsProps> = ({
       );
     } catch (err) {
       console.error('Error updating project publication:', err);
-      onError(t('projects.notifications.publish_failed'));
+      // The database refuses publishing without consent; the list may predate a withdrawal.
+      const refusedForConsent =
+        err instanceof Error && err.message.includes('project_publication_requires_consent');
+      onError(
+        t(refusedForConsent ? 'projects.actions.publish_needs_consent' : 'projects.notifications.publish_failed')
+      );
     }
   }, [onError, project, t, updatePublished]);
 
@@ -85,10 +96,22 @@ const ProjectShowcaseActions: FC<ProjectShowcaseActionsProps> = ({
       <Button onClick={() => setPreviewOpen(true)} className="w-full">
         {t('projects.actions.preview')}
       </Button>
-      {isAdmin && canBePublished(project) ? (
-        <Button onClick={handleTogglePublished} disabled={loading} className="w-full">
-          {project.published ? t('projects.actions.unpublish') : t('projects.actions.publish')}
-        </Button>
+      {isAdmin && offersPublishing(project) ? (
+        <>
+          <Button
+            onClick={handleTogglePublished}
+            disabled={loading || publishBlocked}
+            className="w-full"
+            aria-describedby={publishBlocked ? consentNoteId : undefined}
+          >
+            {project.published ? t('projects.actions.unpublish') : t('projects.actions.publish')}
+          </Button>
+          {publishBlocked ? (
+            <p id={consentNoteId} className="text-xs text-label-secondary">
+              {t('projects.actions.publish_needs_consent')}
+            </p>
+          ) : null}
+        </>
       ) : null}
 
       <DialogShell

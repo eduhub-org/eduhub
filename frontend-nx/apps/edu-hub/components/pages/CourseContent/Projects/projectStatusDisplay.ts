@@ -211,7 +211,27 @@ export function getPublicationDecision(project: {
   if (!isPostSubmission || isOnlineCourseProject(project)) {
     return null;
   }
-  return project.ProjectConsentEvents?.[0]?.eventType === 'granted' ? 'granted' : 'declined';
+  return hasPublicationConsent(project) ? 'granted' : 'declined';
+}
+
+/** The team's current publication consent: its latest consent event is a grant. */
+export function hasPublicationConsent(project: {
+  ProjectConsentEvents?: { eventType: string }[] | null;
+}): boolean {
+  return project.ProjectConsentEvents?.[0]?.eventType === 'granted';
+}
+
+/**
+ * Whether a project may go into the public showcase: an open Project Template always (it has no
+ * team, and companies offer it there to find participants), any other project only with its
+ * team's consent. Mirrors the database guard `enforce_project_publication_consent`.
+ */
+export function canPublishProject(
+  project: Parameters<typeof isOpenTemplate>[0] & {
+    ProjectConsentEvents?: { eventType: string }[] | null;
+  }
+): boolean {
+  return isOpenTemplate(project) || hasPublicationConsent(project);
 }
 
 /** Download / external-link buttons in project preview (student list & panel). */

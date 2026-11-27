@@ -474,6 +474,8 @@ const AddProjectDialog: FC<AddProjectDialogProps> = ({
 
           <div className="rounded border border-border-primary bg-bg-secondary p-3 space-y-2 text-sm text-label-secondary">
             <p>{t('projects.add_dialog.template_notice')}</p>
+            {/* Without authors the project becomes a Project Template, which needs no consent. */}
+            {!hasAuthors ? <p>{t('projects.add_dialog.template_showcase_notice')}</p> : null}
             <p>{t('projects.add_dialog.extra_fields_notice')}</p>
           </div>
         </div>
