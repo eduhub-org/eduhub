@@ -44,6 +44,11 @@ jest.mock('../../../../hooks/user', () => ({
   useUserId: () => 'admin-1',
 }));
 
+jest.mock('../../../../hooks/authentication', () => ({
+  ...jest.requireActual('../../../../hooks/authentication'),
+  useIsAdmin: () => true,
+}));
+
 jest.mock('../../../../hooks/managementRole', () => ({
   ManagementRoleProvider: ({ children, role }: { children: React.ReactNode; role?: string }) => {
     managementRoles(role);
@@ -223,5 +228,14 @@ describe('ManageProjectsOverviewContent', () => {
     expect(lastTableProps().onAddButtonClick).toBeUndefined();
     expect(lastTableProps().onRowDelete).toBeUndefined();
     expect(queryNames(mockUseRoleQuery)).not.toContain('ProjectsByCourse');
+  });
+
+  it('links Admins to the project settings that stay in Settings', () => {
+    render(<ManageProjectsOverviewContent />);
+
+    expect(screen.getByRole('link', { name: /settings_links.project_types/ })).toHaveAttribute(
+      'href',
+      '/manage/settings/project-types'
+    );
   });
 });

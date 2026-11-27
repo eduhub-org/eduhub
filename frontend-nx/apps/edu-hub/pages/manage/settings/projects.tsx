@@ -1,12 +1,10 @@
-import { FC } from 'react';
+import { GetServerSideProps } from 'next';
 
-import ManageProjectsContent from '../../../components/pages/ManageProjectsContent';
-import SettingsSectionPage from '../../../components/pages/ManageSettings/SettingsSectionPage';
+/** @deprecated Projects moved to /manage/projects — kept for bookmarks and external links. */
+export const getServerSideProps: GetServerSideProps = async () => ({
+  redirect: { destination: '/manage/projects', permanent: false },
+});
 
-const ProjectsSettingsPage: FC = () => (
-  <SettingsSectionPage itemId="projects">
-    <ManageProjectsContent inSettingsLayout />
-  </SettingsSectionPage>
-);
-
-export default ProjectsSettingsPage;
+export default function ProjectsSettingsRedirect() {
+  return null;
+}

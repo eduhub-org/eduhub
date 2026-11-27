@@ -16,6 +16,7 @@ import { usePersistedPageSize } from '../../common/TableGrid/hooks';
 import ProjectsManagementGrid, {
   ProjectsGridExtraColumn,
 } from '../ManageCourseContent/CourseParticipationsTab/projects/ProjectsManagementGrid';
+import ProjectsOverviewSettingsLinks from './ProjectsOverviewSettingsLinks';
 
 export const PROJECTS_OVERVIEW_PAGE_SIZE = 50;
 const REFETCH_QUERIES = ['ProjectsOverview'];
@@ -92,6 +93,7 @@ const ManageProjectsOverviewContent: FC = () => {
     <PageBlock>
       <div className="max-w-screen-xl mx-auto mt-20">
         <CommonPageHeader headline={t('headline')} />
+        <ProjectsOverviewSettingsLinks />
         {/* The grid's own queries, mutations and inputs run as admin too. */}
         <ManagementRoleProvider role={AuthRoles.admin}>
           <ProjectsManagementGrid

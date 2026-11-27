@@ -159,4 +159,13 @@ describe('ProjectsManagementGrid', () => {
     );
     expect(ranQueryNames()).not.toContain('ProjectCoursesByCourse');
   });
+
+  it('offers the project preview among the row actions', () => {
+    renderGrid();
+
+    const actionColumn = lastTableProps().columns.find((c: { id: string }) => c.id === 'action');
+    render(<>{actionColumn.cell({ row: { original: project } })}</>);
+
+    expect(screen.getByRole('button', { name: 'projects.actions.preview' })).toBeInTheDocument();
+  });
 });

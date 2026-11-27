@@ -1742,7 +1742,15 @@
         "evaluate_project": "Projekt beurteilen",
         "evaluate_disabled_tooltip": "Sobald das Projekt eingereicht wurde, kannst du es hier bewerten.",
         "suggest_for_publication": "Zur Veröffentlichung vorschlagen",
-        "withdraw_publication_suggestion": "Vorschlag zurückziehen"
+        "withdraw_publication_suggestion": "Vorschlag zurückziehen",
+        "preview": "Vorschau",
+        "publish": "Veröffentlichen",
+        "unpublish": "Veröffentlichung zurücknehmen"
+      },
+      "notifications": {
+        "publish_success": "Projekt veröffentlicht",
+        "unpublish_success": "Veröffentlichung zurückgenommen",
+        "publish_failed": "Das Projekt konnte nicht veröffentlicht oder zurückgenommen werden. Bitte versuche es noch einmal."
       },
       "expanded": {
         "tagline": "Untertitel",
@@ -2455,36 +2463,12 @@
       }
     }
   },
-  "manageProjects": {
-    "headline": "Projekte",
-    "search_placeholder": "Projekte suchen",
-    "filter": {
-      "program_label": "Programm",
-      "all_programs": "Alle Programme",
-      "course_group_label": "Kursgruppe",
-      "all_course_groups": "Alle Kursgruppen"
-    },
-    "table": {
-      "title": "Titel",
-      "authors": "Autor:innen",
-      "no_authors": "Keine Autor:innen",
-      "program": "Programm / Kurs",
-      "published": "Veröffentlicht",
-      "not_published": "Nicht veröffentlicht"
-    },
-    "actions": {
-      "publish": "Veröffentlichen",
-      "unpublish": "Zurückziehen",
-      "publish_blocked_incomplete": "Bitte Projekttyp und Dokumentationsanleitung festlegen, bevor dieses Projekt veröffentlicht werden kann."
-    },
-    "notifications": {
-      "publish_success": "Projekt veröffentlicht",
-      "unpublish_success": "Projekt zurückgezogen",
-      "action_failed": "Die Aktion konnte nicht abgeschlossen werden. Bitte erneut versuchen."
-    }
-  },
   "projectsOverview": {
     "headline": "Projekte",
+    "settings_links": {
+      "project_types": "Projekttypen",
+      "documentation_instructions": "Dokumentationsanleitungen"
+    },
     "courses_column": "Kurs(e) / Programm",
     "no_courses": "Kein Kurs"
   },
@@ -3661,10 +3645,6 @@
         "project-types": {
           "label": "Projekttypen",
           "description": "Standard-Leistungszertifikate und Dokumentationsanleitungen pro Projekttyp"
-        },
-        "projects": {
-          "label": "Projekte",
-          "description": "Projekte veröffentlichen, verbergen und verschlagworten"
         },
         "documentation-instructions": {
           "label": "Dokumentationsanleitungen",

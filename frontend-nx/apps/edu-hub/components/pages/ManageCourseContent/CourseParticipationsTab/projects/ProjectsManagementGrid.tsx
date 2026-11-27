@@ -90,6 +90,7 @@ import { ProjectRow } from '../../../CourseContent/Projects/types';
 import ConfirmProjectDialog from './ConfirmProjectDialog';
 import ReviewProjectDialog from './ReviewProjectDialog';
 import AddProjectDialog from './AddProjectDialog';
+import ProjectShowcaseActions from './ProjectShowcaseActions';
 
 /** A column a page adds to the grid, shown after the title and in the phone card. */
 export interface ProjectsGridExtraColumn {
@@ -623,6 +624,22 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
     [handleTogglePublicationSuggestion, t]
   );
 
+  // The next step, then the showcase actions (preview, and publishing for Admins).
+  const renderRowActions = useCallback(
+    (project: ProjectRow) => (
+      <div className="flex flex-col gap-2 w-full">
+        {renderProjectAction(project)}
+        <ProjectShowcaseActions
+          project={project}
+          refetchQueries={refetchQueries}
+          onError={setErrorMessage}
+          projectPageHref={projectHref(project, 'withinCourse', courseId)}
+        />
+      </div>
+    ),
+    [courseId, refetchQueries, renderProjectAction]
+  );
+
   const columns = useMemo<ColumnDef<ProjectRow>[]>(
     () => [
       {
@@ -672,10 +689,10 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
       {
         id: 'action',
         header: '',
-        cell: ({ row }) => renderProjectAction(row.original),
+        cell: ({ row }) => renderRowActions(row.original),
       },
     ],
-    [extraColumns, renderAuthors, renderProjectAction, renderTitle, renderType, t, tCourse]
+    [extraColumns, renderAuthors, renderRowActions, renderTitle, renderType, t, tCourse]
   );
 
   const renderMobileRow = useCallback(
@@ -697,10 +714,10 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
           {renderAuthors(project)}
           {renderType(project)}
         </div>
-        <div className="pt-1">{renderProjectAction(project)}</div>
+        <div className="pt-1">{renderRowActions(project)}</div>
       </div>
     ),
-    [extraColumns, renderAuthors, renderProjectAction, renderTitle, renderType]
+    [extraColumns, renderAuthors, renderRowActions, renderTitle, renderType]
   );
 
   const expandableRowComponent = useCallback(

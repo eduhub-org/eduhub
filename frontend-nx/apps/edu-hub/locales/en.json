@@ -1760,7 +1760,15 @@
         "evaluate_project": "Evaluate project",
         "evaluate_disabled_tooltip": "You can evaluate the project here once it has been submitted.",
         "suggest_for_publication": "Suggest for publication",
-        "withdraw_publication_suggestion": "Withdraw suggestion"
+        "withdraw_publication_suggestion": "Withdraw suggestion",
+        "preview": "Preview",
+        "publish": "Publish",
+        "unpublish": "Unpublish"
+      },
+      "notifications": {
+        "publish_success": "Project published",
+        "unpublish_success": "Project unpublished",
+        "publish_failed": "The project could not be published or unpublished. Please try again."
       },
       "expanded": {
         "tagline": "Tagline",
@@ -2470,36 +2478,12 @@
       }
     }
   },
-  "manageProjects": {
-    "headline": "Projects",
-    "search_placeholder": "Search projects",
-    "filter": {
-      "program_label": "Program",
-      "all_programs": "All programs",
-      "course_group_label": "Course group",
-      "all_course_groups": "All course groups"
-    },
-    "table": {
-      "title": "Title",
-      "authors": "Authors",
-      "no_authors": "No authors",
-      "program": "Program / Course",
-      "published": "Published",
-      "not_published": "Not published"
-    },
-    "actions": {
-      "publish": "Publish",
-      "unpublish": "Unpublish",
-      "publish_blocked_incomplete": "Set a project type and documentation instruction before this project can be published."
-    },
-    "notifications": {
-      "publish_success": "Project published",
-      "unpublish_success": "Project unpublished",
-      "action_failed": "The action could not be completed. Please try again."
-    }
-  },
   "projectsOverview": {
     "headline": "Projects",
+    "settings_links": {
+      "project_types": "Project types",
+      "documentation_instructions": "Documentation instructions"
+    },
     "courses_column": "Course(s) / Program",
     "no_courses": "No course"
   },
@@ -3676,10 +3660,6 @@
         "project-types": {
           "label": "Project types",
           "description": "Default achievement certificate templates and documentation instructions per project type"
-        },
-        "projects": {
-          "label": "Projects",
-          "description": "Publish, unpublish and tag projects"
         },
         "documentation-instructions": {
           "label": "Documentation instructions",

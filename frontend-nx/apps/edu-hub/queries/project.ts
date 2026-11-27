@@ -365,6 +365,27 @@ export const UPDATE_PROJECT_ACCEPTING_PARTICIPANTS = gql`
   }
 `;
 
+// Toggles showcase publication independently of the lifecycle status. Publishing
+// also clears suggestedForPublication (the recommendation is fulfilled); on
+// unpublish the caller passes the current flag value so it is left untouched.
+// Admins only: Org Admins have no update permission on `published`.
+export const UPDATE_PROJECT_PUBLISHED = gql`
+  mutation UpdateProjectPublished(
+    $itemId: Int!
+    $published: Boolean!
+    $suggestedForPublication: Boolean!
+  ) {
+    update_Project_by_pk(
+      pk_columns: { id: $itemId }
+      _set: { published: $published, suggestedForPublication: $suggestedForPublication }
+    ) {
+      id
+      published
+      suggestedForPublication
+    }
+  }
+`;
+
 export const UPDATE_PROJECT_SUBMISSION_DEADLINE = gql`
   mutation UpdateProjectSubmissionDeadline($itemId: Int!, $value: timestamptz) {
     update_Project_by_pk(pk_columns: { id: $itemId }, _set: { submissionDeadline: $value }) {
