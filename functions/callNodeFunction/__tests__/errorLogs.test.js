@@ -2,6 +2,8 @@ import { errorGroupOf, errorLogConfig, groupErrors, MAX_ENTRIES, normalizeMessag
 
 const settings = (values) => (name) => values[name];
 const config = { project: 'eduhub-production', filter: 'severity>=ERROR' };
+/** What AbortSignal.timeout makes fetch reject with. */
+const timeoutError = () => Object.assign(new Error('The operation timed out.'), { name: 'TimeoutError' });
 
 const hasuraHttp = (code, error, operationName, timestamp = '2026-11-25T10:00:00Z') => ({
   timestamp,
@@ -150,7 +152,7 @@ describe('readErrorEntries', () => {
     const result = await readErrorEntries(config, {
       ...window,
       fetchImpl: async (url, init) => {
-        if (calls.length === 1 && !url.includes('metadata')) throw new DOMException('The operation timed out.', 'TimeoutError');
+        if (calls.length === 1 && !url.includes('metadata')) throw timeoutError();
         return fetchImpl(url, init);
       },
     });
@@ -160,7 +162,7 @@ describe('readErrorEntries', () => {
   it('fails when the time runs out before the first page', async () => {
     const timeout = async (url, init) => {
       if (url.includes('metadata')) return new Response(JSON.stringify({ access_token: 't', expires_in: 3600 }));
-      throw new DOMException('The operation timed out.', 'TimeoutError');
+      throw timeoutError();
     };
     await expect(readErrorEntries(config, { ...window, fetchImpl: timeout })).rejects.toThrow('timed out');
   });
