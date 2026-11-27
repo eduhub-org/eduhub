@@ -4,7 +4,6 @@ import type { CourseSetup } from '../mcp/operations';
 import { COURSE_SETUP_ROLES } from './courseSetupTools';
 import { AssistantSession, authenticate, refuse, requestedRole } from './handler';
 import { errorMessage, toLocale } from './messages';
-import { DEFAULT_CONTACT } from './prompt';
 
 /**
  * Apply or discard a Proposed Change from the widget's buttons (issue #2193/#2194):
@@ -36,8 +35,6 @@ export interface ProposalsHandlerDeps {
   getSession(req: NextApiRequest): Promise<AssistantSession | null>;
   /** The course-setup operations as this user and role, or null when the MCP server isn't configured. */
   courseSetup(session: AssistantSession, role: string): CourseSetup | null;
-  /** Where people can write when saving fails. */
-  contact?: string;
 }
 
 export const createProposalsHandler = (deps: ProposalsHandlerDeps) => async (req: NextApiRequest, res: NextApiResponse) => {
@@ -67,12 +64,11 @@ export const createProposalsHandler = (deps: ProposalsHandlerDeps) => async (req
         : await setup.discardProposedChange({ proposedChangeId });
     return res.status(200).json(result);
   } catch (error) {
-    const params = { contact: deps.contact ?? DEFAULT_CONTACT };
     if (error instanceof OperationError && STATUS[error.code]) {
-      const message = errorMessage(`PROPOSAL_${error.code}`, locale, params);
+      const message = errorMessage(`PROPOSAL_${error.code}`, locale);
       return res.status(STATUS[error.code]).json({ error: { code: error.code, message } });
     }
     console.error('Assistant: applying or discarding a Proposed Change failed');
-    return res.status(500).json({ error: { code: 'INTERNAL', message: errorMessage('PROPOSAL_FAILED', locale, params) } });
+    return res.status(500).json({ error: { code: 'INTERNAL', message: errorMessage('PROPOSAL_FAILED', locale) } });
   }
 };

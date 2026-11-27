@@ -4001,7 +4001,7 @@
     "errors": {
       "NOT_LOGGED_IN": "Bitte melde Dich an, um den Assistenten zu fragen.",
       "OFF": "Der Assistent ist gerade nicht verfügbar.",
-      "SPENDING_CAP_REACHED": "Der Assistent ist für diesen Monat pausiert, weil sein Monatsbudget aufgebraucht ist. Ab dem 1. des nächsten Monats ist er wieder da. Bei Fragen schreib an {contact}.",
+      "SPENDING_CAP_REACHED": "Der Assistent ist für diesen Monat pausiert, weil sein Monatsbudget aufgebraucht ist. Ab dem 1. des nächsten Monats ist er wieder da.",
       "RATE_LIMITED_SHORT": "Du hast in kurzer Zeit viele Fragen gestellt. Bitte warte etwa {minutes} Minuten und frag dann weiter.",
       "RATE_LIMITED_DAILY": "Du hast heute die maximale Zahl an Fragen erreicht. Morgen kannst Du wieder fragen.",
       "MESSAGE_TOO_LONG": "Deine Nachricht ist zu lang. Bitte kürze sie auf höchstens {max} Zeichen.",
@@ -4010,8 +4010,8 @@
       "IMPERSONATING": "Während Du die Plattform als eine andere Person ansiehst, ist der Assistent nicht verfügbar.",
       "ROLE_NOT_ALLOWED": "Diese Rolle kannst Du für den Assistenten nicht verwenden.",
       "BUSY": "Der Assistent ist gerade ausgelastet. Bitte versuch es in einer Minute noch einmal.",
-      "UNAVAILABLE": "Der Assistent konnte gerade nicht antworten. Bitte versuch es später noch einmal oder schreib an {contact}.",
-      "TOOL_CALL_FAILED": "Der Assistent konnte die nötigen Daten nicht abrufen. Bitte formuliere Deine Frage anders oder schreib an {contact}.",
+      "UNAVAILABLE": "Der Assistent konnte gerade nicht antworten. Bitte versuch es später noch einmal.",
+      "TOOL_CALL_FAILED": "Der Assistent konnte die nötigen Daten nicht abrufen. Bitte formuliere Deine Frage anders.",
       "FEEDBACK_CONSENT_REQUIRED": "Ohne Deine Einwilligung speichern wir das Gespräch nicht.",
       "PROPOSAL_UNAUTHENTICATED": "Deine Anmeldung ist abgelaufen. Bitte melde Dich neu an und übernimm die Änderung dann noch einmal.",
       "PROPOSAL_FORBIDDEN": "Mit Deiner aktuellen Rolle kannst Du diesen Kurs nicht ändern.",
@@ -4022,8 +4022,8 @@
       "PROPOSAL_STALE": "Der Kurs wurde nach diesem Vorschlag geändert. Bitte den Assistant um einen neuen Vorschlag.",
       "PROPOSAL_TITLE_TAKEN": "Ein anderer Kurs in diesem Programm hat schon diesen Titel. Bitte wähle einen anderen Titel.",
       "PROPOSAL_EXPIRED": "Dieser Vorschlag ist abgelaufen. Bitte den Assistant um einen neuen.",
-      "PROPOSAL_HASURA_ERROR": "Die Änderung konnte nicht gespeichert werden. Bitte versuch es später noch einmal oder schreib an {contact}.",
-      "PROPOSAL_FAILED": "Beim Speichern der Änderung ist etwas schiefgegangen. Bitte versuch es später noch einmal oder schreib an {contact}.",
+      "PROPOSAL_HASURA_ERROR": "Die Änderung konnte nicht gespeichert werden. Bitte versuch es später noch einmal.",
+      "PROPOSAL_FAILED": "Beim Speichern der Änderung ist etwas schiefgegangen. Bitte versuch es später noch einmal.",
       "generic": "Etwas ist schiefgelaufen. Bitte versuch es später noch einmal.",
       "NETWORK": "Die Verbindung wurde unterbrochen. Bitte versuch es noch einmal.",
       "INTERRUPTED": "Die Antwort wurde abgebrochen. Bitte frag noch einmal.",
@@ -4032,7 +4032,7 @@
       "REPORT_ALREADY_VOTED": "Du bist bei dieser Meldung schon dabei.",
       "REPORT_CLOSED": "Diese Meldung ist schon abgeschlossen oder gibt es nicht mehr.",
       "REPORT_NOT_WITHDRAWABLE": "Diese Meldung kannst Du nicht mehr zurückziehen: Das EduHub-Team hat sie schon angesehen oder andere haben sich angeschlossen.",
-      "REPORT_FAILED": "Deine Meldung konnte gerade nicht gespeichert werden. Bitte versuch es später noch einmal oder schreib an {contact}."
+      "REPORT_FAILED": "Deine Meldung konnte gerade nicht gespeichert werden. Bitte versuch es später noch einmal."
     },
     "context": {
       "chip": "Wird mitgesendet: {page}",

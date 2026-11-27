@@ -60,8 +60,10 @@ const mockStreamChat = jest.fn();
 const mockDecideProposal = jest.fn();
 const mockSendFeedback = jest.fn();
 const mockSendReport = jest.fn();
+const mockFetchContact = jest.fn(async (): Promise<string | null> => 'team@example.org');
 jest.mock('../api', () => ({
   ...jest.requireActual('../api'),
+  fetchContact: () => mockFetchContact(),
   sendReport: (...args: unknown[]) => mockSendReport(...args),
   streamChat: (...args: unknown[]) => mockStreamChat(...args),
   decideProposal: (...args: unknown[]) => mockDecideProposal(...args),
@@ -189,8 +191,20 @@ describe('AssistantWidget', () => {
     expect(await screen.findByText(/The Assistant is paused for this month\./)).toBeInTheDocument();
     expect(screen.getAllByRole('link', { name: 'Contact the EduHub team' })[0]).toHaveAttribute(
       'href',
-      'mailto:edu@opencampus.sh'
+      'mailto:team@example.org'
     );
+  });
+
+  it('shows no contact link when the server has no contact configured', async () => {
+    mockFetchContact.mockResolvedValueOnce(null);
+    replyWith([{ type: 'error', error: { code: 'UNAVAILABLE', message: 'The Assistant couldn’t answer right now.' } }]);
+    renderWidget();
+    openPanel();
+    await ask('Hello?');
+
+    expect(await screen.findByText(/couldn’t answer right now/)).toBeInTheDocument();
+    expect(mockFetchContact).toHaveBeenCalled();
+    expect(screen.queryByRole('link', { name: 'Contact the EduHub team' })).not.toBeInTheDocument();
   });
 
   it('offers questions and course tasks to start with, and sends the one picked', async () => {

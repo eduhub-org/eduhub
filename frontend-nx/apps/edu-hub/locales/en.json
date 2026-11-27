@@ -4016,7 +4016,7 @@
     "errors": {
       "NOT_LOGGED_IN": "Please log in to ask the Assistant.",
       "OFF": "The Assistant is not available right now.",
-      "SPENDING_CAP_REACHED": "The Assistant is paused for this month because its monthly budget is used up. It will be back on the 1st of next month. For questions, write to {contact}.",
+      "SPENDING_CAP_REACHED": "The Assistant is paused for this month because its monthly budget is used up. It will be back on the 1st of next month.",
       "RATE_LIMITED_SHORT": "You have asked a lot of questions in a short time. Please wait about {minutes} minutes and then continue.",
       "RATE_LIMITED_DAILY": "You have reached the maximum number of questions for today. You can ask again tomorrow.",
       "MESSAGE_TOO_LONG": "Your message is too long. Please shorten it to at most {max} characters.",
@@ -4025,8 +4025,8 @@
       "IMPERSONATING": "The Assistant is not available while you view the platform as someone else.",
       "ROLE_NOT_ALLOWED": "You can't use this role with the Assistant.",
       "BUSY": "The Assistant is busy right now. Please try again in a minute.",
-      "UNAVAILABLE": "The Assistant couldn't answer right now. Please try again later or write to {contact}.",
-      "TOOL_CALL_FAILED": "The Assistant couldn't look up the data it needed. Please rephrase your question or write to {contact}.",
+      "UNAVAILABLE": "The Assistant couldn't answer right now. Please try again later.",
+      "TOOL_CALL_FAILED": "The Assistant couldn't look up the data it needed. Please rephrase your question.",
       "FEEDBACK_CONSENT_REQUIRED": "Without your consent we don't store the conversation.",
       "PROPOSAL_UNAUTHENTICATED": "Your login has expired. Please log in again and then apply the change.",
       "PROPOSAL_FORBIDDEN": "You can't change this course with your current role.",
@@ -4037,8 +4037,8 @@
       "PROPOSAL_STALE": "The course was changed after this proposal. Please ask the Assistant for a new proposal.",
       "PROPOSAL_TITLE_TAKEN": "Another course in this program already has this title. Please choose a different title.",
       "PROPOSAL_EXPIRED": "This proposal has expired. Please ask the Assistant for a new one.",
-      "PROPOSAL_HASURA_ERROR": "The change couldn't be saved. Please try again later or write to {contact}.",
-      "PROPOSAL_FAILED": "Something went wrong while saving the change. Please try again later or write to {contact}.",
+      "PROPOSAL_HASURA_ERROR": "The change couldn't be saved. Please try again later.",
+      "PROPOSAL_FAILED": "Something went wrong while saving the change. Please try again later.",
       "generic": "Something went wrong. Please try again later.",
       "NETWORK": "The connection was lost. Please try again.",
       "INTERRUPTED": "The reply was cut off. Please ask again.",
@@ -4047,7 +4047,7 @@
       "REPORT_ALREADY_VOTED": "You already support this report.",
       "REPORT_CLOSED": "This report is already closed or no longer exists.",
       "REPORT_NOT_WITHDRAWABLE": "You can no longer withdraw this report: the EduHub team has already looked at it or others have joined.",
-      "REPORT_FAILED": "Your report couldn't be saved right now. Please try again later or write to {contact}."
+      "REPORT_FAILED": "Your report couldn't be saved right now. Please try again later."
     },
     "context": {
       "chip": "Sent along: {page}",
