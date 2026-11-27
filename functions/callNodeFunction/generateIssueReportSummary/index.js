@@ -213,9 +213,11 @@ export default async function generateIssueReportSummary(req, logger, { gql, rea
   const errors = await readErrors(read, since, until, fetchImpl, logger);
   const errorCount = errors?.groups ? errors.total : 0;
 
-  let summary = errors?.unavailable
-    ? "## Overview\n\nNo open reports and no thumbs-down feedback this week. The production errors could not be read."
-    : "## Overview\n\nNo open reports, no thumbs-down feedback and no production errors this week.";
+  const quiet = "No open reports and no thumbs-down feedback this week.";
+  // Only claim "no production errors" when the logs were read.
+  let summary = `## Overview\n\n${
+    !errors ? quiet : errors.unavailable ? `${quiet} The production errors could not be read.` : "No open reports, no thumbs-down feedback and no production errors this week."
+  }`;
   let usage = { inputTokens: 0, outputTokens: 0 };
   let model = null;
   // Nothing to plan: no model call, no cost.

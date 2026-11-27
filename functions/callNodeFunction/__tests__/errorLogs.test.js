@@ -145,6 +145,26 @@ describe('readErrorEntries', () => {
     expect(calls).toHaveLength(1);
   });
 
+  it('keeps the pages read when the time runs out while a page loads', async () => {
+    const { calls, fetchImpl } = fakeFetch([{ entries: [{ a: 1 }], nextPageToken: 'more' }]);
+    const result = await readErrorEntries(config, {
+      ...window,
+      fetchImpl: async (url, init) => {
+        if (calls.length === 1 && !url.includes('metadata')) throw new DOMException('The operation timed out.', 'TimeoutError');
+        return fetchImpl(url, init);
+      },
+    });
+    expect(result).toEqual({ entries: [{ a: 1 }], complete: false });
+  });
+
+  it('fails when the time runs out before the first page', async () => {
+    const timeout = async (url, init) => {
+      if (url.includes('metadata')) return new Response(JSON.stringify({ access_token: 't', expires_in: 3600 }));
+      throw new DOMException('The operation timed out.', 'TimeoutError');
+    };
+    await expect(readErrorEntries(config, { ...window, fetchImpl: timeout })).rejects.toThrow('timed out');
+  });
+
   it('fails with the status only', async () => {
     const { fetchImpl } = fakeFetch([new Response('{"error":{"message":"filter: severity>=ERROR"}}', { status: 403 })]);
     await expect(readErrorEntries(config, { ...window, fetchImpl })).rejects.toThrow(/^Cloud Logging answered 403$/);

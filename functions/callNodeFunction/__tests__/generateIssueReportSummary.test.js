@@ -150,6 +150,8 @@ describe('generateIssueReportSummary', () => {
     const stored = gql.requests.find((r) => r.query.includes('InsertIssueReportSummary')).variables.object;
     expect(stored.periodStart).toBe('2026-11-23T05:17:00.000Z');
     expect(stored).toEqual(expect.objectContaining({ model: null, costEur: 0, reportCount: 0, feedbackCount: 0 }));
+    // The error analysis is off here, so the text makes no claim about errors.
+    expect(stored.summary).toBe('## Overview\n\nNo open reports and no thumbs-down feedback this week.');
   });
 
   it('stores nothing and logs no content when the model fails', async () => {
@@ -210,6 +212,15 @@ describe('production errors', () => {
     expect(result).toEqual({ success: true, reports: 1, feedback: 0, errors: null });
     expect(calls.find((c) => c.url.includes('chat/completions')).body.messages[1].content).toContain('Production errors: unavailable this week');
     expect(logger.warn).toHaveBeenCalledWith('Reading the production errors for the summary failed', { error: 'Cloud Logging answered 403' });
+  });
+
+  it('says there were no production errors only when the logs were read', async () => {
+    const { fetchImpl } = fetchWith(new Response(JSON.stringify({})));
+    const gql = fakeGql({ reports: [], newReports: 0 });
+    await generateIssueReportSummary({}, logger, { gql, read: settings(withLogs), fetchImpl, now: () => NOW });
+    const stored = gql.requests.find((r) => r.query.includes('InsertIssueReportSummary')).variables.object;
+    expect(stored.summary).toBe('## Overview\n\nNo open reports, no thumbs-down feedback and no production errors this week.');
+    expect(stored.model).toBeNull();
   });
 
   it('leaves errors out entirely while the analysis is off', () => {

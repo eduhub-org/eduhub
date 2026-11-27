@@ -124,21 +124,14 @@ export const readErrorEntries = async (config, { since, until, fetchImpl = globa
   do {
     const remaining = deadline - now();
     if (remaining <= 0) return { entries, complete: false };
-    const response = await fetchImpl(`${LOGGING_URL}?fields=${encodeURIComponent(FIELDS)}`, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        resourceNames: [`projects/${config.project}`],
-        filter: `${config.filter}\nAND timestamp>="${since}" AND timestamp<"${until}"`,
-        orderBy: "timestamp desc",
-        pageSize: PAGE_SIZE,
-        pageToken,
-      }),
-      signal: AbortSignal.timeout(remaining),
-    });
-    // The status only: an error body can quote the filter.
-    if (!response.ok) throw new Error(`Cloud Logging answered ${response.status}`);
-    const body = await response.json();
+    let body;
+    try {
+      body = await readPage(config, { since, until, pageToken, token, fetchImpl, timeoutMs: remaining });
+    } catch (error) {
+      // The budget ran out while a page was loading: keep the pages already read.
+      if ((error.name === "TimeoutError" || error.name === "AbortError") && entries.length) return { entries, complete: false };
+      throw error;
+    }
     entries.push(...(body.entries ?? []));
     pageToken = body.nextPageToken;
     if (entries.length >= MAX_ENTRIES) {
@@ -146,4 +139,23 @@ export const readErrorEntries = async (config, { since, until, fetchImpl = globa
     }
   } while (pageToken);
   return { entries, complete: true };
+};
+
+/** One page of entries:list. */
+const readPage = async (config, { since, until, pageToken, token, fetchImpl, timeoutMs }) => {
+  const response = await fetchImpl(`${LOGGING_URL}?fields=${encodeURIComponent(FIELDS)}`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      resourceNames: [`projects/${config.project}`],
+      filter: `${config.filter}\nAND timestamp>="${since}" AND timestamp<"${until}"`,
+      orderBy: "timestamp desc",
+      pageSize: PAGE_SIZE,
+      pageToken,
+    }),
+    signal: AbortSignal.timeout(timeoutMs),
+  });
+  // The status only: an error body can quote the filter.
+  if (!response.ok) throw new Error(`Cloud Logging answered ${response.status}`);
+  return response.json();
 };

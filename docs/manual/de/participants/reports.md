@@ -35,7 +35,7 @@ Unter jeder Antwort kannst Du sie mit Daumen hoch oder runter bewerten. Bei Daum
 
 ## Für Admins: die Seite Meldungen
 
-Admins finden alle Meldungen unter **Meldungen** im Benutzermenü. Jeden Montag erscheint dort eine Wochenzusammenfassung auf Englisch: die neuen und offenen Meldungen nach Thema gruppiert, wahrscheinliche Duplikate, vorgeschlagene Prioritäten und wiederkehrende Probleme mit den Antworten des Assistenten. Frühere Wochen wählst Du unter **Woche** aus.
+Admins finden alle Meldungen unter **Meldungen** im Benutzermenü. Jeden Montag erscheint dort eine Wochenzusammenfassung auf Englisch: die neuen und offenen Meldungen nach Thema gruppiert, wahrscheinliche Duplikate, vorgeschlagene Prioritäten und wiederkehrende Probleme mit den Antworten des Assistenten. Ein Abschnitt **Production errors** fasst die Fehler zusammen, die die Dienste der Plattform in der Woche protokolliert haben, und ordnet jede Gruppe ein: wahrscheinlicher Bug, Konfigurationsproblem (etwa ein fehlendes oder abgelaufenes Token), Kapazitätsproblem, ausgefallener externer Dienst oder Rauschen, jeweils mit einem Vorschlag für den nächsten Schritt. Die Zusammenfassung erscheint auch in Wochen mit Fehlern, aber ohne Meldungen. Frühere Wochen wählst Du unter **Woche** aus.
 
 Darunter zeigt die Tabelle standardmäßig die offenen Meldungen; filtern kannst Du nach **Art** und **Status**. Für jede Meldung setzt Du **Status** und **Priorität**. Öffne eine Meldung, um ihre Beschreibung, die Seite und Rolle, von der sie kam, und die meldende Person zu sehen, und um:
 
