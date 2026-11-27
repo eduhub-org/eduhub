@@ -57,6 +57,7 @@ import removeKeycloakRole from "./removeKeycloakRole/index.js";
 import sendQuestionaires from "./sendQuestionaires/index.js";
 import syncExpertEmbeddings from "./syncExpertEmbeddings/index.js";
 import semanticExpertSearch from "./semanticExpertSearch/index.js";
+import semanticProjectSearch from "./semanticProjectSearch/index.js";
 import searchKnowledge from "./searchKnowledge/index.js";
 import generateIssueReportSummary from "./generateIssueReportSummary/index.js";
 import { createDispatcher } from "./lib/dispatcher.js";
@@ -162,6 +163,7 @@ export const callNodeFunctionHandlers = {
   sendQuestionaires,
   syncExpertEmbeddings,
   semanticExpertSearch,
+  semanticProjectSearch,
   searchKnowledge,
   generateIssueReportSummary,
 };

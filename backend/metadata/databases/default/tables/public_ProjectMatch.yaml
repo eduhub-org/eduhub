@@ -1,0 +1,4 @@
+# Return type of match_projects; never holds rows. No role permissions.
+table:
+  name: ProjectMatch
+  schema: public
