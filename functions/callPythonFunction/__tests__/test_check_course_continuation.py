@@ -138,5 +138,7 @@ def test_running_courses_are_found_by_their_upcoming_sessions(monkeypatch):
     monkeypatch.setattr(mod, "EduHubClient", lambda: RecordingClient([]))
     monkeypatch.setattr(mod, "get_default_mail_template", lambda client, mail_type: TEMPLATE)
     assert mod.check_course_continuation({})["success"] is True
-    assert "Sessions: {endDateTime: {_gte: $now}}" in queries[0]
+    assert "{Sessions: {endDateTime: {_gte: $now}}}" in queries[0]
+    # A mandatory program session still to come keeps the course running too.
+    assert "{Program: {Sessions: {isMandatory: {_eq: true}, endDateTime: {_gte: $now}}}}" in queries[0]
     assert "endTime" not in queries[0]
