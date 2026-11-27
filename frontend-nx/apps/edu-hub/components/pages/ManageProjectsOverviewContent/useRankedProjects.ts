@@ -59,7 +59,7 @@ const keywordStrength = (project: ProjectsOverview_Project, search: string): num
         project.description,
         ...(project.ProjectAuthors ?? []).flatMap((author) => [author.User?.firstName, author.User?.lastName]),
         ...(project.ProjectMentors ?? []).flatMap((mentor) => [mentor.User?.firstName, mentor.User?.lastName]),
-        ...(project.courses ?? []).flatMap((course) => [course.title, course.Program?.shortTitle]),
+        ...(project.courses ?? []).flatMap((course) => [course.title, course.Program?.shortTitle, course.Program?.title]),
       ],
     ],
   ];

@@ -457,6 +457,7 @@ describe('ManageProjectsOverviewContent status chips, filters and search', () =>
       { ProjectMentors: { User: { lastName: { _ilike: `%${word}%` } } } },
       { ProjectCourses: { Course: { title: { _ilike: `%${word}%` } } } },
       { ProjectCourses: { Course: { Program: { shortTitle: { _ilike: `%${word}%` } } } } },
+      { ProjectCourses: { Course: { Program: { title: { _ilike: `%${word}%` } } } } },
     ];
     // A search of three or more characters is ranked: the statuses apply in the browser.
     expect(lastVariables('ProjectsOverview')).toEqual({

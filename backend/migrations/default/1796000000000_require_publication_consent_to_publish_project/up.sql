@@ -54,6 +54,12 @@ FOR EACH ROW EXECUTE FUNCTION public.enforce_project_publication_consent();
 CREATE OR REPLACE FUNCTION public.unpublish_project_on_consent_withdrawal()
 RETURNS TRIGGER AS $$
 BEGIN
+  -- Lock the project row first, so a concurrent publish either finishes before
+  -- this (and is unpublished here) or waits and then sees the withdrawal: the
+  -- publish guard runs while its UPDATE holds this lock, and each statement in
+  -- it reads the latest committed consent event (READ COMMITTED).
+  PERFORM 1 FROM public."Project" WHERE id = NEW."projectId" FOR UPDATE;
+
   UPDATE public."Project"
   SET published = false
   WHERE id = NEW."projectId"
@@ -77,6 +83,9 @@ RETURNS TRIGGER AS $$
 DECLARE
   latest_event text;
 BEGIN
+  -- Same row lock as on consent withdrawal, so a concurrent publish is serialized.
+  PERFORM 1 FROM public."Project" WHERE id = NEW."projectId" FOR UPDATE;
+
   IF NOT EXISTS (
     SELECT 1 FROM public."Project" p
     WHERE p.id = NEW."projectId" AND p.published IS TRUE

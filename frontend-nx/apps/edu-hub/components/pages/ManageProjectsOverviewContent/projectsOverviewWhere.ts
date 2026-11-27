@@ -38,6 +38,7 @@ export const PROJECTS_OVERVIEW_SEARCH_FIELDS = [
   'ProjectMentors.User.lastName',
   'ProjectCourses.Course.title',
   'ProjectCourses.Course.Program.shortTitle',
+  'ProjectCourses.Course.Program.title',
 ];
 
 const and = (conditions: Project_bool_exp[]): Project_bool_exp => {
