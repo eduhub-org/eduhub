@@ -48,14 +48,18 @@ type(scope): description
 - `perf:` - Performance improvement (triggers **patch** version bump)
 - `BREAKING CHANGE:` - Breaking change (triggers **major** version bump)
 
-#### Non-Version Bumping Types (appear in changelog)
-- `chore:` - Maintenance tasks (no release, appears in changelog)
-- `docs:` - Documentation changes (no release, appears in changelog)
-- `style:` - Code style changes (no release, appears in changelog)
-- `refactor:` - Code refactoring (no release, appears in changelog)
-- `test:` - Adding tests (no release, appears in changelog)
-- `build:` - Build system changes (no release, appears in changelog)
-- `ci:` - CI configuration changes (no release, appears in changelog)
+#### Non-Version Bumping Types (not in the release notes)
+The `angular` preset lists only `feat`, `fix`, `perf`, reverts and breaking
+changes in the GitHub release notes; these types trigger no release and are left
+out of the notes.
+
+- `chore:` - Maintenance tasks
+- `docs:` - Documentation changes
+- `style:` - Code style changes
+- `refactor:` - Code refactoring
+- `test:` - Adding tests
+- `build:` - Build system changes
+- `ci:` - CI configuration changes
 
 ### Examples
 ```bash
@@ -236,8 +240,7 @@ Verify your commit messages match exactly:
 ## Monorepo Configuration
 
 - Semantic-release runs from the `frontend-nx` directory
-- Automatically syncs versions across all workspace packages  
-- Updates root `package.json` and all `functions/*/package.json` files
+- A release creates the git tag `vX.Y.Z` on the deployed `production` commit and the GitHub release with its notes. It commits nothing: no file carries the version (the `package.json` versions stay `0.1.0`), so there is nothing to merge back into `develop` or `staging`
 - GitHub Actions workflow handles the entire release process
 - No manual intervention required once PRs are merged
 
@@ -285,7 +288,7 @@ feat merge develop                                 # Missing colon
 - The actual features/fixes are already documented in individual commits
 - This prevents double-counting version bumps
 - It keeps the git history clean and semantic
-- `chore:` commits appear in the changelog but don't trigger version bumps
+- `chore:` commits don't trigger version bumps and don't appear in the release notes
 
 ### Example Flow
 ```bash
