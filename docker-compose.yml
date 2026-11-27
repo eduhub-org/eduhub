@@ -72,7 +72,7 @@ services:
       ASSISTANT_LLM_API_KEY: ${ASSISTANT_LLM_API_KEY:-}
       ASSISTANT_LLM_PRICE_INPUT_EUR_PER_MTOK: ${ASSISTANT_LLM_PRICE_INPUT_EUR_PER_MTOK:-}
       ASSISTANT_LLM_PRICE_OUTPUT_EUR_PER_MTOK: ${ASSISTANT_LLM_PRICE_OUTPUT_EUR_PER_MTOK:-}
-      ASSISTANT_CONTACT: ${ASSISTANT_CONTACT:-edu@opencampus.sh}
+      ASSISTANT_CONTACT: ${ASSISTANT_CONTACT-edu@opencampus.sh}
       # Set to "true" to let impersonated sessions write as well as read. Off by
       # default and deliberately a single switch -- see the read-only gate in
       # pages/api/impersonation/graphql.ts.
