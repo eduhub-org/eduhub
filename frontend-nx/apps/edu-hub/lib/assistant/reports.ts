@@ -85,7 +85,6 @@ const constraintError = async (run: () => Promise<unknown>): Promise<'UNIQUE' | 
 export interface ReportsHandlerDeps {
   getSession(req: NextApiRequest): Promise<AssistantSession | null>;
   hasuraUrl: string;
-  contact: string;
   fetchImpl?: typeof fetch;
   now?: () => Date;
   /** After a successful join, e.g. to update the linked GitHub issue's footer (lib/github). */
@@ -112,7 +111,7 @@ export const createReportsHandler = (deps: ReportsHandlerDeps) => async (req: Ne
     OWN_DATA_ROLE
   );
   const fail = (status: number, code: AssistantErrorCode) =>
-    refuse(res, status, code, locale, { contact: deps.contact, max: REPORT_LIMITS.perDay });
+    refuse(res, status, code, locale, { max: REPORT_LIMITS.perDay });
   const now = deps.now ?? (() => new Date());
 
   try {

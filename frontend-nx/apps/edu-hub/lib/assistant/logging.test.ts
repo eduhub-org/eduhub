@@ -136,7 +136,6 @@ it('logs no feedback content', async () => {
     getSession: async () => session(),
     rateLimiter: createRateLimiter({ rateShortMax: 5, rateShortWindowMs: 60_000, rateDailyMax: 5 }),
     hasuraUrl: 'http://h',
-    contact: 'c',
     fetchImpl: hasura.fetchImpl,
   })(http.req, http.res);
   expect(http.status).toBe(204);
