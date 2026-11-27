@@ -12,7 +12,7 @@ Current active behavior:
 - semantic-release is configured only for `production`
 - GitHub Actions runs the release workflow only on `push` to `production`
 - release notes are generated from conventional commits
-- release automation updates versioned files across the monorepo
+- a release only creates the git tag `vX.Y.Z` on the deployed `production` commit and the GitHub release with its notes; it commits nothing (no version files, no changelog), so nothing needs merging back into `develop` or `staging`
 
 ## Important Drift
 

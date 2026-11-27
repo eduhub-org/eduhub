@@ -59,6 +59,7 @@ import syncExpertEmbeddings from "./syncExpertEmbeddings/index.js";
 import semanticExpertSearch from "./semanticExpertSearch/index.js";
 import searchKnowledge from "./searchKnowledge/index.js";
 import generateIssueReportSummary from "./generateIssueReportSummary/index.js";
+import reconcileIssueReportsWithGithub from "./reconcileIssueReportsWithGithub/index.js";
 import { createDispatcher } from "./lib/dispatcher.js";
 
 // Handlers by the `Function-Name` (legacy: `name`) header Hasura sends, one map
@@ -164,6 +165,7 @@ export const callNodeFunctionHandlers = {
   semanticExpertSearch,
   searchKnowledge,
   generateIssueReportSummary,
+  reconcileIssueReportsWithGithub,
 };
 
 /**

@@ -9,6 +9,10 @@ export const COURSE_PARTICIPATIONS = gql`
     $order_by: [CourseEnrollment_order_by!] = [{ User: { lastName: asc } }]
   ) {
     Course_by_pk(id: $courseId) {
+      # Without id Apollo cannot normalize this Course and stores it inline under
+      # Course_by_pk, replacing ManagedCourse's reference; the two queries then
+      # keep refetching each other on the manage page.
+      id
       CourseEnrollments(
         limit: $limit
         offset: $offset

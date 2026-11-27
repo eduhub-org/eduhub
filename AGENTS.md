@@ -80,8 +80,9 @@ vs jest-config). This is now fixed by pinning `@babel/core` to `7.29.7` via a
 7. **Conventional commits, 80-char line cap**: `feat:` minor, `fix:` patch,
    `perf:` patch, `BREAKING CHANGE`/`!` major. Use `chore:` for branch-promotion
    merges. Semantic-release only runs on pushes to `production`.
-8. **Branch flow**: `develop` → `staging` → `production`. Never edit version
-   fields in any `package.json` or `CHANGELOG.md` by hand.
+8. **Branch flow**: `develop` → `staging` → `production`. The version is only
+   the git tag (`vX.Y.Z`) and GitHub release that semantic-release creates on
+   `production`. No file carries it, so there is nothing to bump or merge back.
 9. **Docker image rebuilds**: `docker compose up` reuses an existing image and
    does NOT detect Dockerfile/baked-content changes. After changing a
    `Dockerfile`, Keycloak provider jars/version, a pinned `image:` tag, or

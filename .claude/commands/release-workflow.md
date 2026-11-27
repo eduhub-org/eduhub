@@ -23,9 +23,10 @@ feature/*  →  develop  →  staging  →  production
 - `production`: release. PRs from `staging`. Deploys to prod and publishes a
   semantic version.
 
-Never manually edit `frontend-nx/package.json`, root `package.json`,
-`functions/*/package.json`, or `CHANGELOG.md` — semantic-release synchronizes
-them.
+The version is only the git tag (`vX.Y.Z`) and the GitHub release that
+semantic-release creates on `production`. No file in the repo carries it (the
+`package.json` versions stay `0.1.0`), and a release adds no commit, so there
+is nothing to bump by hand or to merge back into `develop` or `staging`.
 
 ## Promote develop → staging
 
@@ -59,22 +60,8 @@ Semantic-release then:
 1. Reads all conventional commits since the last tag.
 2. Picks MAJOR / MINOR / PATCH from commit types
    (see `/conventional-commits` for the table).
-3. Bumps `frontend-nx/package.json`, root `package.json`, every
-   `functions/*/package.json`.
-4. Updates `CHANGELOG.md`.
-5. Creates a git tag and GitHub release.
-
-Semantic-release adds `[skip ci]` to release commits automatically.
-
-## Sync tags back
-
-After production releases, fast-forward the version tags into the upstream
-branches so future diffs stay clean:
-
-```bash
-git checkout develop && git merge production && git push origin develop
-git checkout staging && git merge production && git push origin staging
-```
+3. Tags the deployed `production` commit and creates the GitHub release with
+   the release notes. It commits nothing.
 
 ## Squash merges
 

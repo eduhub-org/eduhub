@@ -47,7 +47,8 @@ export interface ChatHandlerDeps {
   spend: SpendTracker;
   rateLimiter: RateLimiter;
   buildTools(session: AssistantSession, role: string): Promise<ToolSet & { close?(): Promise<void> }>;
-  contact: string;
+  /** Named in the system prompt when the Assistant can't help (ASSISTANT_CONTACT); none if unset. */
+  contact?: string;
 }
 
 const ASSISTANT_ROLES = ['user', ...COURSE_SETUP_ROLES];
@@ -98,7 +99,6 @@ export const authenticate = async (
 export const createChatHandler = (deps: ChatHandlerDeps) => async (req: NextApiRequest, res: NextApiResponse) => {
   const body = (req.body && typeof req.body === 'object' ? req.body : {}) as Record<string, unknown>;
   const locale = toLocale(body.locale);
-  const contact = deps.contact;
 
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
@@ -132,11 +132,11 @@ export const createChatHandler = (deps: ChatHandlerDeps) => async (req: NextApiR
     // Without the month's total the cap can't be checked, so stay off rather than overspend.
     console.error('Assistant: reading the monthly spending failed');
     recordMetric({ metric: 'assistant_rejected', reason: 'SPENDING_UNKNOWN' });
-    return refuse(res, 503, 'UNAVAILABLE', locale, { contact });
+    return refuse(res, 503, 'UNAVAILABLE', locale);
   }
   if (spent >= config.monthlySpendCapEur) {
     recordMetric({ metric: 'assistant_rejected', reason: 'SPENDING_CAP_REACHED' });
-    return refuse(res, 503, 'SPENDING_CAP_REACHED', locale, { contact });
+    return refuse(res, 503, 'SPENDING_CAP_REACHED', locale);
   }
 
   const allowed = deps.rateLimiter.take(session.userId);
@@ -173,7 +173,7 @@ export const createChatHandler = (deps: ChatHandlerDeps) => async (req: NextApiR
     else if (event.type === 'tool') send('tool', { name: event.name, status: event.status });
     else if (event.type === 'proposal') send('proposal', event.proposal);
     else if (event.type === 'report') send('report', event.report);
-    else send('error', { code: event.code, message: errorMessage(event.code, locale, { contact }) });
+    else send('error', { code: event.code, message: errorMessage(event.code, locale) });
   };
 
   let tools: (ToolSet & { close?(): Promise<void> }) | null = null;
@@ -183,7 +183,7 @@ export const createChatHandler = (deps: ChatHandlerDeps) => async (req: NextApiR
     const summary = await runChat({
       provider: deps.provider(),
       tools,
-      system: buildSystemPrompt({ role, page: sanitizePage(body.pageContext), canSetUpCourses, contact }),
+      system: buildSystemPrompt({ role, page: sanitizePage(body.pageContext), canSetUpCourses, contact: deps.contact }),
       messages: conversation.messages,
       maxToolRounds: config.limits.maxToolRounds,
       emit,

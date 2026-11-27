@@ -7,6 +7,7 @@ from pythonFunctions.check_attendance import (
     MATCH_TYPE_NONE,
     MATCH_TYPE_PARTIAL_NAME,
     clean_display_name,
+    default_source,
     match_participants,
 )
 
@@ -1065,3 +1066,35 @@ def test_record_indexes_are_sent_as_postgres_array_literal():
     unmatched = EduHubClient._attendance_object({"sessionId": 1, "attendanceRecordIndexes": None})
     assert combined["attendanceRecordIndexes"] == "{0,3}"
     assert unmatched["attendanceRecordIndexes"] is None
+
+
+class TestSourceWithoutRecords:
+    """Attendance.source is NOT NULL: a session nobody joined still needs a
+    source on its MISSED rows, or Hasura rejects the whole insert and the
+    session is retried (and fails) every night."""
+
+    def test_unmatched_participant_without_any_record_gets_the_fallback_source(self):
+        rows = match_participants(_participants(JANE), _records([]), SESSION, fallback_source="ZOOM")
+        assert rows[0]["status"] == "MISSED"
+        assert rows[0]["source"] == "ZOOM"
+
+    def test_closest_candidate_source_wins_over_the_fallback(self):
+        records = _records([_check_in("Someone Else")])
+        rows = match_participants(_participants(JANE), records, SESSION, fallback_source="ZOOM")
+        assert rows[0]["source"] == "LIMESURVEY"
+
+    def test_default_source_follows_the_session_location(self):
+        def course_session(*options):
+            return {
+                "programId": None,
+                "Course": {
+                    "CourseLocations": [
+                        {"locationOption": option, "defaultSessionAddress": None} for option in options
+                    ]
+                },
+            }
+
+        assert default_source(course_session("ONLINE")) == "ZOOM"
+        assert default_source(course_session("KIEL")) == "LIMESURVEY"
+        assert default_source(course_session("KIEL", "ONLINE")) == "ZOOM"
+        assert default_source(course_session()) is None

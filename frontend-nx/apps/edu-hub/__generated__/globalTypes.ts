@@ -1236,7 +1236,7 @@ export enum IssueReport_select_column {
   created_at = "created_at",
   description = "description",
   duplicateOfId = "duplicateOfId",
-  githubIssueUrl = "githubIssueUrl",
+  githubIssueNumber = "githubIssueNumber",
   id = "id",
   locale = "locale",
   priority = "priority",
@@ -8297,7 +8297,7 @@ export interface IssueReport_bool_exp {
   created_at?: timestamptz_comparison_exp | null;
   description?: String_comparison_exp | null;
   duplicateOfId?: Int_comparison_exp | null;
-  githubIssueUrl?: String_comparison_exp | null;
+  githubIssueNumber?: Int_comparison_exp | null;
   id?: Int_comparison_exp | null;
   locale?: String_comparison_exp | null;
   peopleAffected?: Int_comparison_exp | null;
@@ -8317,7 +8317,7 @@ export interface IssueReport_max_order_by {
   created_at?: order_by | null;
   description?: order_by | null;
   duplicateOfId?: order_by | null;
-  githubIssueUrl?: order_by | null;
+  githubIssueNumber?: order_by | null;
   id?: order_by | null;
   locale?: order_by | null;
   publicNote?: order_by | null;
@@ -8333,7 +8333,7 @@ export interface IssueReport_min_order_by {
   created_at?: order_by | null;
   description?: order_by | null;
   duplicateOfId?: order_by | null;
-  githubIssueUrl?: order_by | null;
+  githubIssueNumber?: order_by | null;
   id?: order_by | null;
   locale?: order_by | null;
   publicNote?: order_by | null;
@@ -8353,7 +8353,7 @@ export interface IssueReport_order_by {
   created_at?: order_by | null;
   description?: order_by | null;
   duplicateOfId?: order_by | null;
-  githubIssueUrl?: order_by | null;
+  githubIssueNumber?: order_by | null;
   id?: order_by | null;
   locale?: order_by | null;
   peopleAffected?: order_by | null;

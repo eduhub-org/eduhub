@@ -592,6 +592,11 @@ variable "assistant_monthly_spend_cap_eur" {
   type        = number
   default     = 50
 }
+variable "assistant_contact" {
+  description = "Contact the Assistant names when it can't help, and in its error messages"
+  type        = string
+  default     = "edu@opencampus.sh"
+}
 variable "assistant_llm_price_input_eur_per_mtok" {
   description = "Price of the Assistant's model per million input tokens in EUR, from the provider's price list for the chosen model (and location). The spending cap multiplies it with the tokens the API reports; without it the Assistant stays off."
   type        = number
@@ -648,6 +653,38 @@ variable "summary_llm_price_input_eur_per_mtok" {
 }
 variable "summary_llm_price_output_eur_per_mtok" {
   description = "Price of the summary model per million output tokens (including reasoning) in EUR"
+  type        = number
+  default     = null
+}
+variable "github_app_id" {
+  description = "App ID of the EduHub Reports GitHub App, which turns approved Assistant reports into GitHub issues and syncs their status back (12_github_reports.tf). Empty turns the sync off."
+  type        = string
+  default     = ""
+}
+variable "github_app_installation_id" {
+  description = "Installation ID of the EduHub Reports GitHub App on the organization (the number at the end of its installation settings URL)"
+  type        = string
+  default     = ""
+}
+variable "github_app_private_key" {
+  description = "Private key (PEM) of the EduHub Reports GitHub App. Kept in Secret Manager."
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+variable "github_app_webhook_secret" {
+  description = "Webhook secret of the EduHub Reports GitHub App; /api/webhooks/github refuses deliveries not signed with it. Kept in Secret Manager."
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+variable "github_issue_repo" {
+  description = "Repository (owner/name) the report issues are created in: eduhub-org/eduhub in production, empty or a private sandbox repo on staging"
+  type        = string
+  default     = ""
+}
+variable "github_project_number" {
+  description = "Number of the organization project board new report issues go on (4: EduHub Development); null for no board"
   type        = number
   default     = null
 }

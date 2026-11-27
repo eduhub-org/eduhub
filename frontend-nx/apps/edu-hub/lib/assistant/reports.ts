@@ -85,9 +85,10 @@ const constraintError = async (run: () => Promise<unknown>): Promise<'UNIQUE' | 
 export interface ReportsHandlerDeps {
   getSession(req: NextApiRequest): Promise<AssistantSession | null>;
   hasuraUrl: string;
-  contact: string;
   fetchImpl?: typeof fetch;
   now?: () => Date;
+  /** After a successful join, e.g. to update the linked GitHub issue's footer (lib/github). */
+  onVoted?: (reportId: number) => Promise<void>;
 }
 
 /**
@@ -110,7 +111,7 @@ export const createReportsHandler = (deps: ReportsHandlerDeps) => async (req: Ne
     OWN_DATA_ROLE
   );
   const fail = (status: number, code: AssistantErrorCode) =>
-    refuse(res, status, code, locale, { contact: deps.contact, max: REPORT_LIMITS.perDay });
+    refuse(res, status, code, locale, { max: REPORT_LIMITS.perDay });
   const now = deps.now ?? (() => new Date());
 
   try {
@@ -154,6 +155,8 @@ export const createReportsHandler = (deps: ReportsHandlerDeps) => async (req: Ne
       if (refused === 'UNIQUE') return fail(409, 'REPORT_ALREADY_VOTED');
       if (refused === 'CHECK') return fail(409, 'REPORT_CLOSED');
       console.info(JSON.stringify({ metric: 'assistant_report', event: 'voted' }));
+      // Not awaited: the join is stored; updating the GitHub footer must not delay the answer.
+      void deps.onVoted?.(reportId).catch(() => undefined);
       return res.status(200).json({ reportId });
     }
 

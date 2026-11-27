@@ -176,7 +176,19 @@ def check_attendance(arguments):
                 len(course_participants),
             )
 
-            attendance_rows = match_participants(course_participants, records, session)
+            attendance_rows = match_participants(
+                course_participants, records, session, fallback_source=default_source(session)
+            )
+            if any(row["source"] is None for row in attendance_rows):
+                # Only possible for a session without a location; Hasura would
+                # reject the NOT NULL source, so leave it for a later run.
+                logging.warning(
+                    "Skipping attendance writes for session %s (id=%s): no Attendance Source "
+                    "for its unmatched participants (the session has no location).",
+                    session.get("title"),
+                    session.get("id"),
+                )
+                continue
             for row in attendance_rows:
                 logging.info(
                     "### %s: %s via %s [%s: %s to %s; recorded identifier: %s]",
@@ -273,6 +285,19 @@ def session_locations(session):
 
 # Every LocationOption except ONLINE; all use the same check-in survey.
 ON_SITE_OPTIONS = ("KIEL", "HEIDE", "HAMBURG")
+
+
+def default_source(session):
+    """The Attendance Source of a session without any usable Attendance
+    Record (e.g. nobody joined its Zoom meeting): Zoom if it is held online,
+    the check-in survey if on site, None without a location. Attendance.source
+    is NOT NULL, so the MISSED rows of such a session need one too."""
+    options = [loc["locationOption"] for loc in session_locations(session)]
+    if "ONLINE" in options:
+        return SOURCE_ZOOM
+    if any(option in ON_SITE_OPTIONS for option in options):
+        return SOURCE_LIMESURVEY
+    return None
 
 
 def check_in_window_closed(session, now=None):
@@ -691,7 +716,7 @@ def _combine_zoom_records(records):
     }
 
 
-def match_participants(participants, records, session):
+def match_participants(participants, records, session, fallback_source=None):
     """Match every participant against the session's Attendance Records and
     return one Attendance row (dict) per participant.
 
@@ -705,7 +730,7 @@ def match_participants(participants, records, session):
     (renamed for breakout rooms, phone dial-in). A check-in wins over a Zoom
     stay; a Zoom stay below the Minimum Attendance Time is MISSED but keeps
     its match details. Unmatched participants get the closest candidate per
-    Attendance Location.
+    Attendance Location, and its source (``fallback_source`` without one).
     """
     session_id = int(session["id"])
     session_seconds = (session["endDateTime"] - session["startDateTime"]).total_seconds()
@@ -854,7 +879,7 @@ def match_participants(participants, records, session):
                     {k: c[k] for k in ("location", "identifier", "score")} for c in closest
                 ]
                 or None,
-                "source": closest[0]["source"] if closest else None,
+                "source": closest[0]["source"] if closest else fallback_source,
                 "location": None,
             }
         )
