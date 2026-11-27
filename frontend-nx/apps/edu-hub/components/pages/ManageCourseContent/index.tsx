@@ -1,6 +1,7 @@
 import { useTranslations } from 'next-intl';
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
+import { useImpersonation } from '../../../contexts/ImpersonationContext';
 import { useRoleMutation } from '../../../hooks/authedMutation';
 import { useOrgAdminQuery, useRoleQuery } from '../../../hooks/authedQuery';
 import { MANAGED_COURSE, ORG_ADMIN_MANAGEABLE_COURSE, UPDATE_COURSE_STATUS } from '../../../queries/course';
@@ -112,6 +113,7 @@ export const ManageCourseContent: FC<Props> = ({ courseId, expectedSegment }) =>
   const isAdmin = useIsAdmin();
   const isInstructor = useIsInstructor();
   const isOrgAdmin = useIsOrgAdmin();
+  const { loading: impersonationLoading } = useImpersonation();
   const userId = useUserId();
   const manageCourseWhere = useManageCourseWhere();
   const checkAsOrgAdmin = isOrgAdmin && !isAdmin;
@@ -125,7 +127,8 @@ export const ManageCourseContent: FC<Props> = ({ courseId, expectedSegment }) =>
     { variables, skip: !checkAsOrgAdmin }
   );
 
-  if (checkAsOrgAdmin && (loading || !userId)) {
+  // While an impersonation is still resolving, the viewed user's roles are not known yet.
+  if (impersonationLoading || (checkAsOrgAdmin && (loading || !userId))) {
     return (
       <PageBlock>
         <div className="min-h-[50vh] flex items-center justify-center">

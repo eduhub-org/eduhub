@@ -11,6 +11,8 @@ jest.mock('../../../../hooks/authentication', () => ({
   useIsOrgAdmin: () => roles.orgAdmin,
   useIsUserIdInList: () => false,
 }));
+const impersonation = { loading: false };
+jest.mock('../../../../contexts/ImpersonationContext', () => ({ useImpersonation: () => impersonation }));
 jest.mock('../../../../hooks/user', () => ({ useUserId: () => 'user-1' }));
 jest.mock('../../../../hooks/manageScope', () => ({ useManageCourseWhere: () => ({}) }));
 
@@ -42,6 +44,7 @@ describe('ManageCourseContent', () => {
     replace.mockClear();
     useRoleQuery.mockClear();
     Object.assign(roles, { admin: false, instructor: false, orgAdmin: false });
+    impersonation.loading = false;
   });
 
   it('sends a participant to the course page without requesting ManagedCourse', () => {
@@ -57,5 +60,13 @@ describe('ManageCourseContent', () => {
 
     expect(replace).not.toHaveBeenCalled();
     expect(managedCourseRequested()).toBe(true);
+  });
+
+  it('waits for a pending impersonation before redirecting', () => {
+    impersonation.loading = true;
+    render(<ManageCourseContent courseId={42} expectedSegment="course" />);
+
+    expect(replace).not.toHaveBeenCalled();
+    expect(managedCourseRequested()).toBe(false);
   });
 });
