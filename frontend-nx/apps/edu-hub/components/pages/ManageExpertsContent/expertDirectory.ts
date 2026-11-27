@@ -1,4 +1,5 @@
 import { ExpertsList_User } from '../../../queries/__generated__/ExpertsList';
+import { rankSearchResults } from '../../../helpers/rankedSearch';
 import { ProgramType } from '../../../types/enums';
 
 /** Where a search word was found; a translation key under `manageExperts.match_field`. */
@@ -387,11 +388,6 @@ export interface RankedExpert {
   similar: SimilarRole[];
 }
 
-// Reciprocal rank fusion: each list adds 1 / (K + rank). K = 60 is the usual choice; it keeps
-// a person found by both searches above one found by only one, without tuning weights to the
-// different scales of keyword and cosine scores.
-const RRF_K = 60;
-
 // How telling a keyword hit is, by the field it is in: a title says what the role is about, a
 // description may only mention the word.
 const FIELD_WEIGHT: Record<MatchField, number> = {
@@ -440,47 +436,23 @@ export const rankExperts = (
   similarExperts: ExpertsList_User[],
   matches: SourceMatch[],
   search: string
-): RankedExpert[] => {
-  const people = new Map<string, ExpertsList_User>();
-  [...keywordExperts, ...similarExperts].forEach((expert) => people.set(expert.id, expert));
-
-  const candidates = Array.from(people.values()).flatMap((expert) => {
-    const roles = expertRoles(expert);
-    const keywordHit = matchesAllWords(expert, roles, search);
-    const similar = similarRoles(roles, matches);
-    if (!keywordHit && !similar.length) return [];
-    return [
-      {
-        ranked: { expert, roles, keywordHit, similar },
-        personHit: keywordHit && isPersonHit(expert, search),
-        strength: keywordHit ? keywordStrength(expert, roles, search) : 0,
-        active: lastActive(roles)?.getTime() ?? 0,
-      },
-    ];
+): RankedExpert[] =>
+  rankSearchResults({
+    keywordItems: keywordExperts,
+    semanticItems: similarExperts,
+    idOf: (expert) => expert.id,
+    assess: (expert) => {
+      const roles = expertRoles(expert);
+      const keywordHit = matchesAllWords(expert, roles, search);
+      const similar = similarRoles(roles, matches);
+      return {
+        result: { expert, roles, keywordHit, similar },
+        relevance: {
+          keyword: keywordHit ? keywordStrength(expert, roles, search) : null,
+          similarity: similar.length ? similar[0].similarity : null,
+          pinned: keywordHit && isPersonHit(expert, search),
+          tiebreak: lastActive(roles)?.getTime() ?? 0,
+        },
+      };
+    },
   });
-
-  const rankBy = (subset: typeof candidates, value: (candidate: (typeof candidates)[number]) => number) =>
-    new Map(
-      [...subset]
-        .sort((a, b) => value(b) - value(a) || b.active - a.active)
-        .map((candidate, index) => [candidate.ranked.expert.id, index + 1])
-    );
-  const keywordRank = rankBy(
-    candidates.filter((candidate) => candidate.ranked.keywordHit),
-    (candidate) => candidate.strength
-  );
-  const semanticRank = rankBy(
-    candidates.filter((candidate) => candidate.ranked.similar.length > 0),
-    (candidate) => candidate.ranked.similar[0].similarity
-  );
-  const fused = (id: string) =>
-    [keywordRank.get(id), semanticRank.get(id)].reduce<number>(
-      (sum, rank) => (rank === undefined ? sum : sum + 1 / (RRF_K + rank)),
-      0
-    );
-
-  return candidates
-    .map((candidate) => ({ ...candidate, score: fused(candidate.ranked.expert.id) }))
-    .sort((a, b) => Number(b.personHit) - Number(a.personHit) || b.score - a.score || b.active - a.active)
-    .map((candidate) => candidate.ranked);
-};
