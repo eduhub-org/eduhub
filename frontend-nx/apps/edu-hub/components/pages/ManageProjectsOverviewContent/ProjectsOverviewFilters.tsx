@@ -56,18 +56,24 @@ interface ProjectsOverviewFiltersProps {
   scope?: Project_bool_exp;
   filters: ProjectsOverviewFilterState;
   onChange: (filters: ProjectsOverviewFilterState) => void;
+  /**
+   * Counts per status of a ranked search, counted in the browser (useRankedProjects); without
+   * them the chips count on the server.
+   */
+  counts?: Record<ProjectStatusKey, number>;
 }
 
 /**
  * Status chips with counts (multi-select, Needs Attention preset), program and course-group
- * filters and keyword search for the projects overview. Everything is applied on the server,
- * under the viewer's management role (admin or org_admin).
+ * filters and search for the projects overview. Applied on the server, under the viewer's
+ * management role (admin or org_admin), except for the statuses of a ranked search (`counts`).
  */
 const ProjectsOverviewFilters: FC<ProjectsOverviewFiltersProps> = ({
   role,
   scope,
   filters,
   onChange,
+  counts: rankedCounts,
 }) => {
   const t = useTranslations('projectsOverview');
   const tCourse = useTranslations('course');
@@ -87,9 +93,11 @@ const ProjectsOverviewFilters: FC<ProjectsOverviewFiltersProps> = ({
   );
   const countsQuery = useManageQuery<ProjectsOverviewStatusCounts, ProjectsOverviewStatusCountsVariables>(
     PROJECTS_OVERVIEW_STATUS_COUNTS,
-    { variables: countVariables }
+    { variables: countVariables, skip: Boolean(rankedCounts) }
   );
-  const counts = countsQuery.data ?? countsQuery.previousData;
+  const serverCounts = countsQuery.data ?? countsQuery.previousData;
+  const countOf = (status: ProjectStatusKey) =>
+    rankedCounts ? rankedCounts[status] : serverCounts?.[status]?.aggregate?.count;
 
   const programOptions = useMemo(
     () =>
@@ -166,7 +174,7 @@ const ProjectsOverviewFilters: FC<ProjectsOverviewFiltersProps> = ({
               className="rounded-full bg-bg-card px-2 text-xs font-semibold text-label-primary"
               data-testid={`status-count-${status}`}
             >
-              {counts?.[status]?.aggregate?.count ?? '–'}
+              {countOf(status) ?? '–'}
             </span>
           </FilterChip>
         ))}

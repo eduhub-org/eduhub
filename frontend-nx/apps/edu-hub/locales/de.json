@@ -2475,6 +2475,9 @@
     },
     "courses_column": "Kurs(e) / Programm",
     "no_courses": "Kein Kurs",
+    "ranked_hint": "Sortiert nach Relevanz: Projekte, in denen alle Suchwörter vorkommen, und inhaltlich ähnliche Projekte.",
+    "ranked_capped": "Von {total} Stichwort-Treffern wurden die ersten {ranked} in Statusreihenfolge berücksichtigt – verfeinere deine Suche, um alle zu sehen.",
+    "semantic_unavailable": "Die Ähnlichkeitssuche ist gerade nicht verfügbar – du siehst nur Stichwort-Treffer.",
     "filter": {
       "status_label": "Projektstatus",
       "needs_attention": "Handlungsbedarf",

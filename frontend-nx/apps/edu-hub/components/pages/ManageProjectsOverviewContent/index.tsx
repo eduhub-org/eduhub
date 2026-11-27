@@ -24,6 +24,7 @@ import {
   ProjectsOverviewFilterState,
   projectsOverviewWhere,
 } from './projectsOverviewWhere';
+import { useRankedProjects } from './useRankedProjects';
 
 export const PROJECTS_OVERVIEW_PAGE_SIZE = 50;
 const REFETCH_QUERIES = ['ProjectsOverview', 'ProjectsOverviewStatusCounts'];
@@ -51,7 +52,9 @@ const CourseList: FC<{ courses: ProjectsOverview_Project_courses[] }> = ({ cours
 /**
  * Every project across all courses, for Admins, and across their organization's programs, for
  * Org Admins: the course tab's project grid fed by a cross-course query, paged on the server and
- * sorted by Project Status, then last update. Runs under the viewer's management role.
+ * sorted by Project Status, then last update. A search of three or more characters instead shows
+ * keyword and semantic hits ranked by relevance, paged in the browser (useRankedProjects). Runs
+ * under the viewer's management role.
  */
 const ManageProjectsOverviewContent: FC = () => {
   const t = useTranslations('projectsOverview');
@@ -74,20 +77,32 @@ const ManageProjectsOverviewContent: FC = () => {
     setPageIndex(0);
   }, []);
 
+  const ranked = useRankedProjects({ filters, scope });
   const query = useManageQuery<ProjectsOverview, ProjectsOverviewVariables>(
     PROJECTS_OVERVIEW,
-    { variables: { where, limit: pageSize, offset: pageIndex * pageSize } }
+    { variables: { where, limit: pageSize, offset: pageIndex * pageSize }, skip: ranked.active }
   );
   // Keep the last page on screen while the next one loads.
   const data = query.data ?? query.previousData;
 
+  const projects = useMemo(
+    () =>
+      ranked.active
+        ? ranked.rows.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize)
+        : data?.Project,
+    [ranked.active, ranked.rows, pageIndex, pageSize, data?.Project]
+  );
+  const totalCount = ranked.active
+    ? ranked.rows.length
+    : data?.Project_aggregate.aggregate?.count ?? 0;
+
   const coursesByProjectId = useMemo(() => {
     const map = new Map<number, ProjectsOverview_Project_courses[]>();
-    for (const project of data?.Project ?? []) {
+    for (const project of projects ?? []) {
       map.set(project.id, project.courses ?? []);
     }
     return map;
-  }, [data?.Project]);
+  }, [projects]);
 
   const extraColumns = useMemo<ProjectsGridExtraColumn[]>(
     () => [
@@ -109,6 +124,11 @@ const ManageProjectsOverviewContent: FC = () => {
   );
 
   const { refetch } = query;
+  const { active: rankedActive, refetch: refetchRanked } = ranked;
+  const handleRefetch = useCallback(
+    () => (rankedActive ? refetchRanked() : refetch()),
+    [rankedActive, refetchRanked, refetch]
+  );
 
   return (
     <PageBlock>
@@ -120,21 +140,33 @@ const ManageProjectsOverviewContent: FC = () => {
           scope={scope}
           filters={filters}
           onChange={handleFiltersChange}
+          counts={ranked.active ? ranked.counts : undefined}
         />
+        {ranked.active && (
+          <div className="mb-4 space-y-1 text-sm text-label-secondary">
+            <p>{t('ranked_hint')}</p>
+            {ranked.keywordTotal > ranked.keywordRanked && (
+              <p>
+                {t('ranked_capped', { ranked: ranked.keywordRanked, total: ranked.keywordTotal })}
+              </p>
+            )}
+            {ranked.semanticUnavailable && <p>{t('semantic_unavailable')}</p>}
+          </div>
+        )}
         {/* The grid's own queries, mutations and inputs run under the same role. Publishing
             shows only under admin (ProjectShowcaseActions). */}
         <ManagementRoleProvider role={role}>
           <ProjectsManagementGrid
-            projects={data?.Project}
-            loading={query.loading}
-            error={query.error}
+            projects={projects}
+            loading={ranked.active ? ranked.loading : query.loading}
+            error={ranked.active ? ranked.error : query.error}
             refetchQueries={REFETCH_QUERIES}
-            onRefetch={() => refetch()}
+            onRefetch={handleRefetch}
             extraColumns={extraColumns}
             pagination={{
               pageIndex,
               pageSize,
-              totalCount: data?.Project_aggregate.aggregate?.count ?? 0,
+              totalCount,
               onPageChange: setPageIndex,
               onPageSizeChange: handlePageSizeChange,
             }}

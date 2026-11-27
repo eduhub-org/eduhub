@@ -198,10 +198,11 @@ type QueryDocument = { definitions: { kind: string; name?: { value: string } }[]
 const operationName = (doc: unknown) =>
   (doc as QueryDocument).definitions.find((d) => d.kind === 'OperationDefinition')?.name?.value;
 const queryNames = (mock: jest.Mock) => mock.mock.calls.map(([doc]) => operationName(doc));
-/** Variables of the latest call of the named overview query. */
+/** Variables of the latest call of the named overview query that is sent (not skipped). */
 const lastVariables = (name: string) =>
-  mockUseManageQuery.mock.calls.filter(([doc]) => operationName(doc) === name).at(-1)?.[1]
-    ?.variables;
+  mockUseManageQuery.mock.calls
+    .filter(([doc, options]) => operationName(doc) === name && !options?.skip)
+    .at(-1)?.[1]?.variables;
 
 const statusCount = (count: number) => ({
   __typename: 'Project_aggregate',
@@ -433,7 +434,7 @@ describe('ManageProjectsOverviewContent status chips, filters and search', () =>
     });
   });
 
-  it('searches titles, texts, people, course and program on the server', () => {
+  it('searches titles, texts, people, course and program for keyword candidates', () => {
     jest.useFakeTimers();
     render(<ManageProjectsOverviewContent />);
 
@@ -457,11 +458,11 @@ describe('ManageProjectsOverviewContent status chips, filters and search', () =>
       { ProjectCourses: { Course: { title: { _ilike: `%${word}%` } } } },
       { ProjectCourses: { Course: { Program: { shortTitle: { _ilike: `%${word}%` } } } } },
     ];
-    expect(listWhere()).toEqual({
-      _and: [
-        { _and: [{ _or: fields('solar') }, { _or: fields('ada') }] },
-        { projectStatusRank: { _in: [1, 4, 6] } },
-      ],
+    // A search of three or more characters is ranked: the statuses apply in the browser.
+    expect(lastVariables('ProjectsOverview')).toEqual({
+      where: { _and: [{ _or: fields('solar') }, { _or: fields('ada') }] },
+      limit: 300,
+      offset: 0,
     });
   });
 
@@ -615,5 +616,186 @@ describe('ManageProjectsOverviewContent for Org Admins', () => {
     expect(screen.getByRole('button', { name: 'projects.actions.unpublish' })).toBeInTheDocument();
     expect(listWhere()).toEqual({ projectStatusRank: { _in: [1, 4, 6] } });
     expect(lastVariables('Programs')).toEqual({ where: {} });
+  });
+});
+
+describe('ManageProjectsOverviewContent ranked search', () => {
+  const solarBoat = { ...project, id: 1, title: 'Solar Boat' };
+  const gardenSensors = {
+    ...project,
+    id: 2,
+    title: 'Garden sensors',
+    description: 'Solar powered soil sensors',
+    sentBackAt: '2026-02-01T00:00:00Z',
+  };
+  const electricFerry = {
+    ...project,
+    id: 3,
+    title: 'Electric ferry',
+    status: ProjectStatus_enum.PROPOSED,
+  };
+  const everyProject = [solarBoat, gardenSensors, electricFerry];
+  // Project 99 is close in meaning but outside the caller's filters, so loading it finds nothing.
+  const matches = [
+    { __typename: 'ProjectMatchResult', projectId: 3, similarity: 0.9 },
+    { __typename: 'ProjectMatchResult', projectId: 99, similarity: 0.8 },
+    { __typename: 'ProjectMatchResult', projectId: 1, similarity: 0.5 },
+  ];
+  const semanticResult = (overrides: Record<string, unknown> = {}) => ({
+    semanticProjectSearch: {
+      __typename: 'SemanticProjectSearchResult',
+      success: true,
+      enabled: true,
+      matches,
+      ...overrides,
+    },
+  });
+
+  type Where = Record<string, any>;
+  /** The ids a ProjectsOverview `where` asks for, when it loads the semantic matches. */
+  const idsOf = (where: Where): number[] | undefined =>
+    where?.id?._in ?? where?._and?.find((condition: Where) => condition.id)?.id._in;
+
+  let semantic: unknown;
+  beforeEach(() => {
+    mockIsAdmin = true;
+    semantic = semanticResult();
+    tableGridProps.mockClear();
+    mockUseManageQuery.mockReset();
+    mockUseManageQuery.mockImplementation(
+      (doc: unknown, options?: { skip?: boolean; variables?: Where }) => {
+        const result = { loading: false, refetch: jest.fn() };
+        if (options?.skip) return { ...result, data: undefined };
+        const name = operationName(doc);
+        if (name === 'SemanticProjectSearch') return { ...result, data: semantic };
+        if (name === 'ProjectsOverview') {
+          const ids = idsOf(options?.variables?.where);
+          const rows = ids
+            ? everyProject.filter((candidate) => ids.includes(candidate.id))
+            : [solarBoat, gardenSensors];
+          return {
+            ...result,
+            data: { Project: rows, Project_aggregate: { aggregate: { count: rows.length } } },
+          };
+        }
+        return { ...result, data: manageQueryData[name ?? ''] };
+      }
+    );
+    mockUseRoleQuery.mockReset();
+    mockUseRoleQuery.mockReturnValue({ data: undefined, loading: false, refetch: jest.fn() });
+    window.localStorage.clear();
+    jest.useFakeTimers();
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  const search = (value: string) => {
+    fireEvent.change(screen.getByLabelText('filter.search_label'), { target: { value } });
+    act(() => {
+      jest.advanceTimersByTime(500);
+    });
+  };
+  const rowIds = () => screen.queryAllByTestId(/^row-/).map((row) => row.dataset.testid);
+  const sent = (name: string) =>
+    mockUseManageQuery.mock.calls.filter(
+      ([doc, options]) => operationName(doc) === name && !options?.skip
+    );
+  const searchCondition = (word: string) => ({
+    _and: [{ _or: expect.arrayContaining([{ title: { _ilike: `%${word}%` } }]) }],
+  });
+
+  it('switches to ranked mode at three characters and ranks keyword and semantic hits together', () => {
+    render(<ManageProjectsOverviewContent />);
+    fireEvent.click(screen.getByRole('button', { name: 'filter.show_all' }));
+
+    search('solar');
+
+    expect(sent('SemanticProjectSearch').at(-1)?.[1].variables).toEqual({ query: 'solar' });
+    // Found by both searches first, then the closest in meaning, then the weaker keyword hit.
+    expect(rowIds()).toEqual(['row-1', 'row-3', 'row-2']);
+    expect(screen.getByText('ranked_hint')).toBeInTheDocument();
+    // Paged in the browser.
+    expect(lastTableProps()).toMatchObject({ pageIndex: 0, pageSize: 50, totalCount: 3 });
+  });
+
+  it('loads keyword candidates and semantic matches with the active filters, statuses aside', () => {
+    render(<ManageProjectsOverviewContent />);
+    fireEvent.change(screen.getByLabelText('filter.program_label'), { target: { value: '3' } });
+
+    search('solar');
+
+    const program = { ProjectCourses: { Course: { programId: { _eq: 3 } } } };
+    const calls = sent('ProjectsOverview').map(([, options]) => options.variables);
+    const keyword = calls.filter((variables) => !idsOf(variables.where)).at(-1);
+    const similar = calls.filter((variables) => idsOf(variables.where)).at(-1);
+    expect(keyword).toEqual({
+      where: { _and: [program, searchCondition('solar')] },
+      limit: 300,
+      offset: 0,
+    });
+    // The matches, closest first, loaded under the caller's role with the same filters.
+    expect(similar?.where).toEqual({ _and: [program, { id: { _in: [3, 99, 1] } }] });
+  });
+
+  it('filters the ranked results by status and counts them on the chips', () => {
+    render(<ManageProjectsOverviewContent />);
+    fireEvent.click(screen.getByRole('button', { name: 'filter.show_all' }));
+
+    search('solar');
+
+    expect(screen.getByTestId('status-count-ONGOING')).toHaveTextContent('1');
+    expect(screen.getByTestId('status-count-SENT_BACK')).toHaveTextContent('1');
+    expect(screen.getByTestId('status-count-PROPOSED')).toHaveTextContent('1');
+    expect(screen.getByTestId('status-count-PUBLISHED')).toHaveTextContent('0');
+    // Counted in the browser: the server's counts would only see keyword matches.
+    const countQueries = mockUseManageQuery.mock.calls.filter(
+      ([doc]) => operationName(doc) === 'ProjectsOverviewStatusCounts'
+    );
+    expect(countQueries.at(-1)?.[1].skip).toBe(true);
+
+    fireEvent.click(statusChip('SENT_BACK'));
+    expect(rowIds()).toEqual(['row-2']);
+    // The chips keep counting every ranked result, whatever is selected.
+    expect(screen.getByTestId('status-count-ONGOING')).toHaveTextContent('1');
+  });
+
+  it('applies the Needs Attention preset to the ranked results too', () => {
+    render(<ManageProjectsOverviewContent />);
+
+    search('solar');
+
+    // Only the Awaiting Confirmation project is in the Admin's preset.
+    expect(rowIds()).toEqual(['row-3']);
+  });
+
+  it.each([
+    ['fails', { success: false, matches: [] }],
+    ['is turned off', { enabled: false, matches: [] }],
+  ])('shows keyword results with a note when semantic search %s', (_, overrides) => {
+    semantic = semanticResult(overrides);
+    render(<ManageProjectsOverviewContent />);
+    fireEvent.click(screen.getByRole('button', { name: 'filter.show_all' }));
+
+    search('solar');
+
+    expect(screen.getByText('semantic_unavailable')).toBeInTheDocument();
+    expect(rowIds()).toEqual(['row-1', 'row-2']);
+  });
+
+  it('keeps shorter searches paged on the server', () => {
+    render(<ManageProjectsOverviewContent />);
+
+    search('so');
+
+    expect(sent('SemanticProjectSearch')).toHaveLength(0);
+    expect(lastVariables('ProjectsOverview')).toEqual({
+      where: { _and: [searchCondition('so'), { projectStatusRank: { _in: [1, 4, 6] } }] },
+      limit: 50,
+      offset: 0,
+    });
+    expect(screen.queryByText('ranked_hint')).not.toBeInTheDocument();
+    expect(screen.queryByText('semantic_unavailable')).not.toBeInTheDocument();
   });
 });

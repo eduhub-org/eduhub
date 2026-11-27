@@ -78,6 +78,21 @@ export function projectsOverviewBaseWhere(
   return and(conditions);
 }
 
+/**
+ * The projects among `projectIds` (the semantic matches of a ranked search) that pass the program
+ * and course-group filters within the viewer's `scope`; the search words and statuses are left out.
+ */
+export function projectsOverviewMatchesWhere(
+  filters: Omit<ProjectsOverviewFilterState, 'statuses' | 'search'>,
+  scope: Project_bool_exp,
+  projectIds: number[]
+): Project_bool_exp {
+  return and([
+    projectsOverviewBaseWhere({ ...filters, search: '' }, scope),
+    { id: { _in: projectIds } },
+  ]);
+}
+
 /** The `where` of the overview's project list. */
 export function projectsOverviewWhere(
   filters: ProjectsOverviewFilterState,

@@ -184,6 +184,22 @@ export const PROJECTS_OVERVIEW = gql`
   }
 `;
 
+export const SEMANTIC_PROJECT_SEARCH = gql`
+  # The projects closest in meaning to a search of the projects overview (ADR
+  # 0009): ids and similarities only. The overview loads them with
+  # PROJECTS_OVERVIEW under its own role and filters (useRankedProjects).
+  query SemanticProjectSearch($query: String!) {
+    semanticProjectSearch(query: $query) {
+      success
+      enabled
+      matches {
+        projectId
+        similarity
+      }
+    }
+  }
+`;
+
 export const PROJECTS_OVERVIEW_STATUS_COUNTS = gql`
   # Number of projects per Project Status for the overview's status chips. Each
   # variable is the overview's active filters (program, course group, search)

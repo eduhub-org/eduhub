@@ -2490,6 +2490,9 @@
     },
     "courses_column": "Course(s) / Program",
     "no_courses": "No course",
+    "ranked_hint": "Sorted by relevance: projects with every search word, and projects similar in meaning.",
+    "ranked_capped": "Of {total} keyword matches, the first {ranked} in status order are included – refine your search to see all of them.",
+    "semantic_unavailable": "The similarity search is currently unavailable – you only see keyword matches.",
     "filter": {
       "status_label": "Project Status",
       "needs_attention": "Needs Attention",
