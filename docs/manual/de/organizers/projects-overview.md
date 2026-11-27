@@ -26,3 +26,11 @@ Klicke auf eine Zeile, um sie aufzuklappen. Du hast dieselben Aktionen wie im Pr
 Ein Projekt zu einem Kurs hinzufügen oder aus einem Kurs herausnehmen kannst Du nur auf der Verwaltungsseite dieses Kurses.
 
 Da ein Projekt in mehreren Kursen stehen kann, weiß die Übersicht nicht, welche Abgabefrist eines Kurses gilt. Sie zeigt nur eine Frist, die am Projekt selbst gesetzt ist; die Frist aus Kurs oder Programm siehst Du auf der Verwaltungsseite des Kurses.
+
+## Vorschau und Veröffentlichen
+
+**Vorschau** zeigt ein Projekt so, wie seine Projektseite es darstellt: Titelbild, Untertitel, Beschreibung, Autor:innen und bei einem bestandenen Projekt seine Dokumentation, Präsentation und seinen Link.
+
+Admins veröffentlichen ein Projekt im öffentlichen Showcase mit **Veröffentlichen** und nehmen es mit **Veröffentlichung zurücknehmen** wieder heraus. Beides gibt es für bestandene Projekte (außer Onlinekursen), offene Projektvorlagen und bereits veröffentlichte Projekte. Mit dem Veröffentlichen ist ein Vorschlag zur Veröffentlichung erledigt; das Zurücknehmen ändert sonst nichts am Status des Projekts. Org-Admins können keine Projekte veröffentlichen. Dieselben Schaltflächen findest Du im Projektreiter der Verwaltungsseite eines Kurses.
+
+Über der Liste findest Du als Admin Links zu den Einstellungen **Projekttypen** und **Dokumentationsanleitungen**.

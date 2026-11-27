@@ -26,3 +26,11 @@ Click a row to expand it. You get the same actions as on the projects tab of a c
 Adding a project to a course and taking a project out of a course are only possible on the manage page of that course.
 
 Since a project can be listed in several courses, the overview doesn't know which course's submission deadline applies. It only shows a deadline set on the project itself; the course or program deadline is shown on the course's manage page.
+
+## Preview and publishing
+
+**Preview** shows a project the way its Project Page presents it: cover image, tagline, description, authors and, for a Passed Project, its documentation, presentation and link.
+
+Admins publish a project in the public showcase with **Publish**, and take it out again with **Unpublish**. Both are offered for Passed Projects (except online courses), open Project Templates and projects that are already published. Publishing fulfils a suggestion for publication; unpublishing leaves the project's status otherwise unchanged. Org Admins can't publish projects. The same buttons are on the projects tab of a course's manage page.
+
+Above the list, Admins find links to the settings **Project types** and **Documentation instructions**.
