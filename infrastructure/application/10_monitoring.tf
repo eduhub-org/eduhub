@@ -87,14 +87,16 @@ locals {
     },
     {
       # Structured logs of our own code: the cloud functions (winston) and
-      # the media service. Their messages are fixed texts; details such as
-      # ids go into other fields.
+      # the media service. Many messages carry an id or a number
+      # ("... for user <id>", "courseId: 42", "sessionSpeakerId=17"), which
+      # would make every occurrence its own alert. So the label keeps the
+      # words up to the first one containing a digit or "=", at most 20.
       key      = "app"
       name     = "Application error"
       selector = "jsonPayload.message:*"
       labels = {
         "service" = "EXTRACT(resource.labels.service_name)"
-        "message" = "REGEXP_EXTRACT(jsonPayload.message, \"^(.{1,150})\")"
+        "message" = "REGEXP_EXTRACT(jsonPayload.message, \"^((?:[^[:space:]0-9:=]+(?:[[:space:]]+|:[[:space:]]*|$)){1,20})\")"
       }
       subject = "$${log.extracted_label.service}: $${log.extracted_label.message}"
       content = <<-EOT
