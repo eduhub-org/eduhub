@@ -223,6 +223,20 @@ describe('production errors', () => {
     expect(stored.model).toBeNull();
   });
 
+  it('makes no claim about errors when the logs were read only partly', async () => {
+    let page = 0;
+    const fetchImpl = async (url) => {
+      if (url.includes('metadata')) return new Response(JSON.stringify({ access_token: 'sa-token', expires_in: 3600 }));
+      page += 1;
+      if (page > 1) throw Object.assign(new Error('timed out'), { name: 'TimeoutError' });
+      return new Response(JSON.stringify({ entries: [], nextPageToken: 'more' }));
+    };
+    const gql = fakeGql({ reports: [], newReports: 0 });
+    await generateIssueReportSummary({}, logger, { gql, read: settings(withLogs), fetchImpl, now: () => NOW });
+    const stored = gql.requests.find((r) => r.query.includes('InsertIssueReportSummary')).variables.object;
+    expect(stored.summary).toBe('## Overview\n\nNo open reports and no thumbs-down feedback this week. The production errors could not be read completely.');
+  });
+
   it('leaves errors out entirely while the analysis is off', () => {
     const [, user] = buildMessages({ since: 's', until: 'u', reports: [], newReportCount: 0, feedback: [] });
     expect(user.content).not.toContain('Production errors');

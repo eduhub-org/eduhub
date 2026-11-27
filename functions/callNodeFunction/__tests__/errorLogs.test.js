@@ -38,7 +38,9 @@ describe('normalizeMessage', () => {
     expect(normalizeMessage('Error: Hasura request failed: HTTP 500')).toBe('Error: Hasura request failed: HTTP 500');
     expect(normalizeMessage('AxiosError: Request failed with status code 502')).toBe('AxiosError: Request failed with status code 502');
     expect(normalizeMessage('2026-11-20 10:00:00,123 ERROR (executor-thread-12) KC-SERVICES0013: Failed')).toBe('ERROR (executor-thread-<n>) KC-SERVICES0013: Failed');
-    expect(normalizeMessage('GET https://x.example/api?token=abc123 failed\n  at stack')).toBe('GET https://x.example/api failed');
+    expect(normalizeMessage('GET https://x.example/api?token=abc123 failed\n  at stack')).toBe('GET https://x.example/… failed');
+    expect(normalizeMessage('GET https://x.example/reset/opaqueSecret failed')).toBe('GET https://x.example/… failed');
+    expect(normalizeMessage('see "https://cloud.google.com/run/docs/x".')).toBe('see "https://cloud.google.com/…".');
     expect(normalizeMessage('x'.repeat(300))).toHaveLength(201);
   });
 });

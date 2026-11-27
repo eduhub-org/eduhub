@@ -216,7 +216,11 @@ export default async function generateIssueReportSummary(req, logger, { gql, rea
   const quiet = "No open reports and no thumbs-down feedback this week.";
   // Only claim "no production errors" when the logs were read.
   let summary = `## Overview\n\n${
-    !errors ? quiet : errors.unavailable ? `${quiet} The production errors could not be read.` : "No open reports, no thumbs-down feedback and no production errors this week."
+    !errors
+      ? quiet
+      : errors.unavailable || !errors.complete
+        ? `${quiet} The production errors could not be read${errors.unavailable ? "" : " completely"}.`
+        : "No open reports, no thumbs-down feedback and no production errors this week."
   }`;
   let usage = { inputTokens: 0, outputTokens: 0 };
   let model = null;

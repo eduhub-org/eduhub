@@ -40,7 +40,8 @@ export const errorLogConfig = (read = env) => {
 export const normalizeMessage = (text) => {
   const clean = redactEmails(String(text ?? "").split("\n")[0])
     .replace(/^\d{4}-\d\d-\d\d[T ][\d:.,]+Z?\s+/, "") // leading timestamp (Keycloak)
-    .replace(/https?:\/\/\S+/g, (url) => url.replace(/[?#].*$/, "")) // query strings hold tokens and ids
+    // Paths and query strings can hold tokens and ids; the host says which service failed.
+    .replace(/(https?:\/\/[^/\s?#"']+)[^\s"']*/g, (_, origin) => `${origin}/…`)
     .replace(/\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b/gi, "<id>")
     .replace(/\b\d{1,3}(?:\.\d{1,3}){3}\b/g, "<ip>")
     .replace(/\b(?=[0-9a-f]*\d)[0-9a-f]{12,}\b/gi, "<id>")
@@ -121,6 +122,7 @@ export const readErrorEntries = async (config, { since, until, fetchImpl = globa
   const deadline = now() + DEADLINE_MS;
   const entries = [];
   let pageToken;
+  let pages = 0;
   do {
     const remaining = deadline - now();
     if (remaining <= 0) return { entries, complete: false };
@@ -129,9 +131,10 @@ export const readErrorEntries = async (config, { since, until, fetchImpl = globa
       body = await readPage(config, { since, until, pageToken, token, fetchImpl, timeoutMs: remaining });
     } catch (error) {
       // The budget ran out while a page was loading: keep the pages already read.
-      if ((error.name === "TimeoutError" || error.name === "AbortError") && entries.length) return { entries, complete: false };
+      if ((error.name === "TimeoutError" || error.name === "AbortError") && pages) return { entries, complete: false };
       throw error;
     }
+    pages += 1;
     entries.push(...(body.entries ?? []));
     pageToken = body.nextPageToken;
     if (entries.length >= MAX_ENTRIES) {
