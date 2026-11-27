@@ -17,6 +17,20 @@ The list is sorted by Project Status in the order of the project lifecycle: Proj
 
 The list shows 50 projects per page. Use the arrows below the list to move between pages, or change **Items per page**.
 
+## Finding projects
+
+Above the list there is one chip per Project Status: **Project Template**, **Awaiting Confirmation**, **Ongoing**, **Sent Back**, **Submitted**, **Passed**, **Suggested for Publication**, **Published** and **Not Passed**. Each chip shows how many projects have that status. Click chips to show only projects with those statuses; you can select several at once, and clicking a selected chip deselects it.
+
+The overview opens on **Needs Attention**: the projects waiting for a decision from you. For Admins these are the statuses Awaiting Confirmation (Project Confirmation), Submitted (review) and Suggested for Publication. Click **Show all** to clear the selection and see every project, and **Needs Attention** to get back to it.
+
+You can narrow the list further:
+
+- **Program**: projects listed in at least one course of that program.
+- **Course group**: projects listed in at least one course of that course group.
+- **Search**: finds projects whose title, tagline or description, author or mentor names, course title or program short title contain every word you type.
+
+The chip counts take the program, course group and search into account, so they show how many projects of each status match those filters.
+
 ## Working on a project
 
 Click a row to expand it. You get the same actions as on the projects tab of a course's manage page: confirming a project (Project Confirmation), reviewing a submitted project, adding and removing authors and mentors, editing the title, tagline, description, cover image, type and documentation instruction, and suggesting a project for publication. Your changes are saved straight away.

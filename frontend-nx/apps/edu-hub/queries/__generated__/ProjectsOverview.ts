@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { ProjectStatus_enum, ProjectRating_enum, ProjectParticipationStatus_enum } from "./../../__generated__/globalTypes";
+import { ProjectStatus_enum, ProjectRating_enum, ProjectParticipationStatus_enum, Project_bool_exp } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: ProjectsOverview
@@ -296,6 +296,7 @@ export interface ProjectsOverview {
 }
 
 export interface ProjectsOverviewVariables {
+  where: Project_bool_exp;
   limit: number;
   offset: number;
 }

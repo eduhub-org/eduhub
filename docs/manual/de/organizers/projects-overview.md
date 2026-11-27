@@ -17,6 +17,20 @@ Die Liste ist nach dem Projektstatus in der Reihenfolge des Projektablaufs sorti
 
 Die Liste zeigt 50 Projekte pro Seite. Mit den Pfeilen unter der Liste wechselst Du die Seite, oder Du änderst **Einträge pro Seite**.
 
+## Projekte finden
+
+Über der Liste gibt es für jeden Projektstatus einen Chip: **Projektvorlage**, **Wartet auf Bestätigung**, **In Bearbeitung**, **Zurückgegeben**, **Eingereicht**, **Bestanden**, **Zur Veröffentlichung vorgeschlagen**, **Veröffentlicht** und **Nicht bestanden**. Jeder Chip zeigt, wie viele Projekte diesen Status haben. Klicke auf Chips, um nur Projekte mit diesen Status anzuzeigen; Du kannst mehrere gleichzeitig auswählen, und ein Klick auf einen ausgewählten Chip hebt die Auswahl wieder auf.
+
+Die Übersicht öffnet mit **Handlungsbedarf**: den Projekten, die auf eine Entscheidung von Dir warten. Für Admins sind das die Status Wartet auf Bestätigung (Projektbestätigung), Eingereicht (Bewertung) und Zur Veröffentlichung vorgeschlagen. Mit **Alle anzeigen** hebst Du die Auswahl auf und siehst alle Projekte, mit **Handlungsbedarf** kommst Du zu ihr zurück.
+
+Du kannst die Liste weiter eingrenzen:
+
+- **Programm**: Projekte, die in mindestens einem Kurs dieses Programms stehen.
+- **Kursgruppe**: Projekte, die in mindestens einem Kurs dieser Kursgruppe stehen.
+- **Suche**: findet Projekte, deren Titel, Untertitel oder Beschreibung, Namen der Autor:innen oder Mentor:innen, Kurstitel oder Programm-Kurztitel jedes eingegebene Wort enthalten.
+
+Die Zahlen auf den Chips berücksichtigen Programm, Kursgruppe und Suche; sie zeigen also, wie viele Projekte jedes Status zu diesen Filtern passen.
+
 ## An einem Projekt arbeiten
 
 Klicke auf eine Zeile, um sie aufzuklappen. Du hast dieselben Aktionen wie im Projektreiter der Verwaltungsseite eines Kurses: ein Projekt bestätigen (Projektbestätigung), ein eingereichtes Projekt bewerten, Autor:innen und Mentor:innen hinzufügen und entfernen, Titel, Untertitel, Beschreibung, Titelbild, Typ und Dokumentationsanleitung ändern und ein Projekt zur Veröffentlichung vorschlagen. Deine Änderungen werden sofort gespeichert.

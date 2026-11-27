@@ -6,7 +6,7 @@
 --
 -- Keep in sync with the status chip logic in
 -- frontend-nx/apps/edu-hub/components/pages/CourseContent/Projects/projectStatusDisplay.ts
--- (isOpenTemplate, resolveProjectStatusChipKey):
+-- (PROJECT_STATUSES order, getProjectStatusChipKey):
 --   0 Project Template           PROPOSED, no ACCEPTED author (published or not)
 --   1 Awaiting Confirmation      PROPOSED with an ACCEPTED author
 --   2 Ongoing                    ONGOING, not sent back
