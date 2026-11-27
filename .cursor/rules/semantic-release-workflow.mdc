@@ -1,6 +1,6 @@
 ---
 description: "Semantic release workflow, branch strategy, and automated versioning process for EduHub"
-globs: ["**/.github/workflows/**", "**/.releaserc.json", "**/CHANGELOG.md", "**/package.json", "**/frontend-nx/package.json"]
+globs: ["**/.github/workflows/**", "**/.releaserc.json"]
 alwaysApply: false
 ---
 
@@ -55,22 +55,10 @@ EduHub uses automated semantic versioning with a three-branch workflow for consi
 
 ## Version Management
 
-Semantic release automatically updates versions in:
-- `frontend-nx/package.json` (main frontend package)
-- `package.json` (root workspace package)
-- All `functions/*/package.json` files (serverless functions)
-- `CHANGELOG.md` (auto-generated changelog)
-
-## Workspace Version Synchronization
-
-**Critical for Monorepo Setup**: EduHub uses Yarn 3 workspaces, requiring version alignment:
-
-- **Semantic-release runs from `frontend-nx`** directory and auto-updates `frontend-nx/package.json`
-- **Root `package.json` is manually updated** via `prepareCmd` to prevent version drift
-- **All function packages sync** to the same version for consistency
-- **Prevents Yarn workspace resolution issues** and noisy diffs
-
-**Never manually edit version numbers** - the automated system keeps everything synchronized.
+The version is only the git tag (`vX.Y.Z`) and the GitHub release that
+semantic-release creates on `production`. A release commits nothing: no file
+in the repo carries the version (the `package.json` versions stay `0.1.0`), so
+there is nothing to bump by hand or to merge back into `develop` or `staging`.
 
 ## Merge Commit Guidelines
 
@@ -91,8 +79,7 @@ Merge pull request #123 from org/develop
 
 ## Automated Processes
 
-- **Changelog Generation**: Automatic based on conventional commits
-- **GitHub Releases**: Created with release notes
+- **GitHub Releases**: Created with release notes generated from conventional commits
 - **Git Tags**: Applied with proper versioning
 - **Version Bumping**: Based on commit message types
 - **Deployment**: Automatic to respective environments
@@ -101,5 +88,4 @@ Merge pull request #123 from org/develop
 
 - Semantic release runs from the `frontend-nx` directory in the monorepo
 - The workflow requires conventional commit format for proper version determination
-- All version updates happen automatically - do not manually edit version numbers
-- The `[skip ci]` flag is automatically added to release commits to prevent infinite loops
+- Releases only tag and publish; they never commit to the repository

@@ -236,8 +236,7 @@ Verify your commit messages match exactly:
 ## Monorepo Configuration
 
 - Semantic-release runs from the `frontend-nx` directory
-- Automatically syncs versions across all workspace packages  
-- Updates root `package.json` and all `functions/*/package.json` files
+- A release creates the git tag `vX.Y.Z` on the deployed `production` commit and the GitHub release with its notes. It commits nothing: no file carries the version (the `package.json` versions stay `0.1.0`), so there is nothing to merge back into `develop` or `staging`
 - GitHub Actions workflow handles the entire release process
 - No manual intervention required once PRs are merged
 
@@ -285,7 +284,7 @@ feat merge develop                                 # Missing colon
 - The actual features/fixes are already documented in individual commits
 - This prevents double-counting version bumps
 - It keeps the git history clean and semantic
-- `chore:` commits appear in the changelog but don't trigger version bumps
+- `chore:` commits appear in the release notes but don't trigger version bumps
 
 ### Example Flow
 ```bash
