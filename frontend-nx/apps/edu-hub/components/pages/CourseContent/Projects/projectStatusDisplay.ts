@@ -80,6 +80,8 @@ export function resolveProjectStatusChipKey(
   return status;
 }
 
+// The SQL function `project_status_rank` (computed field Project.projectStatusRank) orders the
+// projects overview by the same Project Status; keep the two in sync.
 export function getProjectStatusChipKey(
   project: Pick<
     ProjectRow,

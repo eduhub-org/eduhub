@@ -1,4 +1,4 @@
-import { FC, useCallback, useMemo, useState } from 'react';
+import { FC, ReactNode, useCallback, useMemo, useState } from 'react';
 import { ColumnDef } from '@tanstack/react-table';
 import { ApolloError } from '@apollo/client';
 import { CircularProgress, Tooltip } from '@mui/material';
@@ -91,6 +91,22 @@ import ConfirmProjectDialog from './ConfirmProjectDialog';
 import ReviewProjectDialog from './ReviewProjectDialog';
 import AddProjectDialog from './AddProjectDialog';
 
+/** A column a page adds to the grid, shown after the title and in the phone card. */
+export interface ProjectsGridExtraColumn {
+  id: string;
+  header: string;
+  render: (project: ProjectRow) => ReactNode;
+}
+
+/** Server-side paging, owned by the parent's row query. */
+export interface ProjectsGridPagination {
+  pageIndex: number;
+  pageSize: number;
+  totalCount: number;
+  onPageChange: (index: number) => void;
+  onPageSizeChange: (size: number) => void;
+}
+
 interface ProjectsManagementGridProps {
   /**
    * The course the grid manages projects of. Without one, the course-only
@@ -106,6 +122,10 @@ interface ProjectsManagementGridProps {
   refetchQueries: string[];
   /** Reloads the parent's rows. */
   onRefetch: () => void;
+  /** Page-specific columns, e.g. the courses on the cross-course overview. */
+  extraColumns?: ProjectsGridExtraColumn[];
+  /** When given, `projects` is one page of `totalCount` rows; otherwise all rows, unpaged. */
+  pagination?: ProjectsGridPagination;
   programDefaultProjectType: string | null;
   /** Course / program fallback when `Project.submissionDeadline` is null. */
   courseDefaultProjectSubmissionDeadline: string | null | undefined;
@@ -119,6 +139,8 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
   error,
   refetchQueries,
   onRefetch,
+  extraColumns,
+  pagination,
   programDefaultProjectType,
   courseDefaultProjectSubmissionDeadline,
   courseSubmissionDeadlineDefaultSource,
@@ -623,6 +645,14 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
         enableSorting: true,
         cell: ({ row }) => renderTitle(row.original),
       },
+      ...(extraColumns ?? []).map(
+        (column): ColumnDef<ProjectRow> => ({
+          id: column.id,
+          header: column.header,
+          enableSorting: false,
+          cell: ({ row }) => column.render(row.original),
+        })
+      ),
       {
         id: 'authors',
         header: t('projects.table.authors'),
@@ -645,7 +675,7 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
         cell: ({ row }) => renderProjectAction(row.original),
       },
     ],
-    [renderAuthors, renderProjectAction, renderTitle, renderType, t, tCourse]
+    [extraColumns, renderAuthors, renderProjectAction, renderTitle, renderType, t, tCourse]
   );
 
   const renderMobileRow = useCallback(
@@ -661,13 +691,16 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
         </div>
         {renderTitle(project)}
         <div className="flex flex-col gap-1 text-xs text-label-secondary">
+          {(extraColumns ?? []).map((column) => (
+            <div key={column.id}>{column.render(project)}</div>
+          ))}
           {renderAuthors(project)}
           {renderType(project)}
         </div>
         <div className="pt-1">{renderProjectAction(project)}</div>
       </div>
     ),
-    [renderAuthors, renderProjectAction, renderTitle, renderType]
+    [extraColumns, renderAuthors, renderProjectAction, renderTitle, renderType]
   );
 
   const expandableRowComponent = useCallback(
@@ -1136,10 +1169,13 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
         data={allProjects}
         loading={loading}
         error={error}
-        enablePagination={false}
+        enablePagination={Boolean(pagination)}
         showGlobalSearchField={false}
-        pageIndex={0}
-        onPageChange={() => undefined}
+        pageIndex={pagination?.pageIndex ?? 0}
+        onPageChange={pagination?.onPageChange ?? (() => undefined)}
+        pageSize={pagination?.pageSize}
+        totalCount={pagination?.totalCount}
+        onPageSizeChange={pagination?.onPageSizeChange}
         searchFilter=""
         onSearchFilterChange={() => undefined}
         refetchQueries={refetchQueries}

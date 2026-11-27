@@ -58,6 +58,7 @@
       "courses": "Kurse",
       "events": "Events",
       "degrees": "Degrees",
+      "projects": "Projekte",
       "programs": "Programme",
       "settings": "Einstellungen",
       "calendar": "Kalender",
@@ -2481,6 +2482,11 @@
       "unpublish_success": "Projekt zurückgezogen",
       "action_failed": "Die Aktion konnte nicht abgeschlossen werden. Bitte erneut versuchen."
     }
+  },
+  "projectsOverview": {
+    "headline": "Projekte",
+    "courses_column": "Kurs(e) / Programm",
+    "no_courses": "Kein Kurs"
   },
   "managePrograms": {
     "program_sessions": {

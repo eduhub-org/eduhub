@@ -8,6 +8,7 @@ let mockIsOrgAdmin = false;
 let mockIsAdmin = false;
 let mockIsInstructor = false;
 let mockCanViewStatistics = false;
+let mockCanManageCourses = false;
 
 jest.mock('next-intl', () => ({
   useTranslations: () => (key: string) => key,
@@ -25,7 +26,7 @@ jest.mock('../../../hooks/authentication', () => ({
 
 jest.mock('../../../hooks/orgAdminCapabilities', () => ({
   useOrgAdminCapabilities: () => ({
-    canManageCourses: false,
+    canManageCourses: mockCanManageCourses,
     canManageEvents: false,
     canManageDegrees: false,
     canManageSettings: false,
@@ -53,6 +54,7 @@ describe('account Menu', () => {
     mockIsAdmin = false;
     mockIsInstructor = false;
     mockCanViewStatistics = false;
+    mockCanManageCourses = false;
   });
 
   it('leaves an 8px gap below the avatar trigger', async () => {
@@ -121,6 +123,33 @@ describe('account Menu', () => {
 
     expect(screen.getByRole('menuitem', { name: 'menu.statistics' })).toHaveAttribute('href', '/statistics');
     expect(screen.getByText('menu.section_management')).toBeInTheDocument();
+  });
+
+  it('links the projects overview for admins', async () => {
+    mockIsAdmin = true;
+    await renderMenu();
+
+    expect(screen.getByRole('menuitem', { name: 'menu.projects' })).toHaveAttribute(
+      'href',
+      '/manage/projects'
+    );
+  });
+
+  it.each([
+    [
+      'org admins who manage courses',
+      () => {
+        mockIsOrgAdmin = true;
+        mockCanManageCourses = true;
+      },
+    ],
+    ['instructors', () => (mockIsInstructor = true)],
+    ['participants', () => undefined],
+  ])('hides the projects overview from %s', async (_, setRole) => {
+    setRole();
+    await renderMenu();
+
+    expect(screen.queryByRole('menuitem', { name: 'menu.projects' })).not.toBeInTheDocument();
   });
 
   it('hides the manual entry from participants and org admins', async () => {

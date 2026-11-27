@@ -58,6 +58,7 @@
       "courses": "Courses",
       "events": "Events",
       "degrees": "Degrees",
+      "projects": "Projects",
       "programs": "Programs",
       "settings": "Settings",
       "calendar": "Calendar",
@@ -2496,6 +2497,11 @@
       "unpublish_success": "Project unpublished",
       "action_failed": "The action could not be completed. Please try again."
     }
+  },
+  "projectsOverview": {
+    "headline": "Projects",
+    "courses_column": "Course(s) / Program",
+    "no_courses": "No course"
   },
   "managePrograms": {
     "program_sessions": {

@@ -150,6 +150,37 @@ export const PROJECTS_BY_COURSE = gql`
   }
 `;
 
+export const PROJECTS_OVERVIEW = gql`
+  # Every project across all courses, for the Admin projects overview. Same row
+  # fragment as the course tab, plus the courses (and their programs) a project
+  # is listed in. Sorted by Project Status in lifecycle order (computed field,
+  # see the project_status_rank SQL function), then most recently updated.
+  ${PROJECT_FRAGMENT_DETAILED}
+  query ProjectsOverview($limit: Int!, $offset: Int!) {
+    Project(
+      order_by: [{ projectStatusRank: asc }, { updated_at: desc }, { id: desc }]
+      limit: $limit
+      offset: $offset
+    ) {
+      ...ProjectFragmentDetailed
+      courses {
+        id
+        title
+        Program {
+          id
+          title
+          shortTitle
+        }
+      }
+    }
+    Project_aggregate {
+      aggregate {
+        count
+      }
+    }
+  }
+`;
+
 export const MY_PROJECT_BY_COURSE = gql`
   # Matches projects in the course where the user is a confirmed author (ACCEPTED)
   # or was marked EXCLUDED from the final submission. The caller prefers the

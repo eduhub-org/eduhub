@@ -84,6 +84,14 @@ computed_fields:
         name: project_courses
         schema: public
       table_argument: project_row
+  # Admin-only for now (no role grants it): sorts the projects overview by Project Status.
+  - name: projectStatusRank
+    comment: Lifecycle position of the derived Project Status, from 0 (Project Template) to 8 (Not Passed).
+    definition:
+      function:
+        name: project_status_rank
+        schema: public
+      table_argument: project_row
 insert_permissions:
   - role: user_access
     permission:
