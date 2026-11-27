@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl';
 import { CircularProgress } from '@mui/material';
 
 import Onboarding from './Onboarding';
-import { useLazyRoleQuery } from '../../../hooks/authedQuery';
+import { useRoleQuery } from '../../../hooks/authedQuery';
 import { useUserId } from '../../../hooks/user';
 import { CourseWithEnrollment } from '../../../queries/__generated__/CourseWithEnrollment';
 import { COURSE_WITH_ENROLLMENT } from '../../../queries/courseWithEnrollment';
@@ -112,20 +112,20 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
   const [participationExitKind, setParticipationExitKind] = useState<ParticipationExitKind | null>(null);
   const [cancellationRequested, setCancellationRequested] = useState(false);
 
-  // Query for authorized course data
-  const [
-    getCoursesAuthorized,
-    {
-      data: authorizedCourseData,
-      refetch: refetchCourse,
-      loading: getCoursesAuthorizedLoading,
-      called: getCoursesAuthorizedCalled,
-    },
-  ] = useLazyRoleQuery<CourseWithEnrollment>(COURSE_WITH_ENROLLMENT, {
+  // Query for authorized course data. Only with a user id: when a session expires or briefly drops
+  // during a token refresh, userId turns undefined, and a query left running would go out
+  // anonymous without it, which Hasura rejects.
+  const {
+    data: authorizedCourseData,
+    refetch: refetchCourse,
+    loading: getCoursesAuthorizedLoading,
+    called: getCoursesAuthorizedCalled,
+  } = useRoleQuery<CourseWithEnrollment>(COURSE_WITH_ENROLLMENT, {
     variables: {
       id,
       userId,
     },
+    skip: !isLoggedIn || !userId,
     fetchPolicy: 'cache-and-network',
     onCompleted(data) {
       // Check if user has been invited to the course and the invitation has not expired. An
@@ -144,23 +144,16 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
   });
 
   // Query for unauthorized course data
-  const [
-    getCoursesUnauthorized,
-    { data: unauthorizedCourseData, loading: getCoursesUnauthorizedLoading, called: getCoursesUnauthorizedCalled },
-  ] = useLazyRoleQuery<Course, CourseVariables>(COURSE_ANONYMOUS, {
+  const {
+    data: unauthorizedCourseData,
+    loading: getCoursesUnauthorizedLoading,
+    called: getCoursesUnauthorizedCalled,
+  } = useRoleQuery<Course, CourseVariables>(COURSE_ANONYMOUS, {
     variables: {
       id,
     },
+    skip: isLoggedIn,
   });
-
-  // Call the appropriate query based on user authentication status
-  useEffect(() => {
-    if (isLoggedIn) {
-      getCoursesAuthorized();
-    } else {
-      getCoursesUnauthorized();
-    }
-  }, [isLoggedIn, getCoursesAuthorized, getCoursesUnauthorized]);
 
   // Extract course data from authorized or unauthorized query result
   const course = authorizedCourseData?.Course_by_pk || unauthorizedCourseData?.Course_by_pk;
