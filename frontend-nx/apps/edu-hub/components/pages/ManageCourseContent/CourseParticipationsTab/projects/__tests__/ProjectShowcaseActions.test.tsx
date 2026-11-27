@@ -59,6 +59,19 @@ const passedProject = {
       User: { __typename: 'User', id: 'author-1', firstName: 'Ada', lastName: 'Lovelace' },
     },
   ],
+  ProjectConsentEvents: [{ __typename: 'ProjectConsentEvent', id: 7, eventType: 'granted' }],
+  publicationConsentWithdrawnAt: null,
+} as unknown as ProjectRow;
+
+const withoutConsent = (project: ProjectRow, events: { eventType: string }[] = []): ProjectRow =>
+  ({ ...project, ProjectConsentEvents: events } as unknown as ProjectRow);
+
+const openTemplate = {
+  ...passedProject,
+  status: ProjectStatus_enum.PROPOSED,
+  suggestedForPublication: false,
+  ProjectAuthors: [],
+  ProjectConsentEvents: [],
 } as unknown as ProjectRow;
 
 const renderActions = (project: ProjectRow, onError = jest.fn()) =>
@@ -86,6 +99,61 @@ describe('ProjectShowcaseActions', () => {
     // The row's query reloads, so the row shows the new state.
     expect(mockUseRoleMutation.mock.calls[0][1]).toEqual({ refetchQueries: ['ProjectsOverview'] });
     expect(await screen.findByText('projects.notifications.publish_success')).toBeInTheDocument();
+  });
+
+  it('disables publishing with a note when the team has not consented', () => {
+    renderActions(withoutConsent(passedProject));
+
+    const publish = screen.getByRole('button', { name: 'projects.actions.publish' });
+    expect(publish).toBeDisabled();
+    expect(screen.getByText('projects.actions.publish_needs_consent')).toBeInTheDocument();
+    expect(publish).toHaveAccessibleDescription('projects.actions.publish_needs_consent');
+    fireEvent.click(publish);
+    expect(mockUpdatePublished).not.toHaveBeenCalled();
+  });
+
+  it('disables publishing when the team withdrew its consent', () => {
+    renderActions(withoutConsent(passedProject, [{ eventType: 'withdrawn' }]));
+
+    expect(screen.getByRole('button', { name: 'projects.actions.publish' })).toBeDisabled();
+    expect(screen.getByText('projects.actions.publish_needs_consent')).toBeInTheDocument();
+  });
+
+  it('enables publishing once the team granted consent, without the note', () => {
+    renderActions(passedProject);
+
+    expect(screen.getByRole('button', { name: 'projects.actions.publish' })).toBeEnabled();
+    expect(screen.queryByText('projects.actions.publish_needs_consent')).not.toBeInTheDocument();
+  });
+
+  it('lets an Admin publish an open Project Template without consent', async () => {
+    renderActions(openTemplate);
+
+    const publish = screen.getByRole('button', { name: 'projects.actions.publish' });
+    expect(publish).toBeEnabled();
+    expect(screen.queryByText('projects.actions.publish_needs_consent')).not.toBeInTheDocument();
+    fireEvent.click(publish);
+
+    await waitFor(() =>
+      expect(mockUpdatePublished).toHaveBeenCalledWith({
+        variables: { itemId: 42, published: true, suggestedForPublication: false },
+      })
+    );
+  });
+
+  it('always lets an Admin unpublish, even without consent', async () => {
+    renderActions(withoutConsent({ ...passedProject, published: true }));
+
+    const unpublish = screen.getByRole('button', { name: 'projects.actions.unpublish' });
+    expect(unpublish).toBeEnabled();
+    expect(screen.queryByText('projects.actions.publish_needs_consent')).not.toBeInTheDocument();
+    fireEvent.click(unpublish);
+
+    await waitFor(() =>
+      expect(mockUpdatePublished).toHaveBeenCalledWith({
+        variables: { itemId: 42, published: false, suggestedForPublication: true },
+      })
+    );
   });
 
   it('lets an Admin unpublish a published project and keeps its suggestion', async () => {
@@ -123,6 +191,19 @@ describe('ProjectShowcaseActions', () => {
     fireEvent.click(screen.getByRole('button', { name: 'projects.actions.publish' }));
 
     await waitFor(() => expect(onError).toHaveBeenCalledWith('projects.notifications.publish_failed'));
+  });
+
+  it('explains a publish the database refused for missing consent', async () => {
+    mockUpdatePublished.mockRejectedValue(
+      new Error('project_publication_requires_consent: project 42 can only be published once ...')
+    );
+    const onError = jest.fn();
+    jest.spyOn(console, 'error').mockImplementation(() => undefined);
+    renderActions(passedProject, onError);
+
+    fireEvent.click(screen.getByRole('button', { name: 'projects.actions.publish' }));
+
+    await waitFor(() => expect(onError).toHaveBeenCalledWith('projects.actions.publish_needs_consent'));
   });
 
   it('opens the project preview', () => {

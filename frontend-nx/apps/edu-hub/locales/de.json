@@ -1735,7 +1735,8 @@
         "title": "Titel",
         "authors": "Autor:innen",
         "type": "Typ",
-        "no_authors": "Noch keine Autor:innen"
+        "no_authors": "Noch keine Autor:innen",
+        "consent_withdrawn_unpublished": "Am {date} zurückgenommen: Das Team hat seine Zustimmung zur Veröffentlichung widerrufen"
       },
       "actions": {
         "confirm_project": "Projekt bestätigen",
@@ -1746,7 +1747,8 @@
         "withdraw_publication_suggestion": "Vorschlag zurückziehen",
         "preview": "Vorschau",
         "publish": "Veröffentlichen",
-        "unpublish": "Veröffentlichung zurücknehmen"
+        "unpublish": "Veröffentlichung zurücknehmen",
+        "publish_needs_consent": "Das Team hat der Veröffentlichung nicht zugestimmt. Ohne seine Zustimmung kann das Projekt nicht veröffentlicht werden."
       },
       "notifications": {
         "publish_success": "Projekt veröffentlicht",
@@ -1832,6 +1834,7 @@
         "no_authors_added": "Noch keine Autor:innen hinzugefügt.",
         "remove_author_aria": "Autor:in entfernen",
         "template_notice": "Wenn du keine Autor:innen hinzufügst, dient dieses Projekt als Vorlage: Kursteilnehmende können es aus der Projektliste kopieren und auf dieser Basis ein eigenes Team bilden.",
+        "template_showcase_notice": "Eine Projektvorlage kann auch im öffentlichen Projekt-Showcase veröffentlicht werden, wo andere ihr Thema entdecken können.",
         "extra_fields_notice": "Bitte ergänze im Anschluss weitere Details zum Projekt, indem du die Projektzeile in der Liste ausklappst.",
         "submit_button": "Anlegen",
         "error_title_required": "Bitte gib einen Projekttitel an.",

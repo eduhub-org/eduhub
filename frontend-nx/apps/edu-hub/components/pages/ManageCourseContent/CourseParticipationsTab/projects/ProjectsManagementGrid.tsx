@@ -4,7 +4,7 @@ import { ApolloError } from '@apollo/client';
 import { CircularProgress, Tooltip } from '@mui/material';
 import { HelpOutline } from '@mui/icons-material';
 import { useTranslations } from 'next-intl';
-import { MdAddCircle, MdClose } from 'react-icons/md';
+import { MdAddCircle, MdClose, MdWarningAmber } from 'react-icons/md';
 import { useRoleQuery } from '../../../../../hooks/authedQuery';
 import { useRoleMutation } from '../../../../../hooks/authedMutation';
 import { useUserId } from '../../../../../hooks/user';
@@ -62,7 +62,7 @@ import {
   ProjectParticipationStatus_enum,
   ProjectStatus_enum,
 } from '../../../../../__generated__/globalTypes';
-import { makeFullName } from '../../../../../helpers/util';
+import { formattedDate, makeFullName } from '../../../../../helpers/util';
 import {
   filterProjectDocumentationInstructionsWithPdf,
 } from '../../../CourseContent/Projects/projectDocumentationInstruction';
@@ -470,13 +470,23 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
     [updateProjectType, documentationInstructionsWithPdf, t, tCommon]
   );
 
-  // The title with the team's publication decision underneath, once there is one.
+  // The title with the team's publication decision underneath, once there is one, and a warning
+  // when the project was taken out of the showcase because its team withdrew consent.
   const renderTitle = useCallback(
     (project: ProjectRow) => {
       const decision = getPublicationDecision(project);
+      const consentWithdrawnAt = project.published ? null : project.publicationConsentWithdrawnAt;
       return (
         <div className="min-w-0">
           <span className="font-medium text-label-primary">{project.title}</span>
+          {consentWithdrawnAt && (
+            <span className="mt-0.5 flex items-center gap-1 text-xs font-medium text-warning">
+              <MdWarningAmber className="shrink-0" aria-hidden />
+              {t('projects.table.consent_withdrawn_unpublished', {
+                date: formattedDate(new Date(consentWithdrawnAt)),
+              })}
+            </span>
+          )}
           {decision && (
             <span className="mt-0.5 flex items-center gap-1 text-xs text-label-secondary">
               {decision === 'granted' ? (
@@ -490,7 +500,7 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
         </div>
       );
     },
-    [tCourse]
+    [t, tCourse]
   );
 
   const renderAuthors = useCallback(
