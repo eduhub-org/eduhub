@@ -122,3 +122,21 @@ def test_mandatory_program_sessions_count_toward_the_limit(run):
     queued = run([course])
 
     assert len(queued) == 1
+
+
+def test_running_courses_are_found_by_their_upcoming_sessions(monkeypatch):
+    """Course.endTime is a time of day, so comparing it with the timestamptz
+    $now failed validation and the check never ran. A course is still running
+    while one of its sessions has yet to end."""
+    queries = []
+
+    class RecordingClient(FakeClient):
+        def send_query(self, query, variables):
+            queries.append(query)
+            return super().send_query(query, variables)
+
+    monkeypatch.setattr(mod, "EduHubClient", lambda: RecordingClient([]))
+    monkeypatch.setattr(mod, "get_default_mail_template", lambda client, mail_type: TEMPLATE)
+    assert mod.check_course_continuation({})["success"] is True
+    assert "Sessions: {endDateTime: {_gte: $now}}" in queries[0]
+    assert "endTime" not in queries[0]
