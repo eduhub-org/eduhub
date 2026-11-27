@@ -1,3 +1,14 @@
+# Infrastructure
+
+- `bootstrap/`: [`bootstrap.sh`](bootstrap/bootstrap.sh) sets up a new Google Cloud
+  project (project, APIs, the `terraform` and `github` service accounts, Docker registry,
+  main bucket) before the first Terraform run. No Terraform creates the project; why:
+  [ADR 0009](../docs/adr/0009-bootstrap-gcp-projects-by-script.md). Steps around it:
+  [bootstrap/README.md](bootstrap/README.md).
+- `application/`: everything else, applied by CI in one HCP Terraform workspace per
+  environment. A new Google API is enabled here with `google_project_service` and
+  `disable_on_destroy = false`, not in the bootstrap script.
+
 # Application Infrastructure
 
 To run the code to setup the infrastructure for EduHub application and deploy it, the variables listed in the following are needed.
