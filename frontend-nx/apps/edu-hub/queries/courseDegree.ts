@@ -63,6 +63,10 @@ export const DEGREE_PARTICIPANTS_WITH_DEGREE_ENROLLMENTS = gql`
     $order_by: [CourseEnrollment_order_by!] = {updated_at: desc}
   ) {
     Course_by_pk(id: $degreeCourseId) {
+      # Without id Apollo cannot normalize this Course and stores it inline under
+      # Course_by_pk, replacing ManagedCourse's reference; the two queries then
+      # keep refetching each other on the manage page.
+      id
       CourseEnrollments(
         limit: $limit
         offset: $offset
