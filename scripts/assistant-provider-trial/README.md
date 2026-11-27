@@ -57,6 +57,7 @@ Answer quality is rated by hand: fill in `rating` (1–5) in `answers.csv`.
 cd scripts/assistant-provider-trial
 cp providers.example.json providers.json   # set PROJECT_ID, model ids and prices
 gcloud auth login                          # an account with roles/aiplatform.user
+export ASSISTANT_CONTACT=edu@opencampus.sh  # as in Terraform and docker-compose; unset, the prompt names no contact
 python3 run_trial.py --targets gemini-3.8-flash-eu --only de-mydata-01
 python3 run_trial.py --repeat 3             # all targets, 3 runs per case
 ```
