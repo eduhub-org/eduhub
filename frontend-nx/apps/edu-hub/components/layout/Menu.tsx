@@ -105,6 +105,8 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
   // they can manage any program type.
   const canViewCalendarMenu =
     canManageCoursesMenu || canManageEventsMenu || canManageDegreesMenu || canManageSettingsMenu;
+  // Projects overview: org admins see the projects of their organization's course and event programs.
+  const canViewProjectsMenu = canManageCoursesMenu || canManageEventsMenu;
   // Expert directory: org admins see the experts of their organization's courses (same audience).
   const canViewExpertsMenu = canViewCalendarMenu;
   // Whether the "Verwaltung" section has any entries for this user. Plain instructors have no
@@ -188,6 +190,17 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
           selected={isActiveRoute('/manage/degrees')}
         >
           {t('menu.degrees')}
+        </MenuItem>
+      )}
+
+      {canViewProjectsMenu && (
+        <MenuItem
+          component={Link}
+          href="/manage/projects"
+          onClick={closeMenu}
+          selected={isActiveRoute('/manage/projects')}
+        >
+          {t('menu.projects')}
         </MenuItem>
       )}
 

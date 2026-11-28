@@ -33,6 +33,11 @@ describe('SETTINGS_NAV registry', () => {
     });
   });
 
+  it('no longer lists Projects, which moved to the projects overview', () => {
+    expect(Object.keys(SETTINGS_NAV_ITEMS)).not.toContain('projects');
+    expect(SETTINGS_NAV_GROUPS.flatMap((g) => g.items)).not.toContain('projects');
+  });
+
   it('only uses internal routes for in-app settings items', () => {
     Object.values(SETTINGS_NAV_ITEMS)
       .filter((item) => item.href.startsWith('/manage/settings'))

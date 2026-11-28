@@ -245,7 +245,9 @@
     mail per participant and course.
 - name: sync_expert_embeddings
   webhook: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
-  # Nightly is enough: a new course or session shows up among similar experts the next day.
+  # Nightly is enough: a new course or session shows up among similar experts, a new or changed
+  # project in the projects overview's semantic search, the next day. One job for both searches
+  # (ADR 0004, ADR 0009): they share the embedding provider and the time budget of one run.
   schedule: '0 2 * * *'
   include_in_metadata: true
   payload: {}
@@ -260,7 +262,7 @@
       value: syncExpertEmbeddings
     - name: Hasura-Secret
       value_from_env: HASURA_CLOUD_FUNCTION_SECRET
-  comment: Embeds new or changed course, session, project and achievement-option texts for the semantic expert search (ADR 0004)
+  comment: Embeds new or changed course, session, project and achievement-option texts for the semantic expert search (ADR 0004) and every project's text for the semantic project search (ADR 0009)
 - name: delete_expired_assistant_feedback
   webhook: '{{CLOUD_FUNCTION_LINK_CALL_PYTHON_FUNCTION}}'
   schedule: 15 3 * * *

@@ -88,6 +88,11 @@ describe('syncExpertEmbeddings', () => {
     return {
       request: jest.fn(async (query, variables) => {
         if (query.includes('delete_ExpertRoleEmbedding')) return { delete_ExpertRoleEmbedding: { affected_rows: 2 } };
+        // The project pass (covered in projectEmbeddings.test.js) finds nothing to do here.
+        if (query.includes('delete_ProjectEmbedding')) return { delete_ProjectEmbedding: { affected_rows: 0 } };
+        if (query.includes('ProjectSourcesToEmbed')) {
+          return { ProjectEmbeddingSource: [], ProjectEmbeddingSource_aggregate: { aggregate: { count: 0 } } };
+        }
         if (query.includes('ExpertRoleSourcesToEmbed')) {
           return {
             ExpertRoleSource: pending.slice(0, variables.limit),
@@ -106,9 +111,14 @@ describe('syncExpertEmbeddings', () => {
 
     const result = await syncExpertEmbeddings({}, logger, { gql, read: settings({ EMBEDDING_PROVIDER: 'fake' }) });
 
-    expect(result).toEqual({ success: true, deleted: 2, embedded: 1, failed: 0, remaining: 0 });
-    expect(gql.request.mock.calls[0][1]).toEqual({ model: 'fake:word-hash-768' });
-    const upsert = gql.request.mock.calls[2][1].object;
+    expect(result).toEqual({
+      success: true,
+      expertRoles: { deleted: 2, embedded: 1, failed: 0, remaining: 0 },
+      projects: { deleted: 0, embedded: 0, failed: 0, remaining: 0 },
+    });
+    const callTo = (name) => gql.request.mock.calls.find(([query]) => query.includes(name));
+    expect(callTo('delete_ExpertRoleEmbedding')[1]).toEqual({ model: 'fake:word-hash-768' });
+    const upsert = callTo('insert_ExpertRoleEmbedding_one')[1].object;
     expect(upsert).toMatchObject({ sourceType: 'COURSE', sourceId: 7, model: 'fake:word-hash-768', contentHash: 'h' });
     expect(upsert.embedding.startsWith('[')).toBe(true);
   });
@@ -123,7 +133,10 @@ describe('syncExpertEmbeddings', () => {
 
     const result = await syncExpertEmbeddings({}, logger, { gql: fakeGql(sources), read: settings({ EMBEDDING_PROVIDER: 'fake' }) });
 
-    expect(result).toEqual({ success: false, deleted: 2, embedded: 249, failed: 1, remaining: 1 });
+    expect(result).toMatchObject({
+      success: false,
+      expertRoles: { deleted: 2, embedded: 249, failed: 1, remaining: 1 },
+    });
   });
 
   it('stops starting new groups once its time budget is used up', async () => {
@@ -150,7 +163,7 @@ describe('syncExpertEmbeddings', () => {
     });
 
     // Groups of 4 start at 0, 40, 80 s; at 120 s no further group starts.
-    expect(result).toMatchObject({ embedded: 12, remaining: 238 });
+    expect(result.expertRoles).toMatchObject({ embedded: 12, remaining: 238 });
   });
 });
 

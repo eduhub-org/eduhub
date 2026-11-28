@@ -150,6 +150,119 @@ export const PROJECTS_BY_COURSE = gql`
   }
 `;
 
+export const PROJECTS_OVERVIEW = gql`
+  # Every project across all courses for the projects overview (Org Admins add
+  # their programs as a scope to $where). Same row fragment as the course tab,
+  # plus the courses (and their programs) a project is listed in. Sorted by Project Status in lifecycle order (computed field,
+  # see the project_status_rank SQL function), then most recently updated.
+  # $where carries the overview's status chips, filters and keyword search.
+  ${PROJECT_FRAGMENT_DETAILED}
+  query ProjectsOverview($where: Project_bool_exp!, $limit: Int!, $offset: Int!) {
+    Project(
+      where: $where
+      order_by: [{ projectStatusRank: asc }, { updated_at: desc }, { id: desc }]
+      limit: $limit
+      offset: $offset
+    ) {
+      ...ProjectFragmentDetailed
+      courses {
+        id
+        title
+        Program {
+          id
+          title
+          shortTitle
+        }
+      }
+    }
+    Project_aggregate(where: $where) {
+      aggregate {
+        count
+      }
+    }
+  }
+`;
+
+export const SEMANTIC_PROJECT_SEARCH = gql`
+  # The projects closest in meaning to a search of the projects overview (ADR
+  # 0009): ids and similarities only. The overview loads them with
+  # PROJECTS_OVERVIEW under its own role and filters (useRankedProjects).
+  query SemanticProjectSearch($query: String!) {
+    semanticProjectSearch(query: $query) {
+      success
+      enabled
+      matches {
+        projectId
+        similarity
+      }
+    }
+  }
+`;
+
+export const PROJECTS_OVERVIEW_STATUS_COUNTS = gql`
+  # Number of projects per Project Status for the overview's status chips. Each
+  # variable is the overview's active filters (program, course group, search)
+  # plus that status's projectStatusRank, built by projectStatusWhere; the alias
+  # is the status's chip key (PROJECT_STATUSES).
+  query ProjectsOverviewStatusCounts(
+    $TEMPLATE: Project_bool_exp!
+    $PROPOSED: Project_bool_exp!
+    $ONGOING: Project_bool_exp!
+    $SENT_BACK: Project_bool_exp!
+    $SUBMITTED: Project_bool_exp!
+    $COMPLETED_PASSED: Project_bool_exp!
+    $SUGGESTED_FOR_PUBLICATION: Project_bool_exp!
+    $PUBLISHED: Project_bool_exp!
+    $INCOMPLETE_FAILED: Project_bool_exp!
+  ) {
+    TEMPLATE: Project_aggregate(where: $TEMPLATE) {
+      aggregate {
+        count
+      }
+    }
+    PROPOSED: Project_aggregate(where: $PROPOSED) {
+      aggregate {
+        count
+      }
+    }
+    ONGOING: Project_aggregate(where: $ONGOING) {
+      aggregate {
+        count
+      }
+    }
+    SENT_BACK: Project_aggregate(where: $SENT_BACK) {
+      aggregate {
+        count
+      }
+    }
+    SUBMITTED: Project_aggregate(where: $SUBMITTED) {
+      aggregate {
+        count
+      }
+    }
+    COMPLETED_PASSED: Project_aggregate(where: $COMPLETED_PASSED) {
+      aggregate {
+        count
+      }
+    }
+    SUGGESTED_FOR_PUBLICATION: Project_aggregate(where: $SUGGESTED_FOR_PUBLICATION) {
+      aggregate {
+        count
+      }
+    }
+    PUBLISHED: Project_aggregate(where: $PUBLISHED) {
+      aggregate {
+        count
+      }
+    }
+    INCOMPLETE_FAILED: Project_aggregate(where: $INCOMPLETE_FAILED) {
+      aggregate {
+        count
+      }
+    }
+  }
+`;
+
 export const MY_PROJECT_BY_COURSE = gql`
   # Matches projects in the course where the user is a confirmed author (ACCEPTED)
   # or was marked EXCLUDED from the final submission. The caller prefers the
@@ -330,6 +443,27 @@ export const UPDATE_PROJECT_ACCEPTING_PARTICIPANTS = gql`
     ) {
       id
       acceptingParticipants
+    }
+  }
+`;
+
+// Toggles showcase publication independently of the lifecycle status. Publishing
+// also clears suggestedForPublication (the recommendation is fulfilled); on
+// unpublish the caller passes the current flag value so it is left untouched.
+// Admins only: Org Admins have no update permission on `published`.
+export const UPDATE_PROJECT_PUBLISHED = gql`
+  mutation UpdateProjectPublished(
+    $itemId: Int!
+    $published: Boolean!
+    $suggestedForPublication: Boolean!
+  ) {
+    update_Project_by_pk(
+      pk_columns: { id: $itemId }
+      _set: { published: $published, suggestedForPublication: $suggestedForPublication }
+    ) {
+      id
+      published
+      suggestedForPublication
     }
   }
 `;
