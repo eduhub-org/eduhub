@@ -13,6 +13,7 @@ import {
 const mockUpdatePublished = jest.fn();
 const mockUseRoleMutation = jest.fn();
 let mockManagementRole: AuthRoles | undefined;
+let mockCurrentRole: AuthRoles = AuthRoles.admin;
 
 jest.mock('next-intl', () => ({
   useTranslations: () => (key: string) => key,
@@ -25,6 +26,10 @@ jest.mock('../../../../../../hooks/authedMutation', () => ({
 
 jest.mock('../../../../../../hooks/managementRole', () => ({
   useManagementRoleContext: () => mockManagementRole,
+}));
+
+jest.mock('../../../../../../hooks/authentication', () => ({
+  useCurrentRole: () => mockCurrentRole,
 }));
 
 jest.mock('../../../../../../hooks/useMediaQuery', () => ({
@@ -79,6 +84,7 @@ const renderActions = (project: ProjectRow, onError = jest.fn()) =>
 describe('ProjectShowcaseActions', () => {
   beforeEach(() => {
     mockManagementRole = AuthRoles.admin;
+    mockCurrentRole = AuthRoles.admin;
     mockUpdatePublished.mockReset();
     mockUpdatePublished.mockResolvedValue({ data: {} });
     mockUseRoleMutation.mockReset();
@@ -173,6 +179,23 @@ describe('ProjectShowcaseActions', () => {
 
     expect(screen.queryByRole('button', { name: 'projects.actions.publish' })).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'projects.actions.preview' })).toBeInTheDocument();
+  });
+
+  // The course manage page sets no management role for Admins and instructors; the session role
+  // decides then.
+  it('lets an Admin publish when no management role is set', () => {
+    mockManagementRole = undefined;
+    renderActions(passedProject);
+
+    expect(screen.getByRole('button', { name: 'projects.actions.publish' })).toBeInTheDocument();
+  });
+
+  it('does not offer publishing to an instructor when no management role is set', () => {
+    mockManagementRole = undefined;
+    mockCurrentRole = AuthRoles.instructor;
+    renderActions(passedProject);
+
+    expect(screen.queryByRole('button', { name: 'projects.actions.publish' })).not.toBeInTheDocument();
   });
 
   it('does not offer publishing a project that is still being worked on', () => {
