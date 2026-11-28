@@ -2,6 +2,7 @@ import { FC, useCallback, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
 import { useRoleMutation } from '../../../../../hooks/authedMutation';
+import { useCurrentRole } from '../../../../../hooks/authentication';
 import { useManagementRoleContext } from '../../../../../hooks/managementRole';
 import { AuthRoles } from '../../../../../types/enums';
 import { ProjectStatus_enum } from '../../../../../__generated__/globalTypes';
@@ -55,7 +56,11 @@ const ProjectShowcaseActions: FC<ProjectShowcaseActionsProps> = ({
   projectPageHref,
 }) => {
   const t = useTranslations('manageCourse');
-  const isAdmin = useManagementRoleContext() === AuthRoles.admin;
+  // The course manage page sets a management role only for Org Admins; Admins and instructors
+  // manage it under their session role.
+  const managementRole = useManagementRoleContext();
+  const currentRole = useCurrentRole();
+  const isAdmin = (managementRole ?? currentRole) === AuthRoles.admin;
   const [previewOpen, setPreviewOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const consentNoteId = `publish-consent-note-${project.id}`;
