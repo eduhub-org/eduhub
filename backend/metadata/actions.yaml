@@ -856,6 +856,19 @@ actions:
     permissions:
       - role: org_admin
     comment: Expert Role sources (courses, sessions, projects, achievement options) closest in meaning to a search, for the expert directory (ADR 0004). Admins and org admins.
+  - name: semanticProjectSearch
+    definition:
+      kind: ""
+      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      timeout: 30
+      headers:
+        - name: Function-Name
+          value: semanticProjectSearch
+        - name: Hasura-Secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+    permissions:
+      - role: org_admin
+    comment: Projects closest in meaning to a search (title, tagline, description), for the projects overview (ADR 0009). Admins and org admins.
   - name: searchKnowledge
     definition:
       kind: ""
@@ -881,6 +894,8 @@ custom_types:
   objects:
     - name: SemanticExpertSearchResult
     - name: ExpertRoleMatchResult
+    - name: SemanticProjectSearchResult
+    - name: ProjectMatchResult
     - name: SearchKnowledgeResult
     - name: KnowledgePassage
     - name: NotifySessionParticipantsResult

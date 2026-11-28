@@ -1,6 +1,6 @@
 import { ApolloError, QueryResult } from '@apollo/client';
 import { useTranslations } from 'next-intl';
-import { FC, ReactNode, useCallback, useEffect, useMemo, useState, type JSX } from 'react';
+import { ComponentProps, FC, ReactNode, useCallback, useEffect, useMemo, useState, type JSX } from 'react';
 import { useIsAdmin, useIsInstructor } from '../../../../hooks/authentication';
 import { useManagementRoleContext } from '../../../../hooks/managementRole';
 import { AuthRoles, ProgramType } from '../../../../types/enums';
@@ -62,6 +62,11 @@ import { BulkAction } from '../../../common/TableGrid/types';
 import NotificationSnackbar from '../../../common/dialogs/NotificationSnackbar';
 import { ErrorMessageDialog } from '../../../common/dialogs/ErrorMessageDialog';
 import ProjectsManagementGrid from './projects/ProjectsManagementGrid';
+import { PROJECTS_BY_COURSE } from '../../../../queries/project';
+import {
+  ProjectsByCourse,
+  ProjectsByCourseVariables,
+} from '../../../../queries/__generated__/ProjectsByCourse';
 import {
   resolveEffectiveCourseProjectSubmissionDeadline,
   getCourseProjectSubmissionDefaultSource,
@@ -964,7 +969,7 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
             {t('participations_tab_projects_subtitle')}
           </p>
         </header>
-        <ProjectsManagementGrid
+        <CourseProjectsGrid
           courseId={course.id}
           programDefaultProjectType={course.Program?.defaultProjectType ?? null}
           courseDefaultProjectSubmissionDeadline={submissionDeadlineToIsoString(
@@ -1018,6 +1023,33 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
       )}
       {abortConfirmationDialog}
     </div>
+  );
+};
+
+const COURSE_PROJECTS_REFETCH_QUERIES = ['ProjectsByCourse'];
+
+/** Loads the course's projects and hands them to the shared project grid. */
+const CourseProjectsGrid: FC<
+  Omit<
+    ComponentProps<typeof ProjectsManagementGrid>,
+    'projects' | 'loading' | 'error' | 'refetchQueries' | 'onRefetch'
+  > & { courseId: number }
+> = ({ courseId, ...gridProps }) => {
+  const { data, loading, error, refetch } = useRoleQuery<
+    ProjectsByCourse,
+    ProjectsByCourseVariables
+  >(PROJECTS_BY_COURSE, { variables: { courseId } });
+
+  return (
+    <ProjectsManagementGrid
+      {...gridProps}
+      courseId={courseId}
+      projects={data?.Project}
+      loading={loading}
+      error={error}
+      refetchQueries={COURSE_PROJECTS_REFETCH_QUERIES}
+      onRefetch={() => refetch()}
+    />
   );
 };
 

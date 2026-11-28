@@ -1,0 +1,5 @@
+# Semantic project search (ADR 0009). No role permissions: only the semanticProjectSearch action
+# calls it, with the admin secret.
+function:
+  name: match_projects
+  schema: public

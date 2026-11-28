@@ -62,7 +62,8 @@ semantic search (phase 2) covers finding people by topic.
   production runs in, stored with `pgvector`. The cron trigger
   `sync_expert_embeddings` (node function `syncExpertEmbeddings`) keeps the
   vectors in step nightly and backfills on its first runs; new courses and
-  sessions show up in semantic matches the next day.
+  sessions show up in semantic matches the next day. The same job also embeds
+  every project for the projects overview's search (ADR 0009).
 - **Hybrid results, one ranked list**: a search of three or more characters
   shows the people whose fields hold every search word (up to 300 for admins,
   100 for org admins, the most recently active first) together with the

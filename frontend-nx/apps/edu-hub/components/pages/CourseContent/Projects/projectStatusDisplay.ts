@@ -2,7 +2,9 @@ import {
   ProjectParticipationStatus_enum,
   ProjectRating_enum,
   ProjectStatus_enum,
+  Project_bool_exp,
 } from '../../../../__generated__/globalTypes';
+import { AuthRoles } from '../../../../types/enums';
 import { ProjectRow } from './types';
 
 /** Status chip key for course project list: open templates without authors. */
@@ -17,6 +19,70 @@ export const PROJECT_STATUS_CHIP_INCOMPLETE_FAILED = 'INCOMPLETE_FAILED';
 /** Status chip key when staff suggested a completed project for publication. */
 export const PROJECT_STATUS_CHIP_SUGGESTED_FOR_PUBLICATION =
   'SUGGESTED_FOR_PUBLICATION';
+
+/** Status chip key for an ongoing project that a review returned to its team (sentBackAt set). */
+export const PROJECT_STATUS_CHIP_SENT_BACK = 'SENT_BACK';
+
+/**
+ * The nine Project Statuses (CONTEXT.md glossary) as chip keys. Their labels live under
+ * `course.projects.status.<key>`.
+ */
+export type ProjectStatusKey =
+  | 'TEMPLATE' // Project Template
+  | 'PROPOSED' // Awaiting Confirmation
+  | 'ONGOING' // Ongoing
+  | 'SENT_BACK' // Sent Back
+  | 'SUBMITTED' // Submitted
+  | 'COMPLETED_PASSED' // Passed
+  | 'SUGGESTED_FOR_PUBLICATION' // Suggested for Publication
+  | 'PUBLISHED' // Published
+  | 'INCOMPLETE_FAILED'; // Not Passed
+
+/**
+ * The Project Statuses in lifecycle order. A status's position in this list is its rank in the
+ * SQL function `project_status_rank` (computed field `Project.projectStatusRank`); keep the two
+ * in sync.
+ */
+export const PROJECT_STATUSES: readonly ProjectStatusKey[] = [
+  'TEMPLATE',
+  'PROPOSED',
+  'ONGOING',
+  'SENT_BACK',
+  'SUBMITTED',
+  'COMPLETED_PASSED',
+  'SUGGESTED_FOR_PUBLICATION',
+  'PUBLISHED',
+  'INCOMPLETE_FAILED',
+];
+
+/** The `projectStatusRank` value the server computes for a Project Status. */
+export function projectStatusRank(status: ProjectStatusKey): number {
+  return PROJECT_STATUSES.indexOf(status);
+}
+
+/**
+ * Hasura condition matching projects in any of the given Project Statuses. No status selected
+ * means no restriction.
+ */
+export function projectStatusWhere(statuses: readonly ProjectStatusKey[]): Project_bool_exp {
+  if (statuses.length === 0) {
+    return {};
+  }
+  const ranks = Array.from(new Set(statuses.map(projectStatusRank))).sort((a, b) => a - b);
+  return { projectStatusRank: { _in: ranks } };
+}
+
+/**
+ * Needs Attention (CONTEXT.md): the projects waiting for a decision the viewer can make. Everyone
+ * managing projects confirms and reviews them; only Admins also publish.
+ */
+export function needsAttentionStatuses(role: AuthRoles | string): ProjectStatusKey[] {
+  const statuses: ProjectStatusKey[] = ['PROPOSED', 'SUBMITTED'];
+  if (role === AuthRoles.admin) {
+    statuses.push('SUGGESTED_FOR_PUBLICATION');
+  }
+  return statuses;
+}
 
 /**
  * An "open template" is a project anyone can still claim/join: no ACCEPTED
@@ -80,22 +146,35 @@ export function resolveProjectStatusChipKey(
   return status;
 }
 
+/**
+ * The project's Project Status (a ProjectStatusKey; an unknown raw status is passed through).
+ * Mirrors the SQL function `project_status_rank` (computed field Project.projectStatusRank), by
+ * which the projects overview sorts and filters; keep the two in sync.
+ */
 export function getProjectStatusChipKey(
   project: Pick<
     ProjectRow,
-    'status' | 'ProjectAuthors' | 'rating' | 'suggestedForPublication' | 'published'
+    'status' | 'ProjectAuthors' | 'suggestedForPublication' | 'published' | 'sentBackAt'
   >
 ): string {
   if (isOpenTemplate(project)) {
     return PROJECT_STATUS_CHIP_TEMPLATE;
   }
-
-  return resolveProjectStatusChipKey(
-    project.status,
-    project.rating,
-    project.suggestedForPublication,
-    project.published
-  );
+  if (project.published || project.status === ProjectStatus_enum.PUBLISHED) {
+    return ProjectStatus_enum.PUBLISHED;
+  }
+  switch (project.status) {
+    case ProjectStatus_enum.ONGOING:
+      return project.sentBackAt ? PROJECT_STATUS_CHIP_SENT_BACK : ProjectStatus_enum.ONGOING;
+    case ProjectStatus_enum.COMPLETED:
+      return project.suggestedForPublication
+        ? PROJECT_STATUS_CHIP_SUGGESTED_FOR_PUBLICATION
+        : PROJECT_STATUS_CHIP_COMPLETED_PASSED;
+    case ProjectStatus_enum.INCOMPLETE:
+      return PROJECT_STATUS_CHIP_INCOMPLETE_FAILED;
+    default:
+      return project.status;
+  }
 }
 
 export const PROJECT_TYPE_ONLINE_COURSE = 'ONLINE_COURSE';
@@ -132,7 +211,27 @@ export function getPublicationDecision(project: {
   if (!isPostSubmission || isOnlineCourseProject(project)) {
     return null;
   }
-  return project.ProjectConsentEvents?.[0]?.eventType === 'granted' ? 'granted' : 'declined';
+  return hasPublicationConsent(project) ? 'granted' : 'declined';
+}
+
+/** The team's current publication consent: its latest consent event is a grant. */
+export function hasPublicationConsent(project: {
+  ProjectConsentEvents?: { eventType: string }[] | null;
+}): boolean {
+  return project.ProjectConsentEvents?.[0]?.eventType === 'granted';
+}
+
+/**
+ * Whether a project may go into the public showcase: an open Project Template always (it has no
+ * team, and companies offer it there to find participants), any other project only with its
+ * team's consent. Mirrors the database guard `enforce_project_publication_consent`.
+ */
+export function canPublishProject(
+  project: Parameters<typeof isOpenTemplate>[0] & {
+    ProjectConsentEvents?: { eventType: string }[] | null;
+  }
+): boolean {
+  return isOpenTemplate(project) || hasPublicationConsent(project);
 }
 
 /** Download / external-link buttons in project preview (student list & panel). */
