@@ -1017,6 +1017,24 @@ type ExpertRoleMatchResult {
 }
 
 type Query {
+  semanticProjectSearch(
+    query: String!
+  ): SemanticProjectSearchResult!
+}
+
+type SemanticProjectSearchResult {
+  success: Boolean!
+  enabled: Boolean!
+  error: String
+  matches: [ProjectMatchResult!]!
+}
+
+type ProjectMatchResult {
+  projectId: Int!
+  similarity: Float!
+}
+
+type Query {
   searchKnowledge(
     query: String!
     courseId: Int

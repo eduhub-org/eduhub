@@ -8,6 +8,9 @@ let mockIsOrgAdmin = false;
 let mockIsAdmin = false;
 let mockIsInstructor = false;
 let mockCanViewStatistics = false;
+let mockCanManageCourses = false;
+let mockCanManageEvents = false;
+let mockCanManageDegrees = false;
 
 jest.mock('next-intl', () => ({
   useTranslations: () => (key: string) => key,
@@ -25,9 +28,9 @@ jest.mock('../../../hooks/authentication', () => ({
 
 jest.mock('../../../hooks/orgAdminCapabilities', () => ({
   useOrgAdminCapabilities: () => ({
-    canManageCourses: false,
-    canManageEvents: false,
-    canManageDegrees: false,
+    canManageCourses: mockCanManageCourses,
+    canManageEvents: mockCanManageEvents,
+    canManageDegrees: mockCanManageDegrees,
     canManageSettings: false,
     canViewStatistics: mockCanViewStatistics,
   }),
@@ -53,6 +56,9 @@ describe('account Menu', () => {
     mockIsAdmin = false;
     mockIsInstructor = false;
     mockCanViewStatistics = false;
+    mockCanManageCourses = false;
+    mockCanManageEvents = false;
+    mockCanManageDegrees = false;
   });
 
   it('leaves an 8px gap below the avatar trigger', async () => {
@@ -121,6 +127,50 @@ describe('account Menu', () => {
 
     expect(screen.getByRole('menuitem', { name: 'menu.statistics' })).toHaveAttribute('href', '/statistics');
     expect(screen.getByText('menu.section_management')).toBeInTheDocument();
+  });
+
+  it.each([
+    ['admins', () => (mockIsAdmin = true)],
+    [
+      'org admins who manage courses',
+      () => {
+        mockIsOrgAdmin = true;
+        mockCanManageCourses = true;
+      },
+    ],
+    [
+      'org admins who manage events',
+      () => {
+        mockIsOrgAdmin = true;
+        mockCanManageEvents = true;
+      },
+    ],
+  ])('links the projects overview for %s', async (_, setRole) => {
+    setRole();
+    await renderMenu();
+
+    expect(screen.getByRole('menuitem', { name: 'menu.projects' })).toHaveAttribute(
+      'href',
+      '/manage/projects'
+    );
+  });
+
+  it.each([
+    [
+      'org admins who manage neither courses nor events',
+      () => {
+        mockIsOrgAdmin = true;
+        mockCanManageDegrees = true;
+        mockCanViewStatistics = true;
+      },
+    ],
+    ['instructors', () => (mockIsInstructor = true)],
+    ['participants', () => undefined],
+  ])('hides the projects overview from %s', async (_, setRole) => {
+    setRole();
+    await renderMenu();
+
+    expect(screen.queryByRole('menuitem', { name: 'menu.projects' })).not.toBeInTheDocument();
   });
 
   it('hides the manual entry from participants and org admins', async () => {

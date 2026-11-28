@@ -1,0 +1,5 @@
+# Semantic project search (ADR 0009). Written and read only by the embedding sync with the admin
+# secret; no role permissions.
+table:
+  name: ProjectEmbedding
+  schema: public

@@ -1,0 +1,4 @@
+# View of the project texts to embed for semantic project search (ADR 0009); admin secret only.
+table:
+  name: ProjectEmbeddingSource
+  schema: public

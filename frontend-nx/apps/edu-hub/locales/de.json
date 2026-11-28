@@ -58,6 +58,7 @@
       "courses": "Kurse",
       "events": "Events",
       "degrees": "Degrees",
+      "projects": "Projekte",
       "programs": "Programme",
       "settings": "Einstellungen",
       "calendar": "Kalender",
@@ -431,8 +432,9 @@
       "action_failed": "Aktion fehlgeschlagen",
       "status": {
         "TEMPLATE": "Projektvorlage",
-        "PROPOSED": "Vorgeschlagen",
+        "PROPOSED": "Wartet auf Bestätigung",
         "ONGOING": "In Bearbeitung",
+        "SENT_BACK": "Zurückgegeben",
         "SUBMITTED": "Eingereicht",
         "COMPLETED": "Abgeschlossen",
         "COMPLETED_PASSED": "Bestanden",
@@ -1733,7 +1735,8 @@
         "title": "Titel",
         "authors": "Autor:innen",
         "type": "Typ",
-        "no_authors": "Noch keine Autor:innen"
+        "no_authors": "Noch keine Autor:innen",
+        "consent_withdrawn": "Das Team hat seine Zustimmung zur Veröffentlichung am {date} widerrufen"
       },
       "actions": {
         "confirm_project": "Projekt bestätigen",
@@ -1741,7 +1744,16 @@
         "evaluate_project": "Projekt beurteilen",
         "evaluate_disabled_tooltip": "Sobald das Projekt eingereicht wurde, kannst du es hier bewerten.",
         "suggest_for_publication": "Zur Veröffentlichung vorschlagen",
-        "withdraw_publication_suggestion": "Vorschlag zurückziehen"
+        "withdraw_publication_suggestion": "Vorschlag zurückziehen",
+        "preview": "Vorschau",
+        "publish": "Veröffentlichen",
+        "unpublish": "Veröffentlichung zurücknehmen",
+        "publish_needs_consent": "Das Team hat der Veröffentlichung nicht zugestimmt. Ohne seine Zustimmung kann das Projekt nicht veröffentlicht werden."
+      },
+      "notifications": {
+        "publish_success": "Projekt veröffentlicht",
+        "unpublish_success": "Veröffentlichung zurückgenommen",
+        "publish_failed": "Das Projekt konnte nicht veröffentlicht oder zurückgenommen werden. Bitte versuche es noch einmal."
       },
       "expanded": {
         "tagline": "Untertitel",
@@ -1822,6 +1834,7 @@
         "no_authors_added": "Noch keine Autor:innen hinzugefügt.",
         "remove_author_aria": "Autor:in entfernen",
         "template_notice": "Wenn du keine Autor:innen hinzufügst, dient dieses Projekt als Vorlage: Kursteilnehmende können es aus der Projektliste kopieren und auf dieser Basis ein eigenes Team bilden.",
+        "template_showcase_notice": "Eine Projektvorlage kann auch im öffentlichen Projekt-Showcase veröffentlicht werden, wo andere ihr Thema entdecken können.",
         "extra_fields_notice": "Bitte ergänze im Anschluss weitere Details zum Projekt, indem du die Projektzeile in der Liste ausklappst.",
         "submit_button": "Anlegen",
         "error_title_required": "Bitte gib einen Projekttitel an.",
@@ -2454,32 +2467,27 @@
       }
     }
   },
-  "manageProjects": {
+  "projectsOverview": {
     "headline": "Projekte",
-    "search_placeholder": "Projekte suchen",
+    "settings_links": {
+      "project_types": "Projekttypen",
+      "documentation_instructions": "Dokumentationsanleitungen"
+    },
+    "courses_column": "Kurs(e) / Programm",
+    "no_courses": "Kein Kurs",
+    "ranked_hint": "Sortiert nach Relevanz: Projekte, in denen alle Suchwörter vorkommen, und inhaltlich ähnliche Projekte.",
+    "ranked_capped": "Von {total} Stichwort-Treffern wurden die ersten {ranked} in Statusreihenfolge berücksichtigt – verfeinere deine Suche, um alle zu sehen.",
+    "semantic_unavailable": "Die Ähnlichkeitssuche ist gerade nicht verfügbar – du siehst nur Stichwort-Treffer.",
     "filter": {
+      "status_label": "Projektstatus",
+      "needs_attention": "Handlungsbedarf",
+      "show_all": "Alle anzeigen",
       "program_label": "Programm",
       "all_programs": "Alle Programme",
       "course_group_label": "Kursgruppe",
-      "all_course_groups": "Alle Kursgruppen"
-    },
-    "table": {
-      "title": "Titel",
-      "authors": "Autor:innen",
-      "no_authors": "Keine Autor:innen",
-      "program": "Programm / Kurs",
-      "published": "Veröffentlicht",
-      "not_published": "Nicht veröffentlicht"
-    },
-    "actions": {
-      "publish": "Veröffentlichen",
-      "unpublish": "Zurückziehen",
-      "publish_blocked_incomplete": "Bitte Projekttyp und Dokumentationsanleitung festlegen, bevor dieses Projekt veröffentlicht werden kann."
-    },
-    "notifications": {
-      "publish_success": "Projekt veröffentlicht",
-      "unpublish_success": "Projekt zurückgezogen",
-      "action_failed": "Die Aktion konnte nicht abgeschlossen werden. Bitte erneut versuchen."
+      "all_course_groups": "Alle Kursgruppen",
+      "search_label": "Suche",
+      "search_placeholder": "Titel, Personen, Kurs oder Programm"
     }
   },
   "managePrograms": {
@@ -3655,10 +3663,6 @@
         "project-types": {
           "label": "Projekttypen",
           "description": "Standard-Leistungszertifikate und Dokumentationsanleitungen pro Projekttyp"
-        },
-        "projects": {
-          "label": "Projekte",
-          "description": "Projekte veröffentlichen, verbergen und verschlagworten"
         },
         "documentation-instructions": {
           "label": "Dokumentationsanleitungen",

@@ -5,6 +5,7 @@ import { ProjectRating_enum, ProjectStatus_enum } from '../../../../__generated_
 import {
   PROJECT_STATUS_CHIP_COMPLETED_PASSED,
   PROJECT_STATUS_CHIP_INCOMPLETE_FAILED,
+  PROJECT_STATUS_CHIP_SENT_BACK,
   PROJECT_STATUS_CHIP_SUGGESTED_FOR_PUBLICATION,
   resolveProjectStatusChipKey,
 } from './projectStatusDisplay';
@@ -13,6 +14,7 @@ const STATUS_CLASSES: Record<string, string> = {
   TEMPLATE: 'bg-gray-100 text-gray-700 border border-gray-300',
   PROPOSED: 'bg-gray-200 text-gray-800',
   ONGOING: 'bg-blue-100 text-blue-800',
+  [PROJECT_STATUS_CHIP_SENT_BACK]: 'bg-orange-100 text-orange-800',
   SUBMITTED: 'bg-purple-100 text-purple-800',
   COMPLETED: 'bg-green-100 text-green-800',
   [PROJECT_STATUS_CHIP_COMPLETED_PASSED]: 'bg-green-100 text-green-800',

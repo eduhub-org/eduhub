@@ -13784,6 +13784,7 @@ export interface Project_bool_exp {
   parentProjectId?: Int_comparison_exp | null;
   presentationUrl?: String_comparison_exp | null;
   projectReviewRequestedAt?: timestamptz_comparison_exp | null;
+  projectStatusRank?: Int_comparison_exp | null;
   proposedByUserId?: uuid_comparison_exp | null;
   published?: Boolean_comparison_exp | null;
   rating?: ProjectRating_enum_comparison_exp | null;
