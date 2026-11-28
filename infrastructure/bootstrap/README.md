@@ -26,9 +26,11 @@ organization-level roles; set those up separately.
 
 - **Idempotent.** Every step checks first and only creates or grants what is
   missing. After a failure, fix the cause and run it again.
-- **Never turns anything off.** It doesn't disable APIs, remove permissions,
-  move the project, change its billing account or replace bucket lifecycle
-  rules. Where something differs, it prints a warning and leaves it.
+- **Only adds, never turns anything off.** It adds what is missing, including
+  the `temp/` rule on a bucket that has no lifecycle rules. It doesn't disable
+  APIs, remove permissions, move the project, change its billing account or
+  replace existing lifecycle rules. Where something differs (also a needed
+  role granted only with a condition), it prints a warning and leaves it.
 - **New APIs belong in the application workspace.** A feature that needs
   another Google API enables it next to the feature in
   `infrastructure/application`, with `disable_on_destroy = false`, as
@@ -39,7 +41,11 @@ organization-level roles; set those up separately.
 
 Needs `gcloud` and `jq`, logged in (`gcloud auth login`) as a user who may
 create projects under the parent, link the billing account and administer IAM
-in the project. Look first, then apply:
+in the project. Until the project's APIs are enabled (steps 1–3: project,
+billing, APIs), gcloud bills its calls to your own quota project
+(`gcloud config get billing/quota_project`, else your default project), so
+that project needs the Cloud Billing and Service Usage APIs enabled. Later
+steps bill to the new project. Look first, then apply:
 
 ```bash
 infrastructure/bootstrap/bootstrap.sh \

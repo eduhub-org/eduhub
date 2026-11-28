@@ -61,8 +61,11 @@ one of them would delete a whole project.
 
 - No drift detection for the bootstrap part. Running the script with
   `--dry-run` is the check; it reports anything missing. When written, it
-  found the 7-day `temp/` lifecycle rule missing on both existing buckets
-  (everything else matched); applying it is a separate decision.
+  found the 7-day `temp/` lifecycle rule (introduced in 2023, PR #628)
+  missing on both existing buckets; everything else matched. The rule was
+  then added by hand to both buckets (2026-11-28), so GCS deletes the old
+  participation-data exports under `temp/`, and the dry run reports nothing
+  to do on either project.
 - New Google APIs are enabled in the application workspace, so they come and
   go with the features that need them.
 - The opencampus.sh organization setup (admin groups, `Production` /

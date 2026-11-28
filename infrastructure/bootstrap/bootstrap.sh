@@ -4,13 +4,16 @@
 # Terraform workspace (infrastructure/application) expects to exist before its
 # first run. See README.md next to this file and docs/adr/0009.
 #
-# Idempotent: every step checks first and only creates or grants what is
-# missing. It never disables an API, removes a permission or changes an
-# existing setting. Run it again after a failure; with --dry-run it only
-# prints what it would do.
+# Idempotent: every step checks first and only adds what is missing (such as
+# the temp/ lifecycle rule on a bucket that has no lifecycle rules). It never
+# disables an API, removes a permission, or replaces or changes an existing
+# setting; where something differs it prints a WARNING and leaves it. Run it
+# again after a failure; with --dry-run it only prints what it would do.
 #
 # Needs: gcloud (logged in as a user who may create projects under the parent,
-# link the billing account and administer IAM in the project) and jq.
+# link the billing account and administer IAM in the project) and jq. Steps
+# 1-3 bill their API calls to the caller's own gcloud quota project, which
+# needs the Cloud Billing and Service Usage APIs enabled.
 
 set -euo pipefail
 
@@ -137,13 +140,18 @@ retry() {
 ok() { log "OK:   $*"; }
 
 # has_binding ROLE MEMBER GCLOUD_GET_IAM_POLICY_ARGS...
+# Returns 0 if MEMBER has ROLE without a condition, 2 if only with a
+# condition (which may have expired), 1 if not at all.
 has_binding() {
-  local role="$1" member="$2"
+  local role="$1" member="$2" policy
   shift 2
   $PROJECT_EXISTS || return 1
-  gcloud "$@" --flatten='bindings[].members' \
-    --format='value(bindings.role,bindings.members)' 2>/dev/null |
-    grep -qxF "${role}"$'\t'"${member}"
+  policy="$(gcloud "$@" --format=json 2>/dev/null)" || return 1
+  return "$(jq --arg r "$role" --arg m "$member" '
+    [(.bindings // [])[]
+      | select(.role == $r and ((.members // []) | index($m)))]
+    | if any(.[]; .condition == null) then 0
+      elif length > 0 then 2 else 1 end' <<<"$policy")"
 }
 
 ensure_binding() {
@@ -170,12 +178,15 @@ ensure_binding() {
       add=(storage buckets add-iam-policy-binding "$target")
       ;;
   esac
-  if has_binding "$role" "$member" "${get[@]}"; then
-    ok "$role for $member on $kind $target"
-  else
-    act "grant $role to $member on $kind $target" -- \
-      gcloud "${add[@]}" --role "$role" --member "$member"
-  fi
+  local status=0
+  has_binding "$role" "$member" "${get[@]}" || status=$?
+  case "$status" in
+    0) ok "$role for $member on $kind $target" ;;
+    2) warn "$member has $role on $kind $target only with a condition;" \
+      "leaving it (an expired condition grants nothing)" ;;
+    *) act "grant $role to $member on $kind $target" -- \
+      gcloud "${add[@]}" --role "$role" --member "$member" ;;
+  esac
 }
 
 exists() { $PROJECT_EXISTS && "$@" >/dev/null 2>&1; }
@@ -198,11 +209,6 @@ else
     gcloud projects create "$PROJECT_ID" --name "$PROJECT_NAME" \
     "${PARENT_FLAG[@]}"
   $DRY_RUN || PROJECT_EXISTS=true
-fi
-
-# Bill API calls to the project itself, not to the caller's quota project.
-if $PROJECT_EXISTS; then
-  export CLOUDSDK_BILLING_QUOTA_PROJECT="$PROJECT_ID"
 fi
 
 # 2. Billing -----------------------------------------------------------------
@@ -236,6 +242,13 @@ if ((${#missing_apis[@]})); then
     gcloud services enable "${missing_apis[@]}" --project "$PROJECT_ID"
 else
   ok "all ${#APIS[@]} APIs enabled"
+fi
+
+# From here on, bill API calls to the project itself rather than the caller's
+# quota project. Only now: a new project has the APIs this needs (iam,
+# artifactregistry, storage, ...) only after step 3.
+if $PROJECT_EXISTS && { ! $DRY_RUN || ((${#missing_apis[@]} == 0)); }; then
+  export CLOUDSDK_BILLING_QUOTA_PROJECT="$PROJECT_ID"
 fi
 
 # 4. Service accounts ------------------------------------------------------
