@@ -174,7 +174,7 @@ resource "google_org_policy_policy" "deny_global_vertex_endpoint" {
 }
 
 # Knowledge index (issue #2195): .github/workflows/index-knowledge.yml runs as
-# the GitHub deploy account (created in infrastructure/foundation) after each
+# the GitHub deploy account (created by infrastructure/bootstrap) after each
 # production deployment. It writes the index through Hasura with the admin
 # secret and embeds passages with Vertex AI, so it gets read access to that
 # one secret and roles/aiplatform.user. Accepted trade-off: a leaked GitHub
