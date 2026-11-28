@@ -3,19 +3,19 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { Project_bool_exp, Project_order_by, ProjectStatus_enum, ProjectRating_enum, ProjectParticipationStatus_enum } from "./../../__generated__/globalTypes";
+import { ProjectStatus_enum, ProjectRating_enum, ProjectParticipationStatus_enum, Project_bool_exp } from "./../../__generated__/globalTypes";
 
 // ====================================================
-// GraphQL query operation: AdminProjectList
+// GraphQL query operation: ProjectsOverview
 // ====================================================
 
-export interface AdminProjectList_Project_Organization {
+export interface ProjectsOverview_Project_Organization {
   __typename: "Organization";
   id: number;
   name: string;
 }
 
-export interface AdminProjectList_Project_ProjectType {
+export interface ProjectsOverview_Project_ProjectType {
   __typename: "ProjectType";
   value: string;
   /**
@@ -36,7 +36,7 @@ export interface AdminProjectList_Project_ProjectType {
   requiresCoverImage: boolean;
 }
 
-export interface AdminProjectList_Project_ProjectDocumentationInstruction {
+export interface ProjectsOverview_Project_ProjectDocumentationInstruction {
   __typename: "ProjectDocumentationInstruction";
   id: number;
   /**
@@ -49,7 +49,7 @@ export interface AdminProjectList_Project_ProjectDocumentationInstruction {
   url: string | null;
 }
 
-export interface AdminProjectList_Project_SubmittedByUser {
+export interface ProjectsOverview_Project_SubmittedByUser {
   __typename: "User";
   id: any;
   /**
@@ -62,13 +62,13 @@ export interface AdminProjectList_Project_SubmittedByUser {
   lastName: string;
 }
 
-export interface AdminProjectList_Project_ProjectAuthors_User_Organization {
+export interface ProjectsOverview_Project_ProjectAuthors_User_Organization {
   __typename: "Organization";
   id: number;
   name: string;
 }
 
-export interface AdminProjectList_Project_ProjectAuthors_User {
+export interface ProjectsOverview_Project_ProjectAuthors_User {
   __typename: "User";
   id: any;
   /**
@@ -90,10 +90,10 @@ export interface AdminProjectList_Project_ProjectAuthors_User {
   /**
    * An object relationship
    */
-  Organization: AdminProjectList_Project_ProjectAuthors_User_Organization | null;
+  Organization: ProjectsOverview_Project_ProjectAuthors_User_Organization | null;
 }
 
-export interface AdminProjectList_Project_ProjectAuthors {
+export interface ProjectsOverview_Project_ProjectAuthors {
   __typename: "ProjectAuthor";
   id: number;
   userId: any;
@@ -101,10 +101,10 @@ export interface AdminProjectList_Project_ProjectAuthors {
   /**
    * An object relationship
    */
-  User: AdminProjectList_Project_ProjectAuthors_User;
+  User: ProjectsOverview_Project_ProjectAuthors_User;
 }
 
-export interface AdminProjectList_Project_ProjectMentors_User {
+export interface ProjectsOverview_Project_ProjectMentors_User {
   __typename: "User";
   id: any;
   /**
@@ -117,7 +117,7 @@ export interface AdminProjectList_Project_ProjectMentors_User {
   lastName: string;
 }
 
-export interface AdminProjectList_Project_ProjectMentors {
+export interface ProjectsOverview_Project_ProjectMentors {
   __typename: "ProjectMentor";
   id: number;
   /**
@@ -127,10 +127,10 @@ export interface AdminProjectList_Project_ProjectMentors {
   /**
    * An object relationship
    */
-  User: AdminProjectList_Project_ProjectMentors_User;
+  User: ProjectsOverview_Project_ProjectMentors_User;
 }
 
-export interface AdminProjectList_Project_ProjectConsentEvents_ActorUser {
+export interface ProjectsOverview_Project_ProjectConsentEvents_ActorUser {
   __typename: "User";
   id: any;
   /**
@@ -143,7 +143,7 @@ export interface AdminProjectList_Project_ProjectConsentEvents_ActorUser {
   lastName: string;
 }
 
-export interface AdminProjectList_Project_ProjectConsentEvents {
+export interface ProjectsOverview_Project_ProjectConsentEvents {
   __typename: "ProjectConsentEvent";
   id: number;
   eventType: string;
@@ -153,10 +153,10 @@ export interface AdminProjectList_Project_ProjectConsentEvents {
   /**
    * An object relationship
    */
-  ActorUser: AdminProjectList_Project_ProjectConsentEvents_ActorUser;
+  ActorUser: ProjectsOverview_Project_ProjectConsentEvents_ActorUser;
 }
 
-export interface AdminProjectList_Project_ProjectCourses_Course_Program {
+export interface ProjectsOverview_Project_courses_Program {
   __typename: "Program";
   id: number;
   /**
@@ -169,22 +169,7 @@ export interface AdminProjectList_Project_ProjectCourses_Course_Program {
   shortTitle: string | null;
 }
 
-export interface AdminProjectList_Project_ProjectCourses_Course_CourseGroups_CourseGroupOption {
-  __typename: "CourseGroupOption";
-  id: number;
-  title: string;
-}
-
-export interface AdminProjectList_Project_ProjectCourses_Course_CourseGroups {
-  __typename: "CourseGroup";
-  id: number;
-  /**
-   * An object relationship
-   */
-  CourseGroupOption: AdminProjectList_Project_ProjectCourses_Course_CourseGroups_CourseGroupOption;
-}
-
-export interface AdminProjectList_Project_ProjectCourses_Course {
+export interface ProjectsOverview_Project_courses {
   __typename: "Course";
   id: number;
   /**
@@ -192,29 +177,12 @@ export interface AdminProjectList_Project_ProjectCourses_Course {
    */
   title: string;
   /**
-   * Id of the program to which the course belongs.
-   */
-  programId: number;
-  /**
    * An object relationship
    */
-  Program: AdminProjectList_Project_ProjectCourses_Course_Program;
-  /**
-   * An array relationship
-   */
-  CourseGroups: AdminProjectList_Project_ProjectCourses_Course_CourseGroups[];
+  Program: ProjectsOverview_Project_courses_Program;
 }
 
-export interface AdminProjectList_Project_ProjectCourses {
-  __typename: "ProjectCourse";
-  courseId: number;
-  /**
-   * An object relationship
-   */
-  Course: AdminProjectList_Project_ProjectCourses_Course;
-}
-
-export interface AdminProjectList_Project {
+export interface ProjectsOverview_Project {
   __typename: "Project";
   id: number;
   title: string;
@@ -275,61 +243,60 @@ export interface AdminProjectList_Project {
   /**
    * An object relationship
    */
-  Organization: AdminProjectList_Project_Organization | null;
+  Organization: ProjectsOverview_Project_Organization | null;
   /**
    * An object relationship
    */
-  ProjectType: AdminProjectList_Project_ProjectType | null;
+  ProjectType: ProjectsOverview_Project_ProjectType | null;
   /**
    * An object relationship
    */
-  ProjectDocumentationInstruction: AdminProjectList_Project_ProjectDocumentationInstruction | null;
+  ProjectDocumentationInstruction: ProjectsOverview_Project_ProjectDocumentationInstruction | null;
   /**
    * An object relationship
    */
-  SubmittedByUser: AdminProjectList_Project_SubmittedByUser | null;
+  SubmittedByUser: ProjectsOverview_Project_SubmittedByUser | null;
   /**
    * An array relationship
    */
-  ProjectAuthors: AdminProjectList_Project_ProjectAuthors[];
+  ProjectAuthors: ProjectsOverview_Project_ProjectAuthors[];
   /**
    * An array relationship
    */
-  ProjectMentors: AdminProjectList_Project_ProjectMentors[];
+  ProjectMentors: ProjectsOverview_Project_ProjectMentors[];
   /**
    * An array relationship
    */
-  ProjectConsentEvents: AdminProjectList_Project_ProjectConsentEvents[];
+  ProjectConsentEvents: ProjectsOverview_Project_ProjectConsentEvents[];
   /**
-   * An array relationship
+   * Every course the project is listed in, including courses whose listings the caller cannot see.
    */
-  ProjectCourses: AdminProjectList_Project_ProjectCourses[];
+  courses: ProjectsOverview_Project_courses[] | null;
 }
 
-export interface AdminProjectList_Project_aggregate_aggregate {
+export interface ProjectsOverview_Project_aggregate_aggregate {
   __typename: "Project_aggregate_fields";
   count: number;
 }
 
-export interface AdminProjectList_Project_aggregate {
+export interface ProjectsOverview_Project_aggregate {
   __typename: "Project_aggregate";
-  aggregate: AdminProjectList_Project_aggregate_aggregate | null;
+  aggregate: ProjectsOverview_Project_aggregate_aggregate | null;
 }
 
-export interface AdminProjectList {
+export interface ProjectsOverview {
   /**
    * fetch data from the table: "Project"
    */
-  Project: AdminProjectList_Project[];
+  Project: ProjectsOverview_Project[];
   /**
    * fetch aggregated fields from the table: "Project"
    */
-  Project_aggregate: AdminProjectList_Project_aggregate;
+  Project_aggregate: ProjectsOverview_Project_aggregate;
 }
 
-export interface AdminProjectListVariables {
-  where?: Project_bool_exp | null;
-  order_by?: Project_order_by[] | null;
-  limit?: number | null;
-  offset?: number | null;
+export interface ProjectsOverviewVariables {
+  where: Project_bool_exp;
+  limit: number;
+  offset: number;
 }

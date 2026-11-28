@@ -1,2 +1,3 @@
 - "!include public_match_expert_roles.yaml"
 - "!include public_match_knowledge.yaml"
+- "!include public_match_projects.yaml"

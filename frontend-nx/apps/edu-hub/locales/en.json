@@ -58,6 +58,7 @@
       "courses": "Courses",
       "events": "Events",
       "degrees": "Degrees",
+      "projects": "Projects",
       "programs": "Programs",
       "settings": "Settings",
       "calendar": "Calendar",
@@ -430,15 +431,16 @@
       "section_heading_all": "Projects in this course",
       "action_failed": "Action failed",
       "status": {
-        "TEMPLATE": "Project template",
-        "PROPOSED": "Proposed",
-        "ONGOING": "In progress",
+        "TEMPLATE": "Project Template",
+        "PROPOSED": "Awaiting Confirmation",
+        "ONGOING": "Ongoing",
+        "SENT_BACK": "Sent Back",
         "SUBMITTED": "Submitted",
         "COMPLETED": "Completed",
         "COMPLETED_PASSED": "Passed",
         "INCOMPLETE": "Incomplete",
-        "INCOMPLETE_FAILED": "Failed",
-        "SUGGESTED_FOR_PUBLICATION": "Suggested for publication",
+        "INCOMPLETE_FAILED": "Not Passed",
+        "SUGGESTED_FOR_PUBLICATION": "Suggested for Publication",
         "PUBLISHED": "Published"
       },
       "type_label": {
@@ -1751,7 +1753,8 @@
         "title": "Title",
         "authors": "Authors",
         "type": "Type",
-        "no_authors": "No authors yet"
+        "no_authors": "No authors yet",
+        "consent_withdrawn": "The team withdrew its publication consent on {date}"
       },
       "actions": {
         "confirm_project": "Confirm project",
@@ -1759,7 +1762,16 @@
         "evaluate_project": "Evaluate project",
         "evaluate_disabled_tooltip": "You can evaluate the project here once it has been submitted.",
         "suggest_for_publication": "Suggest for publication",
-        "withdraw_publication_suggestion": "Withdraw suggestion"
+        "withdraw_publication_suggestion": "Withdraw suggestion",
+        "preview": "Preview",
+        "publish": "Publish",
+        "unpublish": "Unpublish",
+        "publish_needs_consent": "The team hasn't agreed to publication. Without its consent the project can't be published."
+      },
+      "notifications": {
+        "publish_success": "Project published",
+        "unpublish_success": "Project unpublished",
+        "publish_failed": "The project could not be published or unpublished. Please try again."
       },
       "expanded": {
         "tagline": "Tagline",
@@ -1840,6 +1852,7 @@
         "no_authors_added": "No authors added yet.",
         "remove_author_aria": "Remove author",
         "template_notice": "If you leave the authors list empty, this project will serve as a template: course participants can copy it from the project list and form their own team based on it.",
+        "template_showcase_notice": "A project template can also be published in the public project showcase, where others can discover its topic.",
         "extra_fields_notice": "Please add more details to the project afterwards by expanding its row in the project list.",
         "submit_button": "Create",
         "error_title_required": "Please enter a project title.",
@@ -2469,32 +2482,27 @@
       }
     }
   },
-  "manageProjects": {
+  "projectsOverview": {
     "headline": "Projects",
-    "search_placeholder": "Search projects",
+    "settings_links": {
+      "project_types": "Project types",
+      "documentation_instructions": "Documentation instructions"
+    },
+    "courses_column": "Course(s) / Program",
+    "no_courses": "No course",
+    "ranked_hint": "Sorted by relevance: projects with every search word, and projects similar in meaning.",
+    "ranked_capped": "Of {total} keyword matches, the first {ranked} in status order are included – refine your search to see all of them.",
+    "semantic_unavailable": "The similarity search is currently unavailable – you only see keyword matches.",
     "filter": {
+      "status_label": "Project Status",
+      "needs_attention": "Needs Attention",
+      "show_all": "Show all",
       "program_label": "Program",
       "all_programs": "All programs",
       "course_group_label": "Course group",
-      "all_course_groups": "All course groups"
-    },
-    "table": {
-      "title": "Title",
-      "authors": "Authors",
-      "no_authors": "No authors",
-      "program": "Program / Course",
-      "published": "Published",
-      "not_published": "Not published"
-    },
-    "actions": {
-      "publish": "Publish",
-      "unpublish": "Unpublish",
-      "publish_blocked_incomplete": "Set a project type and documentation instruction before this project can be published."
-    },
-    "notifications": {
-      "publish_success": "Project published",
-      "unpublish_success": "Project unpublished",
-      "action_failed": "The action could not be completed. Please try again."
+      "all_course_groups": "All course groups",
+      "search_label": "Search",
+      "search_placeholder": "Title, people, course or program"
     }
   },
   "managePrograms": {
@@ -3670,10 +3678,6 @@
         "project-types": {
           "label": "Project types",
           "description": "Default achievement certificate templates and documentation instructions per project type"
-        },
-        "projects": {
-          "label": "Projects",
-          "description": "Publish, unpublish and tag projects"
         },
         "documentation-instructions": {
           "label": "Documentation instructions",

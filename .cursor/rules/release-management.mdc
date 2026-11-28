@@ -12,12 +12,7 @@ EduHub uses an automated release management system built on semantic-release for
 ```
 /
 ├── frontend-nx/                 # Main frontend application
-│   ├── package.json            # Primary version source
 │   └── .releaserc.json         # Semantic release config
-├── functions/                   # Serverless functions
-│   └── */package.json          # Auto-synced versions
-├── package.json                # Root workspace package
-├── CHANGELOG.md                # Auto-generated
 └── .github/workflows/release.yml
 ```
 
@@ -41,30 +36,18 @@ EduHub uses an automated release management system built on semantic-release for
 - Monitor production deployment
 - **Only phase that creates semantic versions**
 
-## Version Synchronization
+## Where the Version Lives
 
-The system automatically keeps versions synchronized across:
-
-### Frontend Application
-- **[frontend-nx/package.json](mdc:frontend-nx/package.json)** - Primary version source
-- Dependencies and build configurations
-
-### Serverless Functions
-All function packages in [functions/](mdc:functions/) directory:
-- `functions/addKeycloakRole/package.json`
-- `functions/sendMail/package.json`
-- And others...
-
-### Root Configuration
-- **[package.json](mdc:package.json)** - Workspace configuration
-- **[CHANGELOG.md](mdc:CHANGELOG.md)** - Auto-generated release notes
+The version is only the git tag (`vX.Y.Z`) and the GitHub release that
+semantic-release creates on `production`. A release commits nothing: no file in
+the repo carries the version (the `package.json` versions stay `0.1.0`), so
+there is nothing to bump by hand or to merge back into `develop` or `staging`.
 
 ## GitHub Actions Integration
 
 The **[release workflow](mdc:.github/workflows/release.yml)** handles:
 - Dependency installation in `frontend-nx`
 - Semantic release execution
-- Version updates across all files
 - GitHub release creation
 - Tag generation
 

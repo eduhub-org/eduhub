@@ -90,3 +90,14 @@ export const DELETE_COURSE_GROUP_OPTION = gql`
     }
   }
 `;
+
+// Projects overview filter: only the course groups used by at least one course the caller manages
+// (useManageCourseWhere), so Org Admins don't get other organizations' or slider-only groups.
+export const PROJECTS_OVERVIEW_COURSE_GROUP_OPTIONS = gql`
+  query ProjectsOverviewCourseGroupOptions($courseWhere: Course_bool_exp!) {
+    CourseGroupOption(where: { CourseGroups: { Course: $courseWhere } }, order_by: { order: asc }) {
+      id
+      title
+    }
+  }
+`;

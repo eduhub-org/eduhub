@@ -151,6 +151,20 @@ A project whose review rated it as passed, whether it has been published or not,
 Taking a project out of one course. The project stays in every other course it is listed in, and is only deleted once no course is left. A **Passed Project** can't be taken out of its last course, since that would delete it.
 _Avoid_: Deleting (when the project is still listed in other courses)
 
+**Project Status**:
+The phase a project is in, as organizers and teams see it: Project Template, Awaiting Confirmation, Ongoing, Sent Back, Submitted, Passed, Suggested for Publication, Published or Not Passed.
+_Avoid_: Overview status, chip status, the raw lifecycle values (PROPOSED, ONGOING, …) in copy
+
+**Project Confirmation**:
+An **Organizer** fixing a proposed project's topic, **Project Team** and format so that work can start. Until then the project is **Awaiting Confirmation**, even if its team is just the **Project Proposer**.
+_Avoid_: Team confirmation (it is the project that is confirmed, not only the team)
+
+**Sent Back**:
+A submitted project that a review returned to its **Project Team** for changes. It stops being sent back once the team submits it again.
+
+**Needs Attention**:
+The projects waiting for a decision that the viewer can make: a **Project Confirmation**, a review, and, for **Admins** only, publication.
+
 ### Communication
 
 **Session Reminder**:
@@ -210,6 +224,7 @@ _Avoid_: Ticket, issue (in copy), feedback (that is the thumbs up or down on an 
 - A **Project** is listed in one or more **Courses**; removing it from its last course deletes it, so a **Passed Project** can't be removed from its last course
 - A **Project Template** has zero or more **Project Copies**; deleting the template keeps the copies as projects of their own
 - A **Passed Project** can't be deleted by anyone, **Admins** included
+- A **Project** has exactly one **Project Status** at a time; **Needs Attention** differs between an **Admin** and an **Org Admin** looking at the same project
 - A **Join Request** is announced to the **Project Team**; only a project with no team yet announces it to its mentors (or, without mentors, the course instructors)
 - An **Expert** has one or more **Expert Roles** and zero or more **Expert Notes**; each note belongs to no organization (central admins) or exactly one
 - An **Org Admin** sees only the **Experts** of their organization's courses, and only their organization's **Expert Notes**
@@ -227,5 +242,6 @@ _Avoid_: Ticket, issue (in copy), feedback (that is the thumbs up or down on an 
 - "Attendance" meant both a raw Zoom/LimeSurvey entry and a Participant's result for a Session. Resolved: the entry is an **Attendance Record**, the result an **Attendance**.
 - "Session reminder" meant three emails (24h, 1h, 15min) before sessions. Resolved: one email, before the First Session only, at the Course's Reminder Lead Time.
 - "Project owner" meant both the person who started a project and the team running it, and a **Project Copy** treated the template's creator as its starter. Resolved: the **Project Proposer** is whoever started that project (for a copy, the team member who took on the template), and the **Project Team** decides on **Join Requests**.
+- "Waiting for team confirmation" was used both for a project awaiting an organizer's go-ahead and for a person waiting to join a team. Resolved: the first is a project **Awaiting Confirmation** (an Organizer's **Project Confirmation**), the second a **Join Request**, decided by the **Project Team**.
 - "Event confirmation mail" was asked for as a separate template from the course one. Resolved: there is one **Registration Confirmation**; a Course with a single Session simply reads like an event invitation because it has one date.
 - "Chatbot" was used for the in-app AI help, and "instructors" for those who may change courses through it. Resolved: it is the **Assistant**, and course changes through it are for **Organizers** (and **Admins**), within the rights they already have.

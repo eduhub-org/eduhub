@@ -74,9 +74,9 @@ jobs:
           set -euo pipefail
           tag="${INPUT_TAG:-}"
           if [ -z "$tag" ] && [ -n "${DEPLOYED_SHA:-}" ]; then
-            # The Release workflow tags its "chore(release)" commit on top of the deployed one, at
-            # the same time as the deployment: the release of this deployment is the first tag that
-            # contains it, whatever reached production since. Wait for it if it isn't pushed yet.
+            # The Release workflow tags the deployed commit itself, at the same time as the
+            # deployment: the release of this deployment is the first tag that contains it,
+            # whatever reached production since. Wait for it if it isn't pushed yet.
             for attempt in $(seq 1 20); do
               tag="$(git tag --contains "$DEPLOYED_SHA" --list 'v*' --sort=v:refname | head -n 1)"
               [ -n "$tag" ] && break

@@ -150,6 +150,8 @@ describe('generateIssueReportSummary', () => {
     const stored = gql.requests.find((r) => r.query.includes('InsertIssueReportSummary')).variables.object;
     expect(stored.periodStart).toBe('2026-11-23T05:17:00.000Z');
     expect(stored).toEqual(expect.objectContaining({ model: null, costEur: 0, reportCount: 0, feedbackCount: 0 }));
+    // The error analysis is off here, so the text makes no claim about errors.
+    expect(stored.summary).toBe('## Overview\n\nNo open reports and no thumbs-down feedback this week.');
   });
 
   it('stores nothing and logs no content when the model fails', async () => {
@@ -161,6 +163,83 @@ describe('generateIssueReportSummary', () => {
     expect(result.success).toBe(false);
     expect(gql.requests.some((r) => r.query.includes('InsertIssueReportSummary'))).toBe(false);
     expect(JSON.stringify(logger.error.mock.calls)).not.toContain('CSV export');
+  });
+});
+
+describe('production errors', () => {
+  const withLogs = { ...vertex, ERROR_LOG_PROJECT: 'eduhub-production', ERROR_LOG_FILTER: 'severity>=ERROR' };
+  const entry = (timestamp, userId) => ({
+    timestamp,
+    resource: { labels: { service_name: 'call-node-function' } },
+    jsonPayload: { level: 'error', message: `Failed to check email holders for user ${userId}` },
+  });
+
+  /** Metadata token, then Cloud Logging (`logs`), then the model. */
+  const fetchWith = (logs) => {
+    const calls = [];
+    const fetchImpl = async (url, init) => {
+      if (url.includes('metadata')) return new Response(JSON.stringify({ access_token: 'sa-token', expires_in: 3600 }));
+      calls.push({ url, body: JSON.parse(init.body) });
+      if (url.includes('logging.googleapis.com')) return logs;
+      return chatResponse('## Production errors\n\n- **Configuration**');
+    };
+    return { calls, fetchImpl };
+  };
+
+  it('reads the period\'s errors and sends them grouped, without ids', async () => {
+    const { calls, fetchImpl } = fetchWith(
+      new Response(JSON.stringify({ entries: [entry('2026-11-29T10:00:00Z', 'f3a8c2d1-1111-2222-3333-444455556666'), entry('2026-11-24T10:00:00Z', 'ab12cd34-1111-2222-3333-444455556666')] }))
+    );
+    const gql = fakeGql({ reports: [], newReports: 0 });
+    const result = await generateIssueReportSummary({}, logger, { gql, read: settings(withLogs), fetchImpl, now: () => NOW });
+
+    expect(result).toEqual({ success: true, reports: 0, feedback: 0, errors: 2 });
+    const logRequest = calls.find((c) => c.url.includes('logging.googleapis.com'));
+    expect(logRequest.body.filter).toBe('severity>=ERROR\nAND timestamp>="2026-11-23T05:17:00.000Z" AND timestamp<"2026-11-30T05:17:00.000Z"');
+    // Only errors this week, so the model is still called.
+    const prompt = calls.find((c) => c.url.includes('chat/completions')).body.messages[1].content;
+    expect(prompt).toContain('Production errors in this period: 2 in 1 groups');
+    expect(prompt).toContain('"error":"Failed to check email holders for user <id>","count":2,"days":2');
+    expect(prompt).not.toMatch(/f3a8c2d1|ab12cd34/);
+  });
+
+  it('writes the summary without them when the logs cannot be read', async () => {
+    logger.warn.mockClear();
+    const { calls, fetchImpl } = fetchWith(new Response('denied', { status: 403 }));
+    const gql = fakeGql();
+    const result = await generateIssueReportSummary({}, logger, { gql, read: settings(withLogs), fetchImpl, now: () => NOW });
+
+    expect(result).toEqual({ success: true, reports: 1, feedback: 0, errors: null });
+    expect(calls.find((c) => c.url.includes('chat/completions')).body.messages[1].content).toContain('Production errors: unavailable this week');
+    expect(logger.warn).toHaveBeenCalledWith('Reading the production errors for the summary failed', { error: 'Cloud Logging answered 403' });
+  });
+
+  it('says there were no production errors only when the logs were read', async () => {
+    const { fetchImpl } = fetchWith(new Response(JSON.stringify({})));
+    const gql = fakeGql({ reports: [], newReports: 0 });
+    await generateIssueReportSummary({}, logger, { gql, read: settings(withLogs), fetchImpl, now: () => NOW });
+    const stored = gql.requests.find((r) => r.query.includes('InsertIssueReportSummary')).variables.object;
+    expect(stored.summary).toBe('## Overview\n\nNo open reports, no thumbs-down feedback and no production errors this week.');
+    expect(stored.model).toBeNull();
+  });
+
+  it('makes no claim about errors when the logs were read only partly', async () => {
+    let page = 0;
+    const fetchImpl = async (url) => {
+      if (url.includes('metadata')) return new Response(JSON.stringify({ access_token: 'sa-token', expires_in: 3600 }));
+      page += 1;
+      if (page > 1) throw Object.assign(new Error('timed out'), { name: 'TimeoutError' });
+      return new Response(JSON.stringify({ entries: [], nextPageToken: 'more' }));
+    };
+    const gql = fakeGql({ reports: [], newReports: 0 });
+    await generateIssueReportSummary({}, logger, { gql, read: settings(withLogs), fetchImpl, now: () => NOW });
+    const stored = gql.requests.find((r) => r.query.includes('InsertIssueReportSummary')).variables.object;
+    expect(stored.summary).toBe('## Overview\n\nNo open reports and no thumbs-down feedback this week. The production errors could not be read completely.');
+  });
+
+  it('leaves errors out entirely while the analysis is off', () => {
+    const [, user] = buildMessages({ since: 's', until: 'u', reports: [], newReportCount: 0, feedback: [] });
+    expect(user.content).not.toContain('Production errors');
   });
 });
 
